@@ -28,24 +28,82 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
-import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
-
-
+@NamedQueries(value = {@NamedQuery(name = "FIND_VOLUMES_BY_PROVIDER_ID", query = "SELECT v FROM Volume v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
 public class Volume extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-}
+    public static enum State {
+        CREATING, AVAILABLE, DELETING, DELETED, ERROR
+    }
 
+    public static final String FIND_VOLUMES_BY_PROVIDER_ID = "FIND_VOLUMES_BY_PROVIDER_ID";
+
+    private State state;
+
+    private Capacity capacity;
+
+    private Boolean bootable;
+
+    private Boolean supportsSnapshots;
+
+    private Collection<Machine> machines;
+
+    public Volume() {
+        this.machines = new ArrayList<Machine>();
+    }
+
+    @Enumerated(EnumType.STRING)
+    public State getState() {
+        return this.state;
+    }
+
+    public void setState(final State state) {
+        this.state = state;
+    }
+
+    @Embedded
+    public Capacity getCapacity() {
+        return this.capacity;
+    }
+
+    public void setCapacity(final Capacity capacity) {
+        this.capacity = capacity;
+    }
+
+    public Boolean getBootable() {
+        return this.bootable;
+    }
+
+    public void setBootable(final Boolean bootable) {
+        this.bootable = bootable;
+    }
+
+    @ManyToMany(mappedBy = "volumes", fetch = FetchType.EAGER)
+    public Collection<Machine> getMachines() {
+        return this.machines;
+    }
+
+    public void setMachines(final Collection<Machine> machines) {
+        this.machines = machines;
+    }
+
+    public boolean isSupportsSnapshots() {
+        return this.supportsSnapshots;
+    }
+
+    public void setSupportsSnapshots(final boolean supportsSnapshots) {
+        this.supportsSnapshots = supportsSnapshots;
+    }
+
+}
