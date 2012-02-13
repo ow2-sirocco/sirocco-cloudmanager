@@ -1,0 +1,20 @@
+<projectDescription>
+  <name>sirocco-cloudmanager-provider-util-vncproxy</name>
+  <comment>The OW2 Consortium is an open source community committed to making available to everyone the
+    best and most reliable middleware technology. OW2 mission is to develop open source code
+    middleware and to foster a vibrant community and business ecosystem. 
+  </comment>
+  <projects/>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+    <buildCommand>
+      <name>org.maven.ide.eclipse.maven2Builder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.maven.ide.eclipse.maven2Nature</nature>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>

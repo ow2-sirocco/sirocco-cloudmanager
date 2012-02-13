@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+   SIROCCO
+   Copyright (C) 2010 France Telecom
+   Contact: sirocco@ow2.org
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+   USA
+
+   $Id$
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.ow2.sirocco.cloudmanager</groupId>
+		<artifactId>sirocco-cloudmanager</artifactId>
+		<version>0.5.0-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.ow2.sirocco.cloudmanager</groupId>
+	<artifactId>sirocco-cloudmanager-ear</artifactId>
+	<packaging>ear</packaging>
+	<name>SIROCCO :: CloudManager :: EAR</name>
+
+
+	<dependencies>
+
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-ejb-jar</artifactId>
+			<version>${project.version}</version>
+			<type>ejb</type>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-api-server</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-ear-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<version>5</version>
+					<defaultJavaBundleDir>lib/</defaultJavaBundleDir>
+					<generateApplicationXml>true</generateApplicationXml>
+					<displayName>${product.name}</displayName>
+					<modules>
+						<webModule>
+							<groupId>org.ow2.sirocco.cloudmanager</groupId>
+							<artifactId>sirocco-cloudmanager-api-server</artifactId>
+							<bundleFileName>Sirocco-api.war</bundleFileName>
+							<contextRoot>/SiroccoApi</contextRoot>
+						</webModule>
+						<ejbModule>
+							<groupId>org.ow2.sirocco.cloudmanager</groupId>
+							<artifactId>sirocco-cloudmanager-ejb-jar</artifactId>
+							<bundleFileName>Sirocco-ejb-jar.jar</bundleFileName>
+						</ejbModule>
+					</modules>
+					<archive>
+						<manifestEntries>
+							<Implementation-Version>${project.version}</Implementation-Version>
+						</manifestEntries>
+						<manifest>
+							<addClasspath>true</addClasspath>
+							<classpathPrefix>lib/</classpathPrefix>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
+
+
+		</plugins>
+
+	</build>
+</project>

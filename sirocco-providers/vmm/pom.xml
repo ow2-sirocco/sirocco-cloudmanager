@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.ow2.sirocco.cloudmanager</groupId>
+		<artifactId>sirocco-cloudmanager-providers</artifactId>
+		<version>0.5.0-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>sirocco-cloudmanager-provider-vmm</artifactId>
+
+	<packaging>bundle</packaging>
+
+	<name>SIROCCO :: CloudManager :: Provider :: VMM</name>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.3.5</version>
+				<extensions>true</extensions>
+				<configuration>
+					<instructions>
+						<_include>-target/classes/META-INF/${project.artifactId}.bnd</_include>
+						<Bundle-Name>${project.name}</Bundle-Name>
+						<Bundle-Vendor>Orange Labs</Bundle-Vendor>
+						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<quiet>true</quiet>
+					<windowtitle>${project.name}</windowtitle>
+					<use>yes</use>
+					<overview>${project.build.sourceDirectory}/overview.html</overview>
+					<linksource>yes</linksource>
+					<splitindex>yes</splitindex>
+					<outputDirectory>${project.build.directory}/javadoc</outputDirectory>
+					<encoding>UTF-8</encoding>
+					<sourceEncoding>UTF-8</sourceEncoding>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>process-classes</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.felix</groupId>
+			<artifactId>org.osgi.core</artifactId>
+			<version>1.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-provider-api</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-provider-util-jobmanager</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-provider-util-vncproxy</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.ow2.sirocco.vmm</groupId>
+			<artifactId>sirocco-vmm-api</artifactId>
+			<version>1.2.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ow2.util</groupId>
+			<artifactId>util-log</artifactId>
+			<!-- <version>1.0.25</version> -->
+			<version>1.0.27</version>
+		</dependency>
+		
+		 <dependency>
+     		 <groupId>javax.persistence</groupId>
+      		<artifactId>persistence-api</artifactId>
+     		 <version>1.0</version>
+     		 <scope>provided</scope>
+    	</dependency>
+		
+		<!-- The following dependency is needed if, and only if this bundle is deployed in a non Jonas environment.
+		<dependency>
+			<groupId>org.ow2.bundles</groupId>
+			<artifactId>ow2-util-i18n</artifactId>
+			<version>1.0.27</version>
+		</dependency>
+		 -->
+
+	</dependencies>
+
+</project>

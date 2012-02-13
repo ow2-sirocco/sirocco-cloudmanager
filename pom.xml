@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+   SIROCCO
+   Copyright (C) 2010 France Telecom
+   Contact: sirocco@ow2.org
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+   USA
+
+   $Id$
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.ow2</groupId>
+		<artifactId>ow2</artifactId>
+		<version>1.3</version>
+	</parent>
+	<groupId>org.ow2.sirocco.cloudmanager</groupId>
+	<artifactId>sirocco-cloudmanager</artifactId>
+	<version>0.5.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>SIROCCO :: CloudManager :: Parent</name>
+	
+	<licenses>
+     <license>
+      <name>GNU LESSER GENERAL PUBLIC LICENSE Version 2.1</name>
+      <url>http://www.gnu.org/copyleft/lesser.html</url>
+     </license>
+    </licenses>
+
+	<properties>
+		<product.name>Sirocco</product.name>
+		<ow2.jonas.version>5.2.2</ow2.jonas.version>
+	</properties>
+
+	<modules>
+	<!--  To remove progressively when new project structure is in place
+		<module>sirocco-provider-api</module>
+		<module>sirocco-providers</module>
+		<module>sirocco-ear</module>
+		<module>sirocco-ejb-jar</module>
+		<module>sirocco-apis</module>
+		-->
+		<module>sirocco-model</module>
+		<module>sirocco-core</module>
+		<module>sirocco-connector</module>
+	</modules>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<!-- <encoding>ISO-8859-1</encoding> -->
+					<encoding>UTF-8</encoding>
+					<sourceEncoding>UTF-8</sourceEncoding>
+				</configuration>
+			</plugin>
+			
+			<!-- Add the following plugin, in order to avoid:
+			[WARNING] Using platform encoding (Cp1252 actually)
+			to copy filtered resources, i.e. build is platform
+			dependent! -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<encoding>UTF-8</encoding>
+					<sourceEncoding>UTF-8</sourceEncoding>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<preparationGoals>clean install</preparationGoals>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>com.mycila.maven-license-plugin</groupId>
+				<artifactId>maven-license-plugin</artifactId>
+				<version>1.9.0</version>
+				<configuration>
+					<aggregate>true</aggregate>
+					<strictCheck>true</strictCheck>
+					<header>etc/header.txt</header>
+					<excludes>
+						<exclude>**/ovf/datamodel/*.java</exclude>
+						<exclude>**/*.swf</exclude>
+						<exclude>**/*.swc</exclude>
+						<exclude>**/*.ovf</exclude>
+						<exclude>**/*.TTF</exclude>
+					</excludes>
+					<mapping>
+						<bnd>SCRIPT_STYLE</bnd>
+						<tmpl>XML_STYLE</tmpl>
+					</mapping>
+					<properties>
+						<year>2011</year>
+						<email>sirocco@ow2.org</email>
+						<copyrightHolder>France Telecom</copyrightHolder>
+					</properties>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+
+
+		</plugins>
+
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh-external</artifactId>
+				<version>1.0-beta-6</version>
+			</extension>
+		</extensions>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>OrangeOpenCloud</id>
+			<properties>
+				<product.name>OrangeOpenCloud</product.name>
+			</properties>
+		</profile>
+		<profile>
+			<id>lab-test</id>
+			<distributionManagement>
+				<snapshotRepository>
+					<uniqueVersion>false</uniqueVersion>
+					<id>lab-repository</id>
+					<name>Lab Repository</name>
+					<url>scpexe://p-sirocco/opt/maven-repository</url>
+					<layout>default</layout>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+	</profiles>
+
+	<scm>
+		<connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/sirocco//cloudmanager/trunk</connection>
+		<developerConnection>scm:svn:svn+ssh://dangtran@svn.forge.objectweb.org/svnroot/sirocco/cloudmanager/trunk</developerConnection>
+		<url>http://websvn.ow2.org/listing.php?repname=sirocco&amp;path=/cloudmanager/trunk/</url>
+	</scm>
+
+</project>
