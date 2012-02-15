@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
+import org.ow2.sirocco.cloudmanager.provider.api.entity.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.provider.api.entity.Machine;
 
 /**
@@ -83,7 +84,7 @@ public class VirtualMachineVO implements Serializable {
 
     private Date deleteDate;
 
-    private String location;
+    private CloudProviderLocation location;
 
     private String hostId;
 
@@ -313,17 +314,17 @@ public class VirtualMachineVO implements Serializable {
      * 
      * @return the location of the virtual machine
      */
-    public String getLocation() {
+    public CloudProviderLocation getLocation() {
         return this.location;
     }
 
     /**
      * Sets the location of the virtual machine
      * 
-     * @param location the location of the virtual machine
+     * @param cloudProviderLocation the location of the virtual machine
      */
-    public void setLocation(final String location) {
-        this.location = location;
+    public void setLocation(final CloudProviderLocation cloudProviderLocation) {
+        this.location = cloudProviderLocation;
     }
 
     /**

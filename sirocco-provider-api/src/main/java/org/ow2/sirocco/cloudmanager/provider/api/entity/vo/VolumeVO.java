@@ -29,6 +29,8 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import org.ow2.sirocco.cloudmanager.provider.api.entity.CloudProviderLocation;
+
 @SuppressWarnings("serial")
 public class VolumeVO implements Serializable {
 
@@ -58,7 +60,7 @@ public class VolumeVO implements Serializable {
 
     private String cloudProviderId;
 
-    private String location;
+    private CloudProviderLocation location;
 
     public String getVolumeId() {
         return this.volumeId;
@@ -164,11 +166,11 @@ public class VolumeVO implements Serializable {
         this.cloudProviderId = cloudProviderId;
     }
 
-    public String getLocation() {
+    public CloudProviderLocation getLocation() {
         return this.location;
     }
 
-    public void setLocation(final String location) {
-        this.location = location;
+    public void setLocation(final CloudProviderLocation location2) {
+        this.location = location2;
     }
 }

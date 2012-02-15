@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.provider.api.entity.vo;
 
 import java.io.Serializable;
 
+import org.ow2.sirocco.cloudmanager.provider.api.entity.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.provider.api.entity.MachineImage;
 import org.ow2.sirocco.cloudmanager.provider.api.entity.Visibility;
 
@@ -77,7 +78,7 @@ public class VMImageVO implements Serializable {
 
     private String cloudProviderId;
 
-    private String location;
+    private CloudProviderLocation location;
 
     /**
      * Returns the symbolic name of the VM image
@@ -260,12 +261,12 @@ public class VMImageVO implements Serializable {
         this.cloudProviderId = cloudProviderId;
     }
 
-    public String getLocation() {
+    public CloudProviderLocation getLocation() {
         return this.location;
     }
 
-    public void setLocation(final String location) {
-        this.location = location;
+    public void setLocation(final CloudProviderLocation location2) {
+        this.location = location2;
     }
 
     @Override
