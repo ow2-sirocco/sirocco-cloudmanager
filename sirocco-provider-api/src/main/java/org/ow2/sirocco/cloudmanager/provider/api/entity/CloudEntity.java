@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.provider.api.entity;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
@@ -54,9 +56,32 @@ public abstract class CloudEntity implements Serializable {
 
     protected Project project;
 
+    protected CloudProviderLocation location;
+
     protected Date created;
 
     protected Date deleted;
+
+    protected String providerAssignedId;
+
+    protected Collection<CloudProvider> cloudProviders;
+
+    public String getProviderAssignedId() {
+        return this.providerAssignedId;
+    }
+
+    public void setProviderAssignedId(final String providerAssignedId) {
+        this.providerAssignedId = providerAssignedId;
+    }
+
+    @ManyToMany
+    public Collection<CloudProvider> getCloudProviders() {
+        return this.cloudProviders;
+    }
+
+    public void setCloudProviders(final Collection<CloudProvider> cloudProviders) {
+        this.cloudProviders = cloudProviders;
+    }
 
     protected Map<String, String> properties;
 
@@ -82,6 +107,11 @@ public abstract class CloudEntity implements Serializable {
     @ManyToOne
     public Project getProject() {
         return this.project;
+    }
+
+    @ManyToOne
+    public CloudProviderLocation getLocation() {
+        return this.location;
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -111,6 +141,10 @@ public abstract class CloudEntity implements Serializable {
 
     public void setProject(final Project project) {
         this.project = project;
+    }
+
+    public void setLocation(final CloudProviderLocation location) {
+        this.location = location;
     }
 
     public void setProperties(final Map<String, String> properties) {

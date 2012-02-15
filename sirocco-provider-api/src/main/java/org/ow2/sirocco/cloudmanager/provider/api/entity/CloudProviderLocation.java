@@ -27,74 +27,63 @@ package org.ow2.sirocco.cloudmanager.provider.api.entity;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
 @SuppressWarnings("serial")
+@Entity
+@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"countryName", "stateName"}))
 public class CloudProviderLocation implements Serializable {
 
-    private String locationId;
+    private Integer id;
 
-    private String description;
+    private String Iso3166Code;
+
+    private String countryName;
+
+    private String stateName;
+
+    @Column(name = "iso3166code", nullable = false, length = 6, unique = true)
+    public String getIso3166Code() {
+        return this.Iso3166Code;
+    }
+
+    public void setIso3166Code(final String iso3166Code) {
+        this.Iso3166Code = iso3166Code;
+    }
+
+    public String getCountryName() {
+        return this.countryName;
+    }
+
+    public void setCountryName(final String countryName) {
+        this.countryName = countryName;
+    }
+
+    public String getStateName() {
+        return this.stateName;
+    }
+
+    public void setStateName(final String stateName) {
+        this.stateName = stateName;
+    }
 
     public CloudProviderLocation() {
     }
 
-    public CloudProviderLocation(final String locationId) {
-        this.locationId = locationId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return this.id;
     }
 
-    public CloudProviderLocation(final String locationId, final String description) {
-        this.locationId = locationId;
-        this.description = description;
-    }
-
-    public String getLocationId() {
-        return this.locationId;
-    }
-
-    public void setLocationId(final String locationId) {
-        this.locationId = locationId;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.locationId == null) ? 0 : this.locationId.hashCode());
-        return result;
-    }
-
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
-        CloudProviderLocation other = (CloudProviderLocation) obj;
-        if (this.locationId == null) {
-            if (other.locationId != null) {
-                return false;
-            }
-        } else if (!this.locationId.equals(other.locationId)) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return "CloudProviderLocation [locationId=" + this.locationId + ", description=" + this.description + "]";
+    public void setId(final Integer Id) {
+        this.id = Id;
     }
 
 }

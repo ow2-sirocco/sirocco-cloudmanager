@@ -39,6 +39,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -54,6 +55,12 @@ import org.ow2.sirocco.cloudmanager.provider.api.entity.vo.VirtualMachineVO;
 @Entity
 public class Machine extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    @Override
+    @Id
+    public Integer getId() {
+        return this.id;
+    }
 
     public static final String GET_MACHINE_BY_JOB_ID = "GET_MACHINE_BY_JOB_ID";
 
@@ -80,7 +87,7 @@ public class Machine extends CloudEntity implements Serializable {
 
     private MachineImage image;
 
-    private String location;
+    private CloudProviderLocation location;
 
     private String activeJob;
 
@@ -110,6 +117,7 @@ public class Machine extends CloudEntity implements Serializable {
     /**
      * @return the id of the Vm that has been attributed by the CloudProvider.
      */
+    @Override
     @Column(unique = true)
     public String getProviderAssignedId() {
         return this.providerAssignedId;
@@ -127,6 +135,7 @@ public class Machine extends CloudEntity implements Serializable {
         this.memoryInMB = memoryInMB;
     }
 
+    @Override
     public void setProviderAssignedId(final String providerAssignedId) {
         this.providerAssignedId = providerAssignedId;
     }
@@ -143,11 +152,13 @@ public class Machine extends CloudEntity implements Serializable {
         this.numberOfCpus = numberOfCpus;
     }
 
-    public String getLocation() {
+    @Override
+    public CloudProviderLocation getLocation() {
         return this.location;
     }
 
-    public void setLocation(final String location) {
+    @Override
+    public void setLocation(final CloudProviderLocation location) {
         this.location = location;
     }
 

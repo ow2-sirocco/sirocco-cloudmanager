@@ -216,20 +216,20 @@ public class Project implements Serializable {
     public void setCloudProviderAccounts(final List<CloudProviderAccount> cloudProviderAccounts) {
         this.cloudProviderAccounts = cloudProviderAccounts;
     }
-    
-    public  ProjectVO toValueObject() {
+
+    public ProjectVO toValueObject() {
         ProjectVO projectVo = new ProjectVO();
-        projectVo.setProjectId(getProjectId());
-        projectVo.setCreateDate(getCreateDate());
-        projectVo.setDescription(getDescription());
-        projectVo.setName(getName());
+        projectVo.setProjectId(this.getProjectId());
+        projectVo.setCreateDate(this.getCreateDate());
+        projectVo.setDescription(this.getDescription());
+        projectVo.setName(this.getName());
         ResourceQuotaVO rqVo = new ResourceQuotaVO();
-        rqVo.setCpuQuota(getResourceQuota().getCpuQuota());
-        rqVo.setDiskQuotaInMB(getResourceQuota().getDiskQuotaInMB());
-        rqVo.setMaxNumberOfVMs(getResourceQuota().getVmQuota());
-        rqVo.setRamQuotaInMB(getResourceQuota().getRamQuotaInMB());
+        rqVo.setCpuQuota(this.getResourceQuota().getCpuQuota());
+        rqVo.setDiskQuotaInMB(this.getResourceQuota().getDiskQuotaInMB());
+        rqVo.setMaxNumberOfVMs(this.getResourceQuota().getVmQuota());
+        rqVo.setRamQuotaInMB(this.getResourceQuota().getRamQuotaInMB());
         projectVo.setQuotaVo(rqVo);
-        projectVo.setOwner(getOwner().getUsername());
+        projectVo.setOwner(this.getOwner().getUsername());
         return projectVo;
     }
 

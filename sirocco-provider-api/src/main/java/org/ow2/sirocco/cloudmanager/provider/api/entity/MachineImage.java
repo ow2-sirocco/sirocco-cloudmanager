@@ -53,10 +53,6 @@ public class MachineImage extends CloudEntity implements Serializable {
 
     private CloudProviderAccount cloudProviderAccount;
 
-    private CloudProvider cloudProvider;
-
-    private String location;
-
     private String activeJob;
 
     private String osType;
@@ -107,10 +103,12 @@ public class MachineImage extends CloudEntity implements Serializable {
         this.hypervisor = hypervisor;
     }
 
+    @Override
     public String getProviderAssignedId() {
         return this.providerAssignedId;
     }
 
+    @Override
     public void setProviderAssignedId(final String providerAssignedId) {
         this.providerAssignedId = providerAssignedId;
     }
@@ -154,23 +152,6 @@ public class MachineImage extends CloudEntity implements Serializable {
 
     public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
         this.cloudProviderAccount = cloudProviderAccount;
-    }
-
-    @ManyToOne
-    public CloudProvider getCloudProvider() {
-        return this.cloudProvider;
-    }
-
-    public void setCloudProvider(final CloudProvider cloudProvider) {
-        this.cloudProvider = cloudProvider;
-    }
-
-    public String getLocation() {
-        return this.location;
-    }
-
-    public void setLocation(final String location) {
-        this.location = location;
     }
 
     public String getActiveJob() {
@@ -220,10 +201,10 @@ public class MachineImage extends CloudEntity implements Serializable {
             vmImageVO.setCloudProviderAccountId(this.getCloudProviderAccount().getId().toString());
         }
 
-        if (this.getCloudProvider() == null) {
+        if (this.getCloudProviders() == null) {
             vmImageVO.setCloudProviderId(null);
         } else {
-            vmImageVO.setCloudProviderId(this.getCloudProvider().getId().toString());
+            vmImageVO.setCloudProviderId(((CloudProvider) this.getCloudProviders().toArray()[0]).getId().toString());
         }
 
         vmImageVO.setLocation(this.location);
@@ -236,7 +217,7 @@ public class MachineImage extends CloudEntity implements Serializable {
         return "MachineImage [osType=" + this.osType + ", providerAssignedId=" + this.providerAssignedId + ", hypervisor="
             + this.hypervisor + ", architecture=" + this.architecture + ", diskSizeMB=" + this.diskSizeMB + ", imageSizeMB="
             + this.imageSizeMB + ", state=" + this.state + ", visibility=" + this.visibility + ", format=" + this.format
-            + ", cloudProviderAccount=" + this.cloudProviderAccount + ", cloudProvider=" + this.cloudProvider + ", location="
+            + ", cloudProviderAccount=" + this.cloudProviderAccount + ", cloudProvider=" + this.cloudProviders + ", location="
             + this.location + ", activeJob=" + this.activeJob + "]";
     }
 

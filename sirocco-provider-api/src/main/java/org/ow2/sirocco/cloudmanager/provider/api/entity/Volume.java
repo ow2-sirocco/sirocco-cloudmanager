@@ -75,10 +75,6 @@ public class Volume extends CloudEntity implements Serializable {
 
     private CloudProviderAccount cloudProviderAccount;
 
-    private CloudProvider cloudProvider;
-
-    private String location;
-
     private String activeJob;
 
     public Volume() {
@@ -119,11 +115,13 @@ public class Volume extends CloudEntity implements Serializable {
         this.machines = machines;
     }
 
+    @Override
     @Column(unique = true)
     public String getProviderAssignedId() {
         return this.providerAssignedId;
     }
 
+    @Override
     public void setProviderAssignedId(final String providerAssignedId) {
         this.providerAssignedId = providerAssignedId;
     }
@@ -145,23 +143,6 @@ public class Volume extends CloudEntity implements Serializable {
 
     public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
         this.cloudProviderAccount = cloudProviderAccount;
-    }
-
-    @ManyToOne
-    public CloudProvider getCloudProvider() {
-        return this.cloudProvider;
-    }
-
-    public void setCloudProvider(final CloudProvider cloudProvider) {
-        this.cloudProvider = cloudProvider;
-    }
-
-    public String getLocation() {
-        return this.location;
-    }
-
-    public void setLocation(final String location) {
-        this.location = location;
     }
 
     public String getActiveJob() {
@@ -203,10 +184,10 @@ public class Volume extends CloudEntity implements Serializable {
             vol.setCloudProviderAccountId(this.getCloudProviderAccount().getId().toString());
         }
 
-        if (this.getCloudProvider() == null) {
+        if (this.getCloudProviders() == null) {
             vol.setCloudProviderId(null);
         } else {
-            vol.setCloudProviderId(this.getCloudProvider().getId().toString());
+            vol.setCloudProviderId(((CloudEntity) this.getCloudProviders().toArray()[0]).getId().toString());
         }
         vol.setLocation(this.location);
         return vol;
