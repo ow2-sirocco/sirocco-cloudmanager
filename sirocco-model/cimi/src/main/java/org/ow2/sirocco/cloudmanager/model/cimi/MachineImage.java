@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -47,8 +48,10 @@ public class MachineImage extends CloudEntity implements Serializable {
 	private State		state;
 	private Type		type;
 
-	private	String			imageLocation;
 	private MachineImage	relatedImage;
+	
+	private CloudProviderAccount cloudProviderAccount;
+	
 
 	@Enumerated(EnumType.STRING)
 	public State getState() {
@@ -68,14 +71,6 @@ public class MachineImage extends CloudEntity implements Serializable {
         this.type = type;
     }
 
-	public String getImageLocation() {
-		return imageLocation;
-	}
-
-	public void setImageLocation(String imageLocation) {
-		this.imageLocation = imageLocation;
-	}
-
 	@OneToOne
 	public MachineImage getRelatedImage() {
 		return relatedImage;
@@ -83,6 +78,15 @@ public class MachineImage extends CloudEntity implements Serializable {
 
 	public void setRelatedImage(MachineImage relatedImage) {
 		this.relatedImage = relatedImage;
+	}
+
+	@ManyToOne
+	public CloudProviderAccount getCloudProviderAccount() {
+		return cloudProviderAccount;
+	}
+
+	public void setCloudProviderAccount(CloudProviderAccount cloudProviderAccount) {
+		this.cloudProviderAccount = cloudProviderAccount;
 	}
 }
 

@@ -35,6 +35,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
@@ -58,6 +59,8 @@ public class Volume extends CloudEntity implements Serializable {
     private Boolean supportsSnapshots;
 
     private Collection<Machine> machines;
+    
+    private CloudProviderAccount cloudProviderAccount;
 
     public Volume() {
         this.machines = new ArrayList<Machine>();
@@ -105,5 +108,14 @@ public class Volume extends CloudEntity implements Serializable {
     public void setSupportsSnapshots(final boolean supportsSnapshots) {
         this.supportsSnapshots = supportsSnapshots;
     }
+    
+    @ManyToOne
+	public CloudProviderAccount getCloudProviderAccount() {
+		return cloudProviderAccount;
+	}
+
+	public void setCloudProviderAccount(CloudProviderAccount cloudProviderAccount) {
+		this.cloudProviderAccount = cloudProviderAccount;
+	}
 
 }

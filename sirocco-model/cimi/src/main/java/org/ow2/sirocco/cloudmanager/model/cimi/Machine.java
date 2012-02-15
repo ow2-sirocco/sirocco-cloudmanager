@@ -67,15 +67,17 @@ public class Machine extends CloudEntity implements Serializable {
 	private Memory			memory;
 	private List<Disk>		disks;
 
-	private List<String>		attachmentPoints;
+	/*private List<String>		attachmentPoints;*/
 	private List<Volume>		volumes;
 /**	private List<VolumeTemplate>	volumeTemplates;*/
 	private List<NetworkInterface>	networkInterfaces;
+	
+	private CloudProviderAccount cloudProviderAccount;
 
 	public Machine() {
 		this.volumes = new ArrayList<Volume>();
 /**		this.volumeTemplates = new ArrayList<VolumeTemplate>();*/
-		this.attachmentPoints = new ArrayList<String>();
+		/*this.attachmentPoints = new ArrayList<String>();*/
 		this.disks   = new ArrayList<Disk>();
 		this.networkInterfaces   = new ArrayList<NetworkInterface>();
 	}
@@ -118,13 +120,13 @@ public class Machine extends CloudEntity implements Serializable {
         this.volumes = volumes;
     }
 
-	public List<String> getAttachmentPoints() {
+	/*public List<String> getAttachmentPoints() {
 		return this.attachmentPoints;
 	}
 
 	public void setAttachmentPoints(final List<String> attachmentPoints) {
 		this.attachmentPoints = attachmentPoints;
-	}
+	}*/
 
 	@CollectionOfElements
     public List<NetworkInterface> getNetworkInterfaces() {
@@ -133,5 +135,14 @@ public class Machine extends CloudEntity implements Serializable {
 
     public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
     	this.networkInterfaces = networkInterfaces;
-    }	
+    }
+
+    @ManyToOne
+	public CloudProviderAccount getCloudProviderAccount() {
+		return cloudProviderAccount;
+	}
+
+	public void setCloudProviderAccount(CloudProviderAccount cloudProviderAccount) {
+		this.cloudProviderAccount = cloudProviderAccount;
+	}	
 }

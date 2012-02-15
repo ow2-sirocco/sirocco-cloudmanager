@@ -19,13 +19,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id$
+ *  $Id: CloudEntity.java 897 2012-02-15 10:13:25Z ycas7461 $
  *
  */
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -33,6 +34,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
@@ -50,9 +52,34 @@ public abstract class CloudEntity implements Serializable {
 
     protected String description;
 
+    protected User user;
+
+    protected CloudProviderLocation location;
+
     protected Date created;
 
     protected Date deleted;
+
+    protected String providerAssignedId;
+
+    protected Collection<CloudProvider> cloudProviders;
+
+    public String getProviderAssignedId() {
+        return this.providerAssignedId;
+    }
+
+    public void setProviderAssignedId(final String providerAssignedId) {
+        this.providerAssignedId = providerAssignedId;
+    }
+
+    @ManyToMany
+    public Collection<CloudProvider> getCloudProviders() {
+        return this.cloudProviders;
+    }
+
+    public void setCloudProviders(final Collection<CloudProvider> cloudProviders) {
+        this.cloudProviders = cloudProviders;
+    }
 
     protected Map<String, String> properties;
 
@@ -68,6 +95,16 @@ public abstract class CloudEntity implements Serializable {
 
     public void setDescription(final String description) {
         this.description = description;
+    }
+
+    @ManyToOne
+    public User getUser() {
+        return this.user;
+    }
+
+    @ManyToOne
+    public CloudProviderLocation getLocation() {
+        return this.location;
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -87,9 +124,16 @@ public abstract class CloudEntity implements Serializable {
         this.name = name;
     }
 
+    public void setUser(final User user) {
+        this.user = user;
+    }
 
     public void setCreated(final Date created) {
         this.created = created;
+    }
+
+    public void setLocation(final CloudProviderLocation location) {
+        this.location = location;
     }
 
     public void setProperties(final Map<String, String> properties) {
