@@ -1,20 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-  <name>sirocco-cloudmanager-provider-vmm</name>
-  <comment>The OW2 Consortium is an open source community committed to making available to everyone the
-    best and most reliable middleware technology. OW2 mission is to develop open source code
-    middleware and to foster a vibrant community and business ecosystem. 
-  </comment>
-  <projects/>
-  <buildSpec>
-    <buildCommand>
-      <name>org.eclipse.jdt.core.javabuilder</name>
-    </buildCommand>
-    <buildCommand>
-      <name>org.maven.ide.eclipse.maven2Builder</name>
-    </buildCommand>
-  </buildSpec>
-  <natures>
-    <nature>org.maven.ide.eclipse.maven2Nature</nature>
-    <nature>org.eclipse.jdt.core.javanature</nature>
-  </natures>
+	<name>sirocco-cloudmanager-provider-vmm</name>
+	<comment>The OW2 Consortium is an open source community committed to making available to everyone
+    the best and most reliable middleware technology, including generic enterprise applications
+    and cloud computing technologies. The mission of the OW2 Consortium is to
+      i) develop open source code for middleware, generic enterprise applications and cloud computing and
+      ii) to foster a vibrant community and business ecosystem. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+	<projects>
+		<project>sirocco-cloudmanager-provider-api</project>
+		<project>sirocco-cloudmanager-provider-util-jobmanager</project>
+		<project>sirocco-cloudmanager-provider-util-vncproxy</project>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.jdt.core.javabuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.maven.ide.eclipse.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.m2e.core.maven2Builder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.m2e.core.maven2Nature</nature>
+		<nature>org.maven.ide.eclipse.maven2Nature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+	</natures>
 </projectDescription>
