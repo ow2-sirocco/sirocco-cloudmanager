@@ -45,7 +45,7 @@ public class VolumeConfiguration extends CloudEntity implements Serializable {
         return this.capacity;
     }
 
-    public void setCapacityInMB(final Capacity capacity) {
+    public void setCapacity(final Capacity capacity) {
         this.capacity = capacity;
     }
 
