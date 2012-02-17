@@ -36,10 +36,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 
-@NamedQueries(value = {@NamedQuery(name = "FIND_VOLUMES_BY_PROVIDER_ID", query = "SELECT v FROM Volume v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
 public class Volume extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -47,8 +44,6 @@ public class Volume extends CloudEntity implements Serializable {
     public static enum State {
         CREATING, AVAILABLE, DELETING, DELETED, ERROR
     }
-
-    public static final String FIND_VOLUMES_BY_PROVIDER_ID = "FIND_VOLUMES_BY_PROVIDER_ID";
 
     private State state;
 
@@ -59,7 +54,7 @@ public class Volume extends CloudEntity implements Serializable {
     private Boolean supportsSnapshots;
 
     private Collection<Machine> machines;
-    
+
     private CloudProviderAccount cloudProviderAccount;
 
     public Volume() {
@@ -108,14 +103,14 @@ public class Volume extends CloudEntity implements Serializable {
     public void setSupportsSnapshots(final boolean supportsSnapshots) {
         this.supportsSnapshots = supportsSnapshots;
     }
-    
-    @ManyToOne
-	public CloudProviderAccount getCloudProviderAccount() {
-		return cloudProviderAccount;
-	}
 
-	public void setCloudProviderAccount(CloudProviderAccount cloudProviderAccount) {
-		this.cloudProviderAccount = cloudProviderAccount;
-	}
+    @ManyToOne
+    public CloudProviderAccount getCloudProviderAccount() {
+        return this.cloudProviderAccount;
+    }
+
+    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
+        this.cloudProviderAccount = cloudProviderAccount;
+    }
 
 }
