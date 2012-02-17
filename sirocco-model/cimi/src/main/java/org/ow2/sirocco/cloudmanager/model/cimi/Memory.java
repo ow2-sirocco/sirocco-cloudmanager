@@ -27,37 +27,38 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
-
+import javax.persistence.Enumerated;
 
 @Embeddable
 public class Memory implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     public static enum MemoryUnit {
-		HERTZ, MEGA, GIGA, TERA, PETA, EXA, ZETTA
+        HERTZ, MEGA, GIGA, TERA, PETA, EXA, ZETTA
     }
 
-    private MemoryUnit	memoryUnit;
-    private Float		quantity;
+    private MemoryUnit memoryUnit;
 
+    private Float quantity;
 
-	@Enumerated(EnumType.STRING)
-	public MemoryUnit getMemoryUnit() {
-		return memoryUnit;
-	}
+    @Enumerated(EnumType.STRING)
+    public MemoryUnit getMemoryUnit() {
+        return this.memoryUnit;
+    }
 
-	public void setMemoryUnit(MemoryUnit memoryUnit) {
-		this.memoryUnit = memoryUnit;
-	}
+    public void setMemoryUnit(final MemoryUnit memoryUnit) {
+        this.memoryUnit = memoryUnit;
+    }
 
-	public Float getQuantity() {
-		return quantity;
-	}
+    @Column(name = "memory_quantity")
+    public Float getQuantity() {
+        return this.quantity;
+    }
 
-	public void setQuantity(Float quantity) {
-		this.quantity = quantity;
-	}
+    public void setQuantity(final Float quantity) {
+        this.quantity = quantity;
+    }
 }

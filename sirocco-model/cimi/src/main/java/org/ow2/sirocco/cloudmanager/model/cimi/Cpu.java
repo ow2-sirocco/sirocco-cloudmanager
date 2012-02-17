@@ -27,48 +27,51 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
-
+import javax.persistence.Enumerated;
 
 @Embeddable
 public class Cpu implements Serializable {
     private static final long serialVersionUID = 1L;
+
     public static enum Frequency {
-		HERTZ, MEGA, GIGA
+        HERTZ, MEGA, GIGA
     }
 
-	/**
-	 * CIMI CPU not specified yet
-	 */
-    private Integer		numberCpu;
-    private Frequency	cpuSpeedUnit;
-    private Float		quantity;
+    /**
+     * CIMI CPU not specified yet
+     */
+    private Integer numberCpu;
 
+    private Frequency cpuSpeedUnit;
 
-	public Integer getNumberCpu() {
-		return numberCpu;
-	}
+    private Float quantity;
 
-	public void setNumberCpu(Integer numberCpu) {
-		this.numberCpu = numberCpu;
-	}
+    public Integer getNumberCpu() {
+        return this.numberCpu;
+    }
 
-	@Enumerated(EnumType.STRING)
-	public Frequency getCpuSpeedUnit() {
-		return cpuSpeedUnit;
-	}
+    public void setNumberCpu(final Integer numberCpu) {
+        this.numberCpu = numberCpu;
+    }
 
-	public void setCpuSpeedUnit(Frequency cpuSpeedUnit) {
-		this.cpuSpeedUnit = cpuSpeedUnit;
-	}
+    @Enumerated(EnumType.STRING)
+    public Frequency getCpuSpeedUnit() {
+        return this.cpuSpeedUnit;
+    }
 
-	public Float getQuantity() {
-		return quantity;
-	}
+    public void setCpuSpeedUnit(final Frequency cpuSpeedUnit) {
+        this.cpuSpeedUnit = cpuSpeedUnit;
+    }
 
-	public void setQuantity(Float quantity) {
-		this.quantity = quantity;
-	}
+    @Column(name = "cpu_quantity")
+    public Float getQuantity() {
+        return this.quantity;
+    }
+
+    public void setQuantity(final Float quantity) {
+        this.quantity = quantity;
+    }
 }
