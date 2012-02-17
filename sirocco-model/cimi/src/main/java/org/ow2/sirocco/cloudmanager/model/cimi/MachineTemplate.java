@@ -25,106 +25,109 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.CascadeType;
 
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 public class MachineTemplate extends CloudEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private MachineConfiguration	machineConfiguration;
-	private MachineImage			machineImage;
-	private MachineAdmin			machineAdmin;
-	private List<String>			attachmentPoints;
-	private List<Volume>			volumes;
+    private MachineConfiguration machineConfiguration;
 
-/**	private List<VolumeTemplate>	volumesTemplates;*/
-	private List<NetworkInterface>	networkInterfaces;
+    private MachineImage machineImage;
 
+    private MachineAdmin machineAdmin;
 
-	public MachineTemplate() {
-		this.volumes = new ArrayList<Volume>();
-/**		this.volumeTemplates = new ArrayList<VolumeTemplate>();*/
-		this.attachmentPoints = new ArrayList<String>();
-		this.networkInterfaces   = new ArrayList<NetworkInterface>();
-	}
+    private List<String> attachmentPoints;
 
-	@ManyToOne
-	public MachineConfiguration getMachineConfiguration() {
-		return machineConfiguration;
-	}
+    private List<Volume> volumes;
 
+    /** private List<VolumeTemplate> volumesTemplates; */
+    private List<NetworkInterface> networkInterfaces;
 
-	public void setMachineConfiguration(MachineConfiguration machineConfiguration) {
-		this.machineConfiguration = machineConfiguration;
-	}
+    public MachineTemplate() {
+        this.volumes = new ArrayList<Volume>();
+        /** this.volumeTemplates = new ArrayList<VolumeTemplate>(); */
+        this.attachmentPoints = new ArrayList<String>();
+        this.networkInterfaces = new ArrayList<NetworkInterface>();
+    }
 
+    @ManyToOne
+    public MachineConfiguration getMachineConfiguration() {
+        return this.machineConfiguration;
+    }
 
-	@ManyToOne
-	public MachineImage getMachineImage() {
-		return machineImage;
-	}
+    public void setMachineConfiguration(final MachineConfiguration machineConfiguration) {
+        this.machineConfiguration = machineConfiguration;
+    }
 
-	public void setMachineImage(MachineImage machineImage) {
-		this.machineImage = machineImage;
-	}
+    @ManyToOne
+    public MachineImage getMachineImage() {
+        return this.machineImage;
+    }
 
+    public void setMachineImage(final MachineImage machineImage) {
+        this.machineImage = machineImage;
+    }
 
-	@ManyToOne
-	public MachineAdmin getMachineAdmin() {
-		return machineAdmin;
-	}
+    @ManyToOne
+    public MachineAdmin getMachineAdmin() {
+        return this.machineAdmin;
+    }
 
-	public void setMachineAdmin(MachineAdmin machineAdmin) {
-		this.machineAdmin = machineAdmin;
-	}
+    public void setMachineAdmin(final MachineAdmin machineAdmin) {
+        this.machineAdmin = machineAdmin;
+    }
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name="MACHINETEMPLATE_VOLUME")
-	public List<Volume> getVolumes() {
-		return this.volumes;
-	}	
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "MACHINETEMPLATE_VOLUME")
+    public List<Volume> getVolumes() {
+        return this.volumes;
+    }
 
-	public void setVolumes(final List<Volume> volumes) {
-		this.volumes = volumes;
-	}
+    public void setVolumes(final List<Volume> volumes) {
+        this.volumes = volumes;
+    }
 
-/**
-	@ManyToMany(cascade = CascadeType.PERSIST, CascadeType.MERGE)
-	@JoinTable(name="MACHINETEMPLATE_VOLUMETEMPLATE")
-	public List<VolumeTemplate> getVolumeTemplates() {
-		return this.volumeTemplates;
-	}
+    /**
+     * @ManyToMany(cascade = CascadeType.PERSIST, CascadeType.MERGE)
+     * @JoinTable(name="MACHINETEMPLATE_VOLUMETEMPLATE") public
+     *                                                   List<VolumeTemplate>
+     *                                                   getVolumeTemplates() {
+     *                                                   return
+     *                                                   this.volumeTemplates; }
+     *                                                   public void
+     *                                                   setVolumeTemplates
+     *                                                   (final
+     *                                                   List<VolumeTemplate>
+     *                                                   volumeTemplates) {
+     *                                                   this.volumeTemplates =
+     *                                                   volumeTemplates; }
+     */
+    @CollectionOfElements
+    public List<String> getAttachmentPoints() {
+        return this.attachmentPoints;
+    }
 
-	public void setVolumeTemplates(final List<VolumeTemplate> volumeTemplates) {
-		this.volumeTemplates = volumeTemplates;
-	}	
-*/
-	public List<String> getAttachmentPoints() {
-		return this.attachmentPoints;
-	}
+    public void setAttachmentPoints(final List<String> attachmentPoints) {
+        this.attachmentPoints = attachmentPoints;
+    }
 
-	public void setAttachmentPoints(final List<String> attachmentPoints) {
-		this.attachmentPoints = attachmentPoints;
-	}
-
-	@CollectionOfElements
+    @CollectionOfElements
     public List<NetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
     public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
-    	this.networkInterfaces = networkInterfaces;
-    }	
+        this.networkInterfaces = networkInterfaces;
+    }
 }

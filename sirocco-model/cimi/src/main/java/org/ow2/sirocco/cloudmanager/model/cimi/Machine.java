@@ -27,122 +27,130 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
-import javax.persistence.Embedded;
 
 import org.hibernate.annotations.CollectionOfElements;
 
-
 @Entity
-@NamedQueries({
-	@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")
-})
+@NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
 public class Machine extends CloudEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static final String GET_MACHINE_BY_STATE = "GET_MACHINE_BY_STATE";
+    public static final String GET_MACHINE_BY_STATE = "GET_MACHINE_BY_STATE";
 
     public static enum State {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
     }
 
-    private State 			state;
-	private Cpu			cpu;
-	private Memory			memory;
-	private List<Disk>		disks;
+    private State state;
 
-	/*private List<String>		attachmentPoints;*/
-	private List<Volume>		volumes;
-/**	private List<VolumeTemplate>	volumeTemplates;*/
-	private List<NetworkInterface>	networkInterfaces;
-	
-	private CloudProviderAccount cloudProviderAccount;
+    private Cpu cpu;
 
-	public Machine() {
-		this.volumes = new ArrayList<Volume>();
-/**		this.volumeTemplates = new ArrayList<VolumeTemplate>();*/
-		/*this.attachmentPoints = new ArrayList<String>();*/
-		this.disks   = new ArrayList<Disk>();
-		this.networkInterfaces   = new ArrayList<NetworkInterface>();
-	}
+    /* private List<String> attachmentPoints; */
+    private List<Volume> volumes;
 
-	@Enumerated(EnumType.STRING)
-	public State getState() {
-		return this.state;
-	}
+    /** private List<VolumeTemplate> volumeTemplates; */
+    private List<NetworkInterface> networkInterfaces;
 
-	public void setState(final State state) {
+    private CloudProviderAccount cloudProviderAccount;
+
+    private Memory memory;
+
+    private List<Disk> disks;
+
+    private List<String> attachmentPoints;
+
+    /** private List<VolumeTemplate> volumeTemplates; */
+
+    public Machine() {
+        this.volumes = new ArrayList<Volume>();
+        /** this.volumeTemplates = new ArrayList<VolumeTemplate>(); */
+        this.attachmentPoints = new ArrayList<String>();
+        this.disks = new ArrayList<Disk>();
+        this.networkInterfaces = new ArrayList<NetworkInterface>();
+    }
+
+    @Enumerated(EnumType.STRING)
+    public State getState() {
+        return this.state;
+    }
+
+    public void setState(final State state) {
         this.state = state;
     }
 
-	@Embedded
-	public Cpu getCpu() {
-		return this.cpu;
-	}
+    @Embedded
+    public Cpu getCpu() {
+        return this.cpu;
+    }
 
-	@Embedded
-	public Memory getMemory() {
-		return this.memory;
-	}
+    public void setCpu(final Cpu cpu) {
+        this.cpu = cpu;
+    }
 
-	@CollectionOfElements
-	public List<Disk> getDisks() {
-		return this.disks;
-	}
+    @Embedded
+    public Memory getMemory() {
+        return this.memory;
+    }
 
-	public void setDisks(List<Disk> disks) {
-		disks = this.disks;
-	}
+    public void setMemory(final Memory memory) {
+        this.memory = memory;
+    }
 
-	@ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-	@JoinTable(name="MACHINE_VOLUME")
-	public List<Volume> getVolumes() {
-		return this.volumes;
-	}
+    @CollectionOfElements
+    public List<Disk> getDisks() {
+        return this.disks;
+    }
 
-	public void setVolumes(final List<Volume> volumes) {
+    public void setDisks(List<Disk> disks) {
+        disks = this.disks;
+    }
+
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinTable(name = "MACHINE_VOLUME")
+    public List<Volume> getVolumes() {
+        return this.volumes;
+    }
+
+    public void setVolumes(final List<Volume> volumes) {
         this.volumes = volumes;
     }
 
-	/*public List<String> getAttachmentPoints() {
-		return this.attachmentPoints;
-	}
+    @CollectionOfElements
+    public List<String> getAttachmentPoints() {
+        return this.attachmentPoints;
+    }
 
-	public void setAttachmentPoints(final List<String> attachmentPoints) {
-		this.attachmentPoints = attachmentPoints;
-	}*/
+    public void setAttachmentPoints(final List<String> attachmentPoints) {
+        this.attachmentPoints = attachmentPoints;
+    }
 
-	@CollectionOfElements
+    @CollectionOfElements
     public List<NetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
     public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
-    	this.networkInterfaces = networkInterfaces;
+        this.networkInterfaces = networkInterfaces;
     }
 
     @ManyToOne
-	public CloudProviderAccount getCloudProviderAccount() {
-		return cloudProviderAccount;
-	}
+    public CloudProviderAccount getCloudProviderAccount() {
+        return this.cloudProviderAccount;
+    }
 
-	public void setCloudProviderAccount(CloudProviderAccount cloudProviderAccount) {
-		this.cloudProviderAccount = cloudProviderAccount;
-	}	
+    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
+        this.cloudProviderAccount = cloudProviderAccount;
+    }
 }
