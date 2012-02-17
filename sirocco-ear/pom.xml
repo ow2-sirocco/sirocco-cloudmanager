@@ -42,16 +42,9 @@
 
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-ejb-jar</artifactId>
+			<artifactId>sirocco-cloudmanager-core-manager</artifactId>
 			<version>${project.version}</version>
 			<type>ejb</type>
-		</dependency>
-
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-api-server</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
 		</dependency>
 
 	</dependencies>
@@ -68,16 +61,10 @@
 					<generateApplicationXml>true</generateApplicationXml>
 					<displayName>${product.name}</displayName>
 					<modules>
-						<webModule>
-							<groupId>org.ow2.sirocco.cloudmanager</groupId>
-							<artifactId>sirocco-cloudmanager-api-server</artifactId>
-							<bundleFileName>Sirocco-api.war</bundleFileName>
-							<contextRoot>/SiroccoApi</contextRoot>
-						</webModule>
 						<ejbModule>
 							<groupId>org.ow2.sirocco.cloudmanager</groupId>
-							<artifactId>sirocco-cloudmanager-ejb-jar</artifactId>
-							<bundleFileName>Sirocco-ejb-jar.jar</bundleFileName>
+							<artifactId>sirocco-cloudmanager-core-manager</artifactId>
+							<bundleFileName>sirocco-core.jar</bundleFileName>
 						</ejbModule>
 					</modules>
 					<archive>

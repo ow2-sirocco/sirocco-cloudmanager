@@ -23,7 +23,9 @@
    $Id$
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -33,9 +35,9 @@
 	</parent>
 
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
-	<artifactId>sirocco-cloudmanager-core-ejb-jar</artifactId>
+	<artifactId>sirocco-cloudmanager-core-manager</artifactId>
 	<packaging>ejb</packaging>
-	<name>SIROCCO :: CloudManager :: EJB JAR</name>
+	<name>SIROCCO :: CloudManager :: CORE :: Manager</name>
 
 	<dependencies>
 
@@ -109,21 +111,19 @@
 			<version>${project.version}</version>
 		</dependency>
 
-<!--
+		<!--  
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-model-extensions</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-core-utils-jobmanager</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
-		</dependency>
--->
-	</dependencies>
+		</dependency>-->
+	</dependencies> 
 
 	<build>
 		<plugins>
@@ -142,15 +142,17 @@
 					</archive>
 				</configuration>
 			</plugin>
-<plugin>
+			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
 						<phase>process-sources</phase>
 						<configuration>
 							<tasks>
-								<copy todir="${project.build.directory}/model-cimi" overwrite="true">
-									<fileset dir="../../sirocco-model/cimi/src/main/java" includes="**/*.*" />
+								<copy todir="${project.build.directory}/model-cimi"
+									overwrite="true">
+									<fileset dir="../../sirocco-model/cimi/src/main/java"
+										includes="**/*.*" />
 								</copy>
 							</tasks>
 						</configuration>
@@ -178,7 +180,7 @@
 					</execution>
 				</executions>
 			</plugin>
-						
+
 		</plugins>
 	</build>
 
