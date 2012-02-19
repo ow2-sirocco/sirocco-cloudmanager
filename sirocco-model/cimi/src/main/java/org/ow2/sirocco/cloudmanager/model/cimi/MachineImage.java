@@ -48,6 +48,7 @@ public class MachineImage extends CloudEntity implements Serializable {
 	private State		state;
 	private Type		type;
 
+	private String		imageLocation;
 	private MachineImage	relatedImage;
 	
 	private CloudProviderAccount cloudProviderAccount;
@@ -80,6 +81,14 @@ public class MachineImage extends CloudEntity implements Serializable {
 		this.relatedImage = relatedImage;
 	}
 
+	public String getImageLocation() {
+		return imageLocation;
+	}
+	
+	public void setImageLocation(String imageLocation){
+		this.imageLocation = imageLocation;
+	}
+	
 	@ManyToOne
 	public CloudProviderAccount getCloudProviderAccount() {
 		return cloudProviderAccount;

@@ -28,10 +28,12 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.JoinTable;
@@ -41,6 +43,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
 import org.hibernate.annotations.CollectionOfElements;
+
+import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
 @NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
@@ -57,26 +61,18 @@ public class Machine extends CloudEntity implements Serializable {
 
     private Cpu cpu;
 
-    /* private List<String> attachmentPoints; */
-    private List<Volume> volumes;
-
-    /** private List<VolumeTemplate> volumeTemplates; */
-    private List<NetworkInterface> networkInterfaces;
+    private List<MachineVolume>			volumes;
+    private List<NetworkInterface>  networkInterfaces;
 
     private CloudProviderAccount cloudProviderAccount;
 
-    private Memory memory;
-
+    private Memory 		memory;
     private List<Disk> disks;
 
-    private List<String> attachmentPoints;
-
-    /** private List<VolumeTemplate> volumeTemplates; */
+    @Transient
+    private FSM			fsm;
 
     public Machine() {
-        this.volumes = new ArrayList<Volume>();
-        /** this.volumeTemplates = new ArrayList<VolumeTemplate>(); */
-        this.attachmentPoints = new ArrayList<String>();
         this.disks = new ArrayList<Disk>();
         this.networkInterfaces = new ArrayList<NetworkInterface>();
     }
@@ -117,24 +113,15 @@ public class Machine extends CloudEntity implements Serializable {
         disks = this.disks;
     }
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "MACHINE_VOLUME")
-    public List<Volume> getVolumes() {
+    @CollectionOfElements
+    public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
 
-    public void setVolumes(final List<Volume> volumes) {
+    public void setVolumes(final List<MachineVolume> volumes) {
         this.volumes = volumes;
     }
 
-    @CollectionOfElements
-    public List<String> getAttachmentPoints() {
-        return this.attachmentPoints;
-    }
-
-    public void setAttachmentPoints(final List<String> attachmentPoints) {
-        this.attachmentPoints = attachmentPoints;
-    }
 
     @CollectionOfElements
     public List<NetworkInterface> getNetworkInterfaces() {
@@ -152,5 +139,75 @@ public class Machine extends CloudEntity implements Serializable {
 
     public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
         this.cloudProviderAccount = cloudProviderAccount;
+    }
+    
+    public void initFSM() {
+    	fsm.addAction(State.CREATING, "DELETE", State.DELETING);
+		fsm.addAction(State.CREATING, "DELETE", State.ERROR);
+		fsm.addAction(State.CREATING, "internal", State.STOPPED);
+		fsm.addAction(State.CREATING, "internal", State.ERROR);
+		fsm.addAction(State.ERROR, "START", State.STARTING);
+		fsm.addAction(State.ERROR, "STOP", State.STOPPING);
+		fsm.addAction(State.ERROR, "RESTART", State.STARTING);
+		fsm.addAction(State.ERROR, "DELETE", State.DELETING);
+
+
+		fsm.addAction(State.STOPPED, "START", State.STARTING);
+		fsm.addAction(State.STOPPED, "DELETE", State.DELETING);
+		fsm.addAction(State.STOPPED, "CAPTURE", State.STOPPED);
+		fsm.addAction(State.STOPPED, "RESTART", State.STARTING);
+
+		fsm.addAction(State.STARTING, "internal", State.STARTED);
+		fsm.addAction(State.STARTING, "START", State.STARTING);
+		fsm.addAction(State.STARTING, "RESTART", State.STARTING);
+		fsm.addAction(State.STARTING, "DELETE", State.DELETING);
+		fsm.addAction(State.STARTING, "STOP", State.STOPPING);
+
+		fsm.addAction(State.STARTED, "RESTART", State.STARTING);
+		fsm.addAction(State.STARTED, "STOP", State.STOPPING);
+		fsm.addAction(State.STARTED, "DELETE", State.DELETING);
+		fsm.addAction(State.STARTED, "CAPTURE", State.STARTED);
+		fsm.addAction(State.STARTED, "PAUSE", State.PAUSING);
+		fsm.addAction(State.STARTED, "SUSPEND", State.SUSPENDING);
+
+		fsm.addAction(State.STOPPING, "internal", State.STOPPED);
+		fsm.addAction(State.STOPPING, "START", State.STARTING);
+		fsm.addAction(State.STOPPING, "RESTART", State.STARTING);
+		fsm.addAction(State.STOPPING, "DELETE", State.DELETING);
+
+		fsm.addAction(State.STOPPED, "START", State.STARTING);
+		fsm.addAction(State.STOPPED, "RESTART", State.STARTING);
+		fsm.addAction(State.STOPPED, "CAPTURE", State.STOPPED);
+		fsm.addAction(State.STOPPED, "DELETE", State.DELETING);
+
+		fsm.addAction(State.PAUSING, "internal", State.PAUSED);
+		fsm.addAction(State.PAUSING, "START", State.STARTING);
+		fsm.addAction(State.PAUSING, "RESTART", State.STARTING);
+		fsm.addAction(State.PAUSING, "DELETE", State.DELETING);
+
+		fsm.addAction(State.PAUSED, "START", State.STARTING);
+		fsm.addAction(State.PAUSED, "CAPTURE", State.PAUSED);
+		fsm.addAction(State.PAUSED, "RESTART", State.STARTING);
+		fsm.addAction(State.PAUSED, "STOP", State.STOPPING);
+		fsm.addAction(State.PAUSED, "DELETE", State.DELETING);
+
+		fsm.addAction(State.SUSPENDING, "START", State.STARTING);
+		fsm.addAction(State.SUSPENDING, "RESTART", State.STARTING);
+		fsm.addAction(State.SUSPENDING, "DELETE", State.DELETING);
+		fsm.addAction(State.SUSPENDING, "internal", State.SUSPENDED);
+
+		fsm.addAction(State.SUSPENDED, "START", State.STARTING);
+		fsm.addAction(State.SUSPENDED, "RESTART", State.STARTING);
+		fsm.addAction(State.SUSPENDED, "CAPTURE", State.SUSPENDED);
+		fsm.addAction(State.SUSPENDED, "DELETE", State.DELETING);
+
+		fsm.addAction(State.DELETING, "DELETE", State.DELETING);
+		fsm.addAction(State.DELETING, "internal", State.DELETED);
+    }
+    /** get operations allowed in this state */
+    public Set<String> getOperations() {
+    	Set<String> operations = fsm.getActionsAtState(state);
+		operations.remove(new String("internal"));
+    	return operations;
     }
 }

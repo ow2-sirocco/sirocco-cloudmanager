@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+import javax.persistence.Transient;
 
 import java.io.Serializable;
 import java.util.List;
@@ -37,6 +38,15 @@ public class MachineTemplateCollection  extends CloudEntity implements Serializa
     private static final long serialVersionUID = 1L;
 
 	public MachineTemplateCollection() {}
-
+	
+	@Transient
+	List<MachineTemplate> machineTemplates;
+	
+	public List<MachineTemplate> getMachineTemplates(){
+		return this.machineTemplates;
+	}
+	public void setMachineTemplates(List<MachineTemplate> machineTemplates){
+		this.machineTemplates = machineTemplates;
+	}
 }
 

@@ -25,6 +25,8 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+import javax.persistence.Transient;
+
 import java.io.Serializable;
 import java.util.List;
 
@@ -36,5 +38,14 @@ public class MachineCollection  extends CloudEntity implements Serializable {
 
 	public MachineCollection() {}
 
+	@Transient
+	List<Machine> machines;
+	
+	public List<Machine> getMachines(){
+		return this.machines;
+	}
+	public void setMachines(List<Machine> machines){
+		this.machines = machines;
+	}
 }
 

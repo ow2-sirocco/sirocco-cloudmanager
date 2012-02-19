@@ -22,3 +22,29 @@
  *  
  *
  */
+
+
+package org.ow2.sirocco.cloudmanager.core.api;
+
+import java.util.Date;
+import java.util.List;
+
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+
+
+import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.exception.InvalidMachineIdException;
+
+public interface IMachineImageManager {
+
+	static final String EJB_JNDI_NAME = "MachineImageManager";
+	
+	Job createMachineImage(MachineImage machineImage) throws CloudProviderException;
+
+	List<MachineImage> getMachineImages();
+	
+	MachineImage getMachineImage(String imageId)throws CloudProviderException;
+	
+	void deleteImage(String imageId)throws CloudProviderException;
+}

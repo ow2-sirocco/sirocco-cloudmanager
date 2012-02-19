@@ -30,14 +30,14 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 
 @Entity
-public class MachineAdmin extends CloudEntity implements Serializable {
+public class Credentials extends CloudEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private	String	userName;
 	private String	password;
 
 
-	public MachineAdmin() {}
+	public Credentials() {}
 
 	public String getUserName() {
 		return userName;

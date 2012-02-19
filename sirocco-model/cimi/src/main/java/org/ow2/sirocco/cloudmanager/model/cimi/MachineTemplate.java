@@ -34,7 +34,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-
+import javax.persistence.Embedded;
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
@@ -45,19 +45,14 @@ public class MachineTemplate extends CloudEntity implements Serializable {
 
     private MachineImage machineImage;
 
-    private MachineAdmin machineAdmin;
+    private Credentials credentials;
 
-    private List<String> attachmentPoints;
-
-    private List<Volume> volumes;
-
-    /** private List<VolumeTemplate> volumesTemplates; */
+    private List<MachineVolume> volumes;
+    private List<MachineVolumeTemplate> volumeTemplates;
     private List<NetworkInterface> networkInterfaces;
 
     public MachineTemplate() {
-        this.volumes = new ArrayList<Volume>();
-        /** this.volumeTemplates = new ArrayList<VolumeTemplate>(); */
-        this.attachmentPoints = new ArrayList<String>();
+        
         this.networkInterfaces = new ArrayList<NetworkInterface>();
     }
 
@@ -80,47 +75,34 @@ public class MachineTemplate extends CloudEntity implements Serializable {
     }
 
     @ManyToOne
-    public MachineAdmin getMachineAdmin() {
-        return this.machineAdmin;
+    public Credentials getCredentials() {
+        return this.credentials;
     }
 
-    public void setMachineAdmin(final MachineAdmin machineAdmin) {
-        this.machineAdmin = machineAdmin;
+    public void setCredentials(final Credentials credentials) {
+        this.credentials = credentials;
     }
 
-    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "MACHINETEMPLATE_VOLUME")
-    public List<Volume> getVolumes() {
+    @CollectionOfElements
+    public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
 
-    public void setVolumes(final List<Volume> volumes) {
+    public void setVolumes(final List<MachineVolume> volumes) {
         this.volumes = volumes;
     }
-
-    /**
-     * @ManyToMany(cascade = CascadeType.PERSIST, CascadeType.MERGE)
-     * @JoinTable(name="MACHINETEMPLATE_VOLUMETEMPLATE") public
-     *                                                   List<VolumeTemplate>
-     *                                                   getVolumeTemplates() {
-     *                                                   return
-     *                                                   this.volumeTemplates; }
-     *                                                   public void
-     *                                                   setVolumeTemplates
-     *                                                   (final
-     *                                                   List<VolumeTemplate>
-     *                                                   volumeTemplates) {
-     *                                                   this.volumeTemplates =
-     *                                                   volumeTemplates; }
-     */
+    
+    
+    
     @CollectionOfElements
-    public List<String> getAttachmentPoints() {
-        return this.attachmentPoints;
+    public List<MachineVolumeTemplate> getVolumeTemplates() {
+    	return this.volumeTemplates; 
     }
-
-    public void setAttachmentPoints(final List<String> attachmentPoints) {
-        this.attachmentPoints = attachmentPoints;
+    
+    public void setVolumeTemplates(final List<MachineVolumeTemplate> volumeTemplates) {
+    	this.volumeTemplates = volumeTemplates; 
     }
+ 
 
     @CollectionOfElements
     public List<NetworkInterface> getNetworkInterfaces() {

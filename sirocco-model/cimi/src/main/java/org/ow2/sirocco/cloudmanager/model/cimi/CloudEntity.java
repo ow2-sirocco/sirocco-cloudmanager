@@ -60,6 +60,8 @@ public abstract class CloudEntity implements Serializable {
 
     protected Date deleted;
 
+    protected Date updated;
+    
     protected String providerAssignedId;
 
     protected Collection<CloudProvider> cloudProviders;
@@ -154,4 +156,12 @@ public abstract class CloudEntity implements Serializable {
         return this.deleted;
     }
 
+    public void setUpdated(final Date updated) {
+        this.updated = updated;
+    }
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getUpdated() {
+        return this.updated;
+    }
 }

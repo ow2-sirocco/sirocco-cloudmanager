@@ -23,11 +23,12 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.provider.api.service;
+package org.ow2.sirocco.cloudmanager.connector.api;
 
-import org.ow2.sirocco.cloudmanager.provider.api.entity.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.provider.api.entity.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.provider.api.exception.CloudProviderException;
+
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 
 public interface ICloudProvider {
 
@@ -56,13 +57,12 @@ public interface ICloudProvider {
      * @return
      * @throws MultiCloudException
      */
-    IImageService getImageService() throws CloudProviderException;
+   // IImageService getImageService() throws CloudProviderException;
 
-    IMonitoringService getMonitoringService() throws CloudProviderException;
+    //IMonitoringService getMonitoringService() throws CloudProviderException;
 
-    IPhysicalInfrastructureManagement getPhysicalInfrastructureManagementService() throws CloudProviderException;
 
-    IVolumeService getVolumeService() throws CloudProviderException;
+    //IVolumeService getVolumeService() throws CloudProviderException;
 
     // NetworkService getNetworkService();
 

@@ -99,7 +99,7 @@ public class SqlTableCreator {
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.Machine.class);
-        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.MachineAdmin.class);
+        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.Credentials.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.Volume.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.User.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.class);

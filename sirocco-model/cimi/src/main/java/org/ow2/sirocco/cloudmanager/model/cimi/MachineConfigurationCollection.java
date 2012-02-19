@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+import javax.persistence.Transient;
 
 import java.io.Serializable;
 import java.util.List;
@@ -36,6 +37,15 @@ public class MachineConfigurationCollection  extends CloudEntity implements Seri
     private static final long serialVersionUID = 1L;
 
 	public MachineConfigurationCollection() {}
-
+	
+	@Transient
+	List<MachineConfiguration> machineConfigurations;
+	
+	public List<MachineConfiguration> getMachineConfigurations(){
+		return this.machineConfigurations;
+	}
+	public void setMachineConfigurations(List<MachineConfiguration> machineConfigurations){
+		this.machineConfigurations = machineConfigurations;
+	}
 }
 

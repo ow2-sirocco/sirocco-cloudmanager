@@ -39,7 +39,7 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
 
 	private	Cpu			cpu;
 	private Memory			memory;
-	private List<DiskTemplate>	disks;	
+	private List<DiskTemplate>	diskTemplates;	
 
 	public Cpu	getCpu() {
 	    return this.cpu;
@@ -59,10 +59,10 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
 
 	@CollectionOfElements
 	public List<DiskTemplate> getDiskTemplates() {
-	    return this.disks;
+	    return this.diskTemplates;
 	}
 
-	public void setDiskTemplates(List<DiskTemplate> disks) {
-	    this.disks = disks;
+	public void setDiskTemplates(List<DiskTemplate> diskTemplates) {
+	    this.diskTemplates = diskTemplates;
 	}
 }

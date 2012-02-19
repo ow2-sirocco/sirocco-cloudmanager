@@ -22,14 +22,14 @@
  *  $Id$
  *
  */
-package org.ow2.sirocco.cloudmanager.provider.api.service;
+package org.ow2.sirocco.cloudmanager.connector.api;
 
-import org.ow2.sirocco.cloudmanager.provider.api.entity.Job;
-import org.ow2.sirocco.cloudmanager.provider.api.entity.MachineImage;
-import org.ow2.sirocco.cloudmanager.provider.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 
 public interface IImageService {
-    Job<Void> destroyImage(final String imageId) throws CloudProviderException;
+    Job destroyImage(final String imageId) throws CloudProviderException;
 
-    Job<MachineImage> uploadImage(ImageUpload imageUpload) throws CloudProviderException;
+    Job uploadImage(MachineImage imageUpload) throws CloudProviderException;
 }

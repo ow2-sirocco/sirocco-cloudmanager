@@ -39,7 +39,9 @@
 
 	<modules>
 		<module>manager</module>
+		<!-- Wait until job manager compiles
 		<module>utils</module>
+		-->
 	</modules>
 
 	<dependencies>

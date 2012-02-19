@@ -23,14 +23,8 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.provider.api.service;
+package org.ow2.sirocco.cloudmanager.core.api;
 
-import java.util.List;
-
-public interface ICloudProviderFactoryFinder {
-
-    List<ICloudProviderFactory> listCloudProviderFactories();
-
-    ICloudProviderFactory getCloudProviderFactory(final String cloudProviderType);
+public interface IRemoteMachineImageManager extends IMachineImageManager {
 
 }

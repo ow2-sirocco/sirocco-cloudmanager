@@ -42,12 +42,12 @@ import org.ow2.sirocco.cloudmanager.core.exception.InvalidMachineIdException;
 
 public interface IMachineManager {
 
-	static final String EJB_JNDI_NAME = "MachineManagerBean";
+	static final String EJB_JNDI_NAME = "MachineManager";
 
 	/**
 	 * Operations on MachineCollection
 	 */
-	Job createMachine(MachineCreate machineCreate);
+	Job createMachine(MachineCreate machineCreate) throws CloudProviderException;;
 	List<Machine> getMachines(int first, int last, List<String> attributes) throws CloudProviderException;
 	List<Machine> getMachinesAttributes(List<String> attributes, String queryExpression)  throws CloudProviderException;
 
@@ -69,9 +69,6 @@ public interface IMachineManager {
 			  Map<String, Object> updatedAttributes)
 		 throws InvalidMachineIdException, CloudProviderException;
 
-	List<String> getOperations(final String machineId)
-		 throws InvalidMachineIdException, CloudProviderException;
-
 	/**
 	 * Operations on MachineCollection
 	 */
@@ -84,7 +81,7 @@ public interface IMachineManager {
 	/**
 	 * Operations on MachineConfiguration
 	 */
-	MachineConfiguration getMachineConfiguration(final String MachineId);
+	MachineConfiguration getMachineConfiguration(final String MachineId) throws CloudProviderException;;
 	void updateMachineConfiguration(String machineConfigurationId, 
 			  					   Map<String, Object> updatedAttributes)
 				      throws CloudProviderException;
@@ -95,7 +92,7 @@ public interface IMachineManager {
 	 * Operations on MachineConfigurationCollection
 	 */
 	MachineConfigurationCollection getMachineConfigurationCollection();
-	MachineConfiguration createMachineConfiguration(CreationParameters params, MachineConfiguration machineConfig)
+	MachineConfiguration createMachineConfiguration(MachineConfiguration machineConfig)
 						throws CloudProviderException;
 
 	/**
@@ -109,8 +106,7 @@ public interface IMachineManager {
 	/**
 	 * Operations on MachineTemplateCollection
 	 */
-	MachineTemplate	createMachineTemplate(CreationParameters params,
-										MachineTemplate machineTemplate) 
+	MachineTemplate	createMachineTemplate(MachineTemplate machineTemplate) 
 		throws CloudProviderException;
 	MachineTemplateCollection getMachineTemplateCollection()
 		throws CloudProviderException;
