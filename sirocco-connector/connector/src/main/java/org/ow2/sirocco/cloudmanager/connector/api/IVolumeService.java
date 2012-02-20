@@ -22,13 +22,19 @@
  *  $Id$
  *
  */
+
 package org.ow2.sirocco.cloudmanager.connector.api;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 
-public interface IImageService {
-    Job destroyImage(final String imageId) throws ConnectorException;
+public interface IVolumeService {
 
-    Job uploadImage(MachineImage imageUpload) throws ConnectorException;
+    Job createVolume(VolumeCreate volumeCreate) throws ConnectorException;
+
+    Job deleteVolume(String volumeId) throws ConnectorException;
+
+    Volume.State getVolumeState(String volumeId) throws ConnectorException;
+
 }

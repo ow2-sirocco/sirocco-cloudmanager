@@ -30,40 +30,29 @@ import java.util.List;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
-
-import org.ow2.sirocco.cloudmanager.core.api.MachineCreate;
-import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-
 
 public interface IComputeService {
 
-    Job createMachine(MachineCreate machineCreate) throws CloudProviderException;
+    Job createMachine(MachineCreate machineCreate) throws ConnectorException;
 
-    Job startMachine(final String machineId) throws CloudProviderException;
+    Job startMachine(final String machineId) throws ConnectorException;
 
-    Job stopMachine(final String machineId) throws CloudProviderException;
+    Job stopMachine(final String machineId) throws ConnectorException;
 
-    Job suspendMachine(final String machineId) throws CloudProviderException;
+    Job suspendMachine(final String machineId) throws ConnectorException;
 
-    Job resumeMachine(final String machineId) throws CloudProviderException;
+    Job restartMachine(final String machineId) throws ConnectorException;
 
-    Job rebootMachine(final String machineId) throws CloudProviderException;
+    Job pauseMachine(final String machineId) throws ConnectorException;
 
-    Job pauseMachine(final String machineId) throws CloudProviderException;
+    Job deleteMachine(final String machineId) throws ConnectorException;
 
-    Job unpauseMachine(final String machineId) throws CloudProviderException;
+    Machine.State getMachineState(final String machineId) throws ConnectorException;
 
-    Job destroyMachine(final String machineId) throws CloudProviderException;
+    MachineConfiguration getMachineConfiguration(final String machineId) throws ConnectorException;
 
-    Machine.State getMachineState(final String machineId) throws CloudProviderException;
+    List<NetworkInterface> getMachineNetworkInterfaces(final String machineId) throws ConnectorException;
 
-    MachineConfiguration getMachineConfiguration(final String machineId) throws CloudProviderException;
-
-    List<NetworkInterface> getMachineNetworkInterfaces(final String machineId) throws CloudProviderException;
-
-    List<String> listMachines() throws CloudProviderException;
-
-   
 }

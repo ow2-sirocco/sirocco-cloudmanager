@@ -24,11 +24,21 @@
  */
 package org.ow2.sirocco.cloudmanager.connector.api;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
 
-public interface IImageService {
-    Job destroyImage(final String imageId) throws ConnectorException;
+public interface ICloudProviderConnector {
+    String getCloudProviderId();
 
-    Job uploadImage(MachineImage imageUpload) throws ConnectorException;
+    CloudProviderAccount getCloudProviderAccount();
+
+    CloudProviderLocation getCloudProviderLocation();
+
+    IComputeService getComputeService() throws ConnectorException;
+
+    IVolumeService getVolumeService() throws ConnectorException;
+
+    IImageService getImageService() throws ConnectorException;
+
+    void setNotificationOnJobCompletion(final String jobId) throws ConnectorException;
 }
