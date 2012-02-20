@@ -95,6 +95,7 @@ public class SqlTableCreator {
 
         ArrayList<Class> coll = new ArrayList<Class>();
 
+        
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation.class);
@@ -103,6 +104,7 @@ public class SqlTableCreator {
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.Volume.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.User.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.class);
+        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity.class);
 
         SqlTableCreator sqlTC = new SqlTableCreator(coll);
         System.out.println(sqlTC.dropTablesScript());

@@ -27,7 +27,6 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -49,6 +48,8 @@ public class CloudProviderAccount implements Serializable {
     private String login;
 
     private String password;
+    
+    private User user;
 
     private List<Machine> machines;
 
@@ -126,5 +127,13 @@ public class CloudProviderAccount implements Serializable {
     public void setCloudProvider(final CloudProvider cloudProvider) {
         this.cloudProvider = cloudProvider;
     }
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
 
 }

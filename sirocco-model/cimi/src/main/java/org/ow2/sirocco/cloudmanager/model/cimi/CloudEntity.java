@@ -26,7 +26,6 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 
@@ -34,7 +33,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
@@ -64,7 +62,7 @@ public abstract class CloudEntity implements Serializable {
     
     protected String providerAssignedId;
 
-    protected Collection<CloudProvider> cloudProviders;
+    //protected Collection<CloudProvider> cloudProviders;
 
     public String getProviderAssignedId() {
         return this.providerAssignedId;
@@ -74,14 +72,14 @@ public abstract class CloudEntity implements Serializable {
         this.providerAssignedId = providerAssignedId;
     }
 
-    @ManyToMany
-    public Collection<CloudProvider> getCloudProviders() {
-        return this.cloudProviders;
-    }
+    //@ManyToMany
+    //public Collection<CloudProvider> getCloudProviders() {
+    //    return this.cloudProviders;
+    //}
 
-    public void setCloudProviders(final Collection<CloudProvider> cloudProviders) {
-        this.cloudProviders = cloudProviders;
-    }
+    //public void setCloudProviders(final Collection<CloudProvider> cloudProviders) {
+    //    this.cloudProviders = cloudProviders;
+    //}
 
     protected Map<String, String> properties;
 

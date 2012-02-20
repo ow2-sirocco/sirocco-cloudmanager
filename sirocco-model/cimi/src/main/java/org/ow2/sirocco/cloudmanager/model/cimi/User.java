@@ -46,8 +46,6 @@ public class User implements Serializable {
 
     private Integer id;
 
-    private String apiPassword;
-
     private Date createDate;
 
     private String email;
@@ -64,8 +62,6 @@ public class User implements Serializable {
     private String password;
 
     private String publicKey;
-
-    private boolean isAdmin = false;
 
     private Collection<MachineImage> images;
 
@@ -123,10 +119,6 @@ public class User implements Serializable {
         return this.password;
     }
 
-    public void setApiPassword(final String apiPassword) {
-        this.apiPassword = apiPassword;
-    }
-
     public void setCreateDate(final Date createDate) {
         this.createDate = createDate;
     }
@@ -165,18 +157,6 @@ public class User implements Serializable {
 
     public void setVolumes(final Collection<Volume> volumes) {
         this.volumes = volumes;
-    }
-
-    public String getApiPassword() {
-        return this.apiPassword;
-    }
-
-    public void setAdmin(final boolean isAdmin) {
-        this.isAdmin = isAdmin;
-    }
-
-    public boolean getAdmin() {
-        return this.isAdmin;
     }
 
     @Column(unique = true)
