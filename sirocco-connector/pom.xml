@@ -42,25 +42,10 @@
 	<name>SIROCCO :: CloudManager :: Connectors </name>
 
 	<modules>
-		<module>connector</module>
+		<module>util</module> 
+		<module>connector</module> 
+		<module>mock</module> 
 	</modules>
-
-	<dependencies>
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-core-manager</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-		</dependency>
-
-	</dependencies>
 
 	<build>
 		<plugins>
