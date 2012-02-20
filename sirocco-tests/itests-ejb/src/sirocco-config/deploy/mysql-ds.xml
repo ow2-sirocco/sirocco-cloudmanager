@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<datasources xmlns="http://jonas.ow2.org/ns/datasource/1.0">
+     <datasource>
+        <datasource-configuration>
+            <name>siroccoDS</name>
+            <url>jdbc:mysql://localhost:3306/sirocco</url>
+            <classname>org.gjt.mm.mysql.Driver</classname>
+            <username>admcloud</username>
+            <password>admcloud</password>
+            <mapper>rdb.mysql</mapper>
+            <description>siroccoDS</description>
+        </datasource-configuration>
+        <connectionManager-configuration>
+            <connchecklevel>2</connchecklevel>
+            <connmaxage>1440</connmaxage>
+            <maxopentime>60</maxopentime>
+            <connteststmt>select count(1) from information_schema.tables</connteststmt>
+            <initconpool>10</initconpool>
+            <minconpool>10</minconpool>
+            <maxconpool>100</maxconpool>
+            <samplingperiod>100</samplingperiod>
+            <maxwaittime>5</maxwaittime>
+            <maxwaiters>100</maxwaiters>
+            <pstmtmax>100</pstmtmax>
+        </connectionManager-configuration>
+    </datasource>
+     <!--  <datasource>
+        <datasource-configuration>
+            <name>siroccoDS</name>
+            <url>jdbc:hsqldb:hsql://localhost:@db.port@/sirocco</url>
+            <classname>org.hsqldb.jdbcDriver</classname>
+            <username>admcloud</username>
+            <password>admcloud</password>
+            <mapper>rdb.hsql</mapper>
+            <description>siroccoDS</description>
+        </datasource-configuration>
+        <connectionManager-configuration>
+            <connchecklevel>2</connchecklevel>
+            <connmaxage>1440</connmaxage>
+            <maxopentime>60</maxopentime>
+            <connteststmt>select count(1) from information_schema.system_tables</connteststmt>
+            <initconpool>10</initconpool>
+            <minconpool>10</minconpool>
+            <maxconpool>100</maxconpool>
+            <samplingperiod>100</samplingperiod>
+            <maxwaittime>5</maxwaittime>
+            <maxwaiters>100</maxwaiters>
+            <pstmtmax>100</pstmtmax>
+        </connectionManager-configuration>
+    </datasource>-->
+</datasources>
