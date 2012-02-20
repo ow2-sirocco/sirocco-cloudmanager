@@ -23,9 +23,8 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.model.cimi;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 
 import java.util.Map;
 

@@ -23,12 +23,11 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.Map;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 
 public class VolumeCreate implements Serializable {
     private static final long serialVersionUID = 1L;
