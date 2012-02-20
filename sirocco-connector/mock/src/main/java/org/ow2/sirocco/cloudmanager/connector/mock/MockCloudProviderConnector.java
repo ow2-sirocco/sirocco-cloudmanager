@@ -34,6 +34,7 @@ import java.util.concurrent.Callable;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
+import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
@@ -41,6 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -49,7 +51,7 @@ import org.ow2.util.log.LogFactory;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, IVolumeService {
+public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, IVolumeService, IImageService {
 
     private static Log logger = LogFactory.getLog(MockCloudProviderConnector.class);
 
@@ -97,6 +99,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public IVolumeService getVolumeService() throws ConnectorException {
+        return this;
+    }
+
+    @Override
+    public IImageService getImageService() throws ConnectorException {
         return this;
     }
 
@@ -216,6 +223,18 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public List<NetworkInterface> getMachineNetworkInterfaces(final String machineId) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job destroyImage(final String imageId) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job uploadImage(final MachineImage imageUpload) throws ConnectorException {
         // TODO Auto-generated method stub
         return null;
     }
