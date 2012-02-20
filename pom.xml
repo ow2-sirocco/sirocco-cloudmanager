@@ -51,16 +51,11 @@
 	</properties>
 
 	<modules>
-	<!--  To remove progressively when new project structure is in place
-		<module>sirocco-provider-api</module>
-		<module>sirocco-providers</module>
-		<module>sirocco-ear</module>
-		<module>sirocco-ejb-jar</module>
-		<module>sirocco-apis</module>
-		-->
 		<module>sirocco-model</module>
 		<module>sirocco-core</module>
 		<module>sirocco-connector</module>
+		<module>sirocco-ear</module>
+		<module>sirocco-tests</module>
 	</modules>
 
 	<build>
