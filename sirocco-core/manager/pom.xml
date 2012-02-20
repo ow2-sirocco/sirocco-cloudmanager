@@ -110,6 +110,12 @@
 			<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-connector-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<!--  
 		<dependency>
