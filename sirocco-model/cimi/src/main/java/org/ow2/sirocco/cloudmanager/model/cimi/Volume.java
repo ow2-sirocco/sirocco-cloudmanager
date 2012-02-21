@@ -36,6 +36,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Volume extends CloudEntity implements Serializable {
@@ -53,12 +54,14 @@ public class Volume extends CloudEntity implements Serializable {
 
     private Boolean supportsSnapshots;
 
-    private Collection<Machine> machines;
+    private Collection<MachineVolume> machineVolumes;
 
     private CloudProviderAccount cloudProviderAccount;
 
+	
+
     public Volume() {
-        this.machines = new ArrayList<Machine>();
+        this.machineVolumes = new ArrayList<MachineVolume>();
     }
 
     @Enumerated(EnumType.STRING)
@@ -87,13 +90,13 @@ public class Volume extends CloudEntity implements Serializable {
         this.bootable = bootable;
     }
 
-    @ManyToMany(mappedBy = "volumes", fetch = FetchType.EAGER)
-    public Collection<Machine> getMachines() {
-        return this.machines;
+    @OneToMany(mappedBy = "volume", fetch = FetchType.EAGER)
+    public Collection<MachineVolume> getMachineVolumes() {
+        return this.machineVolumes;
     }
 
-    public void setMachines(final Collection<Machine> machines) {
-        this.machines = machines;
+    public void setMachineVolumes(final Collection<MachineVolume> machineVs) {
+        this.machineVolumes = machineVs;
     }
 
     public boolean isSupportsSnapshots() {
