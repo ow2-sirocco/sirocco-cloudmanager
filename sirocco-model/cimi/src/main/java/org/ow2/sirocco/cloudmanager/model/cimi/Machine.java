@@ -33,6 +33,7 @@ import java.util.Set;
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -61,7 +62,7 @@ public class Machine extends CloudEntity implements Serializable {
 
     private Cpu cpu;
 
-    private List<MachineVolume>			volumes;
+    private List<MachineVolume> machineVolumes;
     private List<NetworkInterface>  networkInterfaces;
 
     private CloudProviderAccount cloudProviderAccount;
@@ -72,9 +73,11 @@ public class Machine extends CloudEntity implements Serializable {
     @Transient
     private FSM			fsm;
 
+	
+
     public Machine() {
         this.disks = new ArrayList<Disk>();
-        this.volumes = new ArrayList<MachineVolume>();
+        this.machineVolumes = new ArrayList<MachineVolume>();
         this.networkInterfaces = new ArrayList<NetworkInterface>();
     }
 
@@ -114,13 +117,13 @@ public class Machine extends CloudEntity implements Serializable {
         disks = this.disks;
     }
 
-    @CollectionOfElements
-    public List<MachineVolume> getVolumes() {
-        return this.volumes;
+    @OneToMany
+    public List<MachineVolume> getMachineVolumes() {
+        return this.machineVolumes;
     }
 
-    public void setVolumes(final List<MachineVolume> volumes) {
-        this.volumes = volumes;
+    public void setMachineVolumes(final List<MachineVolume> mvolumes) {
+        this.machineVolumes = mvolumes;
     }
 
 
