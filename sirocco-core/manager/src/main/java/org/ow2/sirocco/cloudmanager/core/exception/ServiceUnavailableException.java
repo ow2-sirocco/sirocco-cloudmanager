@@ -25,6 +25,27 @@
 
 package org.ow2.sirocco.cloudmanager.core.exception;
 
-public class UserException extends CloudProviderException {
+/**
+ * The server is currently unable to handle the request 
+ * due to temporary overloading or maintenance of the server
+ */
+public class ServiceUnavailableException extends CloudProviderException {
+    private static final long serialVersionUID = 5657353511794738070L;
+
+    /**
+     * Constructs a ServiceUnavailableException with null as its error detail
+     * message.
+     */
+    public ServiceUnavailableException() {
+    }
+
+    /**
+     * Constructs a ServiceUnavailableException with a detail message.
+     * 
+     * @param message the detail message
+     */
+    public ServiceUnavailableException(String message) {
+        super(message);
+    }
 
 }

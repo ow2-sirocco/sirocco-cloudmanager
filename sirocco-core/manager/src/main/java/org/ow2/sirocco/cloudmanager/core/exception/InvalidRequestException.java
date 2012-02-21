@@ -25,6 +25,26 @@
 
 package org.ow2.sirocco.cloudmanager.core.exception;
 
-public class UserException extends CloudProviderException {
+/**
+ * Invalid parameter or field names in the request
+ */
+public class InvalidRequestException extends CloudProviderException {
+    private static final long serialVersionUID = 5657353511794738070L;
+
+    /**
+     * Constructs a InvalidRequestException with null as its error detail
+     * message.
+     */
+    public InvalidRequestException() {
+    }
+
+    /**
+     * Constructs a  with a detail message.
+     * 
+     * @param message the detail message
+     */
+    public InvalidRequestException(String message) {
+        super(message);
+    }
 
 }
