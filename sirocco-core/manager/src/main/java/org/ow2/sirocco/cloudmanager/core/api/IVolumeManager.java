@@ -35,6 +35,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 
@@ -84,6 +85,24 @@ public interface IVolumeManager {
     Volume getVolumeById(final String volumeId) throws InvalidVolumeIdException;
 
     /**
+     * Returns the VolumeTemplate instance with the supplied id
+     * 
+     * @param volumeTemplateId the id of the Volume to retrieve
+     * @return if successful, the VolumeTemplate instance
+     * @throws CloudProviderException raised if the provided id is invalid
+     */
+    VolumeTemplate getVolumeTemplateById(final String volumeTemplateId) throws CloudProviderException;
+
+    /**
+     * Returns the VolumeConfiguration instance with the supplied id
+     * 
+     * @param volumeConfigId the id of the Volume to retrieve
+     * @return if successful, the VolumeConfiguration instance
+     * @throws CloudProviderException raised if the provided id is invalid
+     */
+    VolumeConfiguration getVolumeConfigurationById(final String volumeConfigId) throws CloudProviderException;
+
+    /**
      * Retrieves some attributes of Volume
      * 
      * @param volumeId the id of the Volume
@@ -119,14 +138,23 @@ public interface IVolumeManager {
      * @param last index of the last Volume to return within the Volume
      *        Collection of the caller
      * @param attributes the list of attributes to retrieve
-     * @param filterExpression a filter expression compliant with the DMTF CIMI
-     *        syntax, if null no filtering is performed
      * @return a list of Volumes matching the filter expression within the
      *         requested range (if any), for each Volume, only the requested
      *         attributes are guaranteed to be filled
      * @throws CloudProviderException raised if the input parameters are invalid
      */
-    List<Volume> getVolumesAttributes(int first, int last, List<String> attributes, String filterExpression)
+    List<Volume> getVolumesAttributes(int first, int last, List<String> attributes) throws CloudProviderException;
+
+    List<VolumeConfiguration> getVolumeConfigurationsAttributes(List<String> attributes, String filterExpression)
+        throws CloudProviderException;
+
+    List<VolumeConfiguration> getVolumeConfigurationsAttributes(int first, int last, List<String> attributes)
+        throws CloudProviderException;
+
+    List<VolumeTemplate> getVolumeTemplatesAttributes(List<String> attributes, String filterExpression)
+        throws CloudProviderException;
+
+    List<VolumeTemplate> getVolumeTemplatesConfigurationsAttributes(int first, int last, List<String> attributes)
         throws CloudProviderException;
 
     /**
@@ -142,6 +170,12 @@ public interface IVolumeManager {
     Job updateVolumeAttributes(String volumeId, Map<String, Object> updatedAttributes) throws InvalidVolumeIdException,
         CloudProviderException;
 
+    void updateVolumeConfigurationAttributes(String volumeConfigId, Map<String, Object> updatedAttributes)
+        throws InvalidVolumeIdException, CloudProviderException;
+
+    void updateVolumeTemplateAttributes(String volumeTemplateId, Map<String, Object> updatedAttributes)
+        throws InvalidVolumeIdException, CloudProviderException;
+
     /**
      * Deletes a Volume, this operation is asynchronous
      * 
@@ -153,26 +187,30 @@ public interface IVolumeManager {
      */
     Job deleteVolume(String volumeId) throws InvalidVolumeIdException, CloudProviderException;
 
+    void deleteVolumeTemplate(String volumeTemplateId) throws CloudProviderException;
+
+    void deleteVolumeConfiguration(String volumeConfigId) throws CloudProviderException;
+
     /**
      * Returns the Volume Collection belonging to the caller
      * 
      * @return the Volume Collection belonging to the caller
      */
-    VolumeCollection getVolumeCollection();
+    VolumeCollection getVolumeCollection() throws CloudProviderException;
 
     /**
      * Returns the Volume Configuration Collection belonging to the caller
      * 
      * @return the Volume Configuration Collection belonging to the caller
      */
-    VolumeConfigurationCollection getVolumeConfigurationCollection();
+    VolumeConfigurationCollection getVolumeConfigurationCollection() throws CloudProviderException;
 
     /**
      * Returns the Volume Template Collection belonging to the caller
      * 
      * @return the Volume Template Collection belonging to the caller
      */
-    VolumeTemplateCollection getVolumeTemplateCollection();
+    VolumeTemplateCollection getVolumeTemplateCollection() throws CloudProviderException;
 
     /**
      * Updates the attributes of the Volume Collection belonging to the caller
@@ -181,7 +219,7 @@ public interface IVolumeManager {
      *        attribute to be update and the new value. Note that the only
      *        allowed attributes are "name", "description" and properties
      */
-    void updateVolumeCollection(Map<String, Object> updatedAttributes);
+    void updateVolumeCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
 
     /**
      * Updates the attributes of the Volume Configuration Collection belonging
@@ -191,7 +229,7 @@ public interface IVolumeManager {
      *        attribute to be update and the new value. Note that the only
      *        allowed attributes are "name", "description" and properties
      */
-    void updateVolumeConfigurationCollection(Map<String, Object> updatedAttributes);
+    void updateVolumeConfigurationCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
 
     /**
      * Updates the attributes of the Volume Template Collection belonging to the
@@ -201,6 +239,8 @@ public interface IVolumeManager {
      *        attribute to be update and the new value. Note that the only
      *        allowed attributes are "name", "description" and properties
      */
-    void updateVolumeTemplateCollection(Map<String, Object> updatedAttributes);
+    void updateVolumeTemplateCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
+
+    boolean handleJobCompletion(Job job);
 
 }
