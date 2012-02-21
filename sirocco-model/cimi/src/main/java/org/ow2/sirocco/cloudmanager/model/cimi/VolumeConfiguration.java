@@ -35,17 +35,17 @@ public class VolumeConfiguration extends CloudEntity implements Serializable {
 
     private String format;
 
-    private Capacity capacity;
+    private Disk capacity;
 
     private Boolean supportsSnapshots;
 
     private String guestInterface;
 
-    public Capacity getCapacity() {
+    public Disk getCapacity() {
         return this.capacity;
     }
 
-    public void setCapacity(final Capacity capacity) {
+    public void setCapacity(final Disk capacity) {
         this.capacity = capacity;
     }
 

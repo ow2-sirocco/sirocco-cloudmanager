@@ -37,20 +37,28 @@ public class Memory implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static enum MemoryUnit {
-        HERTZ, MEGA, GIGA, TERA, PETA, EXA, ZETTA
+        BYTE, 
+        KIBIBYTE, 
+        MEGIBYTE, 
+        GIGIBYTE, 
+        TEBIBYTE, 
+        PETIBYTE, 
+        EXBIBYTE, 
+        ZEBIBYTE, 
+        YOBIBYTE
     }
 
-    private MemoryUnit memoryUnit;
+    private MemoryUnit unit;
 
     private Float quantity;
 
     @Enumerated(EnumType.STRING)
-    public MemoryUnit getMemoryUnit() {
-        return this.memoryUnit;
+    public MemoryUnit getUnit() {
+        return this.unit;
     }
 
-    public void setMemoryUnit(final MemoryUnit memoryUnit) {
-        this.memoryUnit = memoryUnit;
+    public void setUnit(final MemoryUnit unit) {
+        this.unit = unit;
     }
 
     @Column(name = "memory_quantity")

@@ -34,21 +34,19 @@ import javax.persistence.EnumType;
 @Embeddable
 public class Disk implements Serializable {
 	private static final long serialVersionUID = 1L;
-    public static enum DiskUnit {
-	    KILO, MEGA, GIGA, TERA, PETA, EXA, ZETTA, YOTTA
-    }
+    
 
-	private DiskUnit	diskUnit;
+	private StorageUnit	unit;
     private Float		quantity;
 
 
 	@Enumerated(EnumType.STRING)
-	public DiskUnit getDiskUnit() {
-		return diskUnit;
+	public StorageUnit getUnit() {
+		return unit;
 	}
 
-	public void setDiskUnit(DiskUnit diskUnit) {
-		this.diskUnit = diskUnit;
+	public void setUnit(StorageUnit unit) {
+		this.unit = unit;
 	}
 
 	public Float getQuantity() {

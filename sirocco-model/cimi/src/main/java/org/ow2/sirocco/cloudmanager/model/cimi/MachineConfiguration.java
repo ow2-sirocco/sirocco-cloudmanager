@@ -65,4 +65,5 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
 	public void setDiskTemplates(List<DiskTemplate> diskTemplates) {
 	    this.diskTemplates = diskTemplates;
 	}
+	
 }

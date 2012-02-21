@@ -35,7 +35,7 @@ public class Credentials extends CloudEntity implements Serializable {
 
 	private	String	userName;
 	private String	password;
-
+	private String	key;
 
 	public Credentials() {}
 
@@ -55,4 +55,11 @@ public class Credentials extends CloudEntity implements Serializable {
 		this.password = password;
 	}
 
+	public byte[] getKey() {
+		return key.getBytes();
+	}
+	
+	public void setKey(byte[] key) {
+		this.key = new String(key);
+	}
 }

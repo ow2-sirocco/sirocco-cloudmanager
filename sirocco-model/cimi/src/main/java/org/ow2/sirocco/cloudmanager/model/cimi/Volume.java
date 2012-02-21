@@ -47,7 +47,7 @@ public class Volume extends CloudEntity implements Serializable {
 
     private State state;
 
-    private Capacity capacity;
+    private Disk capacity;
 
     private Boolean bootable;
 
@@ -71,11 +71,11 @@ public class Volume extends CloudEntity implements Serializable {
     }
 
     @Embedded
-    public Capacity getCapacity() {
+    public Disk getCapacity() {
         return this.capacity;
     }
 
-    public void setCapacity(final Capacity capacity) {
+    public void setCapacity(final Disk capacity) {
         this.capacity = capacity;
     }
 

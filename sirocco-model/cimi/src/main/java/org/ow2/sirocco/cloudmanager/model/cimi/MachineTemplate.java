@@ -52,7 +52,7 @@ public class MachineTemplate extends CloudEntity implements Serializable {
     private List<NetworkInterface> networkInterfaces;
 
     public MachineTemplate() {
-        
+        this.volumes = new ArrayList<MachineVolume>();
         this.networkInterfaces = new ArrayList<NetworkInterface>();
     }
 

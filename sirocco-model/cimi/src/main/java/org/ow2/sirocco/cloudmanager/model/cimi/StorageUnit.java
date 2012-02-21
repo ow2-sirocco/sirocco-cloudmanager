@@ -28,50 +28,18 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
-import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
-
-@Embeddable
-public class DiskTemplate implements Serializable {
-	private static final long serialVersionUID = 1L;
+public enum StorageUnit implements Serializable {
+        BYTE, 
+        KILOBYTE, 
+        MEGABYTE, 
+        GIGABYTE, 
+        TERABYTE, 
+        PETABYTE, 
+        EXABYTE, 
+        ZETTABYTE, 
+        YOTTABYTE;
     
-
-	private StorageUnit	unit;
-    private Float		quantity;
-	private String		format;
-	private String		attachmentPoint;
-
-	@Enumerated(EnumType.STRING)
-	public StorageUnit getUnit() {
-		return unit;
-	}
-
-	public void setUnit(StorageUnit unit) {
-		this.unit = unit;
-	}
-
-	public Float getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Float quantity) {
-		this.quantity = quantity;
-	}
-
-	public String getFormat() {
-		return format;
-	}
-
-	public void setFormat(String format) {
-		this.format = format;
-	}
-
-	public String getAttachmentPoint() {
-		return this.attachmentPoint;
-	}
-
-	public void setAttachmentPoint(String attachmentPoint) {
-		this.attachmentPoint = attachmentPoint;
-	}
 }

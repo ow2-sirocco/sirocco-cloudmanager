@@ -74,6 +74,7 @@ public class Machine extends CloudEntity implements Serializable {
 
     public Machine() {
         this.disks = new ArrayList<Disk>();
+        this.volumes = new ArrayList<MachineVolume>();
         this.networkInterfaces = new ArrayList<NetworkInterface>();
     }
 
@@ -141,6 +142,10 @@ public class Machine extends CloudEntity implements Serializable {
         this.cloudProviderAccount = cloudProviderAccount;
     }
     
+    /**
+     * Ideally: create and persist an FSM per entity per provider.
+     * Machines should then refer appropriate FSM.
+     */
     public void initFSM() {
     	fsm.addAction(State.CREATING, "DELETE", State.DELETING);
 		fsm.addAction(State.CREATING, "DELETE", State.ERROR);
@@ -205,6 +210,7 @@ public class Machine extends CloudEntity implements Serializable {
 		fsm.addAction(State.DELETING, "internal", State.DELETED);
     }
     /** get operations allowed in this state */
+    @Transient
     public Set<String> getOperations() {
     	Set<String> operations = fsm.getActionsAtState(state);
 		operations.remove(new String("internal"));
