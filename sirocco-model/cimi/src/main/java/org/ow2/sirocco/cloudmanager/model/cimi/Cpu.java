@@ -49,6 +49,15 @@ public class Cpu implements Serializable {
 
     private Float quantity;
 
+    public Cpu() {
+    }
+
+    public Cpu(final Cpu from) {
+        this.numberCpu = from.numberCpu;
+        this.cpuSpeedUnit = from.cpuSpeedUnit;
+        this.quantity = from.quantity;
+    }
+
     public Integer getNumberCpu() {
         return this.numberCpu;
     }
