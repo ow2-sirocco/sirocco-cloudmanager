@@ -26,11 +26,23 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 @Entity
 public class VolumeTemplateCollection extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @Transient
+    List<VolumeTemplate> volumeTemplates;
+
+    public List<VolumeTemplate> getVolumeConfigurations() {
+        return this.volumeTemplates;
+    }
+
+    public void setVolumeTemplates(final List<VolumeTemplate> volumeTemplates) {
+        this.volumeTemplates = volumeTemplates;
+    }
 }
