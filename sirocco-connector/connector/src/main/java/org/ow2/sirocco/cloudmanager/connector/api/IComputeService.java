@@ -25,13 +25,9 @@
 
 package org.ow2.sirocco.cloudmanager.connector.api;
 
-import java.util.List;
-
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 
 public interface IComputeService {
 
@@ -51,8 +47,6 @@ public interface IComputeService {
 
     Machine.State getMachineState(final String machineId) throws ConnectorException;
 
-    MachineConfiguration getMachineConfiguration(final String machineId) throws ConnectorException;
-
-    List<NetworkInterface> getMachineNetworkInterfaces(final String machineId) throws ConnectorException;
+    Machine getMachine(final String machineId) throws ConnectorException;
 
 }

@@ -37,4 +37,6 @@ public interface IVolumeService {
 
     Volume.State getVolumeState(String volumeId) throws ConnectorException;
 
+    Volume getVolume(String volumeId) throws ConnectorException;
+
 }
