@@ -68,6 +68,14 @@ public class User implements Serializable {
     private Collection<Machine> machines;
 
     private Collection<Volume> volumes;
+    
+    private Collection<MachineTemplate> machineTemplates;
+    
+    private Collection<MachineConfiguration> machineConfigurations;
+    
+    private Collection<VolumeTemplate> volumeTemplates;
+    
+    private Collection<VolumeConfiguration> volumeConfigurations;
 
     public User() {
     }
@@ -167,5 +175,41 @@ public class User implements Serializable {
     public void setUsername(final String username) {
         this.username = username;
     }
+
+    @OneToMany(mappedBy = "user")
+    public Collection<MachineTemplate> getMachineTemplates() {
+		return machineTemplates;
+	}
+
+	public void setMachineTemplates(Collection<MachineTemplate> machineTemplates) {
+		this.machineTemplates = machineTemplates;
+	}
+
+	@OneToMany(mappedBy = "user")
+	public Collection<MachineConfiguration> getMachineConfigurations() {
+		return machineConfigurations;
+	}
+
+	public void setMachineConfigurations(Collection<MachineConfiguration> machineConfigurations) {
+		this.machineConfigurations = machineConfigurations;
+	}
+
+	@OneToMany(mappedBy = "user")
+	public Collection<VolumeTemplate> getVolumeTemplates() {
+		return volumeTemplates;
+	}
+
+	public void setVolumeTemplates(Collection<VolumeTemplate> volumeTemplates) {
+		this.volumeTemplates = volumeTemplates;
+	}
+
+	@OneToMany(mappedBy = "user")
+	public Collection<VolumeConfiguration> getVolumeConfigurations() {
+		return volumeConfigurations;
+	}
+
+	public void setVolumeConfigurations(Collection<VolumeConfiguration> volumeConfigurations) {
+		this.volumeConfigurations = volumeConfigurations;
+	}
 
 }
