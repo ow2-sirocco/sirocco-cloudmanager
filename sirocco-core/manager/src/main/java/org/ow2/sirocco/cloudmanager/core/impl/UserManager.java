@@ -51,7 +51,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 
-@Stateless(name = IUserManager.EJB_JNDI_NAME, mappedName = ICloudProviderManager.EJB_JNDI_NAME)
+@Stateless(name = IUserManager.EJB_JNDI_NAME, mappedName = IUserManager.EJB_JNDI_NAME)
 @Remote(IRemoteUserManager.class)
 @Local(IUserManager.class)
 public class UserManager implements IUserManager {
