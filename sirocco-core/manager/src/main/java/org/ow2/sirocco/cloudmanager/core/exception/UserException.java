@@ -26,5 +26,21 @@
 package org.ow2.sirocco.cloudmanager.core.exception;
 
 public class UserException extends CloudProviderException {
+	private static final long serialVersionUID = 5657353511794738070L;
 
+    /**
+     * Constructs a ResourceNotFoundException with null as its error detail
+     * message.
+     */
+    public UserException() {
+    }
+
+    /**
+     * Constructs a ResourceNotFoundException with a detail message.
+     * 
+     * @param message the detail message
+     */
+    public UserException(String message) {
+        super(message);
+    }
 }
