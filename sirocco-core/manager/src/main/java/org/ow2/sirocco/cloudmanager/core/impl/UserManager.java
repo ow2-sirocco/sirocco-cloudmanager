@@ -40,7 +40,16 @@ import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.UserException;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 
 @Stateless(name = IUserManager.EJB_JNDI_NAME, mappedName = ICloudProviderManager.EJB_JNDI_NAME)
 @Remote(IRemoteUserManager.class)
@@ -68,6 +77,41 @@ public class UserManager implements IUserManager {
 		u.setPublicKey(publicKey);
 
 		this.em.persist(u);
+		
+		//create collection objects
+		MachineImageCollection mic=new MachineImageCollection();
+		mic.setUser(u);
+		MachineCollection mc=new MachineCollection();
+		mc.setUser(u);
+		VolumeCollection vc=new VolumeCollection();
+		vc.setUser(u);
+		MachineTemplateCollection mtc=new MachineTemplateCollection();
+		mtc.setUser(u);
+		MachineConfigurationCollection mcc=new MachineConfigurationCollection();
+		mcc.setUser(u);
+		VolumeTemplateCollection vtc=new VolumeTemplateCollection();
+		vtc.setUser(u);
+		VolumeConfigurationCollection vcc=new VolumeConfigurationCollection();
+		vcc.setUser(u);
+		
+		//persist them in the database
+		this.em.persist(mic);
+		this.em.persist(mc);
+		this.em.persist(vc);
+		this.em.persist(mtc);
+		this.em.persist(mcc);
+		this.em.persist(vtc);
+		this.em.persist(vcc);
+		
+		//add them to a new user 
+
+		
+		
+		
+		
+		
+		
+		
 		return u;
 	}
 
@@ -113,7 +157,12 @@ public class UserManager implements IUserManager {
 	@Override
 	public void deleteUser(String userId) throws UserException {
 
-		User result = this.em.find(User.class, new Integer(userId));
+		User result = this.getUserById(userId);
+		
+		//List l<List>=this.em
+		//.createQuery("FROM User u WHERE u.id=:usrid")
+		//.setParameter("usrid", userId).getResultList();
+		
 		this.em.remove(result);
 
 	}
