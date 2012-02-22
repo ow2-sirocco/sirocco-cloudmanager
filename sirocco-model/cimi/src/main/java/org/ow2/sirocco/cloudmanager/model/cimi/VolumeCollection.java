@@ -38,10 +38,12 @@ public class VolumeCollection extends CloudEntity implements Serializable {
     @Transient
     List<Volume> volumes;
 
+    @Transient
     public List<Volume> getVolumes() {
         return this.volumes;
     }
 
+    @Transient
     public void setVolumes(final List<Volume> volumes) {
         this.volumes = volumes;
     }

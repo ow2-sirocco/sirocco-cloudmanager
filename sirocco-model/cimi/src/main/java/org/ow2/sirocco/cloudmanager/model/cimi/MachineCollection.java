@@ -41,9 +41,11 @@ public class MachineCollection  extends CloudEntity implements Serializable {
 	@Transient
 	List<Machine> machines;
 	
+	@Transient
 	public List<Machine> getMachines(){
 		return this.machines;
 	}
+	@Transient
 	public void setMachines(List<Machine> machines){
 		this.machines = machines;
 	}

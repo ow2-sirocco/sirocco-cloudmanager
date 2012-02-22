@@ -38,10 +38,12 @@ public class VolumeConfigurationCollection extends CloudEntity implements Serial
     @Transient
     List<VolumeConfiguration> volumeConfigs;
 
+    @Transient
     public List<VolumeConfiguration> getVolumeConfigurations() {
         return this.volumeConfigs;
     }
 
+    @Transient
     public void setVolumeConfigurations(final List<VolumeConfiguration> volumeConfigs) {
         this.volumeConfigs = volumeConfigs;
     }

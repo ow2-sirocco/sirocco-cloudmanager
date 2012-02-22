@@ -41,9 +41,11 @@ public class MachineConfigurationCollection  extends CloudEntity implements Seri
 	@Transient
 	List<MachineConfiguration> machineConfigurations;
 	
+	@Transient
 	public List<MachineConfiguration> getMachineConfigurations(){
 		return this.machineConfigurations;
 	}
+	@Transient
 	public void setMachineConfigurations(List<MachineConfiguration> machineConfigurations){
 		this.machineConfigurations = machineConfigurations;
 	}

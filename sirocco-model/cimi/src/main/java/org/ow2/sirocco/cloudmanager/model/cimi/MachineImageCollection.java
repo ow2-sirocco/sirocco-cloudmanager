@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2012 France Telecom
+ * Copyright (C) 2011 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -19,36 +19,34 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  
+ *  $Id$
  *
  */
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+import javax.persistence.Entity;
 import javax.persistence.Transient;
 
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * @Entity
- */
-
-public class MachineTemplateCollection  extends CloudEntity implements Serializable {
+@Entity
+public class MachineImageCollection  extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-	public MachineTemplateCollection() {}
+	public MachineImageCollection() {}
+
+	@Transient
+	List<MachineImage> images;
 	
 	@Transient
-	List<MachineTemplate> machineTemplates;
-	
-	@Transient
-	public List<MachineTemplate> getMachineTemplates(){
-		return this.machineTemplates;
+	public List<MachineImage> getMachines(){
+		return this.images;
 	}
 	@Transient
-	public void setMachineTemplates(List<MachineTemplate> machineTemplates){
-		this.machineTemplates = machineTemplates;
+	public void setMachines(List<MachineImage> images){
+		this.images = images;
 	}
 }
 
