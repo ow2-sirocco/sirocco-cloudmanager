@@ -73,10 +73,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-<<<<<<< .mine
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
-=======
->>>>>>> .r958
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
@@ -375,7 +372,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		for (Machine machine : machines) {
 
 			if (attributes.contains("volumes")) {
-				((Machine) machine).getMachineVolumes().size();
+				machine.getVolumes().size();
 			}
 			if (attributes.contains("disks")) {
 				machine.getDisks().size();
@@ -541,7 +538,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 	public Machine getMachineById(final String machineId) 
 		throws InvalidMachineIdException, CloudProviderException {
 		Machine m = (Machine)this.em.find(Machine.class, Integer.valueOf(machineId));
-		m.getMachineVolumes().size();
+		m.getVolumes().size();
 		m.getNetworkInterfaces().size();
 		m.getDisks().size();
 		return m;
@@ -560,7 +557,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 			throw new ResourceNotFoundException("Machine " +machineId +" cannot be found");
 		}
 		if (attributes.contains("volumes")) {
-			m.getMachineVolumes().size();
+			m.getVolumes().size();
 		}
 		if (attributes.contains("disks")) {
 			m.getDisks().size();
@@ -912,7 +909,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		}
 		this.em.flush();
 	}
-<<<<<<< .mine
+
 	
 	/**
 	 * To complete: 
@@ -1094,8 +1091,5 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 			throws CloudProviderException {
 		
 	}
-=======
 
-
->>>>>>> .r958
 }
