@@ -34,7 +34,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 
 
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.InvalidMachineIdException;
+
 
 public interface IMachineImageManager {
 
