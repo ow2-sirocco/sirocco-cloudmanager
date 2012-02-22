@@ -24,7 +24,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Capacity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Capacity.Unit;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -92,10 +94,10 @@ public class VolumeManagerTest {
     @Before
     public void setUp() throws Exception {
         this.connectToCloudManager();
-        this.userManager.createUser(VolumeManagerTest.USER_NAME, "password");
-        CloudProvider provider = this.cloudProviderManager.createCloudProvider(VolumeManagerTest.CLOUD_PROVIDER_TYPE);
+        this.userManager.createUser("", "", "", VolumeManagerTest.USER_NAME, "password", "");
+        CloudProvider provider = this.cloudProviderManager.createCloudProvider(VolumeManagerTest.CLOUD_PROVIDER_TYPE, "test");
         CloudProviderAccount account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(),
-            VolumeManagerTest.ACCOUNT_LOGIN, VolumeManagerTest.ACCOUNT_CREDENTIALS);
+            VolumeManagerTest.USER_NAME, VolumeManagerTest.ACCOUNT_LOGIN, VolumeManagerTest.ACCOUNT_CREDENTIALS);
         this.cloudProviderManager.addCloudProviderAccountToUser(VolumeManagerTest.USER_NAME, account.getId().toString());
     }
 
@@ -116,9 +118,9 @@ public class VolumeManagerTest {
         volumeCreate.setProperties(properties);
         VolumeTemplate volumeTemplate = new VolumeTemplate();
         VolumeConfiguration volumeConfig = new VolumeConfiguration();
-        Capacity capacity = new Capacity();
-        capacity.setQuantity(512);
-        capacity.setUnits(Unit.MEGABYTE);
+        Disk capacity = new Disk();
+        capacity.setQuantity((float)512);
+        capacity.setUnit(StorageUnit.MEGABYTE);
         volumeConfig.setCapacity(capacity);
         volumeConfig.setSupportsSnapshots(false);
         volumeTemplate.setVolumeConfig(volumeConfig);
@@ -159,7 +161,7 @@ public class VolumeManagerTest {
         // Assert.assertTrue(volume.getProperties().get("departement").equals("MAPS"));
         Assert.assertNotNull(volume.getCapacity());
         Assert.assertEquals(volume.getCapacity().getQuantity().intValue(), 512);
-        Assert.assertEquals(volume.getCapacity().getUnits(), Unit.MEGABYTE);
+        Assert.assertEquals(volume.getCapacity().getUnit(), StorageUnit.MEGABYTE);
 
         this.deleteVolume(volume.getId().toString());
     }
@@ -186,6 +188,10 @@ public class VolumeManagerTest {
         }
 
         Assert.assertTrue("volume deletion failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+    }
+
+    @Test
+    public void testCRUDVolumeConfigurationAndTemplate() throws Exception {
 
     }
 }
