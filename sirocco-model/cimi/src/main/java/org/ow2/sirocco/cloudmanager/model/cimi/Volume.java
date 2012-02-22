@@ -34,13 +34,17 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
+@NamedQueries(value = {@NamedQuery(name = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM Volume v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
 public class Volume extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static final String GET_VOLUME_BY_PROVIDER_ASSIGNED_ID = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID";
 
     public static enum State {
         CREATING, AVAILABLE, DELETING, DELETED, ERROR
@@ -57,8 +61,6 @@ public class Volume extends CloudEntity implements Serializable {
     private Collection<MachineVolume> machineVolumes;
 
     private CloudProviderAccount cloudProviderAccount;
-
-	
 
     public Volume() {
         this.machineVolumes = new ArrayList<MachineVolume>();
@@ -99,7 +101,7 @@ public class Volume extends CloudEntity implements Serializable {
         this.machineVolumes = machineVs;
     }
 
-    public boolean isSupportsSnapshots() {
+    public Boolean isSupportsSnapshots() {
         return this.supportsSnapshots;
     }
 
