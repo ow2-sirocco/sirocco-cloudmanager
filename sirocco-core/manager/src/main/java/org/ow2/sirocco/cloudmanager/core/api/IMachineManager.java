@@ -37,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.InvalidMachineIdException;
 
@@ -91,7 +92,7 @@ public interface IMachineManager {
 	/**
 	 * Operations on MachineConfigurationCollection
 	 */
-	MachineConfigurationCollection getMachineConfigurationCollection();
+	MachineConfigurationCollection getMachineConfigurationCollection() throws CloudProviderException;
 	MachineConfiguration createMachineConfiguration(MachineConfiguration machineConfig)
 						throws CloudProviderException;
 
