@@ -29,7 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.InvalidVolumeIdException;
+import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
@@ -53,7 +54,7 @@ public interface IVolumeManager {
      * @return the job representing the asynchronous creation operation
      * @throws CloudProviderException raised if the creation fails
      */
-    Job createVolume(VolumeCreate volumeCreate) throws CloudProviderException;
+    Job createVolume(VolumeCreate volumeCreate) throws InvalidRequestException, CloudProviderException;
 
     /**
      * Creates a new Volume Configuration
@@ -63,7 +64,8 @@ public interface IVolumeManager {
      * @return a persisted Volume Configuration instance
      * @throws CloudProviderException raised if the creation fails
      */
-    VolumeConfiguration createVolumeConfiguration(VolumeConfiguration volumeConfig) throws CloudProviderException;
+    VolumeConfiguration createVolumeConfiguration(VolumeConfiguration volumeConfig) throws InvalidRequestException,
+        CloudProviderException;
 
     /**
      * Creates a new Volume Template
@@ -73,7 +75,7 @@ public interface IVolumeManager {
      * @return a persisted Volume Template instance
      * @throws CloudProviderException raised if the creation fails
      */
-    VolumeTemplate createVolumeTemplate(VolumeTemplate volumeTemplate) throws CloudProviderException;
+    VolumeTemplate createVolumeTemplate(VolumeTemplate volumeTemplate) throws InvalidRequestException, CloudProviderException;
 
     /**
      * Returns the Volume instance with the supplied id
@@ -82,7 +84,7 @@ public interface IVolumeManager {
      * @return if successful, the Volume instance
      * @throws InvalidVolumeIdException raised if the provided id is invalid
      */
-    Volume getVolumeById(final String volumeId) throws InvalidVolumeIdException;
+    Volume getVolumeById(final String volumeId) throws ResourceNotFoundException;
 
     /**
      * Returns the VolumeTemplate instance with the supplied id
@@ -112,7 +114,7 @@ public interface IVolumeManager {
      * @throws CloudProviderException raised if any other type of runtime fault
      *         occurs
      */
-    Volume getVolumeAttributes(final String volumeId, List<String> attributes) throws InvalidVolumeIdException,
+    Volume getVolumeAttributes(final String volumeId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
 
     /**
@@ -126,7 +128,8 @@ public interface IVolumeManager {
      *         Volume, only the requested attributes are guaranteed to be filled
      * @throws CloudProviderException raised if the input parameters are invalid
      */
-    List<Volume> getVolumesAttributes(List<String> attributes, String filterExpression) throws CloudProviderException;
+    List<Volume> getVolumesAttributes(List<String> attributes, String filterExpression) throws InvalidRequestException,
+        CloudProviderException;
 
     /**
      * Retrieves some attributes of all Volumes belonging to the caller within a
@@ -143,19 +146,20 @@ public interface IVolumeManager {
      *         attributes are guaranteed to be filled
      * @throws CloudProviderException raised if the input parameters are invalid
      */
-    List<Volume> getVolumesAttributes(int first, int last, List<String> attributes) throws CloudProviderException;
+    List<Volume> getVolumesAttributes(int first, int last, List<String> attributes) throws InvalidRequestException,
+        CloudProviderException;
 
     List<VolumeConfiguration> getVolumeConfigurationsAttributes(List<String> attributes, String filterExpression)
-        throws CloudProviderException;
+        throws InvalidRequestException, CloudProviderException;
 
     List<VolumeConfiguration> getVolumeConfigurationsAttributes(int first, int last, List<String> attributes)
-        throws CloudProviderException;
+        throws InvalidRequestException, CloudProviderException;
 
     List<VolumeTemplate> getVolumeTemplatesAttributes(List<String> attributes, String filterExpression)
-        throws CloudProviderException;
+        throws InvalidRequestException, CloudProviderException;
 
     List<VolumeTemplate> getVolumeTemplatesConfigurationsAttributes(int first, int last, List<String> attributes)
-        throws CloudProviderException;
+        throws InvalidRequestException, CloudProviderException;
 
     /**
      * Updates some attributes of a Volume, this operation is asynchronous
@@ -167,14 +171,14 @@ public interface IVolumeManager {
      * @throws CloudProviderException raised if any other type of runtime fault
      *         occurs
      */
-    Job updateVolumeAttributes(String volumeId, Map<String, Object> updatedAttributes) throws InvalidVolumeIdException,
-        CloudProviderException;
+    Job updateVolumeAttributes(String volumeId, Map<String, Object> updatedAttributes) throws ResourceNotFoundException,
+        InvalidRequestException, CloudProviderException;
 
     void updateVolumeConfigurationAttributes(String volumeConfigId, Map<String, Object> updatedAttributes)
-        throws InvalidVolumeIdException, CloudProviderException;
+        throws InvalidRequestException, ResourceNotFoundException, CloudProviderException;
 
     void updateVolumeTemplateAttributes(String volumeTemplateId, Map<String, Object> updatedAttributes)
-        throws InvalidVolumeIdException, CloudProviderException;
+        throws InvalidRequestException, ResourceNotFoundException, CloudProviderException;
 
     /**
      * Deletes a Volume, this operation is asynchronous
@@ -185,7 +189,7 @@ public interface IVolumeManager {
      * @throws CloudProviderException raised if any other type of runtime fault
      *         occurs
      */
-    Job deleteVolume(String volumeId) throws InvalidVolumeIdException, CloudProviderException;
+    Job deleteVolume(String volumeId) throws ResourceNotFoundException, CloudProviderException;
 
     void deleteVolumeTemplate(String volumeTemplateId) throws CloudProviderException;
 
