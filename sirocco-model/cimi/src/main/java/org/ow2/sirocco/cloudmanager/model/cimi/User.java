@@ -34,6 +34,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -76,6 +77,8 @@ public class User implements Serializable {
     private Collection<VolumeTemplate> volumeTemplates;
     
     private Collection<VolumeConfiguration> volumeConfigurations;
+    
+    private Collection<CloudProviderAccount> cloudProviderAccounts;
 
     public User() {
     }
@@ -210,6 +213,15 @@ public class User implements Serializable {
 
 	public void setVolumeConfigurations(Collection<VolumeConfiguration> volumeConfigurations) {
 		this.volumeConfigurations = volumeConfigurations;
+	}
+
+	@ManyToMany
+	public Collection<CloudProviderAccount> getCloudProviderAccounts() {
+		return cloudProviderAccounts;
+	}
+
+	public void setCloudProviderAccounts(Collection<CloudProviderAccount> cloudProviderAccounts) {
+		this.cloudProviderAccounts = cloudProviderAccounts;
 	}
 
 }
