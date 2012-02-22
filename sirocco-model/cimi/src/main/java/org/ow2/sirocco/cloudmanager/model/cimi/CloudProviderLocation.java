@@ -97,7 +97,7 @@ public class CloudProviderLocation implements Serializable {
 		return cloudProviders;
 	}
 
-	public void setCloudProvider(List<CloudProvider> cloudProviders) {
+	public void setCloudProviders(List<CloudProvider> cloudProviders) {
 		this.cloudProviders = cloudProviders;
 	}
 
