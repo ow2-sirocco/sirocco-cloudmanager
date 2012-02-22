@@ -62,7 +62,7 @@ public class Machine extends CloudEntity implements Serializable {
 
     private Cpu cpu;
 
-    private List<MachineVolume> machineVolumes;
+    private List<MachineVolume> volumes;
     private List<NetworkInterface>  networkInterfaces;
 
     private CloudProviderAccount cloudProviderAccount;
@@ -77,7 +77,7 @@ public class Machine extends CloudEntity implements Serializable {
 
     public Machine() {
         this.disks = new ArrayList<Disk>();
-        this.machineVolumes = new ArrayList<MachineVolume>();
+        this.volumes = new ArrayList<MachineVolume>();
         this.networkInterfaces = new ArrayList<NetworkInterface>();
     }
 
@@ -118,12 +118,12 @@ public class Machine extends CloudEntity implements Serializable {
     }
 
     @OneToMany
-    public List<MachineVolume> getMachineVolumes() {
-        return this.machineVolumes;
+    public List<MachineVolume> getVolumes() {
+        return this.volumes;
     }
 
-    public void setMachineVolumes(final List<MachineVolume> mvolumes) {
-        this.machineVolumes = mvolumes;
+    public void setVolumes(final List<MachineVolume> volumes) {
+        this.volumes = volumes;
     }
 
 
