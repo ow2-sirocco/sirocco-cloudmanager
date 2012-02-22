@@ -82,7 +82,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.InvalidMachineIdException;
 import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceConflictException;
@@ -536,7 +535,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 
 
 	public Machine getMachineById(final String machineId) 
-		throws InvalidMachineIdException, CloudProviderException {
+		throws ResourceNotFoundException, CloudProviderException {
 		Machine m = (Machine)this.em.find(Machine.class, Integer.valueOf(machineId));
 		m.getVolumes().size();
 		m.getNetworkInterfaces().size();
@@ -546,7 +545,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 
 	public Machine getMachineAttributes(final String machineId, 
 				     List<String> attributes) 
-		 throws InvalidMachineIdException, CloudProviderException {
+		 throws ResourceNotFoundException, CloudProviderException {
 		Machine m = null;
 		try {
 			m = (Machine) this.em.find(Machine.class, Integer.valueOf(machineId));
@@ -587,7 +586,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 	}
 	public Job updateMachine(final String machineId, 
 			  final Map<String, Object> attributes)
-		 throws InvalidMachineIdException, CloudProviderException {
+		 throws ResourceNotFoundException, CloudProviderException {
 		
 		Job j = null;
 		

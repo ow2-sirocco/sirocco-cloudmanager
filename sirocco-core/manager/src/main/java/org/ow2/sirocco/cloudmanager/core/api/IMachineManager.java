@@ -64,11 +64,11 @@ public interface IMachineManager {
 
 	Machine getMachineAttributes(final String machineId, 
 				     List<String> attributes) 
-		 throws InvalidMachineIdException, CloudProviderException;
+		 throws CloudProviderException;
 
 	Job updateMachine(final String machineId, 
 			  Map<String, Object> updatedAttributes)
-		 throws InvalidMachineIdException, CloudProviderException;
+		 throws CloudProviderException;
 
 	/**
 	 * Operations on MachineCollection
