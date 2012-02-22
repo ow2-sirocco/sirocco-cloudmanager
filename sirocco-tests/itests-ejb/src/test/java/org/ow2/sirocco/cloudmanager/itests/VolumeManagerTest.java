@@ -10,7 +10,7 @@ import javax.naming.NamingException;
 
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
@@ -20,13 +20,12 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.Capacity;
-import org.ow2.sirocco.cloudmanager.model.cimi.Capacity.Unit;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
+import org.ow2.sirocco.cloudmanager.model.cimi.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -53,15 +52,15 @@ public class VolumeManagerTest {
      */
     private static final int INITIALIZE_TIMEOUT = 30;
 
-    private IRemoteVolumeManager volumeManager;
+    private static IRemoteVolumeManager volumeManager;
 
-    private IRemoteCloudProviderManager cloudProviderManager;
+    private static IRemoteCloudProviderManager cloudProviderManager;
 
-    private IRemoteUserManager userManager;
+    private static IRemoteUserManager userManager;
 
-    private IRemoteJobManager jobManager;
+    private static IRemoteJobManager jobManager;
 
-    private void connectToCloudManager() throws Exception {
+    private static void connectToCloudManager() throws Exception {
         String carolPortString = System.getProperty("carol.port");
         Assert.assertNotNull("carol.port not set!", carolPortString);
         int carolPort = Integer.parseInt(carolPortString);
@@ -73,10 +72,13 @@ public class VolumeManagerTest {
         while (true) {
             try {
                 Context context = new InitialContext(env);
-                this.volumeManager = (IRemoteVolumeManager) context.lookup(IVolumeManager.EJB_JNDI_NAME);
-                this.cloudProviderManager = (IRemoteCloudProviderManager) context.lookup(ICloudProviderManager.EJB_JNDI_NAME);
-                this.userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
-                this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+                VolumeManagerTest.volumeManager = (IRemoteVolumeManager) context.lookup(IVolumeManager.EJB_JNDI_NAME);
+                Object o = context.lookup(ICloudProviderManager.EJB_JNDI_NAME);
+
+                VolumeManagerTest.cloudProviderManager = (IRemoteCloudProviderManager) context
+                    .lookup(ICloudProviderManager.EJB_JNDI_NAME);
+                VolumeManagerTest.userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
+                VolumeManagerTest.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
                 break;
             } catch (NamingException e) {
                 if (System.currentTimeMillis() > timeout) {
@@ -91,14 +93,20 @@ public class VolumeManagerTest {
     /**
      * @throws java.lang.Exception
      */
-    @Before
-    public void setUp() throws Exception {
-        this.connectToCloudManager();
-        this.userManager.createUser("", "", "", VolumeManagerTest.USER_NAME, "password", "");
-        CloudProvider provider = this.cloudProviderManager.createCloudProvider(VolumeManagerTest.CLOUD_PROVIDER_TYPE, "test");
-        CloudProviderAccount account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(),
-            VolumeManagerTest.USER_NAME, VolumeManagerTest.ACCOUNT_LOGIN, VolumeManagerTest.ACCOUNT_CREDENTIALS);
-        this.cloudProviderManager.addCloudProviderAccountToUser(VolumeManagerTest.USER_NAME, account.getId().toString());
+    @BeforeClass
+    public static void setUp() throws Exception {
+        VolumeManagerTest.connectToCloudManager();
+
+        if (VolumeManagerTest.userManager.getUserByUsername(VolumeManagerTest.USER_NAME) == null) {
+            User user = VolumeManagerTest.userManager.createUser("", "", "", VolumeManagerTest.USER_NAME, "password", "");
+            CloudProvider provider = VolumeManagerTest.cloudProviderManager.createCloudProvider(
+                VolumeManagerTest.CLOUD_PROVIDER_TYPE, "test");
+            CloudProviderAccount account = VolumeManagerTest.cloudProviderManager.createCloudProviderAccount(provider.getId()
+                .toString(), VolumeManagerTest.USER_NAME, VolumeManagerTest.ACCOUNT_LOGIN,
+                VolumeManagerTest.ACCOUNT_CREDENTIALS);
+            VolumeManagerTest.cloudProviderManager.addCloudProviderAccountToUser(user.getId().toString(), account.getId()
+                .toString());
+        }
     }
 
     /**
@@ -119,14 +127,14 @@ public class VolumeManagerTest {
         VolumeTemplate volumeTemplate = new VolumeTemplate();
         VolumeConfiguration volumeConfig = new VolumeConfiguration();
         Disk capacity = new Disk();
-        capacity.setQuantity((float)512);
+        capacity.setQuantity((float) 512);
         capacity.setUnit(StorageUnit.MEGABYTE);
         volumeConfig.setCapacity(capacity);
         volumeConfig.setSupportsSnapshots(false);
         volumeTemplate.setVolumeConfig(volumeConfig);
         volumeCreate.setVolumeTemplate(volumeTemplate);
 
-        Job job = this.volumeManager.createVolume(volumeCreate);
+        Job job = VolumeManagerTest.volumeManager.createVolume(volumeCreate);
         Assert.assertNotNull("createVolume returns no job", job);
 
         Assert.assertNotNull(job.getId());
@@ -138,7 +146,7 @@ public class VolumeManagerTest {
 
         int counter = VolumeManagerTest.VOLUME_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
-            job = this.jobManager.getJobById(jobId);
+            job = VolumeManagerTest.jobManager.getJobById(jobId);
             if (job.getStatus() != Job.Status.RUNNING) {
                 break;
             }
@@ -150,7 +158,7 @@ public class VolumeManagerTest {
 
         Assert.assertTrue("volume creation failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
 
-        Volume volume = this.volumeManager.getVolumeById(volumeId);
+        Volume volume = VolumeManagerTest.volumeManager.getVolumeById(volumeId);
         Assert.assertNotNull("cannot find volume juste created", volume);
         Assert.assertEquals("Created volume is not AVAILABLE", volume.getState(), Volume.State.AVAILABLE);
         Assert.assertNotNull(volume.getProviderAssignedId());
@@ -167,7 +175,7 @@ public class VolumeManagerTest {
     }
 
     void deleteVolume(final String volumeId) throws Exception {
-        Job job = this.volumeManager.deleteVolume(volumeId);
+        Job job = VolumeManagerTest.volumeManager.deleteVolume(volumeId);
         Assert.assertNotNull("deleteVolume returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("volume.delete"));
@@ -177,7 +185,7 @@ public class VolumeManagerTest {
 
         int counter = VolumeManagerTest.VOLUME_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
-            job = this.jobManager.getJobById(jobId);
+            job = VolumeManagerTest.jobManager.getJobById(jobId);
             if (job.getStatus() != Job.Status.RUNNING) {
                 break;
             }
@@ -190,8 +198,4 @@ public class VolumeManagerTest {
         Assert.assertTrue("volume deletion failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
     }
 
-    @Test
-    public void testCRUDVolumeConfigurationAndTemplate() throws Exception {
-
-    }
 }
