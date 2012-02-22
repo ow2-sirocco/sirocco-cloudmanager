@@ -50,6 +50,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
@@ -66,7 +67,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
 
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.core.api.MachineCreate;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.InvalidMachineIdException;
@@ -132,7 +132,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		for (Machine machine : machines) {
 
 			if (attributes.contains(new String("volumes"))) {
-				machine.getVolumes().size();
+				((Machine) machine).getMachineVolumes().size();
 			}
 			if (attributes.contains(new String("disks"))) {
 				machine.getDisks().size();
@@ -177,7 +177,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 	public Machine getMachineById(final String machineId) 
 		throws InvalidMachineIdException, CloudProviderException {
 		Machine m = (Machine)this.em.find(Machine.class, Integer.valueOf(machineId));
-		m.getVolumes().size();
+		m.getMachineVolumes().size();
 		m.getNetworkInterfaces().size();
 		m.getDisks().size();
 		return m;
@@ -188,7 +188,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		 throws InvalidMachineIdException, CloudProviderException {
 		Machine m = (Machine) this.em.find(Machine.class, Integer.valueOf(machineId));
 		if (attributes.contains(new String("volumes"))) {
-			m.getVolumes().size();
+			m.getMachineVolumes().size();
 		}
 		if (attributes.contains(new String("disks"))) {
 			m.getDisks().size();
@@ -461,4 +461,6 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		}
 		this.em.flush();
 	}
+
+
 }
