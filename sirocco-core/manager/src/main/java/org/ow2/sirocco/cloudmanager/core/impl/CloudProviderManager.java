@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -134,8 +135,9 @@ public class CloudProviderManager implements ICloudProviderManager {
 
 		CloudProviderAccount cpa=this.getCloudProviderAccountById(cloudProviderAccountId);
 		User u=userManager.getUserById(userId);
-		
-		cpa.setUser(u);
+		List<User> users = cpa.getUsers();
+		users.add(u);
+		cpa.setUsers(users);
 		
 		this.em.merge(cpa);
 
@@ -152,7 +154,37 @@ public class CloudProviderManager implements ICloudProviderManager {
 
 		this.addCloudProviderAccountToUser(userManager.getUserByUsername(userName).getId().toString(), cloudProviderAccountId);
 		
-	}	
+	}
+	
+	/**
+	 * add a provider to user by providing an user id
+	 * @see org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager#addCloudProviderAccountToUser(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void removeCloudProviderAccountFromUser(String userId,
+			String cloudProviderAccountId) throws CloudProviderException, UserException {
+
+		CloudProviderAccount cpa=this.getCloudProviderAccountById(cloudProviderAccountId);
+		User u=userManager.getUserById(userId);
+		List<User> users = cpa.getUsers();
+		users.remove(u);
+		cpa.setUsers(users);		
+		this.em.merge(cpa);
+
+	}
+	
+	/**
+	 * add a provider to user by providing an user name
+	 * @see org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager#addCloudProviderAccountToUserByName(java.lang.String, java.lang.String)
+	 */
+	@Override
+	public void removeCloudProviderAccountFromUserByName(String userName,
+			String cloudProviderAccountId) throws CloudProviderException,
+			UserException {
+
+		this.removeCloudProviderAccountFromUser(userManager.getUserByUsername(userName).getId().toString(), cloudProviderAccountId);
+		
+	}
 
 	@Override
 	public void deleteCloudProviderAccount(String cloudProviderAccountId)

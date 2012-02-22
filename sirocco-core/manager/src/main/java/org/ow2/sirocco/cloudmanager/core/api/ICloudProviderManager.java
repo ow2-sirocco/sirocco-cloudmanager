@@ -44,5 +44,11 @@ public interface ICloudProviderManager {
     void addCloudProviderAccountToUser(String userId, String cloudProviderAccountId) throws CloudProviderException,UserException;
     void addCloudProviderAccountToUserByName(String userName, String cloudProviderAccountId) throws CloudProviderException,UserException;
     void deleteCloudProviderAccount(String cloudProviderAccountId) throws CloudProviderException;
+	void removeCloudProviderAccountFromUser(String userId,
+			String cloudProviderAccountId) throws CloudProviderException,
+			UserException;
+	void removeCloudProviderAccountFromUserByName(String userName,
+			String cloudProviderAccountId) throws CloudProviderException,
+			UserException;
 
 }
