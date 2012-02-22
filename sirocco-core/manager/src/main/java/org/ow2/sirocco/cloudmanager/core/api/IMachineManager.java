@@ -39,7 +39,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.InvalidMachineIdException;
 
 public interface IMachineManager {
 
@@ -60,7 +59,7 @@ public interface IMachineManager {
 	Job deleteMachine(final String machineId) throws CloudProviderException;
 
 	Machine getMachineById(final String machineId) 
-		throws InvalidMachineIdException, CloudProviderException;
+		throws CloudProviderException;
 
 	Machine getMachineAttributes(final String machineId, 
 				     List<String> attributes) 
