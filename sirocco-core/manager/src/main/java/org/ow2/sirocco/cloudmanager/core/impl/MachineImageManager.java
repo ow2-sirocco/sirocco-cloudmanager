@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 
 
 import java.util.List;
+import java.util.Date;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,12 +46,13 @@ import javax.persistence.Query;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
-
+import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.InvalidMachineIdException;
+import org.ow2.sirocco.cloudmanager.core.exception.UserException;
+
 
 @Stateless(name = IMachineImageManager.EJB_JNDI_NAME, mappedName = IMachineImageManager.EJB_JNDI_NAME)
 @Remote(IRemoteMachineImageManager.class)
@@ -62,28 +64,53 @@ public class MachineImageManager implements IMachineImageManager {
 	@PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
 	private EntityManager em;
 
-
+	@EJB
+    private IUserManager userManager;
+	
 	@Resource
 	private SessionContext		ctx;
-	private	String			user;
+	private	User				user;
 
 	@Resource
 	public void setSessionContext(SessionContext ctx) {
 		this.ctx = ctx;
 	}
 
-	private void setUser() {
-		user = ctx.getCallerPrincipal().getName();
+	private void setUser() throws UserException {
+		String username = ctx.getCallerPrincipal().getName();
+		user = userManager.getUserByUsername(username);
 	}
 
-	public Job createMachineImage(MachineImage machineImage) throws CloudProviderException  {
-		Job j = null;
+	public Job createMachineImage(MachineImage mi) throws CloudProviderException  {
+		Job j = new Job();
+	
+		mi.setUser(user);
+		mi.setCreated(new Date());
+		mi.setState(MachineImage.State.AVAILABLE);
+		this.em.persist(mi);
+		this.em.flush();
+		
+		j.setTargetEntity(mi.getId().toString());
+		j.setStatus(Job.Status.SUCCESS);
+		j.setAction("create");
+		j.setParentJob(null);
+		j.setNestedJobs(null);
+		j.setReturnCode(0);
+		j.setUser(user);
+		this.em.persist(j);
+		this.em.flush();
 		return j;
 	}
 
-	public List<MachineImage> getMachineImages() {
-		return this.em.createQuery("FROM MachineImage i WHERE i.state<>'DELETED'").getResultList();
-
+	public List<MachineImage> getMachineImages() throws CloudProviderException {
+		setUser();
+		List<MachineImage> images = null;
+		try {
+			images = this.em.createQuery("FROM MachineImage i WHERE i.state<>'DELETED' AND i.user=:user").setParameter("user", user).getResultList();
+		} catch (Exception e) {
+			throw new CloudProviderException("Internal query error");
+		}
+		return images;
 	}
 
 	public MachineImage getMachineImage(String imageId)
