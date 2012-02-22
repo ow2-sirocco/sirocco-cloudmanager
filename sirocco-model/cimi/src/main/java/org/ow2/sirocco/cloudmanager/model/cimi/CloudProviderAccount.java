@@ -36,6 +36,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -49,7 +50,7 @@ public class CloudProviderAccount implements Serializable {
 
     private String password;
     
-    private User user;
+    private List<User> users;
 
     private List<Machine> machines;
 
@@ -128,12 +129,13 @@ public class CloudProviderAccount implements Serializable {
         this.cloudProvider = cloudProvider;
     }
 
-	public User getUser() {
-		return user;
+    @ManyToMany
+	public List<User> getUsers() {
+		return users;
 	}
 
-	public void setUser(User user) {
-		this.user = user;
+	public void setUsers(List<User> users) {
+		this.users = users;
 	}
 
 }
