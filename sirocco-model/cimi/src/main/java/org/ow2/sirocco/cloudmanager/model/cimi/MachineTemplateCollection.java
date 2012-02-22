@@ -25,15 +25,13 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+import javax.persistence.Entity;
 import javax.persistence.Transient;
 
 import java.io.Serializable;
 import java.util.List;
 
-/**
- * @Entity
- */
-
+@Entity
 public class MachineTemplateCollection  extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
