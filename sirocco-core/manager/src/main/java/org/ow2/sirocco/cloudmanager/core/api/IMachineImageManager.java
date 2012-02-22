@@ -42,7 +42,7 @@ public interface IMachineImageManager {
 	
 	Job createMachineImage(MachineImage machineImage) throws CloudProviderException;
 
-	List<MachineImage> getMachineImages();
+	List<MachineImage> getMachineImages() throws CloudProviderException;
 	
 	MachineImage getMachineImage(String imageId)throws CloudProviderException;
 	
