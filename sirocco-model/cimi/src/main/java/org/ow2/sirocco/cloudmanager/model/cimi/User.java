@@ -215,7 +215,7 @@ public class User implements Serializable {
 		this.volumeConfigurations = volumeConfigurations;
 	}
 
-	@ManyToMany
+	@ManyToMany(mappedBy="user")
 	public Collection<CloudProviderAccount> getCloudProviderAccounts() {
 		return cloudProviderAccounts;
 	}

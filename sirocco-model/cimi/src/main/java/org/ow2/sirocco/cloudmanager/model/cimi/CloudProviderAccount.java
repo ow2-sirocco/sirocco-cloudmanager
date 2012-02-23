@@ -125,7 +125,7 @@ public class CloudProviderAccount implements Serializable {
         this.cloudProvider = cloudProvider;
     }
 
-    @ManyToMany(mappedBy="cloudProviderAccounts")
+    @ManyToMany
 	public List<User> getUsers() {
 		return users;
 	}
