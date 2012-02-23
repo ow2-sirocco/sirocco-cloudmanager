@@ -28,7 +28,12 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+
+import javax.persistence.Embeddable;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 public class Job extends CloudEntity implements Serializable {
@@ -36,8 +41,23 @@ public class Job extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static enum StatusType {
-        RUNNING, SUCCESS, FAILED, CANCELLED
+        CREATED,RUNNING, SUCCESS, FAILED, CANCELLED
     };
+    
+    private StatusType status;
+    private Date timeOfStatusChange;
+    private String targetEntity;
+    private Integer returnCode;
+    private String action;
+    private String statusMessage;
+    private List<Job> nestedJobs;
+    private Job parentJob;
+    private Boolean isCancellable;
+    private Integer progress;
+
+    public Job() {
+    }
+
 
     public StatusType getStatus() {
         return status;
@@ -87,6 +107,7 @@ public class Job extends CloudEntity implements Serializable {
         this.statusMessage = statusMessage;
     }
 
+    @OneToMany(mappedBy = "nestedJobs")
     public List<Job> getNestedJobs() {
         return nestedJobs;
     }
@@ -95,6 +116,7 @@ public class Job extends CloudEntity implements Serializable {
         this.nestedJobs = nestedJobs;
     }
 
+    @OneToOne
     public Job getParentJob() {
         return parentJob;
     }
@@ -119,18 +141,7 @@ public class Job extends CloudEntity implements Serializable {
         this.progress = progress;
     }
 
-    private StatusType status;
-    private Date timeOfStatusChange;
-    private String targetEntity;
-    private Integer returnCode;
-    private String action;
-    private String statusMessage;
-    private List<Job> nestedJobs;
-    private Job parentJob;
-    private Boolean isCancellable;
-    private Integer progress;
-
-    public Job() {
-    }
-
 }
+
+
+
