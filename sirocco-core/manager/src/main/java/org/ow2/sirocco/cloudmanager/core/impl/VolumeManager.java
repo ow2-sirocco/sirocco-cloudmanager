@@ -549,7 +549,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public boolean handleJobCompletion(final Job providerJob) {
+    public boolean volumeCompletionHandler(final Job providerJob) {
         // retrieve the Volume whose providerAssignedId is job.getTargetEntity()
         Volume volume = null;
 

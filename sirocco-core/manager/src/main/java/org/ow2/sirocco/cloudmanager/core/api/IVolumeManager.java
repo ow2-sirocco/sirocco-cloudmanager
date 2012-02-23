@@ -44,7 +44,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
  * Volume management operations
  */
 public interface IVolumeManager {
-    static final String EJB_JNDI_NAME = "VolumeManagerBean";
+    static final String EJB_JNDI_NAME = "VolumeManager";
 
     /**
      * Creates a new Volume, this operation is asynchronous
@@ -245,6 +245,6 @@ public interface IVolumeManager {
      */
     void updateVolumeTemplateCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
 
-    boolean handleJobCompletion(Job job);
+    boolean volumeCompletionHandler(final Job job);
 
 }
