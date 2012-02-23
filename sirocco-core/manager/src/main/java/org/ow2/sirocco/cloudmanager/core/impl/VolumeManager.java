@@ -129,6 +129,7 @@ public class VolumeManager implements IVolumeManager {
         volume.setName(volumeCreate.getName());
         volume.setDescription(volumeCreate.getDescription());
         volume.setProperties(volumeCreate.getProperties());
+        volume.setUser(user);
 
         if (providerJob.getStatus() == Job.Status.RUNNING) {
             // job is running: persist volume+job and set up notification on job
@@ -182,11 +183,13 @@ public class VolumeManager implements IVolumeManager {
         User user = this.getUser();
 
         if (volumeConfig.getName() != null) {
-            if (!this.em.createQuery("FROM v VolumeConfiguration WHERE v.user=:user AND v.name=:name")
-                .setParameter("user", user).setParameter("name", volumeConfig.getName()).getResultList().isEmpty()) {
+            if (!this.em.createQuery("FROM VolumeConfiguration v WHERE v.user.username=:username AND v.name=:name")
+                .setParameter("username", user.getUsername()).setParameter("name", volumeConfig.getName()).getResultList()
+                .isEmpty()) {
                 throw new CloudProviderException("VolumeConfiguration already exists with name " + volumeConfig.getName());
             }
         }
+        volumeConfig.setUser(user);
         this.em.persist(volumeConfig);
         this.em.flush();
         return volumeConfig;
@@ -197,12 +200,13 @@ public class VolumeManager implements IVolumeManager {
         User user = this.getUser();
 
         if (volumeTemplate.getName() != null) {
-            if (!this.em.createQuery("FROM v VolumeTemplate WHERE v.user.username=:username AND v.name=:name")
+            if (!this.em.createQuery("FROM VolumeTemplate v WHERE v.user.username=:username AND v.name=:name")
                 .setParameter("username", user.getUsername()).setParameter("name", volumeTemplate.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("VolumeTemplate already exists with name " + volumeTemplate.getName());
             }
         }
+        volumeTemplate.setUser(user);
         this.em.persist(volumeTemplate);
         this.em.flush();
         return volumeTemplate;
@@ -210,7 +214,8 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public Volume getVolumeById(final String volumeId) throws ResourceNotFoundException {
-        return this.em.find(Volume.class, Integer.valueOf(volumeId));
+        Volume volume = this.em.find(Volume.class, Integer.valueOf(volumeId));
+        return volume;
     }
 
     @Override
@@ -233,7 +238,12 @@ public class VolumeManager implements IVolumeManager {
     public List<Volume> getVolumesAttributes(final List<String> attributes, final String filterExpression)
         throws CloudProviderException {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        if (filterExpression != null && !filterExpression.isEmpty()) {
+            throw new UnsupportedOperationException();
+        }
+        User user = this.getUser();
+        return this.em.createQuery("FROM Volume v WHERE v.user.username=:username ORDER BY v.id")
+            .setParameter("username", user.getUsername()).getResultList();
     }
 
     @SuppressWarnings("unchecked")
@@ -241,7 +251,7 @@ public class VolumeManager implements IVolumeManager {
     public List<Volume> getVolumesAttributes(final int first, final int last, final List<String> attributes)
         throws CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createNamedQuery("FROM Volume v WHERE v.user.username=:userName ORDER BY v.id");
+        Query query = this.em.createQuery("FROM Volume v WHERE v.user.username=:username ORDER BY v.id");
         query.setParameter("username", user.getUsername());
         query.setMaxResults(last - first + 1);
         query.setFirstResult(first);
@@ -251,8 +261,13 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public List<VolumeConfiguration> getVolumeConfigurationsAttributes(final List<String> attributes,
         final String filterExpression) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        if (filterExpression != null && !filterExpression.isEmpty()) {
+            // TODO
+            throw new UnsupportedOperationException();
+        }
+        User user = this.getUser();
+        return this.em.createQuery("FROM VolumeConfiguration v WHERE v.user.username=:username ORDER BY v.id")
+            .setParameter("username", user.getUsername()).getResultList();
     }
 
     @SuppressWarnings("unchecked")
@@ -260,7 +275,7 @@ public class VolumeManager implements IVolumeManager {
     public List<VolumeConfiguration> getVolumeConfigurationsAttributes(final int first, final int last,
         final List<String> attributes) throws CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createNamedQuery("FROM VolumeConfiguration v WHERE v.user.username=:userName ORDER BY v.id");
+        Query query = this.em.createQuery("FROM VolumeConfiguration v WHERE v.user.username=:username ORDER BY v.id");
         query.setParameter("username", user.getUsername());
         query.setMaxResults(last - first + 1);
         query.setFirstResult(first);
@@ -270,16 +285,21 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public List<VolumeTemplate> getVolumeTemplatesAttributes(final List<String> attributes, final String filterExpression)
         throws CloudProviderException {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException();
+        if (filterExpression != null && !filterExpression.isEmpty()) {
+            // TODO
+            throw new UnsupportedOperationException();
+        }
+        User user = this.getUser();
+        return this.em.createQuery("FROM VolumeTemplate v WHERE v.user.username=:username ORDER BY v.id")
+            .setParameter("username", user.getUsername()).getResultList();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<VolumeTemplate> getVolumeTemplatesConfigurationsAttributes(final int first, final int last,
-        final List<String> attributes) throws CloudProviderException {
+    public List<VolumeTemplate> getVolumeTemplatesAttributes(final int first, final int last, final List<String> attributes)
+        throws CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createNamedQuery("FROM VolumeTemplate v WHERE v.user.username=:userName ORDER BY v.id");
+        Query query = this.em.createQuery("FROM VolumeTemplate v WHERE v.user.username=:username ORDER BY v.id");
         query.setParameter("username", user.getUsername());
         query.setMaxResults(last - first + 1);
         query.setFirstResult(first);
@@ -287,18 +307,23 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @SuppressWarnings("unchecked")
-    private void updateCloudEntityAttributes(final CloudEntity entity, final Map<String, Object> attributes) {
+    private boolean updateCloudEntityAttributes(final CloudEntity entity, final Map<String, Object> attributes) {
+        boolean updated = false;
         if (attributes.containsKey("name")) {
             entity.setName((String) attributes.get("name"));
+            updated = true;
         }
 
         if (attributes.containsKey("description")) {
             entity.setDescription((String) attributes.get("description"));
+            updated = true;
         }
 
         if (attributes.containsKey("properties")) {
             entity.setProperties((Map<String, String>) attributes.get("properties"));
+            updated = true;
         }
+        return updated;
     }
 
     @Override
@@ -319,18 +344,25 @@ public class VolumeManager implements IVolumeManager {
         if (volumeConfig == null) {
             throw new ResourceNotFoundException();
         }
-        this.updateCloudEntityAttributes(volumeConfig, attributes);
+        boolean updated = this.updateCloudEntityAttributes(volumeConfig, attributes);
         if (attributes.containsKey("format")) {
             volumeConfig.setFormat((String) attributes.get("format"));
+            updated = true;
         }
         if (attributes.containsKey("capacity")) {
             volumeConfig.setCapacity((Disk) attributes.get("capacity"));
+            updated = true;
         }
         if (attributes.containsKey("supportSnapshots")) {
             volumeConfig.setSupportsSnapshots((Boolean) attributes.get("supportSnapshots"));
+            updated = true;
         }
         if (attributes.containsKey("guestInterface")) {
             volumeConfig.setGuestInterface((String) attributes.get("guestInterface"));
+            updated = true;
+        }
+        if (updated) {
+            volumeConfig.setUpdated(new Date());
         }
     }
 
@@ -341,9 +373,13 @@ public class VolumeManager implements IVolumeManager {
         if (volumeTemplate == null) {
             throw new ResourceNotFoundException();
         }
-        this.updateCloudEntityAttributes(volumeTemplate, attributes);
+        boolean updated = this.updateCloudEntityAttributes(volumeTemplate, attributes);
         if (attributes.containsKey("volumeConfig")) {
             volumeTemplate.setVolumeConfig((VolumeConfiguration) attributes.get("volumeConfig"));
+            updated = true;
+        }
+        if (updated) {
+            volumeTemplate.setUpdated(new Date());
         }
     }
 
@@ -436,10 +472,10 @@ public class VolumeManager implements IVolumeManager {
     public VolumeCollection getVolumeCollection() throws CloudProviderException {
         User user = this.getUser();
         @SuppressWarnings("unchecked")
-        List<Volume> volumes = this.em.createQuery("SELECT v FROM Volume c WHERE v.user.username=:username")
+        List<Volume> volumes = this.em.createQuery("SELECT v FROM Volume v WHERE v.user.username=:username")
             .setParameter("username", user.getUsername()).getResultList();
         VolumeCollection collection = (VolumeCollection) this.em
-            .createQuery("FROM VolumeTemplateCollection m WHERE m.user.username=:username")
+            .createQuery("FROM VolumeCollection m WHERE m.user.username=:username")
             .setParameter("username", user.getUsername()).getSingleResult();
         collection.setVolumes(volumes);
         return collection;
@@ -450,10 +486,10 @@ public class VolumeManager implements IVolumeManager {
         User user = this.getUser();
         @SuppressWarnings("unchecked")
         List<VolumeConfiguration> volumeConfigs = this.em
-            .createQuery("SELECT v FROM VolumeConfiguration c WHERE v.user.username=:username")
+            .createQuery("SELECT v FROM VolumeConfiguration v WHERE v.user.username=:username")
             .setParameter("username", user.getUsername()).getResultList();
         VolumeConfigurationCollection collection = (VolumeConfigurationCollection) this.em
-            .createQuery("FROM VolumeConfigurationCollection m WHERE m.user.username=:username")
+            .createQuery("FROM VolumeConfigurationCollection v WHERE v.user.username=:username")
             .setParameter("username", user.getUsername()).getSingleResult();
         collection.setVolumeConfigurations(volumeConfigs);
         return collection;
@@ -464,10 +500,10 @@ public class VolumeManager implements IVolumeManager {
         User user = this.getUser();
         @SuppressWarnings("unchecked")
         List<VolumeTemplate> volumeTemplates = this.em
-            .createQuery("SELECT v FROM VolumeTemplate c WHERE v.user.username=:username")
+            .createQuery("SELECT v FROM VolumeTemplate v WHERE v.user.username=:username")
             .setParameter("username", user.getUsername()).getResultList();
         VolumeTemplateCollection collection = (VolumeTemplateCollection) this.em
-            .createQuery("FROM VolumeTemplateCollection m WHERE m.user.username=:username")
+            .createQuery("FROM VolumeTemplateCollection v WHERE v.user.username=:username")
             .setParameter("username", user.getUsername()).getSingleResult();
         collection.setVolumeTemplates(volumeTemplates);
         return collection;
@@ -477,27 +513,33 @@ public class VolumeManager implements IVolumeManager {
     public void updateVolumeCollection(final Map<String, Object> attributes) throws CloudProviderException {
         User user = this.getUser();
         VolumeCollection collection = (VolumeCollection) this.em
-            .createQuery("FROM VolumeCollection m WHERE m.user.username=:username")
+            .createQuery("FROM VolumeCollection v WHERE v.user.username=:username")
             .setParameter("username", user.getUsername()).getSingleResult();
-        this.updateCloudEntityAttributes(collection, attributes);
+        if (this.updateCloudEntityAttributes(collection, attributes)) {
+            collection.setUpdated(new Date());
+        }
     }
 
     @Override
     public void updateVolumeConfigurationCollection(final Map<String, Object> attributes) throws CloudProviderException {
         User user = this.getUser();
         VolumeConfigurationCollection collection = (VolumeConfigurationCollection) this.em
-            .createQuery("FROM VolumeConfigurationCollection m WHERE m.user.username=:username")
+            .createQuery("FROM VolumeConfigurationCollection v WHERE v.user.username=:username")
             .setParameter("username", user.getUsername()).getSingleResult();
-        this.updateCloudEntityAttributes(collection, attributes);
+        if (this.updateCloudEntityAttributes(collection, attributes)) {
+            collection.setUpdated(new Date());
+        }
     }
 
     @Override
     public void updateVolumeTemplateCollection(final Map<String, Object> attributes) throws CloudProviderException {
         User user = this.getUser();
         VolumeTemplateCollection collection = (VolumeTemplateCollection) this.em
-            .createQuery("FROM VolumeTemplateCollection m WHERE m.user.username=:username")
+            .createQuery("FROM VolumeTemplateCollection v WHERE v.user.username=:username")
             .setParameter("username", user.getUsername()).getSingleResult();
-        this.updateCloudEntityAttributes(collection, attributes);
+        if (this.updateCloudEntityAttributes(collection, attributes)) {
+            collection.setUpdated(new Date());
+        }
     }
 
     private Volume getVolumeByProviderAssignedId(final String providerAssignedId) {
@@ -538,9 +580,7 @@ public class VolumeManager implements IVolumeManager {
             }
         } else if (providerJob.getAction().equals("volume.delete")) {
             if (providerJob.getStatus() == Job.Status.SUCCESS) {
-                volume.setState(Volume.State.DELETED);
-                volume.setDeleted(new Date());
-                this.em.persist(volume);
+                this.em.remove(volume);
             } else if (providerJob.getStatus() == Job.Status.FAILED) {
                 volume.setState(Volume.State.ERROR);
                 VolumeManager.logger.severe("Failed to delete volume  " + volume.getName() + ": "
