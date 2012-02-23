@@ -54,7 +54,7 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
 	}
 
 	public void setMemory(Memory memory) {
-	    memory = this.memory;
+	    this.memory = memory;
 	}
 
 	@CollectionOfElements
