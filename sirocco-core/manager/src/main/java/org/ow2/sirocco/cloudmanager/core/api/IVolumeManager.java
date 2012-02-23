@@ -158,7 +158,7 @@ public interface IVolumeManager {
     List<VolumeTemplate> getVolumeTemplatesAttributes(List<String> attributes, String filterExpression)
         throws InvalidRequestException, CloudProviderException;
 
-    List<VolumeTemplate> getVolumeTemplatesConfigurationsAttributes(int first, int last, List<String> attributes)
+    List<VolumeTemplate> getVolumeTemplatesAttributes(int first, int last, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 
     /**

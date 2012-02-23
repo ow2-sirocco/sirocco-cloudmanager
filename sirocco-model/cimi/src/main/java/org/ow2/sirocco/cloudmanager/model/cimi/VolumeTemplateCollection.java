@@ -39,7 +39,7 @@ public class VolumeTemplateCollection extends CloudEntity implements Serializabl
     List<VolumeTemplate> volumeTemplates;
 
     @Transient
-    public List<VolumeTemplate> getVolumeConfigurations() {
+    public List<VolumeTemplate> getVolumeTemplates() {
         return this.volumeTemplates;
     }
 
