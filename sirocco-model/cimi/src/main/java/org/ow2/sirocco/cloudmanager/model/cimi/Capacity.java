@@ -59,4 +59,39 @@ public class Capacity implements Serializable {
     public void setQuantity(final Integer quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.quantity == null) ? 0 : this.quantity.hashCode());
+        result = prime * result + ((this.units == null) ? 0 : this.units.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        Capacity other = (Capacity) obj;
+        if (this.quantity == null) {
+            if (other.quantity != null) {
+                return false;
+            }
+        } else if (!this.quantity.equals(other.quantity)) {
+            return false;
+        }
+        if (this.units != other.units) {
+            return false;
+        }
+        return true;
+    }
+
 }

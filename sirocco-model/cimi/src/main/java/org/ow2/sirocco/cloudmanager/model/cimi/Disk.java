@@ -28,32 +28,66 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
-import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Embeddable
 public class Disk implements Serializable {
-	private static final long serialVersionUID = 1L;
-    
+    private static final long serialVersionUID = 1L;
 
-	private StorageUnit	unit;
-    private Float		quantity;
+    private StorageUnit unit;
 
+    private Float quantity;
 
-	@Enumerated(EnumType.STRING)
-	public StorageUnit getUnit() {
-		return unit;
-	}
+    @Enumerated(EnumType.STRING)
+    public StorageUnit getUnit() {
+        return this.unit;
+    }
 
-	public void setUnit(StorageUnit unit) {
-		this.unit = unit;
-	}
+    public void setUnit(final StorageUnit unit) {
+        this.unit = unit;
+    }
 
-	public Float getQuantity() {
-		return quantity;
-	}
+    public Float getQuantity() {
+        return this.quantity;
+    }
 
-	public void setQuantity(Float quantity) {
-		this.quantity = quantity;
-	}
+    public void setQuantity(final Float quantity) {
+        this.quantity = quantity;
+    }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.quantity == null) ? 0 : this.quantity.hashCode());
+        result = prime * result + ((this.unit == null) ? 0 : this.unit.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        Disk other = (Disk) obj;
+        if (this.quantity == null) {
+            if (other.quantity != null) {
+                return false;
+            }
+        } else if (!this.quantity.equals(other.quantity)) {
+            return false;
+        }
+        if (this.unit != other.unit) {
+            return false;
+        }
+        return true;
+    }
+
 }
