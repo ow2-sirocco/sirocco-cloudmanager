@@ -29,9 +29,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -72,11 +70,6 @@ public class CloudProvider implements Serializable {
         this.id = id;
     }
 
-    /**
-     * DUMMY, OPENSTACK_NOVA, ...
-     * 
-     * @return
-     */
     public String getCloudProviderType() {
         return this.cloudProviderType;
     }
@@ -93,7 +86,7 @@ public class CloudProvider implements Serializable {
         this.description = description;
     }
 
-    @OneToMany(mappedBy = "cloudProvider", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cloudProvider")
     public List<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
     }
@@ -102,7 +95,7 @@ public class CloudProvider implements Serializable {
         this.cloudProviderAccounts = cloudProviderAccounts;
     }
 
-    @ManyToMany
+    @ManyToMany(mappedBy="cloudProviders")
 	public List<CloudProviderLocation> getCloudProviderLocations() {
 		return cloudProviderLocations;
 	}

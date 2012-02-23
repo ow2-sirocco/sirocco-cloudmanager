@@ -29,13 +29,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -92,7 +89,7 @@ public class CloudProviderAccount implements Serializable {
         this.password = password;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cloudProviderAccount")
     public List<Machine> getMachines() {
         return this.machines;
     }
@@ -101,7 +98,7 @@ public class CloudProviderAccount implements Serializable {
         this.machines = machines;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "cloudProviderAccount")
     public List<Volume> getVolumes() {
         return this.volumes;
     }
@@ -120,7 +117,6 @@ public class CloudProviderAccount implements Serializable {
     }
 
     @ManyToOne
-    @JoinColumn(name = "CloudProvider_id")
     public CloudProvider getCloudProvider() {
         return this.cloudProvider;
     }
@@ -129,7 +125,7 @@ public class CloudProviderAccount implements Serializable {
         this.cloudProvider = cloudProvider;
     }
 
-    @ManyToMany
+    @ManyToMany(mappedBy="cloudProviderAccounts")
 	public List<User> getUsers() {
 		return users;
 	}
