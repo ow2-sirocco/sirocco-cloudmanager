@@ -623,10 +623,10 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 	         throws CloudProviderException {
 
 		setUser();
-		
-		Query query = this.em.createQuery("FROM Machine m WHERE m.user=:user");
+		Integer userid = user.getId();
+		Query query = this.em.createQuery("FROM Machine m WHERE m.user.id=:userid").setParameter("userid", userid);
 		List<Machine> machines = (List<Machine>) query.setParameter("user", user).getResultList();
-		MachineCollection collection = (MachineCollection) this.em.createQuery("FROM MachineCollection m WHERE m.user=:user").setParameter("user", user).getSingleResult();
+		MachineCollection collection = (MachineCollection) this.em.createQuery("FROM MachineCollection m WHERE m.user.id=:userid").setParameter("userid", userid).getSingleResult();
 		collection.setMachines(machines);
 		return collection;
 	}
@@ -703,10 +703,10 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 	 */
 	public MachineConfigurationCollection getMachineConfigurationCollection() throws CloudProviderException {
 		setUser();
-		
-		Query query = this.em.createQuery("FROM MachineConfiguration c WHERE c.user=:user");
-		List<MachineConfiguration> configs = (List<MachineConfiguration>)query.setParameter("user", user).getResultList();
-		MachineConfigurationCollection collection = (MachineConfigurationCollection)this.em.createQuery("FROM MachineConfigurationCollection m WHERE m.user=:user").setParameter("user", user).getSingleResult();
+		Integer userid = user.getId();
+		Query query = this.em.createQuery("FROM MachineConfiguration c WHERE c.user.id=:userid");
+		List<MachineConfiguration> configs = (List<MachineConfiguration>)query.setParameter("userid", userid).getResultList();
+		MachineConfigurationCollection collection = (MachineConfigurationCollection)this.em.createQuery("FROM MachineConfigurationCollection m WHERE m.user.id=:userid").setParameter("userid", userid).getSingleResult();
 		collection.setMachineConfigurations(configs);
 		return collection;
 	}
@@ -715,11 +715,11 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 	public MachineConfiguration createMachineConfiguration(MachineConfiguration machineConfig) throws CloudProviderException {
 
 		setUser();
-		
+		Integer userid = user.getId();
 		validateMachineConfiguration(machineConfig);
 		boolean exists = true;
 		try {
-			MachineConfiguration mc = (MachineConfiguration ) this.em.createQuery("FROM m MachineConfiguration WHERE m.user=:user AND m.name=:name").setParameter("user", user).setParameter("name", machineConfig.getName()).getSingleResult();
+			MachineConfiguration mc = (MachineConfiguration ) this.em.createQuery("FROM m MachineConfiguration WHERE m.user.id=:userid AND m.name=:name").setParameter("userid", userid).setParameter("name", machineConfig.getName()).getSingleResult();
 		} catch (NoResultException e) {
 			exists = false;
 		} catch (Exception e) {
@@ -844,10 +844,10 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		throws CloudProviderException {
 
 		setUser();
-		
+		Integer userid = user.getId();
 		boolean exists = true;
 		try {
-			MachineTemplate mtemplate = (MachineTemplate) this.em.createQuery("FROM m MachineTemplate WHERE m.user=:user AND m.name=:name").setParameter("user", user).setParameter("name", mt.getName()).getSingleResult();
+			MachineTemplate mtemplate = (MachineTemplate) this.em.createQuery("FROM m MachineTemplate WHERE m.user.id=:userid AND m.name=:name").setParameter("userid", userid).setParameter("name", mt.getName()).getSingleResult();
 		} catch (NoResultException e){
 			exists = false;
 		}
@@ -880,10 +880,10 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 	public MachineTemplateCollection getMachineTemplateCollection()
 		throws CloudProviderException {
 		setUser();
-		
-		Query query = this.em.createQuery("SELECT c FROM MachineTemplate c WHERE c.user=:user");
-		List<MachineTemplate> templates = query.setParameter("user", user).getResultList();
-		MachineTemplateCollection collection = (MachineTemplateCollection) this.em.createQuery("FROM MachineTemplateCollection m WHERE m.user=:user").setParameter("user", user).getSingleResult();
+		Integer userid = user.getId();
+		Query query = this.em.createQuery("SELECT c FROM MachineTemplate c WHERE c.user.id=:userid");
+		List<MachineTemplate> templates = query.setParameter("userid", userid).getResultList();
+		MachineTemplateCollection collection = (MachineTemplateCollection) this.em.createQuery("FROM MachineTemplateCollection m WHERE m.user.id=:userid").setParameter("userid", userid).getSingleResult();
 		collection.setMachineTemplates(templates);
 		return collection;
 	}
@@ -893,9 +893,9 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		throws CloudProviderException {
 
 		setUser();
-		
+		Integer userid = user.getId();
 
-		MachineTemplateCollection collection = (MachineTemplateCollection) this.em.createQuery("FROM MachineTemplateCollection m WHERE m.user=:user").setParameter("user", user).getSingleResult();
+		MachineTemplateCollection collection = (MachineTemplateCollection) this.em.createQuery("FROM MachineTemplateCollection m WHERE m.user.id=:userid").setParameter("userid", userid).getSingleResult();
 
 		if (attributes.containsKey("name")) {
 			collection.setName((String)attributes.get("name"));
