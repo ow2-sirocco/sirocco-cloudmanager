@@ -24,24 +24,30 @@
  */
 package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api;
 
+import java.util.List;
+
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.exception.JobException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 
 public interface IJobManager {
-    
+
     static final String EJB_JNDI_NAME = "JobManager";
-    
-	Job createJob(String targetEntity, String action) throws JobException;
 
-	Job getJobById(String id) throws JobException;
-	
-	Job updateJob(Job job) throws JobException;
+    Job createJob(String targetEntity, String action, String parentJob)
+            throws JobException;
 
-	JobCollection getJobCollection() throws JobException;
-	
-	JobCollection updateJobCollection(JobCollection jobColl) throws JobException;
-	
-	void deleteJob(String id) throws JobException;
+    Job getJobById(String id) throws JobException;
+
+    Job updateJob(Job job) throws JobException;
+
+    JobCollection getJobCollection() throws JobException;
+
+    JobCollection updateJobCollection(JobCollection jobColl)
+            throws JobException;
+
+    void deleteJob(String id) throws JobException;
+
+    List<Job> getNestedJobs(String id) throws JobException;
 
 }

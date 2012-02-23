@@ -1,5 +1,6 @@
 package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl;
 
+import java.util.List;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -14,8 +15,10 @@ import javax.persistence.PersistenceContextType;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.exception.JobException;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
 
 @Stateless(name = IJobManager.EJB_JNDI_NAME, mappedName = IJobManager.EJB_JNDI_NAME)
@@ -32,12 +35,22 @@ public class JobManager implements IJobManager {
     private SessionContext ctx;
 
     @Override
-    public Job createJob(String targetEntity, String action)
+    public Job createJob(String targetEntity, String action, String parentJob)
             throws JobException {
 
         Job j = new Job();
         j.setTargetEntity(targetEntity);
         j.setAction(action);
+
+        if (parentJob != null) {
+            Job parent = this.getJobById(parentJob);
+            if (parent == null) {
+                throw new JobException();
+            } else {
+                j.setParentJob(parent);
+            }
+
+        }
 
         this.em.persist(j);
 
@@ -76,8 +89,21 @@ public class JobManager implements IJobManager {
     @Override
     public void deleteJob(String id) throws JobException {
         Job result = this.getJobById(id);
-        
-        if (result!=null){this.em.remove(result);} 
+
+        if (result != null) {
+            this.em.remove(result);
+        }
+
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Job> getNestedJobs(String id) throws JobException {
+
+        List<Job> l = this.em
+                .createQuery("FROM Job t WHERE t.parentJob_id=:id")
+                .setParameter("id", id).getResultList();
+        return l;
 
     }
 
