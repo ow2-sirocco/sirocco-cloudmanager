@@ -31,18 +31,18 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.service.cm.ManagedService;
-import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.JobManager;
+import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IFutureManager;
 
 public class Activator implements BundleActivator {
-	private JobManagerImpl jobManager;
+	private FutureManager jobManager;
 
 	public void start(final BundleContext context) throws Exception {
 		Dictionary<String, String> props = new Hashtable<String, String>();
 		props.put(Constants.SERVICE_PID, "JobManager");
-		this.jobManager = JobManagerImpl.newJobManager();
+		this.jobManager = FutureManager.newJobManager();
 		this.jobManager.start();
 		context.registerService(new String[] { ManagedService.class.getName(),
-				JobManager.class.getName() }, this.jobManager, props);
+				IFutureManager.class.getName() }, this.jobManager, props);
 	}
 
 	public void stop(final BundleContext context) throws Exception {

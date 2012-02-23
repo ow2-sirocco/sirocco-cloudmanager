@@ -51,15 +51,15 @@ import javax.naming.InitialContext;
 
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.JobManager;
+import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IFutureManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-public class JobManagerImpl implements JobManager, ManagedService {
-	private static Log logger = LogFactory.getLog(JobManagerImpl.class);
+public class FutureManager implements IFutureManager, ManagedService {
+	private static Log logger = LogFactory.getLog(FutureManager.class);
 
 	public static String JOB_WATCHER_PERIOD_PROP_NAME = "jobWatcherPeriodInSeconds";
 
@@ -83,9 +83,9 @@ public class JobManagerImpl implements JobManager, ManagedService {
 		ListenableFuture<?> result;
 	};
 
-	private long jobWatcherPeriodInSeconds = JobManagerImpl.DEFAULT_JOB_WATCHER_PERIOD_IN_SECONDS;
+	private long jobWatcherPeriodInSeconds = FutureManager.DEFAULT_JOB_WATCHER_PERIOD_IN_SECONDS;
 
-	private long jobRetentionPeriodInSeconds = JobManagerImpl.DEFAULT_JOB_RETENTION_TIME_IN_SECONDS;
+	private long jobRetentionPeriodInSeconds = FutureManager.DEFAULT_JOB_RETENTION_TIME_IN_SECONDS;
 
 	private final Map<String, JobEntry> jobs = new ConcurrentHashMap<String, JobEntry>();
 
@@ -97,7 +97,7 @@ public class JobManagerImpl implements JobManager, ManagedService {
 
 	private ScheduledFuture<?> jobWatcherHandle;
 
-	private JobManagerImpl() {
+	private FutureManager() {
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -105,30 +105,30 @@ public class JobManagerImpl implements JobManager, ManagedService {
 			throws ConfigurationException {
 		if (properties != null) {
 			String s = (String) properties
-					.get(JobManagerImpl.JOB_WATCHER_PERIOD_PROP_NAME);
+					.get(FutureManager.JOB_WATCHER_PERIOD_PROP_NAME);
 			if (s != null) {
 				try {
 					this.jobWatcherPeriodInSeconds = Integer.parseInt(s);
 				} catch (NumberFormatException ex) {
-					JobManagerImpl.logger
+					FutureManager.logger
 							.error("Illegal value for jobWatcherPeriodInSeconds property: "
 									+ s);
 				}
 			}
 			s = (String) properties
-					.get(JobManagerImpl.JOB_RETENTION_TIME_PROP_NAME);
+					.get(FutureManager.JOB_RETENTION_TIME_PROP_NAME);
 			if (s != null) {
 				try {
 					this.jobRetentionPeriodInSeconds = Integer.parseInt(s);
 				} catch (NumberFormatException ex) {
-					JobManagerImpl.logger
+					FutureManager.logger
 							.error("Illegal value for jobRetentionPeriodInSeconds property: "
 									+ s);
 				}
 			}
 
 		}
-		JobManagerImpl.logger.info("JobManager ready, watcher period: "
+		FutureManager.logger.info("JobManager ready, watcher period: "
 				+ this.jobWatcherPeriodInSeconds + "s, job retention time: "
 				+ this.jobRetentionPeriodInSeconds + " s");
 	}
@@ -137,16 +137,16 @@ public class JobManagerImpl implements JobManager, ManagedService {
 		final Runnable jobWatcher = new Runnable() {
 			@Override
 			public void run() {
-				JobManagerImpl.logger.debug("Job watcher woken up");
+				FutureManager.logger.debug("Job watcher woken up");
 				Date now = new Date();
-				for (JobEntry jobEntry : JobManagerImpl.this.jobs.values()) {
+				for (JobEntry jobEntry : FutureManager.this.jobs.values()) {
 					Job job = jobEntry.job;
 					if (job.getStatus() != Job.Status.RUNNING) {
 						if (TimeUnit.MILLISECONDS.toSeconds(now.getTime()
-								- job.getTimeOfStatusChange().getTime()) > JobManagerImpl.this.jobRetentionPeriodInSeconds) {
-							JobManagerImpl.logger.info("Reaping job "
+								- job.getTimeOfStatusChange().getTime()) > FutureManager.this.jobRetentionPeriodInSeconds) {
+							FutureManager.logger.info("Reaping job "
 									+ job.getProviderAssignedId());
-							JobManagerImpl.this.jobs.remove(job
+							FutureManager.this.jobs.remove(job
 									.getProviderAssignedId());
 						}
 					}
@@ -163,8 +163,8 @@ public class JobManagerImpl implements JobManager, ManagedService {
 		System.out.println("JobManager shutdowned");
 	}
 
-	public static JobManagerImpl newJobManager() {
-		JobManagerImpl jobManager = new JobManagerImpl();
+	public static FutureManager newJobManager() {
+		FutureManager jobManager = new FutureManager();
 		return jobManager;
 	}
 
@@ -223,7 +223,7 @@ public class JobManagerImpl implements JobManager, ManagedService {
 					}
 				}
 				jobEntry.job.setTimeOfStatusChange(new Date());
-				JobManagerImpl.this.emitJobCompletionEvent(jobEntry.job);
+				FutureManager.this.emitJobCompletionEvent(jobEntry.job);
 			}
 		}, this.jobCompletionExecutorService);
 
@@ -249,27 +249,27 @@ public class JobManagerImpl implements JobManager, ManagedService {
 		try {
 			this.emitMessage(job);
 		} catch (Exception ex) {
-			JobManagerImpl.logger.error("Failed to emit message", ex);
+			FutureManager.logger.error("Failed to emit message", ex);
 		}
 	}
 
 	private void emitMessage(final Serializable payload) throws Exception {
 		InitialContext ctx = new InitialContext();
 		TopicConnectionFactory topicConnectionFactory = (TopicConnectionFactory) ctx
-				.lookup(JobManagerImpl.JMS_TOPIC_CONNECTION_FACTORY_NAME);
+				.lookup(FutureManager.JMS_TOPIC_CONNECTION_FACTORY_NAME);
 		TopicConnection connection = topicConnectionFactory
 				.createTopicConnection();
 		TopicSession session = connection.createTopicSession(false,
 				Session.AUTO_ACKNOWLEDGE);
 		Topic cloudAdminTopic = (Topic) ctx
-				.lookup(JobManagerImpl.JMS_TOPIC_NAME);
+				.lookup(FutureManager.JMS_TOPIC_NAME);
 		TopicPublisher topicPublisher = session
 				.createPublisher(cloudAdminTopic);
 		ObjectMessage message = session.createObjectMessage();
 		message.setObject(payload);
 		topicPublisher.publish(message);
-		JobManagerImpl.logger.info("EMITTED EVENT " + payload.toString()
-				+ " on " + JobManagerImpl.JMS_TOPIC_NAME + " topic");
+		FutureManager.logger.info("EMITTED EVENT " + payload.toString()
+				+ " on " + FutureManager.JMS_TOPIC_NAME + " topic");
 		topicPublisher.close();
 		session.close();
 		connection.close();
