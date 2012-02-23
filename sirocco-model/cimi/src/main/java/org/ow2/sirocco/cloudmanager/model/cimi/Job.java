@@ -27,16 +27,110 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.concurrent.Future;
-
+import java.util.List;
 import javax.persistence.Entity;
 
 @Entity
 public class Job extends CloudEntity implements Serializable {
-    static enum Status {
+
+    private static final long serialVersionUID = 1L;
+
+    public static enum StatusType {
         RUNNING, SUCCESS, FAILED, CANCELLED
     };
 
+    public StatusType getStatus() {
+        return status;
+    }
+
+    public void setStatus(StatusType status) {
+        this.status = status;
+    }
+
+    public Date getTimeOfStatusChange() {
+        return timeOfStatusChange;
+    }
+
+    public void setTimeOfStatusChange(Date timeOfStatusChange) {
+        this.timeOfStatusChange = timeOfStatusChange;
+    }
+
+    public String getTargetEntity() {
+        return targetEntity;
+    }
+
+    public void setTargetEntity(String targetEntity) {
+        this.targetEntity = targetEntity;
+    }
+
+    public Integer getReturnCode() {
+        return returnCode;
+    }
+
+    public void setReturnCode(Integer returnCode) {
+        this.returnCode = returnCode;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getStatusMessage() {
+        return statusMessage;
+    }
+
+    public void setStatusMessage(String statusMessage) {
+        this.statusMessage = statusMessage;
+    }
+
+    public List<Job> getNestedJobs() {
+        return nestedJobs;
+    }
+
+    public void setNestedJobs(List<Job> nestedJobs) {
+        this.nestedJobs = nestedJobs;
+    }
+
+    public Job getParentJob() {
+        return parentJob;
+    }
+
+    public void setParentJob(Job parentJob) {
+        this.parentJob = parentJob;
+    }
+
+    public Boolean getIsCancellable() {
+        return isCancellable;
+    }
+
+    public void setIsCancellable(Boolean isCancellable) {
+        this.isCancellable = isCancellable;
+    }
+
+    public Integer getProgress() {
+        return progress;
+    }
+
+    public void setProgress(Integer progress) {
+        this.progress = progress;
+    }
+
+    private StatusType status;
+    private Date timeOfStatusChange;
+    private String targetEntity;
+    private Integer returnCode;
+    private String action;
+    private String statusMessage;
+    private List<Job> nestedJobs;
+    private Job parentJob;
+    private Boolean isCancellable;
+    private Integer progress;
+
     public Job() {
-    }   
+    }
+
 }
