@@ -27,8 +27,11 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import javax.persistence.Entity;
-import javax.persistence.OneToOne;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Job extends CloudEntity implements Serializable {
@@ -36,7 +39,7 @@ public class Job extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static enum Status {
-        CREATED,RUNNING, SUCCESS, FAILED, CANCELLED
+        RUNNING, SUCCESS, FAILED, CANCELLED
     };
     
     private Status status;
@@ -46,6 +49,7 @@ public class Job extends CloudEntity implements Serializable {
     private String action;
     private String statusMessage;
     private Job parentJob;
+    private List<Job> nestedJobs;
     private Boolean isCancellable;
     private Integer progress;
 
@@ -101,7 +105,7 @@ public class Job extends CloudEntity implements Serializable {
         this.statusMessage = statusMessage;
     }
 
-    @OneToOne
+    @ManyToOne
     public Job getParentJob() {
         return parentJob;
     }
@@ -124,6 +128,17 @@ public class Job extends CloudEntity implements Serializable {
 
     public void setProgress(Integer progress) {
         this.progress = progress;
+    }
+
+
+    @OneToMany(mappedBy="parentJob")
+    public List<Job> getNestedJobs() {
+        return nestedJobs;
+    }
+
+
+    public void setNestedJobs(List<Job> nestedJobs) {
+        this.nestedJobs = nestedJobs;
     }
 
 }
