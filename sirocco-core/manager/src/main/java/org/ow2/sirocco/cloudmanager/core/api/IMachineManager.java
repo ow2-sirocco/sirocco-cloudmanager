@@ -112,4 +112,7 @@ public interface IMachineManager {
 		throws CloudProviderException;
 	void updateMachineTemplateCollection(Map<String, Object> attributes )
 		throws CloudProviderException;
+	
+	boolean machineCompletionHandler(final Job job);
+	
 }
