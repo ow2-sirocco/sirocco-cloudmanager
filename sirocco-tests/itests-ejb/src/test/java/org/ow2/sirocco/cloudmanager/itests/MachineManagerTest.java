@@ -17,7 +17,8 @@ import org.junit.Test;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
-
+import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
+import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -59,7 +60,7 @@ public class MachineManagerTest {
     private static final int INITIALIZE_TIMEOUT = 30;
 
     private IRemoteMachineManager machineManager;
-
+    private IRemoteMachineImageManager machineImageManager;
     private IRemoteCloudProviderManager cloudProviderManager;
 
     private IRemoteUserManager userManager;
@@ -75,7 +76,7 @@ public class MachineManagerTest {
 
         Hashtable<String, Object> env = new Hashtable<String, Object>();
         env.put(Context.INITIAL_CONTEXT_FACTORY, MachineManagerTest.INITIAL_CONTEXT_FACTORY);
-        env.put(Context.PROVIDER_URL, "rmi://localhost:" + carolPort);
+        env.put(Context.PROVIDER_URL, "rmi://p-sirocco:" + carolPort);
         final long timeout = System.currentTimeMillis() + MachineManagerTest.INITIALIZE_TIMEOUT * 1000;
         while (true) {
             try {
@@ -149,6 +150,7 @@ public class MachineManagerTest {
 		mem.setQuantity((float)1.5);
 
 		List<DiskTemplate> dTemplates = new ArrayList<DiskTemplate>();
+		
 		for (int i = 0; i < 2 ; i++) {
 			DiskTemplate dt = new DiskTemplate();
 			dt.setUnit(StorageUnit.MEGABYTE);
@@ -157,9 +159,18 @@ public class MachineManagerTest {
 			dt.setAttachmentPoint("/dev/sd0");
 			dTemplates.add(dt);
 		}
+		in_c.setCpu(cpu);
+		in_c.setMemory(mem);
+		in_c.setDiskTemplates(dTemplates);
 		return in_c;
 	}
 
+	@Test
+	public void testCreateMachineImage() throws Exception {
+		MachineImage in_i = getMachineImage();
+		Job out_i = this.machineImageManager.createMachineImage(in_i);
+        Assert.assertNotNull("machineImageCreate returns no machineimage", out_i);
+	}
     @Test
 	public void testCreateMachineConfiguration() throws Exception {
 		MachineConfiguration in_c = new MachineConfiguration();
@@ -233,7 +244,7 @@ public class MachineManagerTest {
 
         int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
-          //  job = this.jobManager.getJobById(jobId);
+            // job = this.jobManager.getJobById(jobId);
             if (job.getStatus() != Job.Status.RUNNING) {
                 break;
             }
