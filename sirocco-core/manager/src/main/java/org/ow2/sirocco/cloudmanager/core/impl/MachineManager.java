@@ -148,13 +148,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		 * access the image
 		 */
 		if (accounts.isEmpty() == false) {
-			for (CloudProviderAccount cpa : accounts) {
-				if (cpa.getImages().size() == 0) continue;
-				if (cpa.getImages().contains(template.getMachineImage())) {
-					a = cpa;
-					break;
-				}
-			}
+			a = accounts.get(0);
 		}
 		return a;
 	}
