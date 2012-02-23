@@ -60,7 +60,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static Log logger = LogFactory.getLog(MockCloudProviderConnector.class);
 
-    private static final int ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS = 10;
+    private static final int ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS = 1;
 
     private final String cloudProviderId;
 
