@@ -29,8 +29,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Embeddable;
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
@@ -40,11 +38,11 @@ public class Job extends CloudEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public static enum StatusType {
+    public static enum Status {
         CREATED,RUNNING, SUCCESS, FAILED, CANCELLED
     };
     
-    private StatusType status;
+    private Status status;
     private Date timeOfStatusChange;
     private String targetEntity;
     private Integer returnCode;
@@ -59,11 +57,11 @@ public class Job extends CloudEntity implements Serializable {
     }
 
 
-    public StatusType getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(StatusType status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
