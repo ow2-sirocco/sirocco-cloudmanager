@@ -156,15 +156,16 @@ public class UserManager implements IUserManager {
         removeCollection("VolumeTemplateCollection", result);
         removeCollection("VolumeConfigurationCollection", result);
 
-        this.em.remove(result);
+        if (result!=null){this.em.remove(result);} 
+        
 
     }
 
     @SuppressWarnings("unchecked")
     private void removeCollection(String Type, User u) {
         List<MachineImageCollection> l = this.em
-                .createQuery("FROM " + Type + " t WHERE t.user.id=:usrid")
-                .setParameter("usrid", u.getId()).getResultList();
+                .createQuery("FROM " + Type + " t WHERE t.user=:usrid")
+                .setParameter("usrid", u).getResultList();
         for (CloudEntity lmic : l) {
             lmic.setUser(null);
             this.em.remove(lmic);
