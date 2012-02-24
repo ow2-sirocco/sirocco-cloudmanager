@@ -192,6 +192,9 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
              * Volume should not be passed by value. Check that the volume id
              * exists.
              */
+            if (volume.getId() == null) {
+            	throw new InvalidRequestException("No volume id ");
+            }
             Volume vvv = this.em.find(Volume.class, volume.getId());
             if (vvv == null) {
                 throw new InvalidRequestException("Volume " + volume.getId() + " of name " + volume.getName()
@@ -212,7 +215,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     // TODO
     private void validateMachineImage(final MachineTemplate mt, final User u) throws InvalidRequestException {
     	MachineImage mi = mt.getMachineImage();
-    	if (mi == null) {
+    	if ((mi == null) || (mi.getId() == null)){
     		throw new InvalidRequestException(" MachineImage should be set");
     	}
     	// check that machine image is known
@@ -438,6 +441,9 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
      */
     private Machine checkOps(final String machineId, final String action) throws CloudProviderException {
         Machine m = null;
+        if (machineId == null) {
+        	throw new InvalidRequestException("Null machine id ");
+        }
         try {
             m = this.em.find(Machine.class, Integer.valueOf(machineId));
         } catch (Exception e) {
@@ -562,10 +568,22 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         return this.doService(machineId, "start");
     }
 
+    private void deleteMachineFromDb(Machine m) {
+    	MachineManager.logger.info("Removing deleted machine ");
+    	
+    	m.setCloudProviderAccount(null);
+    	m.setUser(null);
+    	m.setVolumes(null);
+    	this.em.remove(m);
+    }
+    
     // TODO 
     // Delete may be done in any state of the machine
     public Job deleteMachine(final String machineId) throws CloudProviderException {
         Job j = null;
+        if (machineId == null) {
+        	throw new InvalidRequestException(" Null machine id");
+        }
         Machine m = this.em.find(Machine.class, Integer.valueOf(machineId));
         if (m == null) {
         	throw new ResourceNotFoundException(" Invalid machine id " +machineId);
@@ -603,23 +621,33 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         this.em.persist(persistedJob);
         this.em.flush();
         /** Ask connector for notification when job completes*/
+        boolean deletedone = false;
         if (j.getStatus() == Job.Status.RUNNING) {
         	try {
         		connector.setNotificationOnJobCompletion(persistedJob.getProviderAssignedId());
         	} catch (Exception e) {
         		throw new ServiceUnavailableException(e.getMessage());
         	}
+        } else if (j.getStatus() == Job.Status.SUCCESS) {
+        	/** machine is deleted */
+        	deletedone = true;
         }
         /** Tell connector that we are done with it */
         this.relConnector(m, connector);
-        
+        if (deletedone == true) {
+        	
+        	// deleteMachineFromDb(m);
+        }
         this.em.persist(persistedJob);
         this.em.flush();
         return persistedJob;
     }
 
     public Machine getMachineById(final String machineId) throws ResourceNotFoundException, CloudProviderException {
-        Machine m = this.em.find(Machine.class, Integer.valueOf(machineId));
+        if (machineId == null) {
+        	throw new InvalidRequestException(" null machine id");
+        }
+    	Machine m = this.em.find(Machine.class, Integer.valueOf(machineId));
         if (m == null) {
         	throw new ResourceNotFoundException(" Invalid machine id " +machineId);
         }
@@ -632,6 +660,9 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     public Machine getMachineAttributes(final String machineId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
         Machine m = null;
+        if (machineId == null) {
+        	throw new InvalidRequestException(" null machine id");
+        }
         try {
             m = this.em.find(Machine.class, Integer.valueOf(machineId));
         } catch (Exception e) {
@@ -675,7 +706,9 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         CloudProviderException {
 
         Job j = null;
-        
+        if (machineId == null) {
+        	throw new InvalidRequestException(" null machine id");
+        }
         Machine m = this.em.find(Machine.class, Integer.valueOf(machineId));
         if (m == null) {
             throw new ResourceNotFoundException("Machine " + machineId + " cannot be found");
@@ -728,8 +761,11 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     /**
      * Operations on MachineConfiguration
      */
-    public MachineConfiguration getMachineConfiguration(final String mcId) throws ResourceNotFoundException {
-        MachineConfiguration mc = this.em.find(MachineConfiguration.class, Integer.valueOf(mcId));
+    public MachineConfiguration getMachineConfiguration(final String mcId) throws CloudProviderException {
+    	if (mcId == null) {
+        	throw new InvalidRequestException(" null machine configuration id");
+        }
+    	MachineConfiguration mc = this.em.find(MachineConfiguration.class, Integer.valueOf(mcId));
         if (mc == null) {
         	throw new ResourceNotFoundException("Unknown machine configuration " +mcId);
         }
@@ -739,6 +775,9 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 
     public void updateMachineConfiguration(final String mcId, final Map<String, Object> attributes)
         throws CloudProviderException {
+    	if ((mcId == null) || (attributes == null)) {
+        	throw new InvalidRequestException(" null machine configuration id");
+        }
         MachineConfiguration mc = this.em.find(MachineConfiguration.class, Integer.valueOf(mcId));
         if (mc == null) {
         	throw new ResourceNotFoundException("Unknown machine configuration " +mcId);
@@ -765,7 +804,9 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         List<MachineTemplate> mts = null;
         Integer mcid = Integer.valueOf(mcId);
         MachineConfiguration config = null;
-
+        if (mcId == null) {
+        	throw new InvalidRequestException(" null machine configuration id");
+        }
         try {
             config = this.em.find(MachineConfiguration.class, mcid);
         } catch (Exception e) {
@@ -789,6 +830,8 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
             throw new ResourceConflictException("MachineTemplates " + mts.get(0).getId() + " uses the configuration " + mcid);
         }
         // CHECK that disktemplates are cascaded deleted
+        config.setUser(null);
+        // 
         this.em.remove(config);
     }
 
@@ -836,7 +879,10 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
      * Operations on MachineTemplate
      */
     public MachineTemplate getMachineTemplate(final String mtId) throws CloudProviderException {
-        MachineTemplate mt = this.em.find(MachineTemplate.class, Integer.valueOf(mtId));
+    	if (mtId == null) {
+        	throw new InvalidRequestException(" null machine template id");
+        }
+    	MachineTemplate mt = this.em.find(MachineTemplate.class, Integer.valueOf(mtId));
         if (mt == null) {
         	throw new ResourceNotFoundException(" Could not find machine template" +mtId);
         }
@@ -850,6 +896,9 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     public MachineTemplate updateMachineTemplate(final String mtId, final Map<String, Object> attributes)
         throws CloudProviderException {
         MachineTemplate mt = null;
+        if ((mtId == null) || (attributes == null)) {
+        	throw new InvalidRequestException(" null machine template id");
+        }
         mt = this.em.find(MachineTemplate.class, Integer.valueOf(mtId));
         if (mt == null) {
         	throw new ResourceNotFoundException(" Could not find machine template" +mtId);
@@ -956,6 +1005,13 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         return mt;
     }
 
+    private void deleteMachineTemplateFromDb(MachineTemplate mt) {
+    	 mt.setUser(null);
+         mt.setVolumes(null);
+         mt.setVolumeTemplates(null);
+         this.em.remove(mt);
+    }
+    
     public void deleteMachineTemplate(final String mtId) throws CloudProviderException {
         this.setUser();
 
@@ -967,7 +1023,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
             throw new CloudProviderException("Not owner, cannot delete machine template ");
         }
         
-        this.em.remove(mt);
+        deleteMachineTemplateFromDb(mt);
         this.em.flush();
     }
 
@@ -1006,7 +1062,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         if (volumes != null) {
         	for (MachineVolume mv : volumes) {
             	Volume vv = null;
-            	if (mv.getAttachmentPoint() == null ){
+            	if ((mv.getAttachmentPoint() == null ) || (mv.getVolume() == null) || (mv.getVolume().getId() == null)) {
             		throw new InvalidRequestException(" Attachment point empty  " );
             	}
             	try {

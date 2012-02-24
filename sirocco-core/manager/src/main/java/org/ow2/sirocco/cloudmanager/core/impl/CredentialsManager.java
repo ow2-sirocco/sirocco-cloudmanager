@@ -102,7 +102,7 @@ public class CredentialsManager implements ICredentialsManager {
 		credentials.setCreated(new Date());
 		credentials.setUser(user);
 		this.em.persist(credentials);
-		return null;
+		return credentials;
 	}
 	
     public Credentials updateCredentials(Credentials credentials) throws CloudProviderException {
@@ -111,6 +111,9 @@ public class CredentialsManager implements ICredentialsManager {
     
     public Credentials getCredentialsById(String credentialsId) throws CloudProviderException {
     	setUser();
+    	if (credentialsId == null) {
+    		throw new InvalidRequestException("null credentials id");
+    	}
     	Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
     	if (cred == null) {
     		throw new ResourceNotFoundException("Credentials " +credentialsId +" not found");
@@ -132,6 +135,9 @@ public class CredentialsManager implements ICredentialsManager {
     
     public void deleteCredentials(String credentialsId) throws CloudProviderException {
     	setUser();
+    	if (credentialsId == null) {
+    		throw new InvalidRequestException("null credentials id");
+    	}
     	Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
     	/** if anymachine template refers to this credential
     	 * do not delete.
