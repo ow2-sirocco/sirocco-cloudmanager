@@ -1,110 +1,278 @@
+/**
+ *
+ * SIROCCO
+ * Copyright (C) 2011 France Telecom
+ * Contact: sirocco@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  $Id$
+ *
+ */
 package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Dictionary;
 import java.util.List;
-import java.util.logging.Logger;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
-import javax.annotation.Resource;
-import javax.ejb.Local;
-import javax.ejb.Remote;
-import javax.ejb.SessionContext;
-import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceContextType;
+import javax.jms.ObjectMessage;
+import javax.jms.Session;
+import javax.jms.Topic;
+import javax.jms.TopicConnection;
+import javax.jms.TopicConnectionFactory;
+import javax.jms.TopicPublisher;
+import javax.jms.TopicSession;
+import javax.naming.InitialContext;
 
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IRemoteJobManager;
-import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.exception.JobException;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.User;
+import org.ow2.util.log.Log;
+import org.ow2.util.log.LogFactory;
 
-@Stateless(name = IJobManager.EJB_JNDI_NAME, mappedName = IJobManager.EJB_JNDI_NAME)
-@Remote(IRemoteJobManager.class)
-@Local(IJobManager.class)
-@SuppressWarnings("unused")
-public class JobManager implements IJobManager {
+import com.google.common.util.concurrent.ListenableFuture;
 
-    private static Logger logger = Logger.getLogger(JobManager.class.getName());
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
-    private EntityManager em;
+public class JobManager implements IJobManager, ManagedService {
+	private static Log logger = LogFactory.getLog(JobManager.class);
 
-    @Resource
-    private SessionContext ctx;
+	public static String JOB_WATCHER_PERIOD_PROP_NAME = "jobWatcherPeriodInSeconds";
 
-    @Override
-    public Job createJob(String targetEntity, String action, String parentJob)
-            throws JobException {
+	public static String JOB_RETENTION_TIME_PROP_NAME = "jobRetentionPeriodInSeconds";
 
-        Job j = new Job();
-        j.setTargetEntity(targetEntity);
-        j.setAction(action);
+	public static long DEFAULT_JOB_WATCHER_PERIOD_IN_SECONDS = 5 * 60;
 
-        if (parentJob != null) {
-            Job parent = this.getJobById(parentJob);
-            if (parent == null) {
-                throw new JobException();
-            } else {
-                j.setParentJob(parent);
-            }
+	public static long DEFAULT_JOB_RETENTION_TIME_IN_SECONDS = 5 * 60;
 
-        }
+	private static final String JMS_TOPIC_CONNECTION_FACTORY_NAME = "JTCF";
 
-        this.em.persist(j);
+	private static final String JMS_TOPIC_NAME = "JobCompletion";
 
-        return j;
-    }
+	private static class JobEntry {
+		JobEntry(final Job job, final ListenableFuture<?> result) {
+			this.job = job;
+			this.result = result;
+		}
 
-    @Override
-    public Job getJobById(String id) throws JobException {
+		Job job;
+		ListenableFuture<?> result;
+	};
 
-        Job result = this.em.find(Job.class, new Integer(id));
-        return result;
-    }
+	private long jobWatcherPeriodInSeconds = JobManager.DEFAULT_JOB_WATCHER_PERIOD_IN_SECONDS;
 
-    @Override
-    public Job updateJob(Job job) throws JobException {
+	private long jobRetentionPeriodInSeconds = JobManager.DEFAULT_JOB_RETENTION_TIME_IN_SECONDS;
 
-        Integer jobId = job.getId();
-        this.em.merge(job);
+	private final Map<String, JobEntry> jobs = new ConcurrentHashMap<String, JobEntry>();
 
-        return this.getJobById(jobId.toString());
-    }
+	private final ScheduledExecutorService scheduler = Executors
+			.newSingleThreadScheduledExecutor();
 
-    @Override
-    public JobCollection getJobCollection() throws JobException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	private final ExecutorService jobCompletionExecutorService = Executors
+			.newSingleThreadExecutor();
 
-    @Override
-    public JobCollection updateJobCollection(JobCollection jobColl)
-            throws JobException {
-        // TODO Auto-generated method stub
-        return null;
-    }
+	private ScheduledFuture<?> jobWatcherHandle;
 
-    @Override
-    public void deleteJob(String id) throws JobException {
-        Job result = this.getJobById(id);
+	private JobManager() {
+	}
 
-        if (result != null) {
-            this.em.remove(result);
-        }
+	@SuppressWarnings("rawtypes")
+	public void updated(final Dictionary properties)
+			throws ConfigurationException {
+		if (properties != null) {
+			String s = (String) properties
+					.get(JobManager.JOB_WATCHER_PERIOD_PROP_NAME);
+			if (s != null) {
+				try {
+					this.jobWatcherPeriodInSeconds = Integer.parseInt(s);
+				} catch (NumberFormatException ex) {
+					JobManager.logger
+							.error("Illegal value for jobWatcherPeriodInSeconds property: "
+									+ s);
+				}
+			}
+			s = (String) properties
+					.get(JobManager.JOB_RETENTION_TIME_PROP_NAME);
+			if (s != null) {
+				try {
+					this.jobRetentionPeriodInSeconds = Integer.parseInt(s);
+				} catch (NumberFormatException ex) {
+					JobManager.logger
+							.error("Illegal value for jobRetentionPeriodInSeconds property: "
+									+ s);
+				}
+			}
 
-    }
+		}
+		JobManager.logger.info("JobManager ready, watcher period: "
+				+ this.jobWatcherPeriodInSeconds + "s, job retention time: "
+				+ this.jobRetentionPeriodInSeconds + " s");
+	}
 
-    @Override
-    @SuppressWarnings("unchecked")
-    public List<Job> getNestedJobs(String id) throws JobException {
+	public void start() {
+		final Runnable jobWatcher = new Runnable() {
+			@Override
+			public void run() {
+				JobManager.logger.debug("Job watcher woken up");
+				Date now = new Date();
+				for (JobEntry jobEntry : JobManager.this.jobs.values()) {
+					Job job = jobEntry.job;
+					if (job.getStatus() != Job.Status.RUNNING) {
+						if (TimeUnit.MILLISECONDS.toSeconds(now.getTime()
+								- job.getTimeOfStatusChange().getTime()) > JobManager.this.jobRetentionPeriodInSeconds) {
+							JobManager.logger.info("Reaping job "
+									+ job.getProviderAssignedId());
+							JobManager.this.jobs.remove(job
+									.getProviderAssignedId());
+						}
+					}
+				}
+			}
+		};
+		this.jobWatcherHandle = this.scheduler.scheduleAtFixedRate(jobWatcher,
+				0, this.jobWatcherPeriodInSeconds, TimeUnit.SECONDS);
+	}
 
-        List<Job> l = this.em
-                .createQuery("FROM Job t WHERE t.parentJob_id=:id")
-                .setParameter("id", id).getResultList();
-        return l;
+	public void shutdown() {
+		this.jobWatcherHandle.cancel(true);
+		this.scheduler.shutdown();
+		System.out.println("JobManager shutdowned");
+	}
 
-    }
+	public static JobManager newJobManager() {
+		JobManager jobManager = new JobManager();
+		return jobManager;
+	}
+
+	public Job newJob(final String targetEntityId, final String action,
+			final ListenableFuture<?> result) {
+		String jobId = UUID.randomUUID().toString();
+		final Job job = new Job();
+		job.setProviderAssignedId(jobId);
+		job.setTargetEntity(targetEntityId);
+		job.setAction(action);
+		job.setIsCancellable(false);
+		job.setStatus(Job.Status.RUNNING);
+		this.jobs.put(jobId, new JobEntry(job, result));
+		return job;
+	}
+
+	@Override
+	public void setNotificationOnJobCompletion(final String jobId)
+			throws Exception {
+		final JobEntry jobEntry = this.jobs.get(jobId);
+		if (jobEntry == null) {
+			throw new Exception("Invalid jobId: " + jobId);
+		}
+		jobEntry.result.addListener(new Runnable() {
+			@Override
+			public void run() {
+				if (jobEntry.result.isCancelled()) {
+					jobEntry.job.setStatus(Job.Status.CANCELLED);
+					jobEntry.job.setStatusMessage("cancelled");
+				} else {
+					boolean interrupted = false;
+					try {
+						while (true) {
+							try {
+								jobEntry.result.get();
+								jobEntry.job.setStatus(Job.Status.SUCCESS);
+								break;
+							} catch (InterruptedException ex) {
+								interrupted = true;
+								// retry until not interrupted
+							} catch (ExecutionException ex) {
+								jobEntry.job.setStatusMessage(ex.getCause()
+										.getMessage());
+								jobEntry.job.setStatus(Job.Status.FAILED);
+								break;
+							} catch (CancellationException ex) {
+								jobEntry.job.setStatus(Job.Status.CANCELLED);
+								jobEntry.job.setStatusMessage("cancelled");
+								break;
+							}
+						}
+					} finally {
+						if (interrupted) {
+							Thread.currentThread().interrupt();
+						}
+					}
+				}
+				jobEntry.job.setTimeOfStatusChange(new Date());
+				JobManager.this.emitJobCompletionEvent(jobEntry.job);
+			}
+		}, this.jobCompletionExecutorService);
+
+	}
+
+	public Job getJobById(final String id) {
+		JobEntry jobEntry = this.jobs.get(id);
+		if (jobEntry == null) {
+			return null;
+		}
+		return jobEntry.job;
+	}
+
+	public List<Job> getAllJobs() {
+		ArrayList<Job> result = new ArrayList<Job>();
+		for (JobEntry jobEntry : this.jobs.values()) {
+			result.add(jobEntry.job);
+		}
+		return result;
+	}
+
+	private <T> void emitJobCompletionEvent(final Job job) {
+		try {
+			this.emitMessage(job);
+		} catch (Exception ex) {
+			JobManager.logger.error("Failed to emit message", ex);
+		}
+	}
+
+	private void emitMessage(final Serializable payload) throws Exception {
+		InitialContext ctx = new InitialContext();
+		TopicConnectionFactory topicConnectionFactory = (TopicConnectionFactory) ctx
+				.lookup(JobManager.JMS_TOPIC_CONNECTION_FACTORY_NAME);
+		TopicConnection connection = topicConnectionFactory
+				.createTopicConnection();
+		TopicSession session = connection.createTopicSession(false,
+				Session.AUTO_ACKNOWLEDGE);
+		Topic cloudAdminTopic = (Topic) ctx
+				.lookup(JobManager.JMS_TOPIC_NAME);
+		TopicPublisher topicPublisher = session
+				.createPublisher(cloudAdminTopic);
+		ObjectMessage message = session.createObjectMessage();
+		message.setObject(payload);
+		topicPublisher.publish(message);
+		JobManager.logger.info("EMITTED EVENT " + payload.toString()
+				+ " on " + JobManager.JMS_TOPIC_NAME + " topic");
+		topicPublisher.close();
+		session.close();
+		connection.close();
+	}
 
 }
