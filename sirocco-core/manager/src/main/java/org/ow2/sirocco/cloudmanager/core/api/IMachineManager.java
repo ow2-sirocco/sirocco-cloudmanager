@@ -39,6 +39,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 
 public interface IMachineManager {
 
@@ -47,7 +49,7 @@ public interface IMachineManager {
 	/**
 	 * Operations on MachineCollection
 	 */
-	Job createMachine(MachineCreate machineCreate) throws CloudProviderException;;
+	Job createMachine(MachineCreate machineCreate) throws InvalidRequestException, CloudProviderException;
 	List<Machine> getMachines(int first, int last, List<String> attributes) throws CloudProviderException;
 	List<Machine> getMachinesAttributes(List<String> attributes, String queryExpression)  throws CloudProviderException;
 
@@ -59,7 +61,7 @@ public interface IMachineManager {
 	Job deleteMachine(final String machineId) throws CloudProviderException;
 
 	Machine getMachineById(final String machineId) 
-		throws CloudProviderException;
+			throws ResourceNotFoundException,  CloudProviderException;
 
 	Machine getMachineAttributes(final String machineId, 
 				     List<String> attributes) 

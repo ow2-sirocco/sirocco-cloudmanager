@@ -126,7 +126,7 @@ public class MachineImageManager implements IMachineImageManager {
 		return image;
 	}
 
-	public void deleteImage(String imageId)throws CloudProviderException {
+	public void deleteMachineImage(String imageId)throws CloudProviderException {
 
 	}
 

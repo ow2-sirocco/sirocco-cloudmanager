@@ -36,7 +36,7 @@ public interface ICredentialsManager {
 	
 	Credentials createCredentials(Credentials credentials) throws CloudProviderException;
     Credentials updateCredentials(Credentials credentials) throws CloudProviderException;
-    Credentials readCredentials(String credentialsId) throws CloudProviderException;
+    Credentials getCredentialsById(String credentialsId) throws CloudProviderException;
     void deleteCredentials(String credentialsId) throws CloudProviderException;
 
 }

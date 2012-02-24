@@ -46,5 +46,5 @@ public interface IMachineImageManager {
 	
 	MachineImage getMachineImage(String imageId)throws CloudProviderException;
 	
-	void deleteImage(String imageId)throws CloudProviderException;
+	void deleteMachineImage(String imageId)throws CloudProviderException;
 }

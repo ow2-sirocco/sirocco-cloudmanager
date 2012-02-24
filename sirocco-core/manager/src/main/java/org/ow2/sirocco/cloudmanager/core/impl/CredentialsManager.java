@@ -109,7 +109,7 @@ public class CredentialsManager implements ICredentialsManager {
     	throw new InvalidRequestException(" Cannot update credentials ");
     }
     
-    public Credentials readCredentials(String credentialsId) throws CloudProviderException {
+    public Credentials getCredentialsById(String credentialsId) throws CloudProviderException {
     	setUser();
     	Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
     	if (cred == null) {
