@@ -20,7 +20,11 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
+import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
@@ -149,9 +153,9 @@ public class MachineManagerTest {
         this.credcounter += 1;
         return in;
     }
-    private Credentials createCredentials() {
+    private Credentials createCredentials() throws Exception {
     	Credentials in_c = initCredentials();
-    	Credentials out_c = this.credManager().createCredentials(in_c);
+    	Credentials out_c = this.credManager.createCredentials(in_c);
     	Assert.assertNotNull("createCredentials returns no credentials", out_c);
     	creds.add(out_c);
     	return out_c;
@@ -162,7 +166,7 @@ public class MachineManagerTest {
         MachineConfiguration in_c = new MachineConfiguration();
         in_c.setName("testConfig_" + this.ccounter);
         this.ccounter += 1;
-        in_c.setDescription("testConfig_" + this.counter + " description");
+        in_c.setDescription("testConfig_" + this.ccounter + " description");
         Map<String, String> properties = new HashMap<String, String>();
         properties.put("entity", "machineconfiguration");
         in_c.setProperties(properties);
@@ -210,7 +214,7 @@ public class MachineManagerTest {
         MachineImage i = null;
         while (done != true) {
         	int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
-        	i = MachineManagerTest.machineImageManager.getMachineImage(out_j.setTargetEntity());
+        	i = MachineManagerTest.machineImageManager.getMachineImage(out_j.getTargetEntity());
         	Thread.sleep(1000);
         	
         	if (counter-- == 100) {
@@ -288,7 +292,7 @@ public class MachineManagerTest {
         Machine machine = MachineManagerTest.machineManager.getMachineById(machineId);
         Assert.assertNotNull("cannot find machine juste created", machine);
         Assert.assertEquals("Created machine is STARTED", machine.getState(), Machine.State.STARTED);
-        Assert.assertNotNull(machine.getProviderAssignedId());
+        
         Assert.assertNotNull(machine.getId());
         Assert.assertEquals(machine.getName(), "myMachine");
         Assert.assertEquals(machine.getDescription(), "my machine");
