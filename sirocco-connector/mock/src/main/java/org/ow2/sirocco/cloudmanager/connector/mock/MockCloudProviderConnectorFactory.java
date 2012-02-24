@@ -36,7 +36,7 @@ import org.osgi.framework.ServiceReference;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
-import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl.JobManager;
+import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
 import org.ow2.util.log.Log;
@@ -51,7 +51,7 @@ public class MockCloudProviderConnectorFactory implements ICloudProviderConnecto
 
     private static final int THREADPOOL_SIZE = 10;
 
-    private JobManager jobManager;
+    private IJobManager jobManager;
 
     private ListeningExecutorService executorService = MoreExecutors.listeningDecorator(Executors
         .newFixedThreadPool(MockCloudProviderConnectorFactory.THREADPOOL_SIZE));
@@ -59,13 +59,13 @@ public class MockCloudProviderConnectorFactory implements ICloudProviderConnecto
     private Set<ICloudProviderConnector> cloudProvidersInUse = new LinkedHashSet<ICloudProviderConnector>();
 
     public MockCloudProviderConnectorFactory(final BundleContext context) {
-        ServiceReference jobManagerServiceRef = context.getServiceReference(JobManager.class.getName());
+        ServiceReference jobManagerServiceRef = context.getServiceReference(IJobManager.class.getName());
         if (jobManagerServiceRef != null) {
-            this.jobManager = (JobManager) context.getService(jobManagerServiceRef);
+            this.jobManager = (IJobManager) context.getService(jobManagerServiceRef);
         }
     }
 
-    public MockCloudProviderConnectorFactory(final JobManager jobManager) {
+    public MockCloudProviderConnectorFactory(final IJobManager jobManager) {
         this.jobManager = jobManager;
     }
 
@@ -108,7 +108,7 @@ public class MockCloudProviderConnectorFactory implements ICloudProviderConnecto
         return Collections.singletonList(mockLocation);
     }
 
-    JobManager getJobManager() {
+    IJobManager getJobManager() {
         return this.jobManager;
     }
 
