@@ -64,17 +64,21 @@ public class MachineManagerTest {
     private static final int INITIALIZE_TIMEOUT = 30;
 
     private static IRemoteMachineManager machineManager;
-
+    private static IRemoteCredentialsManager credManager;
     private static IRemoteMachineImageManager machineImageManager;
 
     private static IRemoteCloudProviderManager cloudProviderManager;
 
     private static IRemoteUserManager userManager;
 
-    // private IRemoteJobManager jobManager;
+    private IRemoteJobManager jobManager;
 
-    private int counter = 1000;
-
+    List<MachineImage> images = new ArrayList<MachineImage>();
+    List<MachineConfiguration> configs = new ArrayList<MachineConfiguration>();
+    List<MachineTemplate> templates = new ArrayList<MachineTemplate>();
+    List<Machine> machines = new ArrayList<Machine>();
+    List<Credentials> creds = new ArrayList<Credentials>();
+    
     private static void connectToCloudManager() throws Exception {
         String carolPortString = System.getProperty("carol.port");
         Assert.assertNotNull("carol.port not set!", carolPortString);
@@ -132,7 +136,7 @@ public class MachineManagerTest {
 
     private int credcounter = 1;
 
-    private Credentials getCredentials() {
+    private Credentials initCredentials() {
         Credentials in = new Credentials();
         in.setName("testCred_" + this.credcounter);
         in.setDescription("testCred_" + this.credcounter + " description ");
@@ -145,11 +149,19 @@ public class MachineManagerTest {
         this.credcounter += 1;
         return in;
     }
-
-    private MachineConfiguration getMachineConfiguration() {
+    private Credentials createCredentials() {
+    	Credentials in_c = initCredentials();
+    	Credentials out_c = this.credManager().createCredentials(in_c);
+    	Assert.assertNotNull("createCredentials returns no credentials", out_c);
+    	creds.add(out_c);
+    	return out_c;
+    }
+    private int ccounter = 1;
+    
+    private MachineConfiguration initMachineConfiguration() {
         MachineConfiguration in_c = new MachineConfiguration();
-        in_c.setName("testConfig_" + this.counter);
-        this.counter += 1;
+        in_c.setName("testConfig_" + this.ccounter);
+        this.ccounter += 1;
         in_c.setDescription("testConfig_" + this.counter + " description");
         Map<String, String> properties = new HashMap<String, String>();
         properties.put("entity", "machineconfiguration");
@@ -170,7 +182,7 @@ public class MachineManagerTest {
             dt.setUnit(StorageUnit.MEGABYTE);
             dt.setQuantity((float) 4.5);
             dt.setFormat("ext3");
-            dt.setAttachmentPoint("/dev/sd0");
+            dt.setAttachmentPoint("/dev/sd"+i);
             dTemplates.add(dt);
         }
         in_c.setCpu(cpu);
@@ -179,72 +191,71 @@ public class MachineManagerTest {
         return in_c;
     }
 
+    private int imagecounter = 1;
+
+    private MachineImage initMachineImage() {
+        MachineImage mimage = new MachineImage();
+        mimage.setName("image_" + this.imagecounter);
+        mimage.setDescription("image description " + this.imagecounter);
+        mimage.setImageLocation("http://example.com/images/WinXP-SP2"+this.imagecounter);
+        this.imagecounter += 1;
+        return mimage;
+    }
+    
+    private MachineImage createMachineImage() throws Exception {
+    	MachineImage in_i = this.initMachineImage();
+        Job out_j = MachineManagerTest.machineImageManager.createMachineImage(in_i);
+        Assert.assertNotNull("machineImageCreate returns no machineimage", out_j);
+        boolean done = false;
+        MachineImage i = null;
+        while (done != true) {
+        	int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
+        	i = MachineManagerTest.machineImageManager.getMachineImage(out_j.setTargetEntity());
+        	Thread.sleep(1000);
+        	
+        	if (counter-- == 100) {
+        		throw new Exception("Machine image create time out");
+        	}
+        }
+        return i;
+    }
+    
     @Test
     public void testCreateMachineImage() throws Exception {
-        MachineImage in_i = this.getMachineImage();
-        Job out_i = MachineManagerTest.machineImageManager.createMachineImage(in_i);
-        Assert.assertNotNull("machineImageCreate returns no machineimage", out_i);
+        createMachineImage();
+    }
+
+    
+   
+    private MachineConfiguration createMachineConfiguration() throws Exception {
+        MachineConfiguration in_c = initMachineConfiguration();
+        
+        MachineConfiguration out_c = MachineManagerTest.machineManager.createMachineConfiguration(in_c);
+        Assert.assertNotNull("machineConfigurationCreate returns no machineconfiguration", out_c);
+        configs.add(in_c);
+        return out_c;
     }
 
     @Test
     public void testCreateMachineConfiguration() throws Exception {
-        MachineConfiguration in_c = new MachineConfiguration();
-        in_c.setName("testConfig_" + this.counter);
-        this.counter += 1;
-        in_c.setDescription("testConfig_" + this.counter + " description");
-        Map<String, String> properties = new HashMap<String, String>();
-        properties.put("entity", "machineconfiguration");
-        in_c.setProperties(properties);
-
-        Cpu cpu = new Cpu();
-        cpu.setCpuSpeedUnit(Cpu.Frequency.GIGA);
-        cpu.setQuantity((float) 3.5);
-        cpu.setNumberCpu(1);
-        Memory mem = new Memory();
-        mem.setUnit(Memory.MemoryUnit.MEGIBYTE);
-        mem.setQuantity((float) 1.5);
-        List<DiskTemplate> dTemplates = new ArrayList<DiskTemplate>();
-        for (int i = 0; i < 2; i++) {
-            DiskTemplate dt = new DiskTemplate();
-            dt.setUnit(StorageUnit.MEGABYTE);
-            dt.setQuantity((float) 4.5);
-            dt.setFormat("ext3");
-            dt.setAttachmentPoint("/dev/sd0");
-            dTemplates.add(dt);
-        }
-        in_c.setCpu(cpu);
-        in_c.setMemory(mem);
-        in_c.setDiskTemplates(dTemplates);
-        MachineConfiguration out_c = MachineManagerTest.machineManager.createMachineConfiguration(in_c);
-        Assert.assertNotNull("machineConfigurationCreate returns no machineconfiguration", out_c);
-
+    	createMachineConfiguration();
     }
-
-    private int imagecounter = 1;
-
-    private MachineImage getMachineImage() {
-        MachineImage mimage = new MachineImage();
-        mimage.setName("image_" + this.imagecounter);
-        mimage.setDescription("image description " + this.imagecounter);
-        mimage.setImageLocation("http://example.com/images/WinXP-SP2");
-        this.imagecounter += 1;
-        return mimage;
-    }
-
+    
+    private int mcounter = 0;
     @Test
     public void testCreateMachine() throws Exception {
         MachineCreate machineCreate = new MachineCreate();
-        machineCreate.setName("myMachine");
-        machineCreate.setDescription("my machine");
+        machineCreate.setName("myMachine_"+mcounter);
+        machineCreate.setDescription("my machine" +mcounter);
         Map<String, String> properties = new HashMap<String, String>();
         properties.put("department", "MAPS");
         machineCreate.setProperties(properties);
         MachineTemplate machineTemplate = new MachineTemplate();
-        MachineConfiguration machineConfig = this.getMachineConfiguration();
-
-        machineTemplate.setMachineImage(this.getMachineImage());
+        MachineConfiguration machineConfig = this.createMachineConfiguration();
         machineTemplate.setMachineConfiguration(machineConfig);
-        machineTemplate.setCredentials(this.getCredentials());
+        machineTemplate.setMachineImage(this.createMachineImage());
+        
+        machineTemplate.setCredentials(this.createCredentials());
         machineTemplate.setVolumes(new ArrayList<MachineVolume>());
         machineTemplate.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
         machineTemplate.setNetworkInterfaces(new ArrayList<NetworkInterface>());
