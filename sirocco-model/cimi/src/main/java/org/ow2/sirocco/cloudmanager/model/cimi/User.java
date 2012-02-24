@@ -39,7 +39,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-
 @Entity
 public class User implements Serializable {
 
@@ -69,15 +68,15 @@ public class User implements Serializable {
     private Collection<Machine> machines;
 
     private Collection<Volume> volumes;
-    
+
     private Collection<MachineTemplate> machineTemplates;
-    
+
     private Collection<MachineConfiguration> machineConfigurations;
-    
+
     private Collection<VolumeTemplate> volumeTemplates;
-    
+
     private Collection<VolumeConfiguration> volumeConfigurations;
-    
+
     private Collection<CloudProviderAccount> cloudProviderAccounts;
 
     public User() {
@@ -181,47 +180,47 @@ public class User implements Serializable {
 
     @OneToMany(mappedBy = "user")
     public Collection<MachineTemplate> getMachineTemplates() {
-		return machineTemplates;
-	}
+        return this.machineTemplates;
+    }
 
-	public void setMachineTemplates(Collection<MachineTemplate> machineTemplates) {
-		this.machineTemplates = machineTemplates;
-	}
+    public void setMachineTemplates(final Collection<MachineTemplate> machineTemplates) {
+        this.machineTemplates = machineTemplates;
+    }
 
-	@OneToMany(mappedBy = "user")
-	public Collection<MachineConfiguration> getMachineConfigurations() {
-		return machineConfigurations;
-	}
+    @OneToMany(mappedBy = "user")
+    public Collection<MachineConfiguration> getMachineConfigurations() {
+        return this.machineConfigurations;
+    }
 
-	public void setMachineConfigurations(Collection<MachineConfiguration> machineConfigurations) {
-		this.machineConfigurations = machineConfigurations;
-	}
+    public void setMachineConfigurations(final Collection<MachineConfiguration> machineConfigurations) {
+        this.machineConfigurations = machineConfigurations;
+    }
 
-	@OneToMany(mappedBy = "user")
-	public Collection<VolumeTemplate> getVolumeTemplates() {
-		return volumeTemplates;
-	}
+    @OneToMany(mappedBy = "user")
+    public Collection<VolumeTemplate> getVolumeTemplates() {
+        return this.volumeTemplates;
+    }
 
-	public void setVolumeTemplates(Collection<VolumeTemplate> volumeTemplates) {
-		this.volumeTemplates = volumeTemplates;
-	}
+    public void setVolumeTemplates(final Collection<VolumeTemplate> volumeTemplates) {
+        this.volumeTemplates = volumeTemplates;
+    }
 
-	@OneToMany(mappedBy = "user")
-	public Collection<VolumeConfiguration> getVolumeConfigurations() {
-		return volumeConfigurations;
-	}
+    @OneToMany(mappedBy = "user")
+    public Collection<VolumeConfiguration> getVolumeConfigurations() {
+        return this.volumeConfigurations;
+    }
 
-	public void setVolumeConfigurations(Collection<VolumeConfiguration> volumeConfigurations) {
-		this.volumeConfigurations = volumeConfigurations;
-	}
+    public void setVolumeConfigurations(final Collection<VolumeConfiguration> volumeConfigurations) {
+        this.volumeConfigurations = volumeConfigurations;
+    }
 
-	@ManyToMany(mappedBy="user")
-	public Collection<CloudProviderAccount> getCloudProviderAccounts() {
-		return cloudProviderAccounts;
-	}
+    @ManyToMany(mappedBy = "users")
+    public Collection<CloudProviderAccount> getCloudProviderAccounts() {
+        return this.cloudProviderAccounts;
+    }
 
-	public void setCloudProviderAccounts(Collection<CloudProviderAccount> cloudProviderAccounts) {
-		this.cloudProviderAccounts = cloudProviderAccounts;
-	}
+    public void setCloudProviderAccounts(final Collection<CloudProviderAccount> cloudProviderAccounts) {
+        this.cloudProviderAccounts = cloudProviderAccounts;
+    }
 
 }
