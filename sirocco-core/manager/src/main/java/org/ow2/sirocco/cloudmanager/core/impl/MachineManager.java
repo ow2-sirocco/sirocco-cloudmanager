@@ -355,7 +355,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         j.setProperties(new HashMap<String, String>());
         
         j.setCreated(new Date());
-        j.setProviderAssignedId(creationJob.getId().toString());
+        j.setProviderAssignedId(creationJob.getProviderAssignedId().toString());
         j.setAction("create");
         j.setStatus(creationJob.getStatus());
         j.setReturnCode(creationJob.getReturnCode());
@@ -491,7 +491,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         persistedJob.setNestedJobs(null);
         persistedJob.setStatusMessage(j.getStatusMessage());
         persistedJob.setTargetEntity(m.getId().toString());
-        persistedJob.setProviderAssignedId(j.getId().toString());
+        persistedJob.setProviderAssignedId(j.getProviderAssignedId().toString());
         persistedJob.setCreated(new Date());
         persistedJob.setLocation(m.getLocation());
         persistedJob.setUser(m.getUser());
