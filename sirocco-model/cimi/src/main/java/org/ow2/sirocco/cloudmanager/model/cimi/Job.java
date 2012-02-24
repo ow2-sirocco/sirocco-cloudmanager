@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -131,7 +132,7 @@ public class Job extends CloudEntity implements Serializable {
     }
 
 
-    @OneToMany(mappedBy="parentJob")
+    @OneToMany(mappedBy="parentJob",fetch=FetchType.EAGER)
     public List<Job> getNestedJobs() {
         return nestedJobs;
     }
