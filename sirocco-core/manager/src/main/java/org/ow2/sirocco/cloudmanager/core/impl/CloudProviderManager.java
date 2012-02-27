@@ -34,6 +34,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -153,7 +154,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         CloudProviderAccount cpa = this
                 .getCloudProviderAccountById(cloudProviderAccountId);
         User u = userManager.getUserById(userId);
-        List<User> users = cpa.getUsers();
+        Set<User> users = cpa.getUsers();
         users.add(u);
         cpa.setUsers(users);
 
@@ -192,7 +193,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         CloudProviderAccount cpa = this
                 .getCloudProviderAccountById(cloudProviderAccountId);
         User u = userManager.getUserById(userId);
-        List<User> users = cpa.getUsers();
+        Set<User> users = cpa.getUsers();
         users.remove(u);
         cpa.setUsers(users);
         this.em.merge(cpa);
