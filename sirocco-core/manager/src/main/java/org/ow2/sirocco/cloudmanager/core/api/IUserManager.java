@@ -7,7 +7,7 @@ public interface IUserManager {
 	
 	static final String EJB_JNDI_NAME = "UserManager";
 	
-	User createUser(String firstName,String lastName,String email,String username,String password,String publicKey) throws UserException;
+	User createUser(String firstName,String lastName,String email,String username,String password) throws UserException;
 	User getUserById(String userId) throws UserException;
 	User getUserByUsername(String userName) throws UserException;
 	User updateUser(User user) throws UserException;
