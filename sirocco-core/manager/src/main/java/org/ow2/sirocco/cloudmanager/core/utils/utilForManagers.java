@@ -24,7 +24,7 @@ public class utilForManagers {
 
     }
 
-    private static Method invokeSetter(Class targetClass, Object targetObj,
+    private static Object invokeSetter(Class targetClass, Object targetObj,
             String attrName, Object attrValue) throws IntrospectionException,
             NoSuchFieldException, IllegalArgumentException,
             IllegalAccessException, InvocationTargetException {
@@ -32,7 +32,7 @@ public class utilForManagers {
         BeanInfo info = Introspector.getBeanInfo(targetClass);
         for (PropertyDescriptor pd : info.getPropertyDescriptors())
             if (attrName.equals(pd.getName()))
-                pd.getWriteMethod().invoke(targetObj, attrValue);
+                return pd.getWriteMethod().invoke(targetObj, attrValue);
         throw new NoSuchFieldException(targetClass + " has no field "
                 + attrName);
     }
