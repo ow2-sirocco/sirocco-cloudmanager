@@ -26,11 +26,10 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -53,12 +52,12 @@ public class CloudProvider implements Serializable {
 
     private String description;
 
-    private List<CloudProviderAccount> cloudProviderAccounts;
+    private Set<CloudProviderAccount> cloudProviderAccounts;
     
-    private List<CloudProviderLocation> cloudProviderLocations;
+    private Set<CloudProviderLocation> cloudProviderLocations;
 
     public CloudProvider() {
-        this.cloudProviderAccounts = new ArrayList<CloudProviderAccount>();
+        this.cloudProviderAccounts = new HashSet<CloudProviderAccount>();
     }
 
     @Id
@@ -87,22 +86,22 @@ public class CloudProvider implements Serializable {
         this.description = description;
     }
 
-    @OneToMany(mappedBy = "cloudProvider",fetch=FetchType.EAGER)
-    public List<CloudProviderAccount> getCloudProviderAccounts() {
+    @OneToMany(mappedBy = "cloudProvider")
+    public Set<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
     }
 
-    public void setCloudProviderAccounts(final List<CloudProviderAccount> cloudProviderAccounts) {
+    public void setCloudProviderAccounts(final Set<CloudProviderAccount> cloudProviderAccounts) {
         this.cloudProviderAccounts = cloudProviderAccounts;
     }
 
-    @ManyToMany(mappedBy="cloudProviders",fetch=FetchType.EAGER)
-	public List<CloudProviderLocation> getCloudProviderLocations() {
+    @ManyToMany(mappedBy="cloudProviders")
+	public Set<CloudProviderLocation> getCloudProviderLocations() {
 		return cloudProviderLocations;
 	}
 	
 	public void setCloudProviderLocations(
-			List<CloudProviderLocation> cloudProviderLocations) {
+			Set<CloudProviderLocation> cloudProviderLocations) {
 		this.cloudProviderLocations = cloudProviderLocations;
 	}
 

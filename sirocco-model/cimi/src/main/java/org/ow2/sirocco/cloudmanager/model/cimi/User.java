@@ -26,12 +26,11 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,21 +61,21 @@ public class User implements Serializable {
 
     private String password;
 
-    private Collection<MachineImage> images;
+    private Set<MachineImage> images;
 
-    private Collection<Machine> machines;
+    private Set<Machine> machines;
 
-    private Collection<Volume> volumes;
+    private Set<Volume> volumes;
 
-    private Collection<MachineTemplate> machineTemplates;
+    private Set<MachineTemplate> machineTemplates;
 
-    private Collection<MachineConfiguration> machineConfigurations;
+    private Set<MachineConfiguration> machineConfigurations;
 
-    private Collection<VolumeTemplate> volumeTemplates;
+    private Set<VolumeTemplate> volumeTemplates;
 
-    private Collection<VolumeConfiguration> volumeConfigurations;
+    private Set<VolumeConfiguration> volumeConfigurations;
 
-    private Collection<CloudProviderAccount> cloudProviderAccounts;
+    private Set<CloudProviderAccount> cloudProviderAccounts;
 
     public User() {
     }
@@ -87,18 +86,18 @@ public class User implements Serializable {
         return this.id;
     }
 
-    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
-    public Collection<MachineImage> getImages() {
+    @OneToMany(mappedBy = "user")
+    public Set<MachineImage> getImages() {
         return this.images;
     }
 
-    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
-    public Collection<Machine> getMachines() {
+    @OneToMany(mappedBy = "user")
+    public Set<Machine> getMachines() {
         return this.machines;
     }
 
-    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
-    public Collection<Volume> getVolumes() {
+    @OneToMany(mappedBy = "user")
+    public Set<Volume> getVolumes() {
         return this.volumes;
     }
 
@@ -147,15 +146,15 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public void setImages(final Collection<MachineImage> images) {
+    public void setImages(final Set<MachineImage> images) {
         this.images = images;
     }
 
-    public void setMachines(final Collection<Machine> machines) {
+    public void setMachines(final Set<Machine> machines) {
         this.machines = machines;
     }
 
-    public void setVolumes(final Collection<Volume> volumes) {
+    public void setVolumes(final Set<Volume> volumes) {
         this.volumes = volumes;
     }
 
@@ -168,48 +167,48 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
-    public Collection<MachineTemplate> getMachineTemplates() {
+    @OneToMany(mappedBy = "user")
+    public Set<MachineTemplate> getMachineTemplates() {
         return this.machineTemplates;
     }
 
-    public void setMachineTemplates(final Collection<MachineTemplate> machineTemplates) {
+    public void setMachineTemplates(final Set<MachineTemplate> machineTemplates) {
         this.machineTemplates = machineTemplates;
     }
 
-    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
-    public Collection<MachineConfiguration> getMachineConfigurations() {
+    @OneToMany(mappedBy = "user")
+    public Set<MachineConfiguration> getMachineConfigurations() {
         return this.machineConfigurations;
     }
 
-    public void setMachineConfigurations(final Collection<MachineConfiguration> machineConfigurations) {
+    public void setMachineConfigurations(final Set<MachineConfiguration> machineConfigurations) {
         this.machineConfigurations = machineConfigurations;
     }
 
-    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
-    public Collection<VolumeTemplate> getVolumeTemplates() {
+    @OneToMany(mappedBy = "user")
+    public Set<VolumeTemplate> getVolumeTemplates() {
         return this.volumeTemplates;
     }
 
-    public void setVolumeTemplates(final Collection<VolumeTemplate> volumeTemplates) {
+    public void setVolumeTemplates(final Set<VolumeTemplate> volumeTemplates) {
         this.volumeTemplates = volumeTemplates;
     }
 
-    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
-    public Collection<VolumeConfiguration> getVolumeConfigurations() {
+    @OneToMany(mappedBy = "user")
+    public Set<VolumeConfiguration> getVolumeConfigurations() {
         return this.volumeConfigurations;
     }
 
-    public void setVolumeConfigurations(final Collection<VolumeConfiguration> volumeConfigurations) {
+    public void setVolumeConfigurations(final Set<VolumeConfiguration> volumeConfigurations) {
         this.volumeConfigurations = volumeConfigurations;
     }
 
-    @ManyToMany(mappedBy = "users",fetch=FetchType.EAGER)
-    public Collection<CloudProviderAccount> getCloudProviderAccounts() {
+    @ManyToMany(mappedBy = "users")
+    public Set<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
     }
 
-    public void setCloudProviderAccounts(final Collection<CloudProviderAccount> cloudProviderAccounts) {
+    public void setCloudProviderAccounts(final Set<CloudProviderAccount> cloudProviderAccounts) {
         this.cloudProviderAccounts = cloudProviderAccounts;
     }
 

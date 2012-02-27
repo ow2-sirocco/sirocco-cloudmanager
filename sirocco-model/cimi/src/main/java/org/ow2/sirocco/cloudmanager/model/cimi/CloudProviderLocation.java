@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -52,7 +53,7 @@ public class CloudProviderLocation implements Serializable {
 
     private String stateName;
     
-    private List<CloudProvider> cloudProviders;
+    private Set<CloudProvider> cloudProviders;
 
     @Column(name = "iso3166code", nullable = false, length = 6, unique = true)
     public String getIso3166Code() {
@@ -93,11 +94,11 @@ public class CloudProviderLocation implements Serializable {
     }
 
     @ManyToMany
-	public List<CloudProvider> getCloudProviders() {
+	public Set<CloudProvider> getCloudProviders() {
 		return cloudProviders;
 	}
 
-	public void setCloudProviders(List<CloudProvider> cloudProviders) {
+	public void setCloudProviders(Set<CloudProvider> cloudProviders) {
 		this.cloudProviders = cloudProviders;
 	}
 

@@ -27,7 +27,9 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -48,20 +50,20 @@ public class CloudProviderAccount implements Serializable {
 
     private String password;
     
-    private List<User> users;
+    private Set<User> users;
 
-    private List<Machine> machines;
+    private Set<Machine> machines;
 
-    private List<Volume> volumes;
+    private Set<Volume> volumes;
 
-    private List<MachineImage> images;
+    private Set<MachineImage> images;
 
     private CloudProvider cloudProvider;
 
     public CloudProviderAccount() {
-        this.machines = new ArrayList<Machine>();
-        this.volumes = new ArrayList<Volume>();
-        this.images = new ArrayList<MachineImage>();
+        this.machines = new HashSet<Machine>();
+        this.volumes = new HashSet<Volume>();
+        this.images = new HashSet<MachineImage>();
     }
 
     @Id
@@ -90,30 +92,30 @@ public class CloudProviderAccount implements Serializable {
         this.password = password;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount",fetch=FetchType.EAGER)
-    public List<Machine> getMachines() {
+    @OneToMany(mappedBy = "cloudProviderAccount")
+    public Set<Machine> getMachines() {
         return this.machines;
     }
 
-    public void setMachines(final List<Machine> machines) {
+    public void setMachines(final Set<Machine> machines) {
         this.machines = machines;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount",fetch=FetchType.EAGER)
-    public List<Volume> getVolumes() {
+    @OneToMany(mappedBy = "cloudProviderAccount")
+    public Set<Volume> getVolumes() {
         return this.volumes;
     }
 
-    public void setVolumes(final List<Volume> volumes) {
+    public void setVolumes(final Set<Volume> volumes) {
         this.volumes = volumes;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount",fetch=FetchType.EAGER)
-    public List<MachineImage> getImages() {
+    @OneToMany(mappedBy = "cloudProviderAccount")
+    public Set<MachineImage> getImages() {
         return this.images;
     }
 
-    public void setImages(final List<MachineImage> images) {
+    public void setImages(final Set<MachineImage> images) {
         this.images = images;
     }
 
@@ -127,11 +129,11 @@ public class CloudProviderAccount implements Serializable {
     }
 
     @ManyToMany
-	public List<User> getUsers() {
+	public Set<User> getUsers() {
 		return users;
 	}
 
-	public void setUsers(List<User> users) {
+	public void setUsers(Set<User> users) {
 		this.users = users;
 	}
 
