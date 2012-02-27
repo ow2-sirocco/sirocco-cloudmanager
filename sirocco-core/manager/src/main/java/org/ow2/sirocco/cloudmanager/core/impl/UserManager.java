@@ -69,7 +69,7 @@ public class UserManager implements IUserManager {
 
     @Override
     public User createUser(String firstName, String lastName, String email,
-            String username, String password, String publicKey)
+            String username, String password)
             throws UserException {
         User u = new User();
         u.setFirstName(firstName);
@@ -77,7 +77,6 @@ public class UserManager implements IUserManager {
         u.setEmail(email);
         u.setUsername(username);
         u.setPassword(password);
-        u.setPublicKey(publicKey);
 
         this.em.persist(u);
 
@@ -127,11 +126,7 @@ public class UserManager implements IUserManager {
                 .createQuery("FROM User u WHERE u.username=:usrname")
                 .setParameter("usrname", userName).getResultList();
 
-        for (User lu : l) {
-            u = lu;
-            break;
-        }
-        return u;
+        return l.get(0);
     }
 
     @Override
@@ -163,7 +158,7 @@ public class UserManager implements IUserManager {
 
     @SuppressWarnings("unchecked")
     private void removeCollection(String Type, User u) {
-        List<MachineImageCollection> l = this.em
+        List<CloudEntity> l = this.em
                 .createQuery("FROM " + Type + " t WHERE t.user=:usrid")
                 .setParameter("usrid", u).getResultList();
         for (CloudEntity lmic : l) {
