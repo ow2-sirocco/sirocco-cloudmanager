@@ -31,6 +31,7 @@ import java.util.Date;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -61,8 +62,6 @@ public class User implements Serializable {
 
     private String password;
 
-    private String publicKey;
-
     private Collection<MachineImage> images;
 
     private Collection<Machine> machines;
@@ -88,17 +87,17 @@ public class User implements Serializable {
         return this.id;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
     public Collection<MachineImage> getImages() {
         return this.images;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
     public Collection<Machine> getMachines() {
         return this.machines;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
     public Collection<Volume> getVolumes() {
         return this.volumes;
     }
@@ -106,11 +105,6 @@ public class User implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     public Date getCreateDate() {
         return this.createDate;
-    }
-
-    @Column(columnDefinition = "TEXT")
-    public String getPublicKey() {
-        return this.publicKey;
     }
 
     public String getEmail() {
@@ -153,10 +147,6 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public void setPublicKey(final String publicKey) {
-        this.publicKey = publicKey;
-    }
-
     public void setImages(final Collection<MachineImage> images) {
         this.images = images;
     }
@@ -178,7 +168,7 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
     public Collection<MachineTemplate> getMachineTemplates() {
         return this.machineTemplates;
     }
@@ -187,7 +177,7 @@ public class User implements Serializable {
         this.machineTemplates = machineTemplates;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
     public Collection<MachineConfiguration> getMachineConfigurations() {
         return this.machineConfigurations;
     }
@@ -196,7 +186,7 @@ public class User implements Serializable {
         this.machineConfigurations = machineConfigurations;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
     public Collection<VolumeTemplate> getVolumeTemplates() {
         return this.volumeTemplates;
     }
@@ -205,7 +195,7 @@ public class User implements Serializable {
         this.volumeTemplates = volumeTemplates;
     }
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user",fetch=FetchType.EAGER)
     public Collection<VolumeConfiguration> getVolumeConfigurations() {
         return this.volumeConfigurations;
     }
@@ -214,7 +204,7 @@ public class User implements Serializable {
         this.volumeConfigurations = volumeConfigurations;
     }
 
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users",fetch=FetchType.EAGER)
     public Collection<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
     }

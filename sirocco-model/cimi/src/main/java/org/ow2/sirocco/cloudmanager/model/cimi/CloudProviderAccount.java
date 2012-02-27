@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -89,7 +90,7 @@ public class CloudProviderAccount implements Serializable {
         this.password = password;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount")
+    @OneToMany(mappedBy = "cloudProviderAccount",fetch=FetchType.EAGER)
     public List<Machine> getMachines() {
         return this.machines;
     }
@@ -98,7 +99,7 @@ public class CloudProviderAccount implements Serializable {
         this.machines = machines;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount")
+    @OneToMany(mappedBy = "cloudProviderAccount",fetch=FetchType.EAGER)
     public List<Volume> getVolumes() {
         return this.volumes;
     }
@@ -107,7 +108,7 @@ public class CloudProviderAccount implements Serializable {
         this.volumes = volumes;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount")
+    @OneToMany(mappedBy = "cloudProviderAccount",fetch=FetchType.EAGER)
     public List<MachineImage> getImages() {
         return this.images;
     }
