@@ -32,7 +32,7 @@
   <!-- Add new repositories here -->
   <repository id="maven2-local">
     <type>maven2</type>
-    <url>file://@maven.local.rep@</url>
+    <url>file://@local.repository@</url>
   </repository>
 
   <!-- Default repositories -->

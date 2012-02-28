@@ -1,39 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <deployment-plan xmlns="http://jonas.ow2.org/ns/deployment-plan/1.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m2="http://jonas.ow2.org/ns/deployment-plan/maven2/1.0">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m2="http://jonas.ow2.org/ns/deployment-plan/maven2/1.0"
+	xmlns:url="http://jonas.ow2.org/ns/deployment-plan/url/1.0">
 
 
-	<deployment id="dep100" xsi:type="m2:maven2-deploymentType">
-		<m2:groupId>org.ow2.sirocco.cloudmanager</m2:groupId>
-		<m2:artifactId>sirocco-cloudmanager-model-cimi</m2:artifactId>
-		<m2:version>@sirocco.version@</m2:version>
+	<deployment xsi:type="url:url-deploymentType" id="dep100"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-model-cimi.jar</url:resource>
 	</deployment>
-
-	<deployment id="dep150" xsi:type="m2:maven2-deploymentType">
-		<m2:groupId>org.ow2.sirocco.cloudmanager</m2:groupId>
-		<m2:artifactId>sirocco-cloudmanager-connector-api</m2:artifactId>
-		<m2:version>@sirocco.version@</m2:version>
+	
+	<deployment xsi:type="url:url-deploymentType" id="dep150"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-connector-api.jar</url:resource>
 	</deployment>
-
-	<deployment id="dep200" xsi:type="m2:maven2-deploymentType">
-		<m2:groupId>org.ow2.sirocco.cloudmanager</m2:groupId>
-		<m2:artifactId>sirocco-cloudmanager-connector-util-jobmanager
-		</m2:artifactId>
-		<m2:version>@sirocco.version@</m2:version>
+	
+	<deployment xsi:type="url:url-deploymentType" id="dep200"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-connector-util-jobmanager.jar</url:resource>
 	</deployment>
-
-	<deployment id="dep900" xsi:type="m2:maven2-deploymentType">
-		<m2:groupId>org.ow2.sirocco.cloudmanager</m2:groupId>
-		<m2:artifactId>sirocco-cloudmanager-connector-mock</m2:artifactId>
-		<m2:version>@sirocco.version@</m2:version>
+	
+	<deployment xsi:type="url:url-deploymentType" id="dep900"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-connector-mock.jar</url:resource>
 	</deployment>
-
-
-	<deployment xsi:type="m2:maven2-deploymentType" id="dep1000">
-		<m2:groupId>org.ow2.sirocco.cloudmanager</m2:groupId>
-		<m2:artifactId>sirocco-cloudmanager-ear</m2:artifactId>
-		<m2:version>@sirocco.version@</m2:version>
-		<m2:type>ear</m2:type>
+	
+	<deployment xsi:type="url:url-deploymentType" id="dep1000"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-ear.ear</url:resource>
 	</deployment>
+	
 
 </deployment-plan>
