@@ -80,6 +80,8 @@ public class MockCloudProviderConnectorFactory implements ICloudProviderConnecto
                 }
             }
         }
+        MockCloudProviderConnectorFactory.logger.info("Adding new connector account.login=" + cloudProviderAccount.getLogin()
+            + " location=" + cloudProviderLocation);
         result = new MockCloudProviderConnector(this, cloudProviderAccount, cloudProviderLocation);
         this.cloudProvidersInUse.add(result);
         return result;
@@ -97,7 +99,11 @@ public class MockCloudProviderConnectorFactory implements ICloudProviderConnecto
         if (cloudProviderToBeDeleted == null) {
             throw new ConnectorException("The given cloudProviderId: " + cloudProviderId + " is unknown by the system.");
         } else {
-            this.cloudProvidersInUse.remove(cloudProviderToBeDeleted);
+            MockCloudProviderConnectorFactory.logger.info("Disposing connector account.login="
+                + cloudProviderToBeDeleted.getCloudProviderAccount().getLogin() + " location="
+                + cloudProviderToBeDeleted.getCloudProviderLocation());
+            // not done for stateful mock connectors
+            // this.cloudProvidersInUse.remove(cloudProviderToBeDeleted);
         }
     }
 
