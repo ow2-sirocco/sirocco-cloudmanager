@@ -1,30 +1,61 @@
+/**
+ *
+ * SIROCCO
+ * Copyright (C) 2011 France Telecom
+ * Contact: sirocco@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  $Id: Capacity.java 978 2012-02-23 06:55:37Z dangtran $
+ *
+ */
 package org.ow2.sirocco.cloudmanager.itests;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.dbunit.PropertiesBasedJdbcDatabaseTester;
+import org.dbunit.dataset.xml.XmlDataSet;
+import org.dbunit.operation.DatabaseOperation;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
+import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
+import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
-import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
-import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
@@ -44,6 +75,13 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
 
+/**
+ * This class requires the following system properties: -Dcarol.port=1099
+ * -Ddbunit.connectionUrl=jdbc:mysql://localhost:3306/sirocco
+ * -Ddbunit.driverClass=org.gjt.mm.mysql.Driver -Ddbunit.username=admcloud
+ * -Ddbunit.password=admcloud -Ddbunit.schema=sirocco
+ * -Ddbunit.dataset=src/sirocco-config/db/sirocco_db_empty.xml
+ */
 public class MachineManagerTest {
     private static final String USER_NAME = "ANONYMOUS";
 
@@ -67,23 +105,29 @@ public class MachineManagerTest {
      */
     private static final int INITIALIZE_TIMEOUT = 30;
 
-    private static IRemoteMachineManager machineManager;
-    private static IRemoteCredentialsManager credManager;
-    private static IRemoteMachineImageManager machineImageManager;
+    private IRemoteMachineManager machineManager;
 
-    private static IRemoteCloudProviderManager cloudProviderManager;
+    private IRemoteCredentialsManager credManager;
 
-    private static IRemoteUserManager userManager;
+    private IRemoteMachineImageManager machineImageManager;
+
+    private IRemoteCloudProviderManager cloudProviderManager;
+
+    private IRemoteUserManager userManager;
 
     private IRemoteJobManager jobManager;
 
     List<MachineImage> images = new ArrayList<MachineImage>();
+
     List<MachineConfiguration> configs = new ArrayList<MachineConfiguration>();
+
     List<MachineTemplate> templates = new ArrayList<MachineTemplate>();
+
     List<Machine> machines = new ArrayList<Machine>();
+
     List<Credentials> creds = new ArrayList<Credentials>();
-    
-    private static void connectToCloudManager() throws Exception {
+
+    private void connectToCloudManager() throws Exception {
         String carolPortString = System.getProperty("carol.port");
         Assert.assertNotNull("carol.port not set!", carolPortString);
         int carolPort = Integer.parseInt(carolPortString);
@@ -95,14 +139,13 @@ public class MachineManagerTest {
         while (true) {
             try {
                 Context context = new InitialContext(env);
-                MachineManagerTest.machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
-                MachineManagerTest.cloudProviderManager = (IRemoteCloudProviderManager) context
-                    .lookup(ICloudProviderManager.EJB_JNDI_NAME);
-                MachineManagerTest.userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
-                MachineManagerTest.machineImageManager = (IRemoteMachineImageManager) context
-                    .lookup(IMachineImageManager.EJB_JNDI_NAME);
-                // this.jobManager = (IRemoteJobManager)
-                // context.lookup(IJobManager.EJB_JNDI_NAME);
+                this.machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
+                this.cloudProviderManager = (IRemoteCloudProviderManager) context.lookup(ICloudProviderManager.EJB_JNDI_NAME);
+                this.userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
+                this.credManager = (IRemoteCredentialsManager) context.lookup(ICredentialsManager.EJB_JNDI_NAME);
+                this.machineImageManager = (IRemoteMachineImageManager) context.lookup(IMachineImageManager.EJB_JNDI_NAME);
+
+                this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
                 break;
             } catch (NamingException e) {
                 if (System.currentTimeMillis() > timeout) {
@@ -114,21 +157,28 @@ public class MachineManagerTest {
         }
     }
 
+    private void setUpDatabase() throws Exception {
+        PropertiesBasedJdbcDatabaseTester databaseTest;
+        Reader reader = new FileReader(new File(System.getProperty("dbunit.dataset")));
+        XmlDataSet dataSet = new XmlDataSet(reader);
+        databaseTest = new PropertiesBasedJdbcDatabaseTester();
+        databaseTest.setDataSet(dataSet);
+        databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        databaseTest.onSetup();
+    }
+
     /**
      * @throws java.lang.Exception
      */
-    @BeforeClass
-    public static void setUp() throws Exception {
-        MachineManagerTest.connectToCloudManager();
-        User user = MachineManagerTest.userManager.createUser("Lov", "Maps", "lov@maps", MachineManagerTest.USER_NAME,
-            "password", "foobar");
-        CloudProvider provider = MachineManagerTest.cloudProviderManager.createCloudProvider(
-            MachineManagerTest.CLOUD_PROVIDER_TYPE, "mock");
-        CloudProviderAccount account = MachineManagerTest.cloudProviderManager.createCloudProviderAccount(provider.getId()
-            .toString(), MachineManagerTest.ACCOUNT_USER, MachineManagerTest.ACCOUNT_LOGIN,
-            MachineManagerTest.ACCOUNT_CREDENTIALS);
-        MachineManagerTest.cloudProviderManager.addCloudProviderAccountToUser(user.getId().toString(), account.getId()
-            .toString());
+    @Before
+    public void setUp() throws Exception {
+        this.setUpDatabase();
+        this.connectToCloudManager();
+        User user = this.userManager.createUser("Lov", "Maps", "lov@maps", MachineManagerTest.USER_NAME, "password");
+        CloudProvider provider = this.cloudProviderManager.createCloudProvider(MachineManagerTest.CLOUD_PROVIDER_TYPE, "mock");
+        CloudProviderAccount account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(),
+            MachineManagerTest.ACCOUNT_USER, MachineManagerTest.ACCOUNT_LOGIN, MachineManagerTest.ACCOUNT_CREDENTIALS);
+        this.cloudProviderManager.addCloudProviderAccountToUser(user.getId().toString(), account.getId().toString());
     }
 
     /**
@@ -144,27 +194,29 @@ public class MachineManagerTest {
         Credentials in = new Credentials();
         in.setName("testCred_" + this.credcounter);
         in.setDescription("testCred_" + this.credcounter + " description ");
-        in.setProperties(null);
+        in.setProperties(new HashMap<String, String>());
 
         in.setUserName("madras");
         in.setPassword("bombaydelhi");
-        String key = new String("parisnewyork" + this.credcounter);
-        in.setKey(key.getBytes());
+        // String key = new String("parisnewyork" + this.credcounter);
+        // in.setKey(key.getBytes());
         this.credcounter += 1;
         return in;
     }
+
     private Credentials createCredentials() throws Exception {
-    	Credentials in_c = initCredentials();
-    	Credentials out_c = this.credManager.createCredentials(in_c);
-    	Assert.assertNotNull("createCredentials returns no credentials", out_c);
-    	creds.add(out_c);
-    	return out_c;
+        Credentials in_c = this.initCredentials();
+        Credentials out_c = this.credManager.createCredentials(in_c);
+        Assert.assertNotNull("createCredentials returns no credentials", out_c);
+        this.creds.add(out_c);
+        return out_c;
     }
+
     private int ccounter = 1;
-    
+
     private MachineConfiguration initMachineConfiguration() {
         MachineConfiguration in_c = new MachineConfiguration();
-        in_c.setName("testConfig_" + this.ccounter);
+        in_c.setName("testConfig_" + UUID.randomUUID());
         this.ccounter += 1;
         in_c.setDescription("testConfig_" + this.ccounter + " description");
         Map<String, String> properties = new HashMap<String, String>();
@@ -186,7 +238,7 @@ public class MachineManagerTest {
             dt.setUnit(StorageUnit.MEGABYTE);
             dt.setQuantity((float) 4.5);
             dt.setFormat("ext3");
-            dt.setAttachmentPoint("/dev/sd"+i);
+            dt.setAttachmentPoint("/dev/sd" + i);
             dTemplates.add(dt);
         }
         in_c.setCpu(cpu);
@@ -201,83 +253,102 @@ public class MachineManagerTest {
         MachineImage mimage = new MachineImage();
         mimage.setName("image_" + this.imagecounter);
         mimage.setDescription("image description " + this.imagecounter);
-        mimage.setImageLocation("http://example.com/images/WinXP-SP2"+this.imagecounter);
+        mimage.setImageLocation("http://example.com/images/WinXP-SP2" + this.imagecounter);
         this.imagecounter += 1;
         return mimage;
     }
-    
+
     private MachineImage createMachineImage() throws Exception {
-    	MachineImage in_i = this.initMachineImage();
-        Job out_j = MachineManagerTest.machineImageManager.createMachineImage(in_i);
+        MachineImage in_i = this.initMachineImage();
+        Job out_j = this.machineImageManager.createMachineImage(in_i);
         Assert.assertNotNull("machineImageCreate returns no machineimage", out_j);
         boolean done = false;
         MachineImage i = null;
+        int loop = 0;
         while (done != true) {
-        	int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
-        	i = MachineManagerTest.machineImageManager.getMachineImage(out_j.getTargetEntity());
-        	Thread.sleep(1000);
-        	
-        	if (counter-- == 100) {
-        		throw new Exception("Machine image create time out");
-        	}
+            int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
+            i = this.machineImageManager.getMachineImage(out_j.getTargetEntity());
+            System.out.println(" createMachineImage return");
+            if (i == null) {
+                System.out.println(" createMachineImage return");
+                throw new Exception(" createMachineImage returned null");
+            }
+            System.out.println("createMachineImage state " + i.getState());
+            if (i.getState() == MachineImage.State.AVAILABLE) {
+                done = true;
+            }
+            if (loop == 5) {
+                done = true;
+            }
+            loop++;
+            Thread.sleep(1000);
+        }
+        if ((i.getState() != MachineImage.State.AVAILABLE)) {
+            throw new Exception(" failed to create machine image");
         }
         return i;
     }
-    
+
     @Test
     public void testCreateMachineImage() throws Exception {
-        createMachineImage();
+        this.createMachineImage();
     }
 
-    
-   
     private MachineConfiguration createMachineConfiguration() throws Exception {
-        MachineConfiguration in_c = initMachineConfiguration();
-        
-        MachineConfiguration out_c = MachineManagerTest.machineManager.createMachineConfiguration(in_c);
+        MachineConfiguration in_c = this.initMachineConfiguration();
+
+        MachineConfiguration out_c = this.machineManager.createMachineConfiguration(in_c);
         Assert.assertNotNull("machineConfigurationCreate returns no machineconfiguration", out_c);
-        configs.add(in_c);
+        this.configs.add(in_c);
         return out_c;
     }
 
     @Test
     public void testCreateMachineConfiguration() throws Exception {
-    	createMachineConfiguration();
+        this.createMachineConfiguration();
     }
-    
+
     private int mcounter = 0;
+
     @Test
     public void testCreateMachine() throws Exception {
+        System.out.println("testCreateMachine enter");
         MachineCreate machineCreate = new MachineCreate();
-        machineCreate.setName("myMachine_"+mcounter);
-        machineCreate.setDescription("my machine" +mcounter);
+        machineCreate.setName("myMachine_" + this.mcounter);
+        machineCreate.setDescription("my machine" + this.mcounter);
         Map<String, String> properties = new HashMap<String, String>();
         properties.put("department", "MAPS");
         machineCreate.setProperties(properties);
         MachineTemplate machineTemplate = new MachineTemplate();
+        System.out.println("testCreateMachine createMachineConfiguration");
         MachineConfiguration machineConfig = this.createMachineConfiguration();
         machineTemplate.setMachineConfiguration(machineConfig);
+        System.out.println("testCreateMachine createMachineImage");
         machineTemplate.setMachineImage(this.createMachineImage());
-        
+        System.out.println("testCreateMachine createCredentials");
         machineTemplate.setCredentials(this.createCredentials());
         machineTemplate.setVolumes(new ArrayList<MachineVolume>());
         machineTemplate.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
         machineTemplate.setNetworkInterfaces(new ArrayList<NetworkInterface>());
         machineCreate.setMachineTemplate(machineTemplate);
-
-        Job job = MachineManagerTest.machineManager.createMachine(machineCreate);
+        System.out.println("testCreateMachine createMachine");
+        Job job = this.machineManager.createMachine(machineCreate);
         Assert.assertNotNull("machineCreate returns no job", job);
 
         Assert.assertNotNull(job.getId());
-        Assert.assertTrue("job action is invalid", job.getAction().equals("volume.create"));
+        Assert.assertTrue("job action is invalid", job.getAction().equals("machine.create"));
         String machineId = job.getTargetEntity();
         Assert.assertNotNull("job target entity is invalid", machineId);
-
+        System.out.println("testCreateMachine return from createMachine");
         String jobId = job.getId().toString();
-
+        System.out.println("testCreateMachine return from createMachine" + jobId);
         int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
+        System.out.println("testCreateMachine  getMachineById" + machineId);
+        Machine machine = this.machineManager.getMachineById(machineId);
+        System.out.println("testCreateMachine  machine state of " + machineId + " is " + machine.getState());
         while (true) {
-            // job = this.jobManager.getJobById(jobId);
+            job = this.jobManager.getJobById(jobId);
+
             if (job.getStatus() != Job.Status.RUNNING) {
                 break;
             }
@@ -289,13 +360,13 @@ public class MachineManagerTest {
 
         Assert.assertTrue("machine creation failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
 
-        Machine machine = MachineManagerTest.machineManager.getMachineById(machineId);
+        machine = this.machineManager.getMachineById(machineId);
         Assert.assertNotNull("cannot find machine juste created", machine);
-        Assert.assertEquals("Created machine is STARTED", machine.getState(), Machine.State.STARTED);
-        
+        Assert.assertEquals("Created machine is not STOPPED", machine.getState(), Machine.State.STOPPED);
+
         Assert.assertNotNull(machine.getId());
-        Assert.assertEquals(machine.getName(), "myMachine");
-        Assert.assertEquals(machine.getDescription(), "my machine");
+        Assert.assertEquals(machine.getName(), "myMachine_" + this.mcounter);
+        Assert.assertEquals(machine.getDescription(), "my machine" + this.mcounter);
 
         Assert.assertEquals(machine.getMemory().getUnit(), Memory.MemoryUnit.MEGIBYTE);
 
@@ -303,7 +374,7 @@ public class MachineManagerTest {
     }
 
     void deleteMachine(final String machineId) throws Exception {
-        Job job = MachineManagerTest.machineManager.deleteMachine(machineId);
+        Job job = this.machineManager.deleteMachine(machineId);
         Assert.assertNotNull("deleteMachine returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("machine.delete"));
@@ -313,7 +384,7 @@ public class MachineManagerTest {
 
         int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
-            // job = this.jobManager.getJobById(jobId);
+            job = this.jobManager.getJobById(jobId);
             if (job.getStatus() != Job.Status.RUNNING) {
                 break;
             }

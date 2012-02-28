@@ -1,5 +1,32 @@
+/**
+ *
+ * SIROCCO
+ * Copyright (C) 2011 France Telecom
+ * Contact: sirocco@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  $Id$
+ *
+ */
 package org.ow2.sirocco.cloudmanager.itests;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -10,9 +37,12 @@ import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
+import org.dbunit.PropertiesBasedJdbcDatabaseTester;
+import org.dbunit.dataset.xml.XmlDataSet;
+import org.dbunit.operation.DatabaseOperation;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
@@ -58,13 +88,13 @@ public class VolumeManagerTest {
      */
     private static final int INITIALIZE_TIMEOUT = 30;
 
-    private static IRemoteVolumeManager volumeManager;
+    private IRemoteVolumeManager volumeManager;
 
-    private static IRemoteCloudProviderManager cloudProviderManager;
+    private IRemoteCloudProviderManager cloudProviderManager;
 
-    private static IRemoteUserManager userManager;
+    private IRemoteUserManager userManager;
 
-    private static IRemoteJobManager jobManager;
+    private IRemoteJobManager jobManager;
 
     private int counterVolume = 0;
 
@@ -72,7 +102,7 @@ public class VolumeManagerTest {
 
     private int counterVolumeTemplate = 0;
 
-    private static void connectToCloudManager() throws Exception {
+    private void connectToCloudManager() throws Exception {
         String carolPortString = System.getProperty("carol.port");
         Assert.assertNotNull("carol.port not set!", carolPortString);
         int carolPort = Integer.parseInt(carolPortString);
@@ -84,13 +114,12 @@ public class VolumeManagerTest {
         while (true) {
             try {
                 Context context = new InitialContext(env);
-                VolumeManagerTest.volumeManager = (IRemoteVolumeManager) context.lookup(IVolumeManager.EJB_JNDI_NAME);
+                this.volumeManager = (IRemoteVolumeManager) context.lookup(IVolumeManager.EJB_JNDI_NAME);
                 Object o = context.lookup(ICloudProviderManager.EJB_JNDI_NAME);
 
-                VolumeManagerTest.cloudProviderManager = (IRemoteCloudProviderManager) context
-                    .lookup(ICloudProviderManager.EJB_JNDI_NAME);
-                VolumeManagerTest.userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
-                VolumeManagerTest.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+                this.cloudProviderManager = (IRemoteCloudProviderManager) context.lookup(ICloudProviderManager.EJB_JNDI_NAME);
+                this.userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
+                this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
                 break;
             } catch (NamingException e) {
                 if (System.currentTimeMillis() > timeout) {
@@ -102,20 +131,30 @@ public class VolumeManagerTest {
         }
     }
 
+    private void setUpDatabase() throws Exception {
+        PropertiesBasedJdbcDatabaseTester databaseTest;
+        Reader reader = new FileReader(new File(System.getProperty("dbunit.dataset")));
+        XmlDataSet dataSet = new XmlDataSet(reader);
+        databaseTest = new PropertiesBasedJdbcDatabaseTester();
+        databaseTest.setDataSet(dataSet);
+        databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        databaseTest.onSetup();
+    }
+
     /**
      * @throws java.lang.Exception
      */
-    @BeforeClass
-    public static void setUp() throws Exception {
-        VolumeManagerTest.connectToCloudManager();
+    @Before
+    public void setUp() throws Exception {
+        this.setUpDatabase();
 
-        User user = VolumeManagerTest.userManager.createUser("", "", "", VolumeManagerTest.USER_NAME, "password", "");
-        CloudProvider provider = VolumeManagerTest.cloudProviderManager.createCloudProvider(
-            VolumeManagerTest.CLOUD_PROVIDER_TYPE, "test");
-        CloudProviderAccount account = VolumeManagerTest.cloudProviderManager.createCloudProviderAccount(provider.getId()
-            .toString(), VolumeManagerTest.USER_NAME, VolumeManagerTest.ACCOUNT_LOGIN, VolumeManagerTest.ACCOUNT_CREDENTIALS);
-        VolumeManagerTest.cloudProviderManager.addCloudProviderAccountToUser(user.getId().toString(), account.getId()
-            .toString());
+        this.connectToCloudManager();
+
+        User user = this.userManager.createUser("", "", "", VolumeManagerTest.USER_NAME, "password");
+        CloudProvider provider = this.cloudProviderManager.createCloudProvider(VolumeManagerTest.CLOUD_PROVIDER_TYPE, "test");
+        CloudProviderAccount account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(),
+            VolumeManagerTest.USER_NAME, VolumeManagerTest.ACCOUNT_LOGIN, VolumeManagerTest.ACCOUNT_CREDENTIALS);
+        this.cloudProviderManager.addCloudProviderAccountToUser(user.getId().toString(), account.getId().toString());
     }
 
     /**
@@ -142,7 +181,7 @@ public class VolumeManagerTest {
         volumeTemplate.setVolumeConfig(volumeConfig);
         volumeCreate.setVolumeTemplate(volumeTemplate);
 
-        Job job = VolumeManagerTest.volumeManager.createVolume(volumeCreate);
+        Job job = this.volumeManager.createVolume(volumeCreate);
         Assert.assertNotNull("createVolume returns no job", job);
 
         Assert.assertNotNull(job.getId());
@@ -154,7 +193,7 @@ public class VolumeManagerTest {
 
         int counter = VolumeManagerTest.VOLUME_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
-            job = VolumeManagerTest.jobManager.getJobById(jobId);
+            job = this.jobManager.getJobById(jobId);
             if (job.getStatus() != Job.Status.RUNNING) {
                 break;
             }
@@ -172,7 +211,7 @@ public class VolumeManagerTest {
     public void testCRUDVolume() throws Exception {
         String volumeId = this.createVolume();
 
-        Volume volume = VolumeManagerTest.volumeManager.getVolumeById(volumeId);
+        Volume volume = this.volumeManager.getVolumeById(volumeId);
         Assert.assertNotNull("cannot find volume juste created", volume);
         Assert.assertEquals("Created volume is not AVAILABLE", volume.getState(), Volume.State.AVAILABLE);
         Assert.assertNotNull(volume.getProviderAssignedId());
@@ -191,7 +230,7 @@ public class VolumeManagerTest {
     }
 
     void deleteVolume(final String volumeId) throws Exception {
-        Job job = VolumeManagerTest.volumeManager.deleteVolume(volumeId);
+        Job job = this.volumeManager.deleteVolume(volumeId);
         Assert.assertNotNull("deleteVolume returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("volume.delete"));
@@ -201,7 +240,7 @@ public class VolumeManagerTest {
 
         int counter = VolumeManagerTest.VOLUME_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
-            job = VolumeManagerTest.jobManager.getJobById(jobId);
+            job = this.jobManager.getJobById(jobId);
             if (job.getStatus() != Job.Status.RUNNING) {
                 break;
             }
@@ -213,7 +252,7 @@ public class VolumeManagerTest {
 
         Assert.assertTrue("volume deletion failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
         try {
-            VolumeManagerTest.volumeManager.getVolumeById(volumeId);
+            this.volumeManager.getVolumeById(volumeId);
         } catch (ResourceNotFoundException e) {
         }
     }
@@ -228,7 +267,7 @@ public class VolumeManagerTest {
         inVolumeConfig.setName("myVolumeConfig" + this.counterVolumeConfig++);
         inVolumeConfig.setDescription("a volume config");
 
-        VolumeConfiguration outVolumeConfiguration = VolumeManagerTest.volumeManager.createVolumeConfiguration(inVolumeConfig);
+        VolumeConfiguration outVolumeConfiguration = this.volumeManager.createVolumeConfiguration(inVolumeConfig);
         Assert.assertNotNull(outVolumeConfiguration);
         Assert.assertNotNull(outVolumeConfiguration.getId());
         Assert.assertEquals(inVolumeConfig.getCapacity(), outVolumeConfiguration.getCapacity());
@@ -247,7 +286,7 @@ public class VolumeManagerTest {
         VolumeConfiguration volumeConfig = this.createVolumeConfiguration();
         inVolumeTemplate.setVolumeConfig(volumeConfig);
 
-        VolumeTemplate outVolumeTemplate = VolumeManagerTest.volumeManager.createVolumeTemplate(inVolumeTemplate);
+        VolumeTemplate outVolumeTemplate = this.volumeManager.createVolumeTemplate(inVolumeTemplate);
         Assert.assertNotNull(outVolumeTemplate);
         Assert.assertNotNull(outVolumeTemplate.getId());
         Assert.assertNotNull(outVolumeTemplate.getVolumeConfig());
@@ -262,8 +301,7 @@ public class VolumeManagerTest {
     public void testCRUDVolumeTemplateAndConfiguration() throws Exception {
         VolumeTemplate createdVolumeTemplate = this.createVolumeTemplate();
 
-        VolumeTemplate readVolumeTemplate = VolumeManagerTest.volumeManager.getVolumeTemplateById(createdVolumeTemplate.getId()
-            .toString());
+        VolumeTemplate readVolumeTemplate = this.volumeManager.getVolumeTemplateById(createdVolumeTemplate.getId().toString());
         Assert.assertNotNull(readVolumeTemplate);
         Assert.assertEquals(createdVolumeTemplate.getId(), readVolumeTemplate.getId());
         Assert.assertEquals(createdVolumeTemplate.getVolumeConfig().getId(), readVolumeTemplate.getVolumeConfig().getId());
@@ -271,19 +309,18 @@ public class VolumeManagerTest {
         VolumeConfiguration newVolumeConfiguration = this.createVolumeConfiguration();
         Map<String, Object> attributes = new HashMap<String, Object>();
         attributes.put("volumeConfig", newVolumeConfiguration);
-        VolumeManagerTest.volumeManager.updateVolumeTemplateAttributes(readVolumeTemplate.getId().toString(), attributes);
-        readVolumeTemplate = VolumeManagerTest.volumeManager.getVolumeTemplateById(readVolumeTemplate.getId().toString());
+        this.volumeManager.updateVolumeTemplateAttributes(readVolumeTemplate.getId().toString(), attributes);
+        readVolumeTemplate = this.volumeManager.getVolumeTemplateById(readVolumeTemplate.getId().toString());
         Assert.assertEquals(newVolumeConfiguration.getId(), readVolumeTemplate.getVolumeConfig().getId());
 
-        VolumeManagerTest.volumeManager.deleteVolumeTemplate(readVolumeTemplate.getId().toString());
-        VolumeManagerTest.volumeManager.deleteVolumeConfiguration(newVolumeConfiguration.getId().toString());
-        VolumeManagerTest.volumeManager.deleteVolumeConfiguration(createdVolumeTemplate.getVolumeConfig().getId().toString());
+        this.volumeManager.deleteVolumeTemplate(readVolumeTemplate.getId().toString());
+        this.volumeManager.deleteVolumeConfiguration(newVolumeConfiguration.getId().toString());
+        this.volumeManager.deleteVolumeConfiguration(createdVolumeTemplate.getVolumeConfig().getId().toString());
 
         try {
-            VolumeManagerTest.volumeManager.getVolumeTemplateById(readVolumeTemplate.getId().toString());
-            VolumeManagerTest.volumeManager.getVolumeConfigurationById(newVolumeConfiguration.getId().toString());
-            VolumeManagerTest.volumeManager.getVolumeConfigurationById(createdVolumeTemplate.getVolumeConfig().getId()
-                .toString());
+            this.volumeManager.getVolumeTemplateById(readVolumeTemplate.getId().toString());
+            this.volumeManager.getVolumeConfigurationById(newVolumeConfiguration.getId().toString());
+            this.volumeManager.getVolumeConfigurationById(createdVolumeTemplate.getVolumeConfig().getId().toString());
         } catch (ResourceNotFoundException e) {
         }
     }
@@ -293,28 +330,28 @@ public class VolumeManagerTest {
         for (int i = 0; i < 20; i++) {
             this.createVolume();
         }
-        VolumeCollection volumeCollection = VolumeManagerTest.volumeManager.getVolumeCollection();
+        VolumeCollection volumeCollection = this.volumeManager.getVolumeCollection();
         Assert.assertEquals(20, volumeCollection.getVolumes().size());
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-        List<Volume> volumes = VolumeManagerTest.volumeManager.getVolumesAttributes(0, 9, attributes);
+        List<Volume> volumes = this.volumeManager.getVolumesAttributes(0, 9, attributes);
         Assert.assertEquals(10, volumes.size());
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals("myVolume" + i, volumes.get(i).getName());
         }
-        volumes = VolumeManagerTest.volumeManager.getVolumesAttributes(10, 25, attributes);
+        volumes = this.volumeManager.getVolumesAttributes(10, 25, attributes);
         Assert.assertEquals(10, volumes.size());
-        volumes = VolumeManagerTest.volumeManager.getVolumesAttributes(20, 100, attributes);
+        volumes = this.volumeManager.getVolumesAttributes(20, 100, attributes);
         Assert.assertEquals(0, volumes.size());
 
-        volumes = VolumeManagerTest.volumeManager.getVolumesAttributes(attributes, null);
+        volumes = this.volumeManager.getVolumesAttributes(attributes, null);
         Assert.assertEquals(20, volumes.size());
         for (int i = 0; i < 20; i++) {
             Assert.assertEquals("myVolume" + i, volumes.get(i).getName());
             this.deleteVolume(volumes.get(i).getId().toString());
         }
-        volumeCollection = VolumeManagerTest.volumeManager.getVolumeCollection();
+        volumeCollection = this.volumeManager.getVolumeCollection();
         Assert.assertEquals(0, volumeCollection.getVolumes().size());
     }
 
@@ -323,30 +360,28 @@ public class VolumeManagerTest {
         for (int i = 0; i < 20; i++) {
             this.createVolumeConfiguration();
         }
-        VolumeConfigurationCollection volumeConfigCollection = VolumeManagerTest.volumeManager
-            .getVolumeConfigurationCollection();
+        VolumeConfigurationCollection volumeConfigCollection = this.volumeManager.getVolumeConfigurationCollection();
         Assert.assertEquals(20, volumeConfigCollection.getVolumeConfigurations().size());
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-        List<VolumeConfiguration> volumeConfigs = VolumeManagerTest.volumeManager.getVolumeConfigurationsAttributes(0, 9,
-            attributes);
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurationsAttributes(0, 9, attributes);
         Assert.assertEquals(10, volumeConfigs.size());
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals("myVolumeConfig" + i, volumeConfigs.get(i).getName());
         }
-        volumeConfigs = VolumeManagerTest.volumeManager.getVolumeConfigurationsAttributes(10, 25, attributes);
+        volumeConfigs = this.volumeManager.getVolumeConfigurationsAttributes(10, 25, attributes);
         Assert.assertEquals(10, volumeConfigs.size());
-        volumeConfigs = VolumeManagerTest.volumeManager.getVolumeConfigurationsAttributes(20, 100, attributes);
+        volumeConfigs = this.volumeManager.getVolumeConfigurationsAttributes(20, 100, attributes);
         Assert.assertEquals(0, volumeConfigs.size());
 
-        volumeConfigs = VolumeManagerTest.volumeManager.getVolumeConfigurationsAttributes(attributes, null);
+        volumeConfigs = this.volumeManager.getVolumeConfigurationsAttributes(attributes, null);
         Assert.assertEquals(20, volumeConfigs.size());
         for (int i = 0; i < 20; i++) {
             Assert.assertEquals("myVolumeConfig" + i, volumeConfigs.get(i).getName());
-            VolumeManagerTest.volumeManager.deleteVolumeConfiguration(volumeConfigs.get(i).getId().toString());
+            this.volumeManager.deleteVolumeConfiguration(volumeConfigs.get(i).getId().toString());
         }
-        volumeConfigCollection = VolumeManagerTest.volumeManager.getVolumeConfigurationCollection();
+        volumeConfigCollection = this.volumeManager.getVolumeConfigurationCollection();
         Assert.assertEquals(0, volumeConfigCollection.getVolumeConfigurations().size());
     }
 
@@ -355,30 +390,29 @@ public class VolumeManagerTest {
         for (int i = 0; i < 20; i++) {
             this.createVolumeTemplate();
         }
-        VolumeTemplateCollection volumeTemplateCollection = VolumeManagerTest.volumeManager.getVolumeTemplateCollection();
+        VolumeTemplateCollection volumeTemplateCollection = this.volumeManager.getVolumeTemplateCollection();
         Assert.assertEquals(20, volumeTemplateCollection.getVolumeTemplates().size());
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-        List<VolumeTemplate> volumeTemplates = VolumeManagerTest.volumeManager.getVolumeTemplatesAttributes(0, 9, attributes);
+        List<VolumeTemplate> volumeTemplates = this.volumeManager.getVolumeTemplatesAttributes(0, 9, attributes);
         Assert.assertEquals(10, volumeTemplates.size());
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals("myVolumeTemplate" + i, volumeTemplates.get(i).getName());
         }
-        volumeTemplates = VolumeManagerTest.volumeManager.getVolumeTemplatesAttributes(10, 25, attributes);
+        volumeTemplates = this.volumeManager.getVolumeTemplatesAttributes(10, 25, attributes);
         Assert.assertEquals(10, volumeTemplates.size());
-        volumeTemplates = VolumeManagerTest.volumeManager.getVolumeTemplatesAttributes(20, 100, attributes);
+        volumeTemplates = this.volumeManager.getVolumeTemplatesAttributes(20, 100, attributes);
         Assert.assertEquals(0, volumeTemplates.size());
 
-        volumeTemplates = VolumeManagerTest.volumeManager.getVolumeTemplatesAttributes(attributes, null);
+        volumeTemplates = this.volumeManager.getVolumeTemplatesAttributes(attributes, null);
         Assert.assertEquals(20, volumeTemplates.size());
         for (int i = 0; i < 20; i++) {
             Assert.assertEquals("myVolumeTemplate" + i, volumeTemplates.get(i).getName());
-            VolumeManagerTest.volumeManager.deleteVolumeTemplate(volumeTemplates.get(i).getId().toString());
-            VolumeManagerTest.volumeManager.deleteVolumeConfiguration(volumeTemplates.get(i).getVolumeConfig().getId()
-                .toString());
+            this.volumeManager.deleteVolumeTemplate(volumeTemplates.get(i).getId().toString());
+            this.volumeManager.deleteVolumeConfiguration(volumeTemplates.get(i).getVolumeConfig().getId().toString());
         }
-        volumeTemplateCollection = VolumeManagerTest.volumeManager.getVolumeTemplateCollection();
+        volumeTemplateCollection = this.volumeManager.getVolumeTemplateCollection();
         Assert.assertEquals(0, volumeTemplateCollection.getVolumeTemplates().size());
     }
 }
