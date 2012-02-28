@@ -54,7 +54,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.UserException;
-import org.ow2.sirocco.cloudmanager.core.utils.utilForManagers;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
@@ -234,7 +234,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         CloudProvider lCP = this.getCloudProviderById(id);
 
         try {
-            utilForManagers.fillObject(lCP, updatedAttributes);
+            UtilsForManagers.fillObject(lCP, updatedAttributes);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CloudProviderException();
@@ -261,7 +261,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         CloudProviderAccount lCPA = this.getCloudProviderAccountById(id);
 
         try {
-            utilForManagers.fillObject(lCPA, updatedAttributes);
+            UtilsForManagers.fillObject(lCPA, updatedAttributes);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CloudProviderException();
@@ -314,7 +314,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         CloudProviderLocation lCPL = this.getCloudProviderLocationById(id);
 
         try {
-            utilForManagers.fillObject(lCPL, updatedAttributes);
+            UtilsForManagers.fillObject(lCPL, updatedAttributes);
         } catch (Exception e) {
             e.printStackTrace();
             throw new CloudProviderException();
