@@ -91,26 +91,18 @@ public class JobCompletionHandlerBean implements MessageListener {
             } else if (providerJob.getAction().startsWith("image")) {
             }
 
-            if (!done) {
-                try {
-                    this.emitMessage(providerJob);
-                } catch (Exception e) {
-                }
-            } else {
-                // update Job entity
-                try {
-                    Job job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
-                        .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
-                    job.setStatus(providerJob.getStatus());
-                    job.setStatusMessage(providerJob.getStatusMessage());
-                    job.setReturnCode(providerJob.getReturnCode());
-                    job.setTimeOfStatusChange(new Date());
-                } catch (NoResultException e) {
-                    // should not happen
-                    JobCompletionHandlerBean.logger.info("Cannot find job with providerAssignedId "
-                        + providerJob.getProviderAssignedId());
-                }
-
+            // update Job entity
+            try {
+                Job job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
+                    .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
+                job.setStatus(providerJob.getStatus());
+                job.setStatusMessage(providerJob.getStatusMessage());
+                job.setReturnCode(providerJob.getReturnCode());
+                job.setTimeOfStatusChange(new Date());
+            } catch (NoResultException e) {
+                // should not happen
+                JobCompletionHandlerBean.logger.info("Cannot find job with providerAssignedId "
+                    + providerJob.getProviderAssignedId());
             }
 
         }
