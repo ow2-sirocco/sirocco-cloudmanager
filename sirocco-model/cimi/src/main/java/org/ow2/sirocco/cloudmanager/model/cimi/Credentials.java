@@ -28,38 +28,43 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.Lob;
 
 @Entity
 public class Credentials extends CloudEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private	String	userName;
-	private String	password;
-	private String	key;
+    private String userName;
 
-	public Credentials() {}
+    private String password;
 
-	public String getUserName() {
-		return userName;
-	}
+    private byte[] publicKey;
 
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
+    public Credentials() {
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getUserName() {
+        return this.userName;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setUserName(final String userName) {
+        this.userName = userName;
+    }
 
-	public byte[] getKey() {
-		return key.getBytes();
-	}
-	
-	public void setKey(byte[] key) {
-		this.key = new String(key);
-	}
+    public String getPassword() {
+        return this.password;
+    }
+
+    public void setPassword(final String password) {
+        this.password = password;
+    }
+
+    @Lob
+    public byte[] getPublicKey() {
+        return this.publicKey;
+    }
+
+    public void setPublicKey(final byte[] key) {
+        this.publicKey = this.publicKey;
+    }
 }
