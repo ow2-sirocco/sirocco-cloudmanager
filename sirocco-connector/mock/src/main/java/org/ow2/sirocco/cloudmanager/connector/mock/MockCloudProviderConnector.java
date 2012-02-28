@@ -60,7 +60,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static Log logger = LogFactory.getLog(MockCloudProviderConnector.class);
 
-    private static final int ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS = 1;
+    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS = 1;
 
     private final String cloudProviderId;
 
@@ -132,7 +132,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Volume> createTask = new Callable<Volume>() {
             @Override
             public Volume call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
                 volume.setState(Volume.State.AVAILABLE);
                 return volume;
             }
@@ -152,7 +152,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> deleteTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
                 MockCloudProviderConnector.this.volumes.remove(volumeId);
                 return null;
             }
@@ -184,6 +184,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Machine machine = new Machine();
         machine.setProviderAssignedId(machineProviderAssignedId);
         this.machines.put(machineProviderAssignedId, machine);
+        MockCloudProviderConnector.logger.info("Creating machine with providerAssignedId " + machineProviderAssignedId);
         machine.setState(Machine.State.CREATING);
         machine.setCpu(new Cpu(machineCreate.getMachineTemplate().getMachineConfiguration().getCpu()));
         machine.setMemory(machineCreate.getMachineTemplate().getMachineConfiguration().getMemory());
@@ -213,7 +214,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Machine> createTask = new Callable<Machine>() {
             @Override
             public Machine call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
                 for (NetworkInterface networkInterface : machine.getNetworkInterfaces()) {
                     networkInterface.setState(InterfaceState.ACTIVE);
                 }
@@ -221,7 +222,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 return machine;
             }
         };
-
         ListenableFuture<Machine> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
         return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machineProviderAssignedId, "machine.create",
             result);
@@ -230,6 +230,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public synchronized Job startMachine(final String machineId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Starting machine with providerAssignedId " + machineId);
         final Machine machine = this.machines.get(machineId);
         if (machine == null) {
             throw new ConnectorException("Machine " + machineId + " doesn't exist");
@@ -242,7 +243,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> startTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
                 machine.setState(Machine.State.STARTED);
                 return null;
             }
@@ -254,6 +255,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public synchronized Job stopMachine(final String machineId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Stopping machine with providerAssignedId " + machineId);
         final Machine machine = this.machines.get(machineId);
         if (machine == null) {
             throw new ConnectorException("Machine " + machineId + " doesn't exist");
@@ -268,7 +270,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> stopTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
                 machine.setState(Machine.State.STOPPED);
                 return null;
             }
@@ -296,7 +298,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> suspendTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
                 machine.setState(Machine.State.SUSPENDED);
                 return null;
             }
@@ -330,7 +332,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> pauseTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
                 machine.setState(Machine.State.PAUSED);
                 return null;
             }
@@ -342,16 +344,18 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public synchronized Job deleteMachine(final String machineId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Deleting machine with providerAssignedId " + machineId);
         Machine machine = this.machines.get(machineId);
         if (machine == null) {
-            throw new ConnectorException("Volume " + machineId + " doesn't exist");
+            throw new ConnectorException("Machine " + machineId + " doesn't exist");
         }
         machine.setState(Machine.State.DELETING);
         final Callable<Void> deleteTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYLCE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
                 MockCloudProviderConnector.this.machines.remove(machineId);
+                MockCloudProviderConnector.logger.info("Machine " + machineId + " deleted");
                 return null;
             }
         };
@@ -368,9 +372,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     @Override
     public synchronized Machine getMachine(final String machineId) throws ConnectorException {
         Machine machine = this.machines.get(machineId);
-        if (machine == null) {
-            throw new ConnectorException("Machine " + machineId + " doesn't exist");
-        }
         return machine;
     }
 
