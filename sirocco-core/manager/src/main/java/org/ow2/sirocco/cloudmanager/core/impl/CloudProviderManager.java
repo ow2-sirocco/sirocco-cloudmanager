@@ -39,6 +39,7 @@ import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
+import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
@@ -74,16 +75,12 @@ public class CloudProviderManager implements ICloudProviderManager {
     private EntityManager em;
 
     @Resource
-    private SessionContext ctx;
+    private EJBContext ctx;
     private String user;
 
     @EJB
     private IUserManager userManager;
 
-    @Resource
-    public void setSessionContext(SessionContext ctx) {
-        this.ctx = ctx;
-    }
 
     private void setUser() {
         user = ctx.getCallerPrincipal().getName();
@@ -278,7 +275,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         try {
             UtilsForManagers.fillObject(lCP, updatedAttributes);
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.info(e.getMessage());
             throw new CloudProviderException();
         }
 
