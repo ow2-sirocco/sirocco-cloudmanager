@@ -38,22 +38,32 @@ public interface ICloudProviderManager {
 	static final String EJB_JNDI_NAME = "CloudProviderManager";
 	
 	CloudProvider createCloudProvider(String type,String description) throws CloudProviderException;
-    CloudProvider getCloudProviderById(String cloudProviderId) throws CloudProviderException;
+    CloudProvider createCloudProvider(CloudProvider cp)
+            throws CloudProviderException;
+	CloudProvider getCloudProviderById(String cloudProviderId) throws CloudProviderException;
     CloudProvider updateCloudProvider(final String id,Map<String, Object> updatedAttributes) throws CloudProviderException;
     CloudProvider updateCloudProvider(CloudProvider CP) throws CloudProviderException;
     void deleteCloudProvider(String cloudProviderId) throws CloudProviderException;
 
     CloudProviderAccount createCloudProviderAccount(String cloudProviderId, String user, String login,String password)
         throws CloudProviderException;
+    CloudProviderAccount createCloudProviderAccount(CloudProviderAccount cpa)
+            throws CloudProviderException;
     CloudProviderAccount getCloudProviderAccountById(String cloudProviderAccountId) throws CloudProviderException;
     CloudProviderAccount updateCloudProviderAccount(final String id,Map<String, Object> updatedAttributes) throws CloudProviderException;
     CloudProviderAccount updateCloudProviderAccount(CloudProviderAccount CP) throws CloudProviderException;   
     void deleteCloudProviderAccount(String cloudProviderAccountId) throws CloudProviderException;
 
-    CloudProviderLocation createCloudProviderLocation(String Iso3166Code,String countryName, String stateName) throws CloudProviderException;
-    CloudProviderLocation getCloudProviderLocationById(String cloudProviderLocationId) throws CloudProviderException;
+
+    CloudProviderLocation createCloudProviderLocation(String Iso3166_1_Code,
+            String Iso3166_2_Code, String postalCode, Double altitude,
+            Double latitude, Double longitude, String countryName,
+            String stateName, String cityName) throws CloudProviderException;    
+    CloudProviderLocation createCloudProviderLocation(CloudProviderLocation cpl)throws CloudProviderException;
     CloudProviderLocation updateCloudProviderLocation(final String id,Map<String, Object> updatedAttributes) throws CloudProviderException;
     CloudProviderLocation updateCloudProviderLocation(CloudProviderLocation CP) throws CloudProviderException;
+    CloudProviderLocation getCloudProviderLocationById(
+            String cloudProviderLocationId) throws CloudProviderException;
     void deleteCloudProviderLocation(String cloudProviderLocationId) throws CloudProviderException;
 
     
@@ -66,5 +76,13 @@ public interface ICloudProviderManager {
 	void removeCloudProviderAccountFromUserByName(String userName,
 			String cloudProviderAccountId) throws CloudProviderException,
 			UserException;
+    double locationDistance(CloudProviderLocation pointA,
+            CloudProviderLocation pointB) throws CloudProviderException;
+
+
+
+   
+
+
 
 }

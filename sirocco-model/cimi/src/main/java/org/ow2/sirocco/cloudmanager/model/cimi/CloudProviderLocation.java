@@ -26,7 +26,6 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Column;
@@ -40,28 +39,124 @@ import javax.persistence.UniqueConstraint;
 
 
 @Entity
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = {"countryName", "stateName"}))
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"iso3166_1", "iso3166_2", "postal_code"}), @UniqueConstraint(columnNames ={"gps_latitude", "gps_longitude", "gps_altitude"})})
 public class CloudProviderLocation implements Serializable {
 
     private static final long serialVersionUID = 1L;
     
     private Integer id;
 
-    private String Iso3166Code;
+    /**
+     * Iso3166-1 alpha-2 code (country code)
+     *  -example: FR for France
+     */  
+    private String Iso3166_1;
+    /**
+     * Iso3166-2 code (subdivision code/province/departement/district, etc.)
+     * - example:for France, FR-M (Lorraine), but we could also store FR-55 (Meuse)
+     * which is more precise
+     */
+    private String Iso3166_2;
+    
+    /**
+     * country specific postal Code (or City code for countries without any
+     * postal code like Ireland).
+     * This code is alphanumerical and has no standard.
+     */
+    private String postalCode;
 
+    /**
+     * country name matching iso 3166-1
+     */    
     private String countryName;
-
+    
+    /**
+     * state name matching iso 3166-2
+     */
     private String stateName;
     
+    /**
+     * city name (for informational purposes only)
+     */    
+    private String cityName;
+    
+    /**
+     * GPS Latitude
+     */    
+    private Double GPS_Latitude;
+    
+    /**
+     * GPS Longitude
+     */    
+    private Double GPS_Longitude;
+    
+    /**
+     * GPS Altitude
+     */    
+    private Double GPS_Altitude;
+    
     private Set<CloudProvider> cloudProviders;
-
-    @Column(name = "iso3166code", nullable = false, length = 6, unique = true)
-    public String getIso3166Code() {
-        return this.Iso3166Code;
+    
+    @Column(name="iso3166_1")
+    public String getIso3166_1() {
+        return Iso3166_1;
     }
 
-    public void setIso3166Code(final String iso3166Code) {
-        this.Iso3166Code = iso3166Code;
+    public void setIso3166_1(String iso3166_1) {
+        Iso3166_1 = iso3166_1;
+    }
+
+    @Column(name="iso3166_2")
+    public String getIso3166_2() {
+        return Iso3166_2;
+    }
+
+    public void setIso3166_2(String iso3166_2) {
+        Iso3166_2 = iso3166_2;
+    }
+
+    @Column(name="postal_code")
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public void setPostalCode(String postalCode) {
+        this.postalCode = postalCode;
+    }
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    @Column(name="gps_latitude")
+    public Double getGPS_Latitude() {
+        return GPS_Latitude;
+    }
+
+    public void setGPS_Latitude(Double gPS_Latitude) {
+        GPS_Latitude = gPS_Latitude;
+    }
+
+    @Column(name="gps_longitude")
+    public Double getGPS_Longitude() {
+        return GPS_Longitude;
+    }
+
+    public void setGPS_Longitude(Double gPS_Longitude) {
+        GPS_Longitude = gPS_Longitude;
+    }
+
+    @Column(name="gps_altitude")
+    public Double getGPS_Altitude() {
+        return GPS_Altitude;
+    }
+
+    public void setGPS_Altitude(Double gPS_Altitude) {
+        GPS_Altitude = gPS_Altitude;
     }
 
     public String getCountryName() {

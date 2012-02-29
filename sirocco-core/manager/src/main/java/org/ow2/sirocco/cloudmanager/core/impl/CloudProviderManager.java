@@ -47,6 +47,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
@@ -54,6 +55,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.UserException;
+import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
@@ -94,9 +96,23 @@ public class CloudProviderManager implements ICloudProviderManager {
         CloudProvider cp = new CloudProvider();
         cp.setCloudProviderType(type);
         cp.setDescription(description);
+        
+        return createCloudProvider(cp);
+    }
+    
+    @Override
+    public CloudProvider createCloudProvider(CloudProvider cp) throws CloudProviderException
+    {
+        if (!isCloudProviderValid(cp)){throw new CloudProviderException("CloudProvider validation failed");};
+
         this.em.persist(cp);
         return cp;
     }
+    
+    private boolean isCloudProviderValid(CloudProvider cp)
+    {        
+        return true;
+    }    
 
     @Override
     public CloudProvider getCloudProviderById(String cloudProviderId)
@@ -126,10 +142,36 @@ public class CloudProviderManager implements ICloudProviderManager {
         cpa.setCloudProvider(this.getCloudProviderById(cloudProviderId));
         cpa.setLogin(login);
         cpa.setPassword(password);
+        
+        cpa=createCloudProviderAccount(cpa);
+        
+       return cpa;
+    }
+    
+    @Override
+    public CloudProviderAccount createCloudProviderAccount(CloudProviderAccount cpa) throws CloudProviderException
+    {
+        
+        if (!isCloudProviderAccountValid(cpa)){throw new CloudProviderException("CloudProviderAccount validation failed");};
 
         this.em.persist(cpa);
         return cpa;
+         
     }
+    
+    private boolean isCloudProviderAccountValid(CloudProviderAccount cpa)
+    {
+        
+        if (cpa.getLogin()==null){return false;}
+        if (cpa.getLogin().equals("")){return false;}
+        
+        if (cpa.getPassword()==null){return false;}
+        if (cpa.getPassword().equals("")){return false;}
+        
+        if (cpa.getCloudProvider()==null){return false;}
+        
+        return true;
+    }    
 
     @Override
     public CloudProviderAccount getCloudProviderAccountById(
@@ -247,6 +289,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     public CloudProvider updateCloudProvider(CloudProvider CP)
             throws CloudProviderException {
 
+        if (!isCloudProviderValid(CP)){throw new CloudProviderException("CloudProvider validation failed");}
         Integer CPId = CP.getId();
         this.em.merge(CP);
 
@@ -275,6 +318,8 @@ public class CloudProviderManager implements ICloudProviderManager {
             CloudProviderAccount CPA) throws CloudProviderException {
 
         Integer CPAId = CPA.getId();
+        if (!isCloudProviderAccountValid(CPA)){throw new CloudProviderException("CloudProviderAccount validation failed");};
+
         this.em.merge(CPA);
 
         return this.getCloudProviderAccountById(CPAId.toString());
@@ -282,19 +327,56 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     @Override
     public CloudProviderLocation createCloudProviderLocation(
-            String Iso3166Code, String countryName, String stateName)
+            String Iso3166_1_Code,String Iso3166_2_Code,String postalCode,Double altitude,Double latitude,Double longitude, String countryName, String stateName,String cityName)
             throws CloudProviderException {
 
         CloudProviderLocation cpl = new CloudProviderLocation();
 
-        cpl.setIso3166Code(Iso3166Code);
+        cpl.setIso3166_1(Iso3166_1_Code);
+        cpl.setIso3166_2(Iso3166_2_Code);
+        cpl.setGPS_Altitude(altitude);
+        cpl.setGPS_Latitude(latitude);
+        cpl.setGPS_Longitude(longitude);
         cpl.setCountryName(countryName);
         cpl.setStateName(stateName);
+        
+        return this.createCloudProviderLocation(cpl);
+    }
+    
+    @Override
+    public CloudProviderLocation createCloudProviderLocation(CloudProviderLocation cpl) throws CloudProviderException
+    {
+        if (!isCloudProviderLocationValid(cpl)){throw new CloudProviderException("CloudProviderLocation validation failed");}
 
         this.em.persist(cpl);
+        
         return cpl;
     }
 
+    private boolean isCloudProviderLocationValid(CloudProviderLocation cpl)
+    {        
+        if (cpl.getIso3166_1()==null){return false;}
+        if (cpl.getIso3166_1().equals("")){return false;}
+        
+        if (cpl.getIso3166_2()==null){return false;}
+        if (cpl.getIso3166_2().equals("")){return false;}
+        
+        if (cpl.getPostalCode()==null){return false;}
+        if (cpl.getPostalCode().equals("")){return false;}
+        
+        if (cpl.getGPS_Altitude()==null){return false;}
+        if (cpl.getGPS_Altitude().equals("")){return false;}
+        
+        if (cpl.getGPS_Latitude()==null){return false;}
+        if (cpl.getGPS_Latitude().equals("")){return false;}
+        
+        if (cpl.getGPS_Longitude()==null){return false;}
+        if (cpl.getGPS_Longitude().equals("")){return false;}
+
+        
+        return true;
+    } 
+    
     @Override
     public CloudProviderLocation getCloudProviderLocationById(
             String cloudProviderLocationId) throws CloudProviderException {
@@ -327,6 +409,8 @@ public class CloudProviderManager implements ICloudProviderManager {
     public CloudProviderLocation updateCloudProviderLocation(
             CloudProviderLocation CPL) throws CloudProviderException {
 
+        if (!isCloudProviderLocationValid(CPL)){throw new CloudProviderException("CloudProviderLocation validation failed");}
+        
         Integer CPLId = CPL.getId();
         this.em.merge(CPL);
 
@@ -343,5 +427,30 @@ public class CloudProviderManager implements ICloudProviderManager {
         this.em.remove(result);
 
     }
+    /**
+     * Method to evaluate distance between 2 different locations
+     * <br>** Only works if the points are close enough that you can omit 
+     * that earth is not regular shape **
+     * <br><br><i>see http://androidsnippets.com/distance-between-two-gps-coordinates-in-meter</i>
+     * @return
+     */
+    @Override
+    public double locationDistance(CloudProviderLocation pointA,CloudProviderLocation pointB) {
+        
+        float pk = (float) (180/3.14159265);
+
+        double a1 = pointA.getGPS_Latitude() / pk;
+        double a2 = pointA.getGPS_Longitude() / pk;
+        double b1 = pointB.getGPS_Latitude() / pk;
+        double b2 = pointB.getGPS_Longitude() / pk;
+
+        double t1 = Math.cos(a1)*Math.cos(a2)*Math.cos(b1)*Math.cos(b2);
+        double t2 = Math.cos(a1)*Math.sin(a2)*Math.cos(b1)*Math.sin(b2);
+        double t3 = Math.sin(a1)*Math.sin(b1);
+        double tt = Math.acos(t1 + t2 + t3);
+
+        return 6366000*tt;
+    }
+    
 
 }
