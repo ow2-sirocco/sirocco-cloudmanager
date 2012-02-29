@@ -37,10 +37,12 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.UserException;
+import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -77,6 +79,8 @@ public class UserManager implements IUserManager {
         u.setEmail(email);
         u.setUsername(username);
         u.setPassword(password);
+        
+        if (!isUserValid(u)){throw new UserException("user validation failed");}
 
         this.em.persist(u);
 
@@ -107,6 +111,30 @@ public class UserManager implements IUserManager {
 
         return u;
     }
+    
+    @Override
+    public User createUser(User u)
+    {
+        this.em.persist(u);
+        return u;
+    }
+    
+    private boolean isUserValid(User u)
+    {
+        if (u.getFirstName()==null){return false;}
+        if (u.getFirstName().equals("")){return false;}
+
+        if (u.getLastName()==null){return false;}
+        if (u.getLastName().equals("")){return false;}
+        
+        if (u.getEmail()==null){return false;}
+        if (!(EmailValidator.getInstance().isValid(u.getEmail()))){return false;}
+        
+        if (u.getPassword()==null){return false;}
+        if (!(new PasswordValidator().validate(u.getPassword()))){return false;}
+        
+        return true;
+    }
 
     @Override
     public User getUserById(String userId) throws UserException {
@@ -133,6 +161,7 @@ public class UserManager implements IUserManager {
     public User updateUser(User user) throws UserException {
 
         Integer userId = user.getId();
+        if (!isUserValid(user)){throw new UserException("user validation failed");}
         this.em.merge(user);
 
         return this.getUserById(userId.toString());

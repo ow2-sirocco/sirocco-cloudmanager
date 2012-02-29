@@ -5,36 +5,36 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.Map;
 
 public class UtilsForManagers {
     
     
-    public static Object fillObject(Object o, Map<String, Object> updatedAttributes)
+    public static Object fillObject(Object obj, Map<String, Object> updatedAttributes)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, IntrospectionException,
             NoSuchFieldException, InvocationTargetException {
 
         for (Map.Entry<String, Object> attr : updatedAttributes.entrySet()) {
-            invokeSetter(o.getClass(), o, attr.getKey(), attr.getValue());
+            invokeSetter(obj, attr.getKey(), attr.getValue());
         }
 
-        return o;
+        return obj;
 
     }
 
-    private static Object invokeSetter(Class targetClass, Object targetObj,
+    private static Object invokeSetter(Object targetObj,
             String attrName, Object attrValue) throws IntrospectionException,
             NoSuchFieldException, IllegalArgumentException,
             IllegalAccessException, InvocationTargetException {
 
-        BeanInfo info = Introspector.getBeanInfo(targetClass);
+        BeanInfo info = Introspector.getBeanInfo(targetObj.getClass());
         for (PropertyDescriptor pd : info.getPropertyDescriptors())
             if (attrName.equals(pd.getName()))
                 return pd.getWriteMethod().invoke(targetObj, attrValue);
-        throw new NoSuchFieldException(targetClass + " has no field "
+        throw new NoSuchFieldException(targetObj.getClass() + " has no field "
                 + attrName);
     }
+
 
 }
