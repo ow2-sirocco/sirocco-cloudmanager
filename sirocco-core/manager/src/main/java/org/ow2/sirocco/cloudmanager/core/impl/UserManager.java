@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.annotation.Resource;
@@ -41,9 +42,12 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.UserException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
@@ -65,25 +69,35 @@ public class UserManager implements IUserManager {
             .getLogger(UserManager.class.getName());
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
-    
+
     @Resource
     private SessionContext ctx;
 
     @Override
     public User createUser(String firstName, String lastName, String email,
-            String username, String password)
-            throws UserException {
+            String username, String password) throws UserException {
         User u = new User();
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setEmail(email);
         u.setUsername(username);
         u.setPassword(password);
-        
-        if (!isUserValid(u)){throw new UserException("user validation failed");}
 
+        return this.createUser(u);
+
+    }
+
+    @Override
+    public User createUser(User u) throws UserException {
+        if (!isUserValid(u)) {
+            throw new UserException("user validation failed");
+        }
+        createAllCollections(u);
         this.em.persist(u);
+        return u;
+    }
 
+    private void createAllCollections(User u) {
         // create collection objects and attach them to the user
         MachineImageCollection mic = new MachineImageCollection();
         mic.setUser(u);
@@ -108,31 +122,37 @@ public class UserManager implements IUserManager {
         this.em.persist(mcc);
         this.em.persist(vtc);
         this.em.persist(vcc);
-
-        return u;
     }
-    
-    @Override
-    public User createUser(User u)
-    {
-        this.em.persist(u);
-        return u;
-    }
-    
-    private boolean isUserValid(User u)
-    {
-        if (u.getFirstName()==null){return false;}
-        if (u.getFirstName().equals("")){return false;}
 
-        if (u.getLastName()==null){return false;}
-        if (u.getLastName().equals("")){return false;}
-        
-        if (u.getEmail()==null){return false;}
-        if (!(EmailValidator.getInstance().isValid(u.getEmail()))){return false;}
-        
-        if (u.getPassword()==null){return false;}
-        if (!(new PasswordValidator().validate(u.getPassword()))){return false;}
-        
+    private boolean isUserValid(User u) {
+        if (u.getFirstName() == null) {
+            return false;
+        }
+        if (u.getFirstName().equals("")) {
+            return false;
+        }
+
+        if (u.getLastName() == null) {
+            return false;
+        }
+        if (u.getLastName().equals("")) {
+            return false;
+        }
+
+        if (u.getEmail() == null) {
+            return false;
+        }
+        if (!(EmailValidator.getInstance().isValid(u.getEmail()))) {
+            return false;
+        }
+
+        if (u.getPassword() == null) {
+            return false;
+        }
+        if (!(new PasswordValidator().validate(u.getPassword()))) {
+            return false;
+        }
+
         return true;
     }
 
@@ -158,13 +178,31 @@ public class UserManager implements IUserManager {
     }
 
     @Override
+    public User updateUser(String id, Map<String, Object> updatedAttributes)
+            throws UserException {
+
+        User u = this.getUserById(id);
+
+        try {
+            UtilsForManagers.fillObject(u, updatedAttributes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new UserException();
+        }
+
+        return this.updateUser(u);
+    }
+
+    @Override
     public User updateUser(User user) throws UserException {
 
         Integer userId = user.getId();
-        if (!isUserValid(user)){throw new UserException("user validation failed");}
+        if (!isUserValid(user)) {
+            throw new UserException("user validation failed");
+        }
         this.em.merge(user);
 
-        return this.getUserById(userId.toString());
+        return user;
     }
 
     @Override
@@ -180,8 +218,9 @@ public class UserManager implements IUserManager {
         removeCollection("VolumeTemplateCollection", result);
         removeCollection("VolumeConfigurationCollection", result);
 
-        if (result!=null){this.em.remove(result);} 
-        
+        if (result != null) {
+            this.em.remove(result);
+        }
 
     }
 
