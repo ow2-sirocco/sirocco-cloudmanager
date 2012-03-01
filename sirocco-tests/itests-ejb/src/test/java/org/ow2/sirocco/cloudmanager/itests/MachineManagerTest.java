@@ -174,8 +174,9 @@ public class MachineManagerTest {
     public void setUp() throws Exception {
         this.setUpDatabase();
         this.connectToCloudManager();
-        User user = this.userManager.createUser("Lov", "Maps", "lov@maps", MachineManagerTest.USER_NAME, "password");
-        CloudProvider provider = this.cloudProviderManager.createCloudProvider(MachineManagerTest.CLOUD_PROVIDER_TYPE, "mock");
+        // change password that is not validated by user manager
+        User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", MachineManagerTest.USER_NAME, "232908Ivry");
+        CloudProvider provider = this.cloudProviderManager.createCloudProvider(CloudProvider.CloudProviderType.MOCK, "mock");
         CloudProviderAccount account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(),
             MachineManagerTest.ACCOUNT_USER, MachineManagerTest.ACCOUNT_LOGIN, MachineManagerTest.ACCOUNT_CREDENTIALS);
         this.cloudProviderManager.addCloudProviderAccountToUser(user.getId().toString(), account.getId().toString());
@@ -268,12 +269,12 @@ public class MachineManagerTest {
         while (done != true) {
             int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
             i = this.machineImageManager.getMachineImage(out_j.getTargetEntity());
-            System.out.println(" createMachineImage return");
+            
             if (i == null) {
-                System.out.println(" createMachineImage return");
+                
                 throw new Exception(" createMachineImage returned null");
             }
-            System.out.println("createMachineImage state " + i.getState());
+           
             if (i.getState() == MachineImage.State.AVAILABLE) {
                 done = true;
             }
@@ -310,9 +311,9 @@ public class MachineManagerTest {
 
     private int mcounter = 0;
 
-    @Test
+    @Test 
     public void testCreateMachine() throws Exception {
-        System.out.println("testCreateMachine enter");
+        
         MachineCreate machineCreate = new MachineCreate();
         machineCreate.setName("myMachine_" + this.mcounter);
         machineCreate.setDescription("my machine" + this.mcounter);
@@ -320,18 +321,18 @@ public class MachineManagerTest {
         properties.put("department", "MAPS");
         machineCreate.setProperties(properties);
         MachineTemplate machineTemplate = new MachineTemplate();
-        System.out.println("testCreateMachine createMachineConfiguration");
+        
         MachineConfiguration machineConfig = this.createMachineConfiguration();
         machineTemplate.setMachineConfiguration(machineConfig);
-        System.out.println("testCreateMachine createMachineImage");
+        
         machineTemplate.setMachineImage(this.createMachineImage());
-        System.out.println("testCreateMachine createCredentials");
+        
         machineTemplate.setCredentials(this.createCredentials());
         machineTemplate.setVolumes(new ArrayList<MachineVolume>());
         machineTemplate.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
         machineTemplate.setNetworkInterfaces(new ArrayList<NetworkInterface>());
         machineCreate.setMachineTemplate(machineTemplate);
-        System.out.println("testCreateMachine createMachine");
+        
         Job job = this.machineManager.createMachine(machineCreate);
         Assert.assertNotNull("machineCreate returns no job", job);
 
@@ -339,16 +340,18 @@ public class MachineManagerTest {
         Assert.assertTrue("job action is invalid", job.getAction().equals("machine.create"));
         String machineId = job.getTargetEntity();
         Assert.assertNotNull("job target entity is invalid", machineId);
-        System.out.println("testCreateMachine return from createMachine");
+       
         String jobId = job.getId().toString();
-        System.out.println("testCreateMachine return from createMachine" + jobId);
+        
         int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
-        System.out.println("testCreateMachine  getMachineById" + machineId);
+        
         Machine machine = this.machineManager.getMachineById(machineId);
-        System.out.println("testCreateMachine  machine state of " + machineId + " is " + machine.getState());
+      
+       
+        
         while (true) {
             job = this.jobManager.getJobById(jobId);
-
+           
             if (job.getStatus() != Job.Status.RUNNING) {
                 break;
             }
@@ -357,7 +360,7 @@ public class MachineManagerTest {
                 throw new Exception("Machine creation time out");
             }
         }
-
+        
         Assert.assertTrue("machine creation failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
 
         machine = this.machineManager.getMachineById(machineId);
@@ -369,11 +372,25 @@ public class MachineManagerTest {
         Assert.assertEquals(machine.getDescription(), "my machine" + this.mcounter);
 
         Assert.assertEquals(machine.getMemory().getUnit(), Memory.MemoryUnit.MEGIBYTE);
-
+       
+        this.startMachine(machine.getId().toString());
+        
+        this.stopMachine(machine.getId().toString());
+        
         this.deleteMachine(machine.getId().toString());
+        
+        Machine mm = null;
+        try {
+        	mm = this.machineManager.getMachineById(machine.getId().toString());
+        } catch (Exception e) {
+        	
+        }
+        Assert.assertNull(" deleted machine still there", mm);
+        System.out.println(" end of testCreateMachine until delete ");
     }
 
     void deleteMachine(final String machineId) throws Exception {
+    	
         Job job = this.machineManager.deleteMachine(machineId);
         Assert.assertNotNull("deleteMachine returns no job", job);
 
@@ -381,7 +398,7 @@ public class MachineManagerTest {
         Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity());
 
         String jobId = job.getId().toString();
-
+       
         int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
             job = this.jobManager.getJobById(jobId);
@@ -393,8 +410,60 @@ public class MachineManagerTest {
                 throw new Exception("Machine operation time out");
             }
         }
-
+        
         Assert.assertTrue("machine deletion failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+
+    }
+    
+    void startMachine(final String machineId) throws Exception {
+    	
+        Job job = this.machineManager.startMachine(machineId);
+        Assert.assertNotNull("startMachine returns no job", job);
+        
+        Assert.assertTrue("job action is invalid", job.getAction().equals("machine.start"));
+        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity());
+
+        String jobId = job.getId().toString();
+        
+        int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
+        while (true) {
+            job = this.jobManager.getJobById(jobId);
+            if (job.getStatus() != Job.Status.RUNNING) {
+                break;
+            }
+            Thread.sleep(1000);
+            if (counter-- == 0) {
+                throw new Exception("Machine operation time out");
+            }
+        }
+        
+        Assert.assertTrue("machine start failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+
+    }
+    
+    void stopMachine(final String machineId) throws Exception {
+    	
+        Job job = this.machineManager.stopMachine(machineId);
+        Assert.assertNotNull("stopMachine returns no job", job);
+
+        Assert.assertTrue("job action is invalid", job.getAction().equals("machine.stop"));
+        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity());
+
+        String jobId = job.getId().toString();
+        
+        int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
+        while (true) {
+            job = this.jobManager.getJobById(jobId);
+            if (job.getStatus() != Job.Status.RUNNING) {
+                break;
+            }
+            Thread.sleep(1000);
+            if (counter-- == 0) {
+                throw new Exception("Machine operation time out");
+            }
+        }
+       
+        Assert.assertTrue("machine stop failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
 
     }
 }
