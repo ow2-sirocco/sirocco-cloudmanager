@@ -3,8 +3,6 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -17,6 +15,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
 import org.ow2.easybeans.osgi.annotation.OSGiResource;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
@@ -65,7 +64,7 @@ public class VolumeManager implements IVolumeManager {
         ICloudProviderConnectorFactory connectorFactory = this.connectorFactoryFinder
             .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
         if (connectorFactory == null) {
-            VolumeManager.logger.severe("Cannot find connector for cloud provider type "
+            VolumeManager.logger.error("Cannot find connector for cloud provider type "
                 + cloudProviderAccount.getCloudProvider().getCloudProviderType());
             return null;
         }
@@ -106,7 +105,7 @@ public class VolumeManager implements IVolumeManager {
             IVolumeService volumeService = connector.getVolumeService();
             providerJob = volumeService.createVolume(volumeCreate);
         } catch (ConnectorException e) {
-            VolumeManager.logger.log(Level.SEVERE, "Failed to create volume: ", e);
+            VolumeManager.logger.error("Failed to create volume: ", e);
             throw new CloudProviderException(e.getMessage());
         }
 
@@ -151,7 +150,7 @@ public class VolumeManager implements IVolumeManager {
             try {
                 connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
             } catch (ConnectorException e) {
-                VolumeManager.logger.log(Level.SEVERE, e.getMessage(), e);
+                VolumeManager.logger.error(e.getMessage(), e);
             }
             return job;
         } else {
@@ -398,7 +397,7 @@ public class VolumeManager implements IVolumeManager {
             IVolumeService volumeService = connector.getVolumeService();
             providerJob = volumeService.deleteVolume(volume.getProviderAssignedId());
         } catch (ConnectorException e) {
-            VolumeManager.logger.log(Level.SEVERE, "Failed to delete volume: ", e);
+            VolumeManager.logger.error("Failed to delete volume: ", e);
             throw new CloudProviderException(e.getMessage());
         }
 
@@ -427,7 +426,7 @@ public class VolumeManager implements IVolumeManager {
             try {
                 connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
             } catch (ConnectorException e) {
-                VolumeManager.logger.log(Level.SEVERE, "", e);
+                VolumeManager.logger.error("", e);
             }
             return job;
         } else {
@@ -556,7 +555,7 @@ public class VolumeManager implements IVolumeManager {
         try {
             volume = this.getVolumeByProviderAssignedId(providerJob.getTargetEntity());
         } catch (PersistenceException e) {
-            VolumeManager.logger.severe("Cannot find Volume with provider-assigned id " + providerJob.getTargetEntity());
+            VolumeManager.logger.error("Cannot find Volume with provider-assigned id " + providerJob.getTargetEntity());
             return false;
         }
 
@@ -570,11 +569,11 @@ public class VolumeManager implements IVolumeManager {
                     volume.setCreated(new Date());
                     this.em.persist(volume);
                 } catch (Exception ex) {
-                    VolumeManager.logger.log(Level.SEVERE, "Failed to create volume " + volume.getName(), ex);
+                    VolumeManager.logger.error("Failed to create volume " + volume.getName(), ex);
                 }
             } else if (providerJob.getStatus() == Job.Status.FAILED) {
                 volume.setState(Volume.State.ERROR);
-                VolumeManager.logger.severe("Failed to create volume  " + volume.getName() + ": "
+                VolumeManager.logger.error("Failed to create volume  " + volume.getName() + ": "
                     + providerJob.getStatusMessage());
                 this.em.persist(volume);
             }
@@ -583,7 +582,7 @@ public class VolumeManager implements IVolumeManager {
                 this.em.remove(volume);
             } else if (providerJob.getStatus() == Job.Status.FAILED) {
                 volume.setState(Volume.State.ERROR);
-                VolumeManager.logger.severe("Failed to delete volume  " + volume.getName() + ": "
+                VolumeManager.logger.error("Failed to delete volume  " + volume.getName() + ": "
                     + providerJob.getStatusMessage());
                 this.em.persist(volume);
             }

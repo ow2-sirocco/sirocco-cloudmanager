@@ -35,7 +35,6 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -49,6 +48,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
 import org.apache.commons.validator.routines.EmailValidator;
+import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
@@ -59,6 +59,7 @@ import org.ow2.sirocco.cloudmanager.core.exception.UserException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider.CloudProviderType;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
@@ -87,7 +88,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProvider createCloudProvider(String type, String description)
+    public CloudProvider createCloudProvider(CloudProviderType type, String description)
             throws CloudProviderException {
 
         CloudProvider cp = new CloudProvider();
@@ -105,7 +106,10 @@ public class CloudProviderManager implements ICloudProviderManager {
         this.em.persist(cp);
         return cp;
     }
-    
+    private String normalizeLabel(String label)
+    {
+        return label.toUpperCase();
+    }
     private boolean isCloudProviderValid(CloudProvider cp)
     {        
         return true;
@@ -343,8 +347,15 @@ public class CloudProviderManager implements ICloudProviderManager {
     @Override
     public CloudProviderLocation createCloudProviderLocation(CloudProviderLocation cpl) throws CloudProviderException
     {
+        cpl.setCityName(normalizeLabel(cpl.getCityName()));
+        cpl.setCountryName(normalizeLabel(cpl.getCountryName()));
+        cpl.setStateName(normalizeLabel(cpl.getStateName()));
+        cpl.setIso3166_1(normalizeLabel(cpl.getIso3166_1()));
+        cpl.setIso3166_2(normalizeLabel(cpl.getIso3166_2()));
+        cpl.setPostalCode(normalizeLabel(cpl.getPostalCode()));
+        
         if (!isCloudProviderLocationValid(cpl)){throw new CloudProviderException("CloudProviderLocation validation failed");}
-
+      
         this.em.persist(cpl);
         
         return cpl;

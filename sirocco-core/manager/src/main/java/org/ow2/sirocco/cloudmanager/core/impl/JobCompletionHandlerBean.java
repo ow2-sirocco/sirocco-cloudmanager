@@ -28,7 +28,6 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
@@ -48,6 +47,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
+import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -79,7 +79,7 @@ public class JobCompletionHandlerBean implements MessageListener {
                 payload = objectMessage.getObject();
                 JobCompletionHandlerBean.logger.info("On topic JobCompletion: received " + payload);
             } catch (JMSException ex) {
-                JobCompletionHandlerBean.logger.log(Level.SEVERE, "Failed to extract from JMS message", ex);
+                JobCompletionHandlerBean.logger.error("Failed to extract from JMS message", ex);
                 return;
             }
             Job providerJob = (Job) payload;
