@@ -25,6 +25,8 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.Map;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -35,11 +37,13 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.persistence.Query;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
 import org.apache.log4j.Logger;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -110,8 +114,23 @@ public class CredentialsManager implements ICredentialsManager {
         return credentials;
     }
 
+    
+    
     public Credentials updateCredentials(final Credentials credentials) throws CloudProviderException {
-        throw new InvalidRequestException(" Cannot update credentials ");
+    	
+        this.setUser();
+        
+        Credentials c = this.em.find(Credentials.class, credentials.getId());
+        if (c == null) {
+        	throw new ResourceNotFoundException(" Could not find credential "+credentials.getId());
+        }
+        if (c.getUser().getUsername() != user.getUsername()) {
+        	throw new CloudProviderException(" Unauthorized to change creds " +user.getUsername());
+        }
+        this.validateCredentials(credentials);
+        this.em.merge(credentials);
+
+        return credentials;
     }
 
     public Credentials getCredentialsById(final String credentialsId) throws CloudProviderException {
@@ -144,6 +163,9 @@ public class CredentialsManager implements ICredentialsManager {
             throw new InvalidRequestException("null credentials id");
         }
         Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
+        if (cred == null) {
+        	throw new ResourceNotFoundException(" Invalid credential id " +credentialsId);
+        }
         /**
          * if anymachine template refers to this credential do not delete.
          */
@@ -164,4 +186,58 @@ public class CredentialsManager implements ICredentialsManager {
         return;
     }
 
+    
+    public void updateCredentialsAttributes(String credentialsId, Map<String, Object> attributes) 
+    		throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
+    	
+    	
+    	if (credentialsId == null) {
+            throw new InvalidRequestException("null credentials id");
+        }
+        Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
+        if (cred == null) {
+            throw new ResourceNotFoundException("Credentials " + credentialsId + " not found");
+        }
+        
+        try {
+            UtilsForManagers.fillObject(cred, attributes);
+        } catch (Exception e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+        this.em.merge(cred);
+        this.em.flush();
+    }
+
+    public List<Credentials> getCredentials(List<String> attributes, String filterExpression)
+    		throws InvalidRequestException, CloudProviderException {
+    	return new ArrayList<Credentials>();
+    }
+
+    public List<Credentials> getCredentials(int first, int last, List<String> attributes) throws InvalidRequestException,
+    CloudProviderException {
+    	
+    	 this.setUser();
+         if ((first < 0) || (last < 0) || (last < first)) {
+             throw new InvalidRequestException(" Illegal array index " + first + " " + last);
+         }
+
+         Query query = this.em
+             .createNamedQuery("FROM Credentials c WHERE v.user.username=:userName ORDER BY v.id");
+         query.setParameter("userName", this.user.getUsername());
+         query.setMaxResults(last - first + 1);
+         query.setFirstResult(first);
+         List<Credentials> creds = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
+         
+         return creds;
+    	
+    }
+/**
+    CredentialsCollection getCredentialsCollection() throws CloudProviderException {
+    	
+    }
+
+    void updateCredentialsCollection(Map<String, Object> attributes) throws CloudProviderException {
+    	
+    }
+*/
 }
