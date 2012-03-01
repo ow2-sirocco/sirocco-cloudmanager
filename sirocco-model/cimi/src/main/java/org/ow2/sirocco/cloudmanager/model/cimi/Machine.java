@@ -150,66 +150,67 @@ public class Machine extends CloudEntity implements Serializable {
      * Machines should then refer appropriate FSM.
      */
     public void initFSM() {
-    	fsm.addAction(State.CREATING, "DELETE", State.DELETING);
-		fsm.addAction(State.CREATING, "DELETE", State.ERROR);
+    	this.fsm = new FSM(State.CREATING.toString());
+    	fsm.addAction(State.CREATING, "delete", State.DELETING);
+		fsm.addAction(State.CREATING, "delete", State.ERROR);
 		fsm.addAction(State.CREATING, "internal", State.STOPPED);
 		fsm.addAction(State.CREATING, "internal", State.ERROR);
-		fsm.addAction(State.ERROR, "START", State.STARTING);
-		fsm.addAction(State.ERROR, "STOP", State.STOPPING);
-		fsm.addAction(State.ERROR, "RESTART", State.STARTING);
-		fsm.addAction(State.ERROR, "DELETE", State.DELETING);
+		fsm.addAction(State.ERROR, "start", State.STARTING);
+		fsm.addAction(State.ERROR, "stop", State.STOPPING);
+		fsm.addAction(State.ERROR, "restart", State.STARTING);
+		fsm.addAction(State.ERROR, "delete", State.DELETING);
 
 
-		fsm.addAction(State.STOPPED, "START", State.STARTING);
-		fsm.addAction(State.STOPPED, "DELETE", State.DELETING);
-		fsm.addAction(State.STOPPED, "CAPTURE", State.STOPPED);
-		fsm.addAction(State.STOPPED, "RESTART", State.STARTING);
+		fsm.addAction(State.STOPPED, "start", State.STARTING);
+		fsm.addAction(State.STOPPED, "delete", State.DELETING);
+		fsm.addAction(State.STOPPED, "capture", State.STOPPED);
+		fsm.addAction(State.STOPPED, "restart", State.STARTING);
 
 		fsm.addAction(State.STARTING, "internal", State.STARTED);
-		fsm.addAction(State.STARTING, "START", State.STARTING);
-		fsm.addAction(State.STARTING, "RESTART", State.STARTING);
-		fsm.addAction(State.STARTING, "DELETE", State.DELETING);
-		fsm.addAction(State.STARTING, "STOP", State.STOPPING);
+		fsm.addAction(State.STARTING, "start", State.STARTING);
+		fsm.addAction(State.STARTING, "restart", State.STARTING);
+		fsm.addAction(State.STARTING, "delete", State.DELETING);
+		fsm.addAction(State.STARTING, "stop", State.STOPPING);
 
-		fsm.addAction(State.STARTED, "RESTART", State.STARTING);
-		fsm.addAction(State.STARTED, "STOP", State.STOPPING);
-		fsm.addAction(State.STARTED, "DELETE", State.DELETING);
-		fsm.addAction(State.STARTED, "CAPTURE", State.STARTED);
-		fsm.addAction(State.STARTED, "PAUSE", State.PAUSING);
-		fsm.addAction(State.STARTED, "SUSPEND", State.SUSPENDING);
+		fsm.addAction(State.STARTED, "restart", State.STARTING);
+		fsm.addAction(State.STARTED, "stop", State.STOPPING);
+		fsm.addAction(State.STARTED, "delete", State.DELETING);
+		fsm.addAction(State.STARTED, "capture", State.STARTED);
+		fsm.addAction(State.STARTED, "pause", State.PAUSING);
+		fsm.addAction(State.STARTED, "suspend", State.SUSPENDING);
 
 		fsm.addAction(State.STOPPING, "internal", State.STOPPED);
-		fsm.addAction(State.STOPPING, "START", State.STARTING);
-		fsm.addAction(State.STOPPING, "RESTART", State.STARTING);
-		fsm.addAction(State.STOPPING, "DELETE", State.DELETING);
+		fsm.addAction(State.STOPPING, "start", State.STARTING);
+		fsm.addAction(State.STOPPING, "restart", State.STARTING);
+		fsm.addAction(State.STOPPING, "delete", State.DELETING);
 
-		fsm.addAction(State.STOPPED, "START", State.STARTING);
-		fsm.addAction(State.STOPPED, "RESTART", State.STARTING);
-		fsm.addAction(State.STOPPED, "CAPTURE", State.STOPPED);
-		fsm.addAction(State.STOPPED, "DELETE", State.DELETING);
+		fsm.addAction(State.STOPPED, "start", State.STARTING);
+		fsm.addAction(State.STOPPED, "restart", State.STARTING);
+		fsm.addAction(State.STOPPED, "capture", State.STOPPED);
+		fsm.addAction(State.STOPPED, "delete", State.DELETING);
 
 		fsm.addAction(State.PAUSING, "internal", State.PAUSED);
-		fsm.addAction(State.PAUSING, "START", State.STARTING);
-		fsm.addAction(State.PAUSING, "RESTART", State.STARTING);
-		fsm.addAction(State.PAUSING, "DELETE", State.DELETING);
+		fsm.addAction(State.PAUSING, "start", State.STARTING);
+		fsm.addAction(State.PAUSING, "restart", State.STARTING);
+		fsm.addAction(State.PAUSING, "delete", State.DELETING);
 
-		fsm.addAction(State.PAUSED, "START", State.STARTING);
-		fsm.addAction(State.PAUSED, "CAPTURE", State.PAUSED);
-		fsm.addAction(State.PAUSED, "RESTART", State.STARTING);
-		fsm.addAction(State.PAUSED, "STOP", State.STOPPING);
-		fsm.addAction(State.PAUSED, "DELETE", State.DELETING);
+		fsm.addAction(State.PAUSED, "start", State.STARTING);
+		fsm.addAction(State.PAUSED, "capture", State.PAUSED);
+		fsm.addAction(State.PAUSED, "restart", State.STARTING);
+		fsm.addAction(State.PAUSED, "stop", State.STOPPING);
+		fsm.addAction(State.PAUSED, "delete", State.DELETING);
 
-		fsm.addAction(State.SUSPENDING, "START", State.STARTING);
-		fsm.addAction(State.SUSPENDING, "RESTART", State.STARTING);
-		fsm.addAction(State.SUSPENDING, "DELETE", State.DELETING);
+		fsm.addAction(State.SUSPENDING, "start", State.STARTING);
+		fsm.addAction(State.SUSPENDING, "restart", State.STARTING);
+		fsm.addAction(State.SUSPENDING, "delete", State.DELETING);
 		fsm.addAction(State.SUSPENDING, "internal", State.SUSPENDED);
 
-		fsm.addAction(State.SUSPENDED, "START", State.STARTING);
-		fsm.addAction(State.SUSPENDED, "RESTART", State.STARTING);
-		fsm.addAction(State.SUSPENDED, "CAPTURE", State.SUSPENDED);
-		fsm.addAction(State.SUSPENDED, "DELETE", State.DELETING);
+		fsm.addAction(State.SUSPENDED, "start", State.STARTING);
+		fsm.addAction(State.SUSPENDED, "restart", State.STARTING);
+		fsm.addAction(State.SUSPENDED, "capture", State.SUSPENDED);
+		fsm.addAction(State.SUSPENDED, "delete", State.DELETING);
 
-		fsm.addAction(State.DELETING, "DELETE", State.DELETING);
+		fsm.addAction(State.DELETING, "delete", State.DELETING);
 		fsm.addAction(State.DELETING, "internal", State.DELETED);
     }
     /** get operations allowed in this state */
