@@ -46,14 +46,18 @@ import javax.persistence.OneToMany;
 public class CloudProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    public static enum CloudProviderType {
+        TYPE1, TYPE2, TYPE3, MOCK, EC2
+    };
+
     private Integer id;
 
-    private String cloudProviderType;
+    private CloudProviderType cloudProviderType;
 
     private String description;
 
     private Set<CloudProviderAccount> cloudProviderAccounts;
-    
+
     private Set<CloudProviderLocation> cloudProviderLocations;
 
     public CloudProvider() {
@@ -70,11 +74,11 @@ public class CloudProvider implements Serializable {
         this.id = id;
     }
 
-    public String getCloudProviderType() {
+    public CloudProviderType getCloudProviderType() {
         return this.cloudProviderType;
     }
 
-    public void setCloudProviderType(final String cloudProviderType) {
+    public void setCloudProviderType(final CloudProviderType cloudProviderType) {
         this.cloudProviderType = cloudProviderType;
     }
 
@@ -91,18 +95,19 @@ public class CloudProvider implements Serializable {
         return this.cloudProviderAccounts;
     }
 
-    public void setCloudProviderAccounts(final Set<CloudProviderAccount> cloudProviderAccounts) {
+    public void setCloudProviderAccounts(
+            final Set<CloudProviderAccount> cloudProviderAccounts) {
         this.cloudProviderAccounts = cloudProviderAccounts;
     }
 
-    @ManyToMany(mappedBy="cloudProviders")
-	public Set<CloudProviderLocation> getCloudProviderLocations() {
-		return cloudProviderLocations;
-	}
-	
-	public void setCloudProviderLocations(
-			Set<CloudProviderLocation> cloudProviderLocations) {
-		this.cloudProviderLocations = cloudProviderLocations;
-	}
+    @ManyToMany(mappedBy = "cloudProviders")
+    public Set<CloudProviderLocation> getCloudProviderLocations() {
+        return cloudProviderLocations;
+    }
+
+    public void setCloudProviderLocations(
+            Set<CloudProviderLocation> cloudProviderLocations) {
+        this.cloudProviderLocations = cloudProviderLocations;
+    }
 
 }

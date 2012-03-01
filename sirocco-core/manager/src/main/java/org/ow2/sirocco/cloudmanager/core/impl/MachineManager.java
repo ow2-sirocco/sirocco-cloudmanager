@@ -61,6 +61,7 @@ import org.ow2.sirocco.cloudmanager.core.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider.CloudProviderType;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
@@ -459,7 +460,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     }
 
     private void relConnector(final Machine m, final ICloudProviderConnector connector) throws CloudProviderException {
-        String cpType = m.getCloudProviderAccount().getCloudProvider().getCloudProviderType();
+        CloudProviderType cpType = m.getCloudProviderAccount().getCloudProvider().getCloudProviderType();
         ICloudProviderConnectorFactory cFactory = null;
         try {
             cFactory = this.cloudProviderConnectorFactoryFinder.getCloudProviderConnectorFactory(cpType);

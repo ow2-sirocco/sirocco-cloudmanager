@@ -27,7 +27,6 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.logging.Level;
 
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;

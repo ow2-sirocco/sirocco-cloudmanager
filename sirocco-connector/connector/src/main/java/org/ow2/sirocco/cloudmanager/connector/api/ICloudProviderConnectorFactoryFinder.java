@@ -27,10 +27,12 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 
 import java.util.List;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider.CloudProviderType;
+
 public interface ICloudProviderConnectorFactoryFinder {
 
     List<ICloudProviderConnectorFactory> listCloudProviderConnectorFactories();
 
-    ICloudProviderConnectorFactory getCloudProviderConnectorFactory(final String cloudProviderType);
+    ICloudProviderConnectorFactory getCloudProviderConnectorFactory(final CloudProviderType cloudProviderType);
 
 }

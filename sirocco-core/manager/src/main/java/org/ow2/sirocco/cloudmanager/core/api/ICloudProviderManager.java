@@ -30,59 +30,91 @@ import java.util.Map;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.UserException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider.CloudProviderType;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
 
 public interface ICloudProviderManager {
-	
-	static final String EJB_JNDI_NAME = "CloudProviderManager";
-	
-	CloudProvider createCloudProvider(String type,String description) throws CloudProviderException;
+
+    static final String EJB_JNDI_NAME = "CloudProviderManager";
+
+    CloudProvider createCloudProvider(CloudProviderType type, String description)
+            throws CloudProviderException;
+
     CloudProvider createCloudProvider(CloudProvider cp)
             throws CloudProviderException;
-	CloudProvider getCloudProviderById(String cloudProviderId) throws CloudProviderException;
-    CloudProvider updateCloudProvider(final String id,Map<String, Object> updatedAttributes) throws CloudProviderException;
-    CloudProvider updateCloudProvider(CloudProvider CP) throws CloudProviderException;
-    void deleteCloudProvider(String cloudProviderId) throws CloudProviderException;
 
-    CloudProviderAccount createCloudProviderAccount(String cloudProviderId, String user, String login,String password)
-        throws CloudProviderException;
+    CloudProvider getCloudProviderById(String cloudProviderId)
+            throws CloudProviderException;
+
+    CloudProvider updateCloudProvider(final String id,
+            Map<String, Object> updatedAttributes)
+            throws CloudProviderException;
+
+    CloudProvider updateCloudProvider(CloudProvider CP)
+            throws CloudProviderException;
+
+    void deleteCloudProvider(String cloudProviderId)
+            throws CloudProviderException;
+
+    CloudProviderAccount createCloudProviderAccount(String cloudProviderId,
+            String user, String login, String password)
+            throws CloudProviderException;
+
     CloudProviderAccount createCloudProviderAccount(CloudProviderAccount cpa)
             throws CloudProviderException;
-    CloudProviderAccount getCloudProviderAccountById(String cloudProviderAccountId) throws CloudProviderException;
-    CloudProviderAccount updateCloudProviderAccount(final String id,Map<String, Object> updatedAttributes) throws CloudProviderException;
-    CloudProviderAccount updateCloudProviderAccount(CloudProviderAccount CP) throws CloudProviderException;   
-    void deleteCloudProviderAccount(String cloudProviderAccountId) throws CloudProviderException;
 
+    CloudProviderAccount getCloudProviderAccountById(
+            String cloudProviderAccountId) throws CloudProviderException;
+
+    CloudProviderAccount updateCloudProviderAccount(final String id,
+            Map<String, Object> updatedAttributes)
+            throws CloudProviderException;
+
+    CloudProviderAccount updateCloudProviderAccount(CloudProviderAccount CP)
+            throws CloudProviderException;
+
+    void deleteCloudProviderAccount(String cloudProviderAccountId)
+            throws CloudProviderException;
 
     CloudProviderLocation createCloudProviderLocation(String Iso3166_1_Code,
             String Iso3166_2_Code, String postalCode, Double altitude,
             Double latitude, Double longitude, String countryName,
-            String stateName, String cityName) throws CloudProviderException;    
-    CloudProviderLocation createCloudProviderLocation(CloudProviderLocation cpl)throws CloudProviderException;
-    CloudProviderLocation updateCloudProviderLocation(final String id,Map<String, Object> updatedAttributes) throws CloudProviderException;
-    CloudProviderLocation updateCloudProviderLocation(CloudProviderLocation CP) throws CloudProviderException;
+            String stateName, String cityName) throws CloudProviderException;
+
+    CloudProviderLocation createCloudProviderLocation(CloudProviderLocation cpl)
+            throws CloudProviderException;
+
+    CloudProviderLocation updateCloudProviderLocation(final String id,
+            Map<String, Object> updatedAttributes)
+            throws CloudProviderException;
+
+    CloudProviderLocation updateCloudProviderLocation(CloudProviderLocation CP)
+            throws CloudProviderException;
+
     CloudProviderLocation getCloudProviderLocationById(
             String cloudProviderLocationId) throws CloudProviderException;
-    void deleteCloudProviderLocation(String cloudProviderLocationId) throws CloudProviderException;
 
-    
-    
-    void addCloudProviderAccountToUser(String userId, String cloudProviderAccountId) throws CloudProviderException,UserException;
-    void addCloudProviderAccountToUserByName(String userName, String cloudProviderAccountId) throws CloudProviderException,UserException;
- 	void removeCloudProviderAccountFromUser(String userId,
-			String cloudProviderAccountId) throws CloudProviderException,
-			UserException;
-	void removeCloudProviderAccountFromUserByName(String userName,
-			String cloudProviderAccountId) throws CloudProviderException,
-			UserException;
+    void deleteCloudProviderLocation(String cloudProviderLocationId)
+            throws CloudProviderException;
+
+    void addCloudProviderAccountToUser(String userId,
+            String cloudProviderAccountId) throws CloudProviderException,
+            UserException;
+
+    void addCloudProviderAccountToUserByName(String userName,
+            String cloudProviderAccountId) throws CloudProviderException,
+            UserException;
+
+    void removeCloudProviderAccountFromUser(String userId,
+            String cloudProviderAccountId) throws CloudProviderException,
+            UserException;
+
+    void removeCloudProviderAccountFromUserByName(String userName,
+            String cloudProviderAccountId) throws CloudProviderException,
+            UserException;
+
     double locationDistance(CloudProviderLocation pointA,
             CloudProviderLocation pointB) throws CloudProviderException;
-
-
-
-   
-
-
 
 }
