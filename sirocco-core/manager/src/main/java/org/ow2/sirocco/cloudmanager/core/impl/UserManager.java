@@ -89,9 +89,9 @@ public class UserManager implements IUserManager {
 
     @Override
     public User createUser(User u) throws UserException {
-        if (!isUserValid(u)) {
-            throw new UserException("user validation failed");
-        }
+        //if (!isUserValid(u)) {
+        //    throw new UserException("user validation failed");
+        //}
         createAllCollections(u);
         this.em.persist(u);
         return u;
@@ -197,9 +197,9 @@ public class UserManager implements IUserManager {
     public User updateUser(User user) throws UserException {
 
         Integer userId = user.getId();
-        if (!isUserValid(user)) {
-            throw new UserException("user validation failed");
-        }
+        //if (!isUserValid(user)) {
+        //    throw new UserException("user validation failed");
+        //}
         this.em.merge(user);
 
         return user;

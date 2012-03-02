@@ -100,7 +100,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     @Override
     public CloudProvider createCloudProvider(CloudProvider cp) throws CloudProviderException
     {
-        if (!isCloudProviderValid(cp)){throw new CloudProviderException("CloudProvider validation failed");};
+        //if (!isCloudProviderValid(cp)){throw new CloudProviderException("CloudProvider validation failed");};
 
         this.em.persist(cp);
         return cp;
@@ -152,7 +152,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     public CloudProviderAccount createCloudProviderAccount(CloudProviderAccount cpa) throws CloudProviderException
     {
         
-        if (!isCloudProviderAccountValid(cpa)){throw new CloudProviderException("CloudProviderAccount validation failed");};
+        //if (!isCloudProviderAccountValid(cpa)){throw new CloudProviderException("CloudProviderAccount validation failed");};
 
         this.em.persist(cpa);
         return cpa;
@@ -289,7 +289,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     public CloudProvider updateCloudProvider(CloudProvider CP)
             throws CloudProviderException {
 
-        if (!isCloudProviderValid(CP)){throw new CloudProviderException("CloudProvider validation failed");}
+        //if (!isCloudProviderValid(CP)){throw new CloudProviderException("CloudProvider validation failed");}
         Integer CPId = CP.getId();
         this.em.merge(CP);
 
@@ -318,7 +318,7 @@ public class CloudProviderManager implements ICloudProviderManager {
             CloudProviderAccount CPA) throws CloudProviderException {
 
         Integer CPAId = CPA.getId();
-        if (!isCloudProviderAccountValid(CPA)){throw new CloudProviderException("CloudProviderAccount validation failed");};
+        //if (!isCloudProviderAccountValid(CPA)){throw new CloudProviderException("CloudProviderAccount validation failed");};
 
         this.em.merge(CPA);
 
@@ -353,7 +353,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         cpl.setIso3166_2(normalizeLabel(cpl.getIso3166_2()));
         cpl.setPostalCode(normalizeLabel(cpl.getPostalCode()));
         
-        if (!isCloudProviderLocationValid(cpl)){throw new CloudProviderException("CloudProviderLocation validation failed");}
+        //if (!isCloudProviderLocationValid(cpl)){throw new CloudProviderException("CloudProviderLocation validation failed");}
       
         this.em.persist(cpl);
         
@@ -416,7 +416,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     public CloudProviderLocation updateCloudProviderLocation(
             CloudProviderLocation CPL) throws CloudProviderException {
 
-        if (!isCloudProviderLocationValid(CPL)){throw new CloudProviderException("CloudProviderLocation validation failed");}
+        //if (!isCloudProviderLocationValid(CPL)){throw new CloudProviderException("CloudProviderLocation validation failed");}
         
         Integer CPLId = CPL.getId();
         this.em.merge(CPL);
