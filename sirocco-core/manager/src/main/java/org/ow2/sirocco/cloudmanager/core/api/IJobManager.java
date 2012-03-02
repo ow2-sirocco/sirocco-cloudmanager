@@ -24,7 +24,7 @@
  */
 package org.ow2.sirocco.cloudmanager.core.api;
 
-import org.ow2.sirocco.cloudmanager.core.exception.JobException;
+import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 
@@ -33,17 +33,17 @@ public interface IJobManager {
     static final String EJB_JNDI_NAME = "JobManager";
 
     Job createJob(String targetEntity, String action, String parentJob)
-            throws JobException;
+            throws CloudProviderException;
 
-    Job getJobById(String id) throws JobException;
+    Job getJobById(String id) throws CloudProviderException;
 
-    Job updateJob(Job job) throws JobException;
+    Job updateJob(Job job) throws CloudProviderException;
 
-    JobCollection getJobCollection() throws JobException;
+    JobCollection getJobCollection() throws CloudProviderException;
 
     JobCollection updateJobCollection(JobCollection jobColl)
-            throws JobException;
+            throws CloudProviderException;
 
-    void deleteJob(String id) throws JobException;
+    void deleteJob(String id) throws CloudProviderException;
 
 }

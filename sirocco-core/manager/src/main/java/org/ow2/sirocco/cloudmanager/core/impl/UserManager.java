@@ -43,7 +43,6 @@ import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.UserException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
@@ -75,7 +74,7 @@ public class UserManager implements IUserManager {
 
     @Override
     public User createUser(String firstName, String lastName, String email,
-            String username, String password) throws UserException {
+            String username, String password) throws CloudProviderException {
         User u = new User();
         u.setFirstName(firstName);
         u.setLastName(lastName);
@@ -88,7 +87,7 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public User createUser(User u) throws UserException {
+    public User createUser(User u) throws CloudProviderException {
         //if (!isUserValid(u)) {
         //    throw new UserException("user validation failed");
         //}
@@ -157,7 +156,7 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public User getUserById(String userId) throws UserException {
+    public User getUserById(String userId) throws CloudProviderException {
 
         User result = this.em.find(User.class, new Integer(userId));
 
@@ -166,7 +165,7 @@ public class UserManager implements IUserManager {
 
     @SuppressWarnings("unchecked")
     @Override
-    public User getUserByUsername(String userName) throws UserException {
+    public User getUserByUsername(String userName) throws CloudProviderException {
 
         User u = null;
 
@@ -179,7 +178,7 @@ public class UserManager implements IUserManager {
 
     @Override
     public User updateUser(String id, Map<String, Object> updatedAttributes)
-            throws UserException {
+            throws CloudProviderException {
 
         User u = this.getUserById(id);
 
@@ -187,14 +186,14 @@ public class UserManager implements IUserManager {
             UtilsForManagers.fillObject(u, updatedAttributes);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new UserException();
+            throw new CloudProviderException();
         }
 
         return this.updateUser(u);
     }
 
     @Override
-    public User updateUser(User user) throws UserException {
+    public User updateUser(User user) throws CloudProviderException {
 
         Integer userId = user.getId();
         //if (!isUserValid(user)) {
@@ -206,7 +205,7 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public void deleteUser(String userId) throws UserException {
+    public void deleteUser(String userId) throws CloudProviderException {
 
         User result = this.getUserById(userId);
 

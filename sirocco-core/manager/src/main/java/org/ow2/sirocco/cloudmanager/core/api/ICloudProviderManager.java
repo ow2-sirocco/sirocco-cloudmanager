@@ -28,7 +28,6 @@ package org.ow2.sirocco.cloudmanager.core.api;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.UserException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
@@ -97,20 +96,16 @@ public interface ICloudProviderManager {
             throws CloudProviderException;
 
     void addCloudProviderAccountToUser(String userId,
-            String cloudProviderAccountId) throws CloudProviderException,
-            UserException;
+            String cloudProviderAccountId) throws CloudProviderException;
 
     void addCloudProviderAccountToUserByName(String userName,
-            String cloudProviderAccountId) throws CloudProviderException,
-            UserException;
+            String cloudProviderAccountId) throws CloudProviderException;
 
     void removeCloudProviderAccountFromUser(String userId,
-            String cloudProviderAccountId) throws CloudProviderException,
-            UserException;
+            String cloudProviderAccountId) throws CloudProviderException;
 
     void removeCloudProviderAccountFromUserByName(String userName,
-            String cloudProviderAccountId) throws CloudProviderException,
-            UserException;
+            String cloudProviderAccountId) throws CloudProviderException;
 
     double locationDistance(CloudProviderLocation pointA,
             CloudProviderLocation pointB) throws CloudProviderException;

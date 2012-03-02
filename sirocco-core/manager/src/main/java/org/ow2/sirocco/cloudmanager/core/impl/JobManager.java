@@ -22,7 +22,6 @@ import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
-import org.ow2.sirocco.cloudmanager.core.exception.JobException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
@@ -47,7 +46,7 @@ public class JobManager implements IJobManager {
     private EJBContext ctx;
 
     public Job createJob(String targetEntity, String action, String parentJob)
-            throws JobException {
+            throws CloudProviderException {
 
         Job j = new Job();
         j.setTargetEntity(targetEntity);
@@ -57,7 +56,7 @@ public class JobManager implements IJobManager {
         if (parentJob != null) {
             Job parent = this.getJobById(parentJob);
             if (parent == null) {
-                throw new JobException();
+                throw new CloudProviderException();
             } else {
                 j.setParentJob(parent);
             }
@@ -70,14 +69,14 @@ public class JobManager implements IJobManager {
     }
 
     @Override
-    public Job getJobById(String id) throws JobException {
+    public Job getJobById(String id) throws CloudProviderException {
 
         Job result = this.em.find(Job.class, new Integer(id));
         return result;
     }
 
     @Override
-    public Job updateJob(Job job) throws JobException {
+    public Job updateJob(Job job) throws CloudProviderException {
 
         Integer jobId = job.getId();
         this.em.merge(job);
@@ -113,20 +112,20 @@ public class JobManager implements IJobManager {
     }*/
 
     @Override
-    public JobCollection getJobCollection() throws JobException {
+    public JobCollection getJobCollection() throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public JobCollection updateJobCollection(JobCollection jobColl)
-            throws JobException {
+            throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void deleteJob(String id) throws JobException {
+    public void deleteJob(String id) throws CloudProviderException {
         Job result = this.getJobById(id);
 
         if (result != null) {

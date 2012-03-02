@@ -55,7 +55,6 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.UserException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
@@ -191,7 +190,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     @Override
     public void addCloudProviderAccountToUser(String userId,
             String cloudProviderAccountId) throws CloudProviderException,
-            UserException {
+            CloudProviderException {
 
         CloudProviderAccount cpa = this
                 .getCloudProviderAccountById(cloudProviderAccountId);
@@ -213,7 +212,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     @Override
     public void addCloudProviderAccountToUserByName(String userName,
             String cloudProviderAccountId) throws CloudProviderException,
-            UserException {
+            CloudProviderException {
 
         this.addCloudProviderAccountToUser(
                 userManager.getUserByUsername(userName).getId().toString(),
@@ -230,7 +229,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     @Override
     public void removeCloudProviderAccountFromUser(String userId,
             String cloudProviderAccountId) throws CloudProviderException,
-            UserException {
+            CloudProviderException {
 
         CloudProviderAccount cpa = this
                 .getCloudProviderAccountById(cloudProviderAccountId);
@@ -251,7 +250,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     @Override
     public void removeCloudProviderAccountFromUserByName(String userName,
             String cloudProviderAccountId) throws CloudProviderException,
-            UserException {
+            CloudProviderException {
 
         this.removeCloudProviderAccountFromUser(
                 userManager.getUserByUsername(userName).getId().toString(),

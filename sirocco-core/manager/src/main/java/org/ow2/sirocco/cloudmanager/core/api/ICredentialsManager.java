@@ -26,7 +26,6 @@
 package org.ow2.sirocco.cloudmanager.core.api;
 
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.UserException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 
 

@@ -43,7 +43,6 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.UserException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
@@ -51,6 +50,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.User;
 @Stateless(name = IMachineImageManager.EJB_JNDI_NAME, mappedName = IMachineImageManager.EJB_JNDI_NAME)
 @Remote(IRemoteMachineImageManager.class)
 @Local(IMachineImageManager.class)
+@SuppressWarnings("unused")
 public class MachineImageManager implements IMachineImageManager {
 
     private static Logger logger = Logger.getLogger(MachineImageManager.class.getName());
@@ -71,7 +71,7 @@ public class MachineImageManager implements IMachineImageManager {
         this.ctx = ctx;
     }
 
-    private void setUser() throws UserException {
+    private void setUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
         this.user = this.userManager.getUserByUsername(username);
     }
