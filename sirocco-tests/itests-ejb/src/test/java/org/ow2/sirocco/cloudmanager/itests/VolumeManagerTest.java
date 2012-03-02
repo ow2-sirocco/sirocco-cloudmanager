@@ -150,10 +150,10 @@ public class VolumeManagerTest {
 
         this.connectToCloudManager();
 
-        User user = this.userManager.createUser("", "", "", VolumeManagerTest.USER_NAME, "password");
-        CloudProvider provider = this.cloudProviderManager.createCloudProvider(VolumeManagerTest.CLOUD_PROVIDER_TYPE, "test");
+        User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", VolumeManagerTest.USER_NAME, "232908Ivry");
+        CloudProvider provider = this.cloudProviderManager.createCloudProvider(VolumeManagerTest.CLOUD_PROVIDER_TYPE, "mock");
         CloudProviderAccount account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(),
-            VolumeManagerTest.USER_NAME, VolumeManagerTest.ACCOUNT_LOGIN, VolumeManagerTest.ACCOUNT_CREDENTIALS);
+            VolumeManagerTest.ACCOUNT_LOGIN, VolumeManagerTest.ACCOUNT_CREDENTIALS);
         this.cloudProviderManager.addCloudProviderAccountToUser(user.getId().toString(), account.getId().toString());
     }
 
