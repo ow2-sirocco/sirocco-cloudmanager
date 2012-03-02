@@ -168,8 +168,14 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 	private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount account,
 			final CloudProviderLocation location) throws CloudProviderException {
 
+		if (account == null) {
+			throw new CloudProviderException("Cloud provider account ");
+		}
 		ICloudProviderConnectorFactory connectorFactory = this.cloudProviderConnectorFactoryFinder
 				.getCloudProviderConnectorFactory(account.getCloudProvider().getCloudProviderType());
+		if (connectorFactory == null) {
+			throw new CloudProviderException(" Internal error in connector factory ");
+		}
 		return connectorFactory.getCloudProviderConnector(account, location);
 	}
 
@@ -255,7 +261,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		if (this.checkQuota(this.user, mt.getMachineConfiguration()) == false) {
 			throw new CloudProviderException("User exceeded quota ");
 		}
-
+		MachineManager.logger.info(" selectCloudProviders ");
 		/**
 		 * Obtain list of matching provider
 		 */
@@ -265,6 +271,8 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		}
 		CloudProviderAccount account = null;
 		CloudProvider myprovider = null;
+		
+		MachineManager.logger.info(" selectCloudProviderAccounts ");
 		for (CloudProvider cp : providers) {
 			/**
 			 * Select provider account to use
@@ -287,7 +295,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 					+ account.getCloudProvider().getCloudProviderType());
 		}
 		String connectorid = connector.getCloudProviderId();
-
+		MachineManager.logger.info(" got a connector " +connectorid);
 		Job creationJob = null;
 		IComputeService computeService = null;
 
