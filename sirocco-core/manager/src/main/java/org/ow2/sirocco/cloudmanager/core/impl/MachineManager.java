@@ -61,7 +61,6 @@ import org.ow2.sirocco.cloudmanager.core.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider.CloudProviderType;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
@@ -124,7 +123,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 		List<CloudProvider> l = new ArrayList<CloudProvider>();
 
 		Query q = this.em.createQuery("FROM CloudProvider c WHERE c.cloudProviderType=:type");
-		q.setParameter("type", CloudProvider.CloudProviderType.MOCK);
+		q.setParameter("type", "MOCK");
 
 		q.setMaxResults(1);
 		List<CloudProvider> cp = q.getResultList();
@@ -473,7 +472,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 	}
 
 	private void relConnector(final Machine m, final ICloudProviderConnector connector) throws CloudProviderException {
-		CloudProvider.CloudProviderType cpType = m.getCloudProviderAccount().getCloudProvider().getCloudProviderType();
+		String cpType = m.getCloudProviderAccount().getCloudProvider().getCloudProviderType();
 		ICloudProviderConnectorFactory cFactory = null;
 		try {
 			cFactory = this.cloudProviderConnectorFactoryFinder.getCloudProviderConnectorFactory(cpType);
