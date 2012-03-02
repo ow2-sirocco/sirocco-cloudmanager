@@ -30,7 +30,6 @@ import java.util.Map;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.UserException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider.CloudProviderType;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
 
@@ -38,7 +37,7 @@ public interface ICloudProviderManager {
 
     static final String EJB_JNDI_NAME = "CloudProviderManager";
 
-    CloudProvider createCloudProvider(CloudProviderType type, String description)
+    CloudProvider createCloudProvider(String type, String description)
             throws CloudProviderException;
 
     CloudProvider createCloudProvider(CloudProvider cp)
@@ -58,8 +57,7 @@ public interface ICloudProviderManager {
             throws CloudProviderException;
 
     CloudProviderAccount createCloudProviderAccount(String cloudProviderId,
-            String user, String login, String password)
-            throws CloudProviderException;
+            String login, String password) throws CloudProviderException;
 
     CloudProviderAccount createCloudProviderAccount(CloudProviderAccount cpa)
             throws CloudProviderException;

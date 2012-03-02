@@ -34,7 +34,6 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.util.tracker.ServiceTracker;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider.CloudProviderType;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
@@ -70,7 +69,7 @@ public class CloudProviderConnectorFactoryFinderImpl implements ICloudProviderCo
     }
 
     @Override
-    public ICloudProviderConnectorFactory getCloudProviderConnectorFactory(final CloudProviderType cloudProviderType) {
+    public ICloudProviderConnectorFactory getCloudProviderConnectorFactory(final String cloudProviderType) {
         if (cloudProviderType == null) {
             throw new NullPointerException();
         }

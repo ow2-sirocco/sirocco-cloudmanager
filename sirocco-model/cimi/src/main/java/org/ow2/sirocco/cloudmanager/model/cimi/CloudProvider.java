@@ -46,13 +46,9 @@ import javax.persistence.OneToMany;
 public class CloudProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public static enum CloudProviderType {
-        TYPE1, TYPE2, TYPE3, MOCK, EC2
-    };
-
     private Integer id;
 
-    private CloudProviderType cloudProviderType;
+    private String cloudProviderType;
 
     private String description;
 
@@ -74,11 +70,11 @@ public class CloudProvider implements Serializable {
         this.id = id;
     }
 
-    public CloudProviderType getCloudProviderType() {
+    public String getCloudProviderType() {
         return this.cloudProviderType;
     }
 
-    public void setCloudProviderType(final CloudProviderType cloudProviderType) {
+    public void setCloudProviderType(final String cloudProviderType) {
         this.cloudProviderType = cloudProviderType;
     }
 
