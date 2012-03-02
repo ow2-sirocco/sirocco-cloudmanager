@@ -25,96 +25,102 @@
 
 package org.ow2.sirocco.cloudmanager.core.api;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.exception.ResourceConflictException;
+import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
-import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
-import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
-
 public interface IMachineManager {
 
-	static final String EJB_JNDI_NAME = "MachineManager";
+    static final String EJB_JNDI_NAME = "MachineManager";
 
-	/**
-	 * Operations on MachineCollection
-	 */
-	Job createMachine(MachineCreate machineCreate) throws InvalidRequestException, CloudProviderException;
-	List<Machine> getMachines(int first, int last, List<String> attributes) throws CloudProviderException;
-	List<Machine> getMachinesAttributes(List<String> attributes, String queryExpression)  throws CloudProviderException;
+    /**
+     * Operations on MachineCollection
+     */
+    Job createMachine(MachineCreate machineCreate) throws ResourceConflictException, InvalidRequestException,
+        CloudProviderException;
 
-	/**
-	 * Operations on Machine
-	 */
-	Job startMachine(final String machineId) throws CloudProviderException;
-	Job stopMachine(final String machineId) throws CloudProviderException;
-	Job deleteMachine(final String machineId) throws CloudProviderException;
+    List<Machine> getMachines(int first, int last, List<String> attributes) throws InvalidRequestException,
+        CloudProviderException;
 
-	Machine getMachineById(final String machineId) 
-			throws ResourceNotFoundException,  CloudProviderException;
+    List<Machine> getMachinesAttributes(List<String> attributes, String queryExpression) throws InvalidRequestException,
+        CloudProviderException;
 
-	Machine getMachineAttributes(final String machineId, 
-				     List<String> attributes) 
-		 throws CloudProviderException;
+    /**
+     * Operations on Machine
+     */
+    Job startMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
-	Job updateMachine(final String machineId, 
-			  Map<String, Object> updatedAttributes)
-		 throws CloudProviderException;
+    Job stopMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
-	/**
-	 * Operations on MachineCollection
-	 */
-	MachineCollection	getMachineCollection()
-	         throws CloudProviderException;
+    Job deleteMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
-	void	updateMachineCollection(Map<String, Object> attributes)
-	         throws CloudProviderException;
+    Machine getMachineById(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
-	/**
-	 * Operations on MachineConfiguration
-	 */
-	MachineConfiguration getMachineConfiguration(final String MachineId) throws CloudProviderException;;
-	void updateMachineConfiguration(String machineConfigurationId, 
-			  					   Map<String, Object> updatedAttributes)
-				      throws CloudProviderException;
-	void deleteMachineConfiguration(final String machineConfigurationId)
-				      throws CloudProviderException;
+    Machine getMachineAttributes(final String machineId, List<String> attributes) throws ResourceNotFoundException,
+        CloudProviderException;
 
-	/**
-	 * Operations on MachineConfigurationCollection
-	 */
-	MachineConfigurationCollection getMachineConfigurationCollection() throws CloudProviderException;
-	MachineConfiguration createMachineConfiguration(MachineConfiguration machineConfig)
-						throws CloudProviderException;
+    Job updateMachine(final String machineId, Map<String, Object> updatedAttributes) throws ResourceNotFoundException,
+        CloudProviderException;
 
-	/**
-	 * Operations on MachineTemplate
-	 */
-	MachineTemplate getMachineTemplate(String machineTemplateId) throws CloudProviderException;
-	MachineTemplate updateMachineTemplate(String machineTemplateId, Map<String, Object> attributes)
-		throws CloudProviderException;
-	void deleteMachineTemplate(String machineTemplateId) throws CloudProviderException;
+    /**
+     * Operations on MachineCollection
+     */
+    MachineCollection getMachineCollection() throws CloudProviderException;
 
-	/**
-	 * Operations on MachineTemplateCollection
-	 */
-	MachineTemplate	createMachineTemplate(MachineTemplate machineTemplate) 
-		throws CloudProviderException;
-	MachineTemplateCollection getMachineTemplateCollection()
-		throws CloudProviderException;
-	void updateMachineTemplateCollection(Map<String, Object> attributes )
-		throws CloudProviderException;
-	
-	boolean machineCompletionHandler(final Job job);
-	
+    void updateMachineCollection(Map<String, Object> attributes) throws InvalidRequestException, CloudProviderException;
+
+    /**
+     * Operations on MachineConfiguration
+     */
+    MachineConfiguration getMachineConfiguration(final String MachineId) throws ResourceNotFoundException,
+        CloudProviderException;;
+
+    void updateMachineConfiguration(String machineConfigurationId, Map<String, Object> updatedAttributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
+
+    void deleteMachineConfiguration(final String machineConfigurationId) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    /**
+     * Operations on MachineConfigurationCollection
+     */
+    MachineConfigurationCollection getMachineConfigurationCollection() throws CloudProviderException;
+
+    MachineConfiguration createMachineConfiguration(MachineConfiguration machineConfig) throws InvalidRequestException,
+        CloudProviderException;
+
+    /**
+     * Operations on MachineTemplate
+     */
+    MachineTemplate getMachineTemplate(String machineTemplateId) throws ResourceNotFoundException, CloudProviderException;
+
+    MachineTemplate updateMachineTemplate(String machineTemplateId, Map<String, Object> attributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
+
+    void deleteMachineTemplate(String machineTemplateId) throws ResourceNotFoundException, CloudProviderException;
+
+    /**
+     * Operations on MachineTemplateCollection
+     */
+    MachineTemplate createMachineTemplate(MachineTemplate machineTemplate) throws InvalidRequestException,
+        CloudProviderException;
+
+    MachineTemplateCollection getMachineTemplateCollection() throws CloudProviderException;
+
+    void updateMachineTemplateCollection(Map<String, Object> attributes) throws InvalidRequestException, CloudProviderException;
+
+    boolean machineCompletionHandler(final Job job);
+
 }
