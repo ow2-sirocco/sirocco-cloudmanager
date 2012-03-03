@@ -28,13 +28,16 @@ package org.ow2.sirocco.cloudmanager.core.api;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 
 
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-
+import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 
 public interface IMachineImageManager {
 
@@ -46,5 +49,22 @@ public interface IMachineImageManager {
 	
 	MachineImage getMachineImage(String imageId)throws CloudProviderException;
 	
-	void deleteMachineImage(String imageId)throws CloudProviderException;
+	void deleteMachineImage(String imageId)throws ResourceNotFoundException, CloudProviderException;
+	
+	void updateMachineImageAttributes(String imageId, Map<String, Object> attributes) 
+			throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
+
+	List<MachineImage> getMachineImages(List<String> attributes, String filterExpression) 
+			throws InvalidRequestException, CloudProviderException;
+
+	List<MachineImage> getMachineImages(int first, int last, List<String> attributes) 
+				throws InvalidRequestException, CloudProviderException;
+
+	MachineImageCollection getMachineImageCollection() 
+			throws CloudProviderException;
+
+	void updateMachineImageCollection(Map<String, Object> attributes) 
+			throws CloudProviderException;
+
+
 }
