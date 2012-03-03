@@ -41,11 +41,11 @@ public class MachineImageCollection  extends CloudEntity implements Serializable
 	List<MachineImage> images;
 	
 	@Transient
-	public List<MachineImage> getMachines(){
+	public List<MachineImage> getImages(){
 		return this.images;
 	}
 	@Transient
-	public void setMachines(List<MachineImage> images){
+	public void setImages(List<MachineImage> images){
 		this.images = images;
 	}
 }
