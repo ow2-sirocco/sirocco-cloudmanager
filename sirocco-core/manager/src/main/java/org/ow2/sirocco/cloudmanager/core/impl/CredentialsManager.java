@@ -51,6 +51,7 @@ import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
 
@@ -103,7 +104,7 @@ public class CredentialsManager implements ICredentialsManager {
     public Credentials createCredentials(final Credentials credentials) throws CloudProviderException {
         this.setUser();
         // validate user
-
+        CredentialsManager.logger.info("validateCredentials ");
         this.validateCredentials(credentials);
         credentials.setCreated(new Date());
         credentials.setUser(this.user);
@@ -157,7 +158,8 @@ public class CredentialsManager implements ICredentialsManager {
         return cred;
     }
 
-    public void deleteCredentials(final String credentialsId) throws CloudProviderException {
+    public void deleteCredentials(final String credentialsId) 
+    		throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         this.setUser();
         if (credentialsId == null) {
             throw new InvalidRequestException("null credentials id");
@@ -210,7 +212,8 @@ public class CredentialsManager implements ICredentialsManager {
 
     public List<Credentials> getCredentials(List<String> attributes, String filterExpression)
     		throws InvalidRequestException, CloudProviderException {
-    	return new ArrayList<Credentials>();
+    	this.setUser();
+    	throw new InvalidRequestException(" getCredentials with filter expression ");
     }
 
     public List<Credentials> getCredentials(int first, int last, List<String> attributes) throws InvalidRequestException,
@@ -222,7 +225,7 @@ public class CredentialsManager implements ICredentialsManager {
          }
 
          Query query = this.em
-             .createNamedQuery("FROM Credentials c WHERE v.user.username=:userName ORDER BY v.id");
+             .createNamedQuery("FROM Credentials c WHERE c.user.username=:userName ORDER BY c.id");
          query.setParameter("userName", this.user.getUsername());
          query.setMaxResults(last - first + 1);
          query.setFirstResult(first);
@@ -231,13 +234,44 @@ public class CredentialsManager implements ICredentialsManager {
          return creds;
     	
     }
-/**
-    CredentialsCollection getCredentialsCollection() throws CloudProviderException {
-    	
+
+    public CredentialsCollection getCredentialsCollection() throws CloudProviderException {
+    
+    	this.setUser();
+        Integer userid = this.user.getId();
+        Query query = this.em.createQuery("SELECT c FROM Credentials c WHERE c.user.id=:userid");
+        List<Credentials> creds = query.setParameter("userid", userid).getResultList();
+        CredentialsCollection collection = null;
+        try {
+        	collection = (CredentialsCollection) this.em
+        			.createQuery("FROM CredentialsCollection m WHERE m.user.id=:userid").setParameter("userid", userid)
+        			.getSingleResult();
+        } catch (Exception e) {
+        	throw new CloudProviderException(" Internal error " +e.getMessage());
+        }
+        collection.setCredentials(creds);
+        return collection;
     }
 
-    void updateCredentialsCollection(Map<String, Object> attributes) throws CloudProviderException {
+    public void updateCredentialsCollection(Map<String, Object> attributes) throws CloudProviderException {
     	
+    	this.setUser();
+    	Integer userid = user.getId();
+    	CredentialsCollection collection = null;
+    	try {
+        	collection = (CredentialsCollection) this.em
+        			.createQuery("FROM CredentialsCollection m WHERE m.user.id=:userid").setParameter("userid", userid)
+        			.getSingleResult();
+        } catch (Exception e) {
+        	throw new CloudProviderException(" Internal error " +e.getMessage());
+        }
+    	
+    	try {
+            UtilsForManagers.fillObject(collection, attributes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CloudProviderException("Error updating credentials collection " +e.getMessage());
+        }
     }
-*/
+
 }

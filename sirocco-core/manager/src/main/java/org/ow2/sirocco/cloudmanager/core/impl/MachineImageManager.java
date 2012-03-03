@@ -27,6 +27,8 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -37,15 +39,21 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
+import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 
 @Stateless(name = IMachineImageManager.EJB_JNDI_NAME, mappedName = IMachineImageManager.EJB_JNDI_NAME)
 @Remote(IRemoteMachineImageManager.class)
@@ -121,8 +129,120 @@ public class MachineImageManager implements IMachineImageManager {
         return image;
     }
 
-    public void deleteMachineImage(final String imageId) throws CloudProviderException {
+	public void deleteMachineImage(final String imageId)
+			throws CloudProviderException, ResourceNotFoundException {
+		setUser();
+		MachineImage image = null;
+        try {
+            image = this.em.find(MachineImage.class, Integer.valueOf(imageId));
 
-    }
+        } catch (Exception e) {
+            throw new CloudProviderException("MachineImage of identity " + imageId + " cannot be found ");
+        }
+        
+        /** if related image is not null then do not permit deletion */
+        if (image.getRelatedImage() != null) {
+        	throw new CloudProviderException("Related images exist for this image" +imageId);
+        }
+        /** if a machine template referernces the image do not permit deletion */
+        List<MachineTemplate> templates = null;
+        try {
+            templates = this.em.createQuery("FROM MachineTemplate t WHERE t.machineImage.id=:mid")
+                .setParameter("id", Integer.valueOf(imageId)).getResultList();
+        } catch (Exception e) {
+            throw new CloudProviderException("Internal query error" +e.getMessage());
+        }
+        if (templates != null ) {
+        	throw new CloudProviderException("Machine templates refer to this image " +imageId);
+        }
+        Set<MachineImage> images = user.getImages();
+        images.remove(image);
+        user.setImages(images);
+        
+        em.remove(image);
+        em.flush();
+        
+	}
+
+	public List<MachineImage> getMachineImages(List<String> attributes, String filterExpression) 
+					throws InvalidRequestException, CloudProviderException {
+		throw new InvalidRequestException(" Select images by query expression not supported ");
+	}
+
+	public List<MachineImage> getMachineImages(int first, int last, List<String> attributes) 
+			throws InvalidRequestException, CloudProviderException {
+		this.setUser();
+        if ((first < 0) || (last < 0) || (last < first)) {
+            throw new InvalidRequestException(" Illegal array index " + first + " " + last);
+        }
+
+        Query query = this.em
+            .createNamedQuery("FROM MachineImage i WHERE i.user.username=:userName ORDER BY i.id");
+        query.setParameter("userName", this.user.getUsername());
+        query.setMaxResults(last - first + 1);
+        query.setFirstResult(first);
+        List<MachineImage> images = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
+        
+        return images;
+	}
+
+	public MachineImageCollection getMachineImageCollection()
+			throws CloudProviderException {
+	
+		this.setUser();
+        Integer userid = this.user.getId();
+        Query query = this.em.createQuery("SELECT i FROM MachineImage i WHERE i.user.id=:userid");
+        List<MachineImage> images = query.setParameter("userid", userid).getResultList();
+        MachineImageCollection collection = null;
+        try {
+        	collection = (MachineImageCollection) this.em
+        			.createQuery("FROM MachineImageCollection m WHERE m.user.id=:userid").setParameter("userid", userid)
+        			.getSingleResult();
+        } catch (Exception e) {
+        	throw new CloudProviderException(" Internal error " +e.getMessage());
+        }
+        collection.setImages(images);
+        return collection;
+	}
+
+	public void updateMachineImageCollection(Map<String, Object> attributes)
+			throws CloudProviderException {
+		this.setUser();
+		Integer userid = user.getId();
+		MachineImageCollection collection = null;
+    	try {
+    		 collection = (MachineImageCollection) this.em
+        			.createQuery("FROM MachineImageCollection m WHERE m.user.id=:userid").setParameter("userid", userid)
+        			.getSingleResult();
+        } catch (Exception e) {
+        	throw new CloudProviderException(" Internal error " +e.getMessage());
+        }
+    	
+    	try {
+            UtilsForManagers.fillObject(collection, attributes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CloudProviderException("Error updating machine image collection " +e.getMessage());
+        }
+	}
+	
+	public void updateMachineImageAttributes(String imageId, Map<String, Object> attributes) 
+			throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
+		
+		setUser();
+		MachineImage image = null;
+        try {
+            image = this.em.find(MachineImage.class, Integer.valueOf(imageId));
+        } catch (Exception e) {
+            throw new ResourceNotFoundException("MachineImage of identity " + imageId + " cannot be found ");
+        }
+    	try {
+    		// TODO Filter RO attributes
+            UtilsForManagers.fillObject(image, attributes);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new CloudProviderException("Error updating machine image  " +e.getMessage());
+        }
+	}
 
 }
