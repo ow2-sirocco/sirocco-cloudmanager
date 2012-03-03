@@ -25,9 +25,14 @@
 
 package org.ow2.sirocco.cloudmanager.core.api;
 
-import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import java.util.List;
+import java.util.Map;
 
+import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
 
 public interface ICredentialsManager {
 	
@@ -36,6 +41,24 @@ public interface ICredentialsManager {
 	Credentials createCredentials(Credentials credentials) throws CloudProviderException;
     Credentials updateCredentials(Credentials credentials) throws CloudProviderException;
     Credentials getCredentialsById(String credentialsId) throws CloudProviderException;
-    void deleteCredentials(String credentialsId) throws CloudProviderException;
+    void deleteCredentials(String credentialsId) throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
+
+	void updateCredentialsAttributes(String credentialsId,
+			Map<String, Object> attributes) throws ResourceNotFoundException,
+			InvalidRequestException, CloudProviderException;
+
+	List<Credentials> getCredentials(List<String> attributes,
+			String filterExpression) throws InvalidRequestException,
+			CloudProviderException;
+
+	List<Credentials> getCredentials(int first, int last,
+									 List<String> attributes) 
+					throws InvalidRequestException, CloudProviderException;
+
+	CredentialsCollection getCredentialsCollection()
+			throws CloudProviderException;
+
+	void updateCredentialsCollection(Map<String, Object> attributes)
+			throws CloudProviderException;
 
 }
