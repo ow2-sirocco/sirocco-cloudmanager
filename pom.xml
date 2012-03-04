@@ -54,6 +54,7 @@
 		<module>sirocco-model</module>
 		<module>sirocco-core</module>
 		<module>sirocco-connector</module>
+		<module>sirocco-apis</module>
 		<module>sirocco-ear</module>
 		<module>sirocco-tests</module>
 	</modules>

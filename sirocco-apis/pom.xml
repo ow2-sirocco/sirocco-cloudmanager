@@ -38,13 +38,7 @@
 	<name>SIROCCO :: CloudManager :: APIs</name>
 
 
-	<properties>
-		<cxf.version>2.3.3</cxf.version>
-	</properties>
-
 	<modules>
-		<module>sirocco</module>
-		<module>command-line-tools</module>
 	</modules>
 
 </project>
