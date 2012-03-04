@@ -24,25 +24,40 @@
  */
 package org.ow2.sirocco.cloudmanager.core.api;
 
+import java.util.List;
+import java.util.Map;
+
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 
+/**
+ * Job management operations
+ */
 public interface IJobManager {
 
     static final String EJB_JNDI_NAME = "JobManager";
 
-    Job createJob(String targetEntity, String action, String parentJob)
-            throws CloudProviderException;
+    Job createJob(String targetEntity, String action, String parentJob) throws CloudProviderException;
 
-    Job getJobById(String id) throws CloudProviderException;
+    Job getJobById(String id) throws ResourceNotFoundException, CloudProviderException;
+
+    Job getJobAttributes(final String id, List<String> attributes) throws ResourceNotFoundException, CloudProviderException;
+
+    List<Job> getJobs(List<String> attributes, String filterExpression) throws InvalidRequestException, CloudProviderException;
+
+    List<Job> getJobs(int first, int last, List<String> attributes) throws InvalidRequestException, CloudProviderException;
 
     Job updateJob(Job job) throws CloudProviderException;
 
+    Job updateJobAttributes(String id, Map<String, Object> updatedAttributes) throws ResourceNotFoundException,
+        InvalidRequestException, CloudProviderException;
+
     JobCollection getJobCollection() throws CloudProviderException;
 
-    JobCollection updateJobCollection(JobCollection jobColl)
-            throws CloudProviderException;
+    JobCollection updateJobCollection(JobCollection jobColl) throws CloudProviderException;
 
     void deleteJob(String id) throws CloudProviderException;
 
