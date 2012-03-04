@@ -266,7 +266,6 @@ public interface IVolumeManager {
      * 
      * @param volumeConfigId the id of the VolumeConfiguration
      * @param updatedAttributes the list of attributes to update
-     * @return the job representing the asynchronous update operation
      * @throws ResourceNotFoundException raised if the provided id is invalid
      * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if any other type of runtime fault
@@ -280,7 +279,6 @@ public interface IVolumeManager {
      * 
      * @param volumeTemplateId the id of the VolumeTemplate
      * @param updatedAttributes the list of attributes to update
-     * @return the job representing the asynchronous update operation
      * @throws ResourceNotFoundException raised if the provided id is invalid
      * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if any other type of runtime fault
