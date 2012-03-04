@@ -52,6 +52,7 @@ public interface IVolumeManager {
      * @param volumeCreate contains either a reference to a Volume Template or a
      *        Volume Template itself
      * @return the job representing the asynchronous creation operation
+     * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if the creation fails
      */
     Job createVolume(VolumeCreate volumeCreate) throws InvalidRequestException, CloudProviderException;
@@ -62,6 +63,7 @@ public interface IVolumeManager {
      * @param volumeConfig contains initialization values of the Volume
      *        Configuration
      * @return a persisted Volume Configuration instance
+     * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if the creation fails
      */
     VolumeConfiguration createVolumeConfiguration(VolumeConfiguration volumeConfig) throws InvalidRequestException,
@@ -73,6 +75,7 @@ public interface IVolumeManager {
      * @param volumeTemplate contains initialization values of the Volume
      *        Template
      * @return a persisted Volume Template instance
+     * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if the creation fails
      */
     VolumeTemplate createVolumeTemplate(VolumeTemplate volumeTemplate) throws InvalidRequestException, CloudProviderException;
@@ -82,7 +85,7 @@ public interface IVolumeManager {
      * 
      * @param volumeId the id of the Volume to retrieve
      * @return if successful, the Volume instance
-     * @throws InvalidVolumeIdException raised if the provided id is invalid
+     * @throws ResourceNotFoundException raised if the provided id is invalid
      */
     Volume getVolumeById(final String volumeId) throws ResourceNotFoundException;
 
@@ -96,6 +99,19 @@ public interface IVolumeManager {
     VolumeTemplate getVolumeTemplateById(final String volumeTemplateId) throws CloudProviderException;
 
     /**
+     * Retrieves some attributes of a Volume Template
+     * 
+     * @param volumeTemplateId the id of the Volume Template
+     * @param attributes the list of attributes to retrieve
+     * @return a Volume Template instance whose requested attributes are filled
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws CloudProviderException raised if any other type of runtime fault
+     *         occurs
+     */
+    VolumeTemplate getVolumeTemplateAttributes(final String volumeTemplateId, List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException;
+
+    /**
      * Returns the VolumeConfiguration instance with the supplied id
      * 
      * @param volumeConfigId the id of the Volume to retrieve
@@ -105,12 +121,26 @@ public interface IVolumeManager {
     VolumeConfiguration getVolumeConfigurationById(final String volumeConfigId) throws CloudProviderException;
 
     /**
-     * Retrieves some attributes of Volume
+     * Retrieves some attributes of a Volume Configuration
+     * 
+     * @param volumeConfigId the id of the Volume Configuration
+     * @param attributes the list of attributes to retrieve
+     * @return a Volume Configuration instance whose requested attributes are
+     *         filled
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws CloudProviderException raised if any other type of runtime fault
+     *         occurs
+     */
+    VolumeConfiguration getVolumeConfigurationAttributes(final String volumeConfigId, List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException;
+
+    /**
+     * Retrieves some attributes of a Volume
      * 
      * @param volumeId the id of the Volume
      * @param attributes the list of attributes to retrieve
      * @return a Volume instance whose requested attributes are filled
-     * @throws InvalidVolumeIdException raised if the provided id is invalid
+     * @throws ResourceNotFoundException raised if the provided id is invalid
      * @throws CloudProviderException raised if any other type of runtime fault
      *         occurs
      */
@@ -126,40 +156,96 @@ public interface IVolumeManager {
      *        syntax, if null no filtering is performed
      * @return a list of Volumes matching the filter expression, for each
      *         Volume, only the requested attributes are guaranteed to be filled
+     * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if the input parameters are invalid
      */
-    List<Volume> getVolumesAttributes(List<String> attributes, String filterExpression) throws InvalidRequestException,
+    List<Volume> getVolumes(List<String> attributes, String filterExpression) throws InvalidRequestException,
         CloudProviderException;
 
     /**
      * Retrieves some attributes of all Volumes belonging to the caller within a
-     * specific range, only Volumes that match a supplied filter expression are
-     * returned
+     * specific range, only Volumes
      * 
      * @param first index of the first Volume to return within the Volume
      *        Collection of the caller
      * @param last index of the last Volume to return within the Volume
      *        Collection of the caller
      * @param attributes the list of attributes to retrieve
-     * @return a list of Volumes matching the filter expression within the
-     *         requested range (if any), for each Volume, only the requested
-     *         attributes are guaranteed to be filled
+     * @return a list of Volumes within the requested range (if any), for each
+     *         Volume, only the requested attributes are guaranteed to be filled
+     * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if the input parameters are invalid
      */
-    List<Volume> getVolumesAttributes(int first, int last, List<String> attributes) throws InvalidRequestException,
+    List<Volume> getVolumes(int first, int last, List<String> attributes) throws InvalidRequestException,
         CloudProviderException;
 
-    List<VolumeConfiguration> getVolumeConfigurationsAttributes(List<String> attributes, String filterExpression)
+    /**
+     * Retrieves some attributes of all Volume Configurations belonging to the
+     * caller that match a supplied filter expression
+     * 
+     * @param attributes the list of attributes to retrieve
+     * @param filterExpression a filter expression compliant with the DMTF CIMI
+     *        syntax, if null no filtering is performed
+     * @return a list of VolumeConfiguration matching the filter expression, for
+     *         each VolumeConfiguration, only the requested attributes are
+     *         guaranteed to be filled
+     * @throws InvalidRequestException raised if the the request is invalid
+     * @throws CloudProviderException raised if the input parameters are invalid
+     */
+    List<VolumeConfiguration> getVolumeConfigurations(List<String> attributes, String filterExpression)
         throws InvalidRequestException, CloudProviderException;
 
-    List<VolumeConfiguration> getVolumeConfigurationsAttributes(int first, int last, List<String> attributes)
+    /**
+     * Retrieves some attributes of all VolumeConfigurations belonging to the
+     * caller within a specific range
+     * 
+     * @param first index of the first VolumeConfiguration to return within the
+     *        VolumeConfiguration Collection of the caller
+     * @param last index of the last VolumeConfiguration to return within the
+     *        VolumeConfiguration Collection of the caller
+     * @param attributes the list of attributes to retrieve
+     * @return a list of VolumeConfiguration within the requested range (if
+     *         any), for each Volume, only the requested attributes are
+     *         guaranteed to be filled
+     * @throws InvalidRequestException raised if the the request is invalid
+     * @throws CloudProviderException raised if the input parameters are invalid
+     */
+    List<VolumeConfiguration> getVolumeConfigurations(int first, int last, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 
-    List<VolumeTemplate> getVolumeTemplatesAttributes(List<String> attributes, String filterExpression)
-        throws InvalidRequestException, CloudProviderException;
+    /**
+     * Retrieves some attributes of all Volume Templates belonging to the caller
+     * that match a supplied filter expression
+     * 
+     * @param attributes the list of attributes to retrieve
+     * @param filterExpression a filter expression compliant with the DMTF CIMI
+     *        syntax, if null no filtering is performed
+     * @return a list of VolumeTemplate matching the filter expression, for each
+     *         VolumeTemplate, only the requested attributes are guaranteed to
+     *         be filled
+     * @throws InvalidRequestException raised if the the request is invalid
+     * @throws CloudProviderException raised if the input parameters are invalid
+     */
+    List<VolumeTemplate> getVolumeTemplates(List<String> attributes, String filterExpression) throws InvalidRequestException,
+        CloudProviderException;
 
-    List<VolumeTemplate> getVolumeTemplatesAttributes(int first, int last, List<String> attributes)
-        throws InvalidRequestException, CloudProviderException;
+    /**
+     * Retrieves some attributes of all VolumeTemplates belonging to the caller
+     * within a specific range
+     * 
+     * @param first index of the first VolumeTemplate to return within the
+     *        VolumeTemplate Collection of the caller
+     * @param last index of the last VolumeTemplate to return within the
+     *        VolumeTemplate Collection of the caller
+     * @param attributes the list of attributes to retrieve
+     * @return a list of VolumeTemplate within the requested range (if any), for
+     *         each Volume, only the requested attributes are guaranteed to be
+     *         filled
+     * @throws InvalidRequestException raised if the the request is invalid
+     * @throws CloudProviderException raised if the input parameters are invalid
+     */
+    List<VolumeTemplate> getVolumeTemplates(int first, int last, List<String> attributes) throws InvalidRequestException,
+        CloudProviderException;
 
     /**
      * Updates some attributes of a Volume, this operation is asynchronous
@@ -167,16 +253,39 @@ public interface IVolumeManager {
      * @param volumeId the id of the Volume
      * @param updatedAttributes the list of attributes to update
      * @return the job representing the asynchronous update operation
-     * @throws InvalidVolumeIdException raised if the provided id is invalid
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if any other type of runtime fault
      *         occurs
      */
     Job updateVolumeAttributes(String volumeId, Map<String, Object> updatedAttributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
+    /**
+     * Updates some attributes of a VolumeConfiguration
+     * 
+     * @param volumeConfigId the id of the VolumeConfiguration
+     * @param updatedAttributes the list of attributes to update
+     * @return the job representing the asynchronous update operation
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws InvalidRequestException raised if the the request is invalid
+     * @throws CloudProviderException raised if any other type of runtime fault
+     *         occurs
+     */
     void updateVolumeConfigurationAttributes(String volumeConfigId, Map<String, Object> updatedAttributes)
         throws InvalidRequestException, ResourceNotFoundException, CloudProviderException;
 
+    /**
+     * Updates some attributes of a VolumeTemplate
+     * 
+     * @param volumeTemplateId the id of the VolumeTemplate
+     * @param updatedAttributes the list of attributes to update
+     * @return the job representing the asynchronous update operation
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws InvalidRequestException raised if the the request is invalid
+     * @throws CloudProviderException raised if any other type of runtime fault
+     *         occurs
+     */
     void updateVolumeTemplateAttributes(String volumeTemplateId, Map<String, Object> updatedAttributes)
         throws InvalidRequestException, ResourceNotFoundException, CloudProviderException;
 
@@ -185,34 +294,56 @@ public interface IVolumeManager {
      * 
      * @param volumeId the id of the Volume
      * @return the job representing the asynchronous delete operation
-     * @throws InvalidVolumeIdExceptionraised if the provided id is invalid
+     * @throws ResourceNotFoundException raised if the provided id is invalid
      * @throws CloudProviderException raised if any other type of runtime fault
      *         occurs
      */
     Job deleteVolume(String volumeId) throws ResourceNotFoundException, CloudProviderException;
 
-    void deleteVolumeTemplate(String volumeTemplateId) throws CloudProviderException;
+    /**
+     * Deletes a VolumeTemplate
+     * 
+     * @param volumeTemplateId the id of the VolumeTemplate
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws CloudProviderException raised if any other type of runtime fault
+     *         occurs
+     */
+    void deleteVolumeTemplate(String volumeTemplateId) throws ResourceNotFoundException, CloudProviderException;
 
-    void deleteVolumeConfiguration(String volumeConfigId) throws CloudProviderException;
+    /**
+     * Deletes a VolumeConfiguration
+     * 
+     * @param volumeConfigId the id of the VolumeConfiguration
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws CloudProviderException raised if any other type of runtime fault
+     *         occurs
+     */
+    void deleteVolumeConfiguration(String volumeConfigId) throws ResourceNotFoundException, CloudProviderException;
 
     /**
      * Returns the Volume Collection belonging to the caller
      * 
      * @return the Volume Collection belonging to the caller
+     * @throws CloudProviderException raised if the operation cannot be
+     *         completed
      */
     VolumeCollection getVolumeCollection() throws CloudProviderException;
 
     /**
-     * Returns the Volume Configuration Collection belonging to the caller
+     * Returns the VolumeConfiguration Collection belonging to the caller
      * 
-     * @return the Volume Configuration Collection belonging to the caller
+     * @return the VolumeConfiguration Collection belonging to the caller
+     * @throws CloudProviderException raised if the operation cannot be
+     *         completed
      */
     VolumeConfigurationCollection getVolumeConfigurationCollection() throws CloudProviderException;
 
     /**
-     * Returns the Volume Template Collection belonging to the caller
+     * Returns the VolumeTemplate Collection belonging to the caller
      * 
-     * @return the Volume Template Collection belonging to the caller
+     * @return the VolumeTemplate Collection belonging to the caller
+     * @throws CloudProviderException raised if the operation cannot be
+     *         completed
      */
     VolumeTemplateCollection getVolumeTemplateCollection() throws CloudProviderException;
 
@@ -221,7 +352,9 @@ public interface IVolumeManager {
      * 
      * @param updatedAttributes each entry of this map contains the name of the
      *        attribute to be update and the new value. Note that the only
-     *        allowed attributes are "name", "description" and properties
+     *        allowed attributes are "name", "description" and "properties"
+     * @throws CloudProviderException raised if the operation cannot be
+     *         completed
      */
     void updateVolumeCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
 
@@ -231,7 +364,9 @@ public interface IVolumeManager {
      * 
      * @param updatedAttributes each entry of this map contains the name of the
      *        attribute to be update and the new value. Note that the only
-     *        allowed attributes are "name", "description" and properties
+     *        allowed attributes are "name", "description" and "properties"
+     * @throws CloudProviderException raised if the operation cannot be
+     *         completed
      */
     void updateVolumeConfigurationCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
 
@@ -241,7 +376,9 @@ public interface IVolumeManager {
      * 
      * @param updatedAttributes each entry of this map contains the name of the
      *        attribute to be update and the new value. Note that the only
-     *        allowed attributes are "name", "description" and properties
+     *        allowed attributes are "name", "description" and "properties"
+     * @throws CloudProviderException raised if the operation cannot be
+     *         completed
      */
     void updateVolumeTemplateCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
 

@@ -214,28 +214,62 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public Volume getVolumeById(final String volumeId) throws ResourceNotFoundException {
         Volume volume = this.em.find(Volume.class, Integer.valueOf(volumeId));
+        if (volume == null) {
+            throw new ResourceNotFoundException(" Invalid volume id " + volumeId);
+        }
         return volume;
     }
 
     @Override
     public VolumeConfiguration getVolumeConfigurationById(final String volumeConfigId) throws CloudProviderException {
-        return this.em.find(VolumeConfiguration.class, Integer.valueOf(volumeConfigId));
+        VolumeConfiguration result = this.em.find(VolumeConfiguration.class, Integer.valueOf(volumeConfigId));
+        if (result == null) {
+            throw new ResourceNotFoundException(" Invalid Volume Configuration id " + volumeConfigId);
+        }
+        return result;
+    }
+
+    @Override
+    public VolumeConfiguration getVolumeConfigurationAttributes(final String volumeConfigId, final List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException {
+        VolumeConfiguration result = this.em.find(VolumeConfiguration.class, Integer.valueOf(volumeConfigId));
+        if (result == null) {
+            throw new ResourceNotFoundException(" Invalid Volume Configuration id " + volumeConfigId);
+        }
+        return result;
     }
 
     @Override
     public VolumeTemplate getVolumeTemplateById(final String volumeTemplateId) throws CloudProviderException {
-        return this.em.find(VolumeTemplate.class, Integer.valueOf(volumeTemplateId));
+        VolumeTemplate result = this.em.find(VolumeTemplate.class, Integer.valueOf(volumeTemplateId));
+        if (result == null) {
+            throw new ResourceNotFoundException(" Invalid Volume Template id " + volumeTemplateId);
+        }
+        return result;
+    }
+
+    @Override
+    public VolumeTemplate getVolumeTemplateAttributes(final String volumeTemplateId, final List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException {
+        VolumeTemplate result = this.em.find(VolumeTemplate.class, Integer.valueOf(volumeTemplateId));
+        if (result == null) {
+            throw new ResourceNotFoundException(" Invalid Volume Template id " + volumeTemplateId);
+        }
+        return result;
     }
 
     @Override
     public Volume getVolumeAttributes(final String volumeId, final List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException {
-        return this.em.find(Volume.class, Integer.valueOf(volumeId));
+        Volume result = this.em.find(Volume.class, Integer.valueOf(volumeId));
+        if (result == null) {
+            throw new ResourceNotFoundException(" Invalid volume id " + volumeId);
+        }
+        return result;
     }
 
     @Override
-    public List<Volume> getVolumesAttributes(final List<String> attributes, final String filterExpression)
-        throws CloudProviderException {
+    public List<Volume> getVolumes(final List<String> attributes, final String filterExpression) throws CloudProviderException {
         // TODO Auto-generated method stub
         if (filterExpression != null && !filterExpression.isEmpty()) {
             throw new UnsupportedOperationException();
@@ -247,7 +281,7 @@ public class VolumeManager implements IVolumeManager {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Volume> getVolumesAttributes(final int first, final int last, final List<String> attributes)
+    public List<Volume> getVolumes(final int first, final int last, final List<String> attributes)
         throws CloudProviderException {
         User user = this.getUser();
         Query query = this.em.createQuery("FROM Volume v WHERE v.user.username=:username ORDER BY v.id");
@@ -258,8 +292,8 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public List<VolumeConfiguration> getVolumeConfigurationsAttributes(final List<String> attributes,
-        final String filterExpression) throws CloudProviderException {
+    public List<VolumeConfiguration> getVolumeConfigurations(final List<String> attributes, final String filterExpression)
+        throws CloudProviderException {
         if (filterExpression != null && !filterExpression.isEmpty()) {
             // TODO
             throw new UnsupportedOperationException();
@@ -271,8 +305,8 @@ public class VolumeManager implements IVolumeManager {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<VolumeConfiguration> getVolumeConfigurationsAttributes(final int first, final int last,
-        final List<String> attributes) throws CloudProviderException {
+    public List<VolumeConfiguration> getVolumeConfigurations(final int first, final int last, final List<String> attributes)
+        throws CloudProviderException {
         User user = this.getUser();
         Query query = this.em.createQuery("FROM VolumeConfiguration v WHERE v.user.username=:username ORDER BY v.id");
         query.setParameter("username", user.getUsername());
@@ -282,7 +316,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public List<VolumeTemplate> getVolumeTemplatesAttributes(final List<String> attributes, final String filterExpression)
+    public List<VolumeTemplate> getVolumeTemplates(final List<String> attributes, final String filterExpression)
         throws CloudProviderException {
         if (filterExpression != null && !filterExpression.isEmpty()) {
             // TODO
@@ -295,7 +329,7 @@ public class VolumeManager implements IVolumeManager {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<VolumeTemplate> getVolumeTemplatesAttributes(final int first, final int last, final List<String> attributes)
+    public List<VolumeTemplate> getVolumeTemplates(final int first, final int last, final List<String> attributes)
         throws CloudProviderException {
         User user = this.getUser();
         Query query = this.em.createQuery("FROM VolumeTemplate v WHERE v.user.username=:username ORDER BY v.id");
