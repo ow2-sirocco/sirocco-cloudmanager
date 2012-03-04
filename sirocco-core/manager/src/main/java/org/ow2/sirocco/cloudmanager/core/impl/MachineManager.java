@@ -60,6 +60,7 @@ import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
@@ -138,6 +139,19 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 
         l.add(cp.get(0));
         return l;
+    }
+
+    /**
+     * Operations on CloudProviderEntryPoint
+     */
+
+    @Override
+    public CloudEntryPoint getCloudEntryPoint() throws CloudProviderException {
+        this.setUser();
+        Integer userid = this.user.getId();
+        CloudEntryPoint cep = (CloudEntryPoint) this.em.createQuery("FROM CloudEntryPoint c WHERE c.user.id=:userid")
+            .setParameter("userid", userid).getSingleResult();
+        return cep;
     }
 
     /**
@@ -437,8 +451,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     }
 
     // TODO
-    public List<Machine> getMachinesAttributes(final List<String> attributes, final String queryExpression)
-        throws CloudProviderException {
+    public List<Machine> getMachines(final List<String> attributes, final String queryExpression) throws CloudProviderException {
         List<Machine> machines = new ArrayList<Machine>();
 
         return machines;
@@ -712,6 +725,12 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         if (requested.containsKey("properties")) {
             s.put("properties", requested.get("properties"));
         }
+        if (requested.containsKey("name")) {
+            s.put("name", requested.get("name"));
+        }
+        if (requested.containsKey("description")) {
+            s.put("description", requested.get("description"));
+        }
         return s;
     }
 
@@ -727,28 +746,50 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         if (m == null) {
             throw new ResourceNotFoundException("Machine " + machineId + " cannot be found");
         }
-        // REMOVE
-        if (attributes.size() > 0) {
-            throw new ServiceUnavailableException(" Come back later for update ");
-        }
-        if (attributes.size() > 1) {
-            throw new InvalidRequestException("May update only one by one ");
-        }
-        Map<String, Object> allowedUpdates = this.filterUpdates(attributes);
 
-        /** invoke connector */
-        ICloudProviderConnector connector = this.getConnector(m);
-        IComputeService computeService;
-        try {
-            computeService = connector.getComputeService();
-        } catch (ConnectorException e) {
-            throw new ServiceUnavailableException(e.getMessage());
+        if (attributes.containsKey("name")) {
+            m.setName((String) attributes.get("name"));
         }
 
-        // j = computeService.updateMachine(m, allowedUpdates);
+        if (attributes.containsKey("description")) {
+            m.setDescription((String) attributes.get("description"));
+        }
 
-        // this is getting quite complicated :(
+        j = new Job();
+        j.setTargetEntity(m.getId().toString());
+        j.setStatus(Job.Status.SUCCESS);
+        j.setAction("update");
+        j.setParentJob(null);
+        j.setNestedJobs(null);
+        j.setReturnCode(0);
+        j.setUser(this.user);
+        this.em.persist(j);
+        this.em.flush();
         return j;
+
+        // TODO
+        // if (attributes.size() > 0) {
+        // throw new
+        // ServiceUnavailableException(" Come back later for update ");
+        // }
+        // if (attributes.size() > 1) {
+        // throw new InvalidRequestException("May update only one by one ");
+        // }
+        // Map<String, Object> allowedUpdates = this.filterUpdates(attributes);
+        //
+        // /** invoke connector */
+        // ICloudProviderConnector connector = this.getConnector(m);
+        // IComputeService computeService;
+        // try {
+        // computeService = connector.getComputeService();
+        // } catch (ConnectorException e) {
+        // throw new ServiceUnavailableException(e.getMessage());
+        // }
+        //
+        // // j = computeService.updateMachine(m, allowedUpdates);
+        //
+        // // this is getting quite complicated :(
+        // return j;
     }
 
     /**
@@ -862,6 +903,27 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
             .getSingleResult();
         collection.setMachineConfigurations(configs);
         return collection;
+    }
+
+    @Override
+    public void updateMachineConfigurationCollection(final Map<String, Object> attributes) throws InvalidRequestException,
+        CloudProviderException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public List<MachineConfiguration> getMachineConfigurations(final int first, final int last, final List<String> attributes)
+        throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<MachineConfiguration> getMachineConfigurations(final List<String> attributes, final String queryExpression)
+        throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public MachineConfiguration createMachineConfiguration(final MachineConfiguration machineConfig)
@@ -1107,6 +1169,20 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
             .getSingleResult();
         collection.setMachineTemplates(templates);
         return collection;
+    }
+
+    @Override
+    public List<MachineTemplate> getMachineTemplates(final int first, final int last, final List<String> attributes)
+        throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<MachineTemplate> getMachineTemplates(final List<String> attributes, final String queryExpression)
+        throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     public void updateMachineTemplateCollection(final Map<String, Object> attributes) throws CloudProviderException {

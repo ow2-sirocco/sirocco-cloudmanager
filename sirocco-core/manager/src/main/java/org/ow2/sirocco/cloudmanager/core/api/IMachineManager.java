@@ -32,6 +32,7 @@ import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
@@ -41,21 +42,17 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 
+/**
+ * Machine management operations
+ */
 public interface IMachineManager {
 
     static final String EJB_JNDI_NAME = "MachineManager";
 
     /**
-     * Operations on MachineCollection
+     * Operations on CEP
      */
-    Job createMachine(MachineCreate machineCreate) throws ResourceConflictException, InvalidRequestException,
-        CloudProviderException;
-
-    List<Machine> getMachines(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<Machine> getMachinesAttributes(List<String> attributes, String queryExpression) throws InvalidRequestException,
-        CloudProviderException;
+    CloudEntryPoint getCloudEntryPoint() throws CloudProviderException;
 
     /**
      * Operations on Machine
@@ -79,6 +76,15 @@ public interface IMachineManager {
      */
     MachineCollection getMachineCollection() throws CloudProviderException;
 
+    Job createMachine(MachineCreate machineCreate) throws ResourceConflictException, InvalidRequestException,
+        CloudProviderException;
+
+    List<Machine> getMachines(int first, int last, List<String> attributes) throws InvalidRequestException,
+        CloudProviderException;
+
+    List<Machine> getMachines(List<String> attributes, String queryExpression) throws InvalidRequestException,
+        CloudProviderException;
+
     void updateMachineCollection(Map<String, Object> attributes) throws InvalidRequestException, CloudProviderException;
 
     /**
@@ -101,6 +107,15 @@ public interface IMachineManager {
     MachineConfiguration createMachineConfiguration(MachineConfiguration machineConfig) throws InvalidRequestException,
         CloudProviderException;
 
+    List<MachineConfiguration> getMachineConfigurations(int first, int last, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
+
+    List<MachineConfiguration> getMachineConfigurations(List<String> attributes, String queryExpression)
+        throws InvalidRequestException, CloudProviderException;
+
+    void updateMachineConfigurationCollection(Map<String, Object> attributes) throws InvalidRequestException,
+        CloudProviderException;
+
     /**
      * Operations on MachineTemplate
      */
@@ -118,6 +133,12 @@ public interface IMachineManager {
         CloudProviderException;
 
     MachineTemplateCollection getMachineTemplateCollection() throws CloudProviderException;
+
+    List<MachineTemplate> getMachineTemplates(int first, int last, List<String> attributes) throws InvalidRequestException,
+        CloudProviderException;
+
+    List<MachineTemplate> getMachineTemplates(List<String> attributes, String queryExpression) throws InvalidRequestException,
+        CloudProviderException;
 
     void updateMachineTemplateCollection(Map<String, Object> attributes) throws InvalidRequestException, CloudProviderException;
 
