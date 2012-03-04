@@ -194,6 +194,25 @@
 				</executions>
 			</plugin>
 
+			<plugin>
+                                <artifactId>maven-javadoc-plugin</artifactId>
+                                <version>2.6.1</version>
+                                <configuration>
+                                        <subpackages>org.ow2.sirocco.cloudmanager.core.api:org.ow2.sirocco.cloudmanager.core.exception:org.ow2.sirocco.cloudmanager.model.cimi</subpackages>
+                                        <windowtitle>Sirocco Service Manager API</windowtitle>
+                                        <doctitle>Sirocco Service Manager API</doctitle>
+                                </configuration>
+                                <executions>
+                                        <execution>
+                                                <id>attach-javadocs</id>
+                                                <goals>
+                                                        <goal>jar</goal>
+                                                </goals>
+                                        </execution>
+                                </executions>
+                        </plugin>
+
+
 		</plugins>
 	</build>
 
