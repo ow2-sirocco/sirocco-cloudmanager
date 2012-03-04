@@ -27,12 +27,9 @@ package org.ow2.sirocco.cloudmanager.itests;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -45,16 +42,14 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
-
 
 /**
  * This class requires the following system properties: -Dcarol.port=1099
@@ -66,9 +61,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.User;
 public class CredentialsTest {
     private static final String USER_NAME = "ANONYMOUS";
 
-
     private static final String ACCOUNT_USER = "machinetest";
-
 
     /**
      * Initial Context Factory.
@@ -81,9 +74,8 @@ public class CredentialsTest {
     private static final int INITIALIZE_TIMEOUT = 30;
 
     private IRemoteCredentialsManager credManager;
+
     private IRemoteUserManager userManager;
-
-
 
     Map<String, Credentials> creds = new HashMap<String, Credentials>();
 
@@ -142,102 +134,98 @@ public class CredentialsTest {
 
     private int credcounter = 1;
 
-    private Credentials initCredentials() {
-        Credentials in = new Credentials();
-        in.setName("testCred_" + this.credcounter);
-        in.setDescription("testCred_" + this.credcounter + " description ");
-        in.setProperties(new HashMap<String, String>());
+    private CredentialsCreate initCredentials() {
+        CredentialsCreate credentialsCreate = new CredentialsCreate();
+        CredentialsTemplate in = new CredentialsTemplate();
+        credentialsCreate.setCredentialTemplate(in);
+        credentialsCreate.setName("testCred_" + this.credcounter);
+        credentialsCreate.setDescription("testCred_" + this.credcounter + " description ");
+        credentialsCreate.setProperties(new HashMap<String, String>());
         in.setUserName("madras");
         in.setPassword("bombaydelhi");
         String key = new String("parisnewyork" + this.credcounter);
         in.setPublicKey(key.getBytes());
         this.credcounter += 1;
-        return in;
+        return credentialsCreate;
     }
 
-    private Credentials createCredentials(Credentials in_c) throws Exception {
-       
+    private Credentials createCredentials(final CredentialsCreate in_c) throws Exception {
+
         Credentials out_c = this.credManager.createCredentials(in_c);
         Assert.assertNotNull("createCredentials returns no credentials", out_c);
         this.creds.put(out_c.getId().toString(), out_c);
         return out_c;
     }
 
-    private boolean isPresent(Credentials c) {
-    	Credentials c_list = creds.get(c.getId().toString());
-    	if (c_list == null)  {
-    		return false;
-    	}
-    	return isEqual(c, c_list);
-    	
+    private boolean isPresent(final Credentials c) {
+        Credentials c_list = this.creds.get(c.getId().toString());
+        if (c_list == null) {
+            return false;
+        }
+        return this.isEqual(c, c_list);
+
     }
-    private boolean isEqual(Credentials one, Credentials two) {
-    	if (one.getUserName().equals(two.getUserName()) == false) {
-    		return false;
-    	}
-    	if (one.getPassword().equals(two.getPassword()) == false) {
-    		return false;
-    	}
-    	return true;
+
+    private boolean isEqual(final Credentials one, final Credentials two) {
+        if (one.getUserName().equals(two.getUserName()) == false) {
+            return false;
+        }
+        if (one.getPassword().equals(two.getPassword()) == false) {
+            return false;
+        }
+        return true;
     }
-    
-    
-    
+
     @Test
     public void testCredentials() throws Exception {
 
-        Credentials c1 = this.initCredentials();
-        c1 = this.createCredentials(c1);
-        
-        Credentials c2 = this.initCredentials();
-        c2 = this.createCredentials(c2);
-        
-        Credentials c3 = this.initCredentials();
-        c3 = this.createCredentials(c3);
-       
-        Credentials c4 = this.initCredentials();
-        c4 = this.createCredentials(c4);
+        Credentials c1 = this.createCredentials(this.initCredentials());
+
+        Credentials c2 = this.createCredentials(this.initCredentials());
+
+        Credentials c3 = this.createCredentials(this.initCredentials());
+
+        Credentials c4 = this.createCredentials(this.initCredentials());
         // get credentials
         String cid = c2.getId().toString();
-        System.out.println("testCredentials get creds for " +cid);
-        Credentials c2_out =  this.credManager.getCredentialsById(cid);
-        System.out.println("testCredentials check if good " +c2_out.getId().toString());
-        boolean e = isEqual(c2, c2_out);
+        System.out.println("testCredentials get creds for " + cid);
+        Credentials c2_out = this.credManager.getCredentialsById(cid);
+        System.out.println("testCredentials check if good " + c2_out.getId().toString());
+        boolean e = this.isEqual(c2, c2_out);
         Assert.assertEquals(e, true);
         Assert.assertEquals(c2.getId(), c2_out.getId());
-        
+
         // get credentials collection
-        // CredentialsCollection credColl = this.credManager.getCredentialsCollection();
+        // CredentialsCollection credColl =
+        // this.credManager.getCredentialsCollection();
         // List<Credentials> creds = credColl.getCredentials();
         // int count = 0;
-        
-        //for (Credentials c : creds) {
-        	// if (isPresent(c) == true) {
-        	//	count++;
-        	//}
-        //}
-       //Assert.assertEquals(count, creds.size());
-       
+
+        // for (Credentials c : creds) {
+        // if (isPresent(c) == true) {
+        // count++;
+        // }
+        // }
+        // Assert.assertEquals(count, creds.size());
+
         // delete credentials
-        System.out.println("testCredentials delete creds " +c1.getId().toString());
-        deleteCredentials(c1.getId().toString());
+        System.out.println("testCredentials delete creds " + c1.getId().toString());
+        this.deleteCredentials(c1.getId().toString());
         String deletedCid = c1.getId().toString();
         Credentials c1deleted_out = null;
-        System.out.println("testCredentials reads creds again " +c1.getId().toString());
+        System.out.println("testCredentials reads creds again " + c1.getId().toString());
         try {
-        	c1deleted_out =  this.credManager.getCredentialsById(deletedCid);
+            c1deleted_out = this.credManager.getCredentialsById(deletedCid);
         } catch (Exception ex) {
-        	System.out.println(" Expected exception ");
+            System.out.println(" Expected exception ");
         }
         Assert.assertNull(c1deleted_out);
         System.out.println("testCredentials completed ");
     }
 
-    
     void deleteCredentials(final String credId) throws Exception {
 
         this.credManager.deleteCredentials(credId);
     }
 
-   
 }
