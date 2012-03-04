@@ -90,7 +90,7 @@ public interface IMachineManager {
     /**
      * Operations on MachineConfiguration
      */
-    MachineConfiguration getMachineConfiguration(final String MachineId) throws ResourceNotFoundException,
+    MachineConfiguration getMachineConfigurationById(final String MachineId) throws ResourceNotFoundException,
         CloudProviderException;;
 
     void updateMachineConfiguration(String machineConfigurationId, Map<String, Object> updatedAttributes)
@@ -119,7 +119,7 @@ public interface IMachineManager {
     /**
      * Operations on MachineTemplate
      */
-    MachineTemplate getMachineTemplate(String machineTemplateId) throws ResourceNotFoundException, CloudProviderException;
+    MachineTemplate getMachineTemplateById(String machineTemplateId) throws ResourceNotFoundException, CloudProviderException;
 
     MachineTemplate updateMachineTemplate(String machineTemplateId, Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;

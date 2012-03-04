@@ -816,7 +816,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     /**
      * Operations on MachineConfiguration
      */
-    public MachineConfiguration getMachineConfiguration(final String mcId) throws CloudProviderException {
+    public MachineConfiguration getMachineConfigurationById(final String mcId) throws CloudProviderException {
         if (mcId == null) {
             throw new InvalidRequestException(" null machine configuration id");
         }
@@ -953,7 +953,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     /**
      * Operations on MachineTemplate
      */
-    public MachineTemplate getMachineTemplate(final String mtId) throws CloudProviderException {
+    public MachineTemplate getMachineTemplateById(final String mtId) throws CloudProviderException {
         if (mtId == null) {
             throw new InvalidRequestException(" null machine template id");
         }
