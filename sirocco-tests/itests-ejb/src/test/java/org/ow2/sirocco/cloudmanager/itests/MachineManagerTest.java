@@ -61,6 +61,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -191,23 +193,24 @@ public class MachineManagerTest {
 
     private int credcounter = 1;
 
-    private Credentials initCredentials() {
-        Credentials in = new Credentials();
-        in.setName("testCred_" + this.credcounter);
-        in.setDescription("testCred_" + this.credcounter + " description ");
-        in.setProperties(new HashMap<String, String>());
+    private CredentialsCreate initCredentials() {
+        CredentialsCreate credentialsCreate = new CredentialsCreate();
+        CredentialsTemplate in = new CredentialsTemplate();
+        credentialsCreate.setCredentialTemplate(in);
+        credentialsCreate.setName("testCred_" + this.credcounter);
+        credentialsCreate.setDescription("testCred_" + this.credcounter + " description ");
+        credentialsCreate.setProperties(new HashMap<String, String>());
 
         in.setUserName("madras");
         in.setPassword("bombaydelhi");
         // String key = new String("parisnewyork" + this.credcounter);
         // in.setKey(key.getBytes());
         this.credcounter += 1;
-        return in;
+        return credentialsCreate;
     }
 
     private Credentials createCredentials() throws Exception {
-        Credentials in_c = this.initCredentials();
-        Credentials out_c = this.credManager.createCredentials(in_c);
+        Credentials out_c = this.credManager.createCredentials(this.initCredentials());
         Assert.assertNotNull("createCredentials returns no credentials", out_c);
         this.creds.add(out_c);
         return out_c;
@@ -268,7 +271,7 @@ public class MachineManagerTest {
         int loop = 0;
         while (done != true) {
             int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
-            i = this.machineImageManager.getMachineImage(out_j.getTargetEntity());
+            i = this.machineImageManager.getMachineImageById(out_j.getTargetEntity());
 
             if (i == null) {
 

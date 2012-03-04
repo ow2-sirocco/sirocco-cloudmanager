@@ -335,17 +335,17 @@ public class VolumeManagerTest {
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-        List<Volume> volumes = this.volumeManager.getVolumesAttributes(0, 9, attributes);
+        List<Volume> volumes = this.volumeManager.getVolumes(0, 9, attributes);
         Assert.assertEquals(10, volumes.size());
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals("myVolume" + i, volumes.get(i).getName());
         }
-        volumes = this.volumeManager.getVolumesAttributes(10, 25, attributes);
+        volumes = this.volumeManager.getVolumes(10, 25, attributes);
         Assert.assertEquals(10, volumes.size());
-        volumes = this.volumeManager.getVolumesAttributes(20, 100, attributes);
+        volumes = this.volumeManager.getVolumes(20, 100, attributes);
         Assert.assertEquals(0, volumes.size());
 
-        volumes = this.volumeManager.getVolumesAttributes(attributes, null);
+        volumes = this.volumeManager.getVolumes(attributes, null);
         Assert.assertEquals(20, volumes.size());
         for (int i = 0; i < 20; i++) {
             Assert.assertEquals("myVolume" + i, volumes.get(i).getName());
@@ -365,17 +365,17 @@ public class VolumeManagerTest {
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurationsAttributes(0, 9, attributes);
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurations(0, 9, attributes);
         Assert.assertEquals(10, volumeConfigs.size());
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals("myVolumeConfig" + i, volumeConfigs.get(i).getName());
         }
-        volumeConfigs = this.volumeManager.getVolumeConfigurationsAttributes(10, 25, attributes);
+        volumeConfigs = this.volumeManager.getVolumeConfigurations(10, 25, attributes);
         Assert.assertEquals(10, volumeConfigs.size());
-        volumeConfigs = this.volumeManager.getVolumeConfigurationsAttributes(20, 100, attributes);
+        volumeConfigs = this.volumeManager.getVolumeConfigurations(20, 100, attributes);
         Assert.assertEquals(0, volumeConfigs.size());
 
-        volumeConfigs = this.volumeManager.getVolumeConfigurationsAttributes(attributes, null);
+        volumeConfigs = this.volumeManager.getVolumeConfigurations(attributes, null);
         Assert.assertEquals(20, volumeConfigs.size());
         for (int i = 0; i < 20; i++) {
             Assert.assertEquals("myVolumeConfig" + i, volumeConfigs.get(i).getName());
@@ -395,17 +395,17 @@ public class VolumeManagerTest {
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-        List<VolumeTemplate> volumeTemplates = this.volumeManager.getVolumeTemplatesAttributes(0, 9, attributes);
+        List<VolumeTemplate> volumeTemplates = this.volumeManager.getVolumeTemplates(0, 9, attributes);
         Assert.assertEquals(10, volumeTemplates.size());
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals("myVolumeTemplate" + i, volumeTemplates.get(i).getName());
         }
-        volumeTemplates = this.volumeManager.getVolumeTemplatesAttributes(10, 25, attributes);
+        volumeTemplates = this.volumeManager.getVolumeTemplates(10, 25, attributes);
         Assert.assertEquals(10, volumeTemplates.size());
-        volumeTemplates = this.volumeManager.getVolumeTemplatesAttributes(20, 100, attributes);
+        volumeTemplates = this.volumeManager.getVolumeTemplates(20, 100, attributes);
         Assert.assertEquals(0, volumeTemplates.size());
 
-        volumeTemplates = this.volumeManager.getVolumeTemplatesAttributes(attributes, null);
+        volumeTemplates = this.volumeManager.getVolumeTemplates(attributes, null);
         Assert.assertEquals(20, volumeTemplates.size());
         for (int i = 0; i < 20; i++) {
             Assert.assertEquals("myVolumeTemplate" + i, volumeTemplates.get(i).getName());
