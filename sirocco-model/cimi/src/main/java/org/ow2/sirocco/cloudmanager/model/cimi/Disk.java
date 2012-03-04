@@ -90,4 +90,9 @@ public class Disk implements Serializable {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "Disk [unit=" + this.unit + ", quantity=" + this.quantity + "]";
+    }
+
 }

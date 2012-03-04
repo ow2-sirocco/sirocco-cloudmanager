@@ -83,4 +83,10 @@ public class Cpu implements Serializable {
     public void setQuantity(final Float quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public String toString() {
+        return "Cpu [numberCpu=" + this.numberCpu + ", cpuSpeedUnit=" + this.cpuSpeedUnit + ", quantity=" + this.quantity + "]";
+    }
+
 }

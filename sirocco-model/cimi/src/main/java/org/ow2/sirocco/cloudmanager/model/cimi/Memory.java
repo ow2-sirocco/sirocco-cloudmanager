@@ -37,15 +37,7 @@ public class Memory implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static enum MemoryUnit {
-        BYTE, 
-        KIBIBYTE, 
-        MEGIBYTE, 
-        GIGIBYTE, 
-        TEBIBYTE, 
-        PETIBYTE, 
-        EXBIBYTE, 
-        ZEBIBYTE, 
-        YOBIBYTE
+        BYTE, KIBIBYTE, MEGIBYTE, GIGIBYTE, TEBIBYTE, PETIBYTE, EXBIBYTE, ZEBIBYTE, YOBIBYTE
     }
 
     private MemoryUnit unit;
@@ -69,4 +61,10 @@ public class Memory implements Serializable {
     public void setQuantity(final Float quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public String toString() {
+        return "Memory [unit=" + this.unit + ", quantity=" + this.quantity + "]";
+    }
+
 }

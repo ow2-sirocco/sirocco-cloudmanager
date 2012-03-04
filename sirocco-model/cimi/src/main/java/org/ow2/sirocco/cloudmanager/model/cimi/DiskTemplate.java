@@ -28,50 +28,58 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
-import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
-
+import javax.persistence.Enumerated;
 
 @Embeddable
 public class DiskTemplate implements Serializable {
-	private static final long serialVersionUID = 1L;
-    
+    private static final long serialVersionUID = 1L;
 
-	private StorageUnit	unit;
-    private Float		quantity;
-	private String		format;
-	private String		attachmentPoint;
+    private StorageUnit unit;
 
-	@Enumerated(EnumType.STRING)
-	public StorageUnit getUnit() {
-		return unit;
-	}
+    private Float quantity;
 
-	public void setUnit(StorageUnit unit) {
-		this.unit = unit;
-	}
+    private String format;
 
-	public Float getQuantity() {
-		return quantity;
-	}
+    private String attachmentPoint;
 
-	public void setQuantity(Float quantity) {
-		this.quantity = quantity;
-	}
+    @Enumerated(EnumType.STRING)
+    public StorageUnit getUnit() {
+        return this.unit;
+    }
 
-	public String getFormat() {
-		return format;
-	}
+    public void setUnit(final StorageUnit unit) {
+        this.unit = unit;
+    }
 
-	public void setFormat(String format) {
-		this.format = format;
-	}
+    public Float getQuantity() {
+        return this.quantity;
+    }
 
-	public String getAttachmentPoint() {
-		return this.attachmentPoint;
-	}
+    public void setQuantity(final Float quantity) {
+        this.quantity = quantity;
+    }
 
-	public void setAttachmentPoint(String attachmentPoint) {
-		this.attachmentPoint = attachmentPoint;
-	}
+    public String getFormat() {
+        return this.format;
+    }
+
+    public void setFormat(final String format) {
+        this.format = format;
+    }
+
+    public String getAttachmentPoint() {
+        return this.attachmentPoint;
+    }
+
+    public void setAttachmentPoint(final String attachmentPoint) {
+        this.attachmentPoint = attachmentPoint;
+    }
+
+    @Override
+    public String toString() {
+        return "DiskTemplate [unit=" + this.unit + ", quantity=" + this.quantity + ", format=" + this.format
+            + ", attachmentPoint=" + this.attachmentPoint + "]";
+    }
+
 }
