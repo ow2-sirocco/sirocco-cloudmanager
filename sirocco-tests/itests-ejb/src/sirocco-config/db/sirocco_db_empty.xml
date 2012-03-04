@@ -1,5 +1,42 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <dataset>
+  <table name="CloudProviderLocation">
+    <column>id</column>
+    <column>gps_altitude</column>
+    <column>gps_latitude</column>
+    <column>gps_longitude</column>
+    <column>cityName</column>
+    <column>countryName</column>
+    <column>iso3166_1</column>
+    <column>iso3166_2</column>
+    <column>postal_code</column>
+    <column>stateName</column>
+  </table>
+  <table name="User">
+    <column>id</column>
+    <column>createDate</column>
+    <column>email</column>
+    <column>firstName</column>
+    <column>lastName</column>
+    <column>password</column>
+    <column>username</column>
+  </table>
+  <table name="CloudEntryPoint">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="CloudEntryPoint_properties">
+    <column>CloudEntryPoint_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
   <table name="CloudProvider">
     <column>id</column>
     <column>cloudProviderType</column>
@@ -11,24 +48,9 @@
     <column>password</column>
     <column>cloudProvider_id</column>
   </table>
-  <table name="User">
-    <column>id</column>
-    <column>createDate</column>
-    <column>email</column>
-    <column>firstName</column>
-    <column>lastName</column>
-    <column>password</column>
-    <column>username</column>
-  </table>
   <table name="CloudProviderAccount_User">
     <column>cloudProviderAccounts_id</column>
     <column>users_id</column>
-  </table>
-  <table name="CloudProviderLocation">
-    <column>id</column>
-    <column>countryName</column>
-    <column>iso3166code</column>
-    <column>stateName</column>
   </table>
   <table name="CloudProviderLocation_CloudProvider">
     <column>cloudProviderLocations_id</column>
@@ -47,22 +69,6 @@
     <column>userName</column>
     <column>location_id</column>
     <column>user_id</column>
-  </table>
-  <table name="CredentialsCollection">
-    <column>id</column>
-    <column>created</column>
-    <column>deleted</column>
-    <column>description</column>
-    <column>name</column>
-    <column>providerAssignedId</column>
-    <column>updated</column>
-    <column>location_id</column>
-    <column>user_id</column>
-  </table>
-  <table name="CredentialsCollection_properties">
-    <column>CredentialsCollection_id</column>
-    <column>element</column>
-    <column>mapkey</column>
   </table>
   <table name="Credentials_properties">
     <column>Credentials_id</column>
