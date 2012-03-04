@@ -45,6 +45,7 @@ import javax.persistence.NamedQuery;
 
 import org.hibernate.annotations.CollectionOfElements;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity

@@ -28,9 +28,9 @@ package org.ow2.sirocco.cloudmanager.core.api;
 import java.util.List;
 import java.util.Map;
 
-import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
-import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;

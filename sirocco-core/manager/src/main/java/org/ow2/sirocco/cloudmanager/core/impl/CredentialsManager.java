@@ -45,9 +45,9 @@ import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
-import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
-import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
@@ -55,7 +55,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Stateless(name = ICredentialsManager.EJB_JNDI_NAME, mappedName = ICredentialsManager.EJB_JNDI_NAME)
 @Remote(IRemoteCredentialsManager.class)

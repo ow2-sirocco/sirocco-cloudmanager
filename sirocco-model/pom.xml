@@ -43,7 +43,6 @@
 
 	<modules>
 		<module>cimi</module>
-		<module>extensions</module>
 	</modules>
 
 </project>

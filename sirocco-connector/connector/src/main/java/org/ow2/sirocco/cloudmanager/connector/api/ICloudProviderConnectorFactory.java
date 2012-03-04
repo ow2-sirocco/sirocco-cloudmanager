@@ -27,8 +27,8 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 
 import java.util.List;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 public interface ICloudProviderConnectorFactory {
     String CLOUD_PROVIDER_TYPE_PROPERTY = "cloudprovider.type";

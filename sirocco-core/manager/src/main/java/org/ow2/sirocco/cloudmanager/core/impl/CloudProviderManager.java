@@ -54,13 +54,13 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
-import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Stateless(name = ICloudProviderManager.EJB_JNDI_NAME, mappedName = ICloudProviderManager.EJB_JNDI_NAME)
 @Remote(IRemoteCloudProviderManager.class)

@@ -23,7 +23,7 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.core.exception;
+package org.ow2.sirocco.cloudmanager.core.api.exception;
 
 /**
  * Base class of the exception classes.

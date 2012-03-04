@@ -95,25 +95,22 @@ public class SqlTableCreator {
 
         ArrayList<Class> coll = new ArrayList<Class>();
 
-        
-        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider.class);
-        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount.class);
-        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation.class);
-        
+        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider.class);
+        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount.class);
+        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation.class);
+
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.Credentials.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.Machine.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.Volume.class);
-        
-        
-        
+
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration.class);
-        
-        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.User.class);
+
+        coll.add(org.ow2.sirocco.cloudmanager.model.cimi.extension.User.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.class);
         coll.add(org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity.class);
 

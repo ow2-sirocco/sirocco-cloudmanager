@@ -33,6 +33,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+
 @Entity
 public class MachineImage extends CloudEntity implements Serializable {
 	private static final long serialVersionUID = 1L;

@@ -23,7 +23,7 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.model.cimi;
+package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -38,6 +38,14 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 
 @Entity
 public class User implements Serializable {

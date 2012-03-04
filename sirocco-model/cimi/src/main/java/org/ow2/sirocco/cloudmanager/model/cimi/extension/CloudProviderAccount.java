@@ -23,7 +23,7 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.model.cimi;
+package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -39,6 +39,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 
 @Entity
 public class CloudProviderAccount implements Serializable {

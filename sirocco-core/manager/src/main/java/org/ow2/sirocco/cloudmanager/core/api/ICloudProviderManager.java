@@ -27,10 +27,10 @@ package org.ow2.sirocco.cloudmanager.core.api;
 
 import java.util.Map;
 
-import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 public interface ICloudProviderManager {
 

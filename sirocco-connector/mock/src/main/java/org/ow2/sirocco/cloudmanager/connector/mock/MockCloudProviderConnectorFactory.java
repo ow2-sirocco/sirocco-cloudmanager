@@ -37,8 +37,8 @@ import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 

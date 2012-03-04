@@ -49,7 +49,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 /**
  * This class requires the following system properties: -Dcarol.port=1099

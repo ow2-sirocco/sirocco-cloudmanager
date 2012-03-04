@@ -2,8 +2,8 @@ package org.ow2.sirocco.cloudmanager.core.api;
 
 import java.util.Map;
 
-import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.model.cimi.User;
+import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 public interface IUserManager {
 

@@ -23,7 +23,7 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.core.exception;
+package org.ow2.sirocco.cloudmanager.core.api.exception;
 
 /**
  * Request specified on a resource identifier that does not exist

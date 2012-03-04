@@ -23,19 +23,21 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.core.exception;
+package org.ow2.sirocco.cloudmanager.core.api.exception;
 
 /**
- * Invalid parameter or field names in the request
+ * Creation or update request could not be completed, , because it would cause 
+ * a conflict in the current state of the resources supported by the 
+ * platform. 
  */
-public class InvalidRequestException extends CloudProviderException {
+public class ResourceConflictException extends CloudProviderException {
     private static final long serialVersionUID = 5657353511794738070L;
 
     /**
-     * Constructs a InvalidRequestException with null as its error detail
+     * Constructs a ResourceConflictException with null as its error detail
      * message.
      */
-    public InvalidRequestException() {
+    public ResourceConflictException() {
     }
 
     /**
@@ -43,7 +45,7 @@ public class InvalidRequestException extends CloudProviderException {
      * 
      * @param message the detail message
      */
-    public InvalidRequestException(String message) {
+    public ResourceConflictException(String message) {
         super(message);
     }
 

@@ -41,7 +41,7 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
-import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
@@ -50,10 +50,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Stateless(name = IUserManager.EJB_JNDI_NAME, mappedName = IUserManager.EJB_JNDI_NAME)
 @Remote(IRemoteUserManager.class)

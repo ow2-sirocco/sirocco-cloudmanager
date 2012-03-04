@@ -39,6 +39,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+
 @NamedQueries(value = {@NamedQuery(name = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM Volume v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
 public class Volume extends CloudEntity implements Serializable {
