@@ -23,14 +23,13 @@
    $Id$
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager-itests</artifactId>
-		<version>0.5.0-SNAPSHOT</version>
+		<version>0.5.0</version>
 	</parent>
 
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
@@ -306,11 +305,9 @@
 
 										<property name="carol.protocol" value="jrmp" />
 
-										<typedef resource="org/ow2/jonas/ant/antlib.xml"
-											classpath="${jonas.root}/lib/common/ow_jonas_ant.jar" />
+										<typedef resource="org/ow2/jonas/ant/antlib.xml" classpath="${jonas.root}/lib/common/ow_jonas_ant.jar" />
 
-										<jonasbase jonasRoot="${jonas.root}" destDir="${jonas.base}"
-											update="off">
+										<jonasbase jonasRoot="${jonas.root}" destDir="${jonas.base}" update="off">
 											<!--<jonasProperties services="db,resource,ejb3,depmonitor" /> -->
 											<webcontainer ondemandenabled="false">
 												<tomcat>
@@ -320,8 +317,7 @@
 													<http port="${webcontainer.port}" />
 												</jetty>
 											</webcontainer>
-											<jms port="${jms.port}" initialTopics="JobCompletion"
-												initialQueues="" />
+											<jms port="${jms.port}" initialTopics="JobCompletion" initialQueues="" />
 											<carol defaultPort="${carol.port}" protocols="${carol.protocol}" />
 											<db port="${db.port}" />
 										</jonasbase>
@@ -330,23 +326,17 @@
 										<copy todir="${jonas.base}/deploy">
 											<fileset dir="src/sirocco-config/deploy" />
 										</copy>
-										<replace file="${jonas.base}/deploy/datasource.xml"
-											token="@db.url@" value="${database.url}" />
-										<replace file="${jonas.base}/deploy/datasource.xml"
-											token="@db.driver@" value="${database.driver}" />
-										<replace file="${jonas.base}/deploy/datasource.xml"
-											token="@db.user@" value="${database.username}" />
-										<replace file="${jonas.base}/deploy/datasource.xml"
-											token="@db.password@" value="${database.password}" />
-										<replace file="${jonas.base}/deploy/datasource.xml"
-											token="@db.mapper@" value="${database.mapper}" />
-										<replace file="${jonas.base}/deploy/datasource.xml"
-											token="@db.teststmt@" value="${database.teststmt}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.url@" value="${database.url}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.driver@" value="${database.driver}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.user@" value="${database.username}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.password@" value="${database.password}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.mapper@" value="${database.mapper}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.teststmt@" value="${database.teststmt}" />
 
 
 
 
-										token="@sirocco.version@" value="${project.version}" />
+										token="@sirocco.version@" value="${project.version}" /&gt;
 
 										<copy todir="${jonas.base}/etc">
 											<fileset dir="src/sirocco-config/etc" />
@@ -355,8 +345,7 @@
 											<fileset dir="src/sirocco-config/conf" />
 										</copy>
 
-										<replace file="${jonas.base}/conf/initial-repositories.xml"
-											token="@local.repository@" value="${project.build.directory}/repository" />
+										<replace file="${jonas.base}/conf/initial-repositories.xml" token="@local.repository@" value="${project.build.directory}/repository" />
 
 									</tasks>
 								</configuration>
