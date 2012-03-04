@@ -25,10 +25,9 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.util.Map;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.annotation.Resource;
@@ -37,21 +36,24 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.persistence.Query;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
+import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
-import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
 
@@ -101,13 +103,20 @@ public class CredentialsManager implements ICredentialsManager {
         }
     }
 
-    public Credentials createCredentials(final Credentials credentials) throws CloudProviderException {
+    public Credentials createCredentials(final CredentialsCreate credentialsCreate) throws CloudProviderException {
         this.setUser();
         // validate user
         CredentialsManager.logger.info("validateCredentials ");
-        this.validateCredentials(credentials);
+
+        Credentials credentials = new Credentials();
         credentials.setCreated(new Date());
         credentials.setUser(this.user);
+        credentials.setUserName(credentialsCreate.getCredentialsTemplate().getUserName());
+        credentials.setPassword(credentialsCreate.getCredentialsTemplate().getPassword());
+        credentials.setPublicKey(credentialsCreate.getCredentialsTemplate().getPublicKey());
+
+        this.validateCredentials(credentials);
+
         CredentialsManager.logger.info("Persist credentials  " + credentials.getName());
         this.em.persist(credentials);
         this.em.flush();
@@ -115,18 +124,16 @@ public class CredentialsManager implements ICredentialsManager {
         return credentials;
     }
 
-    
-    
     public Credentials updateCredentials(final Credentials credentials) throws CloudProviderException {
-    	
+
         this.setUser();
-        
+
         Credentials c = this.em.find(Credentials.class, credentials.getId());
         if (c == null) {
-        	throw new ResourceNotFoundException(" Could not find credential "+credentials.getId());
+            throw new ResourceNotFoundException(" Could not find credential " + credentials.getId());
         }
-        if (c.getUser().getUsername() != user.getUsername()) {
-        	throw new CloudProviderException(" Unauthorized to change creds " +user.getUsername());
+        if (c.getUser().getUsername() != this.user.getUsername()) {
+            throw new CloudProviderException(" Unauthorized to change creds " + this.user.getUsername());
         }
         this.validateCredentials(credentials);
         this.em.merge(credentials);
@@ -158,15 +165,15 @@ public class CredentialsManager implements ICredentialsManager {
         return cred;
     }
 
-    public void deleteCredentials(final String credentialsId) 
-    		throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
+    public void deleteCredentials(final String credentialsId) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException {
         this.setUser();
         if (credentialsId == null) {
             throw new InvalidRequestException("null credentials id");
         }
         Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
         if (cred == null) {
-        	throw new ResourceNotFoundException(" Invalid credential id " +credentialsId);
+            throw new ResourceNotFoundException(" Invalid credential id " + credentialsId);
         }
         /**
          * if anymachine template refers to this credential do not delete.
@@ -188,19 +195,17 @@ public class CredentialsManager implements ICredentialsManager {
         return;
     }
 
-    
-    public void updateCredentialsAttributes(String credentialsId, Map<String, Object> attributes) 
-    		throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
-    	
-    	
-    	if (credentialsId == null) {
+    public void updateCredentialsAttributes(final String credentialsId, final Map<String, Object> attributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
+
+        if (credentialsId == null) {
             throw new InvalidRequestException("null credentials id");
         }
         Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
         if (cred == null) {
             throw new ResourceNotFoundException("Credentials " + credentialsId + " not found");
         }
-        
+
         try {
             UtilsForManagers.fillObject(cred, attributes);
         } catch (Exception e) {
@@ -210,68 +215,132 @@ public class CredentialsManager implements ICredentialsManager {
         this.em.flush();
     }
 
-    public List<Credentials> getCredentials(List<String> attributes, String filterExpression)
-    		throws InvalidRequestException, CloudProviderException {
-    	this.setUser();
-    	throw new InvalidRequestException(" getCredentials with filter expression ");
+    public List<Credentials> getCredentials(final List<String> attributes, final String filterExpression)
+        throws InvalidRequestException, CloudProviderException {
+        this.setUser();
+        throw new InvalidRequestException(" getCredentials with filter expression ");
     }
 
-    public List<Credentials> getCredentials(int first, int last, List<String> attributes) throws InvalidRequestException,
-    CloudProviderException {
-    	
-    	 this.setUser();
-         if ((first < 0) || (last < 0) || (last < first)) {
-             throw new InvalidRequestException(" Illegal array index " + first + " " + last);
-         }
+    public List<Credentials> getCredentials(final int first, final int last, final List<String> attributes)
+        throws InvalidRequestException, CloudProviderException {
 
-         Query query = this.em
-             .createNamedQuery("FROM Credentials c WHERE c.user.username=:userName ORDER BY c.id");
-         query.setParameter("userName", this.user.getUsername());
-         query.setMaxResults(last - first + 1);
-         query.setFirstResult(first);
-         List<Credentials> creds = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-         
-         return creds;
-    	
+        this.setUser();
+        if ((first < 0) || (last < 0) || (last < first)) {
+            throw new InvalidRequestException(" Illegal array index " + first + " " + last);
+        }
+
+        Query query = this.em.createNamedQuery("FROM Credentials c WHERE c.user.username=:userName ORDER BY c.id");
+        query.setParameter("userName", this.user.getUsername());
+        query.setMaxResults(last - first + 1);
+        query.setFirstResult(first);
+        List<Credentials> creds = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
+
+        return creds;
+
     }
 
     public CredentialsCollection getCredentialsCollection() throws CloudProviderException {
-    
-    	this.setUser();
+
+        this.setUser();
         Integer userid = this.user.getId();
         Query query = this.em.createQuery("SELECT c FROM Credentials c WHERE c.user.id=:userid");
         List<Credentials> creds = query.setParameter("userid", userid).getResultList();
         CredentialsCollection collection = null;
         try {
-        	collection = (CredentialsCollection) this.em
-        			.createQuery("FROM CredentialsCollection m WHERE m.user.id=:userid").setParameter("userid", userid)
-        			.getSingleResult();
+            collection = (CredentialsCollection) this.em.createQuery("FROM CredentialsCollection m WHERE m.user.id=:userid")
+                .setParameter("userid", userid).getSingleResult();
         } catch (Exception e) {
-        	throw new CloudProviderException(" Internal error " +e.getMessage());
+            throw new CloudProviderException(" Internal error " + e.getMessage());
         }
         collection.setCredentials(creds);
         return collection;
     }
 
-    public void updateCredentialsCollection(Map<String, Object> attributes) throws CloudProviderException {
-    	
-    	this.setUser();
-    	Integer userid = user.getId();
-    	CredentialsCollection collection = null;
-    	try {
-        	collection = (CredentialsCollection) this.em
-        			.createQuery("FROM CredentialsCollection m WHERE m.user.id=:userid").setParameter("userid", userid)
-        			.getSingleResult();
+    public void updateCredentialsCollection(final Map<String, Object> attributes) throws CloudProviderException {
+
+        this.setUser();
+        Integer userid = this.user.getId();
+        CredentialsCollection collection = null;
+        try {
+            collection = (CredentialsCollection) this.em.createQuery("FROM CredentialsCollection m WHERE m.user.id=:userid")
+                .setParameter("userid", userid).getSingleResult();
         } catch (Exception e) {
-        	throw new CloudProviderException(" Internal error " +e.getMessage());
+            throw new CloudProviderException(" Internal error " + e.getMessage());
         }
-    	
-    	try {
+
+        try {
             UtilsForManagers.fillObject(collection, attributes);
         } catch (Exception e) {
             e.printStackTrace();
-            throw new CloudProviderException("Error updating credentials collection " +e.getMessage());
+            throw new CloudProviderException("Error updating credentials collection " + e.getMessage());
         }
+    }
+
+    @Override
+    public CredentialsTemplate createCredentialsTemplate(final CredentialsTemplate credentialsTemplate)
+        throws CloudProviderException {
+        this.setUser();
+
+        credentialsTemplate.setUser(this.user);
+        credentialsTemplate.setCreated(new Date());
+
+        CredentialsManager.logger.info("Persist credentialsTemplate  " + credentialsTemplate.getName());
+        this.em.persist(credentialsTemplate);
+        this.em.flush();
+        return credentialsTemplate;
+    }
+
+    @Override
+    public CredentialsTemplate updateCredentialsTemplate(final CredentialsTemplate credentialsTemplate)
+        throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public CredentialsTemplate getCredentialsTemplateById(final String credentialsTemplateId) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteCredentialsTemplate(final String credentialsTemplateId) throws ResourceNotFoundException,
+        InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateCredentialsTemplateAttributes(final String credentialsTemplateId, final Map<String, Object> attributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public List<CredentialsTemplate> getCredentialsTemplates(final List<String> attributes, final String filterExpression)
+        throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<CredentialsTemplate> getCredentialsTemplates(final int first, final int last, final List<String> attributes)
+        throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public CredentialsTemplateCollection getCredentialsTemplateCollection() throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void updateCredentialsTemplateCollection(final Map<String, Object> attributes) throws CloudProviderException {
+        // TODO Auto-generated method stub
+
     }
 
 }

@@ -29,36 +29,63 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 
+/**
+ * Credentials management operations
+ */
 public interface ICredentialsManager {
-	
-	static final String EJB_JNDI_NAME = "CredentialsManager";
-	
-	Credentials createCredentials(Credentials credentials) throws CloudProviderException;
+
+    static final String EJB_JNDI_NAME = "CredentialsManager";
+
+    Credentials createCredentials(CredentialsCreate credentialsCreate) throws CloudProviderException;
+
     Credentials updateCredentials(Credentials credentials) throws CloudProviderException;
+
     Credentials getCredentialsById(String credentialsId) throws CloudProviderException;
-    void deleteCredentials(String credentialsId) throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-	void updateCredentialsAttributes(String credentialsId,
-			Map<String, Object> attributes) throws ResourceNotFoundException,
-			InvalidRequestException, CloudProviderException;
+    void deleteCredentials(String credentialsId) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException;
 
-	List<Credentials> getCredentials(List<String> attributes,
-			String filterExpression) throws InvalidRequestException,
-			CloudProviderException;
+    void updateCredentialsAttributes(String credentialsId, Map<String, Object> attributes) throws ResourceNotFoundException,
+        InvalidRequestException, CloudProviderException;
 
-	List<Credentials> getCredentials(int first, int last,
-									 List<String> attributes) 
-					throws InvalidRequestException, CloudProviderException;
+    List<Credentials> getCredentials(List<String> attributes, String filterExpression) throws InvalidRequestException,
+        CloudProviderException;
 
-	CredentialsCollection getCredentialsCollection()
-			throws CloudProviderException;
+    List<Credentials> getCredentials(int first, int last, List<String> attributes) throws InvalidRequestException,
+        CloudProviderException;
 
-	void updateCredentialsCollection(Map<String, Object> attributes)
-			throws CloudProviderException;
+    CredentialsCollection getCredentialsCollection() throws CloudProviderException;
+
+    void updateCredentialsCollection(Map<String, Object> attributes) throws CloudProviderException;
+
+    CredentialsTemplate createCredentialsTemplate(CredentialsTemplate credentialsTemplate) throws CloudProviderException;
+
+    CredentialsTemplate updateCredentialsTemplate(CredentialsTemplate credentialsTemplate) throws CloudProviderException;
+
+    CredentialsTemplate getCredentialsTemplateById(String credentialsTemplateId) throws CloudProviderException;
+
+    void deleteCredentialsTemplate(String credentialsTemplateId) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException;
+
+    void updateCredentialsTemplateAttributes(String credentialsTemplateId, Map<String, Object> attributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
+
+    List<CredentialsTemplate> getCredentialsTemplates(List<String> attributes, String filterExpression)
+        throws InvalidRequestException, CloudProviderException;
+
+    List<CredentialsTemplate> getCredentialsTemplates(int first, int last, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
+
+    CredentialsTemplateCollection getCredentialsTemplateCollection() throws CloudProviderException;
+
+    void updateCredentialsTemplateCollection(Map<String, Object> attributes) throws CloudProviderException;
 
 }
