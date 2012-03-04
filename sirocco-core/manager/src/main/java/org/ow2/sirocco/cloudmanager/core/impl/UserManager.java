@@ -39,18 +39,15 @@ import javax.persistence.PersistenceContextType;
 
 import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
-import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudProvider;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.User;
@@ -64,8 +61,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 @SuppressWarnings("unused")
 public class UserManager implements IUserManager {
 
-    private static Logger logger = Logger
-            .getLogger(UserManager.class.getName());
+    private static Logger logger = Logger.getLogger(UserManager.class.getName());
+
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
@@ -73,8 +70,8 @@ public class UserManager implements IUserManager {
     private SessionContext ctx;
 
     @Override
-    public User createUser(String firstName, String lastName, String email,
-            String username, String password) throws CloudProviderException {
+    public User createUser(final String firstName, final String lastName, final String email, final String username,
+        final String password) throws CloudProviderException {
         User u = new User();
         u.setFirstName(firstName);
         u.setLastName(lastName);
@@ -87,16 +84,16 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public User createUser(User u) throws CloudProviderException {
-        //if (!isUserValid(u)) {
-        //    throw new UserException("user validation failed");
-        //}
-        createAllCollections(u);
+    public User createUser(final User u) throws CloudProviderException {
+        // if (!isUserValid(u)) {
+        // throw new UserException("user validation failed");
+        // }
+        this.createAllCollections(u);
         this.em.persist(u);
         return u;
     }
 
-    private void createAllCollections(User u) {
+    private void createAllCollections(final User u) {
         // create collection objects and attach them to the user
         MachineImageCollection mic = new MachineImageCollection();
         mic.setUser(u);
@@ -112,6 +109,8 @@ public class UserManager implements IUserManager {
         vtc.setUser(u);
         VolumeConfigurationCollection vcc = new VolumeConfigurationCollection();
         vcc.setUser(u);
+        CloudEntryPoint cep = new CloudEntryPoint();
+        cep.setUser(u);
 
         // persist them in the database
         this.em.persist(mic);
@@ -121,9 +120,10 @@ public class UserManager implements IUserManager {
         this.em.persist(mcc);
         this.em.persist(vtc);
         this.em.persist(vcc);
+        this.em.persist(cep);
     }
 
-    private boolean isUserValid(User u) {
+    private boolean isUserValid(final User u) {
         if (u.getFirstName() == null) {
             return false;
         }
@@ -156,7 +156,7 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public User getUserById(String userId) throws CloudProviderException {
+    public User getUserById(final String userId) throws CloudProviderException {
 
         User result = this.em.find(User.class, new Integer(userId));
 
@@ -165,20 +165,18 @@ public class UserManager implements IUserManager {
 
     @SuppressWarnings("unchecked")
     @Override
-    public User getUserByUsername(String userName) throws CloudProviderException {
+    public User getUserByUsername(final String userName) throws CloudProviderException {
 
         User u = null;
 
-        List<User> l = this.em
-                .createQuery("FROM User u WHERE u.username=:usrname")
-                .setParameter("usrname", userName).getResultList();
+        List<User> l = this.em.createQuery("FROM User u WHERE u.username=:usrname").setParameter("usrname", userName)
+            .getResultList();
 
         return l.get(0);
     }
 
     @Override
-    public User updateUser(String id, Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public User updateUser(final String id, final Map<String, Object> updatedAttributes) throws CloudProviderException {
 
         User u = this.getUserById(id);
 
@@ -193,29 +191,29 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public User updateUser(User user) throws CloudProviderException {
+    public User updateUser(final User user) throws CloudProviderException {
 
         Integer userId = user.getId();
-        //if (!isUserValid(user)) {
-        //    throw new UserException("user validation failed");
-        //}
+        // if (!isUserValid(user)) {
+        // throw new UserException("user validation failed");
+        // }
         this.em.merge(user);
 
         return user;
     }
 
     @Override
-    public void deleteUser(String userId) throws CloudProviderException {
+    public void deleteUser(final String userId) throws CloudProviderException {
 
         User result = this.getUserById(userId);
 
-        removeCollection("MachineImageCollection", result);
-        removeCollection("MachineCollection", result);
-        removeCollection("VolumeCollection", result);
-        removeCollection("MachineTemplateCollection", result);
-        removeCollection("MachineConfigurationCollection", result);
-        removeCollection("VolumeTemplateCollection", result);
-        removeCollection("VolumeConfigurationCollection", result);
+        this.removeCollection("MachineImageCollection", result);
+        this.removeCollection("MachineCollection", result);
+        this.removeCollection("VolumeCollection", result);
+        this.removeCollection("MachineTemplateCollection", result);
+        this.removeCollection("MachineConfigurationCollection", result);
+        this.removeCollection("VolumeTemplateCollection", result);
+        this.removeCollection("VolumeConfigurationCollection", result);
 
         if (result != null) {
             this.em.remove(result);
@@ -224,10 +222,9 @@ public class UserManager implements IUserManager {
     }
 
     @SuppressWarnings("unchecked")
-    private void removeCollection(String Type, User u) {
-        List<CloudEntity> l = this.em
-                .createQuery("FROM " + Type + " t WHERE t.user=:usrid")
-                .setParameter("usrid", u).getResultList();
+    private void removeCollection(final String Type, final User u) {
+        List<CloudEntity> l = this.em.createQuery("FROM " + Type + " t WHERE t.user=:usrid").setParameter("usrid", u)
+            .getResultList();
         for (CloudEntity lmic : l) {
             lmic.setUser(null);
             this.em.remove(lmic);
