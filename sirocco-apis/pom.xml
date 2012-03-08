@@ -39,6 +39,7 @@
 
 
 	<modules>
+		<module>sirocco-rest-cimi</module>
 	</modules>
 
 </project>
