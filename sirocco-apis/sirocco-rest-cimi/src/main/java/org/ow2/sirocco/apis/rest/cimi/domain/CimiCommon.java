@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id: CimiCommon.java 127 2012-03-08 00:26:28Z antonma $
+ * $Id$
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;

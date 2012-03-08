@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id: ConverterServiceResponse.java 123 2012-03-07 14:41:51Z antonma $
+ * $Id$
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;

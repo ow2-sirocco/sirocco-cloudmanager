@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id: RequestHeader.java 134 2012-03-08 16:56:21Z antonma $
+ * $Id$
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.request;

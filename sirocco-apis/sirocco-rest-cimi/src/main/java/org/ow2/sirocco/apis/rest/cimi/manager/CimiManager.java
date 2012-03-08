@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id: CimiManager.java 119 2012-03-06 17:36:16Z antonma $
+ * $Id$
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;

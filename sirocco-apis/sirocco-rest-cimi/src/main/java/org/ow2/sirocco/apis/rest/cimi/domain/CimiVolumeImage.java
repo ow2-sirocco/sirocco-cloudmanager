@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id: CimiVolumeImage.java 121 2012-03-07 14:40:34Z antonma $
+ * $Id$
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
