@@ -124,7 +124,7 @@ public class CredentialsManager implements ICredentialsManager {
         return credentials;
     }
 
-    public Credentials updateCredentials(final Credentials credentials) throws CloudProviderException {
+    public void updateCredentials(final Credentials credentials) throws CloudProviderException {
 
         this.setUser();
 
@@ -138,7 +138,6 @@ public class CredentialsManager implements ICredentialsManager {
         this.validateCredentials(credentials);
         this.em.merge(credentials);
 
-        return credentials;
     }
 
     public Credentials getCredentialsById(final String credentialsId) throws CloudProviderException {
@@ -291,10 +290,8 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     @Override
-    public CredentialsTemplate updateCredentialsTemplate(final CredentialsTemplate credentialsTemplate)
-        throws CloudProviderException {
+    public void updateCredentialsTemplate(final CredentialsTemplate credentialsTemplate) throws CloudProviderException {
         // TODO Auto-generated method stub
-        return null;
     }
 
     @Override

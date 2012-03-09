@@ -50,9 +50,9 @@ public interface IJobManager {
 
     List<Job> getJobs(int first, int last, List<String> attributes) throws InvalidRequestException, CloudProviderException;
 
-    Job updateJob(Job job) throws CloudProviderException;
+    void updateJob(Job job) throws CloudProviderException;
 
-    Job updateJobAttributes(String id, Map<String, Object> updatedAttributes) throws ResourceNotFoundException,
+    void updateJobAttributes(String id, Map<String, Object> updatedAttributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
     JobCollection getJobCollection() throws CloudProviderException;

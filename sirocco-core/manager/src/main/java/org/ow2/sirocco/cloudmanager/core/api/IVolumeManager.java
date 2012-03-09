@@ -248,6 +248,18 @@ public interface IVolumeManager {
         CloudProviderException;
 
     /**
+     * Updates a volume, this operation is asynchronous
+     * 
+     * @param volume a volume with new values to update
+     * @return the job representing the asynchronous update operation
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws InvalidRequestException raised if the the request is invalid
+     * @throws CloudProviderException raised if any other type of runtime fault
+     *         occurs
+     */
+    Job updateVolume(Volume volume) throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
+
+    /**
      * Updates some attributes of a Volume, this operation is asynchronous
      * 
      * @param volumeId the id of the Volume
@@ -262,6 +274,19 @@ public interface IVolumeManager {
         InvalidRequestException, CloudProviderException;
 
     /**
+     * Updates a Volume Configuration
+     * 
+     * @param volumeConfiguration the new Volume Configuration instance with new
+     *        values to update
+     * @throws InvalidRequestException raised if the the request is invalid
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws CloudProviderException raised if any other type of runtime fault
+     *         occurs
+     */
+    void updateVolumeConfiguration(VolumeConfiguration volumeConfiguration) throws InvalidRequestException,
+        ResourceNotFoundException, CloudProviderException;
+
+    /**
      * Updates some attributes of a VolumeConfiguration
      * 
      * @param volumeConfigId the id of the VolumeConfiguration
@@ -273,6 +298,19 @@ public interface IVolumeManager {
      */
     void updateVolumeConfigurationAttributes(String volumeConfigId, Map<String, Object> updatedAttributes)
         throws InvalidRequestException, ResourceNotFoundException, CloudProviderException;
+
+    /**
+     * Updates a Volume Template
+     * 
+     * @param volumeTemplate a Volume Template instance with new values to
+     *        update
+     * @throws InvalidRequestException raised if the the request is invalid
+     * @throws ResourceNotFoundException raised if the provided id is invalid
+     * @throws CloudProviderException raised if any other type of runtime fault
+     *         occurs
+     */
+    void updateVolumeTemplate(VolumeTemplate volumeTemplate) throws InvalidRequestException, ResourceNotFoundException,
+        CloudProviderException;
 
     /**
      * Updates some attributes of a VolumeTemplate

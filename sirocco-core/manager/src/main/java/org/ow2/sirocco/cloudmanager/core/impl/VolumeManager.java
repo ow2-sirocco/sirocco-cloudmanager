@@ -26,6 +26,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
@@ -371,6 +372,24 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
+    public Job updateVolume(final Volume volume) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException {
+        Volume volumeInDb = this.getVolumeById(volume.getId().toString());
+        if (volumeInDb == null) {
+            throw new ResourceNotFoundException("Volume " + volume.getId() + " doesn't not exist");
+        }
+        // TODO
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateVolumeConfiguration(final VolumeConfiguration volumeConfiguration) throws InvalidRequestException,
+        ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     public void updateVolumeConfigurationAttributes(final String volumeConfigId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, CloudProviderException {
         VolumeConfiguration volumeConfig = this.getVolumeConfigurationById(volumeConfigId);
@@ -397,6 +416,13 @@ public class VolumeManager implements IVolumeManager {
         if (updated) {
             volumeConfig.setUpdated(new Date());
         }
+    }
+
+    @Override
+    public void updateVolumeTemplate(final VolumeTemplate volumeTemplate) throws InvalidRequestException,
+        ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

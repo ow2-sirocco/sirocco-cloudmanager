@@ -69,12 +69,11 @@ public class JobManager implements IJobManager {
     }
 
     @Override
-    public Job updateJob(final Job job) throws CloudProviderException {
+    public void updateJob(final Job job) throws CloudProviderException {
 
         Integer jobId = job.getId();
         this.em.merge(job);
 
-        return this.getJobById(jobId.toString());
     }
 
     /*
@@ -133,10 +132,9 @@ public class JobManager implements IJobManager {
     }
 
     @Override
-    public Job updateJobAttributes(final String id, final Map<String, Object> updatedAttributes)
+    public void updateJobAttributes(final String id, final Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
-        return null;
     }
 
 }

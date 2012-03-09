@@ -130,6 +130,12 @@ public class MachineImageManager implements IMachineImageManager {
         return image;
     }
 
+    @Override
+    public MachineImage getMachineImageAttributes(final String imageId, final List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException {
+        return this.getMachineImageById(imageId);
+    }
+
     public void deleteMachineImage(final String imageId) throws CloudProviderException, ResourceNotFoundException {
         this.setUser();
         MachineImage image = null;
@@ -219,6 +225,13 @@ public class MachineImageManager implements IMachineImageManager {
             e.printStackTrace();
             throw new CloudProviderException("Error updating machine image collection " + e.getMessage());
         }
+    }
+
+    @Override
+    public void updateMachineImage(final MachineImage machineImage) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException {
+        // TODO Auto-generated method stub
+
     }
 
     public void updateMachineImageAttributes(final String imageId, final Map<String, Object> attributes)

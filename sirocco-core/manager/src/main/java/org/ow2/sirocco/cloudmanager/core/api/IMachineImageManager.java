@@ -48,7 +48,13 @@ public interface IMachineImageManager {
 
     MachineImage getMachineImageById(String imageId) throws ResourceNotFoundException, CloudProviderException;
 
+    MachineImage getMachineImageAttributes(String imageId, List<String> attributes) throws ResourceNotFoundException,
+        CloudProviderException;
+
     void deleteMachineImage(String imageId) throws ResourceNotFoundException, CloudProviderException;
+
+    void updateMachineImage(MachineImage machineImage) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException;
 
     void updateMachineImageAttributes(String imageId, Map<String, Object> attributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;

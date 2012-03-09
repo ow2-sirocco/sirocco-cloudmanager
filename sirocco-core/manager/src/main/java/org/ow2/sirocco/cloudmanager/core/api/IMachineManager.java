@@ -68,8 +68,10 @@ public interface IMachineManager {
     Machine getMachineAttributes(final String machineId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
 
-    Job updateMachine(final String machineId, Map<String, Object> updatedAttributes) throws ResourceNotFoundException,
-        CloudProviderException;
+    Job updateMachine(final Machine machine) throws ResourceNotFoundException, CloudProviderException;
+
+    Job updateMachineAttributes(final String machineId, Map<String, Object> updatedAttributes)
+        throws ResourceNotFoundException, CloudProviderException;
 
     /**
      * Operations on MachineCollection
@@ -93,7 +95,10 @@ public interface IMachineManager {
     MachineConfiguration getMachineConfigurationById(final String MachineId) throws ResourceNotFoundException,
         CloudProviderException;;
 
-    void updateMachineConfiguration(String machineConfigurationId, Map<String, Object> updatedAttributes)
+    void updateMachineConfiguration(MachineConfiguration machineConfiguration) throws ResourceNotFoundException,
+        InvalidRequestException, CloudProviderException;
+
+    void updateMachineConfigurationAttributes(String machineConfigurationId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
     void deleteMachineConfiguration(final String machineConfigurationId) throws ResourceNotFoundException,
@@ -121,7 +126,10 @@ public interface IMachineManager {
      */
     MachineTemplate getMachineTemplateById(String machineTemplateId) throws ResourceNotFoundException, CloudProviderException;
 
-    MachineTemplate updateMachineTemplate(String machineTemplateId, Map<String, Object> attributes)
+    void updateMachineTemplate(MachineTemplate machineTemplate) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException;
+
+    void updateMachineTemplateAttributes(String machineTemplateId, Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
     void deleteMachineTemplate(String machineTemplateId) throws ResourceNotFoundException, CloudProviderException;

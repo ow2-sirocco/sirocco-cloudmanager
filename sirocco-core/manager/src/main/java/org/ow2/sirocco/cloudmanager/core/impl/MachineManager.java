@@ -734,9 +734,15 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         return s;
     }
 
+    @Override
+    public Job updateMachine(final Machine machine) throws ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     // TODO
-    public Job updateMachine(final String machineId, final Map<String, Object> attributes) throws ResourceNotFoundException,
-        CloudProviderException {
+    public Job updateMachineAttributes(final String machineId, final Map<String, Object> attributes)
+        throws ResourceNotFoundException, CloudProviderException {
 
         Job j = null;
         if (machineId == null) {
@@ -828,7 +834,14 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         return mc;
     }
 
-    public void updateMachineConfiguration(final String mcId, final Map<String, Object> attributes)
+    @Override
+    public void updateMachineConfiguration(final MachineConfiguration machineConfiguration) throws ResourceNotFoundException,
+        InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void updateMachineConfigurationAttributes(final String mcId, final Map<String, Object> attributes)
         throws CloudProviderException {
         if ((mcId == null) || (attributes == null)) {
             throw new InvalidRequestException(" null machine configuration id");
@@ -968,7 +981,14 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         return mt;
     }
 
-    public MachineTemplate updateMachineTemplate(final String mtId, final Map<String, Object> attributes)
+    @Override
+    public void updateMachineTemplate(final MachineTemplate machineTemplate) throws ResourceNotFoundException,
+        InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+
+    }
+
+    public void updateMachineTemplateAttributes(final String mtId, final Map<String, Object> attributes)
         throws CloudProviderException {
         MachineTemplate mt = null;
         if ((mtId == null) || (attributes == null)) {
@@ -1077,7 +1097,6 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         } catch (Exception e) {
             throw new CloudProviderException(e.getMessage());
         }
-        return mt;
     }
 
     private void deleteMachineTemplateFromDb(final MachineTemplate mt) {

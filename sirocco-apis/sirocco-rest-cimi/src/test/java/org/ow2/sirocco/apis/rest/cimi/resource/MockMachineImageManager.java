@@ -67,6 +67,13 @@ public class MockMachineImageManager implements IMachineImageManager {
         return this.buildMachineImage(id);
     }
 
+    @Override
+    public MachineImage getMachineImageAttributes(final String imageId, final List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException {
+        // TODO
+        return null;
+    }
+
     protected MachineImage buildMachineImage(final Integer id) {
         MachineImage image = new MachineImage();
         image.setId(id);
@@ -111,6 +118,12 @@ public class MockMachineImageManager implements IMachineImageManager {
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public void updateMachineImage(final MachineImage machineImage) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException {
+        // TODO
     }
 
     /**

@@ -342,7 +342,7 @@ public class CimiPrimerScenarioTest {
         Map<String, Object> attributeToUpdate = new HashMap<String, Object>();
         attributeToUpdate.put("name", "Cool Demo #1");
         attributeToUpdate.put("description", null);
-        job = this.machineManager.updateMachine(machineId, attributeToUpdate);
+        job = this.machineManager.updateMachineAttributes(machineId, attributeToUpdate);
         this.waitForJobCompletion(job);
 
         machine = this.machineManager.getMachineById(machineId);

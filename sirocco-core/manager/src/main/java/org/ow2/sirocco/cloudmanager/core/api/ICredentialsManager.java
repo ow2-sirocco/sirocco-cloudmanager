@@ -46,7 +46,7 @@ public interface ICredentialsManager {
 
     Credentials createCredentials(CredentialsCreate credentialsCreate) throws CloudProviderException;
 
-    Credentials updateCredentials(Credentials credentials) throws CloudProviderException;
+    void updateCredentials(Credentials credentials) throws CloudProviderException;
 
     Credentials getCredentialsById(String credentialsId) throws CloudProviderException;
 
@@ -68,7 +68,7 @@ public interface ICredentialsManager {
 
     CredentialsTemplate createCredentialsTemplate(CredentialsTemplate credentialsTemplate) throws CloudProviderException;
 
-    CredentialsTemplate updateCredentialsTemplate(CredentialsTemplate credentialsTemplate) throws CloudProviderException;
+    void updateCredentialsTemplate(CredentialsTemplate credentialsTemplate) throws CloudProviderException;
 
     CredentialsTemplate getCredentialsTemplateById(String credentialsTemplateId) throws CloudProviderException;
 
