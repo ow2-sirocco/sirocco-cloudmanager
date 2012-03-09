@@ -46,57 +46,61 @@ public class CimiMachineImageResourceTest extends JerseyTest {
 
     /**
      * {@inheritDoc}
+     * 
      * @see com.sun.jersey.test.framework.JerseyTest#configure()
      */
     @Override
     protected AppDescriptor configure() {
         return new WebAppDescriptor.Builder("javax.ws.rs.Application", SiroccoRestCimiApplication.class.getName())
-                .initParam(JSONConfiguration.FEATURE_POJO_MAPPING, "true").contextPath("sirocco-rest")
-                .servletClass(SpringServlet.class).contextListenerClass(ContextLoaderListener.class)
-                .contextParam("contextConfigLocation", "classpath:context/resourcesContext.xml").build();
+            .initParam(JSONConfiguration.FEATURE_POJO_MAPPING, "true").contextPath("sirocco-rest")
+            .servletClass(SpringServlet.class).contextListenerClass(ContextLoaderListener.class)
+            .contextParam("contextConfigLocation", "classpath:context/resourcesContext.xml").build();
     }
 
     @Test
     public final void testGetMachineImage() throws Exception {
         ClientResponse clientResponse = null;
 
-        clientResponse = resource().path(ConstantsPath.MACHINE_IMAGE + "/834752")
-                .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE)
-                .header(Constants.HEADER_CIMI_VERSION, "232").get(ClientResponse.class);
-        if (clientResponse.getStatus() == 200) {
-            LOGGER.debug("JSON:\n\t{}", clientResponse.getEntity(String.class));
-            LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        // JSON : Version invalide : ko
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/834752")
+            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE).header(Constants.HEADER_CIMI_VERSION, "232")
+            .get(ClientResponse.class);
+        if (clientResponse.getStatus() == 400) {
+            CimiMachineImageResourceTest.LOGGER.debug("JSON:\n\t{}", clientResponse.getEntity(String.class));
+            CimiMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
         }
 
-        clientResponse = resource().path(ConstantsPath.MACHINE_IMAGE + "/834752")
-                .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE)
-                .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
+        // JSON : Ok
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/834752")
+            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE)
+            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
         if (clientResponse.getStatus() == 200) {
-            LOGGER.debug("JSON:\n\t{}", clientResponse.getEntity(String.class));
-            LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+            CimiMachineImageResourceTest.LOGGER.debug("JSON:\n\t{}", clientResponse.getEntity(String.class));
+            CimiMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
         }
 
-        // clientResponse = resource().path(ConstantsPath.MACHINE_IMAGE +
-        // "/foo")
-        // .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE).get(ClientResponse.class);
-        // if (clientResponse.getStatus() == 400) {
-        // System.out.println("=========================================");
-        // System.out.println("REPONSE: " + clientResponse);
-        // }
-
-        clientResponse = resource().path(ConstantsPath.MACHINE_IMAGE + "/834752")
-                .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML_TYPE).get(ClientResponse.class);
-        if (clientResponse.getStatus() == 200) {
-            LOGGER.debug("XML:\n\t{}", clientResponse.getEntity(String.class));
-            LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/foo")
+            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE).get(ClientResponse.class);
+        if (clientResponse.getStatus() == 400) {
+            System.out.println("=========================================");
+            System.out.println("REPONSE: " + clientResponse);
         }
 
-        clientResponse = resource().path(ConstantsPath.MACHINE_IMAGE + "/834752")
-                .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML_TYPE)
-                .header(Constants.HEADER_CIMI_VERSION, "1.6").get(ClientResponse.class);
+        // XML : sans version : ok
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/834752")
+            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML_TYPE).get(ClientResponse.class);
         if (clientResponse.getStatus() == 200) {
-            LOGGER.debug("JSON:\n\t{}", clientResponse.getEntity(String.class));
-            LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+            CimiMachineImageResourceTest.LOGGER.debug("XML:\n\t{}", clientResponse.getEntity(String.class));
+            CimiMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        }
+
+        // XML : Version invalide : ko
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/834752")
+            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML_TYPE).header(Constants.HEADER_CIMI_VERSION, "1.6")
+            .get(ClientResponse.class);
+        if (clientResponse.getStatus() == 200) {
+            CimiMachineImageResourceTest.LOGGER.debug("JSON:\n\t{}", clientResponse.getEntity(String.class));
+            CimiMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
         }
 
         // clientResponse = resource().path(ConstantsPath.MACHINE_IMAGE +
@@ -107,6 +111,28 @@ public class CimiMachineImageResourceTest extends JerseyTest {
         // System.out.println("REPONSE: " + clientResponse);
         // }
 
+    }
+
+    @Test
+    public final void testGetMachineImageCollection() throws Exception {
+        ClientResponse clientResponse = null;
+
+        // JSON
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
+            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON_TYPE)
+            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
+        if (clientResponse.getStatus() == 200) {
+            CimiMachineImageResourceTest.LOGGER.debug("JSON:\n\t{}", clientResponse.getEntity(String.class));
+            CimiMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        }
+        // XML
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
+            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_XML_TYPE)
+            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
+        if (clientResponse.getStatus() == 200) {
+            CimiMachineImageResourceTest.LOGGER.debug("JSON:\n\t{}", clientResponse.getEntity(String.class));
+            CimiMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        }
     }
 
     // @Test

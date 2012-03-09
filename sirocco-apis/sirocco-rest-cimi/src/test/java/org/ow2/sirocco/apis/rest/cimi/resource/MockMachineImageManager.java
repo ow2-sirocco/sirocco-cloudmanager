@@ -3,6 +3,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.resource;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -22,110 +23,127 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
  */
 public class MockMachineImageManager implements IMachineImageManager {
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#createMachineImage
-     * (org.ow2.sirocco.cloudmanager.model.cimi.MachineImage)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#createMachineImage
+     *      (org.ow2.sirocco.cloudmanager.model.cimi.MachineImage)
      */
     @Override
-    public Job createMachineImage(MachineImage paramMachineImage) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#getMachineImages
-     * ()
-     */
-    @Override
-    public List<MachineImage> getMachineImages() throws CloudProviderException {
+    public Job createMachineImage(final MachineImage paramMachineImage) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     /**
      * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#getMachineImages
+     *      ()
+     */
+    @Override
+    public List<MachineImage> getMachineImages() throws CloudProviderException {
+        List<MachineImage> images = new ArrayList<MachineImage>();
+        for (int i = 0; i < 3; i++) {
+            images.add(this.buildMachineImage(i + 1));
+        }
+        return images;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#
      *      getMachineImageById(java.lang.String)
      */
     @Override
-    public MachineImage getMachineImageById(String paramString) throws ResourceNotFoundException,
-            CloudProviderException {
+    public MachineImage getMachineImageById(final String paramString) throws ResourceNotFoundException, CloudProviderException {
+        Integer id = null;
+        try {
+            id = Integer.valueOf(paramString);
+        } catch (Exception e) {
+            throw new ResourceNotFoundException();
+        }
+        return this.buildMachineImage(id);
+    }
 
+    protected MachineImage buildMachineImage(final Integer id) {
         MachineImage image = new MachineImage();
-        image.setId(834752);
-        image.setDescription("descriptionValue");
-        image.setName("nameValue");
+        image.setId(id);
+        image.setDescription("descriptionValue" + id);
+        image.setName("nameValue" + id);
         image.setState(MachineImage.State.AVAILABLE);
         image.setType(MachineImage.Type.IMAGE);
+        // image.setImageLocation(imageLocation)
+
         Map<String, String> properties = new HashMap<String, String>();
-        properties.put("keyOne", "valueOne");
-        properties.put("keyTwo", "valueTwo");
-        properties.put("keyThree", "valueThree");
+        properties.put("keyOne" + id, "valueOne" + id);
+        properties.put("keyTwo" + id, "valueTwo" + id);
+        properties.put("keyThree" + id, "valueThree" + id);
         image.setProperties(properties);
+
         Calendar cal = new GregorianCalendar(2012, 3, 7, 13, 25, 37);
         cal.add(Calendar.MILLISECOND, 987);
         image.setCreated(cal.getTime());
         return image;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#deleteMachineImage
-     * (java.lang.String)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#deleteMachineImage
+     *      (java.lang.String)
      */
     @Override
-    public void deleteMachineImage(String paramString) throws ResourceNotFoundException, CloudProviderException {
+    public void deleteMachineImage(final String paramString) throws ResourceNotFoundException, CloudProviderException {
         // TODO Auto-generated method stub
 
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#
-     * updateMachineImageAttributes(java.lang.String, java.util.Map)
+     *      updateMachineImageAttributes(java.lang.String, java.util.Map)
      */
     @Override
-    public void updateMachineImageAttributes(String paramString, Map<String, Object> paramMap)
-            throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
+    public void updateMachineImageAttributes(final String paramString, final Map<String, Object> paramMap)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
 
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#getMachineImages
-     * (java.util.List, java.lang.String)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#getMachineImages
+     *      (java.util.List, java.lang.String)
      */
     @Override
-    public List<MachineImage> getMachineImages(List<String> paramList, String paramString)
-            throws InvalidRequestException, CloudProviderException {
+    public List<MachineImage> getMachineImages(final List<String> paramList, final String paramString)
+        throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /*
-     * (non-Javadoc)
-     * @see
-     * org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#getMachineImages
-     * (int, int, java.util.List)
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#getMachineImages
+     *      (int, int, java.util.List)
      */
     @Override
-    public List<MachineImage> getMachineImages(int paramInt1, int paramInt2, List<String> paramList)
-            throws InvalidRequestException, CloudProviderException {
+    public List<MachineImage> getMachineImages(final int paramInt1, final int paramInt2, final List<String> paramList)
+        throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#
-     * getMachineImageCollection()
+     *      getMachineImageCollection()
      */
     @Override
     public MachineImageCollection getMachineImageCollection() throws CloudProviderException {
@@ -133,13 +151,14 @@ public class MockMachineImageManager implements IMachineImageManager {
         return null;
     }
 
-    /*
-     * (non-Javadoc)
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager#
-     * updateMachineImageCollection(java.util.Map)
+     *      updateMachineImageCollection(java.util.Map)
      */
     @Override
-    public void updateMachineImageCollection(Map<String, Object> paramMap) throws CloudProviderException {
+    public void updateMachineImageCollection(final Map<String, Object> paramMap) throws CloudProviderException {
         // TODO Auto-generated method stub
 
     }

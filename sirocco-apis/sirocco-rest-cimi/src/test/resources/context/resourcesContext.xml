@@ -7,16 +7,6 @@
 	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
 	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd">
 
-<!-- 	<context:property-placeholder location="classpath:context/ejb.properties" /> -->
-
-<!-- 	<jee:remote-slsb id="idMachineImageManager" -->
-<!-- 		business-interface="org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager" -->
-<!-- 		jndi-name="MachineImageManager" lookup-home-on-startup="false"> -->
-<!-- 		<jee:environment> -->
-<!-- 			java.naming.factory.initial=org.ow2.carol.jndi.spi.MultiOrbInitialContextFactory -->
-<!-- 			java.naming.provider.url=rmi://localhost:${carol.port} -->
-<!-- 		</jee:environment> -->
-<!-- 	</jee:remote-slsb> -->
 
 	<bean id="IMachineImageManager" class="org.ow2.sirocco.apis.rest.cimi.resource.MockMachineImageManager"  />
 	

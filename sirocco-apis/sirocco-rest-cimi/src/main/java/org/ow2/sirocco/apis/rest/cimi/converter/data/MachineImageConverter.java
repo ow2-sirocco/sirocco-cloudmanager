@@ -27,30 +27,46 @@ package org.ow2.sirocco.apis.rest.cimi.converter.data;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
- * both directions. <p>Converted classes:<ul><li>CIMI model:
- * {@link org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage}
- * </li><li>Service model:
- * {@link org.ow2.sirocco.cloudmanager.model.cimi.MachineImage} </li></ul></p>
+ * both directions.
+ * <p>
+ * Converted classes:
+ * <ul>
+ * <li>CIMI model: {@link CimiMachineImage}</li>
+ * <li>Service model: {@link MachineImage}</li>
+ * </ul>
+ * </p>
  */
 public class MachineImageConverter {
 
-    public static void copyToCimi(org.ow2.sirocco.cloudmanager.model.cimi.MachineImage dataService,
-            CimiMachineImage dataCimi, String urlBase) {
+    /**
+     * Copy the data from the service object in the CIMI object.
+     * 
+     * @param dataService An instance of {@link MachineImage}
+     * @param dataCimi An instance of {@link CimiMachineImage}
+     * @param urlBase The URL base
+     */
+    public static void copyToCimi(final MachineImage dataService, final CimiMachineImage dataCimi, final String urlBase) {
         CommonConverter.copyToCimi(dataService, dataCimi, urlBase, ConstantsPath.MACHINE_IMAGE);
         if (null != dataService.getImageLocation()) {
-            ImageLocation location = new ImageLocation(HrefHelper.makeHref(urlBase,
-                    ConstantsPath.MACHINE_IMAGE_LOCATION, dataService.getImageLocation()));
+            ImageLocation location = new ImageLocation(HrefHelper.makeHref(urlBase, ConstantsPath.MACHINE_IMAGE_LOCATION,
+                dataService.getImageLocation()));
             dataCimi.setImageLocation(location);
         }
         dataCimi.setState(dataService.getState().toString());
         dataCimi.setType(dataService.getType().toString());
     }
 
-    public static void copyToService(CimiMachineImage dataCimi,
-            org.ow2.sirocco.cloudmanager.model.cimi.MachineImage dataService) {
+    /**
+     * Copy the data from the CIMI object in the service object.
+     * 
+     * @param dataCimi An instance of {@link CimiMachineImage}
+     * @param dataService An instance of {@link MachineImage}
+     */
+    public static void copyToService(final CimiMachineImage dataCimi, final MachineImage dataService) {
         CommonConverter.copyToService(dataCimi, dataService);
     }
 

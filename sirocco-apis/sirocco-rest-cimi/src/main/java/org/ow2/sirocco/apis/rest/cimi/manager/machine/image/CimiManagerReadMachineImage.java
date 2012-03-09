@@ -47,40 +47,50 @@ public class CimiManagerReadMachineImage extends CimiManagerAbstract {
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#validate(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
      *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
      */
     @Override
-    protected boolean validate(CimiRequest request, CimiResponse response) throws Exception {
+    protected boolean validate(final CimiRequest request, final CimiResponse response) throws Exception {
         return CimiValidatorHeader.getInstance().validate(request, response);
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
      *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
      */
     @Override
-    protected Object convertToDataService(CimiRequest request, CimiResponse response) throws Exception {
+    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
         return null;
     }
 
     /**
      * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
      *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(CimiRequest request, CimiResponse response, Object dataService) throws Exception {
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
 
-        MachineImage image = this.manager.getMachineImageById(request.getId());
-
-        return image;
+        return this.manager.getMachineImageById(request.getId());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
     @Override
-    protected void convertToResponse(CimiRequest request, CimiResponse response, Object dataService) throws Exception {
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
         if (null == dataService) {
             throw new Exception("Data not found");
         }

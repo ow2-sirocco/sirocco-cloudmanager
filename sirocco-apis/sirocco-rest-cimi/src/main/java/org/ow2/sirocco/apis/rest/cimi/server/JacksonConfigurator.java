@@ -36,7 +36,8 @@ import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
  * Configure the Jackson module use to marshalling Json to objects.
  */
 @Provider
-@Produces({"application/json", MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON})
+@Produces({"application/json", MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON,
+    MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
     /**
@@ -48,7 +49,7 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
      * Default constructor.
      */
     public JacksonConfigurator() {
-        mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+        this.mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
 
         // mapper.setDateFormat(new
         // SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SZ"));
@@ -56,11 +57,12 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
     /**
      * {@inheritDoc}
+     * 
      * @see javax.ws.rs.ext.ContextResolver#getContext(java.lang.Class)
      */
     @Override
-    public ObjectMapper getContext(Class<?> arg0) {
-        return mapper;
+    public ObjectMapper getContext(final Class<?> arg0) {
+        return this.mapper;
     }
 
 }
