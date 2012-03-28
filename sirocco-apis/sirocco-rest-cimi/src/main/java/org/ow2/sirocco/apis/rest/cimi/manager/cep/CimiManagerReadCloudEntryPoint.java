@@ -24,32 +24,22 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.cep;
 
-import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 
-public class CimiManagerReadCloudEntryPoint extends CimiManagerAbstract {
+public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
 
     @Override
-    protected boolean validate(CimiRequest request, CimiResponse response) throws Exception {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    protected Object convertToDataService(CimiRequest request, CimiResponse response) throws Exception {
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    protected Object callService(CimiRequest request, CimiResponse response, Object dataService) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    protected void convertToResponse(CimiRequest request, CimiResponse response, Object dataService) throws Exception {
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
         // TODO Auto-generated method stub
 
     }
