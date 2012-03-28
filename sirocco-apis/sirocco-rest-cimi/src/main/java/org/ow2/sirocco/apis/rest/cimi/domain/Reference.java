@@ -19,38 +19,53 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id$
+ * $Id: ImageLocation.java 1091 2012-03-08 17:21:58Z antonma $
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import javax.xml.bind.annotation.XmlAttribute;
 
 /**
- * Class ImageLocation.
+ * Class Reference.
  */
-@XmlRootElement(name = "imageLocation")
-@JsonSerialize(include = Inclusion.NON_NULL)
-public class ImageLocation extends Reference {
+public class Reference implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Default constructor.
+     * Field "href".
      */
-    public ImageLocation() {
-        super();
+    private String href;
+
+    /**
+     * Return the value of field "href".
+     * 
+     * @return The value
+     */
+    @XmlAttribute
+    public String getHref() {
+        return this.href;
     }
 
     /**
-     * Parameter constructor.
+     * Set the value of field "href".
+     * 
+     * @param href The value
      */
-    public ImageLocation(final String href) {
-        this.setHref(href);
+    public void setHref(final String href) {
+        this.href = href;
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return this.getClass().getSimpleName() + "[href=" + this.href + "]";
     }
 
 }

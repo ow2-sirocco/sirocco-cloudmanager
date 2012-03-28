@@ -26,6 +26,9 @@ package org.ow2.sirocco.apis.rest.cimi.request;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 
+/**
+ * Data container for a CIMI request.
+ */
 public class CimiRequest {
 
     private RequestHeader headerData;
@@ -34,30 +37,27 @@ public class CimiRequest {
 
     private CimiData cimiData;
 
-    public CimiRequest() {
-    }
-
     public RequestHeader getHeader() {
-        return headerData;
+        return this.headerData;
     }
 
-    public void setHeader(RequestHeader headerData) {
+    public void setHeader(final RequestHeader headerData) {
         this.headerData = headerData;
     }
 
     public String getId() {
-        return id;
+        return this.id;
     }
 
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
     public CimiData getCimiData() {
-        return cimiData;
+        return this.cimiData;
     }
 
-    public void setCimiData(CimiData cimiData) {
+    public void setCimiData(final CimiData cimiData) {
         this.cimiData = cimiData;
     }
 

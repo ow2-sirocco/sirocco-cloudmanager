@@ -35,14 +35,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-CloudEntryPoint+json" */
     public final static MediaType APPLICATION_CIMI_CLOUDENTRYPOINT_JSON_TYPE = new MediaType("application",
-            "CIMI-CloudEntryPoint+json");
+        "CIMI-CloudEntryPoint+json");
 
     /** "application/CIMI-CloudEntryPoint+xml" */
     public final static String APPLICATION_CIMI_CLOUDENTRYPOINT_XML = "application/CIMI-CloudEntryPoint+xml";
 
     /** "application/CIMI-CloudEntryPoint+xml" */
     public final static MediaType APPLICATION_CIMI_CLOUDENTRYPOINT_XML_TYPE = new MediaType("application",
-            "CIMI-CloudEntryPoint+xml");
+        "CIMI-CloudEntryPoint+xml");
 
     // --------machine image collection
 
@@ -51,14 +51,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineImageCollection+json" */
     public final static MediaType APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineImageCollection+json");
+        "CIMI-MachineImageCollection+json");
 
     /** "application/CIMI-MachineImageCollection+xml" */
     public final static String APPLICATION_CIMI_MACHINEIMAGECOLLECTION_XML = "application/CIMI-MachineImageCollection+xml";
 
     /** "application/CIMI-MachineImageCollection+xml" */
     public final static MediaType APPLICATION_CIMI_MACHINEIMAGECOLLECTION_XML_TYPE = new MediaType("application",
-            "CIMI-MachineImageCollection+xml");
+        "CIMI-MachineImageCollection+xml");
 
     // --------machine image
 
@@ -67,14 +67,13 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineImage+json" */
     public final static MediaType APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineImage+json");
+        "CIMI-MachineImage+json");
 
     /** "application/CIMI-MachineImage+xml" */
     public final static String APPLICATION_CIMI_MACHINEIMAGE_XML = "application/CIMI-MachineImage+xml";
 
     /** "application/CIMI-MachineImage+xml" */
-    public final static MediaType APPLICATION_CIMI_MACHINEIMAGE_XML_TYPE = new MediaType("application",
-            "CIMI-MachineImage+xml");
+    public final static MediaType APPLICATION_CIMI_MACHINEIMAGE_XML_TYPE = new MediaType("application", "CIMI-MachineImage+xml");
 
     // --------machine image create
 
@@ -83,14 +82,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineImageCreate+json" */
     public final static MediaType APPLICATION_CIMI_MACHINEIMAGECREATE_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineImageCreate+json");
+        "CIMI-MachineImageCreate+json");
 
     /** "application/CIMI-MachineImageCreate+xml" */
     public final static String APPLICATION_CIMI_MACHINEIMAGECREATE_XML = "application/CIMI-MachineImageCreate+xml";
 
     /** "application/CIMI-MachineImageCreate+xml" */
     public final static MediaType APPLICATION_CIMI_MACHINEIMAGECREATE_XML_TYPE = new MediaType("application",
-            "CIMI-MachineImageCreate+xml");
+        "CIMI-MachineImageCreate+xml");
 
     // --------machine collection
 
@@ -99,14 +98,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineCollection+json" */
     public final static MediaType APPLICATION_CIMI_MACHINECOLLECTION_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineCollection+json");
+        "CIMI-MachineCollection+json");
 
     /** "application/CIMI-MachineCollection+xml" */
     public final static String APPLICATION_CIMI_MACHINECOLLECTION_XML = "application/CIMI-MachineCollection+xml";
 
     /** "application/CIMI-MachineCollection+xml" */
     public final static MediaType APPLICATION_CIMI_MACHINECOLLECTION_XML_TYPE = new MediaType("application",
-            "CIMI-MachineCollection+xml");
+        "CIMI-MachineCollection+xml");
 
     // --------machine
 
@@ -129,14 +128,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineTemplateCollection+json" */
     public final static MediaType APPLICATION_CIMI_MACHINETEMPLATECOLLECTION_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineTemplateCollection+json");
+        "CIMI-MachineTemplateCollection+json");
 
     /** "application/CIMI-MachineTemplateCollection+xml" */
     public final static String APPLICATION_CIMI_MACHINETEMPLATECOLLECTION_XML = "application/CIMI-MachineTemplateCollection+xml";
 
     /** "application/CIMI-MachineTemplateCollection+xml" */
     public final static MediaType APPLICATION_CIMI_MACHINETEMPLATECOLLECTION_XML_TYPE = new MediaType("application",
-            "CIMI-MachineTemplateCollection+xml");
+        "CIMI-MachineTemplateCollection+xml");
 
     // --------machine template
 
@@ -145,14 +144,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineTemplate+json" */
     public final static MediaType APPLICATION_CIMI_MACHINETEMPLATE_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineTemplate+json");
+        "CIMI-MachineTemplate+json");
 
     /** "application/CIMI-MachineTemplate+xml" */
     public final static String APPLICATION_CIMI_MACHINETEMPLATE_XML = "application/CIMI-MachineTemplate+xml";
 
     /** "application/CIMI-MachineTemplate+xml" */
     public final static MediaType APPLICATION_CIMI_MACHINETEMPLATE_XML_TYPE = new MediaType("application",
-            "CIMI-MachineTemplate+xml");
+        "CIMI-MachineTemplate+xml");
 
     // --------machine template create
 
@@ -161,14 +160,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineTemplateCreate+json" */
     public final static MediaType APPLICATION_CIMI_MACHINETEMPLATECREATE_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineTemplateCreate+json");
+        "CIMI-MachineTemplateCreate+json");
 
     /** "application/CIMI-MachineTemplateCreate+xml" */
     public final static String APPLICATION_CIMI_MACHINETEMPLATECREATE_XML = "application/CIMI-MachineTemplateCreate+xml";
 
     /** "application/CIMI-MachineTemplateCreate+xml" */
     public final static MediaType APPLICATION_CIMI_MACHINETEMPLATECREATE_XML_TYPE = new MediaType("application",
-            "CIMI-MachineTemplateCreate+xml");
+        "CIMI-MachineTemplateCreate+xml");
 
     // --------machine create
 
@@ -177,14 +176,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineCreate+json" */
     public final static MediaType APPLICATION_CIMI_MACHINECREATE_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineCreate+json");
+        "CIMI-MachineCreate+json");
 
     /** "application/CIMI-MachineCreate+xml" */
     public final static String APPLICATION_CIMI_MACHINECREATE_XML = "application/CIMI-MachineCreate+xml";
 
     /** "application/CIMI-MachineCreate+xml" */
     public final static MediaType APPLICATION_CIMI_MACHINECREATE_XML_TYPE = new MediaType("application",
-            "CIMI-MachineCreate+xml");
+        "CIMI-MachineCreate+xml");
 
     // --------machine configuration collection
 
@@ -192,15 +191,15 @@ public class MediaTypeCimi extends MediaType {
     public final static String APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON = "application/CIMI-MachineConfigurationCollection+json";
 
     /** "application/CIMI-MachineConfigurationCollection+json" */
-    public final static MediaType APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON_TYPE = new MediaType(
-            "application", "CIMI-MachineConfigurationCollection+json");
+    public final static MediaType APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON_TYPE = new MediaType("application",
+        "CIMI-MachineConfigurationCollection+json");
 
     /** "application/CIMI-MachineConfigurationCollection+xml" */
     public final static String APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_XML = "application/CIMI-MachineConfigurationCollection+xml";
 
     /** "application/CIMI-MachineConfigurationCollection+xml" */
-    public final static MediaType APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_XML_TYPE = new MediaType(
-            "application", "CIMI-MachineConfigurationCollection+xml");
+    public final static MediaType APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_XML_TYPE = new MediaType("application",
+        "CIMI-MachineConfigurationCollection+xml");
 
     // --------machine configuration
 
@@ -209,14 +208,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineConfiguration+json" */
     public final static MediaType APPLICATION_CIMI_MACHINECONFIGURATION_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineConfiguration+json");
+        "CIMI-MachineConfiguration+json");
 
     /** "application/CIMI-MachineConfiguration+xml" */
     public final static String APPLICATION_CIMI_MACHINECONFIGURATION_XML = "application/CIMI-MachineConfiguration+xml";
 
     /** "application/CIMI-MachineConfiguration+xml" */
     public final static MediaType APPLICATION_CIMI_MACHINECONFIGURATION_XML_TYPE = new MediaType("application",
-            "CIMI-MachineConfiguration+xml");
+        "CIMI-MachineConfiguration+xml");
 
     // --------machine configuration create
 
@@ -225,14 +224,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-MachineConfigurationCreate+json" */
     public final static MediaType APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_JSON_TYPE = new MediaType("application",
-            "CIMI-MachineConfigurationCreate+json");
+        "CIMI-MachineConfigurationCreate+json");
 
     /** "application/CIMI-MachineConfigurationCreate+xml" */
     public final static String APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_XML = "application/CIMI-MachineConfigurationCreate+xml";
 
     /** "application/CIMI-MachineConfigurationCreate+xml" */
     public final static MediaType APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_XML_TYPE = new MediaType("application",
-            "CIMI-MachineConfigurationCreate+xml");
+        "CIMI-MachineConfigurationCreate+xml");
 
     // --------credentials collection
 
@@ -241,14 +240,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-CredentialsCollection+json" */
     public final static MediaType APPLICATION_CIMI_CREDENTIALSCOLLECTION_JSON_TYPE = new MediaType("application",
-            "CIMI-CredentialsCollection+json");
+        "CIMI-CredentialsCollection+json");
 
     /** "application/CIMI-CredentialsCollection+xml" */
     public final static String APPLICATION_CIMI_CREDENTIALSCOLLECTION_XML = "application/CIMI-CredentialsCollection+xml";
 
     /** "application/CIMI-CredentialsCollection+xml" */
     public final static MediaType APPLICATION_CIMI_CREDENTIALSCOLLECTION_XML_TYPE = new MediaType("application",
-            "CIMI-CredentialsCollection+xml");
+        "CIMI-CredentialsCollection+xml");
 
     // --------credentials
 
@@ -256,15 +255,13 @@ public class MediaTypeCimi extends MediaType {
     public final static String APPLICATION_CIMI_CREDENTIALS_JSON = "application/CIMI-Credentials+json";
 
     /** "application/CIMI-Credentials+json" */
-    public final static MediaType APPLICATION_CIMI_CREDENTIALS_JSON_TYPE = new MediaType("application",
-            "CIMI-Credentials+json");
+    public final static MediaType APPLICATION_CIMI_CREDENTIALS_JSON_TYPE = new MediaType("application", "CIMI-Credentials+json");
 
     /** "application/CIMI-Credentials+xml" */
     public final static String APPLICATION_CIMI_CREDENTIALS_XML = "application/CIMI-Credentials+xml";
 
     /** "application/CIMI-Credentials+xml" */
-    public final static MediaType APPLICATION_CIMI_CREDENTIALS_XML_TYPE = new MediaType("application",
-            "CIMI-Credentials+xml");
+    public final static MediaType APPLICATION_CIMI_CREDENTIALS_XML_TYPE = new MediaType("application", "CIMI-Credentials+xml");
 
     // --------credentials template collection
 
@@ -272,15 +269,15 @@ public class MediaTypeCimi extends MediaType {
     public final static String APPLICATION_CIMI_CREDENTIALSTEMPLATECOLLECTION_JSON = "application/CIMI-CredentialsTemplateCollection+json";
 
     /** "application/CIMI-CredentialsTemplateCollection+json" */
-    public final static MediaType APPLICATION_CIMI_CREDENTIALSEMPLATECOLLECTION_JSON_TYPE = new MediaType(
-            "application", "CIMI-CredentialsTemplateCollection+json");
+    public final static MediaType APPLICATION_CIMI_CREDENTIALSEMPLATECOLLECTION_JSON_TYPE = new MediaType("application",
+        "CIMI-CredentialsTemplateCollection+json");
 
     /** "application/CIMI-CredentialsTemplateCollection+xml" */
     public final static String APPLICATION_CIMI_CREDENTIALSEMPLATECOLLECTION_XML = "application/CIMI-CredentialsTemplateCollection+xml";
 
     /** "application/CIMI-CredentialsTemplateCollection+xml" */
     public final static MediaType APPLICATION_CIMI_CREDENTIALSEMPLATECOLLECTION_XML_TYPE = new MediaType("application",
-            "CIMI-CredentialsTemplateCollection+xml");
+        "CIMI-CredentialsTemplateCollection+xml");
 
     // --------credentials template
 
@@ -289,14 +286,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-CredentialsTemplate+json" */
     public final static MediaType APPLICATION_CIMI_CREDENTIALSTEMPLATE_JSON_TYPE = new MediaType("application",
-            "CIMI-CredentialsTemplate+json");
+        "CIMI-CredentialsTemplate+json");
 
     /** "application/CIMI-CredentialsTemplate+xml" */
     public final static String APPLICATION_CIMI_CREDENTIALSTEMPLATE_XML = "application/CIMI-CredentialsTemplate+xml";
 
     /** "application/CIMI-CredentialsTemplate+xml" */
     public final static MediaType APPLICATION_CIMI_CREDENTIALSTEMPLATE_XML_TYPE = new MediaType("application",
-            "CIMI-CredentialsTemplate+xml");
+        "CIMI-CredentialsTemplate+xml");
 
     // --------credentials template create
 
@@ -305,14 +302,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-CredentialsTemplateCreate+json" */
     public final static MediaType APPLICATION_CIMI_CREDENTIALSTEMPLATECREATE_JSON_TYPE = new MediaType("application",
-            "CIMI-CredentialsTemplateCreate+json");
+        "CIMI-CredentialsTemplateCreate+json");
 
     /** "application/CIMI-CredentialsTemplateCreate+xml" */
     public final static String APPLICATION_CIMI_CREDENTIALSTEMPLATECREATE_XML = "application/CIMI-CredentialsTemplateCreate+xml";
 
     /** "application/CIMI-CredentialsTemplateCreate+xml" */
     public final static MediaType APPLICATION_CIMI_CREDENTIALSTEMPLATECREATE_XML_TYPE = new MediaType("application",
-            "CIMI-CredentialsTemplateCreate+xml");
+        "CIMI-CredentialsTemplateCreate+xml");
 
     // --------credentials create
 
@@ -321,14 +318,14 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-CredentialsCreate+json" */
     public final static MediaType APPLICATION_CIMI_CREDENTIALSCREATE_JSON_TYPE = new MediaType("application",
-            "CIMI-CredentialsCreate+json");
+        "CIMI-CredentialsCreate+json");
 
     /** "application/CIMI-CredentialsCreate+xml" */
     public final static String APPLICATION_CIMI_CREDENTIALSCREATE_XML = "application/CIMI-CredentialsCreate+xml";
 
     /** "application/CIMI-CredentialsCreate+xml" */
     public final static MediaType APPLICATION_CIMI_CREDENTIALSCREATE_XML_TYPE = new MediaType("application",
-            "CIMI-CredentialsCreate+xml");
+        "CIMI-CredentialsCreate+xml");
 
     // --------action
 
@@ -343,5 +340,19 @@ public class MediaTypeCimi extends MediaType {
 
     /** "application/CIMI-Action+xml" */
     public final static MediaType APPLICATION_CIMI_ACTION_XML_TYPE = new MediaType("application", "CIMI-Action+xml");
+
+    // --------Job
+
+    /** "application/CIMI-Job+json" */
+    public final static String APPLICATION_CIMI_JOB_JSON = "application/CIMI-Job+json";
+
+    /** "application/CIMI-Job+json" */
+    public final static MediaType APPLICATION_CIMI_JOB_JSON_TYPE = new MediaType("application", "CIMI-Job+json");
+
+    /** "application/CIMI-Job+xml" */
+    public final static String APPLICATION_CIMI_JOB_XML = "application/CIMI-Job+xml";
+
+    /** "application/CIMI-Job+xml" */
+    public final static MediaType APPLICATION_CIMI_JOB_XML_TYPE = new MediaType("application", "CIMI-Job+xml");
 
 }

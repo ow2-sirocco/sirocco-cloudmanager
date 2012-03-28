@@ -24,43 +24,36 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
-import javax.ws.rs.core.Response.Status;
-
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerDeleteAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerDeleteMachineImage {
+/**
+ * Manage DELETE request of Machine Image.
+ */
+@Component("CimiManagerDeleteMachineImage")
+public class CimiManagerDeleteMachineImage extends CimiManagerDeleteAbstract {
 
-    public CimiManagerDeleteMachineImage() {
-    }
+    @Autowired
+    @Qualifier("IMachineImageManager")
+    private IMachineImageManager manager;
 
-    public Status verifyRequest(CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com +
-        // ConstantePath
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE_IMAGE.substring(1))) {
-            return Status.OK;
-        } else {
-            return Status.BAD_REQUEST;
-        }
-    }
-
-    public void execute(CimiRequest request, CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // deleteMachineImage(request.getHeader().getId());
-        // // status = 200 OK
-        // response.setStatusHttp(Status.OK.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-
-    }
-
-    private void deleteMachineImage(String id) {
-        // FIXME IMachineManager.deleteMachineImage(id);
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        this.manager.deleteMachineImage(request.getId());
+        return null;
     }
 
 }

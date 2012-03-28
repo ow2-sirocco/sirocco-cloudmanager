@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id$
+ * $Id: ImageLocation.java 1091 2012-03-08 17:21:58Z antonma $
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
@@ -30,11 +30,11 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class ImageLocation.
+ * Class ParentJob.
  */
-@XmlRootElement(name = "imageLocation")
+@XmlRootElement(name = "parentJob")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class ImageLocation extends Reference {
+public class ParentJob extends Reference {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -42,14 +42,14 @@ public class ImageLocation extends Reference {
     /**
      * Default constructor.
      */
-    public ImageLocation() {
+    public ParentJob() {
         super();
     }
 
     /**
      * Parameter constructor.
      */
-    public ImageLocation(final String href) {
+    public ParentJob(final String href) {
         this.setHref(href);
     }
 

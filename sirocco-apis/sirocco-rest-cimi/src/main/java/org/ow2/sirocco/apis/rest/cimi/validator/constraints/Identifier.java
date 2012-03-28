@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id$
+ * $Id: $
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.validator.constraints;
@@ -35,24 +35,20 @@ import java.lang.annotation.Target;
 
 import javax.validation.Constraint;
 import javax.validation.Payload;
-
-import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
+import javax.validation.constraints.Pattern;
 
 /**
- * Annotation to validate the CIMI version.
- **/
-@Target({FIELD, METHOD, ANNOTATION_TYPE})
+ * Composition of validation annotation to validate credentials.
+ */
+@Pattern(regexp = "^[a-zA-Z_0-9]+$")
+@Target({METHOD, FIELD, ANNOTATION_TYPE})
 @Retention(RUNTIME)
-@Constraint(validatedBy = AssertVersionValidator.class)
+@Constraint(validatedBy = {})
 @Documented
-public @interface AssertVersion {
-
-    String version() default Constants.VERSION_DMTF_CIMI;
-
-    String message() default "{AssertVersion.message}";
+public @interface Identifier {
+    String message() default "{Identifier.message}";
 
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
-
 }

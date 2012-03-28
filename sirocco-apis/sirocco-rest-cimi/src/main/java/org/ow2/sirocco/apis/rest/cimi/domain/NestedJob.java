@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id$
+ * $Id: $
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
@@ -30,11 +30,11 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class ImageLocation.
+ * Class NestedJob.
  */
-@XmlRootElement(name = "imageLocation")
+@XmlRootElement(name = "parentJob")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class ImageLocation extends Reference {
+public class NestedJob extends Reference {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -42,14 +42,14 @@ public class ImageLocation extends Reference {
     /**
      * Default constructor.
      */
-    public ImageLocation() {
+    public NestedJob() {
         super();
     }
 
     /**
      * Parameter constructor.
      */
-    public ImageLocation(final String href) {
+    public NestedJob(final String href) {
         this.setHref(href);
     }
 

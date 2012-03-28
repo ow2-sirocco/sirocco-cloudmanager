@@ -28,44 +28,26 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.data.MachineImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
-import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHeader;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
+/**
+ * Manage READ request of Machine Image.
+ */
 @Component("CimiManagerReadMachineImage")
-public class CimiManagerReadMachineImage extends CimiManagerAbstract {
+public class CimiManagerReadMachineImage extends CimiManagerReadAbstract {
 
     @Autowired
     @Qualifier("IMachineImageManager")
     private IMachineImageManager manager;
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#validate(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
-     */
-    @Override
-    protected boolean validate(final CimiRequest request, final CimiResponse response) throws Exception {
-        return CimiValidatorHeader.getInstance().validate(request, response);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
-     */
-    @Override
-    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        return null;
-    }
 
     /**
      * {@inheritDoc}
@@ -77,8 +59,17 @@ public class CimiManagerReadMachineImage extends CimiManagerAbstract {
     @Override
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-
-        return this.manager.getMachineImageById(request.getId());
+        MachineImage out = null;
+        CimiSelect select = request.getHeader().getCimiSelect();
+        if (true == select.isEmpty()) {
+            out = this.manager.getMachineImageById(request.getId());
+        } else {
+            out = this.manager.getMachineImageAttributes(request.getId(), select.getAttributes());
+        }
+        if (null == out) {
+            throw new ResourceNotFoundException();
+        }
+        return out;
     }
 
     /**
@@ -91,11 +82,8 @@ public class CimiManagerReadMachineImage extends CimiManagerAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        if (null == dataService) {
-            throw new Exception("Data not found");
-        }
         CimiMachineImage cimi = new CimiMachineImage();
-        MachineImageConverter.copyToCimi((MachineImage) dataService, cimi, request.getHeader().getBaseUri().toString());
+        MachineImageConverter.copyToCimi((MachineImage) dataService, cimi, request.getHeader().getBaseUri(), true, false);
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }

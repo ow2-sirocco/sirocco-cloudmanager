@@ -26,11 +26,22 @@ package org.ow2.sirocco.apis.rest.cimi.utils;
 
 public abstract class Constants {
 
-    /** Version CIMI. */
+    /** Number Version CIMI. */
     public static final String VERSION_DMTF_CIMI = "1.0";
 
-    public static final String HEADER_CIMI_SELECT = "CimiSelect";
+    /** Parameter name in Query String : CimiSelect. */
+    public static final String PARAM_CIMI_SELECT = "CimiSelect";
 
+    /** Parameter name in Header : X-CIMI-Specification-Version. */
     public static final String HEADER_CIMI_VERSION = "X-CIMI-Specification-Version";
+
+    /** Parameter name in Header : X-CIMI-Job-URI. */
+    public static final String HEADER_CIMI_JOB_URI = "X-CIMI-Job-URI";
+
+    /** Parameter name in Header : Location. */
+    public static final String HEADER_LOCATION = "Location";
+
+    /** URI action. */
+    public static final String BASE_URI_ACTIONS = "http://www.dmtf.org/cimi/action/";
 
 }

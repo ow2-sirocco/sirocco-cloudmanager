@@ -39,64 +39,85 @@ import javax.xml.bind.annotation.XmlValue;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.Identifier;
 
 /**
- * Class Common. <p> Attributes common to all entities </p>
+ * Class Common.
+ * <p>
+ * Attributes common to all entities
+ * </p>
  */
 public class CimiCommon implements Serializable, CimiData {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "id". <p> The unique self-reference to this entity; assigned upon
-     * entity creation. This attribute value shall be unique in the Provider’s
-     * cloud. </p>
+     * Field "id".
+     * <p>
+     * The unique self-reference to this entity; assigned upon entity creation.
+     * This attribute value shall be unique in the Provider’s cloud.
+     * </p>
      */
     private String id;
 
     /**
-     * Field "name". <p> The human readable name of this entity; assigned by the
-     * creator as a part of the entity creation input. </p>
+     * Field "name".
+     * <p>
+     * The human readable name of this entity; assigned by the creator as a part
+     * of the entity creation input.
+     * </p>
      */
+    @Identifier
     private String name;
 
     /**
-     * Field "description". <p> The human readable description of this entity;
-     * assigned by the creator as a part of the entity creation input. </p>
+     * Field "description".
+     * <p>
+     * The human readable description of this entity; assigned by the creator as
+     * a part of the entity creation input.
+     * </p>
      */
     private String description;
 
     /**
-     * Field "created". <p> The timestamp when this entity was created. The
-     * format is DateTimeUTC (ISO 8601), example : 2012-02-06T08:39:57Z. </p>
+     * Field "created".
+     * <p>
+     * The timestamp when this entity was created. The format is DateTimeUTC
+     * (ISO 8601), example : 2012-02-06T08:39:57Z.
+     * </p>
      */
     private Date created;
 
     /**
-     * Field "updated". <p> The time at which the last explicit attribute update
-     * was made on the resoure. Note, while operations such as 'stop' do
-     * implicitly modify the 'state' attribute it does not change the
-     * 'updated_time'. The format is DateTimeUTC (ISO 8601), example :
-     * 2012-02-06T08:39:57Z. </p>
+     * Field "updated".
+     * <p>
+     * The time at which the last explicit attribute update was made on the
+     * resoure. Note, while operations such as 'stop' do implicitly modify the
+     * 'state' attribute it does not change the 'updated_time'. The format is
+     * DateTimeUTC (ISO 8601), example : 2012-02-06T08:39:57Z.
+     * </p>
      */
     private Date updated;
 
     /**
-     * Field "properties". <p> A list of key/value pairs, some of which may
-     * control one or more aspects this entity. Properties may also serve as an
-     * extension point, allowing Consumers to record additional information
-     * about the resource. </p>
+     * Field "properties".
+     * <p>
+     * A list of key/value pairs, some of which may control one or more aspects
+     * this entity. Properties may also serve as an extension point, allowing
+     * Consumers to record additional information about the resource.
+     * </p>
      */
     @JsonProperty
     private Map<String, String> properties;
 
     /**
-     * Field "operations". <p> A list of possible operations. </p>
+     * Field "operations".
+     * <p>
+     * A list of possible operations.
+     * </p>
      */
-    private Operation[] operations;
+    private CimiOperation[] operations;
 
     // ---------------------------------------- Constructors
 
@@ -111,6 +132,7 @@ public class CimiCommon implements Serializable, CimiData {
 
     /**
      * Return the value of field "id".
+     * 
      * @return The value
      */
     public String getId() {
@@ -119,14 +141,16 @@ public class CimiCommon implements Serializable, CimiData {
 
     /**
      * Set the value of field "id".
+     * 
      * @param id The value
      */
-    public void setId(String id) {
+    public void setId(final String id) {
         this.id = id;
     }
 
     /**
      * Return the value of field "name".
+     * 
      * @return The value
      */
     public String getName() {
@@ -135,14 +159,16 @@ public class CimiCommon implements Serializable, CimiData {
 
     /**
      * Set the value of field "name".
+     * 
      * @param name The value
      */
-    public void setName(String name) {
+    public void setName(final String name) {
         this.name = name;
     }
 
     /**
      * Return the value of field "description".
+     * 
      * @return The value
      */
     public String getDescription() {
@@ -151,14 +177,16 @@ public class CimiCommon implements Serializable, CimiData {
 
     /**
      * Set the value of field "description".
+     * 
      * @param description The value
      */
-    public void setDescription(String description) {
+    public void setDescription(final String description) {
         this.description = description;
     }
 
     /**
      * Return the value of field "created".
+     * 
      * @return The value
      */
     public Date getCreated() {
@@ -167,14 +195,16 @@ public class CimiCommon implements Serializable, CimiData {
 
     /**
      * Set the value of field "created".
+     * 
      * @param created The value
      */
-    public void setCreated(Date created) {
+    public void setCreated(final Date created) {
         this.created = created;
     }
 
     /**
      * Return the value of field "updated".
+     * 
      * @return The value
      */
     public Date getUpdated() {
@@ -183,14 +213,16 @@ public class CimiCommon implements Serializable, CimiData {
 
     /**
      * Set the value of field "updated".
+     * 
      * @param updated The value
      */
-    public void setUpdated(Date updated) {
+    public void setUpdated(final Date updated) {
         this.updated = updated;
     }
 
     /**
      * Return the value of field "properties".
+     * 
      * @return The value
      */
     @XmlTransient
@@ -202,8 +234,8 @@ public class CimiCommon implements Serializable, CimiData {
     @XmlElement(name = "property")
     public Property[] getPropertyArray() {
         List<Property> list = new ArrayList<Property>();
-        if (null != properties) {
-            for (Entry<String, String> entry : properties.entrySet()) {
+        if (null != this.properties) {
+            for (Entry<String, String> entry : this.properties.entrySet()) {
                 Property mapEntry = new Property();
                 mapEntry.key = entry.getKey();
                 mapEntry.value = entry.getValue();
@@ -213,34 +245,37 @@ public class CimiCommon implements Serializable, CimiData {
         return list.toArray(new Property[list.size()]);
     }
 
-    public void setPropertyArray(Property[] props) {
+    public void setPropertyArray(final Property[] props) {
         this.properties = new HashMap<String, String>();
         for (Property prop : props) {
-            properties.put(prop.key, prop.value);
+            this.properties.put(prop.key, prop.value);
         }
     }
 
     /**
      * Set the value of field "properties".
+     * 
      * @param properties The value
      */
-    public void setProperties(Map<String, String> properties) {
+    public void setProperties(final Map<String, String> properties) {
         this.properties = properties;
     }
 
     /**
      * Return the value of field "operations".
+     * 
      * @return The value
      */
-    public Operation[] getOperations() {
+    public CimiOperation[] getOperations() {
         return this.operations;
     }
 
     /**
      * Set the value of field "operations".
+     * 
      * @param operations The value
      */
-    public void setOperations(Operation[] operations) {
+    public void setOperations(final CimiOperation[] operations) {
         this.operations = operations;
     }
 

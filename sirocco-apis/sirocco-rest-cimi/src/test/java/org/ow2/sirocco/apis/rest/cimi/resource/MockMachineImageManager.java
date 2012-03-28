@@ -31,8 +31,7 @@ public class MockMachineImageManager implements IMachineImageManager {
      */
     @Override
     public Job createMachineImage(final MachineImage paramMachineImage) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return this.buildJob(1);
     }
 
     /**
@@ -81,7 +80,7 @@ public class MockMachineImageManager implements IMachineImageManager {
         image.setName("nameValue" + id);
         image.setState(MachineImage.State.AVAILABLE);
         image.setType(MachineImage.Type.IMAGE);
-        // image.setImageLocation(imageLocation)
+        image.setImageLocation("hrefImageLocationValue");
 
         Map<String, String> properties = new HashMap<String, String>();
         properties.put("keyOne" + id, "valueOne" + id);
@@ -93,6 +92,47 @@ public class MockMachineImageManager implements IMachineImageManager {
         cal.add(Calendar.MILLISECOND, 987);
         image.setCreated(cal.getTime());
         return image;
+    }
+
+    protected Job buildJob(final Integer id) {
+        Calendar cal;
+        Job job = new Job();
+        job.setId(id);
+        job.setDescription("descriptionValue" + id);
+        job.setName("nameValue" + id);
+
+        job.setAction("actionValue");
+        job.setIsCancellable(Boolean.FALSE);
+        job.setProgress(50);
+        job.setReturnCode(10);
+        job.setStatus(Job.Status.RUNNING);
+        job.setStatusMessage("statusMessageValue");
+        job.setTargetEntity("targetEntityValue");
+
+        cal = new GregorianCalendar(0, 0, 0, 1, 2, 3);
+        cal.add(Calendar.MILLISECOND, 456);
+        job.setTimeOfStatusChange(cal.getTime());
+
+        Job jobOther = new Job();
+        jobOther.setId(id + 10);
+        job.setParentJob(jobOther);
+
+        List<Job> list = new ArrayList<Job>();
+        for (int i = 0; i < 3; i++) {
+            jobOther = new Job();
+            jobOther.setId(id + 100 + i);
+            list.add(jobOther);
+        }
+        job.setNestedJobs(list);
+
+        cal = new GregorianCalendar(2012, 3, 7, 13, 25, 37);
+        cal.add(Calendar.MILLISECOND, 987);
+        job.setCreated(cal.getTime());
+
+        cal = new GregorianCalendar(2012, 3, 7, 13, 28, 12);
+        cal.add(Calendar.MILLISECOND, 1);
+        job.setUpdated(cal.getTime());
+        return job;
     }
 
     /**

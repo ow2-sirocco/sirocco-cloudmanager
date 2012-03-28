@@ -87,7 +87,7 @@ public class HelperRequest {
 
     private static List<String> transformQueryParamToList(MultivaluedMap<String, String> queryParameters) {
         List<String> listSelect = new ArrayList<String>();
-        listSelect = queryParameters.get(Constants.HEADER_CIMI_SELECT);
+        listSelect = queryParameters.get(Constants.PARAM_CIMI_SELECT);
         return listSelect;
     }
 

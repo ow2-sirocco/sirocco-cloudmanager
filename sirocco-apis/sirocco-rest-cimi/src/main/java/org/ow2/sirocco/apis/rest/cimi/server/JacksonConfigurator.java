@@ -36,7 +36,7 @@ import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
  * Configure the Jackson module use to marshalling Json to objects.
  */
 @Provider
-@Produces({"application/json", MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON,
+@Produces({"application/json", MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON,
     MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
@@ -53,6 +53,10 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
         // mapper.setDateFormat(new
         // SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SZ"));
+
+        // FIXME Use to avoid Error 500 when a field is unknown
+        // this.mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,
+        // false);
     }
 
     /**

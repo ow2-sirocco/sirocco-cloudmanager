@@ -24,27 +24,22 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.resource;
 
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.image.CimiManagerDeleteMachineImage;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.image.CimiManagerReadMachineImage;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.image.CimiManagerReadMachineImageCollection;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.image.CimiManagerUpdateMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperRequest;
@@ -56,7 +51,16 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Operations supports : read, update and delete
+ * Machine Image REST resource.
+ * <p>
+ * Operations supports :
+ * <ul>
+ * <li>Read a machine image</li>
+ * <li>Read a collection of machines images</li>
+ * <li>Update a machine image</li>
+ * <li>Delete a machine image</li>
+ * </ul>
+ * </p>
  */
 @Component
 @Path(ConstantsPath.MACHINE_IMAGE_PATH)
@@ -76,106 +80,112 @@ public class CimiMachineImageResource {
     @Qualifier("CimiManagerReadMachineImageCollection")
     private CimiManager cimiManagerReadMachineImageCollection;
 
+    @Autowired
+    @Qualifier("CimiManagerDeleteMachineImage")
+    private CimiManager cimiManagerDeleteMachineImage;
+
+    @Autowired
+    @Qualifier("CimiManagerUpdateMachineImage")
+    private CimiManager cimiManagerUpdateMachineImage;
+
+    @Autowired
+    @Qualifier("CimiManagerUpdateMachineImageCollection")
+    private CimiManager cimiManagerUpdateMachineImageCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerCreateMachineImage")
+    private CimiManager cimiManagerCreateMachineImage;
+
     /**
      * Get a machine image.
      * 
-     * @param id The ID machine image to get
+     * @param id The ID of machine image to get
      * @return The REST response
      */
     @GET
     @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
     @Path("{id}")
-    public Response getMachineImage(@PathParam("id") final String id) {
+    public Response readMachineImage(@PathParam("id") final String id) {
         CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id);
         CimiResponse response = new CimiResponse();
-        this.getManagerMachineImageRead().execute(request, response);
+        this.cimiManagerReadMachineImage.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Read operation to retrieve the machine collection.
+     * Get a collection of machines images.
      * 
      * @return The REST response
      */
     @GET
     @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON,
         MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_XML})
-    public Response getMachineImageCollection() {
+    public Response readMachineImageCollection() {
         CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo);
         CimiResponse response = new CimiResponse();
-        this.getManagerMachineImageReadCollection().execute(request, response);
+        this.cimiManagerReadMachineImageCollection.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 
-    // /**
-    // * Get a machine image.
-    // */
-    // @GET
-    // @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
-    // @Path("{id}")
-    // public MachineImage getMachineImageXml(@PathParam("id") String id) {
-    // CimiManagerReadMachineImage manager = getManagerMachineImageRead();
-    // manager.setRequest(HelperRequest.buildRequest(headers, uriInfo, id));
-    // manager.setResponse(new CimiResponse());
-    // manager.execute(null, null);
-    //
-    // return (MachineImage) manager.getResponse().getCimiData();
-    // }
-
     /**
      * Update a machine image.
+     * 
+     * @param id The ID of machine image to update
+     * @return The REST response
      */
     @PUT
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON})
+    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
     @Path("{id}")
-    public Response putMachineImage(final CimiMachineImage machineImage, @PathParam("id") final String id,
-        @QueryParam("CIMISelect") final List<String> listQueryParam) {
-
-        CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(this.headers, this.uriInfo, id, machineImage));
-
+    public Response updateMachineImage(@PathParam("id") final String id, final CimiMachineImage machineImage) {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id, machineImage);
         CimiResponse response = new CimiResponse();
+        this.cimiManagerUpdateMachineImage.execute(request, response);
+        return HelperResponse.buildResponse(response);
+    }
 
-        CimiManagerUpdateMachineImage manager = this.getManagerMachineImageUpdate();
-        manager.execute(request, response);
+    /**
+     * Update a collection of machines images.
+     * 
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
+    public Response updateMachineImageCollection(final CimiMachineImageCollection machineImageCollection) {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, machineImageCollection);
+        CimiResponse response = new CimiResponse();
+        this.cimiManagerUpdateMachineImageCollection.execute(request, response);
+        return HelperResponse.buildResponse(response);
+    }
 
-        return Response.status(response.getStatus()).build();
+    /**
+     * Create a machine image.
+     * 
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECREATE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECREATE_XML})
+    @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
+    public Response createMachineImage(final CimiMachineImage machineImage) {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, machineImage);
+        CimiResponse response = new CimiResponse();
+        this.cimiManagerCreateMachineImage.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
     /**
      * Delete a machine image.
+     * 
+     * @param id The ID of machine image to delete
+     * @return The REST response
      */
     @DELETE
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON})
+    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
     @Path("{id}")
     public Response deleteMachineImage(@PathParam("id") final String id) {
-
-        CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(this.headers, this.uriInfo, id));
-
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id);
         CimiResponse response = new CimiResponse();
-
-        CimiManagerDeleteMachineImage manager = this.getManagerMachineImageDelete();
-        manager.execute(request, response);
-
-        return Response.status(response.getStatus()).build();
+        this.cimiManagerDeleteMachineImage.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
-    private CimiManagerDeleteMachineImage getManagerMachineImageDelete() {
-        CimiManagerDeleteMachineImage manager = new CimiManagerDeleteMachineImage();
-        return manager;
-    }
-
-    private CimiManagerUpdateMachineImage getManagerMachineImageUpdate() {
-        CimiManagerUpdateMachineImage manager = new CimiManagerUpdateMachineImage();
-        return manager;
-    }
-
-    private CimiManagerReadMachineImage getManagerMachineImageRead() {
-        return (CimiManagerReadMachineImage) this.cimiManagerReadMachineImage;
-    }
-
-    private CimiManagerReadMachineImageCollection getManagerMachineImageReadCollection() {
-        return (CimiManagerReadMachineImageCollection) this.cimiManagerReadMachineImageCollection;
-    }
 }

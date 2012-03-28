@@ -26,125 +26,91 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
-import javax.validation.constraints.NotNull;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
 
 /**
- * Class MachineImage.
+ * Class Operation.
  * <p>
+ * The operation executed on the resource.
  * </p>
  */
-@XmlRootElement(name = "machineImage")
+@XmlRootElement(name = "operation")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineImage extends CimiCommon implements Serializable {
+public class CimiOperation implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
+    // ---------------------------------------- Fields
+
+    /**
+     * Field "rel".
+     * <p>
+     * The name of the operation.
+     * </p>
+     */
+    private String rel;
+
     /**
      * Field "href".
      * <p>
+     * The URL to execute the operation.
      * </p>
      */
     private String href;
 
     /**
-     * Field "state".
-     * <p>
-     * </p>
-     */
-    private String state;
-
-    /**
-     * Field "imageLocation".
-     * <p>
-     * </p>
-     */
-    @NotNull(groups = {GroupCreate.class})
-    private ImageLocation imageLocation;
-
-    /**
-     * Field "type".
-     * <p>
-     * </p>
-     */
-    private String type;
-
-    /**
      * Default constructor.
      */
-    public CimiMachineImage() {
+    public CimiOperation() {
         super();
     }
 
     /**
-     * Return the value of field "state".
+     * Parameters constructor.
+     */
+    public CimiOperation(final String rel, final String href) {
+        this.setRel(rel);
+        this.setHref(href);
+    }
+
+    /**
+     * Return the value of field "rel".
      * 
      * @return The value
      */
-    public String getState() {
-        return this.state;
+    public String getRel() {
+        return this.rel;
     }
 
     /**
-     * Set the value of field "state".
+     * Set the value of field "rel".
      * 
-     * @param state The value
+     * @param rel The value
      */
-    public void setState(final String state) {
-        this.state = state;
+    public void setRel(final String rel) {
+        this.rel = rel;
     }
 
     /**
-     * Return the value of field "imageLocation".
+     * Return the value of field "href".
      * 
      * @return The value
      */
-    public ImageLocation getImageLocation() {
-        return this.imageLocation;
-    }
-
-    /**
-     * Set the value of field "imageLocation".
-     * 
-     * @param imageLocation The value
-     */
-    public void setImageLocation(final ImageLocation imageLocation) {
-        this.imageLocation = imageLocation;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
     public String getHref() {
         return this.href;
     }
 
     /**
-     * @param href the href to set
+     * Set the value of field "href".
+     * 
+     * @param href The value
      */
     public void setHref(final String href) {
         this.href = href;
-    }
-
-    /**
-     * @return the type
-     */
-    public String getType() {
-        return this.type;
-    }
-
-    /**
-     * @param type the type to set
-     */
-    public void setType(final String type) {
-        this.type = type;
     }
 
 }

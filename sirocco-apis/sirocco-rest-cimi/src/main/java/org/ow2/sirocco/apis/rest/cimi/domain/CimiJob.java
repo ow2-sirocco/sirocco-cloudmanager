@@ -33,7 +33,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class Job. <p> </p>
+ * Class Job.
  */
 @XmlRootElement(name = "job")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -44,56 +44,76 @@ public class CimiJob extends CimiCommon implements Serializable {
 
     // ---------------------------------------- Fields
     /**
-     * Field "targetEntity". <p> </p>
+     * Field "targetEntity".
+     * <p>
+     * </p>
      */
     private String targetEntity;
 
     /**
-     * Field "action". <p> URI </p>
+     * Field "action".
+     * <p>
+     * URI
+     * </p>
      */
     private String action;
 
     /**
-     * Field "status". <p> </p>
+     * Field "status".
+     * <p>
+     * </p>
      */
     private String status;
 
     /**
-     * Field "returnCode". <p> </p>
+     * Field "returnCode".
+     * <p>
+     * </p>
      */
     private Integer returnCode;
 
     /**
-     * Field "progress". <p> </p>
+     * Field "progress".
+     * <p>
+     * </p>
      */
     private Integer progress;
 
     /**
-     * Field "statusMessage". <p> </p>
+     * Field "statusMessage".
+     * <p>
+     * </p>
      */
     private String statusMessage;
 
     /**
-     * Field "timeOfStatusChange". <p> DateTimeUTC Format ISO 8601 ? </p>
+     * Field "timeOfStatusChange".
+     * <p>
+     * DateTimeUTC Format ISO 8601 ?
+     * </p>
      */
     private Date timeOfStatusChange;
 
     /**
-     * Field "isCancellable". <p> </p>
+     * Field "isCancellable".
+     * <p>
+     * </p>
      */
     private Boolean isCancellable;
 
     /**
-     * Field "parentJob". <p> </p>
+     * Field "parentJob".
+     * <p>
+     * </p>
      */
-    private String parentJob;
+    private ParentJob parentJob;
 
     /**
-     * Field "nestedJobs". <p> </p>
+     * Field "nestedJobs".
+     * <p>
+     * </p>
      */
-    private String[] nestedJobs;
-
-    // ---------------------------------------- Constructors
+    private NestedJob[] nestedJobs;
 
     /**
      * Default constructor.
@@ -102,10 +122,9 @@ public class CimiJob extends CimiCommon implements Serializable {
         super();
     }
 
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "targetEntity".
+     * 
      * @return The value
      */
     public String getTargetEntity() {
@@ -114,14 +133,16 @@ public class CimiJob extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "targetEntity".
+     * 
      * @param targetEntity The value
      */
-    public void setTargetEntity(String targetEntity) {
+    public void setTargetEntity(final String targetEntity) {
         this.targetEntity = targetEntity;
     }
 
     /**
      * Return the value of field "action".
+     * 
      * @return The value
      */
     public String getAction() {
@@ -130,14 +151,16 @@ public class CimiJob extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "action".
+     * 
      * @param action The value
      */
-    public void setAction(String action) {
+    public void setAction(final String action) {
         this.action = action;
     }
 
     /**
      * Return the value of field "status".
+     * 
      * @return The value
      */
     public String getStatus() {
@@ -146,14 +169,16 @@ public class CimiJob extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "status".
+     * 
      * @param status The value
      */
-    public void setStatus(String status) {
+    public void setStatus(final String status) {
         this.status = status;
     }
 
     /**
      * Return the value of field "returnCode".
+     * 
      * @return The value
      */
     public Integer getReturnCode() {
@@ -162,14 +187,16 @@ public class CimiJob extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "returnCode".
+     * 
      * @param returnCode The value
      */
-    public void setReturnCode(Integer returnCode) {
+    public void setReturnCode(final Integer returnCode) {
         this.returnCode = returnCode;
     }
 
     /**
      * Return the value of field "progress".
+     * 
      * @return The value
      */
     public Integer getProgress() {
@@ -178,14 +205,16 @@ public class CimiJob extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "progress".
+     * 
      * @param progress The value
      */
-    public void setProgress(Integer progress) {
+    public void setProgress(final Integer progress) {
         this.progress = progress;
     }
 
     /**
      * Return the value of field "statusMessage".
+     * 
      * @return The value
      */
     public String getStatusMessage() {
@@ -194,14 +223,16 @@ public class CimiJob extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "statusMessage".
+     * 
      * @param statusMessage The value
      */
-    public void setStatusMessage(String statusMessage) {
+    public void setStatusMessage(final String statusMessage) {
         this.statusMessage = statusMessage;
     }
 
     /**
      * Return the value of field "timeOfStatusChange".
+     * 
      * @return The value
      */
     public Date getTimeOfStatusChange() {
@@ -210,14 +241,16 @@ public class CimiJob extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "timeOfStatusChange".
+     * 
      * @param timeOfStatusChange The value
      */
-    public void setTimeOfStatusChange(Date timeOfStatusChange) {
+    public void setTimeOfStatusChange(final Date timeOfStatusChange) {
         this.timeOfStatusChange = timeOfStatusChange;
     }
 
     /**
      * Return the value of field "isCancellable".
+     * 
      * @return The value
      */
     public Boolean getIsCancellable() {
@@ -226,41 +259,46 @@ public class CimiJob extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "isCancellable".
+     * 
      * @param isCancellable The value
      */
-    public void setIsCancellable(Boolean isCancellable) {
+    public void setIsCancellable(final Boolean isCancellable) {
         this.isCancellable = isCancellable;
     }
 
     /**
      * Return the value of field "parentJob".
+     * 
      * @return The value
      */
-    public String getParentJob() {
+    public ParentJob getParentJob() {
         return this.parentJob;
     }
 
     /**
      * Set the value of field "parentJob".
+     * 
      * @param parentJob The value
      */
-    public void setParentJob(String parentJob) {
+    public void setParentJob(final ParentJob parentJob) {
         this.parentJob = parentJob;
     }
 
     /**
      * Return the value of field "nestedJobs".
+     * 
      * @return The value
      */
-    public String[] getNestedJobs() {
+    public NestedJob[] getNestedJobs() {
         return this.nestedJobs;
     }
 
     /**
      * Set the value of field "nestedJobs".
+     * 
      * @param nestedJobs The value
      */
-    public void setNestedJobs(String[] nestedJobs) {
+    public void setNestedJobs(final NestedJob[] nestedJobs) {
         this.nestedJobs = nestedJobs;
     }
 }

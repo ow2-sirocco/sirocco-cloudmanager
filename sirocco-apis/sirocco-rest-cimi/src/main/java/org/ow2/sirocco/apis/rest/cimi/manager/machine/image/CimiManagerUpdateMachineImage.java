@@ -24,59 +24,68 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
+import org.ow2.sirocco.apis.rest.cimi.converter.data.CommonConverter;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerUpdateMachineImage {
+/**
+ * Manage UPDATE request of Machine Image.
+ */
+@Component("CimiManagerUpdateMachineImage")
+public class CimiManagerUpdateMachineImage extends CimiManagerUpdateAbstract {
 
-    public CimiManagerUpdateMachineImage() {
-    }
+    @Autowired
+    @Qualifier("IMachineImageManager")
+    private IMachineImageManager manager;
 
-    public Status verifyRequest(CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com +
-        // ConstantePath
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE_IMAGE.substring(1))) {
-            return Status.OK;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        CimiSelect select = request.getHeader().getCimiSelect();
+        if (true == select.isEmpty()) {
+            this.manager.updateMachineImage((MachineImage) dataService);
         } else {
-            return Status.BAD_REQUEST;
+            Map<String, Object> attrs = new HashMap<String, Object>();
+            for (String attr : select.getAttributes()) {
+                attrs.put(attr, dataService);
+            }
+            this.manager.updateMachineImageAttributes(request.getId(), attrs);
         }
-    }
-
-    public void execute(CimiRequest request, CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // MachineImage machineImageToUpdate =
-        // getMachineImageById(request.getHeader().getId());
-        // MachineImage machineImagePropertiesToUpdate = (MachineImage)
-        // request.getHeader().getCimiData();
-        // updateMachineImage(machineImageToUpdate,
-        // machineImagePropertiesToUpdate, request.getHeader()
-        // .getListSelect());
-        // // status = 202 Accepted
-        // response.setStatusHttp(Status.ACCEPTED.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-
-    }
-
-    private void updateMachineImage(CimiMachineImage machineImageToUpdate, CimiMachineImage machineImagePropertiesToUpdate,
-            List<String> queryParam) {
-        // FIXME IMachineManager.updateMachineImage(machineImageToUpdate,
-        // machineImagePropertiesToUpdate, queryParam);
-    }
-
-    public CimiMachineImage getMachineImageById(String id) {
-        // FIXME return IMachineManager.getMachineImageById(id);
         return null;
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Copy only common attributes.
+     * </p>
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     */
+    @Override
+    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+        MachineImage service = new MachineImage();
+        CommonConverter.copyToService((CimiCommon) request.getCimiData(), service);
+        return service;
     }
 
 }

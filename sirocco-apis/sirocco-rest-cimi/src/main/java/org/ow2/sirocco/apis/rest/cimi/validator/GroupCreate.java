@@ -19,31 +19,14 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id$
+ * $Id:  $
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.domain;
+package org.ow2.sirocco.apis.rest.cimi.validator;
 
-public enum Operation {
+/**
+ * Validation group to valid a create request.
+ */
+public interface GroupCreate {
 
-    // Actions
-    START("start"), STOP("stop"), RESTART("restart"), PAUSE("pause"), SUSPEND("suspend"), CAPTURE("capture"),
-
-    // Operations
-    ADD("add"), EDIT("edit"), DELETE("delete");
-
-    /** */
-    String rel;
-
-    /** */
-    private Operation(final String rel) {
-        this.rel = rel;
-    }
-
-    /**
-     * @return
-     */
-    public String getRel() {
-        return this.rel;
-    }
 }

@@ -25,7 +25,9 @@
 package org.ow2.sirocco.apis.rest.cimi.request;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Utility class to manage CimiSelect expression.
@@ -34,9 +36,11 @@ public class CimiSelect {
 
     private List<String> selects;
 
-    private Integer[] rangeNumericArray;
+    private List<String> attributes;
 
-    private Integer indexNumericArray;
+    private Map<String, List<Integer>> numericArrays;
+
+    private Map<String, String> expressionArrays;
 
     /**
      * Default constructor.
@@ -47,31 +51,41 @@ public class CimiSelect {
 
     /**
      * Set constructor.
+     * 
      * @param selects The original CimiSelect list
      */
-    public CimiSelect(List<String> selects) {
-        setSelects(selects);
+    public CimiSelect(final List<String> selects) {
+        this.setSelects(selects);
     }
 
     /**
      * Get true if the CimiSelect expression is empty.
+     * 
      * @return True if empty
      */
     public boolean isEmpty() {
-        return (null == this.selects);
+        boolean empty = true;
+        if (null != this.attributes) {
+            if (this.attributes.size() > 0) {
+                empty = false;
+            }
+        }
+        return empty;
     }
 
     /**
      * Set the original CimiSelect list and build the instance variables.
+     * 
      * @param selects The CimiSelect list
      */
-    public void setSelects(List<String> selects) {
+    public void setSelects(final List<String> selects) {
         this.selects = selects;
-        build();
+        this.analyze();
     }
 
     /**
      * Get the original CimiSelect list.
+     * 
      * @return CimiSelect list
      */
     public List<String> getSelects() {
@@ -79,134 +93,246 @@ public class CimiSelect {
     }
 
     /**
-     * Get true if the CimiSelect expression is an array with index (a single
-     * number).
-     * @return True it's an array with a single number
+     * Get the attributes.
+     * 
+     * @return The attributes
      */
-    public boolean isIndexNumericArraySelect() {
-        return (null != this.indexNumericArray);
+    public List<String> getAttributes() {
+        return this.attributes;
     }
 
     /**
-     * Get the index of a array expression.
-     * @return The index or null if it's not a array expression with index
+     * Get the last attribute.
+     * 
+     * @return The last attribute or null if empty
      */
-    public Integer getIndexNumericArraySelect() {
-        return this.indexNumericArray;
+    public String getLastAttribute() {
+        String attr = null;
+        if (false == this.isEmpty()) {
+            attr = this.attributes.get(this.attributes.size() - 1);
+        }
+        return attr;
     }
 
     /**
-     * Get true if the CimiSelect expression is an array with a range
-     * (low-high).
-     * @return True it's an array with a range
+     * Get the numerics array of the last attribute.
+     * 
+     * @return The numerics array or null if the last attribute has not numerics
+     *         array
      */
-    public boolean isRangeNumericArraySelect() {
-        return (null != this.rangeNumericArray);
+    public List<Integer> getLastNumericArray() {
+        List<Integer> nums = null;
+        if (false == this.isEmpty()) {
+            nums = this.numericArrays.get(this.getLastAttribute());
+        }
+        return nums;
     }
 
     /**
-     * Get the range of a array expression. In the return array, the first is
-     * the low value and the second is the high value.
-     * @return The array of range or null if it's not a array expression with
-     *         range
+     * The indicator of the presence of a array (expression or numeric) in the
+     * selects.
+     * 
+     * @return Returns true if there is an array
      */
-    public Integer[] getRangeNumericArraySelect() {
-        return this.rangeNumericArray;
+    public boolean isArrayPresent() {
+        boolean hasArray = false;
+        if (false == this.isEmpty()) {
+            hasArray = this.isExpressionArrayPresent() || this.isNumericArrayPresent();
+        }
+        return hasArray;
     }
 
     /**
-     * Initialize the instance variables built.
+     * The indicator of the presence of a numeric array in the selects.
+     * 
+     * @return Returns true if there is a numeric array
      */
-    protected void init() {
-        this.indexNumericArray = null;
-        this.rangeNumericArray = null;
+    public boolean isNumericArrayPresent() {
+        boolean hasArray = false;
+        if (false == this.isEmpty()) {
+            hasArray = null != this.getLastNumericArray();
+        }
+        return hasArray;
     }
 
     /**
-     * Build the instance variables.
+     * The indicator of the presence of a expression array in the selects.
+     * 
+     * @return Returns true if there is a expression array
      */
-    protected void build() {
-        init();
-        buildArray();
+    public boolean isExpressionArrayPresent() {
+        boolean hasArray = false;
+        if (false == this.isEmpty()) {
+            hasArray = null != this.getLastExpressionArray();
+        }
+        return hasArray;
     }
 
     /**
-     * Build and fill the instance variables for a array expression. T if
-     * necessary. See {@link #indexNumericArray} and {@link #rangeNumericArray}
+     * Get the expression array of the last attribute.
+     * 
+     * @return The expression array or null if the last attribute has not
+     *         expression array
      */
-    protected void buildArray() {
-        if ((null != this.selects) && (this.selects.size() == 1)) {
-            String arrayValue = extractBetween(this.selects.get(0), '[', ']');
-            Integer[] values = extractNumericArray(arrayValue);
-            if (values.length > 0) {
-                if (values.length == 1) {
-                    this.indexNumericArray = values[0];
-                } else if (values.length == 2) {
-                    this.rangeNumericArray = values;
+    public String getLastExpressionArray() {
+        String exp = null;
+        if (false == this.isEmpty()) {
+            exp = this.expressionArrays.get(this.getLastAttribute());
+        }
+        return exp;
+    }
+
+    /**
+     * Analyse the original selects.
+     */
+    protected void analyze() {
+        this.attributes = new ArrayList<String>();
+        this.expressionArrays = new HashMap<String, String>();
+        this.numericArrays = new HashMap<String, List<Integer>>();
+
+        List<Integer> numerics;
+        String attr;
+        String arrayExp;
+
+        List<String> fullAttrs = CimiSelect.splitByComma(this.getSelects());
+        for (String full : fullAttrs) {
+            attr = CimiSelect.extractBefore(full, '[');
+            if ((null != attr) && (attr.length() > 0)) {
+                this.attributes.add(attr);
+                arrayExp = CimiSelect.extractBetween(full, '[', ']');
+                if (null != arrayExp) {
+                    numerics = CimiSelect.extractNumericArray(arrayExp);
+                    if (numerics.size() > 0) {
+                        this.numericArrays.put(attr, numerics);
+                    } else {
+                        this.expressionArrays.put(attr, arrayExp);
+                    }
                 }
             }
         }
     }
 
     /**
-     * Extract the numeric values ​​of the contents of a array expression.
-     * @param arrayContents The contents of a array expression (between the
-     *        caracters '[' and ']')
-     * @return A array of numeric values ​​or null if bad expression
+     * Splits all items with comma and adds them in the returned list.
+     * 
+     * @param selects The orginal list
+     * @return The list with all items without comma
      */
-    protected Integer[] extractNumericArray(String arrayContents) {
-        Integer value;
-        List<Integer> listInt = new ArrayList<Integer>();
-        String[] split = arrayContents.split("-");
-        for (int i = 0; i < split.length; i++) {
-            try {
-                value = Integer.valueOf(split[i].trim());
-                listInt.add(value);
-            } catch (Exception e) {
-                listInt.clear();
-                break;
+    public static List<String> splitByComma(final List<String> selects) {
+        List<String> byComma = new ArrayList<String>();
+        if (null != selects) {
+            String[] split;
+            for (String select : selects) {
+                split = select.split(",");
+                for (String element : split) {
+                    if (element.trim().length() > 0) {
+                        byComma.add(element.trim());
+                    }
+                }
             }
         }
-        return (Integer[]) listInt.toArray();
+        return byComma;
     }
 
     /**
-     * Extract the string between two characters. The first character must be
-     * located before the second.
+     * Extract the string before a character.
+     * 
      * @param source The string to analyse
-     * @param first The first character
-     * @param second The second character
-     * @return The string between the two characters, or null if the two
-     *         characters do not exist or are in reverse location
+     * @param before The character before which the extraction should be
+     *        performed
+     * @return The string before the character or the source string if the
+     *         character not found
      */
-    protected String extractBetween(String source, char first, char second) {
+    public static String extractBefore(final String source, final char before) {
         String extract = null;
-        int indexFirst = source.indexOf(first);
-        int indexSecond = source.indexOf(second);
-        if ((indexFirst > -1) && (indexSecond > -1)) {
-            if (indexFirst < indexSecond) {
-                extract = source.substring(indexFirst + 1, indexSecond);
+        if (null != source) {
+            int index = source.indexOf(before);
+            if (index > -1) {
+                extract = source.substring(0, index).trim();
+            } else {
+                extract = source.trim();
             }
         }
         return extract;
     }
 
     /**
+     * Extract the string between two characters. The first character must be
+     * located before the second.
+     * 
+     * @param source The string to analyse
+     * @param first The first character
+     * @param second The second character
+     * @return The string between the two characters, or null if the two
+     *         characters do not exist or are in reverse location
+     */
+    public static String extractBetween(final String source, final char first, final char second) {
+        String extract = null;
+        if (null != source) {
+            int indexFirst = source.indexOf(first);
+            int indexSecond = source.indexOf(second);
+            if ((indexFirst > -1) && (indexSecond > -1)) {
+                if (indexFirst < indexSecond) {
+                    extract = source.substring(indexFirst + 1, indexSecond).trim();
+                }
+            }
+        }
+        return extract;
+    }
+
+    /**
+     * Extract the numeric values ​​of the contents of a array expression.
+     * <p>
+     * The size of the return list is always 2. Example :
+     * <ul>
+     * <li>"1-5" = [1, 5]</li>
+     * <li>"9" = [9, 9]</li>
+     * <li>"7-12-45" = [7, 12]</li>
+     * </ul>
+     * </p>
+     * 
+     * @param arrayContents The contents of a array expression (between the
+     *        caracters '[' and ']')
+     * @return A list of numeric values
+     */
+    public static List<Integer> extractNumericArray(final String arrayContents) {
+        Integer value;
+        List<Integer> listInt = new ArrayList<Integer>();
+        if (null != arrayContents) {
+            String[] split = arrayContents.split("-");
+            for (String element : split) {
+                try {
+                    value = Integer.valueOf(element.trim());
+                    listInt.add(value);
+                    // Max size
+                    if (listInt.size() == 2) {
+                        break;
+                    }
+                } catch (Exception e) {
+                    listInt.clear();
+                    break;
+                }
+            }
+            // Adjust the size to 2
+            if (listInt.size() == 1) {
+                listInt.add(listInt.get(0));
+            }
+        }
+        return listInt;
+    }
+
+    /**
      * {@inheritDoc}
+     * 
      * @see java.lang.Object#toString()
      */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder();
-        if (null != getSelects()) {
-            for (String select : getSelects()) {
-                if (sb.length() > 0) {
-                    sb.append(',');
-                }
-                sb.append(select.trim());
-            }
+        String to = null;
+        if (null != this.getSelects()) {
+            to = this.getSelects().toString();
         }
-        return sb.toString();
+        return to;
     }
 
 }

@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 
@@ -55,12 +56,13 @@ public class MachineImageCollectionConverter {
     public static void copyToCimi(final List<MachineImage> dataService, final CimiMachineImageCollection dataCimi,
         final String urlBase) {
 
+        dataCimi.setId(HrefHelper.makeHref(urlBase, ConstantsPath.MACHINE_IMAGE));
         CimiMachineImage cimi = null;
         List<CimiMachineImage> cimiList = new ArrayList<CimiMachineImage>();
         for (MachineImage machineImage : dataService) {
             cimi = new CimiMachineImage();
             cimiList.add(cimi);
-            MachineImageConverter.copyToCimi(machineImage, cimi, urlBase);
+            MachineImageConverter.copyToCimi(machineImage, cimi, urlBase, false, true);
         }
         dataCimi.setMachineImages(cimiList.toArray(new CimiMachineImage[cimiList.size()]));
     }
