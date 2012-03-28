@@ -26,7 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.data.MachineImageConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;

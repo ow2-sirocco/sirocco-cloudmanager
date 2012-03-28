@@ -24,7 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.data.MachineImageConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;

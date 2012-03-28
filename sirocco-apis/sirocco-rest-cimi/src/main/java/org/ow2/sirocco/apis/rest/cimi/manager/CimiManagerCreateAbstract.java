@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id: $
+ * $Id$
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;
@@ -27,8 +27,8 @@ package org.ow2.sirocco.apis.rest.cimi.manager;
 import javax.validation.groups.Default;
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.data.HrefHelper;
-import org.ow2.sirocco.apis.rest.cimi.converter.data.JobConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.HrefHelper;
+import org.ow2.sirocco.apis.rest.cimi.converter.JobConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;

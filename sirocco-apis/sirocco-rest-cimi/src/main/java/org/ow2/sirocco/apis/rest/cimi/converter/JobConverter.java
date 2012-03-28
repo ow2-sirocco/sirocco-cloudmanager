@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id: MachineImageConverter.java 1096 2012-03-09 08:08:25Z antonma $
+ * $Id$
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;

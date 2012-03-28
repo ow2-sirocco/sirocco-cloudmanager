@@ -27,7 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.data.CommonConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.CommonConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;

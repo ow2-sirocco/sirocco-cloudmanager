@@ -29,7 +29,7 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.data.MachineImageCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
