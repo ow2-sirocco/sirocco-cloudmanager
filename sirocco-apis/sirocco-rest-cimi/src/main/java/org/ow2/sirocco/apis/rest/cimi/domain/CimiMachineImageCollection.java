@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -34,74 +35,62 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
  * Class MachineImageCollection.
- * <p>
- * </p>
  */
 @XmlRootElement(name = "machineImageCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiMachineImageCollection extends CimiCommon implements Serializable {
 
-	/** Serial number */
-	private static final long serialVersionUID = 1L;
+    /** Serial number */
+    private static final long serialVersionUID = 1L;
 
-	// ---------------------------------------- Fields
-	/**
-	 * Field href
-	 * <p>
-	 * </p>
-	 */
-	String href;
+    /**
+     * Field href
+     */
+    String href;
 
-	/**
-	 * Field "machineImages".
-	 * <p>
-	 * </p>
-	 */
-	private CimiMachineImage[] machineImages;
+    /**
+     * Field "machineImages".
+     */
+    private CimiMachineImage[] machineImages;
 
-	// ---------------------------------------- Constructors
+    /**
+     * Default constructor.
+     */
+    public CimiMachineImageCollection() {
+        super();
+    }
 
-	/**
-	 * Default constructor.
-	 */
-	public CimiMachineImageCollection() {
-		super();
-	}
+    /**
+     * Return the value of field "machineImages".
+     * 
+     * @return The value
+     */
+    @XmlElement(name = "machineImage")
+    public CimiMachineImage[] getMachineImages() {
+        return this.machineImages;
+    }
 
-	// ---------------------------------------- ???com-accesseurs???
+    /**
+     * Set the value of field "machineImages".
+     * 
+     * @param machineImages The value
+     */
+    public void setMachineImages(final CimiMachineImage[] machineImages) {
+        this.machineImages = machineImages;
+    }
 
-	/**
-	 * Return the value of field "machineImages".
-	 * 
-	 * @return The value
-	 */
-	public CimiMachineImage[] getMachineImages() {
-		return this.machineImages;
-	}
+    /**
+     * @return the href
+     */
+    @XmlAttribute
+    public String getHref() {
+        return this.href;
+    }
 
-	/**
-	 * Set the value of field "machineImages".
-	 * 
-	 * @param machineImages
-	 *            The value
-	 */
-	public void setMachineImages(CimiMachineImage[] machineImages) {
-		this.machineImages = machineImages;
-	}
-
-	/**
-	 * @return the href
-	 */
-	@XmlAttribute
-	public String getHref() {
-		return href;
-	}
-
-	/**
-	 * @param href
-	 *            the href to set
-	 */
-	public void setHref(String href) {
-		this.href = href;
-	}
+    /**
+     * @param href the href to set
+     */
+    public void setHref(final String href) {
+        this.href = href;
+    }
 }

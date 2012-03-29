@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd">
+
+
+	<bean id="CimiManagerCreateMachineImage"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+	<bean id="CimiManagerDeleteMachineImage"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+	<bean id="CimiManagerReadMachineImage"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+	<bean id="CimiManagerReadMachineImageCollection"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImageCollection" />
+	<bean id="CimiManagerUpdateMachineImage"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+	<bean id="CimiManagerUpdateMachineImageCollection"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+
+	<context:annotation-config />
+	<context:component-scan base-package="org.ow2.sirocco.apis.rest.cimi" />
+</beans>

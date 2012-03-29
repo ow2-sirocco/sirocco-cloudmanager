@@ -26,6 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -82,6 +83,7 @@ public class CimiOperation implements Serializable {
      * 
      * @return The value
      */
+    @XmlAttribute
     public String getRel() {
         return this.rel;
     }
@@ -100,6 +102,7 @@ public class CimiOperation implements Serializable {
      * 
      * @return The value
      */
+    @XmlAttribute
     public String getHref() {
         return this.href;
     }

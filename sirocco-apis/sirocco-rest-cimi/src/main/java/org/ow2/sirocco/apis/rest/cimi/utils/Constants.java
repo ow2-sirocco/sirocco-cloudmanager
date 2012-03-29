@@ -35,6 +35,12 @@ public abstract class Constants {
     /** Parameter name in Header : X-CIMI-Specification-Version. */
     public static final String HEADER_CIMI_VERSION = "X-CIMI-Specification-Version";
 
+    /** Parameter name in Header : SIROCCO-INFO-TEST-ID. */
+    public static final String HEADER_SIROCCO_INFO_TEST_ID = "SIROCCO-INFO-TEST-ID";
+
+    /** Parameter name in Header : SIROCCO-INFO-TEST-EXPAND. */
+    public static final String HEADER_SIROCCO_INFO_TEST_EXPAND = "SIROCCO-INFO-TEST-EXPAND";
+
     /** Parameter name in Header : X-CIMI-Job-URI. */
     public static final String HEADER_CIMI_JOB_URI = "X-CIMI-Job-URI";
 

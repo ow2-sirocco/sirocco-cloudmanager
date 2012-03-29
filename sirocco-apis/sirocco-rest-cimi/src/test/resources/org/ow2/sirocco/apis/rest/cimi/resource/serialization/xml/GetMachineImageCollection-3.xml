@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<machineImageCollection>
+	<id>idValue_3</id>
+	<name>nameValue_3</name>
+	<description>descriptionValue_3</description>
+	<created>2003-04-04T04:03:03.003+02:00</created>
+	<property key="keyProp_3_0">valueProp_3_0</property>
+	<property key="keyProp_3_2">valueProp_3_2</property>
+	<property key="keyProp_3_1">valueProp_3_1</property>
+	<updated>2003-04-04T04:03:03.003+02:00</updated>
+	<machineImage href="hrefValue_3_0" />
+	<machineImage href="hrefValue_3_1" />
+	<machineImage href="hrefValue_3_2" />
+	<operation href="hrefValue_3_0" rel="relValue_3_0" />
+	<operation href="hrefValue_3_1" rel="relValue_3_1" />
+	<operation href="hrefValue_3_2" rel="relValue_3_2" />
+</machineImageCollection>

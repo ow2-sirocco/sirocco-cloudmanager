@@ -36,56 +36,68 @@ import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 
 public class HelperRequest {
 
-    public static CimiRequest buildRequest(HttpHeaders headers, UriInfo uri) {
-        return buildRequest(headers, uri, null, null);
+    public static CimiRequest buildRequest(final HttpHeaders headers, final UriInfo uri) {
+        return HelperRequest.buildRequest(headers, uri, null, null);
     }
 
-    public static CimiRequest buildRequest(HttpHeaders headers, UriInfo uri, CimiData cimiData) {
-        return buildRequest(headers, uri, null, cimiData);
+    public static CimiRequest buildRequest(final HttpHeaders headers, final UriInfo uri, final CimiData cimiData) {
+        return HelperRequest.buildRequest(headers, uri, null, cimiData);
     }
 
-    public static CimiRequest buildRequest(HttpHeaders headers, UriInfo uri, String id) {
-        return buildRequest(headers, uri, id, null);
+    public static CimiRequest buildRequest(final HttpHeaders headers, final UriInfo uri, final String id) {
+        return HelperRequest.buildRequest(headers, uri, id, null);
     }
 
-    public static CimiRequest buildRequest(HttpHeaders headers, UriInfo uri, String id, CimiData cimiData) {
+    public static CimiRequest buildRequest(final HttpHeaders headers, final UriInfo uri, final String id,
+        final CimiData cimiData) {
         CimiRequest request = new CimiRequest();
-        request.setHeader(buildRequestHeader(headers, uri));
+        request.setHeader(HelperRequest.buildRequestHeader(headers, uri));
         request.setId(id);
         request.setCimiData(cimiData);
         return request;
     }
 
     // TODO A passer en privé
-    public static RequestHeader buildRequestHeader(HttpHeaders headers, UriInfo uri) {
+    public static RequestHeader buildRequestHeader(final HttpHeaders headers, final UriInfo uri) {
         RequestHeader requestHeader = new RequestHeader();
         List<String> versions = headers.getRequestHeader(Constants.HEADER_CIMI_VERSION);
         if ((null != versions) && (versions.size() > 0)) {
             requestHeader.setVersion(versions.get(0));
         }
 
-        requestHeader.setCimiSelect(new CimiSelect(transformQueryParamToList(uri.getQueryParameters())));
+        requestHeader.setCimiSelect(new CimiSelect(HelperRequest.transformQueryParamToList(uri.getQueryParameters())));
         requestHeader.setBaseUri(uri.getBaseUri().toString());
         requestHeader.setPath(uri.getPath());
+
+        List<String> siroccoInfoTestsId = headers.getRequestHeader(Constants.HEADER_SIROCCO_INFO_TEST_ID);
+        if ((null != siroccoInfoTestsId) && (siroccoInfoTestsId.size() > 0)) {
+            requestHeader.setSiroccoInfoTestId(siroccoInfoTestsId.get(0));
+        }
+        List<String> siroccoInfoTestExpand = headers.getRequestHeader(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND);
+        if ((null != siroccoInfoTestExpand) && (siroccoInfoTestExpand.size() > 0)) {
+            requestHeader.setSiroccoInfoTestExpand(siroccoInfoTestExpand.get(0));
+        }
+
         return requestHeader;
     }
 
     // TODO A passer en privé ou à supprimer
-    public static RequestHeader buildRequestHeader(HttpHeaders headers, UriInfo uri, String id) {
-        return buildRequestHeader(headers, uri);
+    public static RequestHeader buildRequestHeader(final HttpHeaders headers, final UriInfo uri, final String id) {
+        return HelperRequest.buildRequestHeader(headers, uri);
     }
 
     // TODO A passer en privé ou à supprimer
-    public static RequestHeader buildRequestHeader(HttpHeaders headers, UriInfo uri, CimiData cimiData) {
-        return buildRequestHeader(headers, uri);
+    public static RequestHeader buildRequestHeader(final HttpHeaders headers, final UriInfo uri, final CimiData cimiData) {
+        return HelperRequest.buildRequestHeader(headers, uri);
     } // TODO A passer en privé
 
     // TODO A passer en privé ou à supprimer
-    public static RequestHeader buildRequestHeader(HttpHeaders headers, UriInfo uri, String id, CimiData cimiData) {
-        return buildRequestHeader(headers, uri);
+    public static RequestHeader buildRequestHeader(final HttpHeaders headers, final UriInfo uri, final String id,
+        final CimiData cimiData) {
+        return HelperRequest.buildRequestHeader(headers, uri);
     }
 
-    private static List<String> transformQueryParamToList(MultivaluedMap<String, String> queryParameters) {
+    private static List<String> transformQueryParamToList(final MultivaluedMap<String, String> queryParameters) {
         List<String> listSelect = new ArrayList<String>();
         listSelect = queryParameters.get(Constants.PARAM_CIMI_SELECT);
         return listSelect;

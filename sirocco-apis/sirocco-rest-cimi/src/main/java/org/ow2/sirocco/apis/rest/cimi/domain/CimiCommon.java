@@ -266,6 +266,7 @@ public class CimiCommon implements Serializable, CimiData {
      * 
      * @return The value
      */
+    @XmlElement(name = "operation")
     public CimiOperation[] getOperations() {
         return this.operations;
     }
