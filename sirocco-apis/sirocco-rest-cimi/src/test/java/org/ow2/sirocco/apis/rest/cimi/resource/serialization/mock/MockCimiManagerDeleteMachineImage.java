@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id: MockCimiManagerUpdateMachineImage.java 1114 2012-04-02 13:08:58Z antonma $
+ * $Id$
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock;
