@@ -55,10 +55,11 @@ import org.springframework.stereotype.Component;
  * <p>
  * Operations supports :
  * <ul>
+ * <li>Create a machine image</li>
+ * <li>Delete a machine image</li>
  * <li>Read a machine image</li>
  * <li>Read a collection of machines images</li>
  * <li>Update a machine image</li>
- * <li>Delete a machine image</li>
  * </ul>
  * </p>
  */
