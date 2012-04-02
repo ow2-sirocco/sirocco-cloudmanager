@@ -30,7 +30,7 @@ public abstract class Constants {
     public static final String VERSION_DMTF_CIMI = "1.0";
 
     /** Parameter name in Query String : CimiSelect. */
-    public static final String PARAM_CIMI_SELECT = "CimiSelect";
+    public static final String PARAM_CIMI_SELECT = "CIMISelect";
 
     /** Parameter name in Header : X-CIMI-Specification-Version. */
     public static final String HEADER_CIMI_VERSION = "X-CIMI-Specification-Version";

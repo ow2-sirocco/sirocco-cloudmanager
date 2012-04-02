@@ -31,6 +31,8 @@ import javax.xml.bind.annotation.XmlAttribute;
 /**
  * Class Reference.
  */
+// @XmlRootElement(name = "reference")
+// @JsonSerialize(include = Inclusion.NON_NULL)
 public class Reference implements Serializable {
 
     /** Serial number */

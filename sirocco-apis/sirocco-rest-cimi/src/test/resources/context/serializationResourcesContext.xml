@@ -17,7 +17,7 @@
 	<bean id="CimiManagerReadMachineImageCollection"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImageCollection" />
 	<bean id="CimiManagerUpdateMachineImage"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdateMachineImage" />
 	<bean id="CimiManagerUpdateMachineImageCollection"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
 

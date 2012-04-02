@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -289,6 +290,7 @@ public class CimiJob extends CimiCommon implements Serializable {
      * 
      * @return The value
      */
+    @XmlElement(name = "nestedJob")
     public NestedJob[] getNestedJobs() {
         return this.nestedJobs;
     }

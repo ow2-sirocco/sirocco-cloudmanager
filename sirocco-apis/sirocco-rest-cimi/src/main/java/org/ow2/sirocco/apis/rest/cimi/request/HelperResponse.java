@@ -64,6 +64,10 @@ public class HelperResponse {
         if (null != cimiResponse.getCimiData()) {
             builder.entity(cimiResponse.getCimiData());
         }
+        // Add message error (body)
+        if (null != cimiResponse.getErrorMessage()) {
+            builder.entity(cimiResponse.getErrorMessage());
+        }
         // Add HEADER Response
         builder.header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI);
         if (null != cimiResponse.getHeaders()) {

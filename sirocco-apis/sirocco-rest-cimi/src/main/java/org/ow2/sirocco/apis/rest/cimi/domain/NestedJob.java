@@ -32,7 +32,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 /**
  * Class NestedJob.
  */
-@XmlRootElement(name = "parentJob")
+@XmlRootElement(name = "nestedJob")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class NestedJob extends Reference {
 

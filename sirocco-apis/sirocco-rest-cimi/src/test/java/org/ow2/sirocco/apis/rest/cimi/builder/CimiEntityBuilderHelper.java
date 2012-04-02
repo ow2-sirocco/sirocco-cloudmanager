@@ -33,10 +33,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
+import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.ParentJob;
 
 /**
  * Helper to build Cimi Entities to test.
@@ -59,6 +62,14 @@ public class CimiEntityBuilderHelper {
             cal.set(year, month, day, hour, minute, second);
             cal.set(Calendar.MILLISECOND, milli);
             ret = cal.getTime();
+        }
+        return ret;
+    }
+
+    public static Boolean buildBoolean(final Integer id) {
+        Boolean ret = null;
+        if (null != id) {
+            ret = Boolean.valueOf(0 == id % 2);
         }
         return ret;
     }
@@ -143,4 +154,38 @@ public class CimiEntityBuilderHelper {
         }
         return collec;
     }
+
+    public static CimiJob buildCimiJob(final Integer id) {
+        return CimiEntityBuilderHelper.buildCimiJob(id, null, true);
+    }
+
+    public static CimiJob buildCimiJob(final Integer id, final Integer index, final Boolean expand) {
+        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        CimiJob job = new CimiJob();
+
+        if ((null != expand) && (true == expand)) {
+            CimiEntityBuilderHelper.fillCimiCommon(job, id, index);
+            job.setAction("actionValue" + postfix);
+            job.setIsCancellable(CimiEntityBuilderHelper.buildBoolean(id));
+            job.setProgress(id);
+            job.setReturnCode(id);
+            job.setStatus("statusValue" + postfix);
+            job.setStatusMessage("statusMessageValue" + postfix);
+            job.setTargetEntity("targetEntityValue" + postfix);
+            job.setTimeOfStatusChange(CimiEntityBuilderHelper.buildDate(id));
+
+            if ((null != id) && (id > 0)) {
+                job.setParentJob(new ParentJob("hrefParentValue" + postfix));
+                List<NestedJob> nesteds = new ArrayList<NestedJob>();
+                for (int i = 0; i < id; i++) {
+                    nesteds.add(new NestedJob("hrefNestedValue" + postfix + CimiEntityBuilderHelper.buildPostfix(id, i)));
+                }
+                job.setNestedJobs(nesteds.toArray(new NestedJob[nesteds.size()]));
+            }
+
+        }
+        // image.setHref("hrefValue" + postfix);
+        return job;
+    }
+
 }
