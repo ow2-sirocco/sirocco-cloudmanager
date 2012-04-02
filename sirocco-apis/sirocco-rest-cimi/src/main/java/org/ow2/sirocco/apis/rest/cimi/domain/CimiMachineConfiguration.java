@@ -26,17 +26,23 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
 
 /**
- * Class MachineConfiguration. <p> </p>
+ * Class MachineConfiguration.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "machineConfiguration")
+@XmlRootElement(name = "MachineConfiguration")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiMachineConfiguration extends CimiCommon implements Serializable {
 
@@ -47,18 +53,26 @@ public class CimiMachineConfiguration extends CimiCommon implements Serializable
     private String href;
 
     /**
-     * Field "cpu". <p> </p>
+     * Field "cpu".
+     * <p>
+     * </p>
      */
     private CimiCpu cpu;
 
     /**
-     * Field "memory". <p> </p>
+     * Field "memory".
+     * <p>
+     * </p>
      */
     private CimiMemory memory;
 
     /**
-     * Field "disks". <p> </p>
+     * Field "disks".
+     * <p>
+     * </p>
      */
+    @JsonProperty
+    @NotNull(groups = {GroupCreate.class})
     private CimiDisk[] disks;
 
     // ---------------------------------------- Constructors
@@ -74,6 +88,7 @@ public class CimiMachineConfiguration extends CimiCommon implements Serializable
 
     /**
      * Return the value of field "cpu".
+     * 
      * @return The value
      */
     public CimiCpu getCpu() {
@@ -82,14 +97,16 @@ public class CimiMachineConfiguration extends CimiCommon implements Serializable
 
     /**
      * Set the value of field "cpu".
+     * 
      * @param cpu The value
      */
-    public void setCpu(CimiCpu cpu) {
+    public void setCpu(final CimiCpu cpu) {
         this.cpu = cpu;
     }
 
     /**
      * Return the value of field "memory".
+     * 
      * @return The value
      */
     public CimiMemory getMemory() {
@@ -98,26 +115,30 @@ public class CimiMachineConfiguration extends CimiCommon implements Serializable
 
     /**
      * Set the value of field "memory".
+     * 
      * @param memory The value
      */
-    public void setMemory(CimiMemory memory) {
+    public void setMemory(final CimiMemory memory) {
         this.memory = memory;
     }
 
     /**
      * Return the value of field "disks".
+     * 
      * @return The value
      */
     @XmlElement(name = "disk")
+    @JsonIgnore
     public CimiDisk[] getDisks() {
         return this.disks;
     }
 
     /**
      * Set the value of field "disks".
+     * 
      * @param disks The value
      */
-    public void setDisks(CimiDisk[] disks) {
+    public void setDisks(final CimiDisk[] disks) {
         this.disks = disks;
     }
 
@@ -126,13 +147,13 @@ public class CimiMachineConfiguration extends CimiCommon implements Serializable
      */
     @XmlAttribute
     public String getHref() {
-        return href;
+        return this.href;
     }
 
     /**
      * @param href the href to set
      */
-    public void setHref(String href) {
+    public void setHref(final String href) {
         this.href = href;
     }
 

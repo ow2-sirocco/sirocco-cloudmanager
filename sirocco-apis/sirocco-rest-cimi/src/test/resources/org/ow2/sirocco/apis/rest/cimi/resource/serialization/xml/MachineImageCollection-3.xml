@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<machineImageCollection>
+<MachineImageCollection>
 	<id>idValue_3</id>
 	<name>nameValue_3</name>
 	<description>descriptionValue_3</description>
@@ -14,4 +14,4 @@
 	<operation href="hrefValue_3_0" rel="relValue_3_0" />
 	<operation href="hrefValue_3_1" rel="relValue_3_1" />
 	<operation href="hrefValue_3_2" rel="relValue_3_2" />
-</machineImageCollection>
+</MachineImageCollection>

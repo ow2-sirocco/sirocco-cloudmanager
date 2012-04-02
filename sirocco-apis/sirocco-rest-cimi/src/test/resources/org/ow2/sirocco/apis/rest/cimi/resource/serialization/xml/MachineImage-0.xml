@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<machineImage href="hrefValue_0">
+<MachineImage href="hrefValue_0">
 	<id>idValue_0</id>
 	<name>nameValue_0</name>
 	<description>descriptionValue_0</description>
@@ -8,4 +8,4 @@
 	<imageLocation href="hrefImageLocation_0" />
 	<state>stateValue_0</state>
 	<type>typeValue_0</type>
-</machineImage>
+</MachineImage>

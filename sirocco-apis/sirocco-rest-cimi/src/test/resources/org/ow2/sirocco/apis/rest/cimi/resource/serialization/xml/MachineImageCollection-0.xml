@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<machineImageCollection>
+<MachineImageCollection>
 	<id>idValue_0</id>
 	<name>nameValue_0</name>
 	<description>descriptionValue_0</description>
 	<created>2000-01-01T01:00:00+01:00</created>
 	<updated>2000-01-01T01:00:00+01:00</updated>
-</machineImageCollection>
+</MachineImageCollection>

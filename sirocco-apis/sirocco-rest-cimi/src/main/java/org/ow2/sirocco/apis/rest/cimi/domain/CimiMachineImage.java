@@ -39,7 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
  * <p>
  * </p>
  */
-@XmlRootElement(name = "machineImage")
+@XmlRootElement(name = "MachineImage")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiMachineImage extends CimiCommon implements Serializable {
 

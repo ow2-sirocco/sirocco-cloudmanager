@@ -36,7 +36,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 /**
  * Class MachineImageCollection.
  */
-@XmlRootElement(name = "machineImageCollection")
+@XmlRootElement(name = "MachineImageCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiMachineImageCollection extends CimiCommon implements Serializable {
 

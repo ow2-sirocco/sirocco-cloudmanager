@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<machineImage href="hrefValue_2">
+<MachineImage href="hrefValue_2">
 	<id>idValue_2</id>
 	<name>nameValue_2</name>
 	<description>descriptionValue_2</description>
@@ -12,4 +12,4 @@
 	<imageLocation href="hrefImageLocation_2" />
 	<operation href="hrefValue_2_0" rel="relValue_2_0" />
 	<operation href="hrefValue_2_1" rel="relValue_2_1" />
-</machineImage>
+</MachineImage>

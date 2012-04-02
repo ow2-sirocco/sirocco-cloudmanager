@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<job>
+<Job>
 	<created>2002-03-03T03:02:02.002+01:00</created>
 	<description>descriptionValue_2</description>
 	<id>idValue_2</id>
@@ -20,4 +20,4 @@
 	<statusMessage>statusMessageValue_2</statusMessage>
 	<targetEntity>targetEntityValue_2</targetEntity>
 	<timeOfStatusChange>2002-03-03T03:02:02.002+01:00</timeOfStatusChange>
-</job>
+</Job>
