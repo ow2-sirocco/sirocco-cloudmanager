@@ -117,6 +117,7 @@ public class CimiCommon implements Serializable, CimiData {
      * A list of possible operations.
      * </p>
      */
+    @JsonProperty
     private CimiOperation[] operations;
 
     // ---------------------------------------- Constructors
@@ -266,6 +267,7 @@ public class CimiCommon implements Serializable, CimiData {
      * 
      * @return The value
      */
+    @JsonIgnore
     @XmlElement(name = "operation")
     public CimiOperation[] getOperations() {
         return this.operations;

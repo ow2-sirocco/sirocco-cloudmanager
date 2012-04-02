@@ -135,6 +135,7 @@ public class CimiMachineImageResource {
      */
     @PUT
     @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
+    @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
     @Path("{id}")
     public Response updateMachineImage(@PathParam("id") final String id, final CimiMachineImage machineImage) {
         CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id, machineImage);

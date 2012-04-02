@@ -9,9 +9,9 @@
 
 
 	<bean id="CimiManagerCreateMachineImage"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreateMachineImage" />
 	<bean id="CimiManagerDeleteMachineImage"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDeleteMachineImage" />
 	<bean id="CimiManagerReadMachineImage"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
 	<bean id="CimiManagerReadMachineImageCollection"
@@ -19,7 +19,7 @@
 	<bean id="CimiManagerUpdateMachineImage"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdateMachineImage" />
 	<bean id="CimiManagerUpdateMachineImageCollection"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdateMachineImage" />
 
 	<context:annotation-config />
 	<context:component-scan base-package="org.ow2.sirocco.apis.rest.cimi" />
