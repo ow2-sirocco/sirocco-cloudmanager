@@ -9,14 +9,28 @@
 
 	<context:property-placeholder location="WEB-INF/ejb.properties" />
 
-	<jee:remote-slsb id="IMachineImageManager"
-		business-interface="org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager"
-		jndi-name="MachineImageManager" lookup-home-on-startup="false">
-		<jee:environment>
-			java.naming.factory.initial=org.ow2.carol.jndi.spi.MultiOrbInitialContextFactory
-			java.naming.provider.url=rmi://localhost:${carol.port}
-		</jee:environment>
-	</jee:remote-slsb>
+	<!-- Remote example -->
+	<!-- <jee:remote-slsb id="IMachineImageManager" -->
+	<!-- business-interface="org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager" -->
+	<!-- jndi-name="MachineImageManager" lookup-home-on-startup="false"> -->
+	<!-- <jee:environment> -->
+	<!-- java.naming.factory.initial=org.ow2.carol.jndi.spi.MultiOrbInitialContextFactory -->
+	<!-- java.naming.provider.url=rmi://localhost:${carol.port} -->
+	<!-- </jee:environment> -->
+	<!-- </jee:remote-slsb> -->
+
+	<jee:local-slsb id="IMachineImageManager" jndi-name="MachineImageManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
+	<jee:local-slsb id="IMachineManager" jndi-name="MachineManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
+	<jee:local-slsb id="ICredentialsManager" jndi-name="CredentialsManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
 
 	<context:annotation-config />
 	<context:component-scan base-package="org.ow2.sirocco.apis.rest.cimi" />

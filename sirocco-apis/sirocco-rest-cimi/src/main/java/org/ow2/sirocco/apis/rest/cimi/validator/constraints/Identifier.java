@@ -40,7 +40,7 @@ import javax.validation.constraints.Pattern;
 /**
  * Composition of validation annotation to validate credentials.
  */
-@Pattern(regexp = "^[a-zA-Z_0-9]+$")
+@Pattern(regexp = "^[a-zA-Z_]([a-zA-Z_0-9]+)?$")
 @Target({METHOD, FIELD, ANNOTATION_TYPE})
 @Retention(RUNTIME)
 @Constraint(validatedBy = {})

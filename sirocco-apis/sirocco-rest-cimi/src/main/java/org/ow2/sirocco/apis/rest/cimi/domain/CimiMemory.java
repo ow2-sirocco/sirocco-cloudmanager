@@ -26,15 +26,18 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class Memory. <p> </p>
+ * Class Memory.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "memory")
+@XmlRootElement(name = "Memory")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiMemory implements Serializable {
 
@@ -44,16 +47,19 @@ public class CimiMemory implements Serializable {
     // ---------------------------------------- Fields
 
     /**
-     * Field "quantity". <p> </p>
+     * Field "quantity".
+     * <p>
+     * </p>
      */
     private Integer quantity;
 
     /**
-     * Field "units". <p> enum : byte (B), kibibyte (KiB), mebibyte (MiB),
-     * gibibyte (GiB), tebibyte (TiB), pebibyte (PiB), exbibyte (EiB), zebibyte
-     * (ZiB), yobibyte (YiB) </p>
+     * Field "units".
+     * <p>
+     * enum : byte (B), kibibyte (KiB), mebibyte (MiB), gibibyte (GiB), tebibyte
+     * (TiB), pebibyte (PiB), exbibyte (EiB), zebibyte (ZiB), yobibyte (YiB)
+     * </p>
      */
-    // private IECDigitalUnit units;
     private String units;
 
     // ---------------------------------------- Constructors
@@ -69,33 +75,39 @@ public class CimiMemory implements Serializable {
 
     /**
      * Return the value of field "quantity".
+     * 
      * @return The value
      */
+    @XmlAttribute
     public Integer getQuantity() {
         return this.quantity;
     }
 
     /**
      * Set the value of field "quantity".
+     * 
      * @param quantity The value
      */
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(final Integer quantity) {
         this.quantity = quantity;
     }
 
     /**
      * Return the value of field "units".
+     * 
      * @return The value
      */
+    @XmlAttribute
     public String getUnits() {
         return this.units;
     }
 
     /**
      * Set the value of field "units".
+     * 
      * @param units The value
      */
-    public void setUnits(String units) {
+    public void setUnits(final String units) {
         this.units = units;
     }
 

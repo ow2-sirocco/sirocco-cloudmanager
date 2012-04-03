@@ -30,7 +30,7 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageCollectionConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
@@ -70,11 +70,12 @@ public class CimiManagerReadMachineImageCollection extends CimiManagerReadAbstra
             out = this.manager.getMachineImages();
         } else {
             if (true == select.isNumericArrayPresent()) {
-                List<Integer> numsArray = select.getLastNumericArray();
+                List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());
                 out = this.manager.getMachineImages(numsArray.get(0).intValue(), numsArray.get(1).intValue(),
                     select.getAttributes());
             } else {
-                out = this.manager.getMachineImages(select.getAttributes(), select.getLastExpressionArray());
+                out = this.manager.getMachineImages(select.getAttributes(),
+                    select.getExpressionArray(select.getIndexFirstArray()));
             }
         }
         return out;
@@ -106,7 +107,7 @@ public class CimiManagerReadMachineImageCollection extends CimiManagerReadAbstra
      */
     @Override
     protected void addOperations(final CimiRequest request, final CimiResponse response, final Object dataService) {
-        CimiCommon common = (CimiCommon) response.getCimiData();
+        CimiCommonId common = (CimiCommonId) response.getCimiData();
         List<CimiOperation> ops = new ArrayList<CimiOperation>();
         ops.add(new CimiOperation(Operation.ADD.getRel(), common.getId()));
         common.setOperations(ops.toArray(new CimiOperation[ops.size()]));

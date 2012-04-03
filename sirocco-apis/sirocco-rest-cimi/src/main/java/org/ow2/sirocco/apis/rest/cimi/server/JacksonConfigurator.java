@@ -37,7 +37,8 @@ import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
  */
 @Provider
 @Produces({"application/json", MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON,
-    MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON})
+    MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
+    MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
     /**

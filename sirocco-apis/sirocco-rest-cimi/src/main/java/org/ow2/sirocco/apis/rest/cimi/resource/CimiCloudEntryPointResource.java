@@ -24,14 +24,11 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.resource;
 
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
@@ -39,17 +36,27 @@ import javax.ws.rs.core.UriInfo;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
-import org.ow2.sirocco.apis.rest.cimi.manager.cep.CimiManagerReadCloudEntryPoint;
-import org.ow2.sirocco.apis.rest.cimi.manager.cep.CimiManagerUpdateCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperRequest;
+import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
- * Support read and update operation
+ * Cloud Entry Point REST resource.
+ * <p>
+ * Operations supports :
+ * <ul>
+ * <li>Read a Cloud Entry Point</li>
+ * <li>Update a Cloud Entry Point</li>
+ * </ul>
+ * </p>
  */
+@Component
 @Path(ConstantsPath.CLOUDENTRYPOINT_PATH)
 public class CimiCloudEntryPointResource {
 
@@ -59,58 +66,40 @@ public class CimiCloudEntryPointResource {
     @Context
     HttpHeaders headers;
 
-    public CimiCloudEntryPointResource() {
-    }
+    @Autowired
+    @Qualifier("CimiManagerReadCloudEntryPoint")
+    private CimiManager cimiManagerReadCloudEntryPoint;
 
-    // CRUD method
+    @Autowired
+    @Qualifier("CimiManagerUpdateCloudEntryPoint")
+    private CimiManager cimiManagerUpdateCloudEntryPoint;
+
     /**
-     * Read operation Retrieve the Cloud Entry Point : give the URL to each
-     * collection
+     * Get a Cloud Entry Point.
+     * 
+     * @return The REST response
      */
     @GET
-    @Produces({MediaTypeCimi.APPLICATION_CIMI_CLOUDENTRYPOINT_JSON})
-    public CimiCloudEntryPoint getEntryPoint() {
-
-        CimiRequest request = HelperRequest.buildRequest(headers, uriInfo);
+    @Produces({MediaTypeCimi.APPLICATION_CIMI_CLOUDENTRYPOINT_JSON, MediaTypeCimi.APPLICATION_CIMI_CLOUDENTRYPOINT_XML})
+    public Response readCloudEntryPoint() {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo);
         CimiResponse response = new CimiResponse();
-
-        CimiManager manager = getManagerCloudEntryPointRead();
-        manager.execute(request, response);
-
-        return (CimiCloudEntryPoint) response.getCimiData();
+        this.cimiManagerReadCloudEntryPoint.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
+    /**
+     * Update a Cloud Entry Point.
+     * 
+     * @return The REST response
+     */
     @PUT
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_CLOUDENTRYPOINT_JSON})
-    public Response updateCloudEntryPoint(CimiCloudEntryPoint cloudEntrypoint,
-            @QueryParam("CIMISelect") List<String> listQueryParam) {
-
-        CimiRequest request = HelperRequest.buildRequest(headers, uriInfo, cloudEntrypoint);
+    @Consumes({MediaTypeCimi.APPLICATION_CIMI_CLOUDENTRYPOINT_JSON, MediaTypeCimi.APPLICATION_CIMI_CLOUDENTRYPOINT_XML})
+    public Response updateCloudEntryPoint(final CimiCloudEntryPoint cloudEntryPoint) {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, cloudEntryPoint);
         CimiResponse response = new CimiResponse();
-
-        CimiManagerUpdateCloudEntryPoint manager = getManagerCloudEntryPointUpdate();
-        manager.execute(request, response);
-
-        return Response.status(response.getStatus()).build();
-    }
-
-    /**
-     * Spring prendra le relais
-     * @return
-     */
-    private CimiManagerUpdateCloudEntryPoint getManagerCloudEntryPointUpdate() {
-        CimiManagerUpdateCloudEntryPoint manager = new CimiManagerUpdateCloudEntryPoint();
-
-        return manager;
-    }
-
-    /**
-     * Spring prendra le relais
-     * @return
-     */
-    private CimiManager getManagerCloudEntryPointRead() {
-        CimiManager manager = new CimiManagerReadCloudEntryPoint();
-        return manager;
+        this.cimiManagerUpdateCloudEntryPoint.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
 }

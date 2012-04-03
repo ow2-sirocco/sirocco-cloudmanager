@@ -47,8 +47,8 @@ public class MockCimiManagerReadMachineImage implements CimiManager {
     public void execute(final CimiRequest request, final CimiResponse response) {
         try {
             Integer id = Integer.valueOf(request.getId());
-            CimiMachineImage image = CimiEntityBuilderHelper.buildCimiMachineImage(id);
-            response.setCimiData(image);
+            CimiMachineImage cimi = CimiEntityBuilderHelper.buildCimiMachineImage(id);
+            response.setCimiData(cimi);
             response.setStatus(Status.OK);
         } catch (Exception e) {
             response.setStatus(Status.BAD_REQUEST);

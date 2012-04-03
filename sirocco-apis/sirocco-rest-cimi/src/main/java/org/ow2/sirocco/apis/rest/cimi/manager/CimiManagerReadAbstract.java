@@ -27,7 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.manager;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
@@ -70,7 +70,7 @@ public abstract class CimiManagerReadAbstract extends CimiManagerAbstract {
      */
     @Override
     protected void addOperations(final CimiRequest request, final CimiResponse response, final Object dataService) {
-        CimiCommon common = (CimiCommon) response.getCimiData();
+        CimiCommonId common = (CimiCommonId) response.getCimiData();
         List<CimiOperation> ops = new ArrayList<CimiOperation>();
         ops.add(new CimiOperation(Operation.EDIT.getRel(), common.getId()));
         ops.add(new CimiOperation(Operation.DELETE.getRel(), common.getId()));

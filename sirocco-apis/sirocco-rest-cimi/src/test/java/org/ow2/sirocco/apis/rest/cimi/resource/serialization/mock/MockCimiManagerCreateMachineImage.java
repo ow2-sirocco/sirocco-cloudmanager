@@ -55,8 +55,8 @@ public class MockCimiManagerCreateMachineImage implements CimiManager {
     public void execute(final CimiRequest request, final CimiResponse response) {
         try {
             // Build and compare
-            CimiMachineImage image = CimiEntityBuilderHelper.buildCimiMachineImage(1);
-            Assert.assertEquals(ToStringBuilder.reflectionToString(image, new SerializationHelper.RecursiveToStringStyle()),
+            CimiMachineImage cimi = CimiEntityBuilderHelper.buildCimiMachineImage(1);
+            Assert.assertEquals(ToStringBuilder.reflectionToString(cimi, new SerializationHelper.RecursiveToStringStyle()),
                 ToStringBuilder.reflectionToString(request.getCimiData(), new SerializationHelper.RecursiveToStringStyle()));
 
             // Build response

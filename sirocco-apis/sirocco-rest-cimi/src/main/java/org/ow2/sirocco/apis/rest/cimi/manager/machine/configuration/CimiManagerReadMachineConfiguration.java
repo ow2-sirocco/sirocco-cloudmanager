@@ -24,43 +24,73 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response;
 
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerReadMachineConfiguration {
+/**
+ * Manage READ request of Machine Configuration.
+ */
+@Component("CimiManagerReadMachineConfiguration")
+public class CimiManagerReadMachineConfiguration extends CimiManagerReadAbstract {
 
-    public CimiManagerReadMachineConfiguration() {
-    }
+    @Autowired
+    @Qualifier("IMachineConfigurationManager")
+    private IMachineManager manager;
 
-    public void execute(CimiRequest request, CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // response.setCimiData(getMachineCongById(request.getHeader().getId()));
-        // // status = 200 OK
-        // response.setStatusHttp(status.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-    }
-
-    private CimiMachineConfiguration getMachineCongById(String id) {
-        // FIXME return IMachineManager.getMachineConfById(id);
-        return null;
-    }
-
-    public Status verifyRequest(CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com/
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE_CONFIGURATION)) {
-            return Status.OK;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        MachineConfiguration out = null;
+        CimiSelect select = request.getHeader().getCimiSelect();
+        if (true == select.isEmpty()) {
+            out = this.manager.getMachineConfigurationById(request.getId());
         } else {
-            return Status.BAD_REQUEST;
+            // FIXME
+            throw new UnsupportedOperationException();
+            // out =
+            // this.manager.getMachineConfigurationAttributes(request.getId(),
+            // select.getAttributes());
         }
+        if (null == out) {
+            throw new ResourceNotFoundException();
+        }
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        CimiMachineConfiguration cimi = new CimiMachineConfiguration();
+        MachineConfigurationConverter.copyToCimi((MachineConfiguration) dataService, cimi, request.getHeader().getBaseUri(),
+            true, false);
+        response.setCimiData(cimi);
+        response.setStatus(Response.Status.OK);
     }
 
 }

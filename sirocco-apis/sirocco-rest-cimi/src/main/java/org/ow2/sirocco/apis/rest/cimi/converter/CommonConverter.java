@@ -28,21 +28,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
- * both directions. <p>Converted classes:<ul><li>CIMI model: {@link CimiCommon}
- * </li><li>Service model: {@link CloudEntity}</li></ul></p>
+ * both directions.
+ * <p>
+ * Converted classes:
+ * <ul>
+ * <li>CIMI model: {@link CimiCommonId}</li>
+ * <li>Service model: {@link CloudEntity}</li>
+ * </ul>
+ * </p>
  */
 public class CommonConverter {
 
     /**
      * Copy all data from a service object to a CIMI object.
+     * 
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    private static void copyToCimi(CloudEntity dataService, CimiCommon dataCimi) {
+    private static void copyToCimi(final CloudEntity dataService, final CimiCommonId dataCimi) {
         dataCimi.setCreated(dataService.getCreated());
         dataCimi.setDescription(dataService.getDescription());
         dataCimi.setName(dataService.getName());
@@ -56,20 +65,39 @@ public class CommonConverter {
 
     /**
      * Copy all data from a service object to a CIMI object.
+     * 
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    public static void copyToCimi(CloudEntity dataService, CimiCommon dataCimi, String urlBase, String urlConstant) {
-        copyToCimi(dataService, dataCimi);
+    public static void copyToCimi(final CloudEntity dataService, final CimiCommonId dataCimi, final String urlBase,
+        final String urlConstant) {
+        CommonConverter.copyToCimi(dataService, dataCimi);
         dataCimi.setId(HrefHelper.makeHref(urlBase, urlConstant, dataService.getId()));
     }
 
     /**
      * Copy read/write data from a CIMI object to a service object.
+     * 
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    public static void copyToService(CimiCommon dataCimi, CloudEntity dataService) {
+    public static void copyToService(final CimiCommon dataCimi, final CloudEntity dataService) {
+        dataService.setDescription(dataCimi.getDescription());
+        dataService.setName(dataCimi.getName());
+        if (null != dataCimi.getProperties()) {
+            Map<String, String> props = new HashMap<String, String>();
+            dataService.setProperties(props);
+            props.putAll(dataCimi.getProperties());
+        }
+    }
+
+    /**
+     * Copy read/write data from a CIMI object to a service object.
+     * 
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
+     */
+    public static void copyToService(final CimiCommon dataCimi, final CredentialsCreate dataService) {
         dataService.setDescription(dataCimi.getDescription());
         dataService.setName(dataCimi.getName());
         if (null != dataCimi.getProperties()) {

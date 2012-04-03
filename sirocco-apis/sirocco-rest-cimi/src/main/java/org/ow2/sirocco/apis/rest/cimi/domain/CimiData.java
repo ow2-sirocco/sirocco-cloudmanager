@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-public interface CimiData {
+import java.io.Serializable;
+
+public interface CimiData extends Serializable {
 
 }

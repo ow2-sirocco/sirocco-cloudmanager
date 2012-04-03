@@ -30,29 +30,9 @@ public abstract class ConstantsPath {
 
     public static final String CLOUDENTRYPOINT_PATH = "/" + ConstantsPath.CLOUDENTRYPOINT;
 
-    public static final String MACHINE = "machines";
-
-    public static final String MACHINE_PATH = "/" + ConstantsPath.MACHINE;
-
-    public static final String MACHINE_IMAGE = "machineImages";
-
-    public static final String MACHINE_IMAGE_PATH = "/" + ConstantsPath.MACHINE_IMAGE;
-
-    public static final String MACHINE_IMAGE_LOCATION = "machineImagesData";
-
-    public static final String MACHINE_IMAGE_LOCATION_PATH = "/" + ConstantsPath.MACHINE_IMAGE_LOCATION;
-
-    public static final String MACHINE_CONFIGURATION = "machineConfigs";
-
-    public static final String MACHINE_CONFIGURATION_PATH = "/" + ConstantsPath.MACHINE_CONFIGURATION;
-
     public static final String CREDENTIALS = "credentials";
 
-    public static final String CREDENTIALS_PATH = "/" + ConstantsPath.MACHINE_CONFIGURATION;
-
-    public static final String MACHINE_TEMPLATE = "machinesTemplates";
-
-    public static final String MACHINE_TEMPLATE_PATH = "/" + ConstantsPath.MACHINE_TEMPLATE;
+    public static final String CREDENTIALS_PATH = "/" + ConstantsPath.CREDENTIALS;
 
     public static final String CREDENTIALS_TEMPLATE = "credentialsTemplates";
 
@@ -61,4 +41,21 @@ public abstract class ConstantsPath {
     public static final String JOB = "jobs";
 
     public static final String JOB_PATH = "/" + ConstantsPath.JOB;
+
+    public static final String MACHINE = "machines";
+
+    public static final String MACHINE_PATH = "/" + ConstantsPath.MACHINE;
+
+    public static final String MACHINE_TEMPLATE = "machinesTemplates";
+
+    public static final String MACHINE_TEMPLATE_PATH = "/" + ConstantsPath.MACHINE_TEMPLATE;
+
+    public static final String MACHINE_IMAGE = "machineImages";
+
+    public static final String MACHINE_IMAGE_PATH = "/" + ConstantsPath.MACHINE_IMAGE;
+
+    public static final String MACHINE_CONFIGURATION = "machineConfigs";
+
+    public static final String MACHINE_CONFIGURATION_PATH = "/" + ConstantsPath.MACHINE_CONFIGURATION;
+
 }

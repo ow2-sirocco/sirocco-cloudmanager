@@ -24,31 +24,29 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class JobCollection. <p> </p>
+ * Class JobCollection.
+ * <p>
+ * </p>
  */
 @XmlRootElement(name = "jobCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiJobCollection extends CimiCommon implements Serializable {
+public class CimiJobCollection extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "jobs". <p> </p>
+     * Field "jobs".
+     * <p>
+     * </p>
      */
     private CimiJob[] jobs;
-
-    // ---------------------------------------- Constructors
 
     /**
      * Default constructor.
@@ -57,10 +55,9 @@ public class CimiJobCollection extends CimiCommon implements Serializable {
         super();
     }
 
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "jobs".
+     * 
      * @return The value
      */
     public CimiJob[] getJobs() {
@@ -69,9 +66,10 @@ public class CimiJobCollection extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "jobs".
+     * 
      * @param jobs The value
      */
-    public void setJobs(CimiJob[] jobs) {
+    public void setJobs(final CimiJob[] jobs) {
         this.jobs = jobs;
     }
 

@@ -54,6 +54,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineConfigurationResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineImageResource;
 
 /**
@@ -63,6 +64,7 @@ public class SiroccoRestCimiApplication extends Application {
 
     /**
      * {@inheritDoc}
+     * 
      * @see javax.ws.rs.core.Application#getClasses()
      */
     @Override
@@ -70,12 +72,9 @@ public class SiroccoRestCimiApplication extends Application {
         Set<Class<?>> classes = new HashSet<Class<?>>();
 
         classes.add(JacksonConfigurator.class);
-
         // classes.add(CimiCloudEntryPointResource.class);
-        // classes.add(CimiMachineConfigurationResource.class);
-        // classes.add(CimiMachineImageCollectionResource.class);
+        classes.add(CimiMachineConfigurationResource.class);
         classes.add(CimiMachineImageResource.class);
-        // classes.add(CimiMachineCollectionResource.class);
         // classes.add(CimiMachineResource.class);
         return classes;
     }

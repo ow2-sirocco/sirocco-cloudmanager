@@ -26,22 +26,19 @@ package org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock;
 
 import javax.ws.rs.core.Response.Status;
 
-import junit.framework.ComparisonFailure;
-
+import org.ow2.sirocco.apis.rest.cimi.builder.CimiEntityBuilderHelper;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 
 /**
- * Mock CimiManagerDeleteMachineImage.
+ * Mock CimiManagerReadMachineConfiguration.
  */
-public class MockCimiManagerDeleteMachineImage implements CimiManager {
+public class MockCimiManagerReadMachineConfiguration implements CimiManager {
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Build a new MachineImage and compare it with the MachineImage in request.
-     * </p>
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManager#execute(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
      *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
@@ -49,17 +46,10 @@ public class MockCimiManagerDeleteMachineImage implements CimiManager {
     @Override
     public void execute(final CimiRequest request, final CimiResponse response) {
         try {
-            // Test ID
-            Integer.valueOf(request.getId());
-
-            // Build response
-            response.setCimiData(null);
+            Integer id = Integer.valueOf(request.getId());
+            CimiMachineConfiguration cimi = CimiEntityBuilderHelper.buildCimiMachineConfiguration(id);
+            response.setCimiData(cimi);
             response.setStatus(Status.OK);
-        } catch (ComparisonFailure e) {
-            // Build assert error
-            response.setCimiData(null);
-            response.setErrorMessage(e.getMessage());
-            response.setStatus(Status.NOT_ACCEPTABLE);
         } catch (Exception e) {
             response.setStatus(Status.BAD_REQUEST);
         }

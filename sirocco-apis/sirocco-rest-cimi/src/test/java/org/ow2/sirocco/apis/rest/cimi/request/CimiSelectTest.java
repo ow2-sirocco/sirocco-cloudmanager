@@ -2,7 +2,6 @@ package org.ow2.sirocco.apis.rest.cimi.request;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -123,9 +122,9 @@ public class CimiSelectTest {
         Assert.assertFalse(cimi.isExpressionArrayPresent());
         Assert.assertFalse(cimi.isNumericArrayPresent());
         Assert.assertNull(cimi.getAttributes());
-        Assert.assertNull(cimi.getLastAttribute());
-        Assert.assertNull(cimi.getLastExpressionArray());
-        Assert.assertNull(cimi.getLastNumericArray());
+        Assert.assertNull(cimi.getIndexFirstArray());
+        Assert.assertNull(cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
 
         // Single select
         selects = new ArrayList<String>();
@@ -138,9 +137,9 @@ public class CimiSelectTest {
         Assert.assertFalse(cimi.isNumericArrayPresent());
         Assert.assertNotNull(cimi.getAttributes());
         Assert.assertEquals(1, cimi.getAttributes().size());
-        Assert.assertEquals("attrOne", cimi.getLastAttribute());
-        Assert.assertNull(cimi.getLastExpressionArray());
-        Assert.assertNull(cimi.getLastNumericArray());
+        Assert.assertNull(cimi.getIndexFirstArray());
+        Assert.assertNull(cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
 
         // Duo select in single line
         selects = new ArrayList<String>();
@@ -153,9 +152,9 @@ public class CimiSelectTest {
         Assert.assertFalse(cimi.isNumericArrayPresent());
         Assert.assertNotNull(cimi.getAttributes());
         Assert.assertEquals(2, cimi.getAttributes().size());
-        Assert.assertEquals("attrTwo", cimi.getLastAttribute());
-        Assert.assertNull(cimi.getLastExpressionArray());
-        Assert.assertNull(cimi.getLastNumericArray());
+        Assert.assertNull(cimi.getIndexFirstArray());
+        Assert.assertNull(cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
 
         // Duo select in multi lines
         selects = new ArrayList<String>();
@@ -169,9 +168,9 @@ public class CimiSelectTest {
         Assert.assertFalse(cimi.isNumericArrayPresent());
         Assert.assertNotNull(cimi.getAttributes());
         Assert.assertEquals(2, cimi.getAttributes().size());
-        Assert.assertEquals("attrTwo", cimi.getLastAttribute());
-        Assert.assertNull(cimi.getLastExpressionArray());
-        Assert.assertNull(cimi.getLastNumericArray());
+        Assert.assertNull(cimi.getIndexFirstArray());
+        Assert.assertNull(cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
 
         // Single select with a numeric array
         selects = new ArrayList<String>();
@@ -184,12 +183,12 @@ public class CimiSelectTest {
         Assert.assertTrue(cimi.isNumericArrayPresent());
         Assert.assertNotNull(cimi.getAttributes());
         Assert.assertEquals(1, cimi.getAttributes().size());
-        Assert.assertEquals("attrOne", cimi.getLastAttribute());
-        Assert.assertNull(cimi.getLastExpressionArray());
-        Assert.assertNotNull(cimi.getLastNumericArray());
-        Assert.assertEquals(2, cimi.getLastNumericArray().size());
-        Assert.assertEquals(10, cimi.getLastNumericArray().get(0).intValue());
-        Assert.assertEquals(10, cimi.getLastNumericArray().get(1).intValue());
+        Assert.assertEquals(0, cimi.getIndexFirstArray().intValue());
+        Assert.assertNull(cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNotNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
+        Assert.assertEquals(2, cimi.getNumericArray(cimi.getIndexFirstArray()).size());
+        Assert.assertEquals(10, cimi.getNumericArray(cimi.getIndexFirstArray()).get(0).intValue());
+        Assert.assertEquals(10, cimi.getNumericArray(cimi.getIndexFirstArray()).get(1).intValue());
 
         // Single select with range numeric array
         selects = new ArrayList<String>();
@@ -202,12 +201,12 @@ public class CimiSelectTest {
         Assert.assertTrue(cimi.isNumericArrayPresent());
         Assert.assertNotNull(cimi.getAttributes());
         Assert.assertEquals(1, cimi.getAttributes().size());
-        Assert.assertEquals("attrOne", cimi.getLastAttribute());
-        Assert.assertNull(cimi.getLastExpressionArray());
-        Assert.assertNotNull(cimi.getLastNumericArray());
-        Assert.assertEquals(2, cimi.getLastNumericArray().size());
-        Assert.assertEquals(7, cimi.getLastNumericArray().get(0).intValue());
-        Assert.assertEquals(13, cimi.getLastNumericArray().get(1).intValue());
+        Assert.assertEquals(0, cimi.getIndexFirstArray().intValue());
+        Assert.assertNull(cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNotNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
+        Assert.assertEquals(2, cimi.getNumericArray(cimi.getIndexFirstArray()).size());
+        Assert.assertEquals(7, cimi.getNumericArray(cimi.getIndexFirstArray()).get(0).intValue());
+        Assert.assertEquals(13, cimi.getNumericArray(cimi.getIndexFirstArray()).get(1).intValue());
 
         // Single select with expression array
         selects = new ArrayList<String>();
@@ -220,14 +219,14 @@ public class CimiSelectTest {
         Assert.assertFalse(cimi.isNumericArrayPresent());
         Assert.assertNotNull(cimi.getAttributes());
         Assert.assertEquals(1, cimi.getAttributes().size());
-        Assert.assertEquals("attrOne", cimi.getLastAttribute());
-        Assert.assertNotNull(cimi.getLastExpressionArray());
-        Assert.assertEquals("expOne > 13", cimi.getLastExpressionArray());
-        Assert.assertNull(cimi.getLastNumericArray());
+        Assert.assertEquals(0, cimi.getIndexFirstArray().intValue());
+        Assert.assertNotNull(cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertEquals("expOne > 13", cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
 
         // Multi select with expression array
         selects = new ArrayList<String>();
-        selects.add("attrOne[expOne > 13]");
+        selects.add("attrOne");
         selects.add("attrTwo[expTwo = 7]");
 
         cimi.setSelects(selects);
@@ -237,16 +236,42 @@ public class CimiSelectTest {
         Assert.assertFalse(cimi.isNumericArrayPresent());
         Assert.assertNotNull(cimi.getAttributes());
         Assert.assertEquals(2, cimi.getAttributes().size());
-        Assert.assertEquals("attrTwo", cimi.getLastAttribute());
-        Assert.assertNotNull(cimi.getLastExpressionArray());
-        Assert.assertEquals("expTwo = 7", cimi.getLastExpressionArray());
-        Assert.assertNull(cimi.getLastNumericArray());
+        Assert.assertEquals(1, cimi.getIndexFirstArray().intValue());
+        Assert.assertNotNull(cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertEquals("expTwo = 7", cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
 
         // Multi select with expression and numeric array
         selects = new ArrayList<String>();
-        selects.add("attrOne[expOne > 13]");
+        selects.add("attrOne");
         selects.add("attrTwo[expTwo = 7]");
         selects.add("attrThree[25-103]");
+
+        cimi.setSelects(selects);
+        Assert.assertFalse(cimi.isEmpty());
+        Assert.assertTrue(cimi.isArrayPresent());
+        Assert.assertTrue(cimi.isExpressionArrayPresent());
+        Assert.assertFalse(cimi.isNumericArrayPresent());
+        Assert.assertNotNull(cimi.getAttributes());
+        Assert.assertEquals(3, cimi.getAttributes().size());
+        Assert.assertEquals(1, cimi.getIndexFirstArray().intValue());
+        Assert.assertEquals("expTwo = 7", cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNull(cimi.getExpressionArray(0));
+        Assert.assertEquals("expTwo = 7", cimi.getExpressionArray(1));
+        Assert.assertNull(cimi.getExpressionArray(2));
+        Assert.assertNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
+        Assert.assertNull(cimi.getNumericArray(0));
+        Assert.assertNull(cimi.getNumericArray(1));
+        Assert.assertEquals(2, cimi.getNumericArray(2).size());
+        Assert.assertEquals(25, cimi.getNumericArray(2).get(0).intValue());
+        Assert.assertEquals(103, cimi.getNumericArray(2).get(1).intValue());
+
+        // Multi select with expression and numeric array
+        selects = new ArrayList<String>();
+        selects.add("attrOne");
+        selects.add("attrTwo");
+        selects.add("attrThree[19 - 79]");
+        selects.add("attrFour[expThree=25]");
 
         cimi.setSelects(selects);
         Assert.assertFalse(cimi.isEmpty());
@@ -254,28 +279,25 @@ public class CimiSelectTest {
         Assert.assertFalse(cimi.isExpressionArrayPresent());
         Assert.assertTrue(cimi.isNumericArrayPresent());
         Assert.assertNotNull(cimi.getAttributes());
-        Assert.assertEquals(3, cimi.getAttributes().size());
-        Assert.assertEquals("attrThree", cimi.getLastAttribute());
-        Assert.assertNull(cimi.getLastExpressionArray());
-        Assert.assertNotNull(cimi.getLastNumericArray());
-        Assert.assertEquals(2, cimi.getLastNumericArray().size());
-        Assert.assertEquals(25, cimi.getLastNumericArray().get(0).intValue());
-        Assert.assertEquals(103, cimi.getLastNumericArray().get(1).intValue());
+        Assert.assertEquals(4, cimi.getAttributes().size());
+        Assert.assertEquals(2, cimi.getIndexFirstArray().intValue());
+        Assert.assertNull(cimi.getExpressionArray(cimi.getIndexFirstArray()));
+        Assert.assertNull(cimi.getExpressionArray(0));
+        Assert.assertNull(cimi.getExpressionArray(1));
+        Assert.assertNull(cimi.getExpressionArray(2));
+        Assert.assertEquals("expThree=25", cimi.getExpressionArray(3));
+
+        Assert.assertNotNull(cimi.getNumericArray(cimi.getIndexFirstArray()));
+        Assert.assertEquals(2, cimi.getNumericArray(cimi.getIndexFirstArray()).size());
+        Assert.assertEquals(19, cimi.getNumericArray(cimi.getIndexFirstArray()).get(0).intValue());
+        Assert.assertEquals(79, cimi.getNumericArray(cimi.getIndexFirstArray()).get(1).intValue());
+
+        Assert.assertNull(cimi.getNumericArray(0));
+        Assert.assertNull(cimi.getNumericArray(1));
+        Assert.assertEquals(2, cimi.getNumericArray(2).size());
+        Assert.assertEquals(19, cimi.getNumericArray(2).get(0).intValue());
+        Assert.assertEquals(79, cimi.getNumericArray(2).get(1).intValue());
+        Assert.assertNull(cimi.getNumericArray(3));
     }
 
-    @Test
-    public void testPattern() {
-        String regex = "^[a-zA-Z_0-9]+$";
-        Pattern p = Pattern.compile(regex);
-
-        Assert.assertTrue(p.matcher("aaaaab").matches());
-        Assert.assertTrue(p.matcher("aaa999aab").matches());
-        Assert.assertTrue(p.matcher("aaa9_9_9aab").matches());
-        Assert.assertTrue(p.matcher("____").matches());
-        Assert.assertTrue(p.matcher("0123456789").matches());
-        Assert.assertTrue(p.matcher("ABCDEF_XYZ").matches());
-        Assert.assertTrue(p.matcher("abcdef_xyz").matches());
-
-        Assert.assertFalse(p.matcher("ab.cdef_xyz").matches());
-    }
 }

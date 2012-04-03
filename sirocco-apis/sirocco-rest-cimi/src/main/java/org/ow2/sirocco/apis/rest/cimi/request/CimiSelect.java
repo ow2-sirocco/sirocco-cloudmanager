@@ -26,8 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.request;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility class to manage CimiSelect expression.
@@ -41,6 +43,8 @@ public class CimiSelect {
     private Map<String, List<Integer>> numericArrays;
 
     private Map<String, String> expressionArrays;
+
+    private Integer indexFirstArray;
 
     /**
      * Default constructor.
@@ -102,30 +106,12 @@ public class CimiSelect {
     }
 
     /**
-     * Get the last attribute.
+     * Get the index in the list of attributes of the first array.
      * 
-     * @return The last attribute or null if empty
+     * @return The index of first array or null if not array exists
      */
-    public String getLastAttribute() {
-        String attr = null;
-        if (false == this.isEmpty()) {
-            attr = this.attributes.get(this.attributes.size() - 1);
-        }
-        return attr;
-    }
-
-    /**
-     * Get the numerics array of the last attribute.
-     * 
-     * @return The numerics array or null if the last attribute has not numerics
-     *         array
-     */
-    public List<Integer> getLastNumericArray() {
-        List<Integer> nums = null;
-        if (false == this.isEmpty()) {
-            nums = this.numericArrays.get(this.getLastAttribute());
-        }
-        return nums;
+    public Integer getIndexFirstArray() {
+        return this.indexFirstArray;
     }
 
     /**
@@ -137,7 +123,7 @@ public class CimiSelect {
     public boolean isArrayPresent() {
         boolean hasArray = false;
         if (false == this.isEmpty()) {
-            hasArray = this.isExpressionArrayPresent() || this.isNumericArrayPresent();
+            hasArray = null != this.indexFirstArray;
         }
         return hasArray;
     }
@@ -145,12 +131,12 @@ public class CimiSelect {
     /**
      * The indicator of the presence of a numeric array in the selects.
      * 
-     * @return Returns true if there is a numeric array
+     * @return Returns true if there is a numeric array and it is first array
      */
     public boolean isNumericArrayPresent() {
         boolean hasArray = false;
         if (false == this.isEmpty()) {
-            hasArray = null != this.getLastNumericArray();
+            hasArray = null != this.getNumericArray(this.indexFirstArray);
         }
         return hasArray;
     }
@@ -158,26 +144,44 @@ public class CimiSelect {
     /**
      * The indicator of the presence of a expression array in the selects.
      * 
-     * @return Returns true if there is a expression array
+     * @return Returns true if there is a expression array and it is first array
      */
     public boolean isExpressionArrayPresent() {
         boolean hasArray = false;
         if (false == this.isEmpty()) {
-            hasArray = null != this.getLastExpressionArray();
+            hasArray = null != this.getExpressionArray(this.indexFirstArray);
         }
         return hasArray;
     }
 
     /**
-     * Get the expression array of the last attribute.
+     * Get the numerics array (range or index) of a attribute with his index.
      * 
-     * @return The expression array or null if the last attribute has not
-     *         expression array
+     * @param index Index of attribute in the list of attributes
+     * @return The numerics array or null
      */
-    public String getLastExpressionArray() {
+    public List<Integer> getNumericArray(final Integer index) {
+        List<Integer> nums = null;
+        if (null != index) {
+            if ((false == this.isEmpty()) && (true == this.isArrayPresent())) {
+                nums = this.numericArrays.get(this.attributes.get(index));
+            }
+        }
+        return nums;
+    }
+
+    /**
+     * Get the expression array of a attribute with his index.
+     * 
+     * @param index Index of attribute in the list of attributes
+     * @return The expression array or null
+     */
+    public String getExpressionArray(final Integer index) {
         String exp = null;
-        if (false == this.isEmpty()) {
-            exp = this.expressionArrays.get(this.getLastAttribute());
+        if (null != index) {
+            if ((false == this.isEmpty()) && (true == this.isArrayPresent())) {
+                exp = this.expressionArrays.get(this.attributes.get(index));
+            }
         }
         return exp;
     }
@@ -189,23 +193,36 @@ public class CimiSelect {
         this.attributes = new ArrayList<String>();
         this.expressionArrays = new HashMap<String, String>();
         this.numericArrays = new HashMap<String, List<Integer>>();
+        this.indexFirstArray = null;
 
+        Set<String> attributesNames = new HashSet<String>();
         List<Integer> numerics;
         String attr;
         String arrayExp;
 
+        // Split by comma
         List<String> fullAttrs = CimiSelect.splitByComma(this.getSelects());
         for (String full : fullAttrs) {
             attr = CimiSelect.extractBefore(full, '[');
             if ((null != attr) && (attr.length() > 0)) {
-                this.attributes.add(attr);
-                arrayExp = CimiSelect.extractBetween(full, '[', ']');
-                if (null != arrayExp) {
-                    numerics = CimiSelect.extractNumericArray(arrayExp);
-                    if (numerics.size() > 0) {
-                        this.numericArrays.put(attr, numerics);
-                    } else {
-                        this.expressionArrays.put(attr, arrayExp);
+                // Only one attribute with same name
+                if (false == attributesNames.contains(attr)) {
+                    attributesNames.add(attr);
+                    this.attributes.add(attr);
+                    // Extract expression array
+                    arrayExp = CimiSelect.extractBetween(full, '[', ']');
+                    if (null != arrayExp) {
+                        // Note the first expression array
+                        if (null == this.indexFirstArray) {
+                            this.indexFirstArray = this.attributes.size() - 1;
+                        }
+                        // Numeric array or expression array ?
+                        numerics = CimiSelect.extractNumericArray(arrayExp);
+                        if (numerics.size() > 0) {
+                            this.numericArrays.put(attr, numerics);
+                        } else {
+                            this.expressionArrays.put(attr, arrayExp);
+                        }
                     }
                 }
             }
@@ -326,13 +343,12 @@ public class CimiSelect {
      * 
      * @see java.lang.Object#toString()
      */
+
     @Override
     public String toString() {
-        String to = null;
-        if (null != this.getSelects()) {
-            to = this.getSelects().toString();
-        }
-        return to;
+        return "CimiSelect [selects=" + this.selects + ", attributes=" + this.attributes + ", numericArrays="
+            + this.numericArrays + ", expressionArrays=" + this.expressionArrays + ", indexFirstArray=" + this.indexFirstArray
+            + "]";
     }
 
 }

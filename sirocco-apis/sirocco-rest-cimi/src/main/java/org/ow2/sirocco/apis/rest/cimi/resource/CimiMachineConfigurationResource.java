@@ -24,34 +24,46 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.resource;
 
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration.CimiManagerDeleteMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration.CimiManagerReadMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration.CimiManagerUpdateMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperRequest;
+import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
- * path = /configs Support Read,Update,Delete operation
+ * Machine Configuration REST resource.
+ * <p>
+ * Operations supports :
+ * <ul>
+ * <li>Create a machine configuration</li>
+ * <li>Delete a machine configuration</li>
+ * <li>Read a machine configuration</li>
+ * <li>Read a collection of machines configurations</li>
+ * <li>Update a machine configuration</li>
+ * </ul>
+ * </p>
  */
+@Component
 @Path(ConstantsPath.MACHINE_CONFIGURATION_PATH)
 public class CimiMachineConfigurationResource {
 
@@ -61,81 +73,127 @@ public class CimiMachineConfigurationResource {
     @Context
     HttpHeaders headers;
 
-    public CimiMachineConfigurationResource() {
-    }
+    @Autowired
+    @Qualifier("CimiManagerReadMachineConfiguration")
+    private CimiManager cimiManagerReadMachineConfiguration;
 
-    // CRUD method
+    @Autowired
+    @Qualifier("CimiManagerReadMachineConfigurationCollection")
+    private CimiManager cimiManagerReadMachineConfigurationCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerDeleteMachineConfiguration")
+    private CimiManager cimiManagerDeleteMachineConfiguration;
+
+    @Autowired
+    @Qualifier("CimiManagerUpdateMachineConfiguration")
+    private CimiManager cimiManagerUpdateMachineConfiguration;
+
+    @Autowired
+    @Qualifier("CimiManagerUpdateMachineConfigurationCollection")
+    private CimiManager cimiManagerUpdateMachineConfigurationCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerCreateMachineConfiguration")
+    private CimiManager cimiManagerCreateMachineConfiguration;
 
     /**
-     * Read operation Choosing a machine configuration
+     * Get a machine configuration.
+     * 
+     * @param id The ID of machine configuration to get
+     * @return The REST response
      */
     @GET
-    @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON})
+    @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
+        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML})
     @Path("{id}")
-    public CimiMachineConfiguration getMachineConfiguration(@PathParam("id") String id) {
-
-        CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(headers, uriInfo, id));
-
+    public Response readMachineConfiguration(@PathParam("id") final String id) {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id);
         CimiResponse response = new CimiResponse();
-
-        CimiManagerReadMachineConfiguration manager = getManagerMachineConfigurationRead();
-        manager.execute(request, response);
-
-        return (CimiMachineConfiguration) response.getCimiData();
+        this.cimiManagerReadMachineConfiguration.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Update
+     * Get a collection of machines configurations.
+     * 
+     * @return The REST response
+     */
+    @GET
+    @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON,
+        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_XML})
+    public Response readMachineConfigurationCollection() {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo);
+        CimiResponse response = new CimiResponse();
+        this.cimiManagerReadMachineConfigurationCollection.execute(request, response);
+        return HelperResponse.buildResponse(response);
+    }
+
+    /**
+     * Update a machine configuration.
+     * 
+     * @param id The ID of machine configuration to update
+     * @return The REST response
      */
     @PUT
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON})
+    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
+        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML})
+    @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
     @Path("{id}")
-    public Response putMachineConfiguration(CimiMachineConfiguration machineConf, @PathParam("id") String id,
-            @QueryParam("CIMISelect") List<String> listQueryParam) {
-
-        CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(headers, uriInfo, id, machineConf));
-
+    public Response updateMachineConfiguration(@PathParam("id") final String id,
+        final CimiMachineConfiguration machineConfiguration) {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id, machineConfiguration);
         CimiResponse response = new CimiResponse();
-
-        CimiManagerUpdateMachineConfiguration manager = getManagerMachineConfigurationUpdate();
-        manager.execute(request, response);
-
-        return Response.status(response.getStatus()).build();
+        this.cimiManagerUpdateMachineConfiguration.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
     /**
-     * delete operation
+     * Update a collection of machines configurations.
+     * 
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
+        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML})
+    public Response updateMachineConfigurationCollection(final CimiMachineConfigurationCollection machineConfigurationCollection) {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, machineConfigurationCollection);
+        CimiResponse response = new CimiResponse();
+        this.cimiManagerUpdateMachineConfigurationCollection.execute(request, response);
+        return HelperResponse.buildResponse(response);
+    }
+
+    /**
+     * Create a machine configuration.
+     * 
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_JSON,
+        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_XML})
+    @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
+    public Response createMachineConfiguration(final CimiMachineConfiguration machineConfiguration) {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, machineConfiguration);
+        CimiResponse response = new CimiResponse();
+        this.cimiManagerCreateMachineConfiguration.execute(request, response);
+        return HelperResponse.buildResponse(response);
+    }
+
+    /**
+     * Delete a machine configuration.
+     * 
+     * @param id The ID of machine configuration to delete
+     * @return The REST response
      */
     @DELETE
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON})
+    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
+        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML})
     @Path("{id}")
-    public Response deleteMachineConfiguration(@PathParam("id") String id) {
-
-        CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(headers, uriInfo, id));
-
+    public Response deleteMachineConfiguration(@PathParam("id") final String id) {
+        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id);
         CimiResponse response = new CimiResponse();
-
-        CimiManagerDeleteMachineConfiguration manager = getManagerMachineConfigurationDelete();
-        manager.execute(request, response);
-
-        return Response.status(response.getStatus()).build();
+        this.cimiManagerDeleteMachineConfiguration.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
-    private CimiManagerDeleteMachineConfiguration getManagerMachineConfigurationDelete() {
-        CimiManagerDeleteMachineConfiguration manager = new CimiManagerDeleteMachineConfiguration();
-        return manager;
-    }
-
-    private CimiManagerReadMachineConfiguration getManagerMachineConfigurationRead() {
-        CimiManagerReadMachineConfiguration manager = new CimiManagerReadMachineConfiguration();
-        return manager;
-    }
-
-    private CimiManagerUpdateMachineConfiguration getManagerMachineConfigurationUpdate() {
-        CimiManagerUpdateMachineConfiguration manager = new CimiManagerUpdateMachineConfiguration();
-        return manager;
-    }
 }

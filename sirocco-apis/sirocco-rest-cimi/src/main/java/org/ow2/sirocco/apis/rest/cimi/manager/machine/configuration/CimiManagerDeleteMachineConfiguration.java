@@ -24,50 +24,35 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
-import javax.ws.rs.core.Response.Status;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerDeleteAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerDeleteMachineConfiguration {
+/**
+ * Manage DELETE request of Machine Configuration.
+ */
+@Component("CimiManagerDeleteMachineConfiguration")
+public class CimiManagerDeleteMachineConfiguration extends CimiManagerDeleteAbstract {
 
-    public CimiManagerDeleteMachineConfiguration() {
-    }
+    @Autowired
+    @Qualifier("IMachineConfigurationManager")
+    private IMachineManager manager;
 
-    public Status verifyRequest(CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com +
-        // ConstantePath + / + id
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE_CONFIGURATION.substring(1))) {
-            return Status.OK;
-        } else {
-            return Status.BAD_REQUEST;
-        }
-    }
-
-    public void execute(CimiRequest request, CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // response.setCimiData(getMachineConfById(request.getHeader().getId()));
-        // deleteMachine(request.getHeader().getId());
-        // // status = 200 OK
-        // response.setStatusHttp(status.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-
-    }
-
-    private void deleteMachine(String id) {
-        // FIXME IMachineManager.deleteMachineConf(id);
-    }
-
-    private CimiMachineConfiguration getMachineConfById(String id) {
-        // FIXME return IMachineManager.getMachineConfById(id);
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        this.manager.deleteMachineConfiguration(request.getId());
         return null;
     }
-
 }

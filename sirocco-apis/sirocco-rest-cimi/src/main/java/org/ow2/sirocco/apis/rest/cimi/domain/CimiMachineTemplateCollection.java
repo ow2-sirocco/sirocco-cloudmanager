@@ -24,19 +24,19 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class MachineTemplateCollection. <p> </p>
+ * Class MachineTemplateCollection.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "machineTemplateCollection")
+@XmlRootElement(name = "MachineTemplateCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineTemplateCollection extends CimiCommon implements Serializable {
+public class CimiMachineTemplateCollection extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -44,7 +44,9 @@ public class CimiMachineTemplateCollection extends CimiCommon implements Seriali
     // ---------------------------------------- Fields
 
     /**
-     * Field "machineTemplates". <p> </p>
+     * Field "machineTemplates".
+     * <p>
+     * </p>
      */
     private CimiMachineTemplate[] machineTemplates;
 
@@ -61,6 +63,7 @@ public class CimiMachineTemplateCollection extends CimiCommon implements Seriali
 
     /**
      * Return the value of field "machineTemplates".
+     * 
      * @return The value
      */
     public CimiMachineTemplate[] getMachineTemplates() {
@@ -69,9 +72,10 @@ public class CimiMachineTemplateCollection extends CimiCommon implements Seriali
 
     /**
      * Set the value of field "machineTemplates".
+     * 
      * @param machineTemplates The value
      */
-    public void setMachineTemplates(CimiMachineTemplate[] machineTemplates) {
+    public void setMachineTemplates(final CimiMachineTemplate[] machineTemplates) {
         this.machineTemplates = machineTemplates;
     }
 

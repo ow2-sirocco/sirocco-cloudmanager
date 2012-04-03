@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -33,11 +31,13 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class MachineTemplate. <p> </p>
+ * Class MachineTemplate.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "machineTemplate")
+@XmlRootElement(name = "MachineTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineTemplate extends CimiCommon implements Serializable {
+public class CimiMachineTemplate extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -47,32 +47,44 @@ public class CimiMachineTemplate extends CimiCommon implements Serializable {
     private String href;
 
     /**
-     * Field "machineConfig". <p> </p>
+     * Field "machineConfig".
+     * <p>
+     * </p>
      */
     private CimiMachineConfiguration machineConfig;
 
     /**
-     * Field "machineImage". <p> </p>
+     * Field "machineImage".
+     * <p>
+     * </p>
      */
     private CimiMachineImage machineImage;
 
     /**
-     * Field "Credentials". <p> </p>
+     * Field "Credentials".
+     * <p>
+     * </p>
      */
     private CimiCredentials credentials;
 
     /**
-     * Field "volumes". <p> </p>
+     * Field "volumes".
+     * <p>
+     * </p>
      */
     private CimiVolumeMachine[] volumes;
 
     /**
-     * Field "volumeTemplates". <p> </p>
+     * Field "volumeTemplates".
+     * <p>
+     * </p>
      */
     private CimiVolumeMachineTemplate[] volumeTemplates;
 
     /**
-     * Field "networkInterfaces". <p> </p>
+     * Field "networkInterfaces".
+     * <p>
+     * </p>
      */
     private CimiNetworkInterface[] networkInterfaces;
 
@@ -89,6 +101,7 @@ public class CimiMachineTemplate extends CimiCommon implements Serializable {
 
     /**
      * Return the value of field "machineConfig".
+     * 
      * @return The value
      */
     public CimiMachineConfiguration getMachineConfig() {
@@ -97,14 +110,16 @@ public class CimiMachineTemplate extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "machineConfig".
+     * 
      * @param machineConfig The value
      */
-    public void setMachineConfig(CimiMachineConfiguration machineConfig) {
+    public void setMachineConfig(final CimiMachineConfiguration machineConfig) {
         this.machineConfig = machineConfig;
     }
 
     /**
      * Return the value of field "machineImage".
+     * 
      * @return The value
      */
     public CimiMachineImage getMachineImage() {
@@ -113,14 +128,16 @@ public class CimiMachineTemplate extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "machineImage".
+     * 
      * @param machineImage The value
      */
-    public void setMachineImage(CimiMachineImage machineImage) {
+    public void setMachineImage(final CimiMachineImage machineImage) {
         this.machineImage = machineImage;
     }
 
     /**
      * Return the value of field "Credentials".
+     * 
      * @return The value
      */
     public CimiCredentials getCredentials() {
@@ -129,14 +146,16 @@ public class CimiMachineTemplate extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "Credentials".
+     * 
      * @param CimiCredentials The value
      */
-    public void setCredentials(CimiCredentials credentials) {
+    public void setCredentials(final CimiCredentials credentials) {
         this.credentials = credentials;
     }
 
     /**
      * Return the value of field "volumes".
+     * 
      * @return The value
      */
     public CimiVolumeMachine[] getVolumes() {
@@ -145,14 +164,16 @@ public class CimiMachineTemplate extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "volumes".
+     * 
      * @param volumes The value
      */
-    public void setVolumes(CimiVolumeMachine[] volumes) {
+    public void setVolumes(final CimiVolumeMachine[] volumes) {
         this.volumes = volumes;
     }
 
     /**
      * Return the value of field "volumeTemplates".
+     * 
      * @return The value
      */
     public CimiVolumeMachineTemplate[] getVolumeTemplates() {
@@ -161,14 +182,16 @@ public class CimiMachineTemplate extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "volumeTemplates".
+     * 
      * @param volumeTemplates The value
      */
-    public void setVolumeTemplates(CimiVolumeMachineTemplate[] volumeTemplates) {
+    public void setVolumeTemplates(final CimiVolumeMachineTemplate[] volumeTemplates) {
         this.volumeTemplates = volumeTemplates;
     }
 
     /**
      * Return the value of field "networkInterfaces".
+     * 
      * @return The value
      */
     public CimiNetworkInterface[] getNetworkInterfaces() {
@@ -177,9 +200,10 @@ public class CimiMachineTemplate extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "networkInterfaces".
+     * 
      * @param networkInterfaces The value
      */
-    public void setNetworkInterfaces(CimiNetworkInterface[] networkInterfaces) {
+    public void setNetworkInterfaces(final CimiNetworkInterface[] networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 
@@ -188,13 +212,13 @@ public class CimiMachineTemplate extends CimiCommon implements Serializable {
      */
     @XmlAttribute
     public String getHref() {
-        return href;
+        return this.href;
     }
 
     /**
      * @param href the href to set
      */
-    public void setHref(String href) {
+    public void setHref(final String href) {
         this.href = href;
     }
 

@@ -74,6 +74,7 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
     public static void setUpBeforeClass() throws Exception {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreComments(true);
+        XMLUnit.setIgnoreAttributeOrder(true);
     }
 
     /**

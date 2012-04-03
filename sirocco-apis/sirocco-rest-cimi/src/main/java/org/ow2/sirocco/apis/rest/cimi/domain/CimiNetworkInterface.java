@@ -24,83 +24,89 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class NetworkInterface. <p> </p>
+ * Class NetworkInterface.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "networkInterface")
+@XmlRootElement(name = "NetworkInterface")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiNetworkInterface extends CimiCommon implements Serializable {
+public class CimiNetworkInterface extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "hostname". <p> </p>
+     * Field "hostname".
+     * <p>
+     * </p>
      */
     private String hostname;
 
     /**
-     * Field "macAddress". <p> </p>
+     * Field "macAddress".
+     * <p>
+     * </p>
      */
     private String macAddress;
 
     /**
-     * Field "state". <p> </p>
+     * Field "state".
+     * <p>
+     * </p>
      */
     private String state;
 
     /**
-     * Field "protocol". <p> </p>
+     * Field "protocol".
+     * <p>
+     * </p>
      */
     private String protocol;
 
     /**
-     * Field "allocation". <p> </p>
+     * Field "allocation".
+     * <p>
+     * </p>
      */
     private String allocation;
 
     /**
-     * Field "address". <p> </p>
+     * Field "address".
+     * <p>
+     * </p>
      */
     private String address;
 
     /**
-     * Field "defaultGateway". <p> </p>
+     * Field "defaultGateway".
+     * <p>
+     * </p>
      */
     private String defaultGateway;
 
     /**
-     * Field "dns". <p> </p>
+     * Field "dns".
+     * <p>
+     * </p>
      */
     private String dns;
 
     /**
-     * Field "macTransmissionUnit". <p> </p>
+     * Field "macTransmissionUnit".
+     * <p>
+     * </p>
      */
     private Integer macTransmissionUnit;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiNetworkInterface() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "hostname".
+     * 
      * @return The value
      */
     public String getHostname() {
@@ -109,14 +115,16 @@ public class CimiNetworkInterface extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "hostname".
+     * 
      * @param hostname The value
      */
-    public void setHostname(String hostname) {
+    public void setHostname(final String hostname) {
         this.hostname = hostname;
     }
 
     /**
      * Return the value of field "macAddress".
+     * 
      * @return The value
      */
     public String getMacAddress() {
@@ -125,14 +133,16 @@ public class CimiNetworkInterface extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "macAddress".
+     * 
      * @param macAddress The value
      */
-    public void setMacAddress(String macAddress) {
+    public void setMacAddress(final String macAddress) {
         this.macAddress = macAddress;
     }
 
     /**
      * Return the value of field "state".
+     * 
      * @return The value
      */
     public String getState() {
@@ -141,14 +151,16 @@ public class CimiNetworkInterface extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "state".
+     * 
      * @param state The value
      */
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
     /**
      * Return the value of field "protocol".
+     * 
      * @return The value
      */
     public String getProtocol() {
@@ -157,14 +169,16 @@ public class CimiNetworkInterface extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "protocol".
+     * 
      * @param protocol The value
      */
-    public void setProtocol(String protocol) {
+    public void setProtocol(final String protocol) {
         this.protocol = protocol;
     }
 
     /**
      * Return the value of field "allocation".
+     * 
      * @return The value
      */
     public String getAllocation() {
@@ -173,14 +187,16 @@ public class CimiNetworkInterface extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "allocation".
+     * 
      * @param allocation The value
      */
-    public void setAllocation(String allocation) {
+    public void setAllocation(final String allocation) {
         this.allocation = allocation;
     }
 
     /**
      * Return the value of field "address".
+     * 
      * @return The value
      */
     public String getAddress() {
@@ -189,14 +205,16 @@ public class CimiNetworkInterface extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "address".
+     * 
      * @param address The value
      */
-    public void setAddress(String address) {
+    public void setAddress(final String address) {
         this.address = address;
     }
 
     /**
      * Return the value of field "defaultGateway".
+     * 
      * @return The value
      */
     public String getDefaultGateway() {
@@ -205,14 +223,16 @@ public class CimiNetworkInterface extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "defaultGateway".
+     * 
      * @param defaultGateway The value
      */
-    public void setDefaultGateway(String defaultGateway) {
+    public void setDefaultGateway(final String defaultGateway) {
         this.defaultGateway = defaultGateway;
     }
 
     /**
      * Return the value of field "dns".
+     * 
      * @return The value
      */
     public String getDns() {
@@ -221,14 +241,16 @@ public class CimiNetworkInterface extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "dns".
+     * 
      * @param dns The value
      */
-    public void setDns(String dns) {
+    public void setDns(final String dns) {
         this.dns = dns;
     }
 
     /**
      * Return the value of field "macTransmissionUnit".
+     * 
      * @return The value
      */
     public Integer getMacTransmissionUnit() {
@@ -237,9 +259,10 @@ public class CimiNetworkInterface extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "macTransmissionUnit".
+     * 
      * @param macTransmissionUnit The value
      */
-    public void setMacTransmissionUnit(Integer macTransmissionUnit) {
+    public void setMacTransmissionUnit(final Integer macTransmissionUnit) {
         this.macTransmissionUnit = macTransmissionUnit;
     }
 

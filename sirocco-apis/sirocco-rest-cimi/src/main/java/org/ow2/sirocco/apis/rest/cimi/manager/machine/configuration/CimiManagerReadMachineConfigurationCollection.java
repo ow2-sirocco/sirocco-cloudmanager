@@ -24,42 +24,95 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
-import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.ws.rs.core.Response;
+
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerReadMachineConfigurationCollection {
+/**
+ * Manage READ request of Machines Configurations collection.
+ */
+@Component("CimiManagerReadMachineConfigurationCollection")
+public class CimiManagerReadMachineConfigurationCollection extends CimiManagerReadAbstract {
 
-    public CimiManagerReadMachineConfigurationCollection() {
-    }
+    @Autowired
+    @Qualifier("IMachineConfigurationManager")
+    private IMachineManager manager;
 
-    public void execute(CimiRequest request, CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // response.setCimiData(getMachineConfCollection());
-        // // status = 200 OK
-        // response.setStatusHttp(status.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-    }
-
-    private CimiMachineConfigurationCollection getMachineConfCollection() {
-        // FIXME return IMachineManager.getMachineConfCollection();
-        return null;
-    }
-
-    public Status verifyRequest(CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com/
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE_CONFIGURATION)) {
-            return Status.OK;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        List<MachineConfiguration> out = null;
+        CimiSelect select = request.getHeader().getCimiSelect();
+        if (true == select.isEmpty()) {
+            // FIXME
+            throw new UnsupportedOperationException();
+            // out = this.manager.getMachineConfigurations();
         } else {
-            return Status.BAD_REQUEST;
+            if (true == select.isNumericArrayPresent()) {
+                List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());
+                out = this.manager.getMachineConfigurations(numsArray.get(0).intValue(), numsArray.get(1).intValue(),
+                    select.getAttributes());
+            } else {
+                out = this.manager.getMachineConfigurations(select.getAttributes(),
+                    select.getExpressionArray(select.getIndexFirstArray()));
+            }
         }
+        return out;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        CimiMachineConfigurationCollection cimi = new CimiMachineConfigurationCollection();
+        MachineConfigurationCollectionConverter.copyToCimi((List<MachineConfiguration>) dataService, cimi, request.getHeader()
+            .getBaseUri());
+        response.setCimiData(cimi);
+        response.setStatus(Response.Status.OK);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#addOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void addOperations(final CimiRequest request, final CimiResponse response, final Object dataService) {
+        CimiCommonId common = (CimiCommonId) response.getCimiData();
+        List<CimiOperation> ops = new ArrayList<CimiOperation>();
+        ops.add(new CimiOperation(Operation.ADD.getRel(), common.getId()));
+        common.setOperations(ops.toArray(new CimiOperation[ops.size()]));
     }
 }

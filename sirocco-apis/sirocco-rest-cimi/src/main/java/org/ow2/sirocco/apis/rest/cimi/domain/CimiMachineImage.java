@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -41,7 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
  */
 @XmlRootElement(name = "MachineImage")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineImage extends CimiCommon implements Serializable {
+public class CimiMachineImage extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;

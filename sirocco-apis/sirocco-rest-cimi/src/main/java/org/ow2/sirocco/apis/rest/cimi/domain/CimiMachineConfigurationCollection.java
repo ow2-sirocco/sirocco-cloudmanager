@@ -27,57 +27,54 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class MachineConfigurationCollection. <p> </p>
+ * Class MachineConfigurationCollection.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "machineConfigurationCollection")
+@XmlRootElement(name = "MachineConfigurationCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineConfigurationCollection extends CimiCommon implements Serializable {
+public class CimiMachineConfigurationCollection extends CimiCommonId implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "href". <p> </p>
+     * Field "href".
+     * <p>
+     * </p>
      */
     private String href;
 
     /**
-     * Field "machineConfigurations". <p> </p>
+     * Field "machineConfigurations".
+     * <p>
+     * </p>
      */
     private CimiMachineConfiguration[] machineConfigurations;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiMachineConfigurationCollection() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "machineConfigurations".
+     * 
      * @return The value
      */
+    @XmlElement(name = "machineConfiguration")
     public CimiMachineConfiguration[] getMachineConfigurations() {
         return this.machineConfigurations;
     }
 
     /**
      * Set the value of field "machineConfigurations".
+     * 
      * @param machineConfigurations The value
      */
-    public void setMachineConfigurations(CimiMachineConfiguration[] machineConfigurations) {
+    public void setMachineConfigurations(final CimiMachineConfiguration[] machineConfigurations) {
         this.machineConfigurations = machineConfigurations;
     }
 
@@ -86,13 +83,13 @@ public class CimiMachineConfigurationCollection extends CimiCommon implements Se
      */
     @XmlAttribute
     public String getHref() {
-        return href;
+        return this.href;
     }
 
     /**
      * @param href the href to set
      */
-    public void setHref(String href) {
+    public void setHref(final String href) {
         this.href = href;
     }
 }

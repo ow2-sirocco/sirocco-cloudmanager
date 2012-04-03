@@ -26,34 +26,38 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
 
 /**
- * Class Capacity. <p></p>
+ * Class Capacity.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "capacity")
+@XmlRootElement(name = "Capacity")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiCapacity implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /** Field "quantity". */
     private Integer quantity;
 
     /**
-     * Field "units". <p> enum : byte (B), kilobyte (kB), megabyte (MB),
-     * gigabyte (GB), terabyte (TB), petabyte (PB), exabyte (EB), zettabyte
-     * (ZB), yottabyte (YB) </p>
+     * Field "units".
+     * <p>
+     * enum : byte (B), kilobyte (kB), megabyte (MB), gigabyte (GB), terabyte
+     * (TB), petabyte (PB), exabyte (EB), zettabyte (ZB), yottabyte (YB)
+     * </p>
      */
-    private SIDigitalUnit units;
-
-    // ---------------------------------------- Constructors
+    @NotNull(groups = {GroupCreate.class})
+    private String units;
 
     /**
      * Default constructor.
@@ -62,37 +66,53 @@ public class CimiCapacity implements Serializable {
         super();
     }
 
-    // ---------------------------------------- ???com-accesseurs???
+    /**
+     * Parameterized constructor.
+     * 
+     * @param quantity The quantity
+     * @param units The units
+     */
+    public CimiCapacity(final Integer quantity, final String units) {
+        super();
+        this.quantity = quantity;
+        this.units = units;
+    }
 
     /**
      * Return the value of field "quantity".
+     * 
      * @return The value
      */
+    @XmlAttribute
     public Integer getQuantity() {
         return this.quantity;
     }
 
     /**
      * Set the value of field "quantity".
+     * 
      * @param quantity The value
      */
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(final Integer quantity) {
         this.quantity = quantity;
     }
 
     /**
      * Return the value of field "units".
+     * 
      * @return The value
      */
-    public SIDigitalUnit getUnits() {
+    @XmlAttribute
+    public String getUnits() {
         return this.units;
     }
 
     /**
      * Set the value of field "units".
+     * 
      * @param units The value
      */
-    public void setUnits(SIDigitalUnit units) {
+    public void setUnits(final String units) {
         this.units = units;
     }
 

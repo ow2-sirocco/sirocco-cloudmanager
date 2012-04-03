@@ -24,58 +24,49 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.cep;
 
-import java.util.List;
-
-import javax.ws.rs.core.Response.Status;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerUpdateCloudEntryPoint {
+/**
+ * Manage UPDATE request of Cloud Entry Point.
+ */
+@Component("CimiManagerUpdateCloudEntryPoint")
+public class CimiManagerUpdateCloudEntryPoint extends CimiManagerUpdateAbstract {
 
-    public CimiManagerUpdateCloudEntryPoint() {
+    // FIXME Not Implemented in EJB
+    // @Autowired
+    // @Qualifier("IMachineManager")
+    // private IMachineManager manager;
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        // FIXME Not Implemented in EJB
+        throw new UnsupportedOperationException();
     }
 
-    public void execute(CimiRequest request, CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // CloudEntryPoint cloudEntryPoint = getCloudEntryPoint();
-        // CloudEntryPoint cloudEntryPointToUpdate = (CloudEntryPoint)
-        // request.getHeader().getCimiData();
-        // updateCloudEntryPoint(cloudEntryPoint, cloudEntryPointToUpdate,
-        // request.getHeader().getListSelect());
-        // // status = 202 Accepted
-        // response.setStatusHttp(Status.ACCEPTED.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-    }
-
-    private CimiCloudEntryPoint updateCloudEntryPoint(CimiCloudEntryPoint cloudEntryPoint,
-            CimiCloudEntryPoint cloudEntryPointToUpdate, List<String> queryParam) {
-        // FIXME IMachineManager.updateMachine(cloudEntryPoint,
-        // cloudEntryPointToUpdate, queryParam);
-        return null;
-
-    }
-
-    public Status verifyRequest(CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com +
-        // ConstantePath + / + id
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
-            return Status.OK;
-        } else {
-            return Status.BAD_REQUEST;
-        }
-    }
-
-    public CimiCloudEntryPoint getCloudEntryPoint() {
-        // FIXME return IMachineManager.getCloudEnryPoint();
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Copy only common attributes.
+     * </p>
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     */
+    @Override
+    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+        // FIXME Not Implemented in EJB
         return null;
     }
+
 }

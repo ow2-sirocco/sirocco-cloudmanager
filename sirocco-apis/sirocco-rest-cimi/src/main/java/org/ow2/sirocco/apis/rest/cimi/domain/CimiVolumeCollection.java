@@ -36,7 +36,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "volumeCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeCollection extends CimiCommon implements Serializable {
+public class CimiVolumeCollection extends CimiCommonId implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;

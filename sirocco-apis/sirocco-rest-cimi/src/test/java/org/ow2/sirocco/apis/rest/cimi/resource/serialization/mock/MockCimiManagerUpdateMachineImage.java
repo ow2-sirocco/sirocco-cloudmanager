@@ -56,8 +56,8 @@ public class MockCimiManagerUpdateMachineImage implements CimiManager {
         try {
             // Build and compare
             Integer id = Integer.valueOf(request.getId());
-            CimiMachineImage image = CimiEntityBuilderHelper.buildCimiMachineImage(id);
-            Assert.assertEquals(ToStringBuilder.reflectionToString(image, new SerializationHelper.RecursiveToStringStyle()),
+            CimiMachineImage cimi = CimiEntityBuilderHelper.buildCimiMachineImage(id);
+            Assert.assertEquals(ToStringBuilder.reflectionToString(cimi, new SerializationHelper.RecursiveToStringStyle()),
                 ToStringBuilder.reflectionToString(request.getCimiData(), new SerializationHelper.RecursiveToStringStyle()));
 
             // Build response

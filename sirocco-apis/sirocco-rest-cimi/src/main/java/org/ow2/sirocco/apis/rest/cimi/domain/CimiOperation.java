@@ -38,7 +38,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  * The operation executed on the resource.
  * </p>
  */
-@XmlRootElement(name = "operation")
+@XmlRootElement(name = "Operation")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiOperation implements Serializable {
 

@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -38,12 +37,11 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "Job")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiJob extends CimiCommon implements Serializable {
+public class CimiJob extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
     /**
      * Field "targetEntity".
      * <p>

@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.CommonConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -84,7 +84,7 @@ public class CimiManagerUpdateMachineImage extends CimiManagerUpdateAbstract {
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
         MachineImage service = new MachineImage();
-        CommonConverter.copyToService((CimiCommon) request.getCimiData(), service);
+        CommonConverter.copyToService((CimiCommonId) request.getCimiData(), service);
         return service;
     }
 

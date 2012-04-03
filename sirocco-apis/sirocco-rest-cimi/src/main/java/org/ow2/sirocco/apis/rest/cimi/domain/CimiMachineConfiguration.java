@@ -24,9 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -44,12 +43,11 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
  */
 @XmlRootElement(name = "MachineConfiguration")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineConfiguration extends CimiCommon implements Serializable {
+public class CimiMachineConfiguration extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
     private String href;
 
     /**
@@ -57,7 +55,14 @@ public class CimiMachineConfiguration extends CimiCommon implements Serializable
      * <p>
      * </p>
      */
-    private CimiCpu cpu;
+    private Integer cpu;
+
+    /**
+     * Field "cpuArch".
+     * <p>
+     * </p>
+     */
+    private String cpuArch;
 
     /**
      * Field "memory".
@@ -72,10 +77,9 @@ public class CimiMachineConfiguration extends CimiCommon implements Serializable
      * </p>
      */
     @JsonProperty
-    @NotNull(groups = {GroupCreate.class})
+    @Valid
+    @Size(min = 1, groups = {GroupCreate.class})
     private CimiDisk[] disks;
-
-    // ---------------------------------------- Constructors
 
     /**
      * Default constructor.
@@ -84,14 +88,12 @@ public class CimiMachineConfiguration extends CimiCommon implements Serializable
         super();
     }
 
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "cpu".
      * 
      * @return The value
      */
-    public CimiCpu getCpu() {
+    public Integer getCpu() {
         return this.cpu;
     }
 
@@ -100,8 +102,26 @@ public class CimiMachineConfiguration extends CimiCommon implements Serializable
      * 
      * @param cpu The value
      */
-    public void setCpu(final CimiCpu cpu) {
+    public void setCpu(final Integer cpu) {
         this.cpu = cpu;
+    }
+
+    /**
+     * Return the value of field "cpuArch".
+     * 
+     * @return The value
+     */
+    public String getCpuArch() {
+        return this.cpuArch;
+    }
+
+    /**
+     * Set the value of field "cpuArch".
+     * 
+     * @param cpuArch The value
+     */
+    public void setCpuArch(final String cpuArch) {
+        this.cpuArch = cpuArch;
     }
 
     /**

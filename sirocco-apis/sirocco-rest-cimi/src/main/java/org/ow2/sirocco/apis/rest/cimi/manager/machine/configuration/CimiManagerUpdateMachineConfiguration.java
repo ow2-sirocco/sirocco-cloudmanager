@@ -24,61 +24,68 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.converter.CommonConverter;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerUpdateMachineConfiguration {
+/**
+ * Manage UPDATE request of Machine Configuration.
+ */
+@Component("CimiManagerUpdateMachineConfiguration")
+public class CimiManagerUpdateMachineConfiguration extends CimiManagerUpdateAbstract {
 
-    public CimiManagerUpdateMachineConfiguration() {
-    }
+    @Autowired
+    @Qualifier("IMachineConfigurationManager")
+    private IMachineManager manager;
 
-    public Status verifyRequest(CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com +
-        // ConstantePath + / + id
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE_CONFIGURATION.substring(1))) {
-            return Status.OK;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        CimiSelect select = request.getHeader().getCimiSelect();
+        if (true == select.isEmpty()) {
+            this.manager.updateMachineConfiguration((MachineConfiguration) dataService);
         } else {
-            return Status.BAD_REQUEST;
+            Map<String, Object> attrs = new HashMap<String, Object>();
+            for (String attr : select.getAttributes()) {
+                attrs.put(attr, dataService);
+            }
+            this.manager.updateMachineConfigurationAttributes(request.getId(), attrs);
         }
-    }
-
-    public void execute(CimiRequest request, CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // MachineConfiguration machineConf =
-        // getMachineConfById(request.getHeader().getId());
-        // MachineConfiguration machineConfigurationToUpdate =
-        // (MachineConfiguration) request.getHeader()
-        // .getCimiData();
-        // updateMachineConfiguration(machineConf, machineConfigurationToUpdate,
-        // request.getHeader()
-        // .getListSelect());
-        // // status = 202 Accepted
-        // response.setStatusHttp(Status.ACCEPTED.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-    }
-
-    private CimiMachineConfiguration updateMachineConfiguration(CimiMachineConfiguration machineConf,
-            CimiMachineConfiguration machineConfigurationToUpdate, List<String> queryParam) {
-        // FIXME return
-        // IMachineManager.updateMachineConfiguration(machineConf,machineConfigurationToUpdate,
-        // queryParam);
         return null;
     }
 
-    private CimiMachineConfiguration getMachineConfById(String id) {
-        // FIXME return IMachineManager.getMachineConfById(id);
-        return null;
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Copy only common attributes.
+     * </p>
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     */
+    @Override
+    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+        MachineConfiguration service = new MachineConfiguration();
+        CommonConverter.copyToService((CimiCommonId) request.getCimiData(), service);
+        return service;
     }
 
 }

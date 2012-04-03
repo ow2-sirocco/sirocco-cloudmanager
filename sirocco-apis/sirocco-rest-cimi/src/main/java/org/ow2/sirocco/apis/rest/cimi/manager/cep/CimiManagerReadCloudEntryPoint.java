@@ -24,24 +24,63 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.cep;
 
+import javax.ws.rs.core.Response;
+
+import org.ow2.sirocco.apis.rest.cimi.converter.CloudEntryPointConverter;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+/**
+ * Manage READ request of Cloud Entry Point.
+ */
+@Component("CimiManagerReadCloudEntryPoint")
 public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
 
+    @Autowired
+    @Qualifier("IMachineManager")
+    private IMachineManager manager;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
     @Override
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        CloudEntryPoint out = null;
+        out = this.manager.getCloudEntryPoint();
+
+        if (null == out) {
+            throw new ResourceNotFoundException();
+        }
+        return out;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        // TODO Auto-generated method stub
-
+        CimiCloudEntryPoint cimi = new CimiCloudEntryPoint();
+        CloudEntryPointConverter.copyToCimi((CloudEntryPoint) dataService, cimi, request.getHeader().getBaseUri(), false);
+        response.setCimiData(cimi);
+        response.setStatus(Response.Status.OK);
     }
 
 }

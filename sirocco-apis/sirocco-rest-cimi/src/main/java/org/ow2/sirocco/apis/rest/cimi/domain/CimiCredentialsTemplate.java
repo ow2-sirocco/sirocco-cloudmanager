@@ -37,7 +37,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "credentialsTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsTemplate extends CimiCommon implements Serializable {
+public class CimiCredentialsTemplate extends CimiCommonId implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;

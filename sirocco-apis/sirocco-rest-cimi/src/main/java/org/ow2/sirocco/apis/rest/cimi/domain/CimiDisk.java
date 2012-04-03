@@ -26,39 +26,49 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
 
 /**
- * Class Disk. <p> </p>
+ * Class Disk.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "disk")
-@JsonSerialize(include = Inclusion.NON_NULL)
+@XmlRootElement(name = "Disk")
+@JsonSerialize(include = Inclusion.NON_EMPTY)
 public class CimiDisk implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "capacity". <p> </p>
+     * Field "capacity".
+     * <p>
+     * </p>
      */
+    @Valid
     private CimiCapacity capacity;
 
     /**
-     * Field "format". <p> </p>
+     * Field "format".
+     * <p>
+     * </p>
      */
+    @NotNull(groups = {GroupCreate.class})
     private String format;
 
     /**
-     * Field "attachmentPoint". <p> </p>
+     * Field "attachmentPoint".
+     * <p>
+     * </p>
      */
+    @NotNull(groups = {GroupCreate.class})
     private String attachmentPoint;
-
-    // ---------------------------------------- Constructors
 
     /**
      * Default constructor.
@@ -67,10 +77,35 @@ public class CimiDisk implements Serializable {
         super();
     }
 
-    // ---------------------------------------- ???com-accesseurs???
+    /**
+     * Parameterized constructor.
+     * 
+     * @param format The format
+     * @param attachmentPoint The attachment point
+     */
+    public CimiDisk(final String format, final String attachmentPoint) {
+        super();
+        this.format = format;
+        this.attachmentPoint = attachmentPoint;
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param format The format
+     * @param attachmentPoint The attachment point
+     * @param capacity The capacity
+     */
+    public CimiDisk(final String format, final String attachmentPoint, final CimiCapacity capacity) {
+        super();
+        this.format = format;
+        this.attachmentPoint = attachmentPoint;
+        this.capacity = capacity;
+    }
 
     /**
      * Return the value of field "capacity".
+     * 
      * @return The value
      */
     public CimiCapacity getCapacity() {
@@ -79,14 +114,16 @@ public class CimiDisk implements Serializable {
 
     /**
      * Set the value of field "capacity".
+     * 
      * @param capacity The value
      */
-    public void setCapacity(CimiCapacity capacity) {
+    public void setCapacity(final CimiCapacity capacity) {
         this.capacity = capacity;
     }
 
     /**
      * Return the value of field "format".
+     * 
      * @return The value
      */
     public String getFormat() {
@@ -95,14 +132,16 @@ public class CimiDisk implements Serializable {
 
     /**
      * Set the value of field "format".
+     * 
      * @param format The value
      */
-    public void setFormat(String format) {
+    public void setFormat(final String format) {
         this.format = format;
     }
 
     /**
      * Return the value of field "attachmentPoint".
+     * 
      * @return The value
      */
     public String getAttachmentPoint() {
@@ -111,9 +150,10 @@ public class CimiDisk implements Serializable {
 
     /**
      * Set the value of field "attachmentPoint".
+     * 
      * @param attachmentPoint The value
      */
-    public void setAttachmentPoint(String attachmentPoint) {
+    public void setAttachmentPoint(final String attachmentPoint) {
         this.attachmentPoint = attachmentPoint;
     }
 

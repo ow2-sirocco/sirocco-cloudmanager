@@ -33,48 +33,70 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class Machine. <p> </p>
+ * Class Machine.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "machine")
+@XmlRootElement(name = "Machine")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachine extends CimiCommon implements Serializable {
+public class CimiMachine extends CimiCommonId implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
     /**
-     * Field href <p> </p>
+     * Field href
+     * <p>
+     * </p>
      */
     private String href;
 
     /**
-     * Field "state". <p> </p>
+     * Field "state".
+     * <p>
+     * </p>
      */
     private String state;
 
     /**
-     * Field "cpu". <p> </p>
+     * Field "cpu".
+     * <p>
+     * </p>
      */
-    private CimiCpu cpu;
+    private Integer cpu;
 
     /**
-     * Field "memory". <p> </p>
+     * Field "cpuArch".
+     * <p>
+     * </p>
+     */
+    private String cpuArch;
+
+    /**
+     * Field "memory".
+     * <p>
+     * </p>
      */
     private CimiMemory memory;
 
     /**
-     * Field "capacity". <p> </p>
+     * Field "capacity".
+     * <p>
+     * </p>
      */
     private CimiCapacity capacity;
 
     /**
-     * Field "volumes". <p> </p>
+     * Field "volumes".
+     * <p>
+     * </p>
      */
     private CimiVolumeMachine[] volumes;
 
     /**
-     * Field "networkInterfaces". <p> </p>
+     * Field "networkInterfaces".
+     * <p>
+     * </p>
      */
     private CimiNetworkInterface[] networkInterfaces;
 
@@ -91,6 +113,7 @@ public class CimiMachine extends CimiCommon implements Serializable {
 
     /**
      * Return the value of field "state".
+     * 
      * @return The value
      */
     public String getState() {
@@ -99,30 +122,52 @@ public class CimiMachine extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "state".
+     * 
      * @param state The value
      */
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
     /**
      * Return the value of field "cpu".
+     * 
      * @return The value
      */
-    public CimiCpu getCpu() {
+    public Integer getCpu() {
         return this.cpu;
     }
 
     /**
      * Set the value of field "cpu".
+     * 
      * @param cpu The value
      */
-    public void setCpu(CimiCpu cpu) {
+    public void setCpu(final Integer cpu) {
         this.cpu = cpu;
     }
 
     /**
+     * Return the value of field "cpuArch".
+     * 
+     * @return The value
+     */
+    public String getCpuArch() {
+        return this.cpuArch;
+    }
+
+    /**
+     * Set the value of field "cpuArch".
+     * 
+     * @param cpuArch The value
+     */
+    public void setCpuArch(final String cpuArch) {
+        this.cpuArch = cpuArch;
+    }
+
+    /**
      * Return the value of field "memory".
+     * 
      * @return The value
      */
     public CimiMemory getMemory() {
@@ -131,14 +176,16 @@ public class CimiMachine extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "memory".
+     * 
      * @param memory The value
      */
-    public void setMemory(CimiMemory memory) {
+    public void setMemory(final CimiMemory memory) {
         this.memory = memory;
     }
 
     /**
      * Return the value of field "capacity".
+     * 
      * @return The value
      */
     public CimiCapacity getCapacity() {
@@ -147,14 +194,16 @@ public class CimiMachine extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "capacity".
+     * 
      * @param disks The value
      */
-    public void setCapacity(CimiCapacity capacity) {
+    public void setCapacity(final CimiCapacity capacity) {
         this.capacity = capacity;
     }
 
     /**
      * Return the value of field "volumes".
+     * 
      * @return The value
      */
     public CimiVolumeMachine[] getVolumes() {
@@ -163,14 +212,16 @@ public class CimiMachine extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "volumes".
+     * 
      * @param volumes The value
      */
-    public void setVolumes(CimiVolumeMachine[] volumes) {
+    public void setVolumes(final CimiVolumeMachine[] volumes) {
         this.volumes = volumes;
     }
 
     /**
      * Return the value of field "networkInterfaces".
+     * 
      * @return The value
      */
     public CimiNetworkInterface[] getNetworkInterfaces() {
@@ -179,9 +230,10 @@ public class CimiMachine extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "networkInterfaces".
+     * 
      * @param networkInterfaces The value
      */
-    public void setNetworkInterfaces(CimiNetworkInterface[] networkInterfaces) {
+    public void setNetworkInterfaces(final CimiNetworkInterface[] networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 
@@ -190,13 +242,13 @@ public class CimiMachine extends CimiCommon implements Serializable {
      */
     @XmlAttribute
     public String getHref() {
-        return href;
+        return this.href;
     }
 
     /**
      * @param href the href to set
      */
-    public void setHref(String href) {
+    public void setHref(final String href) {
         this.href = href;
     }
 }

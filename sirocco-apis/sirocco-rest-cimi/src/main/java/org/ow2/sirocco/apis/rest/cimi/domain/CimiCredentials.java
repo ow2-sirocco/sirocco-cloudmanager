@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -34,36 +32,30 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class Credentials. <p> </p>
+ * Class Credentials.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "credentials")
+@XmlRootElement(name = "Credentials")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentials extends CimiCommon implements Serializable {
+public class CimiCredentials extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
     private String href;
 
     /**
-     * Field "key". <p> Marshaling to verify </p>
+     * Field "key".
+     * <p>
+     * Marshaling to verify
+     * </p>
      */
     private byte[] key;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiCredentials() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "key".
+     * 
      * @return The value
      */
     @XmlElement
@@ -73,9 +65,10 @@ public class CimiCredentials extends CimiCommon implements Serializable {
 
     /**
      * Set the value of field "key".
+     * 
      * @param key The value
      */
-    public void setKey(byte[] key) {
+    public void setKey(final byte[] key) {
         this.key = key;
     }
 
@@ -84,13 +77,13 @@ public class CimiCredentials extends CimiCommon implements Serializable {
      */
     @XmlAttribute
     public String getHref() {
-        return href;
+        return this.href;
     }
 
     /**
      * @param href the href to set
      */
-    public void setHref(String href) {
+    public void setHref(final String href) {
         this.href = href;
     }
 }
