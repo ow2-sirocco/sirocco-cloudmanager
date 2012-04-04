@@ -24,9 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.ow2.sirocco.apis.rest.cimi.converter.CommonConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
@@ -63,11 +60,7 @@ public class CimiManagerUpdateMachineImageCollection extends CimiManagerUpdateAb
         if (true == select.isEmpty()) {
             throw new UnsupportedOperationException();
         } else {
-            Map<String, Object> attrs = new HashMap<String, Object>();
-            for (String attr : select.getAttributes()) {
-                attrs.put(attr, dataService);
-            }
-            this.manager.updateMachineImageCollection(attrs);
+            this.manager.updateMachineImageCollection(select.dispatchAttributesValues(dataService));
         }
         return null;
     }

@@ -2,9 +2,12 @@ package org.ow2.sirocco.apis.rest.cimi.request;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
 public class CimiSelectTest {
 
@@ -109,6 +112,45 @@ public class CimiSelectTest {
         Assert.assertEquals(2, CimiSelect.extractNumericArray("  8   -   125   -   369   ").size());
         Assert.assertEquals(8, CimiSelect.extractNumericArray("  8   -   125   -   369   ").get(0).intValue());
         Assert.assertEquals(125, CimiSelect.extractNumericArray("  8   -   125   -   369   ").get(1).intValue());
+    }
+
+    /**
+     * Test for {@link CimiSelect#dispatchAttributesValues(Object)}.
+     */
+    @Test
+    public void testDispatchAttributesValues() {
+        List<String> selects;
+        CimiSelect cimiSelect;
+        Map<String, Object> dispatched;
+
+        // CimiSelect with a 'unknwon' property
+        selects = new ArrayList<String>();
+        selects.add("name");
+        selects.add("description");
+        selects.add("unknown");
+
+        cimiSelect = new CimiSelect();
+        cimiSelect.setSelects(selects);
+
+        // Dispatching select on MachineImage
+        MachineImage image = new MachineImage();
+        image.setName("imageNameValue");
+        image.setDescription("imageDescriptionValue");
+
+        dispatched = cimiSelect.dispatchAttributesValues(image);
+
+        Assert.assertEquals(2, dispatched.size());
+        Assert.assertEquals("imageNameValue", dispatched.get("name"));
+        Assert.assertEquals("imageDescriptionValue", dispatched.get("description"));
+
+        // Same dispatching on MachineConfiguration with only one property
+        // attributed
+        MachineConfiguration config = new MachineConfiguration();
+        config.setName("configNameValue");
+
+        dispatched = cimiSelect.dispatchAttributesValues(config);
+        Assert.assertEquals(1, dispatched.size());
+        Assert.assertEquals("configNameValue", dispatched.get("name"));
     }
 
     @Test

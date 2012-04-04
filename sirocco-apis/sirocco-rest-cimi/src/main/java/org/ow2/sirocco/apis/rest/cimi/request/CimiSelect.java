@@ -31,10 +31,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.beanutils.PropertyUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * Utility class to manage CimiSelect expression.
  */
 public class CimiSelect {
+
+    /** Logger */
+    private static final Logger LOGGER = LoggerFactory.getLogger(CimiSelect.class);
 
     private List<String> selects;
 
@@ -336,6 +343,34 @@ public class CimiSelect {
             }
         }
         return listInt;
+    }
+
+    /**
+     * Dispatch the values of bean with the attributes found in the CimiSelect.
+     * <p>
+     * If a attribute name is not found in bean, it is not copied in map.
+     * </p>
+     * 
+     * @param bean The bean where are the values
+     * @return A map with the attribute name and his value
+     */
+    public Map<String, Object> dispatchAttributesValues(final Object bean) {
+        Map<String, Object> attrValues = new HashMap<String, Object>();
+        Object value;
+        if (false == this.isEmpty()) {
+            for (String name : this.attributes) {
+                try {
+                    value = PropertyUtils.getSimpleProperty(bean, name);
+                    if (null != value) {
+                        attrValues.put(name, value);
+                    }
+                } catch (Exception e) {
+                    CimiSelect.LOGGER.debug("Property [{}] not found in bean [{}] with this message error: {}", new Object[] {
+                        name, bean.getClass().getName(), e.getMessage()});
+                }
+            }
+        }
+        return attrValues;
     }
 
     /**
