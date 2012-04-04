@@ -24,9 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -40,22 +37,13 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "MachineConfigurationCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineConfigurationCollection extends CimiCommonId implements Serializable {
+public class CimiMachineConfigurationCollection extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "href".
-     * <p>
-     * </p>
-     */
-    private String href;
-
-    /**
      * Field "machineConfigurations".
-     * <p>
-     * </p>
      */
     private CimiMachineConfiguration[] machineConfigurations;
 
@@ -76,20 +64,5 @@ public class CimiMachineConfigurationCollection extends CimiCommonId implements 
      */
     public void setMachineConfigurations(final CimiMachineConfiguration[] machineConfigurations) {
         this.machineConfigurations = machineConfigurations;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return this.href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(final String href) {
-        this.href = href;
     }
 }

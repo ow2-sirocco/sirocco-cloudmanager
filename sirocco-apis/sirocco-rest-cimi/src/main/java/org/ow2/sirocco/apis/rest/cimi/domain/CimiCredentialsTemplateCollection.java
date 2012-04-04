@@ -24,43 +24,33 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class CredentialsTemplateCollection. <p> </p>
+ * Class CredentialsTemplateCollection.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "credentialsTemplateCollection")
+@XmlRootElement(name = "CredentialsTemplateCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsTemplateCollection extends CimiCommonId implements Serializable {
+public class CimiCredentialsTemplateCollection extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "CredentialsTemplates". <p> </p>
+     * Field "CredentialsTemplates".
+     * <p>
+     * </p>
      */
     private CimiCredentialsTemplate[] credentialsTemplates;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiCredentialsTemplateCollection() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "CredentialsTemplates".
+     * 
      * @return The value
      */
     public CimiCredentialsTemplate[] getCredentialsTemplates() {
@@ -69,9 +59,10 @@ public class CimiCredentialsTemplateCollection extends CimiCommonId implements S
 
     /**
      * Set the value of field "CredentialsTemplates".
+     * 
      * @param CredentialsTemplates The value
      */
-    public void setCredentialsTemplates(CimiCredentialsTemplate[] credentialsTemplates) {
+    public void setCredentialsTemplates(final CimiCredentialsTemplate[] credentialsTemplates) {
         this.credentialsTemplates = credentialsTemplates;
     }
 

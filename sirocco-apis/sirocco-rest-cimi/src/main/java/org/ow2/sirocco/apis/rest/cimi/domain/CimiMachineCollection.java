@@ -24,48 +24,33 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class MachineCollection. <p> </p>
+ * Class MachineCollection.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "machineCollection")
+@XmlRootElement(name = "MachineCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineCollection extends CimiCommonId implements Serializable {
+public class CimiMachineCollection extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
     /**
-     * Field "href". <p> </p>
-     */
-    private String href;
-
-    /**
-     * Field "machines". <p> </p>
+     * Field "machines".
+     * <p>
+     * </p>
      */
     private CimiMachine[] machines;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiMachineCollection() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "machines".
+     * 
      * @return The value
      */
     public CimiMachine[] getMachines() {
@@ -74,24 +59,10 @@ public class CimiMachineCollection extends CimiCommonId implements Serializable 
 
     /**
      * Set the value of field "machines".
+     * 
      * @param machines The value
      */
-    public void setMachines(CimiMachine[] machines) {
+    public void setMachines(final CimiMachine[] machines) {
         this.machines = machines;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(String href) {
-        this.href = href;
     }
 }

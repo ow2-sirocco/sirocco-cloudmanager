@@ -24,9 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -39,17 +36,10 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "Machine")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachine extends CimiCommonId implements Serializable {
+public class CimiMachine extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Field href
-     * <p>
-     * </p>
-     */
-    private String href;
 
     /**
      * Field "state".
@@ -235,20 +225,5 @@ public class CimiMachine extends CimiCommonId implements Serializable {
      */
     public void setNetworkInterfaces(final CimiNetworkInterface[] networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return this.href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(final String href) {
-        this.href = href;
     }
 }

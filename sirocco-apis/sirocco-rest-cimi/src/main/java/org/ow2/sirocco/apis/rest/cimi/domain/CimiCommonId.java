@@ -26,6 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
@@ -37,7 +38,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
  * Attributes common to all entities
  * </p>
  */
-public class CimiCommonId extends CimiCommon {
+public class CimiCommonId extends CimiCommon implements CimiHref {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -79,6 +80,13 @@ public class CimiCommonId extends CimiCommon {
      */
     @JsonProperty
     private CimiOperation[] operations;
+
+    /**
+     * Field "href".
+     * <p>
+     * </p>
+     */
+    private String href;
 
     /**
      * Return the value of field "id".
@@ -152,6 +160,21 @@ public class CimiCommonId extends CimiCommon {
      */
     public void setOperations(final CimiOperation[] operations) {
         this.operations = operations;
+    }
+
+    /**
+     * @return the href
+     */
+    @XmlAttribute
+    public String getHref() {
+        return this.href;
+    }
+
+    /**
+     * @param href the href to set
+     */
+    public void setHref(final String href) {
+        this.href = href;
     }
 
 }

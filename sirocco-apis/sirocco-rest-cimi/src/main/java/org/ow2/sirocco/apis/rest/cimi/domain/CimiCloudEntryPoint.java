@@ -26,7 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -45,13 +44,6 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // ---------------------------------------- Fields
-
-    /**
-     * Field "href".
-     * <p>
-     * </p>
-     */
-    private String href;
 
     /**
      * Field "machineTemplates".
@@ -326,20 +318,5 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      */
     public void setJobTime(final Long jobTime) {
         this.jobTime = jobTime;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return this.href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(final String href) {
-        this.href = href;
     }
 }

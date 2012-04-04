@@ -34,7 +34,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  * <p>
  * </p>
  */
-@XmlRootElement(name = "jobCollection")
+@XmlRootElement(name = "JobCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiJobCollection extends CimiCommonId {
 

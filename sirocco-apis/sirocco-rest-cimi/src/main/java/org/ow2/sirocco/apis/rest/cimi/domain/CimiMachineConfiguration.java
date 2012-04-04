@@ -26,7 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Size;
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -47,8 +46,6 @@ public class CimiMachineConfiguration extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
-
-    private String href;
 
     /**
      * Field "cpu".
@@ -160,21 +157,6 @@ public class CimiMachineConfiguration extends CimiCommonId {
      */
     public void setDisks(final CimiDisk[] disks) {
         this.disks = disks;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return this.href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(final String href) {
-        this.href = href;
     }
 
 }

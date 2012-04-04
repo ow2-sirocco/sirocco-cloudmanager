@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -43,15 +42,42 @@ public class CimiCredentials extends CimiCommonId {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    private String href;
+    /** The initial superuser's user name. */
+    private String userName;
+
+    /** Initial superuser's password. */
+    private String password;
+
+    /** The digit of the public key for the initial superuser. */
+    private byte[] key;
 
     /**
-     * Field "key".
-     * <p>
-     * Marshaling to verify
-     * </p>
+     * @return the userName
      */
-    private byte[] key;
+    public String getUserName() {
+        return this.userName;
+    }
+
+    /**
+     * @param userName the userName to set
+     */
+    public void setUserName(final String userName) {
+        this.userName = userName;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return this.password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(final String password) {
+        this.password = password;
+    }
 
     /**
      * Return the value of field "key".
@@ -70,20 +96,5 @@ public class CimiCredentials extends CimiCommonId {
      */
     public void setKey(final byte[] key) {
         this.key = key;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return this.href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(final String href) {
-        this.href = href;
     }
 }

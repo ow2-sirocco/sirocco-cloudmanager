@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -43,8 +42,6 @@ public class CimiMachineTemplate extends CimiCommonId {
     private static final long serialVersionUID = 1L;
 
     // ---------------------------------------- Fields
-
-    private String href;
 
     /**
      * Field "machineConfig".
@@ -205,21 +202,6 @@ public class CimiMachineTemplate extends CimiCommonId {
      */
     public void setNetworkInterfaces(final CimiNetworkInterface[] networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return this.href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(final String href) {
-        this.href = href;
     }
 
 }

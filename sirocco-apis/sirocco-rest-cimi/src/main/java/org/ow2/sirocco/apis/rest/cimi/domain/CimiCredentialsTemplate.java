@@ -24,72 +24,77 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class CredentialsTemplate. <p> </p>
+ * Class CredentialsTemplate.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "credentialsTemplate")
+@XmlRootElement(name = "CredentialsTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsTemplate extends CimiCommonId implements Serializable {
+public class CimiCredentialsTemplate extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
+    /** The initial superuser's user name. */
+    private String userName;
 
-    private String href;
+    /** Initial superuser's password. */
+    private String password;
 
-    /**
-     * Field "key". <p> Marshaling to verify </p>
-     */
+    /** The digit of the public key for the initial superuser. */
     private byte[] key;
 
-    // ---------------------------------------- Constructors
-
     /**
-     * Default constructor.
+     * @return the userName
      */
-    public CimiCredentialsTemplate() {
-        super();
+    public String getUserName() {
+        return this.userName;
     }
 
-    // ---------------------------------------- ???com-accesseurs???
+    /**
+     * @param userName the userName to set
+     */
+    public void setUserName(final String userName) {
+        this.userName = userName;
+    }
+
+    /**
+     * @return the password
+     */
+    public String getPassword() {
+        return this.password;
+    }
+
+    /**
+     * @param password the password to set
+     */
+    public void setPassword(final String password) {
+        this.password = password;
+    }
 
     /**
      * Return the value of field "key".
+     * 
      * @return The value
      */
+    @XmlElement
     public byte[] getKey() {
         return this.key;
     }
 
     /**
      * Set the value of field "key".
+     * 
      * @param key The value
      */
-    public void setKey(byte[] key) {
+    public void setKey(final byte[] key) {
         this.key = key;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(String href) {
-        this.href = href;
     }
 }

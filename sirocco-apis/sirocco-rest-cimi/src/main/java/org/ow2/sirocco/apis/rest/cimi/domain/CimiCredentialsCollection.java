@@ -24,33 +24,27 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class CredentialsCollection. <p> </p>
+ * Class CredentialsCollection.
+ * <p>
+ * </p>
  */
-@XmlRootElement(name = "credentialsCollection")
+@XmlRootElement(name = "CredentialsCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsCollection extends CimiCommonId implements Serializable {
+public class CimiCredentialsCollection extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "href". <p> </p>
-     */
-    private String href;
-
-    /**
-     * Field "credentialss". <p> </p>
+     * Field "credentialss".
+     * <p>
+     * </p>
      */
     private CimiCredentials[] credentials;
 
@@ -67,6 +61,7 @@ public class CimiCredentialsCollection extends CimiCommonId implements Serializa
 
     /**
      * Return the value of field "Credentialss".
+     * 
      * @return The value
      */
     public CimiCredentials[] getCredentials() {
@@ -75,24 +70,10 @@ public class CimiCredentialsCollection extends CimiCommonId implements Serializa
 
     /**
      * Set the value of field "Credentialss".
+     * 
      * @param Credentialss The value
      */
-    public void setCredentials(CimiCredentials[] credentials) {
+    public void setCredentials(final CimiCredentials[] credentials) {
         this.credentials = credentials;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(String href) {
-        this.href = href;
     }
 }

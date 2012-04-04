@@ -32,8 +32,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 
 /**
  * Class Credentials.
- * <p>
- * </p>
  */
 @XmlRootElement(name = "CredentialsCreate")
 @JsonSerialize(include = Inclusion.NON_NULL)
