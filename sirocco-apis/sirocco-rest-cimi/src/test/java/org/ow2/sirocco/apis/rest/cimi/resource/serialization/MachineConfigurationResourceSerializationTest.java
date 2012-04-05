@@ -32,52 +32,20 @@ import junit.framework.Assert;
 import net.javacrumbs.jsonunit.JsonAssert;
 
 import org.custommonkey.xmlunit.XMLAssert;
-import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.json.JsonLocator;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.xml.XmlLocator;
-import org.ow2.sirocco.apis.rest.cimi.server.SiroccoRestCimiApplication;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.context.ContextLoaderListener;
 
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
-import com.sun.jersey.test.framework.AppDescriptor;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.WebAppDescriptor;
 
-public class MachineConfigurationResourceSerializationTest extends JerseyTest {
+public class MachineConfigurationResourceSerializationTest extends SerializationTestBase {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MachineConfigurationResourceSerializationTest.class);
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see com.sun.jersey.test.framework.JerseyTest#configure()
-     */
-    @Override
-    protected AppDescriptor configure() {
-        return new WebAppDescriptor.Builder("javax.ws.rs.Application", SiroccoRestCimiApplication.class.getName())
-            .initParam(JSONConfiguration.FEATURE_POJO_MAPPING, "true").contextPath("sirocco-rest")
-            .servletClass(SpringServlet.class).contextListenerClass(ContextLoaderListener.class)
-            .contextParam("contextConfigLocation", "classpath:context/serializationResourcesContext.xml").build();
-    }
-
-    /**
-     * @throws Exception In case of error
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-        XMLUnit.setIgnoreWhitespace(true);
-        XMLUnit.setIgnoreComments(true);
-        XMLUnit.setIgnoreAttributeOrder(true);
-    }
 
     /**
      * Test GET.
