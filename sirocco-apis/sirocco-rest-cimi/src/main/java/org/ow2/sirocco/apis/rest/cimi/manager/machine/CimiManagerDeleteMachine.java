@@ -36,7 +36,7 @@ public class CimiManagerDeleteMachine {
     public CimiManagerDeleteMachine() {
     }
 
-    public void execute(CimiRequest request, CimiResponse response) {
+    public void execute(final CimiRequest request, final CimiResponse response) {
         // Status status = verifyRequest(request);
         // if (status.equals(Status.OK)) {
         // response.setCimiData(getMachineById(request.getHeader().getId()));
@@ -49,22 +49,22 @@ public class CimiManagerDeleteMachine {
         // }
     }
 
-    private void deleteMachine(String id) {
+    private void deleteMachine(final String id) {
         // FIXME IMachineManager.deleteMachine(id);
     }
 
-    public Status verifyRequest(CimiRequest request) {
+    public Status verifyRequest(final CimiRequest request) {
         // FIXME le path de la requete doit être au format http://example.com +
         // ConstantePath
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
+        if (request.getBaseUri().toString().equals("http://localhost:9998/")
+            && request.getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
             return Status.OK;
         } else {
             return Status.BAD_REQUEST;
         }
     }
 
-    public CimiMachine getMachineById(String id) {
+    public CimiMachine getMachineById(final String id) {
         // FIXME return IMachineManager.getMachineById(id);
         return null;
     }

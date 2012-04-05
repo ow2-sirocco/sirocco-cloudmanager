@@ -36,7 +36,7 @@ public class CimiManagerCreateMachine {
     public CimiManagerCreateMachine() {
     }
 
-    public void execute(CimiRequest request, CimiResponse response) {
+    public void execute(final CimiRequest request, final CimiResponse response) {
         // Status status = verifyRequest(request);
         // if (status.equals(Status.OK)) {
         // createMachine((MachineTemplate) request.getHeader().getCimiData());
@@ -48,16 +48,16 @@ public class CimiManagerCreateMachine {
         // }
     }
 
-    private void createMachine(CimiMachineTemplate machineToCreate) {
+    private void createMachine(final CimiMachineTemplate machineToCreate) {
         // FIXME IMachineManager.create(machineToCreate);
 
     }
 
-    public Status verifyRequest(CimiRequest request) {
+    public Status verifyRequest(final CimiRequest request) {
         // FIXME le path de la requete doit être au format http://example.com +
         // ConstantePath
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
+        if (request.getBaseUri().toString().equals("http://localhost:9998/")
+            && request.getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
             return Status.OK;
         } else {
             return Status.BAD_REQUEST;

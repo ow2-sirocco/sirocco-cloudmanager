@@ -38,7 +38,7 @@ public class CimiManagerUpdateMachineCollection {
     public CimiManagerUpdateMachineCollection() {
     }
 
-    public void execute(CimiRequest request, CimiResponse response) {
+    public void execute(final CimiRequest request, final CimiResponse response) {
         // Status status = verifyRequest(request);
         // if (status.equals(Status.OK)) {
         // MachineCollection machineCoToUpdate = getMachineCollection();
@@ -54,18 +54,18 @@ public class CimiManagerUpdateMachineCollection {
         // }
     }
 
-    private CimiMachineCollection updateMachineCo(CimiMachineCollection machineToUpdate,
-            CimiMachineCollection machinePropertiesToUpdate, List<String> queryParam) {
+    private CimiMachineCollection updateMachineCo(final CimiMachineCollection machineToUpdate,
+        final CimiMachineCollection machinePropertiesToUpdate, final List<String> queryParam) {
         // FIXME return IMachineManager.updateMachine(machineToUpdate,
         // machinePropertiesToUpdate, queryParam);
         return null;
     }
 
-    public Status verifyRequest(CimiRequest request) {
+    public Status verifyRequest(final CimiRequest request) {
         // FIXME le path de la requete doit être au format http://example.com +
         // ConstantePath + / + id
-        if (request.getHeader().getBaseUri().toString().equals("http://localhost:9998/")
-                && request.getHeader().getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
+        if (request.getBaseUri().toString().equals("http://localhost:9998/")
+            && request.getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
             return Status.OK;
         } else {
             return Status.BAD_REQUEST;
