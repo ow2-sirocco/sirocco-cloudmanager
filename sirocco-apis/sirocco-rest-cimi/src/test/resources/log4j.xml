@@ -20,11 +20,9 @@
 
 	<category name="org.springframework">
 		<priority value="error" />
-<!-- 		<appender-ref ref="CONSOLE" /> -->
 	</category>
 	<category name="org.hibernate">
 		<priority value="error" />
-<!-- 		<appender-ref ref="CONSOLE" /> -->
 	</category>
 
 	<root>
