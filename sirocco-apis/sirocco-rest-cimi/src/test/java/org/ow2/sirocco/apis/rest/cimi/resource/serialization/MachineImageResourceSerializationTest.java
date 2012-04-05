@@ -26,6 +26,8 @@ package org.ow2.sirocco.apis.rest.cimi.resource.serialization;
 
 import java.io.StringReader;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import junit.framework.Assert;
 import net.javacrumbs.jsonunit.JsonAssert;
 
@@ -597,6 +599,7 @@ public class MachineImageResourceSerializationTest extends JerseyTest {
         ClientResponse clientResponse = null;
         String entityResponse;
         int statusResponse;
+        MultivaluedMap<String, String> heardersResponse;
 
         // JSON : id = 1
         clientResponse = this
@@ -609,13 +612,22 @@ public class MachineImageResourceSerializationTest extends JerseyTest {
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
+        heardersResponse = clientResponse.getHeaders();
 
         MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
         MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
         MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", heardersResponse);
 
-        Assert.assertEquals(200, statusResponse);
+        Assert.assertEquals(202, statusResponse);
+
+        Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_CIMI_JOB_URI));
+        Assert.assertTrue(heardersResponse.get(Constants.HEADER_CIMI_JOB_URI).get(0).endsWith("idValue_1"));
+
+        Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_LOCATION));
+        Assert.assertTrue(heardersResponse.get(Constants.HEADER_LOCATION).get(0)
+            .endsWith(ConstantsPath.MACHINE_IMAGE + "/" + "targetEntityValue_1"));
+
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "Job-1.json"), new StringReader(
             entityResponse));
     }
@@ -630,6 +642,7 @@ public class MachineImageResourceSerializationTest extends JerseyTest {
         ClientResponse clientResponse = null;
         String entityResponse;
         int statusResponse;
+        MultivaluedMap<String, String> heardersResponse;
 
         // XML : id = 1
         clientResponse = this
@@ -642,13 +655,24 @@ public class MachineImageResourceSerializationTest extends JerseyTest {
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
+        heardersResponse = clientResponse.getHeaders();
 
         MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
         MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
         MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", heardersResponse);
 
-        Assert.assertEquals(200, statusResponse);
+        Assert.assertEquals(202, statusResponse);
+        System.out.println(heardersResponse.get(Constants.HEADER_CIMI_JOB_URI));
+        System.out.println(heardersResponse.get(Constants.HEADER_LOCATION));
+
+        Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_CIMI_JOB_URI));
+        Assert.assertTrue(heardersResponse.get(Constants.HEADER_CIMI_JOB_URI).get(0).endsWith("idValue_1"));
+
+        Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_LOCATION));
+        Assert.assertTrue(heardersResponse.get(Constants.HEADER_LOCATION).get(0)
+            .endsWith(ConstantsPath.MACHINE_IMAGE + "/" + "targetEntityValue_1"));
+
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "Job-1.xml"), new StringReader(
             entityResponse));
     }

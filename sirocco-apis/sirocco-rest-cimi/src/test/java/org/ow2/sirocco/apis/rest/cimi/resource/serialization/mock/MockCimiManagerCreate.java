@@ -30,10 +30,13 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
 import org.ow2.sirocco.apis.rest.cimi.builder.CimiEntityBuilderHelper;
+import org.ow2.sirocco.apis.rest.cimi.converter.HrefHelper;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.SerializationHelper;
+import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 
 /**
  * Mock CimiManagerCreate.
@@ -59,8 +62,12 @@ public class MockCimiManagerCreate extends MockCimiManager {
                 ToStringBuilder.reflectionToString(request.getCimiData(), new SerializationHelper.RecursiveToStringStyle()));
 
             // Build response
-            response.setCimiData(CimiEntityBuilderHelper.buildCimiJob(1));
-            response.setStatus(Status.OK);
+            CimiJob cimiJob = CimiEntityBuilderHelper.buildCimiJob(1);
+            response.setCimiData(cimiJob);
+            response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimiJob.getId());
+            response.putHeader(Constants.HEADER_LOCATION,
+                HrefHelper.makeHref(request.getBaseUri(), this.extractPathname(request.getPath()), cimiJob.getTargetEntity()));
+            response.setStatus(Status.ACCEPTED);
         } catch (ComparisonFailure e) {
             // Build assert error
             // response.setCimiData(this.buildEntity(request));
