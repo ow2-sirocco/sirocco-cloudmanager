@@ -87,7 +87,7 @@ public class CimiManagerReadCredentials extends CimiManagerReadAbstract {
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
         CimiCredentials cimi = new CimiCredentials();
-        CredentialsConverter.copyToCimi((Credentials) dataService, cimi, request.getHeader().getBaseUri(), true, false);
+        CredentialsConverter.copyToCimi((Credentials) dataService, cimi, request.getBaseUri(), true, false);
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }

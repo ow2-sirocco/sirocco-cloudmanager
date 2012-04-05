@@ -35,8 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -48,39 +47,39 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Credentials REST resource.
+ * Credentials Template REST resource.
  * <p>
  * Operations supports :
  * <ul>
- * <li>Create a credential</li>
- * <li>Delete a credential</li>
- * <li>Read a credential</li>
- * <li>Update a credential</li>
+ * <li>Create a credential template</li>
+ * <li>Delete a credential template</li>
+ * <li>Read a credential template</li>
+ * <li>Update a credential template</li>
  * </ul>
  * </p>
  */
 @Component
-@Path(ConstantsPath.CREDENTIALS_PATH)
-public class CimiCredentialsResource extends CimiResourceAbstract {
+@Path(ConstantsPath.CREDENTIALS_TEMPLATE_PATH)
+public class CimiCredentialsTemplateResource extends CimiResourceAbstract {
 
     @Autowired
-    @Qualifier("CimiManagerReadCredentials")
-    private CimiManager cimiManagerReadCredentials;
+    @Qualifier("CimiManagerReadCredentialsTemplate")
+    private CimiManager cimiManagerReadCredentialsTemplate;
 
     @Autowired
-    @Qualifier("CimiManagerDeleteCredentials")
-    private CimiManager cimiManagerDeleteCredentials;
+    @Qualifier("CimiManagerDeleteCredentialsTemplate")
+    private CimiManager cimiManagerDeleteCredentialsTemplate;
 
     @Autowired
-    @Qualifier("CimiManagerUpdateCredentials")
-    private CimiManager cimiManagerUpdateCredentials;
+    @Qualifier("CimiManagerUpdateCredentialsTemplate")
+    private CimiManager cimiManagerUpdateCredentialsTemplate;
 
     @Autowired
-    @Qualifier("CimiManagerCreateCredentials")
-    private CimiManager cimiManagerCreateCredentials;
+    @Qualifier("CimiManagerCreateCredentialsTemplate")
+    private CimiManager cimiManagerCreateCredentialsTemplate;
 
     /**
-     * Get a credential.
+     * Get a credential template.
      * 
      * @param id The ID of credential to get
      * @return The REST response
@@ -91,12 +90,12 @@ public class CimiCredentialsResource extends CimiResourceAbstract {
     public Response read(@PathParam("id") final String id) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerReadCredentials.execute(request, response);
+        this.cimiManagerReadCredentialsTemplate.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Update a credential.
+     * Update a credential template.
      * 
      * @param id The ID of credential to update
      * @return The REST response
@@ -105,30 +104,30 @@ public class CimiCredentialsResource extends CimiResourceAbstract {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
-    public Response update(@PathParam("id") final String id, final CimiCredentials cimiData) {
+    public Response update(@PathParam("id") final String id, final CimiCredentialsTemplate cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerUpdateCredentials.execute(request, response);
+        this.cimiManagerUpdateCredentialsTemplate.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Create a credential.
+     * Create a credential template.
      * 
      * @return The REST response
      */
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response create(final CimiCredentialsCreate cimiData) {
+    public Response create(final CimiCredentialsTemplate cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerCreateCredentials.execute(request, response);
+        this.cimiManagerCreateCredentialsTemplate.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Delete a credential.
+     * Delete a credential template.
      * 
      * @param id The ID of credential to delete
      * @return The REST response
@@ -139,7 +138,7 @@ public class CimiCredentialsResource extends CimiResourceAbstract {
     public Response delete(@PathParam("id") final String id) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerDeleteCredentials.execute(request, response);
+        this.cimiManagerDeleteCredentialsTemplate.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 

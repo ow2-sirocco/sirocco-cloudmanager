@@ -32,10 +32,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
@@ -65,14 +62,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path(ConstantsPath.MACHINE_IMAGE_PATH)
-public class CimiMachineImageResource {
-
-    @Context
-    UriInfo uriInfo;
-
-    @Context
-    HttpHeaders headers;
-
+public class CimiMachineImageResource extends CimiResourceAbstract {
     @Autowired
     @Qualifier("CimiManagerReadMachineImage")
     private CimiManager cimiManagerReadMachineImage;
@@ -106,8 +96,8 @@ public class CimiMachineImageResource {
     @GET
     @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
     @Path("{id}")
-    public Response readMachineImage(@PathParam("id") final String id) {
-        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id);
+    public Response read(@PathParam("id") final String id) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
         CimiResponse response = new CimiResponse();
         this.cimiManagerReadMachineImage.execute(request, response);
         return HelperResponse.buildResponse(response);
@@ -121,8 +111,8 @@ public class CimiMachineImageResource {
     @GET
     @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON,
         MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_XML})
-    public Response readMachineImageCollection() {
-        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo);
+    public Response read() {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos());
         CimiResponse response = new CimiResponse();
         this.cimiManagerReadMachineImageCollection.execute(request, response);
         return HelperResponse.buildResponse(response);
@@ -136,10 +126,11 @@ public class CimiMachineImageResource {
      */
     @PUT
     @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
-    @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
+    // @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON,
+    // MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
     @Path("{id}")
-    public Response updateMachineImage(@PathParam("id") final String id, final CimiMachineImage machineImage) {
-        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id, machineImage);
+    public Response update(@PathParam("id") final String id, final CimiMachineImage cimiData) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
         CimiResponse response = new CimiResponse();
         this.cimiManagerUpdateMachineImage.execute(request, response);
         return HelperResponse.buildResponse(response);
@@ -152,8 +143,8 @@ public class CimiMachineImageResource {
      */
     @PUT
     @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
-    public Response updateMachineImageCollection(final CimiMachineImageCollection machineImageCollection) {
-        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, machineImageCollection);
+    public Response update(final CimiMachineImageCollection cimiDataCollection) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiDataCollection);
         CimiResponse response = new CimiResponse();
         this.cimiManagerUpdateMachineImageCollection.execute(request, response);
         return HelperResponse.buildResponse(response);
@@ -166,9 +157,10 @@ public class CimiMachineImageResource {
      */
     @POST
     @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECREATE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECREATE_XML})
-    @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
-    public Response createMachineImage(final CimiMachineImage machineImage) {
-        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, machineImage);
+    // @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON,
+    // MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
+    public Response create(final CimiMachineImage cimiData) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();
         this.cimiManagerCreateMachineImage.execute(request, response);
         return HelperResponse.buildResponse(response);
@@ -181,10 +173,11 @@ public class CimiMachineImageResource {
      * @return The REST response
      */
     @DELETE
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
+    // @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON,
+    // MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
     @Path("{id}")
-    public Response deleteMachineImage(@PathParam("id") final String id) {
-        CimiRequest request = HelperRequest.buildRequest(this.headers, this.uriInfo, id);
+    public Response delete(@PathParam("id") final String id) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
         CimiResponse response = new CimiResponse();
         this.cimiManagerDeleteMachineImage.execute(request, response);
         return HelperResponse.buildResponse(response);

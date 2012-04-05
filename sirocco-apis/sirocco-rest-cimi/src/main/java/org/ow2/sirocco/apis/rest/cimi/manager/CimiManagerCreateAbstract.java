@@ -72,11 +72,11 @@ public abstract class CimiManagerCreateAbstract extends CimiManagerAbstract {
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
         CimiJob cimi = new CimiJob();
-        JobConverter.copyToCimi((Job) dataService, cimi, request.getHeader().getBaseUri(), true);
+        JobConverter.copyToCimi((Job) dataService, cimi, request.getBaseUri(), true);
         response.setCimiData(cimi);
         response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
         response.putHeader(Constants.HEADER_LOCATION,
-            HrefHelper.makeHref(request.getHeader().getBaseUri(), this.getEntityPathname(), cimi.getTargetEntity()));
+            HrefHelper.makeHref(request.getBaseUri(), this.getEntityPathname(), cimi.getTargetEntity()));
         response.setStatus(Response.Status.ACCEPTED);
     }
 

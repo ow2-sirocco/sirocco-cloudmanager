@@ -78,7 +78,7 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
         CimiCloudEntryPoint cimi = new CimiCloudEntryPoint();
-        CloudEntryPointConverter.copyToCimi((CloudEntryPoint) dataService, cimi, request.getHeader().getBaseUri(), false);
+        CloudEntryPointConverter.copyToCimi((CloudEntryPoint) dataService, cimi, request.getBaseUri(), false);
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }

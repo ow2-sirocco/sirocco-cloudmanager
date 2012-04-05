@@ -93,7 +93,7 @@ public class CimiManagerReadMachineImageCollection extends CimiManagerReadAbstra
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
         CimiMachineImageCollection cimi = new CimiMachineImageCollection();
-        MachineImageCollectionConverter.copyToCimi((List<MachineImage>) dataService, cimi, request.getHeader().getBaseUri());
+        MachineImageCollectionConverter.copyToCimi((List<MachineImage>) dataService, cimi, request.getBaseUri());
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }

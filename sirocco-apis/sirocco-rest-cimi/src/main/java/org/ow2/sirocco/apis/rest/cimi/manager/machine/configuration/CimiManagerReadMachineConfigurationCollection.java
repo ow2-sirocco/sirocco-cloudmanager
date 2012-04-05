@@ -95,8 +95,8 @@ public class CimiManagerReadMachineConfigurationCollection extends CimiManagerRe
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
         CimiMachineConfigurationCollection cimi = new CimiMachineConfigurationCollection();
-        MachineConfigurationCollectionConverter.copyToCimi((List<MachineConfiguration>) dataService, cimi, request.getHeader()
-            .getBaseUri());
+        MachineConfigurationCollectionConverter
+            .copyToCimi((List<MachineConfiguration>) dataService, cimi, request.getBaseUri());
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }
