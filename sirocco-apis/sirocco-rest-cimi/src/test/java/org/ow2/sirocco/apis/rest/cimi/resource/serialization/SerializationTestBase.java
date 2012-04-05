@@ -28,6 +28,8 @@ import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.junit.BeforeClass;
 import org.ow2.sirocco.apis.rest.cimi.server.SiroccoRestCimiApplication;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.context.ContextLoaderListener;
 
 import com.sun.jersey.api.json.JSONConfiguration;
@@ -38,8 +40,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 
 public class SerializationTestBase extends JerseyTest {
 
-    // private static final Logger LOGGER =
-    // LoggerFactory.getLogger(SerializationTestBase.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(SerializationTestBase.class);
 
     /**
      * {@inheritDoc}
@@ -68,7 +69,9 @@ public class SerializationTestBase extends JerseyTest {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
+        SerializationTestBase.LOGGER.debug("Begin delay");
         Thread.sleep(1000);
+        SerializationTestBase.LOGGER.debug("End delay");
     }
 
 }
