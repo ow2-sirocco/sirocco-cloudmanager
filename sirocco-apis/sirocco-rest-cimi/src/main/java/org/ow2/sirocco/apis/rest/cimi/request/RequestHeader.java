@@ -30,10 +30,6 @@ public class RequestHeader {
 
     private CimiSelect cimiSelect;
 
-    private String baseUri;
-
-    private String path;
-
     @AssertVersion
     private String version;
 
@@ -55,28 +51,12 @@ public class RequestHeader {
         this.cimiSelect = cimiSelect;
     }
 
-    public void setBaseUri(final String baseUri) {
-        this.baseUri = baseUri;
-    }
-
-    public String getBaseUri() {
-        return this.baseUri;
-    }
-
     public void setVersion(final String version) {
         this.version = version;
     }
 
     public String getVersion() {
         return this.version;
-    }
-
-    public void setPath(final String path) {
-        this.path = path;
-    }
-
-    public String getPath() {
-        return this.path;
     }
 
     /**

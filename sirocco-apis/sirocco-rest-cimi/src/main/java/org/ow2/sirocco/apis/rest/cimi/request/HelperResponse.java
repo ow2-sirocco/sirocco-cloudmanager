@@ -53,7 +53,7 @@ public class HelperResponse {
         ResponseBuilder builder = null;
         int status = cimiResponse.getStatus();
 
-        // Make builder with stattus
+        // Make builder with status
         if (0 == status) {
             builder = Response.serverError();
             HelperResponse.LOGGER.error("CIMI Response Status is null");

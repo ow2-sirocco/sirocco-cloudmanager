@@ -31,18 +31,24 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
  */
 public class CimiRequest {
 
-    private RequestHeader headerData;
+    private RequestHeader header;
 
     private String id;
 
     private CimiData cimiData;
 
+    private String baseUri;
+
+    private String path;
+
+    private String method;
+
     public RequestHeader getHeader() {
-        return this.headerData;
+        return this.header;
     }
 
-    public void setHeader(final RequestHeader headerData) {
-        this.headerData = headerData;
+    public void setHeader(final RequestHeader header) {
+        this.header = header;
     }
 
     public String getId() {
@@ -59,6 +65,30 @@ public class CimiRequest {
 
     public void setCimiData(final CimiData cimiData) {
         this.cimiData = cimiData;
+    }
+
+    public String getBaseUri() {
+        return this.baseUri;
+    }
+
+    public String getPath() {
+        return this.path;
+    }
+
+    public void setBaseUri(final String baseUri) {
+        this.baseUri = baseUri;
+    }
+
+    public void setPath(final String path) {
+        this.path = path;
+    }
+
+    public String getMethod() {
+        return this.method;
+    }
+
+    public void setMethod(final String method) {
+        this.method = method;
     }
 
 }

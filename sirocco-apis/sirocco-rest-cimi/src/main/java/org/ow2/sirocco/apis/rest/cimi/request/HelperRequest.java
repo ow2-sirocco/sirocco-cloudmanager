@@ -32,9 +32,56 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
+import org.ow2.sirocco.apis.rest.cimi.resource.CimiResourceAbstract;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 
 public class HelperRequest {
+
+    public static CimiRequest buildRequest(final CimiResourceAbstract.JaxRsRequestInfos infos) {
+        return HelperRequest.buildRequest(infos, null, null);
+    }
+
+    public static CimiRequest buildRequest(final CimiResourceAbstract.JaxRsRequestInfos infos, final CimiData cimiData) {
+        return HelperRequest.buildRequest(infos, null, cimiData);
+    }
+
+    public static CimiRequest buildRequest(final CimiResourceAbstract.JaxRsRequestInfos infos, final String id) {
+        return HelperRequest.buildRequest(infos, id, null);
+    }
+
+    public static CimiRequest buildRequest(final CimiResourceAbstract.JaxRsRequestInfos infos, final String id,
+        final CimiData cimiData) {
+        CimiRequest request = new CimiRequest();
+        request.setHeader(HelperRequest.buildRequestHeader(infos));
+        request.setId(id);
+        request.setCimiData(cimiData);
+        request.setBaseUri(infos.getUriInfo().getBaseUri().toString());
+        request.setPath(infos.getUriInfo().getPath());
+        request.setMethod(infos.getRequest().getMethod());
+        return request;
+    }
+
+    private static RequestHeader buildRequestHeader(final CimiResourceAbstract.JaxRsRequestInfos infos) {
+        RequestHeader requestHeader = new RequestHeader();
+        List<String> versions = infos.getHeaders().getRequestHeader(Constants.HEADER_CIMI_VERSION);
+        if ((null != versions) && (versions.size() > 0)) {
+            requestHeader.setVersion(versions.get(0));
+        }
+
+        requestHeader.setCimiSelect(new CimiSelect(HelperRequest.transformQueryParamToList(infos.getUriInfo()
+            .getQueryParameters())));
+
+        List<String> siroccoInfoTestsId = infos.getHeaders().getRequestHeader(Constants.HEADER_SIROCCO_INFO_TEST_ID);
+        if ((null != siroccoInfoTestsId) && (siroccoInfoTestsId.size() > 0)) {
+            requestHeader.setSiroccoInfoTestId(siroccoInfoTestsId.get(0));
+        }
+        List<String> siroccoInfoTestExpand = infos.getHeaders().getRequestHeader(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND);
+        if ((null != siroccoInfoTestExpand) && (siroccoInfoTestExpand.size() > 0)) {
+            requestHeader.setSiroccoInfoTestExpand(siroccoInfoTestExpand.get(0));
+        }
+
+        return requestHeader;
+    }
 
     public static CimiRequest buildRequest(final HttpHeaders headers, final UriInfo uri) {
         return HelperRequest.buildRequest(headers, uri, null, null);
@@ -54,6 +101,9 @@ public class HelperRequest {
         request.setHeader(HelperRequest.buildRequestHeader(headers, uri));
         request.setId(id);
         request.setCimiData(cimiData);
+        request.setBaseUri(uri.getBaseUri().toString());
+        request.setPath(uri.getPath());
+
         return request;
     }
 
@@ -66,9 +116,6 @@ public class HelperRequest {
         }
 
         requestHeader.setCimiSelect(new CimiSelect(HelperRequest.transformQueryParamToList(uri.getQueryParameters())));
-        requestHeader.setBaseUri(uri.getBaseUri().toString());
-        requestHeader.setPath(uri.getPath());
-
         List<String> siroccoInfoTestsId = headers.getRequestHeader(Constants.HEADER_SIROCCO_INFO_TEST_ID);
         if ((null != siroccoInfoTestsId) && (siroccoInfoTestsId.size() > 0)) {
             requestHeader.setSiroccoInfoTestId(siroccoInfoTestsId.get(0));
