@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -40,11 +39,6 @@ public class CimiMachineImageCollection extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * Field href
-     */
-    String href;
 
     /**
      * Field "machineImages".
@@ -75,20 +69,5 @@ public class CimiMachineImageCollection extends CimiCommonId {
      */
     public void setMachineImages(final CimiMachineImage[] machineImages) {
         this.machineImages = machineImages;
-    }
-
-    /**
-     * @return the href
-     */
-    @XmlAttribute
-    public String getHref() {
-        return this.href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    public void setHref(final String href) {
-        this.href = href;
     }
 }

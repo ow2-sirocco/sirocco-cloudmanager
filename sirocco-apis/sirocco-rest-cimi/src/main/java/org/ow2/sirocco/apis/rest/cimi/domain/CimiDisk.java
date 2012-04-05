@@ -40,7 +40,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
  * </p>
  */
 @XmlRootElement(name = "Disk")
-@JsonSerialize(include = Inclusion.NON_EMPTY)
+@JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiDisk implements Serializable {
 
     /** Serial number */

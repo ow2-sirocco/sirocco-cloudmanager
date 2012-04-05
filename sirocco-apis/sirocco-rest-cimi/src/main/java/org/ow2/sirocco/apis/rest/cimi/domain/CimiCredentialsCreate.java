@@ -28,10 +28,9 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 
 /**
- * Class Credentials.
+ * Class Credentials Create.
  */
 @XmlRootElement(name = "CredentialsCreate")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -40,19 +39,19 @@ public class CimiCredentialsCreate extends CimiCommon {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    private CredentialsTemplate credentialsTemplate;
+    private CimiCredentialsTemplate credentialsTemplate;
 
     /**
      * @return the credentialsTemplate
      */
-    public CredentialsTemplate getCredentialsTemplate() {
+    public CimiCredentialsTemplate getCredentialsTemplate() {
         return this.credentialsTemplate;
     }
 
     /**
      * @param credentialsTemplate the credentialsTemplate to set
      */
-    public void setCredentialsTemplate(final CredentialsTemplate credentialsTemplate) {
+    public void setCredentialsTemplate(final CimiCredentialsTemplate credentialsTemplate) {
         this.credentialsTemplate = credentialsTemplate;
     }
 
