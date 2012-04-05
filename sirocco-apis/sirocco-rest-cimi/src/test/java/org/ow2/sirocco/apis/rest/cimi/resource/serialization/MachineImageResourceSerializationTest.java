@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
  * USA
  *
- * $Id: java 1096 2012-03-09 08:08:25Z antonma $
+ * $Id:  $
  *
  */
 package org.ow2.sirocco.apis.rest.cimi.resource.serialization;
@@ -50,9 +50,9 @@ import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
-public class SerializationMachineImageResourceTest extends JerseyTest {
+public class MachineImageResourceSerializationTest extends JerseyTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(SerializationMachineImageResourceTest.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(MachineImageResourceSerializationTest.class);
 
     /**
      * {@inheritDoc}
@@ -95,10 +95,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "MachineImage-0.json"),
@@ -111,10 +111,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "MachineImage-1.json"),
@@ -128,10 +128,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "MachineImage-2.json"),
@@ -156,10 +156,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "MachineImage-0.xml"),
@@ -172,10 +172,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "MachineImage-1.xml"),
@@ -189,10 +189,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "MachineImage-2.xml"),
@@ -219,10 +219,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(
@@ -238,10 +238,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(
@@ -257,10 +257,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(
@@ -277,10 +277,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(
@@ -308,10 +308,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "MachineImageCollection-0.xml"),
@@ -326,10 +326,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "MachineImageCollection-1.xml"),
@@ -344,10 +344,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "MachineImageCollection-3.xml"),
@@ -363,10 +363,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class,
@@ -396,10 +396,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "Job-0.json"), new StringReader(
@@ -417,10 +417,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "Job-1.json"), new StringReader(
@@ -438,10 +438,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "Job-2.json"), new StringReader(
@@ -472,10 +472,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(500, statusResponse);
     }
@@ -503,10 +503,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "Job-0.xml"), new StringReader(
@@ -524,10 +524,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "Job-1.xml"), new StringReader(
@@ -545,10 +545,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "Job-2.xml"), new StringReader(
@@ -579,10 +579,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(400, statusResponse);
     }
@@ -610,10 +610,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "Job-1.json"), new StringReader(
@@ -643,10 +643,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "Job-1.xml"), new StringReader(
@@ -666,10 +666,10 @@ public class SerializationMachineImageResourceTest extends JerseyTest {
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
-        SerializationMachineImageResourceTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("STATUS: {}", statusResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        SerializationMachineImageResourceTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
+        MachineImageResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineImageResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
 
         Assert.assertEquals(200, statusResponse);
     }

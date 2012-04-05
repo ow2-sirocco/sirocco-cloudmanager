@@ -10,47 +10,57 @@
 
 	<!-- CloudEntryPoint -->
 	<bean id="CimiManagerReadCloudEntryPoint"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
 	<bean id="CimiManagerUpdateCloudEntryPoint"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdateMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
 	<!-- Credentials -->
 	<bean id="CimiManagerCreateCredentials"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreateMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
 	<bean id="CimiManagerDeleteCredentials"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
 	<bean id="CimiManagerReadCredentials"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
 	<bean id="CimiManagerUpdateCredentials"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdateMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
-	<!-- eMachineImage -->
+	<!-- Credentials Template -->
+	<bean id="CimiManagerCreateCredentialsTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
+	<bean id="CimiManagerDeleteCredentialsTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
+	<bean id="CimiManagerReadCredentialsTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerUpdateCredentialsTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
+
+	<!-- MachineImage -->
 	<bean id="CimiManagerCreateMachineImage"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreateMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
 	<bean id="CimiManagerDeleteMachineImage"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
 	<bean id="CimiManagerReadMachineImage"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
 	<bean id="CimiManagerReadMachineImageCollection"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineImageCollection" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
 	<bean id="CimiManagerUpdateMachineImage"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdateMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 	<bean id="CimiManagerUpdateMachineImageCollection"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdateMachineImage" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
 	<!-- MachineConfiguration -->
 	<bean id="CimiManagerCreateMachineConfiguration"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreateMachineConfiguration" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
 	<bean id="CimiManagerDeleteMachineConfiguration"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
 	<bean id="CimiManagerReadMachineConfiguration"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineConfiguration" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
 	<bean id="CimiManagerReadMachineConfigurationCollection"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerReadMachineConfigurationCollection" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
 	<bean id="CimiManagerUpdateMachineConfiguration"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdateMachineConfiguration" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 	<bean id="CimiManagerUpdateMachineConfigurationCollection"
-		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdateMachineConfiguration" />
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
 
 	<context:annotation-config />

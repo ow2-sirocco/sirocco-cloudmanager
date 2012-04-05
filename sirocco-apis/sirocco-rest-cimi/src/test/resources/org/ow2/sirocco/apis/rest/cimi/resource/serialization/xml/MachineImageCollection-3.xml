@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineImageCollection>
+<MachineImageCollection href="hrefValue_3">
 	<description>descriptionValue_3</description>
 	<name>nameValue_3</name>
 	<property key="keyProp_3_0">valueProp_3_0</property>

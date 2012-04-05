@@ -26,8 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock;
 
 import javax.ws.rs.core.Response.Status;
 
-import junit.framework.ComparisonFailure;
-
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -55,13 +53,9 @@ public class MockCimiManagerDelete implements CimiManager {
             // Build response
             response.setCimiData(null);
             response.setStatus(Status.OK);
-        } catch (ComparisonFailure e) {
-            // Build assert error
-            response.setCimiData(null);
-            response.setErrorMessage(e.getMessage());
-            response.setStatus(Status.NOT_ACCEPTABLE);
         } catch (Exception e) {
-            response.setStatus(Status.BAD_REQUEST);
+            response.setErrorMessage(e.getMessage());
+            response.setStatus(Status.SERVICE_UNAVAILABLE);
         }
     }
 

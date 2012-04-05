@@ -30,17 +30,16 @@ import junit.framework.Assert;
 import junit.framework.ComparisonFailure;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.ow2.sirocco.apis.rest.cimi.builder.CimiEntityBuilderHelper;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
-import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.SerializationHelper;
+import org.ow2.sirocco.apis.rest.cimi.utils.PathType;
 
 /**
- * Mock CimiManagerUpdateMachineImage.
+ * Mock CimiManagerUpdate.
  */
-public class MockCimiManagerUpdateMachineImage implements CimiManager {
+public class MockCimiManagerUpdate extends MockCimiManager {
 
     /**
      * {@inheritDoc}
@@ -55,13 +54,12 @@ public class MockCimiManagerUpdateMachineImage implements CimiManager {
     public void execute(final CimiRequest request, final CimiResponse response) {
         try {
             // Build and compare
-            Integer id = Integer.valueOf(request.getId());
-            CimiMachineImage cimi = CimiEntityBuilderHelper.buildCimiMachineImage(id);
+            CimiData cimi = this.buildEntity(request);
             Assert.assertEquals(ToStringBuilder.reflectionToString(cimi, new SerializationHelper.RecursiveToStringStyle()),
                 ToStringBuilder.reflectionToString(request.getCimiData(), new SerializationHelper.RecursiveToStringStyle()));
 
             // Build response
-            response.setCimiData(CimiEntityBuilderHelper.buildCimiJob(id));
+            response.setCimiData(this.buildEntity(request, PathType.Job));
             response.setStatus(Status.OK);
         } catch (ComparisonFailure e) {
             // Build assert error
@@ -69,7 +67,8 @@ public class MockCimiManagerUpdateMachineImage implements CimiManager {
             response.setErrorMessage(e.getMessage());
             response.setStatus(Status.NOT_ACCEPTABLE);
         } catch (Exception e) {
-            response.setStatus(Status.BAD_REQUEST);
+            response.setErrorMessage(e.getMessage());
+            response.setStatus(Status.SERVICE_UNAVAILABLE);
         }
     }
 

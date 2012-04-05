@@ -26,19 +26,25 @@ package org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.junit.Assert;
+import org.junit.ComparisonFailure;
 import org.ow2.sirocco.apis.rest.cimi.builder.CimiEntityBuilderHelper;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.resource.serialization.SerializationHelper;
 
 /**
- * Mock CimiManagerReadMachineConfiguration.
+ * Mock CimiManagerCreate.
  */
-public class MockCimiManagerReadMachineConfiguration implements CimiManager {
+public class MockCimiManagerCreate extends MockCimiManager {
 
     /**
      * {@inheritDoc}
+     * <p>
+     * Build a new MachineImage and compare it with the MachineImage in request.
+     * </p>
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManager#execute(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
      *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
@@ -46,12 +52,23 @@ public class MockCimiManagerReadMachineConfiguration implements CimiManager {
     @Override
     public void execute(final CimiRequest request, final CimiResponse response) {
         try {
-            Integer id = Integer.valueOf(request.getId());
-            CimiMachineConfiguration cimi = CimiEntityBuilderHelper.buildCimiMachineConfiguration(id);
-            response.setCimiData(cimi);
+            // Build and compare
+            CimiData cimi = this.buildEntity(request);
+
+            Assert.assertEquals(ToStringBuilder.reflectionToString(cimi, new SerializationHelper.RecursiveToStringStyle()),
+                ToStringBuilder.reflectionToString(request.getCimiData(), new SerializationHelper.RecursiveToStringStyle()));
+
+            // Build response
+            response.setCimiData(CimiEntityBuilderHelper.buildCimiJob(1));
             response.setStatus(Status.OK);
+        } catch (ComparisonFailure e) {
+            // Build assert error
+            // response.setCimiData(this.buildEntity(request));
+            response.setErrorMessage(e.getMessage());
+            response.setStatus(Status.NOT_ACCEPTABLE);
         } catch (Exception e) {
-            response.setStatus(Status.BAD_REQUEST);
+            response.setErrorMessage(e.getMessage());
+            response.setStatus(Status.SERVICE_UNAVAILABLE);
         }
     }
 

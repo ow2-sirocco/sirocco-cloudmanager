@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Job>
+<Job href="hrefValue_0">
 	<created>2000-01-01T01:00:00+01:00</created>
 	<description>descriptionValue_0</description>
 	<id>idValue_0</id>

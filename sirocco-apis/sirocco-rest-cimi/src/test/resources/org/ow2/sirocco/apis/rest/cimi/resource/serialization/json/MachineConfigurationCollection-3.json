@@ -22,7 +22,9 @@
 			"rel":"relValue_3_2",
 			"href":"hrefValue_3_2"
 		}
+		
 	],
+	"href":"hrefValue_3",
 	"machineConfigurations":[
 		{
 			"href":"hrefValue_3_0"
@@ -33,5 +35,6 @@
 		{
 			"href":"hrefValue_3_2"
 		}
+		
 	]
 }

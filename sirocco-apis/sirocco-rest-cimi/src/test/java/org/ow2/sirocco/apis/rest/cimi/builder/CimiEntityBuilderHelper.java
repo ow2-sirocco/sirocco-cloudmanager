@@ -33,7 +33,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
@@ -79,6 +83,17 @@ public class CimiEntityBuilderHelper {
         return ret;
     }
 
+    public static byte[] buildBytes(final Integer id) {
+        byte[] ret = null;
+        if ((null != id) && (id > 0)) {
+            ret = new byte[13 + id * 13];
+            for (int i = 0; i < ret.length; i++) {
+                ret[i] = (byte) i;
+            }
+        }
+        return ret;
+    }
+
     public static Map<String, String> buildProperties(final Integer id) {
         Map<String, String> properties = null;
         if ((null != id) && (id > 0)) {
@@ -113,15 +128,67 @@ public class CimiEntityBuilderHelper {
         return sb.toString();
     }
 
-    public static void fillCimiCommon(final CimiCommonId common, final Integer id, final Integer index) {
+    public static void fillCimiCommon(final CimiCommon common, final Integer id, final Integer index) {
         String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
-        common.setCreated(CimiEntityBuilderHelper.buildDate(id));
         common.setDescription("descriptionValue" + postfix);
-        common.setId("idValue" + postfix);
         common.setName("nameValue" + postfix);
         common.setProperties(CimiEntityBuilderHelper.buildProperties(id));
-        common.setOperations(CimiEntityBuilderHelper.buildOperations(id));
-        common.setUpdated(CimiEntityBuilderHelper.buildDate(id));
+    }
+
+    public static void fillCimiCommonId(final CimiCommonId common, final Integer id, final Integer index, final Boolean expand) {
+        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        if ((null != expand) && (true == expand)) {
+            CimiEntityBuilderHelper.fillCimiCommon(common, id, index);
+            common.setCreated(CimiEntityBuilderHelper.buildDate(id));
+            common.setId("idValue" + postfix);
+            common.setOperations(CimiEntityBuilderHelper.buildOperations(id));
+            common.setUpdated(CimiEntityBuilderHelper.buildDate(id));
+        }
+        common.setHref("hrefValue" + postfix);
+    }
+
+    public static CimiCredentials buildCimiCredentials(final Integer id) {
+        return CimiEntityBuilderHelper.buildCimiCredentials(id, null, true);
+    }
+
+    public static CimiCredentials buildCimiCredentials(final Integer id, final Integer index, final Boolean expand) {
+        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        CimiCredentials cimi = new CimiCredentials();
+        CimiEntityBuilderHelper.fillCimiCommonId(cimi, id, index, expand);
+        if ((null != expand) && (true == expand)) {
+            cimi.setKey(CimiEntityBuilderHelper.buildBytes(id));
+            cimi.setPassword("passwordValue" + postfix);
+            cimi.setUserName("userNameValue" + postfix);
+        }
+        return cimi;
+    }
+
+    public static CimiCredentialsCreate buildCimiCredentialsCreate(final Integer id) {
+        return CimiEntityBuilderHelper.buildCimiCredentialsCreate(id, null, true);
+    }
+
+    public static CimiCredentialsCreate buildCimiCredentialsCreate(final Integer id, final Integer index, final Boolean expand) {
+        CimiCredentialsCreate cimi = new CimiCredentialsCreate();
+        CimiEntityBuilderHelper.fillCimiCommon(cimi, id, index);
+        cimi.setCredentialsTemplate(CimiEntityBuilderHelper.buildCimiCredentialsTemplate(id, index, expand));
+        return cimi;
+    }
+
+    public static CimiCredentialsTemplate buildCimiCredentialsTemplate(final Integer id) {
+        return CimiEntityBuilderHelper.buildCimiCredentialsTemplate(id, null, true);
+    }
+
+    public static CimiCredentialsTemplate buildCimiCredentialsTemplate(final Integer id, final Integer index,
+        final Boolean expand) {
+        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        CimiCredentialsTemplate cimi = new CimiCredentialsTemplate();
+        CimiEntityBuilderHelper.fillCimiCommonId(cimi, id, index, expand);
+        if ((null != expand) && (true == expand)) {
+            cimi.setKey(CimiEntityBuilderHelper.buildBytes(id));
+            cimi.setPassword("passwordValue" + postfix);
+            cimi.setUserName("userNameValue" + postfix);
+        }
+        return cimi;
     }
 
     public static CimiMachineImage buildCimiMachineImage(final Integer id) {
@@ -131,14 +198,12 @@ public class CimiEntityBuilderHelper {
     public static CimiMachineImage buildCimiMachineImage(final Integer id, final Integer index, final Boolean expand) {
         String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
         CimiMachineImage cimi = new CimiMachineImage();
-
+        CimiEntityBuilderHelper.fillCimiCommonId(cimi, id, index, expand);
         if ((null != expand) && (true == expand)) {
-            CimiEntityBuilderHelper.fillCimiCommon(cimi, id, index);
             cimi.setImageLocation(new ImageLocation("hrefImageLocation" + postfix));
             cimi.setState("stateValue" + postfix);
             cimi.setType("typeValue" + postfix);
         }
-        cimi.setHref("hrefValue" + postfix);
         return cimi;
     }
 
@@ -148,7 +213,7 @@ public class CimiEntityBuilderHelper {
 
     public static CimiMachineImageCollection buildCimiMachineImageCollection(final Integer id, final Boolean expand) {
         CimiMachineImageCollection collec = new CimiMachineImageCollection();
-        CimiEntityBuilderHelper.fillCimiCommon(collec, id, null);
+        CimiEntityBuilderHelper.fillCimiCommonId(collec, id, null, true);
 
         if ((null != id) && (id > 0)) {
             List<CimiMachineImage> cimis = new ArrayList<CimiMachineImage>();
@@ -168,8 +233,8 @@ public class CimiEntityBuilderHelper {
         String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
         CimiJob cimi = new CimiJob();
 
+        CimiEntityBuilderHelper.fillCimiCommonId(cimi, id, index, expand);
         if ((null != expand) && (true == expand)) {
-            CimiEntityBuilderHelper.fillCimiCommon(cimi, id, index);
             cimi.setAction("actionValue" + postfix);
             cimi.setIsCancellable(CimiEntityBuilderHelper.buildBoolean(id));
             cimi.setProgress(id);
@@ -224,9 +289,9 @@ public class CimiEntityBuilderHelper {
         final Boolean expand) {
         String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
         CimiMachineConfiguration cimi = new CimiMachineConfiguration();
+        CimiEntityBuilderHelper.fillCimiCommonId(cimi, id, index, expand);
 
         if ((null != expand) && (true == expand)) {
-            CimiEntityBuilderHelper.fillCimiCommon(cimi, id, index);
             cimi.setCpu(id);
             cimi.setCpuArch("cpuArchValue" + postfix);
             cimi.setMemory(CimiEntityBuilderHelper.buildCimiMemory(id, index));
@@ -249,7 +314,7 @@ public class CimiEntityBuilderHelper {
     public static CimiMachineConfigurationCollection buildCimiMachineConfigurationCollection(final Integer id,
         final Boolean expand) {
         CimiMachineConfigurationCollection collec = new CimiMachineConfigurationCollection();
-        CimiEntityBuilderHelper.fillCimiCommon(collec, id, null);
+        CimiEntityBuilderHelper.fillCimiCommonId(collec, id, null, true);
 
         if ((null != id) && (id > 0)) {
             List<CimiMachineConfiguration> cimis = new ArrayList<CimiMachineConfiguration>();

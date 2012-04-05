@@ -4,6 +4,7 @@
 	"description":"descriptionValue_1",
 	"created":"2001-02-02T01:01:01.001+0000",
 	"updated":"2001-02-02T01:01:01.001+0000",
+	"href":"hrefValue_1",
 	"properties":{
 		"keyProp_1_0":"valueProp_1_0"
 	},
@@ -12,6 +13,7 @@
 			"rel":"relValue_1_0",
 			"href":"hrefValue_1_0"
 		}
+		
 	],
 	"targetEntity":"targetEntityValue_1",
 	"action":"actionValue_1",
@@ -28,5 +30,6 @@
 		{
 			"href":"hrefNestedValue_1_1_0"
 		}
+		
 	]
 }
