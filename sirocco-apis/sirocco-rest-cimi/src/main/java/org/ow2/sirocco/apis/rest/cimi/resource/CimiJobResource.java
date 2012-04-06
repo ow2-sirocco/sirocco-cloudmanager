@@ -25,14 +25,16 @@
 package org.ow2.sirocco.apis.rest.cimi.resource;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -44,52 +46,76 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Cloud Entry Point REST resource.
+ * Job REST resource.
  * <p>
  * Operations supports :
  * <ul>
- * <li>Read a Cloud Entry Point</li>
- * <li>Update a Cloud Entry Point</li>
+ * <li>Delete a job</li>
+ * <li>Read a job</li>
+ * <li>Update a job</li>
  * </ul>
  * </p>
  */
 @Component
-@Path(ConstantsPath.CLOUDENTRYPOINT_PATH)
-public class CimiCloudEntryPointResource extends CimiResourceAbstract {
+@Path(ConstantsPath.JOB_PATH)
+public class CimiJobResource extends CimiResourceAbstract {
 
     @Autowired
-    @Qualifier("CimiManagerReadCloudEntryPoint")
-    private CimiManager cimiManagerReadCloudEntryPoint;
+    @Qualifier("CimiManagerReadJob")
+    private CimiManager cimiManagerReadJob;
 
     @Autowired
-    @Qualifier("CimiManagerUpdateCloudEntryPoint")
-    private CimiManager cimiManagerUpdateCloudEntryPoint;
+    @Qualifier("CimiManagerDeleteJob")
+    private CimiManager cimiManagerDeleteJob;
+
+    @Autowired
+    @Qualifier("CimiManagerUpdateJob")
+    private CimiManager cimiManagerUpdateJob;
 
     /**
-     * Get a Cloud Entry Point.
+     * Get a job.
      * 
+     * @param id The ID of job to get
      * @return The REST response
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response readCloudEntryPoint() {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos());
+    @Path("{id}")
+    public Response read(@PathParam("id") final String id) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerReadCloudEntryPoint.execute(request, response);
+        this.cimiManagerReadJob.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Update a Cloud Entry Point.
+     * Update a job.
      * 
+     * @param id The ID of job to update
      * @return The REST response
      */
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateCloudEntryPoint(final CimiCloudEntryPoint cloudEntryPoint) {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cloudEntryPoint);
+    @Path("{id}")
+    public Response update(@PathParam("id") final String id, final CimiJob cimiData) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerUpdateCloudEntryPoint.execute(request, response);
+        this.cimiManagerUpdateJob.execute(request, response);
+        return HelperResponse.buildResponse(response);
+    }
+
+    /**
+     * Delete a job.
+     * 
+     * @param id The ID of job to delete
+     * @return The REST response
+     */
+    @DELETE
+    @Path("{id}")
+    public Response delete(@PathParam("id") final String id) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
+        CimiResponse response = new CimiResponse();
+        this.cimiManagerDeleteJob.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 

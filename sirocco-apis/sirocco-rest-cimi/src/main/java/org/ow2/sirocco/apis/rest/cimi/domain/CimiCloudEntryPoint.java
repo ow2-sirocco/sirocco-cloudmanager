@@ -50,84 +50,84 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * <p>
      * </p>
      */
-    private CimiMachineTemplate machineTemplates;
+    private CimiMachineTemplateCollection machineTemplates;
 
     /**
      * Field "machineConfigs".
      * <p>
      * </p>
      */
-    private CimiMachineConfiguration machineConfigs;
+    private CimiMachineConfigurationCollection machineConfigs;
 
     /**
      * Field "machineImages".
      * <p>
      * </p>
      */
-    private CimiMachineImage machineImages;
+    private CimiMachineImageCollection machineImages;
 
     /**
      * Field "CredentialsTemplates".
      * <p>
      * </p>
      */
-    private CimiCredentialsTemplate CredentialsTemplates;
+    private CimiCredentialsTemplateCollection CredentialsTemplates;
 
     /**
      * Field "Credentials".
      * <p>
      * </p>
      */
-    private CimiCredentials credentials;
+    private CimiCredentialsCollection credentials;
 
     /**
      * Field "machines".
      * <p>
      * </p>
      */
-    private CimiMachine machines;
+    private CimiMachineCollection machines;
 
     /**
      * Field "volumeTemplates".
      * <p>
      * </p>
      */
-    private CimiVolumeTemplate volumeTemplates;
+    private CimiVolumeTemplateCollection volumeTemplates;
 
     /**
      * Field "volumeConfigurations".
      * <p>
      * </p>
      */
-    private CimiVolumeConfiguration volumeConfigurations;
+    private CimiVolumeConfigurationCollection volumeConfigurations;
 
     /**
      * Field "volumeImages".
      * <p>
      * </p>
      */
-    private CimiVolumeImage volumeImages;
+    private CimiVolumeImageCollection volumeImages;
 
     /**
      * Field "volumes".
      * <p>
      * </p>
      */
-    private CimiVolume volumes;
+    private CimiVolumeCollection volumes;
 
     /**
      * Field "jobTime".
      * <p>
      * </p>
      */
-    private Long jobTime;
+    private Integer jobTime;
 
     /**
      * Return the value of field "machineTemplates".
      * 
      * @return The value
      */
-    public CimiMachineTemplate getMachineTemplates() {
+    public CimiMachineTemplateCollection getMachineTemplates() {
         return this.machineTemplates;
     }
 
@@ -136,7 +136,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param machineTemplates The value
      */
-    public void setMachineTemplates(final CimiMachineTemplate machineTemplates) {
+    public void setMachineTemplates(final CimiMachineTemplateCollection machineTemplates) {
         this.machineTemplates = machineTemplates;
     }
 
@@ -145,7 +145,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public CimiMachineConfiguration getMachineConfigs() {
+    public CimiMachineConfigurationCollection getMachineConfigs() {
         return this.machineConfigs;
     }
 
@@ -154,7 +154,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param machineConfigs The value
      */
-    public void setMachineConfigs(final CimiMachineConfiguration machineConfigs) {
+    public void setMachineConfigs(final CimiMachineConfigurationCollection machineConfigs) {
         this.machineConfigs = machineConfigs;
     }
 
@@ -163,7 +163,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public CimiMachineImage getMachineImages() {
+    public CimiMachineImageCollection getMachineImages() {
         return this.machineImages;
     }
 
@@ -172,7 +172,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param machineImages The value
      */
-    public void setMachineImages(final CimiMachineImage machineImages) {
+    public void setMachineImages(final CimiMachineImageCollection machineImages) {
         this.machineImages = machineImages;
     }
 
@@ -181,7 +181,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public CimiCredentialsTemplate getCredentialsTemplates() {
+    public CimiCredentialsTemplateCollection getCredentialsTemplates() {
         return this.CredentialsTemplates;
     }
 
@@ -190,7 +190,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param CredentialsTemplates The value
      */
-    public void setCredentialsTemplates(final CimiCredentialsTemplate CredentialsTemplates) {
+    public void setCredentialsTemplates(final CimiCredentialsTemplateCollection CredentialsTemplates) {
         this.CredentialsTemplates = CredentialsTemplates;
     }
 
@@ -199,7 +199,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public CimiCredentials getCredentials() {
+    public CimiCredentialsCollection getCredentials() {
         return this.credentials;
     }
 
@@ -208,7 +208,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param Credentialss The value
      */
-    public void setCredentials(final CimiCredentials credentials) {
+    public void setCredentials(final CimiCredentialsCollection credentials) {
         this.credentials = credentials;
     }
 
@@ -217,7 +217,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public CimiMachine getMachines() {
+    public CimiMachineCollection getMachines() {
         return this.machines;
     }
 
@@ -226,7 +226,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param machines The value
      */
-    public void setMachines(final CimiMachine machines) {
+    public void setMachines(final CimiMachineCollection machines) {
         this.machines = machines;
     }
 
@@ -235,7 +235,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public CimiVolumeTemplate getVolumeTemplates() {
+    public CimiVolumeTemplateCollection getVolumeTemplates() {
         return this.volumeTemplates;
     }
 
@@ -244,7 +244,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param volumeTemplates The value
      */
-    public void setVolumeTemplates(final CimiVolumeTemplate volumeTemplates) {
+    public void setVolumeTemplates(final CimiVolumeTemplateCollection volumeTemplates) {
         this.volumeTemplates = volumeTemplates;
     }
 
@@ -253,7 +253,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public CimiVolumeConfiguration getVolumeConfigurations() {
+    public CimiVolumeConfigurationCollection getVolumeConfigurations() {
         return this.volumeConfigurations;
     }
 
@@ -262,7 +262,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param volumeConfigurations The value
      */
-    public void setVolumeConfigurations(final CimiVolumeConfiguration volumeConfigurations) {
+    public void setVolumeConfigurations(final CimiVolumeConfigurationCollection volumeConfigurations) {
         this.volumeConfigurations = volumeConfigurations;
     }
 
@@ -271,7 +271,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public CimiVolumeImage getVolumeImages() {
+    public CimiVolumeImageCollection getVolumeImages() {
         return this.volumeImages;
     }
 
@@ -280,7 +280,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param volumeImages The value
      */
-    public void setVolumeImages(final CimiVolumeImage volumeImages) {
+    public void setVolumeImages(final CimiVolumeImageCollection volumeImages) {
         this.volumeImages = volumeImages;
     }
 
@@ -289,7 +289,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public CimiVolume getVolumes() {
+    public CimiVolumeCollection getVolumes() {
         return this.volumes;
     }
 
@@ -298,7 +298,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param volumes The value
      */
-    public void setVolumes(final CimiVolume volumes) {
+    public void setVolumes(final CimiVolumeCollection volumes) {
         this.volumes = volumes;
     }
 
@@ -307,7 +307,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @return The value
      */
-    public Long getJobTime() {
+    public Integer getJobTime() {
         return this.jobTime;
     }
 
@@ -316,7 +316,7 @@ public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
      * 
      * @param jobTime The value
      */
-    public void setJobTime(final Long jobTime) {
+    public void setJobTime(final Integer jobTime) {
         this.jobTime = jobTime;
     }
 }

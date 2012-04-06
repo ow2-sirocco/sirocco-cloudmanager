@@ -126,8 +126,6 @@ public class CimiMachineImageResource extends CimiResourceAbstract {
      */
     @PUT
     @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
-    // @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON,
-    // MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
     @Path("{id}")
     public Response update(@PathParam("id") final String id, final CimiMachineImage cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
@@ -157,8 +155,6 @@ public class CimiMachineImageResource extends CimiResourceAbstract {
      */
     @POST
     @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECREATE_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECREATE_XML})
-    // @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON,
-    // MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
     public Response create(final CimiMachineImage cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();
@@ -173,8 +169,6 @@ public class CimiMachineImageResource extends CimiResourceAbstract {
      * @return The REST response
      */
     @DELETE
-    // @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON,
-    // MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML})
     @Path("{id}")
     public Response delete(@PathParam("id") final String id) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);

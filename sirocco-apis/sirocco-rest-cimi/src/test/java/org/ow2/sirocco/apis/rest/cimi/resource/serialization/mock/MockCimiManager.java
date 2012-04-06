@@ -45,11 +45,20 @@ public abstract class MockCimiManager implements CimiManager {
     protected CimiData buildEntity(final CimiRequest request, final PathType type) {
         CimiData cimi = null;
         switch (type) {
+        case CloudEntryPoint:
+            cimi = this.buildCloudEntryPoint(request);
+            break;
         case Credentials:
             cimi = this.buildCredentials(request);
             break;
         case CredentialsTemplate:
             cimi = this.buildCredentialsTemplate(request);
+            break;
+        case Job:
+            cimi = this.buildJob(request);
+            break;
+        case Machine:
+            cimi = this.buildMachine(request);
             break;
         case MachineConfiguration:
             cimi = this.buildMachineConfiguration(request);
@@ -57,11 +66,27 @@ public abstract class MockCimiManager implements CimiManager {
         case MachineImage:
             cimi = this.buildMachineImage(request);
             break;
-        case Job:
-            cimi = this.buildMachineJob(request);
+        case MachineTemplate:
+            cimi = this.buildMachineTemplate(request);
             break;
         default:
             throw new UnsupportedOperationException(type + " for " + request.getPath() + " not implemented !");
+        }
+        return cimi;
+    }
+
+    protected CimiData buildCloudEntryPoint(final CimiRequest request) {
+        CimiData cimi = null;
+        MethodType type = MethodType.valueOf(request.getMethod());
+
+        switch (type) {
+        case GET:
+        case PUT:
+            request.setId("2");
+            cimi = CimiEntityBuilderHelper.buildCimiCloudEntryPoint(2);
+            break;
+        default:
+            throw new UnsupportedOperationException(type + " in " + request.getPath() + " not implemented !");
         }
         return cimi;
     }
@@ -77,11 +102,8 @@ public abstract class MockCimiManager implements CimiManager {
         case GET:
         case PUT:
             if (null == request.getId()) {
-                // cimi =
-                // CimiEntityBuilderHelper.buildCredentialsCollection(request.getHeader().getIntegerSiroccoInfoTestId(),
-                // request.getHeader().getBooleanSiroccoInfoTestExpand());
-                throw new UnsupportedOperationException(type + " for " + request.getPath() + " not implemented !");
-
+                cimi = CimiEntityBuilderHelper.buildCimiCredentialsCollection(
+                    request.getHeader().getIntegerSiroccoInfoTestId(), request.getHeader().getBooleanSiroccoInfoTestExpand());
             } else {
                 cimi = CimiEntityBuilderHelper.buildCimiCredentials(Integer.valueOf(request.getId()));
             }
@@ -105,13 +127,35 @@ public abstract class MockCimiManager implements CimiManager {
         case GET:
         case PUT:
             if (null == request.getId()) {
-                // cimi =
-                // CimiEntityBuilderHelper.buildCredentialsTemplateCollection(request.getHeader().getIntegerSiroccoInfoTestId(),
-                // request.getHeader().getBooleanSiroccoInfoTestExpand());
-                throw new UnsupportedOperationException(type + " for " + request.getPath() + " not implemented !");
-
+                cimi = CimiEntityBuilderHelper.buildCimiCredentialsTemplateCollection(request.getHeader()
+                    .getIntegerSiroccoInfoTestId(), request.getHeader().getBooleanSiroccoInfoTestExpand());
             } else {
                 cimi = CimiEntityBuilderHelper.buildCimiCredentialsTemplate(Integer.valueOf(request.getId()));
+            }
+            break;
+        case DELETE:
+            break;
+        default:
+            throw new UnsupportedOperationException(type + " in " + request.getPath() + " not implemented !");
+        }
+        return cimi;
+    }
+
+    protected CimiData buildMachine(final CimiRequest request) {
+        CimiData cimi = null;
+        MethodType type = MethodType.valueOf(request.getMethod());
+
+        switch (type) {
+        case POST:
+            cimi = CimiEntityBuilderHelper.buildCimiMachineCreate(1);
+            break;
+        case GET:
+        case PUT:
+            if (null == request.getId()) {
+                cimi = CimiEntityBuilderHelper.buildCimiMachineCollection(request.getHeader().getIntegerSiroccoInfoTestId(),
+                    request.getHeader().getBooleanSiroccoInfoTestExpand());
+            } else {
+                cimi = CimiEntityBuilderHelper.buildCimiMachine(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:
@@ -135,7 +179,6 @@ public abstract class MockCimiManager implements CimiManager {
             if (null == request.getId()) {
                 cimi = CimiEntityBuilderHelper.buildCimiMachineConfigurationCollection(request.getHeader()
                     .getIntegerSiroccoInfoTestId(), request.getHeader().getBooleanSiroccoInfoTestExpand());
-
             } else {
                 cimi = CimiEntityBuilderHelper.buildCimiMachineConfiguration(Integer.valueOf(request.getId()));
             }
@@ -161,7 +204,6 @@ public abstract class MockCimiManager implements CimiManager {
             if (null == request.getId()) {
                 cimi = CimiEntityBuilderHelper.buildCimiMachineImageCollection(request.getHeader()
                     .getIntegerSiroccoInfoTestId(), request.getHeader().getBooleanSiroccoInfoTestExpand());
-
             } else {
                 cimi = CimiEntityBuilderHelper.buildCimiMachineImage(Integer.valueOf(request.getId()));
             }
@@ -174,7 +216,32 @@ public abstract class MockCimiManager implements CimiManager {
         return cimi;
     }
 
-    protected CimiData buildMachineJob(final CimiRequest request) {
+    protected CimiData buildMachineTemplate(final CimiRequest request) {
+        CimiData cimi = null;
+        MethodType type = MethodType.valueOf(request.getMethod());
+
+        switch (type) {
+        case POST:
+            cimi = CimiEntityBuilderHelper.buildCimiMachineTemplate(1);
+            break;
+        case GET:
+        case PUT:
+            if (null == request.getId()) {
+                cimi = CimiEntityBuilderHelper.buildCimiMachineTemplateCollection(request.getHeader()
+                    .getIntegerSiroccoInfoTestId(), request.getHeader().getBooleanSiroccoInfoTestExpand());
+            } else {
+                cimi = CimiEntityBuilderHelper.buildCimiMachineTemplate(Integer.valueOf(request.getId()));
+            }
+            break;
+        case DELETE:
+            break;
+        default:
+            throw new UnsupportedOperationException(type + " in " + request.getPath() + " not implemented !");
+        }
+        return cimi;
+    }
+
+    protected CimiData buildJob(final CimiRequest request) {
         CimiData cimi = null;
         MethodType type = MethodType.valueOf(request.getMethod());
 
@@ -185,7 +252,8 @@ public abstract class MockCimiManager implements CimiManager {
         case GET:
         case PUT:
             if (null == request.getId()) {
-                throw new UnsupportedOperationException("Job Collection not implemented !");
+                cimi = CimiEntityBuilderHelper.buildCimiJobCollection(request.getHeader().getIntegerSiroccoInfoTestId(),
+                    request.getHeader().getBooleanSiroccoInfoTestExpand());
             } else {
                 cimi = CimiEntityBuilderHelper.buildCimiJob(Integer.valueOf(request.getId()));
             }

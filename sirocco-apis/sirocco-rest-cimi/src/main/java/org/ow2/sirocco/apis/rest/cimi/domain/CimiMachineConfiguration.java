@@ -52,14 +52,7 @@ public class CimiMachineConfiguration extends CimiCommonId {
      * <p>
      * </p>
      */
-    private Integer cpu;
-
-    /**
-     * Field "cpuArch".
-     * <p>
-     * </p>
-     */
-    private String cpuArch;
+    private CimiCpu cpu;
 
     /**
      * Field "memory".
@@ -76,7 +69,7 @@ public class CimiMachineConfiguration extends CimiCommonId {
     @JsonProperty
     @Valid
     @Size(min = 1, groups = {GroupCreate.class})
-    private CimiDisk[] disks;
+    private CimiDiskConfiguration[] disks;
 
     /**
      * Default constructor.
@@ -90,7 +83,7 @@ public class CimiMachineConfiguration extends CimiCommonId {
      * 
      * @return The value
      */
-    public Integer getCpu() {
+    public CimiCpu getCpu() {
         return this.cpu;
     }
 
@@ -99,26 +92,8 @@ public class CimiMachineConfiguration extends CimiCommonId {
      * 
      * @param cpu The value
      */
-    public void setCpu(final Integer cpu) {
+    public void setCpu(final CimiCpu cpu) {
         this.cpu = cpu;
-    }
-
-    /**
-     * Return the value of field "cpuArch".
-     * 
-     * @return The value
-     */
-    public String getCpuArch() {
-        return this.cpuArch;
-    }
-
-    /**
-     * Set the value of field "cpuArch".
-     * 
-     * @param cpuArch The value
-     */
-    public void setCpuArch(final String cpuArch) {
-        this.cpuArch = cpuArch;
     }
 
     /**
@@ -146,7 +121,7 @@ public class CimiMachineConfiguration extends CimiCommonId {
      */
     @XmlElement(name = "disk")
     @JsonIgnore
-    public CimiDisk[] getDisks() {
+    public CimiDiskConfiguration[] getDisks() {
         return this.disks;
     }
 
@@ -155,7 +130,7 @@ public class CimiMachineConfiguration extends CimiCommonId {
      * 
      * @param disks The value
      */
-    public void setDisks(final CimiDisk[] disks) {
+    public void setDisks(final CimiDiskConfiguration[] disks) {
         this.disks = disks;
     }
 

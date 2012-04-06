@@ -14,6 +14,7 @@
 		}
 	],
 	"href":"hrefValue_1",
+	"state":"stateValue_1",
 	"cpu":{
 		"numberVirtualCpus":1,
 		"frequency":100,
@@ -28,9 +29,7 @@
 			"capacity":{
 				"quantity":1,
 				"units":"unitValue_1_0"
-			},
-			"format":"formatValue_1_0",
-			"attachmentPoint":"attachmentPointValue_1_0"
+			}
 		}
 	]
 }

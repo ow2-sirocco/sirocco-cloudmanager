@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineConfiguration href="hrefValue_1">
+<Machine href="hrefValue_1">
 	<description>descriptionValue_1</description>
 	<name>nameValue_1</name>
 	<property key="keyProp_1_0">valueProp_1_0</property>
@@ -9,9 +9,8 @@
 	<updated>2001-02-02T02:01:01.001+01:00</updated>
 	<cpu frequency="100" numberVirtualCpus="1" units="unitValue_1" />
 	<disk>
-		<attachmentPoint>attachmentPointValue_1_0</attachmentPoint>
 		<capacity quantity="1" units="unitValue_1_0" />
-		<format>formatValue_1_0</format>
 	</disk>
 	<memory quantity="1" units="unitValue_1" />
-</MachineConfiguration>
+	<state>stateValue_1</state>
+</Machine>

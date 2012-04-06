@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -53,6 +54,7 @@ public class CimiMachineCollection extends CimiCommonId {
      * 
      * @return The value
      */
+    @XmlElement(name = "machine")
     public CimiMachine[] getMachines() {
         return this.machines;
     }

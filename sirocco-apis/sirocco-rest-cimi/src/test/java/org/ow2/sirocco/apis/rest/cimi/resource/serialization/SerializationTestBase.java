@@ -37,6 +37,7 @@ import com.sun.jersey.spi.spring.container.servlet.SpringServlet;
 import com.sun.jersey.test.framework.AppDescriptor;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.sun.jersey.test.framework.spi.container.TestContainerException;
 
 public class SerializationTestBase extends JerseyTest {
 
@@ -69,9 +70,21 @@ public class SerializationTestBase extends JerseyTest {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
-        SerializationTestBase.LOGGER.debug("Begin delay");
-        Thread.sleep(1000);
-        SerializationTestBase.LOGGER.debug("End delay");
-    }
+        int delay = 1000;
+        String propDelay = System.getProperty("SIROCCO_TEST_DELAY");
+        if (null != propDelay) {
+            try {
+                delay = Integer.parseInt(propDelay);
+            } catch (NumberFormatException e) {
+                throw new TestContainerException("SIROCCO_TEST_DELAY with a value of \"" + propDelay
+                    + "\" is not a valid integer.", e);
+            }
+        }
 
+        if (delay > 0) {
+            SerializationTestBase.LOGGER.debug("Begin delay : {}ms", delay);
+            Thread.sleep(delay);
+            SerializationTestBase.LOGGER.debug("End delay");
+        }
+    }
 }

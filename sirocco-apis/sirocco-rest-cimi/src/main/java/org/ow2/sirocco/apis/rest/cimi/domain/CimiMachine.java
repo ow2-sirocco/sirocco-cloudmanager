@@ -24,8 +24,11 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
@@ -53,14 +56,7 @@ public class CimiMachine extends CimiCommonId {
      * <p>
      * </p>
      */
-    private Integer cpu;
-
-    /**
-     * Field "cpuArch".
-     * <p>
-     * </p>
-     */
-    private String cpuArch;
+    private CimiCpu cpu;
 
     /**
      * Field "memory".
@@ -70,11 +66,12 @@ public class CimiMachine extends CimiCommonId {
     private CimiMemory memory;
 
     /**
-     * Field "capacity".
+     * Field "disks".
      * <p>
      * </p>
      */
-    private CimiCapacity capacity;
+    @JsonProperty
+    private CimiDisk[] disks;
 
     /**
      * Field "volumes".
@@ -124,7 +121,7 @@ public class CimiMachine extends CimiCommonId {
      * 
      * @return The value
      */
-    public Integer getCpu() {
+    public CimiCpu getCpu() {
         return this.cpu;
     }
 
@@ -133,26 +130,8 @@ public class CimiMachine extends CimiCommonId {
      * 
      * @param cpu The value
      */
-    public void setCpu(final Integer cpu) {
+    public void setCpu(final CimiCpu cpu) {
         this.cpu = cpu;
-    }
-
-    /**
-     * Return the value of field "cpuArch".
-     * 
-     * @return The value
-     */
-    public String getCpuArch() {
-        return this.cpuArch;
-    }
-
-    /**
-     * Set the value of field "cpuArch".
-     * 
-     * @param cpuArch The value
-     */
-    public void setCpuArch(final String cpuArch) {
-        this.cpuArch = cpuArch;
     }
 
     /**
@@ -174,21 +153,23 @@ public class CimiMachine extends CimiCommonId {
     }
 
     /**
-     * Return the value of field "capacity".
+     * Return the value of field "disks".
      * 
      * @return The value
      */
-    public CimiCapacity getCapacity() {
-        return this.capacity;
+    @XmlElement(name = "disk")
+    @JsonIgnore
+    public CimiDisk[] getDisks() {
+        return this.disks;
     }
 
     /**
-     * Set the value of field "capacity".
+     * Set the value of field "disks".
      * 
      * @param disks The value
      */
-    public void setCapacity(final CimiCapacity capacity) {
-        this.capacity = capacity;
+    public void setDisks(final CimiDisk[] disks) {
+        this.disks = disks;
     }
 
     /**

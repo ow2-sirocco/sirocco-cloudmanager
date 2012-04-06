@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -50,22 +51,12 @@ public class CimiMachineTemplateCollection extends CimiCommonId {
      */
     private CimiMachineTemplate[] machineTemplates;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiMachineTemplateCollection() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "machineTemplates".
      * 
      * @return The value
      */
+    @XmlElement(name = "machineTemplate")
     public CimiMachineTemplate[] getMachineTemplates() {
         return this.machineTemplates;
     }

@@ -34,6 +34,34 @@
 	<bean id="CimiManagerUpdateCredentialsTemplate"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
+	<!-- Job -->
+	<bean id="CimiManagerDeleteJob"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
+	<bean id="CimiManagerReadJob"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerUpdateJob"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
+
+	<!-- Machine -->
+	<bean id="CimiManagerCreateMachine"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
+	<bean id="CimiManagerDeleteMachine"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
+	<bean id="CimiManagerReadMachine"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerUpdateMachine"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
+
+	<!-- Machine Template -->
+	<bean id="CimiManagerCreateMachineTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
+	<bean id="CimiManagerDeleteMachineTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
+	<bean id="CimiManagerReadMachineTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerUpdateMachineTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
+
 	<!-- MachineImage -->
 	<bean id="CimiManagerCreateMachineImage"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />

@@ -27,12 +27,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import java.io.Serializable;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
 
 /**
  * Class Disk.
@@ -55,22 +53,6 @@ public class CimiDisk implements Serializable {
     private CimiCapacity capacity;
 
     /**
-     * Field "format".
-     * <p>
-     * </p>
-     */
-    @NotNull(groups = {GroupCreate.class})
-    private String format;
-
-    /**
-     * Field "attachmentPoint".
-     * <p>
-     * </p>
-     */
-    @NotNull(groups = {GroupCreate.class})
-    private String attachmentPoint;
-
-    /**
      * Default constructor.
      */
     public CimiDisk() {
@@ -80,26 +62,10 @@ public class CimiDisk implements Serializable {
     /**
      * Parameterized constructor.
      * 
-     * @param format The format
-     * @param attachmentPoint The attachment point
-     */
-    public CimiDisk(final String format, final String attachmentPoint) {
-        super();
-        this.format = format;
-        this.attachmentPoint = attachmentPoint;
-    }
-
-    /**
-     * Parameterized constructor.
-     * 
-     * @param format The format
-     * @param attachmentPoint The attachment point
      * @param capacity The capacity
      */
-    public CimiDisk(final String format, final String attachmentPoint, final CimiCapacity capacity) {
+    public CimiDisk(final CimiCapacity capacity) {
         super();
-        this.format = format;
-        this.attachmentPoint = attachmentPoint;
         this.capacity = capacity;
     }
 
@@ -120,41 +86,4 @@ public class CimiDisk implements Serializable {
     public void setCapacity(final CimiCapacity capacity) {
         this.capacity = capacity;
     }
-
-    /**
-     * Return the value of field "format".
-     * 
-     * @return The value
-     */
-    public String getFormat() {
-        return this.format;
-    }
-
-    /**
-     * Set the value of field "format".
-     * 
-     * @param format The value
-     */
-    public void setFormat(final String format) {
-        this.format = format;
-    }
-
-    /**
-     * Return the value of field "attachmentPoint".
-     * 
-     * @return The value
-     */
-    public String getAttachmentPoint() {
-        return this.attachmentPoint;
-    }
-
-    /**
-     * Set the value of field "attachmentPoint".
-     * 
-     * @param attachmentPoint The value
-     */
-    public void setAttachmentPoint(final String attachmentPoint) {
-        this.attachmentPoint = attachmentPoint;
-    }
-
 }

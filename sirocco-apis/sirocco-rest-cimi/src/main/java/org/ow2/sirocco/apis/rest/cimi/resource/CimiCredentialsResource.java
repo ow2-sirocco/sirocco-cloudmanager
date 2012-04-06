@@ -103,7 +103,6 @@ public class CimiCredentialsResource extends CimiResourceAbstract {
      */
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
     public Response update(@PathParam("id") final String id, final CimiCredentials cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
@@ -119,7 +118,6 @@ public class CimiCredentialsResource extends CimiResourceAbstract {
      */
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response create(final CimiCredentialsCreate cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();
@@ -134,7 +132,6 @@ public class CimiCredentialsResource extends CimiResourceAbstract {
      * @return The REST response
      */
     @DELETE
-    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
     public Response delete(@PathParam("id") final String id) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);

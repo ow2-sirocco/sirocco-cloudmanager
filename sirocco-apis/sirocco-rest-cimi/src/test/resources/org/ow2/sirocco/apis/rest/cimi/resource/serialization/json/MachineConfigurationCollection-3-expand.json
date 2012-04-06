@@ -53,8 +53,11 @@
 				
 			],
 			"href":"hrefValue_3_0",
-			"cpu":3,
-			"cpuArch":"cpuArchValue_3_0",
+			"cpu":{
+				"numberVirtualCpus":3,
+				"frequency":300,
+				"units":"unitValue_3_0"
+			},
 			"memory":{
 				"quantity":3,
 				"units":"unitValue_3_0"
@@ -115,8 +118,11 @@
 				
 			],
 			"href":"hrefValue_3_1",
-			"cpu":3,
-			"cpuArch":"cpuArchValue_3_1",
+			"cpu":{
+				"numberVirtualCpus":3,
+				"frequency":300,
+				"units":"unitValue_3_1"
+			},
 			"memory":{
 				"quantity":3,
 				"units":"unitValue_3_1"
@@ -177,8 +183,11 @@
 				
 			],
 			"href":"hrefValue_3_2",
-			"cpu":3,
-			"cpuArch":"cpuArchValue_3_2",
+			"cpu":{
+				"numberVirtualCpus":3,
+				"frequency":300,
+				"units":"unitValue_3_2"
+			},
 			"memory":{
 				"quantity":3,
 				"units":"unitValue_3_2"

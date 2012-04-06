@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.resource;
 
-import java.util.List;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -34,135 +32,112 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.CimiManagerActionMachine;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.CimiManagerDeleteMachine;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.CimiManagerReadMachine;
-import org.ow2.sirocco.apis.rest.cimi.manager.machine.CimiManagerUpdateMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperRequest;
+import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
-import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 /**
- * This entity supports the Read, Update and Delete operations. Action : start +
- * stop + restart + pause + suspend + capture + snapshot + restore
+ * Machine REST resource.
+ * <p>
+ * Operations supports :
+ * <ul>
+ * <li>Create a machine</li>
+ * <li>Delete a machine</li>
+ * <li>Read a machine</li>
+ * <li>Update a machine</li>
+ * </ul>
+ * </p>
  */
+@Component
 @Path(ConstantsPath.MACHINE_PATH)
-public class CimiMachineResource {
+public class CimiMachineResource extends CimiResourceAbstract {
 
-    @Context
-    UriInfo uriInfo;
+    @Autowired
+    @Qualifier("CimiManagerReadMachine")
+    private CimiManager cimiManagerReadMachine;
 
-    @Context
-    HttpHeaders headers;
+    @Autowired
+    @Qualifier("CimiManagerDeleteMachine")
+    private CimiManager cimiManagerDeleteMachine;
 
-    public CimiMachineResource() {
+    @Autowired
+    @Qualifier("CimiManagerUpdateMachine")
+    private CimiManager cimiManagerUpdateMachine;
 
-    }
+    @Autowired
+    @Qualifier("CimiManagerCreateMachine")
+    private CimiManager cimiManagerCreateMachine;
 
-    // CRUD method
     /**
-     * Read operation
+     * Get a machine.
+     * 
+     * @param id The ID of machine to get
+     * @return The REST response
      */
     @GET
-    @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINE_JSON})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
-    public CimiMachine getMachine(@PathParam("id") String id) {
-        CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(headers, uriInfo, id));
-
+    public Response read(@PathParam("id") final String id) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
         CimiResponse response = new CimiResponse();
-
-        CimiManagerReadMachine manager = getManagerMachineRead();
-        manager.execute(request, response);
-
-        return (CimiMachine) response.getCimiData();
+        this.cimiManagerReadMachine.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Update
+     * Update a machine.
+     * 
+     * @param id The ID of machine to update
+     * @return The REST response
      */
     @PUT
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINE_JSON})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
-    public Response putMachine(CimiMachine machine, @PathParam("id") String id,
-            @QueryParam("CIMISelect") List<String> listQueryParam) {
-
-        CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(headers, uriInfo, id, machine));
-
+    public Response update(@PathParam("id") final String id, final CimiMachine cimiData) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
         CimiResponse response = new CimiResponse();
-
-        CimiManagerUpdateMachine manager = getManagerMachineUpdate();
-        manager.execute(request, response);
-
-        return Response.status(response.getStatus()).build();
+        this.cimiManagerUpdateMachine.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
     /**
-     * actions
+     * Create a machine.
+     * 
+     * @return The REST response
      */
     @POST
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_ACTION_JSON})
-    @Path("{id}")
-    public Response postActionMachine(CimiMachine machine, @PathParam("id") String id) {
-
-        CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(headers, uriInfo, id, machine));
-
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response create(final CimiMachineCreate cimiData) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();
-
-        CimiManagerActionMachine manager = getManagerMachineAction();
-        manager.execute(request, response);
-
-        return Response.status(response.getStatus()).build();
+        this.cimiManagerCreateMachine.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
     /**
-     * delete operation
+     * Delete a machine.
+     * 
+     * @param id The ID of machine to delete
+     * @return The REST response
      */
     @DELETE
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINE_JSON})
     @Path("{id}")
-    public Response deleteMachine(@PathParam("id") String id) {
-
-        CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(headers, uriInfo, id));
-
+    public Response delete(@PathParam("id") final String id) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
         CimiResponse response = new CimiResponse();
-
-        CimiManagerDeleteMachine manager = getManagerMachineDelete();
-        manager.execute(request, response);
-
-        return Response.status(response.getStatus()).build();
-    }
-
-    private CimiManagerActionMachine getManagerMachineAction() {
-        CimiManagerActionMachine manager = new CimiManagerActionMachine();
-        return manager;
-    }
-
-    private CimiManagerDeleteMachine getManagerMachineDelete() {
-        CimiManagerDeleteMachine manager = new CimiManagerDeleteMachine();
-        return manager;
-    }
-
-    private CimiManagerUpdateMachine getManagerMachineUpdate() {
-        CimiManagerUpdateMachine manager = new CimiManagerUpdateMachine();
-        return manager;
-    }
-
-    private CimiManagerReadMachine getManagerMachineRead() {
-        CimiManagerReadMachine manager = new CimiManagerReadMachine();
-        return manager;
+        this.cimiManagerDeleteMachine.execute(request, response);
+        return HelperResponse.buildResponse(response);
     }
 
 }

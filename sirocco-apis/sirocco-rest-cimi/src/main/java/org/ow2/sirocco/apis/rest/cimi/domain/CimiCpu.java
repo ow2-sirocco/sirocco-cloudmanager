@@ -33,52 +33,72 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class Memory.
- * <p>
- * </p>
+ * Class Cpu.
  */
-@XmlRootElement(name = "Memory")
+@XmlRootElement(name = "Cpu")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMemory implements Serializable {
+public class CimiCpu implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
+    /**
+     * Field "numberVirtualCpus".
+     */
+    private Integer numberVirtualCpus;
 
     /**
-     * Field "quantity".
-     * <p>
-     * </p>
+     * Field "frequency".
      */
-    private Integer quantity;
+    private Integer frequency;
 
     /**
      * Field "units".
      * <p>
-     * enum : byte (B), kibibyte (KiB), mebibyte (MiB), gibibyte (GiB), tebibyte
-     * (TiB), pebibyte (PiB), exbibyte (EiB), zebibyte (ZiB), yobibyte (YiB)
+     * enum : hertz (Hz), decahertz (daHz), hectohertz (hHz), kilohertz (kHz),
+     * megahertz (MHz), gigahertz (GHz), terahertz (THz), petahertz (PHz),
+     * exahertz (EHz), zettahertz (ZHz), yottahertz (YHz)
      * </p>
      */
+    // private FrequencyUnit units;
     private String units;
 
     /**
-     * Return the value of field "quantity".
+     * Return the value of field "numberVirtualCpus".
      * 
      * @return The value
      */
     @XmlAttribute
-    public Integer getQuantity() {
-        return this.quantity;
+    public Integer getNumberVirtualCpus() {
+        return this.numberVirtualCpus;
     }
 
     /**
-     * Set the value of field "quantity".
+     * Set the value of field "numberVirtualCpus".
      * 
-     * @param quantity The value
+     * @param numberVirtualCpus The value
      */
-    public void setQuantity(final Integer quantity) {
-        this.quantity = quantity;
+    public void setNumberVirtualCpus(final Integer numberVirtualCpus) {
+        this.numberVirtualCpus = numberVirtualCpus;
+    }
+
+    /**
+     * Return the value of field "frequency".
+     * 
+     * @return The value
+     */
+    @XmlAttribute
+    public Integer getFrequency() {
+        return this.frequency;
+    }
+
+    /**
+     * Set the value of field "frequency".
+     * 
+     * @param frequency The value
+     */
+    public void setFrequency(final Integer frequency) {
+        this.frequency = frequency;
     }
 
     /**
@@ -99,5 +119,4 @@ public class CimiMemory implements Serializable {
     public void setUnits(final String units) {
         this.units = units;
     }
-
 }

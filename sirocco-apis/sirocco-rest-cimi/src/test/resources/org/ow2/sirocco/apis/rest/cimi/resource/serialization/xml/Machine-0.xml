@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineConfiguration href="hrefValue_0">
+<Machine href="hrefValue_0">
 	<description>descriptionValue_0</description>
 	<name>nameValue_0</name>
 	<created>2000-01-01T01:00:00+01:00</created>
@@ -7,4 +7,5 @@
 	<updated>2000-01-01T01:00:00+01:00</updated>
 	<cpu frequency="0" numberVirtualCpus="0" units="unitValue_0" />
 	<memory quantity="0" units="unitValue_0" />
-</MachineConfiguration>
+	<state>stateValue_0</state>
+</Machine>

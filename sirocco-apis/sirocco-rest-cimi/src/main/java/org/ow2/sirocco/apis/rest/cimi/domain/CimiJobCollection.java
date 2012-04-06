@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -60,6 +61,7 @@ public class CimiJobCollection extends CimiCommonId {
      * 
      * @return The value
      */
+    @XmlElement(name = "job")
     public CimiJob[] getJobs() {
         return this.jobs;
     }

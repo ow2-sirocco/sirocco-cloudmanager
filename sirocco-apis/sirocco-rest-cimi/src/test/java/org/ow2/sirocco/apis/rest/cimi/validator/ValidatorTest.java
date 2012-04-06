@@ -5,7 +5,7 @@ import javax.validation.groups.Default;
 import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
@@ -60,55 +60,59 @@ public class ValidatorTest {
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));
 
         cimi.setName("A");
-        cimi.setDisks(new CimiDisk[0]);
+        cimi.setDisks(new CimiDiskConfiguration[0]);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, GroupCreate.class));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));
 
         cimi.setName("A");
-        cimi.setDisks(new CimiDisk[] {new CimiDisk()});
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration()});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, GroupCreate.class));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));
 
         cimi.setName("A");
-        cimi.setDisks(new CimiDisk[] {new CimiDisk(), new CimiDisk()});
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(), new CimiDiskConfiguration()});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, GroupCreate.class));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));
 
         cimi.setName("A");
-        cimi.setDisks(new CimiDisk[] {new CimiDisk("format", "attachementPoint")});
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration("format", "attachementPoint")});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi, GroupCreate.class));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));
 
         cimi.setName("A");
-        cimi.setDisks(new CimiDisk[] {new CimiDisk("format", "attachementPoint"), new CimiDisk()});
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration("format", "attachementPoint"),
+            new CimiDiskConfiguration()});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, GroupCreate.class));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));
 
         cimi.setName("A");
-        cimi.setDisks(new CimiDisk[] {new CimiDisk("format", "attachementPoint"), new CimiDisk("format", "attachementPoint")});
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration("format", "attachementPoint"),
+            new CimiDiskConfiguration("format", "attachementPoint")});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi, GroupCreate.class));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));
 
         cimi.setName("A");
-        cimi.setDisks(new CimiDisk[] {new CimiDisk("format", "attachementPoint", new CimiCapacity())});
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(new CimiCapacity(), "format", "attachementPoint")});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, GroupCreate.class));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));
 
         cimi.setName("A");
-        cimi.setDisks(new CimiDisk[] {new CimiDisk("format", "attachementPoint", new CimiCapacity(1, "units"))});
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(new CimiCapacity(1, "units"), "format",
+            "attachementPoint")});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi, GroupCreate.class));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));
 
         cimi.setName("0");
-        cimi.setDisks(new CimiDisk[] {new CimiDisk("format", "attachementPoint", new CimiCapacity(1, "units"))});
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(new CimiCapacity(1, "units"), "format",
+            "attachementPoint")});
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(cimi, GroupCreate.class));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(cimi, Default.class, GroupCreate.class));

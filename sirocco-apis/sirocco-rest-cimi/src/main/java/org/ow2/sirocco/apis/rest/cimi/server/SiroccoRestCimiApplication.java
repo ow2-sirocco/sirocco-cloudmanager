@@ -54,8 +54,14 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import org.ow2.sirocco.apis.rest.cimi.resource.CimiCloudEntryPointResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CimiCredentialsResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CimiCredentialsTemplateResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CimiJobResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineConfigurationResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineImageResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineTemplateResource;
 
 /**
  * Define the REST Application and the REST resources.
@@ -71,11 +77,19 @@ public class SiroccoRestCimiApplication extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
 
+        // Configuration
         classes.add(JacksonConfigurator.class);
-        // classes.add(CimiCloudEntryPointResource.class);
+
+        // Resources
+        classes.add(CimiCloudEntryPointResource.class);
+        classes.add(CimiCredentialsResource.class);
+        classes.add(CimiCredentialsTemplateResource.class);
+        classes.add(CimiJobResource.class);
+        classes.add(CimiMachineResource.class);
         classes.add(CimiMachineConfigurationResource.class);
         classes.add(CimiMachineImageResource.class);
-        // classes.add(CimiMachineResource.class);
+        classes.add(CimiMachineTemplateResource.class);
+
         return classes;
     }
 }

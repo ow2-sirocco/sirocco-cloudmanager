@@ -24,48 +24,43 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class CredentialsTemplateCollection.
+ * Class Machine Create.
  * <p>
  * </p>
  */
-@XmlRootElement(name = "CredentialsTemplateCollection")
+@XmlRootElement(name = "MachineCreate")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsTemplateCollection extends CimiCommonId {
+public class CimiMachineCreate extends CimiCommon {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "CredentialsTemplates".
-     * <p>
-     * </p>
+     * Field "machineTemplate".
      */
-    private CimiCredentialsTemplate[] credentialsTemplates;
+    private CimiMachineTemplate machineTemplate;
 
     /**
-     * Return the value of field "CredentialsTemplates".
+     * Return the value of field "machineTemplate".
      * 
      * @return The value
      */
-    @XmlElement(name = "credentialsTemplate")
-    public CimiCredentialsTemplate[] getCredentialsTemplates() {
-        return this.credentialsTemplates;
+    public CimiMachineTemplate getMachineTemplate() {
+        return this.machineTemplate;
     }
 
     /**
-     * Set the value of field "CredentialsTemplates".
+     * Set the value of field "machineTemplate".
      * 
-     * @param CredentialsTemplates The value
+     * @param machineTemplate The value
      */
-    public void setCredentialsTemplates(final CimiCredentialsTemplate[] credentialsTemplates) {
-        this.credentialsTemplates = credentialsTemplates;
+    public void setMachineTemplate(final CimiMachineTemplate machineTemplate) {
+        this.machineTemplate = machineTemplate;
     }
-
 }

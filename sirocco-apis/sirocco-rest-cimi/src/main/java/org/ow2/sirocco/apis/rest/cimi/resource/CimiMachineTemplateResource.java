@@ -35,7 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -47,41 +47,41 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Credentials Template REST resource.
+ * Machine Template REST resource.
  * <p>
  * Operations supports :
  * <ul>
- * <li>Create a credential template</li>
- * <li>Delete a credential template</li>
- * <li>Read a credential template</li>
- * <li>Update a credential template</li>
+ * <li>Create a machine template</li>
+ * <li>Delete a machine template</li>
+ * <li>Read a machine template</li>
+ * <li>Update a machine template</li>
  * </ul>
  * </p>
  */
 @Component
-@Path(ConstantsPath.CREDENTIALS_TEMPLATE_PATH)
-public class CimiCredentialsTemplateResource extends CimiResourceAbstract {
+@Path(ConstantsPath.MACHINE_TEMPLATE_PATH)
+public class CimiMachineTemplateResource extends CimiResourceAbstract {
 
     @Autowired
-    @Qualifier("CimiManagerReadCredentialsTemplate")
-    private CimiManager cimiManagerReadCredentialsTemplate;
+    @Qualifier("CimiManagerReadMachineTemplate")
+    private CimiManager cimiManagerReadMachineTemplate;
 
     @Autowired
-    @Qualifier("CimiManagerDeleteCredentialsTemplate")
-    private CimiManager cimiManagerDeleteCredentialsTemplate;
+    @Qualifier("CimiManagerDeleteMachineTemplate")
+    private CimiManager cimiManagerDeleteMachineTemplate;
 
     @Autowired
-    @Qualifier("CimiManagerUpdateCredentialsTemplate")
-    private CimiManager cimiManagerUpdateCredentialsTemplate;
+    @Qualifier("CimiManagerUpdateMachineTemplate")
+    private CimiManager cimiManagerUpdateMachineTemplate;
 
     @Autowired
-    @Qualifier("CimiManagerCreateCredentialsTemplate")
-    private CimiManager cimiManagerCreateCredentialsTemplate;
+    @Qualifier("CimiManagerCreateMachineTemplate")
+    private CimiManager cimiManagerCreateMachineTemplate;
 
     /**
-     * Get a credential template.
+     * Get a machine template.
      * 
-     * @param id The ID of credential to get
+     * @param id The ID of machine template to get
      * @return The REST response
      */
     @GET
@@ -90,44 +90,44 @@ public class CimiCredentialsTemplateResource extends CimiResourceAbstract {
     public Response read(@PathParam("id") final String id) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerReadCredentialsTemplate.execute(request, response);
+        this.cimiManagerReadMachineTemplate.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Update a credential template.
+     * Update a machine template.
      * 
-     * @param id The ID of credential to update
+     * @param id The ID of machine template to update
      * @return The REST response
      */
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
-    public Response update(@PathParam("id") final String id, final CimiCredentialsTemplate cimiData) {
+    public Response update(@PathParam("id") final String id, final CimiMachineTemplate cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerUpdateCredentialsTemplate.execute(request, response);
+        this.cimiManagerUpdateMachineTemplate.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Create a credential template.
+     * Create a machine template.
      * 
      * @return The REST response
      */
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response create(final CimiCredentialsTemplate cimiData) {
+    public Response create(final CimiMachineTemplate cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerCreateCredentialsTemplate.execute(request, response);
+        this.cimiManagerCreateMachineTemplate.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 
     /**
-     * Delete a credential template.
+     * Delete a machine template.
      * 
-     * @param id The ID of credential to delete
+     * @param id The ID of machine template to delete
      * @return The REST response
      */
     @DELETE
@@ -135,7 +135,7 @@ public class CimiCredentialsTemplateResource extends CimiResourceAbstract {
     public Response delete(@PathParam("id") final String id) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
         CimiResponse response = new CimiResponse();
-        this.cimiManagerDeleteCredentialsTemplate.execute(request, response);
+        this.cimiManagerDeleteMachineTemplate.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 

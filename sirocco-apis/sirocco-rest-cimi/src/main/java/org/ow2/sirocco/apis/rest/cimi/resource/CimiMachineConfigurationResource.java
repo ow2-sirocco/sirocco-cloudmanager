@@ -129,7 +129,6 @@ public class CimiMachineConfigurationResource extends CimiResourceAbstract {
     @PUT
     @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
         MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML})
-    @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
     @Path("{id}")
     public Response update(@PathParam("id") final String id, final CimiMachineConfiguration cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
@@ -161,7 +160,6 @@ public class CimiMachineConfigurationResource extends CimiResourceAbstract {
     @POST
     @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_JSON,
         MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_XML})
-    @Produces({MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_JOB_XML})
     public Response create(final CimiMachineConfiguration cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();
@@ -176,8 +174,6 @@ public class CimiMachineConfigurationResource extends CimiResourceAbstract {
      * @return The REST response
      */
     @DELETE
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
-        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML})
     @Path("{id}")
     public Response delete(@PathParam("id") final String id) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
@@ -185,5 +181,4 @@ public class CimiMachineConfigurationResource extends CimiResourceAbstract {
         this.cimiManagerDeleteMachineConfiguration.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
-
 }
