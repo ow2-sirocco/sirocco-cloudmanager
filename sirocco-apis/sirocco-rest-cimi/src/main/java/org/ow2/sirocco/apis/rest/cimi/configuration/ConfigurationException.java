@@ -22,46 +22,47 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.domain;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+package org.ow2.sirocco.apis.rest.cimi.configuration;
 
 /**
- * Class CredentialsCollection.
+ * Runtime configuration exception.
+ * <p>
+ * Occurs when a configuration object is required and it is not found in
+ * configuration.
+ * </p>
  */
-@XmlRootElement(name = "CredentialsCollection")
-@JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsCollection extends CimiCommonId {
+public class ConfigurationException extends RuntimeException {
 
-    /** Serial number */
+    /** Serial. */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "credentials".
-     * <p>
-     * </p>
-     */
-    private CimiCredentials[] credentials;
-
-    /**
-     * Return the value of field "Credentials".
      * 
-     * @return The value
      */
-    public CimiCredentials[] getCredentials() {
-        return this.credentials;
+    public ConfigurationException() {
+        super();
     }
 
     /**
-     * Set the value of field "Credentials".
-     * 
-     * @param Credentials The value
+     * @param message
+     * @param cause
      */
-    public void setCredentials(final CimiCredentials[] credentials) {
-        this.credentials = credentials;
+    public ConfigurationException(final String message, final Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * @param message
+     */
+    public ConfigurationException(final String message) {
+        super(message);
+    }
+
+    /**
+     * @param cause
+     */
+    public ConfigurationException(final Throwable cause) {
+        super(cause);
     }
 
 }

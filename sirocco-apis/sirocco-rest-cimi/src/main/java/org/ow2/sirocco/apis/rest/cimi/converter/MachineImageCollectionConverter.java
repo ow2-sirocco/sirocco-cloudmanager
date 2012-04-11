@@ -29,7 +29,8 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 
@@ -40,46 +41,105 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
  * Converted classes:
  * <ul>
  * <li>CIMI model: {@link CimiMachineImageCollection}</li>
- * <li>Service model: List of {@link MachineImage}</li>
+ * <li>Service model: {@link MachineImageCollection}</li>
  * </ul>
  * </p>
  */
-public class MachineImageCollectionConverter {
+public class MachineImageCollectionConverter extends CommonIdConverter implements EntityConverter {
 
     /**
-     * Copy the data from the service object in the CIMI object.
+     * {@inheritDoc}
      * 
-     * @param dataService An instance of {@link MachineImageCollection}
-     * @param dataCimi An instance of List of {@link CimiMachineImage}
-     * @param urlBase The URL base
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
      */
-    public static void copyToCimi(final List<MachineImage> dataService, final CimiMachineImageCollection dataCimi,
-        final String urlBase) {
-
-        dataCimi.setId(HrefHelper.makeHref(urlBase, ConstantsPath.MACHINE_IMAGE));
-        CimiMachineImage cimi = null;
-        List<CimiMachineImage> cimiList = new ArrayList<CimiMachineImage>();
-        for (MachineImage machineImage : dataService) {
-            cimi = new CimiMachineImage();
-            cimiList.add(cimi);
-            MachineImageConverter.copyToCimi(machineImage, cimi, urlBase, false, true);
-        }
-        dataCimi.setMachineImages(cimiList.toArray(new CimiMachineImage[cimiList.size()]));
+    @Override
+    public Object toCimi(final Context context, final Object dataService) {
+        CimiMachineImageCollection cimi = new CimiMachineImageCollection();
+        this.copyToCimi(context, dataService, cimi);
+        return cimi;
     }
 
     /**
-     * Copy the data from the CIMI object in the service object.
+     * {@inheritDoc}
      * 
-     * @param dataCimi An instance of {@link CimiMachineImageCollection}
-     * @param dataService An instance of {@link MachineImage}
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object, java.lang.Object)
      */
-    public static void copyToService(final CimiMachineImageCollection dataCimi, final List<MachineImage> dataService) {
-        MachineImage serviceImage;
+    @SuppressWarnings("unchecked")
+    @Override
+    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+        MachineImageCollection use;
+        if (dataService instanceof List<?>) {
+            use = new MachineImageCollection();
+            use.setImages((List<MachineImage>) dataService);
+        } else {
+            use = (MachineImageCollection) dataService;
+        }
+        this.doCopyToCimi(context, use, (CimiMachineImageCollection) dataCimi);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
+     */
+    @Override
+    public Object toService(final Context context, final Object dataCimi) {
+        MachineImageCollection service = new MachineImageCollection();
+        this.copyToService(context, dataCimi, service);
+        return service;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
+     *      java.lang.Object)
+     */
+    @Override
+    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+        this.doCopyToService(context, (CimiMachineImageCollection) dataCimi, (MachineImageCollection) dataService);
+    }
+
+    /**
+     * Copy data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void doCopyToCimi(final Context context, final MachineImageCollection dataService,
+        final CimiMachineImageCollection dataCimi) {
+        this.fill(context, dataService, dataCimi);
+        EntityConverter converter = context.getConverter(CimiEntityType.MachineImage);
+        List<CimiMachineImage> cimiList = new ArrayList<CimiMachineImage>();
+        for (MachineImage machineImage : dataService.getImages()) {
+            cimiList.add((CimiMachineImage) converter.toCimi(context, machineImage));
+        }
+        dataCimi.setMachineImages(cimiList.toArray(new CimiMachineImage[cimiList.size()]));
+
+    }
+
+    /**
+     * Copy data from a CIMI object to a service object.
+     * 
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
+     */
+    protected void doCopyToService(final Context context, final CimiMachineImageCollection dataCimi,
+        final MachineImageCollection dataService) {
+        List<MachineImage> listServicesImages = new ArrayList<MachineImage>();
+        dataService.setImages(listServicesImages);
         CimiMachineImage[] images = dataCimi.getMachineImages();
-        for (CimiMachineImage cimiImage : images) {
-            serviceImage = new MachineImage();
-            dataService.add(serviceImage);
-            MachineImageConverter.copyToService(cimiImage, serviceImage);
+        if (null != images) {
+            EntityConverter converter = context.getConverter(CimiEntityType.MachineImage);
+            for (CimiMachineImage cimiImage : images) {
+                listServicesImages.add((MachineImage) converter.toService(context, cimiImage));
+            }
         }
     }
 

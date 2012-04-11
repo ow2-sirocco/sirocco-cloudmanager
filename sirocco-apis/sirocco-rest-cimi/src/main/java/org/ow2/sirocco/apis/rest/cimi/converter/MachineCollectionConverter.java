@@ -24,21 +24,29 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 
 /**
- * Convert the data of the CIMI model and the service model in both directions.
+ * Helper class to convert the data of the CIMI model and the service model in
+ * both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiMachineConfiguration}</li>
- * <li>Service model: {@link MachineConfiguration}</li>
+ * <li>CIMI model: {@link CimiMachineCollection}</li>
+ * <li>Service model: {@link MachineCollection}</li>
  * </ul>
  * </p>
  */
-public class MachineConfigurationConverter extends CommonIdConverter implements EntityConverter {
+public class MachineCollectionConverter extends CommonIdConverter implements EntityConverter {
+
     /**
      * {@inheritDoc}
      * 
@@ -47,7 +55,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      */
     @Override
     public Object toCimi(final Context context, final Object dataService) {
-        CimiMachineConfiguration cimi = new CimiMachineConfiguration();
+        CimiMachineCollection cimi = new CimiMachineCollection();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -58,9 +66,17 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
      *      java.lang.Object, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (MachineConfiguration) dataService, (CimiMachineConfiguration) dataCimi);
+        MachineCollection use;
+        if (dataService instanceof List<?>) {
+            use = new MachineCollection();
+            use.setMachines((List<Machine>) dataService);
+        } else {
+            use = (MachineCollection) dataService;
+        }
+        this.doCopyToCimi(context, use, (CimiMachineCollection) dataCimi);
     }
 
     /**
@@ -71,7 +87,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      */
     @Override
     public Object toService(final Context context, final Object dataCimi) {
-        MachineConfiguration service = new MachineConfiguration();
+        MachineCollection service = new MachineCollection();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -85,7 +101,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      */
     @Override
     public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiMachineConfiguration) dataCimi, (MachineConfiguration) dataService);
+        this.doCopyToService(context, (CimiMachineCollection) dataCimi, (MachineCollection) dataService);
     }
 
     /**
@@ -95,24 +111,15 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final MachineConfiguration dataService,
-        final CimiMachineConfiguration dataCimi) {
+    protected void doCopyToCimi(final Context context, final MachineCollection dataService, final CimiMachineCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if (true == context.shouldBeExpanded(dataCimi)) {
-            // TODO
-            if (null != dataService.getCpu()) {
-                // dataCimi.setConfigurationLocation(new
-                // ConfigurationLocation(dataService.getConfigurationLocation()));
-            }
-            if (null != dataService.getMemory()) {
-                // dataCimi.setConfigurationLocation(new
-                // ConfigurationLocation(dataService.getConfigurationLocation()));
-            }
-            if (null != dataService.getDiskTemplates()) {
-                // dataCimi.setConfigurationLocation(new
-                // ConfigurationLocation(dataService.getConfigurationLocation()));
-            }
+        EntityConverter converter = context.getConverter(CimiEntityType.Machine);
+        List<CimiMachine> cimiList = new ArrayList<CimiMachine>();
+        for (Machine machineImage : dataService.getMachines()) {
+            cimiList.add((CimiMachine) converter.toCimi(context, machineImage));
         }
+        dataCimi.setMachines(cimiList.toArray(new CimiMachine[cimiList.size()]));
+
     }
 
     /**
@@ -122,10 +129,16 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiMachineConfiguration dataCimi,
-        final MachineConfiguration dataService) {
-        this.fill(dataCimi, dataService);
-        // TODO
+    protected void doCopyToService(final Context context, final CimiMachineCollection dataCimi,
+        final MachineCollection dataService) {
+        List<Machine> listServicesImages = new ArrayList<Machine>();
+        dataService.setMachines(listServicesImages);
+
+        EntityConverter converter = context.getConverter(CimiEntityType.Machine);
+        CimiMachine[] images = dataCimi.getMachines();
+        for (CimiMachine cimiImage : images) {
+            listServicesImages.add((Machine) converter.toService(context, cimiImage));
+        }
     }
 
 }

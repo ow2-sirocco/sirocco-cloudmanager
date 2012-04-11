@@ -26,12 +26,13 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
@@ -82,8 +83,9 @@ public class CimiManagerReadMachineImage extends CimiManagerReadAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        CimiMachineImage cimi = new CimiMachineImage();
-        MachineImageConverter.copyToCimi((MachineImage) dataService, cimi, request.getBaseUri(), true, false);
+        Context context = new Context(request, CimiEntityType.MachineImage);
+        CimiMachineImage cimi = (CimiMachineImage) context.getConverter().toCimi(context, dataService);
+
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }

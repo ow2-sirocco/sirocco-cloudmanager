@@ -24,12 +24,11 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,19 +66,8 @@ public class CimiManagerCreateMachineConfiguration extends CimiManagerCreateAbst
      */
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        MachineConfiguration service = new MachineConfiguration();
-        MachineConfigurationConverter.copyToService((CimiMachineConfiguration) request.getCimiData(), service);
-        return service;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract#getEntityPathname()
-     */
-    @Override
-    protected String getEntityPathname() {
-        return ConstantsPath.MACHINE_CONFIGURATION;
+        Context context = new Context(request, CimiEntityType.MachineConfiguration);
+        return context.getConverter().toService(context, request.getCimiData());
     }
 
 }

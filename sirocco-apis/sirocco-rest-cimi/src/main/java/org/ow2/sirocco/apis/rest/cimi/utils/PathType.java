@@ -25,7 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.utils;
 
 /**
- *
+ * Enumeration of all the path name used.
  */
 public enum PathType {
     /** */
@@ -45,25 +45,38 @@ public enum PathType {
     /** */
     MachineTemplate(ConstantsPath.MACHINE_TEMPLATE);
 
-    /** */
+    /** The pathname. */
     String pathname;
 
-    /** */
+    /** Constructor. */
     private PathType(final String pathname) {
         this.pathname = pathname;
     }
 
     /**
-     * @return
+     * Get the pathname.
+     * 
+     * @return The pathname
      */
     public String getPathname() {
         return this.pathname;
     }
 
+    /**
+     * Get the complete path.
+     * 
+     * @return The complete path
+     */
     public String getCompletePath() {
         return "/" + this.pathname;
     }
 
+    /**
+     * Find the path type with a given pathname.
+     * 
+     * @param pathname The pathname
+     * @return The path type or null if not found
+     */
     public static PathType valueOfPathname(final String pathname) {
         PathType type = null;
         for (PathType value : PathType.values()) {

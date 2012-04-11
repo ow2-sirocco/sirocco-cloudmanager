@@ -28,16 +28,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.ParentJob;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
 /**
- * Helper class to convert the data of the CIMI model and the service model in
- * both directions.
+ * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
@@ -46,19 +43,66 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
  * </ul>
  * </p>
  */
-public class JobConverter {
+public class JobConverter extends CommonIdConverter implements EntityConverter {
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
+     */
+    @Override
+    public Object toCimi(final Context context, final Object dataService) {
+        CimiJob cimi = new CimiJob();
+        this.copyToCimi(context, dataService, cimi);
+        return cimi;
+    }
 
     /**
-     * Copy the data from the service object in the CIMI object.
+     * {@inheritDoc}
      * 
-     * @param dataService An instance of {@link MachineImage}
-     * @param dataCimi An instance of {@link CimiMachineImage}
-     * @param urlBase The URL base
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object, java.lang.Object)
      */
-    public static void copyToCimi(final Job dataService, final CimiJob dataCimi, final String urlBase, final boolean expand) {
-        if (true == expand) {
-            CommonConverter.copyToCimi(dataService, dataCimi, urlBase, ConstantsPath.JOB);
+    @Override
+    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+        this.doCopyToCimi(context, (Job) dataService, (CimiJob) dataCimi);
+    }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
+     */
+    @Override
+    public Object toService(final Context context, final Object dataCimi) {
+        Job service = new Job();
+        this.copyToService(context, dataCimi, service);
+        return service;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
+     *      java.lang.Object)
+     */
+    @Override
+    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+        this.doCopyToService(context, (CimiJob) dataCimi, (Job) dataService);
+    }
+
+    /**
+     * Copy data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void doCopyToCimi(final Context context, final Job dataService, final CimiJob dataCimi) {
+        this.fill(context, dataService, dataCimi);
+        if (true == context.shouldBeExpanded(dataCimi)) {
             dataCimi.setAction(dataService.getAction());
             dataCimi.setIsCancellable(dataService.getIsCancellable());
             dataCimi.setProgress(dataService.getProgress());
@@ -69,13 +113,12 @@ public class JobConverter {
             dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
 
             if (null != dataService.getParentJob()) {
-                dataCimi.setParentJob(new ParentJob(HrefHelper.makeHref(urlBase, ConstantsPath.JOB, dataService.getParentJob()
-                    .getId())));
+                dataCimi.setParentJob(new ParentJob(context.makeHref(dataCimi, dataService.getParentJob().getId())));
             }
             if (null != dataService.getNestedJobs()) {
                 List<NestedJob> list = new ArrayList<NestedJob>();
                 for (Job job : dataService.getNestedJobs()) {
-                    list.add(new NestedJob(HrefHelper.makeHref(urlBase, ConstantsPath.JOB, job.getId())));
+                    list.add(new NestedJob(context.makeHref(dataCimi, job.getId())));
                 }
                 dataCimi.setNestedJobs(list.toArray(new NestedJob[list.size()]));
             }
@@ -83,14 +126,13 @@ public class JobConverter {
     }
 
     /**
-     * Copy the data from the CIMI object in the service object.
+     * Copy data from a CIMI object to a service object.
      * 
-     * @param dataCimi An instance of {@link CimiMachineImage}
-     * @param dataService An instance of {@link MachineImage}
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
      */
-    public static void copyToService(final CimiMachineImage dataCimi, final MachineImage dataService) {
-        CommonConverter.copyToService(dataCimi, dataService);
-        // Nothing to do
+    protected void doCopyToService(final Context context, final CimiJob dataCimi, final Job dataService) {
+        this.fill(dataCimi, dataService);
     }
-
 }

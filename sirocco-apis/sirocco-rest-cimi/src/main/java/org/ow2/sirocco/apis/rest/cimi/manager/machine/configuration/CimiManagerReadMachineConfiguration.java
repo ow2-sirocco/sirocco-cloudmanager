@@ -26,12 +26,13 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -86,8 +87,8 @@ public class CimiManagerReadMachineConfiguration extends CimiManagerReadAbstract
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        CimiMachineConfiguration cimi = new CimiMachineConfiguration();
-        MachineConfigurationConverter.copyToCimi((MachineConfiguration) dataService, cimi, request.getBaseUri(), true, false);
+        Context context = new Context(request, CimiEntityType.MachineConfiguration);
+        CimiMachineConfiguration cimi = (CimiMachineConfiguration) context.getConverter().toCimi(context, dataService);
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }

@@ -24,12 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.CommonConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -76,8 +76,9 @@ public class CimiManagerUpdateMachineImageCollection extends CimiManagerUpdateAb
      */
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        MachineImageCollection service = new MachineImageCollection();
-        CommonConverter.copyToService((CimiCommonId) request.getCimiData(), service);
+        Context context = new Context(request, CimiEntityType.MachineImageCollection);
+        MachineImageCollection service = (MachineImageCollection) context.getConverter().toService(context,
+            request.getCimiData());
         return service;
     }
 

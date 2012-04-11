@@ -27,12 +27,12 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.CommonConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,8 +83,8 @@ public class CimiManagerUpdateMachineConfiguration extends CimiManagerUpdateAbst
      */
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        MachineConfiguration service = new MachineConfiguration();
-        CommonConverter.copyToService((CimiCommonId) request.getCimiData(), service);
+        Context context = new Context(request, CimiEntityType.MachineConfiguration);
+        MachineConfiguration service = (MachineConfiguration) context.getConverter().toService(context, request.getCimiData());
         return service;
     }
 

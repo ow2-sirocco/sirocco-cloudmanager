@@ -107,7 +107,7 @@ public class MockMachineImageManager implements IMachineImageManager {
         job.setReturnCode(10);
         job.setStatus(Job.Status.RUNNING);
         job.setStatusMessage("statusMessageValue");
-        job.setTargetEntity("targetEntityValue");
+        job.setTargetEntity(id.toString());
 
         cal = new GregorianCalendar(0, 0, 0, 1, 2, 3);
         cal.add(Calendar.MILLISECOND, 456);
@@ -188,8 +188,11 @@ public class MockMachineImageManager implements IMachineImageManager {
     @Override
     public List<MachineImage> getMachineImages(final int paramInt1, final int paramInt2, final List<String> paramList)
         throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        List<MachineImage> images = new ArrayList<MachineImage>();
+        for (int i = paramInt1; i <= paramInt2; i++) {
+            images.add(this.buildMachineImage(i));
+        }
+        return images;
     }
 
     /**
@@ -200,8 +203,29 @@ public class MockMachineImageManager implements IMachineImageManager {
      */
     @Override
     public MachineImageCollection getMachineImageCollection() throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return this.buildMachineImageCollection();
+    }
+
+    protected MachineImageCollection buildMachineImageCollection() throws CloudProviderException {
+        MachineImageCollection images = new MachineImageCollection();
+        int id = 123;
+        images.setId(id);
+        images.setDescription("descriptionValue" + id);
+        images.setName("nameValue" + id);
+
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put("keyOne" + id, "valueOne" + id);
+        properties.put("keyTwo" + id, "valueTwo" + id);
+        properties.put("keyThree" + id, "valueThree" + id);
+        images.setProperties(properties);
+
+        Calendar cal = new GregorianCalendar(2012, 3, 7, 13, 25, 37);
+        cal.add(Calendar.MILLISECOND, 987);
+        images.setCreated(cal.getTime());
+        images.setUpdated(cal.getTime());
+
+        images.setImages(this.getMachineImages());
+        return images;
     }
 
     /**

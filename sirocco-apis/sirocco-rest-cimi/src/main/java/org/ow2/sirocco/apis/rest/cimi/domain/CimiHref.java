@@ -26,6 +26,9 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
+/**
+ * Referenced entity can reference another entity.
+ */
 public interface CimiHref extends Serializable {
 
 }

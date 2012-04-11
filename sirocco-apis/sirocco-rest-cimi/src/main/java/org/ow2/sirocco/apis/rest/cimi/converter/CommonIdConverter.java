@@ -24,10 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 /**
@@ -35,42 +33,29 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiCommon}</li>
+ * <li>CIMI model: {@link CimiCommonId}</li>
  * <li>Service model: {@link CloudEntity}</li>
  * </ul>
  * </p>
  */
-public class CommonConverter {
+public class CommonIdConverter extends CommonConverter {
 
     /**
      * Fill the common data from a service object to a CIMI object.
      * 
+     * @param context The current context
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void fill(final CloudEntity dataService, final CimiCommon dataCimi) {
-        dataCimi.setDescription(dataService.getDescription());
-        dataCimi.setName(dataService.getName());
-        if (null != dataService.getProperties()) {
-            Map<String, String> props = new HashMap<String, String>();
-            dataCimi.setProperties(props);
-            props.putAll(dataService.getProperties());
+    protected void fill(final Context context, final CloudEntity dataService, final CimiCommonId dataCimi) {
+        if (true == context.shouldBeExpanded(dataCimi)) {
+            this.fill(dataService, dataCimi);
+            dataCimi.setCreated(dataService.getCreated());
+            dataCimi.setUpdated(dataService.getUpdated());
+            dataCimi.setId(context.makeHref(dataCimi, dataService.getId()));
         }
-    }
-
-    /**
-     * Fill the common data from a CIMI object to a service object.
-     * 
-     * @param dataCimi Source CIMI object
-     * @param dataService Destination Service object
-     */
-    protected void fill(final CimiCommon dataCimi, final CloudEntity dataService) {
-        dataService.setDescription(dataCimi.getDescription());
-        dataService.setName(dataCimi.getName());
-        if (null != dataCimi.getProperties()) {
-            Map<String, String> props = new HashMap<String, String>();
-            dataService.setProperties(props);
-            props.putAll(dataCimi.getProperties());
+        if (true == context.shouldBeReferenced(dataCimi)) {
+            dataCimi.setHref(context.makeHref(dataCimi, dataService.getId()));
         }
     }
 

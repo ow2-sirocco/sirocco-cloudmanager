@@ -26,12 +26,11 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
 /**
- * Helper class to convert the data of the CIMI model and the service model in
- * both directions.
+ * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
@@ -40,39 +39,87 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
  * </ul>
  * </p>
  */
-public class MachineImageConverter {
+public class MachineImageConverter extends CommonIdConverter implements EntityConverter {
 
     /**
-     * Copy the data from the service object in the CIMI object.
+     * {@inheritDoc}
      * 
-     * @param dataService An instance of {@link MachineImage}
-     * @param dataCimi An instance of {@link CimiMachineImage}
-     * @param urlBase The URL base
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
      */
-    public static void copyToCimi(final MachineImage dataService, final CimiMachineImage dataCimi, final String urlBase,
-        final boolean expand, final boolean href) {
-        if (true == expand) {
-            CommonConverter.copyToCimi(dataService, dataCimi, urlBase, ConstantsPath.MACHINE_IMAGE);
+    @Override
+    public Object toCimi(final Context context, final Object dataService) {
+        CimiMachineImage cimi = new CimiMachineImage();
+        this.copyToCimi(context, dataService, cimi);
+        return cimi;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object, java.lang.Object)
+     */
+    @Override
+    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+        this.doCopyToCimi(context, (MachineImage) dataService, (CimiMachineImage) dataCimi);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
+     */
+    @Override
+    public Object toService(final Context context, final Object dataCimi) {
+        MachineImage service = new MachineImage();
+        this.copyToService(context, dataCimi, service);
+        return service;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
+     *      java.lang.Object)
+     */
+    @Override
+    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+        this.doCopyToService(context, (CimiMachineImage) dataCimi, (MachineImage) dataService);
+    }
+
+    /**
+     * Copy data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void doCopyToCimi(final Context context, final MachineImage dataService, final CimiMachineImage dataCimi) {
+        this.fill(context, dataService, dataCimi);
+        if (true == context.shouldBeExpanded(dataCimi)) {
             if (null != dataService.getImageLocation()) {
                 dataCimi.setImageLocation(new ImageLocation(dataService.getImageLocation()));
             }
             dataCimi.setState(dataService.getState().toString());
             dataCimi.setType(dataService.getType().toString());
         }
-        if (true == href) {
-            dataCimi.setHref(HrefHelper.makeHref(urlBase, ConstantsPath.MACHINE_IMAGE, dataService.getId()));
-        }
     }
 
     /**
-     * Copy the data from the CIMI object in the service object.
+     * Copy data from a CIMI object to a service object.
      * 
-     * @param dataCimi An instance of {@link CimiMachineImage}
-     * @param dataService An instance of {@link MachineImage}
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
      */
-    public static void copyToService(final CimiMachineImage dataCimi, final MachineImage dataService) {
-        CommonConverter.copyToService(dataCimi, dataService);
-        dataService.setImageLocation(dataCimi.getImageLocation().getHref());
+    protected void doCopyToService(final Context context, final CimiMachineImage dataCimi, final MachineImage dataService) {
+        this.fill(dataCimi, dataService);
+        if (null != dataCimi.getImageLocation()) {
+            dataService.setImageLocation(dataCimi.getImageLocation().getHref());
+        }
     }
 
 }

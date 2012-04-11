@@ -25,12 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 
 /**
- * Helper class to convert the data of the CIMI model and the service model in
- * both directions.
+ * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
@@ -39,29 +38,80 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
  * </ul>
  * </p>
  */
-public class CloudEntryPointConverter {
-
+public class CloudEntryPointConverter extends CommonIdConverter implements EntityConverter {
     /**
-     * Copy the data from the service object in the CIMI object.
+     * {@inheritDoc}
      * 
-     * @param dataService An instance of {@link CloudEntryPoint}
-     * @param dataCimi An instance of List of {@link CimiCloudEntryPoint}
-     * @param urlBase The URL base
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
      */
-    public static void copyToCimi(final CloudEntryPoint dataService, final CimiCloudEntryPoint dataCimi, final String urlBase,
-        final boolean expand) {
-        CommonConverter.copyToCimi(dataService, dataCimi, urlBase, ConstantsPath.CLOUDENTRYPOINT);
-        // FIXME Detail not implemented in CloudEntryPoint
+    @Override
+    public Object toCimi(final Context context, final Object dataService) {
+        CimiCloudEntryPoint cimi = new CimiCloudEntryPoint();
+        this.copyToCimi(context, dataService, cimi);
+        return cimi;
     }
 
     /**
-     * Copy the data from the CIMI object in the service object.
+     * {@inheritDoc}
      * 
-     * @param dataCimi An instance of {@link CimiCloudEntryPoint}
-     * @param dataService An instance of {@link CloudEntryPoint}
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object, java.lang.Object)
      */
-    public static void copyToService(final CimiCloudEntryPoint dataCimi, final CloudEntryPoint dataService) {
-        // FIXME Not Implemented in EJB
+    @Override
+    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+        this.doCopyToCimi(context, (CloudEntryPoint) dataService, (CimiCloudEntryPoint) dataCimi);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
+     */
+    @Override
+    public Object toService(final Context context, final Object dataCimi) {
+        CloudEntryPoint service = new CloudEntryPoint();
+        this.copyToService(context, dataCimi, service);
+        return service;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
+     *      java.lang.Object)
+     */
+    @Override
+    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+        this.doCopyToService(context, (CimiCloudEntryPoint) dataCimi, (CloudEntryPoint) dataService);
+    }
+
+    /**
+     * Copy data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void doCopyToCimi(final Context context, final CloudEntryPoint dataService, final CimiCloudEntryPoint dataCimi) {
+        this.fill(context, dataService, dataCimi);
+        if (true == context.shouldBeExpanded(dataCimi)) {
+            // TODO
+        }
+    }
+
+    /**
+     * Copy data from a CIMI object to a service object.
+     * 
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
+     */
+    protected void doCopyToService(final Context context, final CimiCloudEntryPoint dataCimi, final CloudEntryPoint dataService) {
+        this.fill(dataCimi, dataService);
+        // TODO
     }
 
 }

@@ -24,21 +24,22 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiMachineConfiguration}</li>
- * <li>Service model: {@link MachineConfiguration}</li>
+ * <li>CIMI model: {@link CimiMachineTemplate}</li>
+ * <li>Service model: {@link MachineTemplate}</li>
  * </ul>
  * </p>
  */
-public class MachineConfigurationConverter extends CommonIdConverter implements EntityConverter {
+public class MachineTemplateConverter extends CommonIdConverter implements EntityConverter {
+
     /**
      * {@inheritDoc}
      * 
@@ -47,7 +48,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      */
     @Override
     public Object toCimi(final Context context, final Object dataService) {
-        CimiMachineConfiguration cimi = new CimiMachineConfiguration();
+        CimiMachineTemplate cimi = new CimiMachineTemplate();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -60,7 +61,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      */
     @Override
     public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (MachineConfiguration) dataService, (CimiMachineConfiguration) dataCimi);
+        this.doCopyToCimi(context, (MachineTemplate) dataService, (CimiMachineTemplate) dataCimi);
     }
 
     /**
@@ -71,7 +72,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      */
     @Override
     public Object toService(final Context context, final Object dataCimi) {
-        MachineConfiguration service = new MachineConfiguration();
+        MachineTemplate service = new MachineTemplate();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -85,7 +86,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      */
     @Override
     public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiMachineConfiguration) dataCimi, (MachineConfiguration) dataService);
+        this.doCopyToService(context, (CimiMachineTemplate) dataCimi, (MachineTemplate) dataService);
     }
 
     /**
@@ -95,23 +96,10 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final MachineConfiguration dataService,
-        final CimiMachineConfiguration dataCimi) {
+    protected void doCopyToCimi(final Context context, final MachineTemplate dataService, final CimiMachineTemplate dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.shouldBeExpanded(dataCimi)) {
             // TODO
-            if (null != dataService.getCpu()) {
-                // dataCimi.setConfigurationLocation(new
-                // ConfigurationLocation(dataService.getConfigurationLocation()));
-            }
-            if (null != dataService.getMemory()) {
-                // dataCimi.setConfigurationLocation(new
-                // ConfigurationLocation(dataService.getConfigurationLocation()));
-            }
-            if (null != dataService.getDiskTemplates()) {
-                // dataCimi.setConfigurationLocation(new
-                // ConfigurationLocation(dataService.getConfigurationLocation()));
-            }
         }
     }
 
@@ -122,8 +110,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiMachineConfiguration dataCimi,
-        final MachineConfiguration dataService) {
+    protected void doCopyToService(final Context context, final CimiMachineTemplate dataCimi, final MachineTemplate dataService) {
         this.fill(dataCimi, dataService);
         // TODO
     }

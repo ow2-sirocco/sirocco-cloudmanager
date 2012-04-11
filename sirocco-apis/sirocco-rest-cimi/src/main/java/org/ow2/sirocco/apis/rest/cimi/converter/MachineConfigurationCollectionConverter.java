@@ -29,13 +29,13 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 
 /**
- * Helper class to convert the data of the CIMI model and the service model in
- * both directions.
+ * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
@@ -44,43 +44,100 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
  * </ul>
  * </p>
  */
-public class MachineConfigurationCollectionConverter {
-
+public class MachineConfigurationCollectionConverter extends CommonIdConverter implements EntityConverter {
     /**
-     * Copy the data from the service object in the CIMI object.
+     * {@inheritDoc}
      * 
-     * @param dataService An instance of {@link MachineConfigurationCollection}
-     * @param dataCimi An instance of List of {@link CimiMachineConfiguration}
-     * @param urlBase The URL base
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
      */
-    public static void copyToCimi(final List<MachineConfiguration> dataService,
-        final CimiMachineConfigurationCollection dataCimi, final String urlBase) {
-
-        dataCimi.setId(HrefHelper.makeHref(urlBase, ConstantsPath.MACHINE_IMAGE));
-        CimiMachineConfiguration cimi = null;
-        List<CimiMachineConfiguration> cimiList = new ArrayList<CimiMachineConfiguration>();
-        for (MachineConfiguration machineConfiguration : dataService) {
-            cimi = new CimiMachineConfiguration();
-            cimiList.add(cimi);
-            MachineConfigurationConverter.copyToCimi(machineConfiguration, cimi, urlBase, false, true);
-        }
-        dataCimi.setMachineConfigurations(cimiList.toArray(new CimiMachineConfiguration[cimiList.size()]));
+    @Override
+    public Object toCimi(final Context context, final Object dataService) {
+        CimiMachineConfigurationCollection cimi = new CimiMachineConfigurationCollection();
+        this.copyToCimi(context, dataService, cimi);
+        return cimi;
     }
 
     /**
-     * Copy the data from the CIMI object in the service object.
+     * {@inheritDoc}
      * 
-     * @param dataCimi An instance of {@link CimiMachineConfigurationCollection}
-     * @param dataService An instance of {@link MachineConfiguration}
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object, java.lang.Object)
      */
-    public static void copyToService(final CimiMachineConfigurationCollection dataCimi,
-        final List<MachineConfiguration> dataService) {
-        MachineConfiguration serviceConfiguration;
+    @SuppressWarnings("unchecked")
+    @Override
+    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+        MachineConfigurationCollection use;
+        if (dataService instanceof List<?>) {
+            use = new MachineConfigurationCollection();
+            use.setMachineConfigurations((List<MachineConfiguration>) dataService);
+        } else {
+            use = (MachineConfigurationCollection) dataService;
+        }
+        this.doCopyToCimi(context, use, (CimiMachineConfigurationCollection) dataCimi);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
+     */
+    @Override
+    public Object toService(final Context context, final Object dataCimi) {
+        MachineConfigurationCollection service = new MachineConfigurationCollection();
+        this.copyToService(context, dataCimi, service);
+        return service;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
+     *      java.lang.Object)
+     */
+    @Override
+    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+        this.doCopyToService(context, (CimiMachineConfigurationCollection) dataCimi,
+            (MachineConfigurationCollection) dataService);
+    }
+
+    /**
+     * Copy data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void doCopyToCimi(final Context context, final MachineConfigurationCollection dataService,
+        final CimiMachineConfigurationCollection dataCimi) {
+        this.fill(context, dataService, dataCimi);
+        EntityConverter converter = context.getConverter(CimiEntityType.MachineConfiguration);
+        List<CimiMachineConfiguration> cimiList = new ArrayList<CimiMachineConfiguration>();
+        for (MachineConfiguration machineImage : dataService.getMachineConfigurations()) {
+            cimiList.add((CimiMachineConfiguration) converter.toCimi(context, machineImage));
+        }
+        dataCimi.setMachineConfigurations(cimiList.toArray(new CimiMachineConfiguration[cimiList.size()]));
+
+    }
+
+    /**
+     * Copy data from a CIMI object to a service object.
+     * 
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
+     */
+    protected void doCopyToService(final Context context, final CimiMachineConfigurationCollection dataCimi,
+        final MachineConfigurationCollection dataService) {
+        List<MachineConfiguration> listServicesImages = new ArrayList<MachineConfiguration>();
+        dataService.setMachineConfigurations(listServicesImages);
+
+        EntityConverter converter = context.getConverter(CimiEntityType.MachineConfiguration);
         CimiMachineConfiguration[] images = dataCimi.getMachineConfigurations();
-        for (CimiMachineConfiguration cimiConfiguration : images) {
-            serviceConfiguration = new MachineConfiguration();
-            dataService.add(serviceConfiguration);
-            MachineConfigurationConverter.copyToService(cimiConfiguration, serviceConfiguration);
+        for (CimiMachineConfiguration cimiImage : images) {
+            listServicesImages.add((MachineConfiguration) converter.toService(context, cimiImage));
         }
     }
 

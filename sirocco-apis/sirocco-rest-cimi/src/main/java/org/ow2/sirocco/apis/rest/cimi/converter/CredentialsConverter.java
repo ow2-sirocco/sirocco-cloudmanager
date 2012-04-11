@@ -25,14 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 
 /**
- * Helper class to convert the data of the CIMI model and the service model in
- * both directions.
+ * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
@@ -41,75 +38,80 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
  * </ul>
  * </p>
  */
-public class CredentialsConverter {
+public class CredentialsConverter extends CommonIdConverter implements EntityConverter {
 
     /**
-     * Copy the data from the service object in the CIMI object.
+     * {@inheritDoc}
      * 
-     * @param dataService An instance of {@link Credentials}
-     * @param dataCimi An instance of {@link CimiCredentials}
-     * @param urlBase The URL base
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
      */
-    public static void copyToCimi(final Credentials dataService, final CimiCredentials dataCimi, final String urlBase,
-        final boolean expand, final boolean href) {
-        // TODO
-        if (true == expand) {
-            CommonConverter.copyToCimi(dataService, dataCimi, urlBase, ConstantsPath.CREDENTIALS);
-            // if (null != dataService.getCpu()) {
-            // // dataCimi.setConfigurationLocation(new
-            // //
-            // ConfigurationLocation(dataService.getConfigurationLocation()));
-            // }
-            // if (null != dataService.getMemory()) {
-            // // dataCimi.setConfigurationLocation(new
-            // //
-            // ConfigurationLocation(dataService.getConfigurationLocation()));
-            // }
-            // if (null != dataService.getDiskTemplates()) {
-            // // dataCimi.setConfigurationLocation(new
-            // //
-            // ConfigurationLocation(dataService.getConfigurationLocation()));
-            // }
+    @Override
+    public Object toCimi(final Context context, final Object dataService) {
+        CimiCredentials cimi = new CimiCredentials();
+        this.copyToCimi(context, dataService, cimi);
+        return cimi;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object, java.lang.Object)
+     */
+    @Override
+    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+        this.doCopyToCimi(context, (Credentials) dataService, (CimiCredentials) dataCimi);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     *      java.lang.Object)
+     */
+    @Override
+    public Object toService(final Context context, final Object dataCimi) {
+        Credentials service = new Credentials();
+        this.copyToService(context, dataCimi, service);
+        return service;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
+     *      java.lang.Object)
+     */
+    @Override
+    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+        this.doCopyToService(context, (CimiCredentials) dataCimi, (Credentials) dataService);
+    }
+
+    /**
+     * Copy data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void doCopyToCimi(final Context context, final Credentials dataService, final CimiCredentials dataCimi) {
+        this.fill(context, dataService, dataCimi);
+        if (true == context.shouldBeExpanded(dataCimi)) {
+            // TODO
         }
-        if (true == href) {
-            dataCimi.setHref(HrefHelper.makeHref(urlBase, ConstantsPath.CREDENTIALS, dataService.getId()));
-        }
     }
 
     /**
-     * Copy the data from the CIMI object in the service object.
+     * Copy data from a CIMI object to a service object.
      * 
-     * @param dataCimi An instance of {@link CimiCredentials}
-     * @param dataService An instance of {@link Credentials}
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
      */
-    public static void copyToService(final CimiCredentials dataCimi, final Credentials dataService) {
-        CommonConverter.copyToService(dataCimi, dataService);
-        // TODO
-        // dataService.setConfigurationLocation(dataCimi.getConfigurationLocation().getHref());
-    }
-
-    /**
-     * Copy the data from the service object in the CIMI object.
-     * 
-     * @param dataService An instance of {@link Credentials}
-     * @param dataCimi An instance of {@link CimiCredentials}
-     * @param urlBase The URL base
-     */
-    public static void copyToCimi(final CredentialsCreate dataService, final CimiCredentialsCreate dataCimi,
-        final String urlBase, final boolean expand, final boolean href) {
+    protected void doCopyToService(final Context context, final CimiCredentials dataCimi, final Credentials dataService) {
+        this.fill(dataCimi, dataService);
         // TODO
     }
-
-    /**
-     * Copy the data from the CIMI object in the service object.
-     * 
-     * @param dataCimi An instance of {@link CimiCredentialsCreate}
-     * @param dataService An instance of {@link CredentialsCreate}
-     */
-    public static void copyToService(final CimiCredentialsCreate dataCimi, final CredentialsCreate dataService) {
-        CommonConverter.copyToService(dataCimi, dataService);
-        // TODO
-        // dataService.setConfigurationLocation(dataCimi.getConfigurationLocation().getHref());
-    }
-
 }

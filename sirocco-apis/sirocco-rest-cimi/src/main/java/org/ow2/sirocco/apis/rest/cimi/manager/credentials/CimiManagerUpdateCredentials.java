@@ -27,12 +27,12 @@ package org.ow2.sirocco.apis.rest.cimi.manager.credentials;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.CommonConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,8 +83,8 @@ public class CimiManagerUpdateCredentials extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        Credentials service = new Credentials();
-        CommonConverter.copyToService((CimiCommonId) request.getCimiData(), service);
+        Context context = new Context(request, CimiEntityType.Credentials);
+        Credentials service = (Credentials) context.getConverter().toService(context, request.getCimiData());
         return service;
     }
 

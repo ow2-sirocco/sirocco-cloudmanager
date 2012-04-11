@@ -29,7 +29,6 @@ import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
@@ -38,8 +37,9 @@ import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -64,10 +64,10 @@ public class CimiManagerReadMachineImageCollection extends CimiManagerReadAbstra
     @Override
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        List<MachineImage> out = null;
+        Object out = null;
         CimiSelect select = request.getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getMachineImages();
+            out = this.manager.getMachineImageCollection();
         } else {
             if (true == select.isNumericArrayPresent()) {
                 List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());
@@ -88,12 +88,11 @@ public class CimiManagerReadMachineImageCollection extends CimiManagerReadAbstra
      *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
      *      java.lang.Object)
      */
-    @SuppressWarnings("unchecked")
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        CimiMachineImageCollection cimi = new CimiMachineImageCollection();
-        MachineImageCollectionConverter.copyToCimi((List<MachineImage>) dataService, cimi, request.getBaseUri());
+        Context context = new Context(request, CimiEntityType.MachineImageCollection);
+        CimiMachineImageCollection cimi = (CimiMachineImageCollection) context.getConverter().toCimi(context, dataService);
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }
