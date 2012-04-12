@@ -25,12 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
 /**
- *
+ * Storage unit : Decimal quantity unit.
  */
-public enum SIDigitalUnit {
-    Byte("byte", "B"), kiloByte("kilobyte", "kB"), megaByte("megabyte", "MB"), gigaByte("gigabyte", "GB"), teraByte(
-            "terabyte", "TB"), petaByte("petabyte", "PB"), exaByte("exabyte", "EB"), zettaByte("zettabyte", "ZB"), yottaByte(
-            "yottabyte", " YB");
+public enum StorageUnit {
+    BYTE("byte", "B"), KILOBYTE("kilobyte", "kB"), MEGABYTE("megabyte", "MB"), GIGABYTE("gigabyte", "GB"), TERABYTE("terabyte",
+        "TB"), PETABYTE("petabyte", "PB"), EXABYTE("exabyte", "EB"), ZETTABYTE("zettabyte", "ZB"), YOTTABYTE("yottabyte", " YB");
 
     /** The label of unit */
     private String label;
@@ -40,16 +39,18 @@ public enum SIDigitalUnit {
 
     /**
      * Parameter constructor.
+     * 
      * @param label The label of unit
      * @param symbol The symbol of unit
      */
-    SIDigitalUnit(String label, String symbol) {
+    StorageUnit(final String label, final String symbol) {
         this.label = label;
         this.symbol = symbol;
     }
 
     /**
      * Return the label of unit.
+     * 
      * @return The label of unit
      */
     public String getLabel() {
@@ -58,9 +59,34 @@ public enum SIDigitalUnit {
 
     /**
      * Return the symbol of unit
+     * 
      * @return The symbol of unit
      */
     public String getSymbol() {
         return this.symbol;
+    }
+
+    /**
+     * Find the unit type with a given unit string.
+     * <p>
+     * The string to find can be a label or a symbol and the case are ignored.
+     * </p>
+     * 
+     * @param toFind The unit string to find
+     * @return The unit type or null if not found
+     */
+    public static StorageUnit findValueOf(final String toFind) {
+        StorageUnit unit = null;
+        for (StorageUnit value : StorageUnit.values()) {
+            if (toFind.equalsIgnoreCase(value.getLabel())) {
+                unit = value;
+                break;
+            }
+            if (toFind.equalsIgnoreCase(value.getSymbol())) {
+                unit = value;
+                break;
+            }
+        }
+        return unit;
     }
 }

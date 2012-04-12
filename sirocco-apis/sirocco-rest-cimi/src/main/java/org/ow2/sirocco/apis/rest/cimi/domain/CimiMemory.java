@@ -26,16 +26,16 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
 
 /**
  * Class Memory.
- * <p>
- * </p>
  */
 @XmlRootElement(name = "Memory")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -51,6 +51,7 @@ public class CimiMemory implements Serializable {
      * <p>
      * </p>
      */
+    @NotNull(groups = {GroupCreate.class})
     private Integer quantity;
 
     /**
@@ -60,6 +61,7 @@ public class CimiMemory implements Serializable {
      * (TiB), pebibyte (PiB), exbibyte (EiB), zebibyte (ZiB), yobibyte (YiB)
      * </p>
      */
+    @NotNull(groups = {GroupCreate.class})
     private String units;
 
     /**

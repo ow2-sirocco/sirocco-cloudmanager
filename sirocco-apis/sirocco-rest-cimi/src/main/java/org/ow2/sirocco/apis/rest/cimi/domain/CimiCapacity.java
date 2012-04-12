@@ -47,6 +47,7 @@ public class CimiCapacity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** Field "quantity". */
+    @NotNull(groups = {GroupCreate.class})
     private Integer quantity;
 
     /**

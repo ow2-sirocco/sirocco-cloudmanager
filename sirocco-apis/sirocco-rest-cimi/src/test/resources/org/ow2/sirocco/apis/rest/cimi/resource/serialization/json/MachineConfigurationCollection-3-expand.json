@@ -55,7 +55,7 @@
 			"href":"hrefValue_3_0",
 			"cpu":{
 				"numberVirtualCpus":3,
-				"frequency":300,
+				"frequency":300.0,
 				"units":"unitValue_3_0"
 			},
 			"memory":{
@@ -120,7 +120,7 @@
 			"href":"hrefValue_3_1",
 			"cpu":{
 				"numberVirtualCpus":3,
-				"frequency":300,
+				"frequency":300.0,
 				"units":"unitValue_3_1"
 			},
 			"memory":{
@@ -185,7 +185,7 @@
 			"href":"hrefValue_3_2",
 			"cpu":{
 				"numberVirtualCpus":3,
-				"frequency":300,
+				"frequency":300.0,
 				"units":"unitValue_3_2"
 			},
 			"memory":{

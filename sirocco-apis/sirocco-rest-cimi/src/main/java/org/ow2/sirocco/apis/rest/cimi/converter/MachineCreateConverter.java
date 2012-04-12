@@ -24,21 +24,26 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiCredentialsTemplate}</li>
- * <li>Service model: {@link CredentialsTemplate}</li>
+ * <li>CIMI model: {@link CimiMachineCreate}</li>
+ * <li>Service model: {@link MachineCreate}</li>
  * </ul>
  * </p>
  */
-public class CredentialsTemplateConverter extends CommonIdConverter implements EntityConverter {
+public class MachineCreateConverter implements EntityConverter {
 
     /**
      * {@inheritDoc}
@@ -48,9 +53,8 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public Object toCimi(final Context context, final Object dataService) {
-        CimiCredentialsTemplate cimi = new CimiCredentialsTemplate();
-        this.copyToCimi(context, dataService, cimi);
-        return cimi;
+        // Unnecessary
+        return null;
     }
 
     /**
@@ -61,7 +65,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (CredentialsTemplate) dataService, (CimiCredentialsTemplate) dataCimi);
+        // Unnecessary
     }
 
     /**
@@ -72,7 +76,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public Object toService(final Context context, final Object dataCimi) {
-        CredentialsTemplate service = new CredentialsTemplate();
+        MachineCreate service = new MachineCreate();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -86,23 +90,22 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiCredentialsTemplate) dataCimi, (CredentialsTemplate) dataService);
+        this.doCopyToService(context, (CimiMachineCreate) dataCimi, (MachineCreate) dataService);
     }
 
     /**
-     * Copy data from a service object to a CIMI object.
+     * Fill the common data from a CIMI object to a service object.
      * 
-     * @param context The current context
-     * @param dataService Source service object
-     * @param dataCimi Destination CIMI object
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
      */
-    protected void doCopyToCimi(final Context context, final CredentialsTemplate dataService,
-        final CimiCredentialsTemplate dataCimi) {
-        this.fill(context, dataService, dataCimi);
-        if (true == context.shouldBeExpanded(dataCimi)) {
-            dataCimi.setKey(dataService.getPublicKey());
-            dataCimi.setPassword(dataService.getPassword());
-            dataCimi.setUserName(dataService.getUserName());
+    protected void fill(final CimiMachineCreate dataCimi, final MachineCreate dataService) {
+        dataService.setDescription(dataCimi.getDescription());
+        dataService.setName(dataCimi.getName());
+        if (null != dataCimi.getProperties()) {
+            Map<String, String> props = new HashMap<String, String>();
+            dataService.setProperties(props);
+            props.putAll(dataCimi.getProperties());
         }
     }
 
@@ -113,12 +116,12 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiCredentialsTemplate dataCimi,
-        final CredentialsTemplate dataService) {
+    protected void doCopyToService(final Context context, final CimiMachineCreate dataCimi, final MachineCreate dataService) {
         this.fill(dataCimi, dataService);
-        dataService.setPublicKey(dataCimi.getKey());
-        dataService.setPassword(dataCimi.getPassword());
-        dataService.setUserName(dataCimi.getUserName());
+        if (null != dataCimi.getMachineTemplate()) {
+            dataService.setMachineTemplate((MachineTemplate) context.getConverter(CimiMachineTemplate.class).toService(context,
+                dataCimi.getMachineTemplate()));
+        }
     }
 
 }

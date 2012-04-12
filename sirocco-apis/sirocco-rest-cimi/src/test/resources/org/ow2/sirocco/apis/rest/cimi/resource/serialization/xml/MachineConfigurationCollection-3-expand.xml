@@ -23,7 +23,7 @@
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
 		<updated>2003-04-04T04:03:03.003+02:00</updated>
-		<cpu frequency="300" numberVirtualCpus="3" units="unitValue_3_0" />
+		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_0" />
 		<disk>
 			<capacity quantity="3" units="unitValue_3_0" />
 			<attachmentPoint>attachmentPointValue_3_0</attachmentPoint>
@@ -53,7 +53,7 @@
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
 		<updated>2003-04-04T04:03:03.003+02:00</updated>
-		<cpu frequency="300" numberVirtualCpus="3" units="unitValue_3_1" />
+		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_1" />
 		<disk>
 			<capacity quantity="3" units="unitValue_3_0" />
 			<attachmentPoint>attachmentPointValue_3_0</attachmentPoint>
@@ -83,7 +83,7 @@
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
 		<updated>2003-04-04T04:03:03.003+02:00</updated>
-		<cpu frequency="300" numberVirtualCpus="3" units="unitValue_3_2" />
+		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_2" />
 		<disk>
 			<capacity quantity="3" units="unitValue_3_0" />
 			<attachmentPoint>attachmentPointValue_3_0</attachmentPoint>

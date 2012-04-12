@@ -24,9 +24,18 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
+import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -99,18 +108,20 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
         final CimiMachineConfiguration dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.shouldBeExpanded(dataCimi)) {
-            // TODO
             if (null != dataService.getCpu()) {
-                // dataCimi.setConfigurationLocation(new
-                // ConfigurationLocation(dataService.getConfigurationLocation()));
+                dataCimi.setCpu((CimiCpu) context.getConverter(CimiCpu.class).toCimi(context, dataService.getCpu()));
             }
             if (null != dataService.getMemory()) {
-                // dataCimi.setConfigurationLocation(new
-                // ConfigurationLocation(dataService.getConfigurationLocation()));
+                dataCimi
+                    .setMemory((CimiMemory) context.getConverter(CimiMemory.class).toCimi(context, dataService.getMemory()));
             }
-            if (null != dataService.getDiskTemplates()) {
-                // dataCimi.setConfigurationLocation(new
-                // ConfigurationLocation(dataService.getConfigurationLocation()));
+            if ((null != dataService.getDiskTemplates()) && (dataService.getDiskTemplates().size() > 0)) {
+                List<CimiDiskConfiguration> listCimis = new ArrayList<CimiDiskConfiguration>();
+                EntityConverter converter = context.getConverter(CimiDiskConfiguration.class);
+                for (DiskTemplate itemService : dataService.getDiskTemplates()) {
+                    listCimis.add((CimiDiskConfiguration) converter.toCimi(context, itemService));
+                }
+                dataCimi.setDisks(listCimis.toArray(new CimiDiskConfiguration[listCimis.size()]));
             }
         }
     }
@@ -125,7 +136,19 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
     protected void doCopyToService(final Context context, final CimiMachineConfiguration dataCimi,
         final MachineConfiguration dataService) {
         this.fill(dataCimi, dataService);
-        // TODO
+        if (null != dataCimi.getCpu()) {
+            dataService.setCpu((Cpu) context.getConverter(CimiCpu.class).toService(context, dataCimi.getCpu()));
+        }
+        if (null != dataCimi.getMemory()) {
+            dataService.setMemory((Memory) context.getConverter(CimiMemory.class).toService(context, dataCimi.getMemory()));
+        }
+        if ((null != dataCimi.getDisks()) && (dataCimi.getDisks().length > 0)) {
+            List<DiskTemplate> listServices = new ArrayList<DiskTemplate>();
+            EntityConverter converter = context.getConverter(CimiDiskConfiguration.class);
+            for (CimiDiskConfiguration itemCimi : dataCimi.getDisks()) {
+                listServices.add((DiskTemplate) converter.toService(context, itemCimi));
+            }
+        }
     }
 
 }

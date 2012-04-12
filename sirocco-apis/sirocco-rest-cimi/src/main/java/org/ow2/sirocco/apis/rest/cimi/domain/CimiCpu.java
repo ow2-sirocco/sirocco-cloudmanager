@@ -26,11 +26,13 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
 
 /**
  * Class Cpu.
@@ -50,7 +52,8 @@ public class CimiCpu implements Serializable {
     /**
      * Field "frequency".
      */
-    private Integer frequency;
+    @NotNull(groups = {GroupCreate.class})
+    private Float frequency;
 
     /**
      * Field "units".
@@ -60,7 +63,7 @@ public class CimiCpu implements Serializable {
      * exahertz (EHz), zettahertz (ZHz), yottahertz (YHz)
      * </p>
      */
-    // private FrequencyUnit units;
+    @NotNull(groups = {GroupCreate.class})
     private String units;
 
     /**
@@ -88,7 +91,7 @@ public class CimiCpu implements Serializable {
      * @return The value
      */
     @XmlAttribute
-    public Integer getFrequency() {
+    public Float getFrequency() {
         return this.frequency;
     }
 
@@ -97,7 +100,7 @@ public class CimiCpu implements Serializable {
      * 
      * @param frequency The value
      */
-    public void setFrequency(final Integer frequency) {
+    public void setFrequency(final Float frequency) {
         this.frequency = frequency;
     }
 

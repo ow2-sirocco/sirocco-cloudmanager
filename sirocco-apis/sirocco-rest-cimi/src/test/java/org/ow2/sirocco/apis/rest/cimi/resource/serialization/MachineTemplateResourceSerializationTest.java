@@ -171,7 +171,7 @@ public class MachineTemplateResourceSerializationTest extends SerializationTestB
      */
     @Test
     @Ignore
-    public final void testGetMachineCollectionJson() throws Exception {
+    public final void testGetMachineTemplateCollectionJson() throws Exception {
         ClientResponse clientResponse = null;
         String entityResponse;
         int statusResponse;
@@ -254,7 +254,7 @@ public class MachineTemplateResourceSerializationTest extends SerializationTestB
      */
     @Test
     @Ignore
-    public final void testGetMachineCollectionXml() throws Exception {
+    public final void testGetMachineTemplateCollectionXml() throws Exception {
         ClientResponse clientResponse = null;
         String entityResponse;
         int statusResponse;

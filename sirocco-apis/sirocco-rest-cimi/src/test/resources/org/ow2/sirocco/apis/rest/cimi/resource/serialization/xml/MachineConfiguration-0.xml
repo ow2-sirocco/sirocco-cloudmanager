@@ -5,6 +5,6 @@
 	<created>2000-01-01T01:00:00+01:00</created>
 	<id>idValue_0</id>
 	<updated>2000-01-01T01:00:00+01:00</updated>
-	<cpu frequency="0" numberVirtualCpus="0" units="unitValue_0" />
+	<cpu frequency="0.0" numberVirtualCpus="0" units="unitValue_0" />
 	<memory quantity="0" units="unitValue_0" />
 </MachineConfiguration>

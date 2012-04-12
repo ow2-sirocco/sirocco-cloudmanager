@@ -92,16 +92,20 @@ public class AppConfig {
         return type;
     }
 
-    public static EntityConverter getConverter(final CimiCommon data) {
-        ItemConfig item = AppConfig.getInstance().getConfig().find(data.getClass());
+    public static EntityConverter getConverter(final Class<?> klass) {
+        ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
         if (null == item) {
-            throw new ConfigurationException("ItemConfig not found in configuration for " + data);
+            throw new ConfigurationException("ItemConfig not found in configuration for " + klass.getName());
         }
         EntityConverter converter = (EntityConverter) item.getData(ConfigFactory.CONVERTER);
         if (null == converter) {
-            throw new ConfigurationException("EntityConverter not found in configuration for " + data);
+            throw new ConfigurationException("EntityConverter not found in configuration for " + klass.getName());
         }
         return converter;
+    }
+
+    public static EntityConverter getConverter(final CimiCommon data) {
+        return AppConfig.getConverter(data.getClass());
     }
 
     public static EntityConverter getConverter(final CimiEntityType type) {

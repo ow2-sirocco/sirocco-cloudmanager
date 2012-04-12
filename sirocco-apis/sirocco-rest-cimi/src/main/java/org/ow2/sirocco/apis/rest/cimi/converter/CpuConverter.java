@@ -24,22 +24,23 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
+import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
+import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiCredentialsTemplate}</li>
- * <li>Service model: {@link CredentialsTemplate}</li>
+ * <li>CIMI model: {@link CimiCpu}</li>
+ * <li>Service model: {@link Cpu}</li>
  * </ul>
  * </p>
  */
-public class CredentialsTemplateConverter extends CommonIdConverter implements EntityConverter {
-
+public class CpuConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
@@ -48,7 +49,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public Object toCimi(final Context context, final Object dataService) {
-        CimiCredentialsTemplate cimi = new CimiCredentialsTemplate();
+        CimiCpu cimi = new CimiCpu();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -61,7 +62,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (CredentialsTemplate) dataService, (CimiCredentialsTemplate) dataCimi);
+        this.doCopyToCimi(context, (Cpu) dataService, (CimiCpu) dataCimi);
     }
 
     /**
@@ -72,7 +73,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public Object toService(final Context context, final Object dataCimi) {
-        CredentialsTemplate service = new CredentialsTemplate();
+        Cpu service = new Cpu();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -86,7 +87,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiCredentialsTemplate) dataCimi, (CredentialsTemplate) dataService);
+        this.doCopyToService(context, (CimiCpu) dataCimi, (Cpu) dataService);
     }
 
     /**
@@ -96,14 +97,10 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final CredentialsTemplate dataService,
-        final CimiCredentialsTemplate dataCimi) {
-        this.fill(context, dataService, dataCimi);
-        if (true == context.shouldBeExpanded(dataCimi)) {
-            dataCimi.setKey(dataService.getPublicKey());
-            dataCimi.setPassword(dataService.getPassword());
-            dataCimi.setUserName(dataService.getUserName());
-        }
+    protected void doCopyToCimi(final Context context, final Cpu dataService, final CimiCpu dataCimi) {
+        dataCimi.setFrequency(dataService.getQuantity());
+        dataCimi.setNumberVirtualCpus(dataService.getNumberCpu());
+        dataCimi.setUnits((String) context.getConverter(FrequencyUnit.class).toCimi(context, dataService.getCpuSpeedUnit()));
     }
 
     /**
@@ -113,12 +110,9 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiCredentialsTemplate dataCimi,
-        final CredentialsTemplate dataService) {
-        this.fill(dataCimi, dataService);
-        dataService.setPublicKey(dataCimi.getKey());
-        dataService.setPassword(dataCimi.getPassword());
-        dataService.setUserName(dataCimi.getUserName());
+    protected void doCopyToService(final Context context, final CimiCpu dataCimi, final Cpu dataService) {
+        dataService.setQuantity(dataCimi.getFrequency());
+        dataService.setNumberCpu(dataCimi.getNumberVirtualCpus());
+        dataService.setCpuSpeedUnit((Frequency) context.getConverter(FrequencyUnit.class).toCimi(context, dataCimi.getUnits()));
     }
-
 }

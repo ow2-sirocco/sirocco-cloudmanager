@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.utils;
 
-
 /**
  * Enumeration of all the entities used.
  */
@@ -38,7 +37,7 @@ public enum CimiEntityType {
     /** */
     Job(PathType.Job), JobCollection(PathType.Job),
     /** */
-    Machine(PathType.Machine), MachineCollection(PathType.Machine),
+    Machine(PathType.Machine), MachineCollection(PathType.Machine), MachineCreate(PathType.Machine),
     /** */
     MachineConfiguration(PathType.MachineConfiguration), MachineConfigurationCollection(PathType.MachineConfiguration),
     /** */

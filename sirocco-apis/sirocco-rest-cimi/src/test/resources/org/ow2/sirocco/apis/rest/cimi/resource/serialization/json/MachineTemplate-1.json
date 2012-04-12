@@ -32,7 +32,7 @@
 		"href":"hrefValue_1",
 		"cpu":{
 			"numberVirtualCpus":1,
-			"frequency":100,
+			"frequency":100.0,
 			"units":"unitValue_1"
 		},
 		"memory":{

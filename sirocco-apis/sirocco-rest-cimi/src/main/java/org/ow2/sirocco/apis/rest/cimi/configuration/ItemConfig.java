@@ -49,6 +49,15 @@ public class ItemConfig {
      * @param type
      * @param klass
      */
+    public ItemConfig(final Class<?> klass) {
+        this();
+        this.setKlass(klass);
+    }
+
+    /**
+     * @param type
+     * @param klass
+     */
     public ItemConfig(final CimiEntityType type, final Class<?> klass) {
         this();
         this.setType(type);

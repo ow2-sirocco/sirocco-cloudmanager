@@ -42,7 +42,7 @@
 		"href":"hrefValue_2",
 		"cpu":{
 			"numberVirtualCpus":2,
-			"frequency":200,
+			"frequency":200.0,
 			"units":"unitValue_2"
 		},
 		"memory":{

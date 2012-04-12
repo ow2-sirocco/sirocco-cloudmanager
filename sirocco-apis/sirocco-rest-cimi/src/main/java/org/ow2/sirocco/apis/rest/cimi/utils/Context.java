@@ -137,6 +137,10 @@ public class Context {
         return AppConfig.getConverter(this.getRootType());
     }
 
+    public EntityConverter getConverter(final Class<?> klass) {
+        return AppConfig.getConverter(klass);
+    }
+
     public EntityConverter getConverter(final CimiCommon data) {
         return AppConfig.getConverter(data);
     }

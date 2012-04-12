@@ -7,7 +7,7 @@
 	<id>idValue_1</id>
 	<operation href="hrefValue_1_0" rel="relValue_1_0" />
 	<updated>2001-02-02T02:01:01.001+01:00</updated>
-	<cpu frequency="100" numberVirtualCpus="1" units="unitValue_1" />
+	<cpu frequency="100.0" numberVirtualCpus="1" units="unitValue_1" />
 	<disk>
 		<attachmentPoint>attachmentPointValue_1_0</attachmentPoint>
 		<capacity quantity="1" units="unitValue_1_0" />

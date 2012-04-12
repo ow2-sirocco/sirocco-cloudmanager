@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -31,11 +33,10 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
 
 /**
  * Class Machine.
- * <p>
- * </p>
  */
 @XmlRootElement(name = "Machine")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -46,57 +47,42 @@ public class CimiMachine extends CimiCommonId {
 
     /**
      * Field "state".
-     * <p>
-     * </p>
      */
     private String state;
 
     /**
      * Field "cpu".
-     * <p>
-     * </p>
      */
+    @Valid
     private CimiCpu cpu;
 
     /**
      * Field "memory".
-     * <p>
-     * </p>
      */
+    @Valid
     private CimiMemory memory;
 
     /**
      * Field "disks".
-     * <p>
-     * </p>
      */
     @JsonProperty
+    @Valid
+    @Size(min = 1, groups = {GroupCreate.class})
     private CimiDisk[] disks;
 
     /**
      * Field "volumes".
-     * <p>
-     * </p>
      */
+    @Valid
+    @Size(min = 1, groups = {GroupCreate.class})
     private CimiVolumeMachine[] volumes;
 
     /**
      * Field "networkInterfaces".
-     * <p>
-     * </p>
      */
+    @Valid
+    @Size(min = 1, groups = {GroupCreate.class})
     private CimiNetworkInterface[] networkInterfaces;
-
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiMachine() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
 
     /**
      * Return the value of field "state".

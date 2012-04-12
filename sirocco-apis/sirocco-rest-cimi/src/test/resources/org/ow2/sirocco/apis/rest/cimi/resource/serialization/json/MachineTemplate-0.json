@@ -14,7 +14,7 @@
 		"href":"hrefValue_0",
 		"cpu":{
 			"numberVirtualCpus":0,
-			"frequency":0,
+			"frequency":0.0,
 			"units":"unitValue_0"
 		},
 		"memory":{

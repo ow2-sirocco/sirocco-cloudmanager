@@ -70,7 +70,7 @@ public class SerializationTestBase extends JerseyTest {
     @After
     public void tearDown() throws Exception {
         super.tearDown();
-        int delay = 1000;
+        int delay = 1;
         String propDelay = System.getProperty("SIROCCO_TEST_DELAY");
         if (null != propDelay) {
             try {

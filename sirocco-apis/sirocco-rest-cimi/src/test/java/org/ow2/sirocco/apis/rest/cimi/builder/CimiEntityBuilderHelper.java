@@ -359,7 +359,7 @@ public class CimiEntityBuilderHelper {
     public static CimiCpu buildCimiCpu(final Integer id, final Integer index) {
         String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
         CimiCpu cimi = new CimiCpu();
-        cimi.setFrequency(id * 100);
+        cimi.setFrequency(new Float(id * 100.0));
         cimi.setNumberVirtualCpus(id);
         cimi.setUnits("unitValue" + postfix);
         return cimi;

@@ -24,9 +24,18 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
+import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -99,7 +108,25 @@ public class MachineConverter extends CommonIdConverter implements EntityConvert
     protected void doCopyToCimi(final Context context, final Machine dataService, final CimiMachine dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.shouldBeExpanded(dataCimi)) {
-            // TODO
+            if (null != dataService.getCpu()) {
+                dataCimi.setCpu((CimiCpu) context.getConverter(CimiCpu.class).toCimi(context, dataService.getCpu()));
+            }
+            if (null != dataService.getMemory()) {
+                dataCimi
+                    .setMemory((CimiMemory) context.getConverter(CimiMemory.class).toCimi(context, dataService.getMemory()));
+            }
+            if ((null != dataService.getDisks()) && (dataService.getDisks().size() > 0)) {
+                List<CimiDisk> listCimis = new ArrayList<CimiDisk>();
+                EntityConverter converter = context.getConverter(CimiDisk.class);
+                for (Disk itemService : dataService.getDisks()) {
+                    listCimis.add((CimiDisk) converter.toCimi(context, itemService));
+                }
+                dataCimi.setDisks(listCimis.toArray(new CimiDisk[listCimis.size()]));
+            }
+            dataCimi.setState(dataService.getState().toString());
+
+            // TODO dataCimi.setNetworkInterfaces(???);
+            // TODO dataCimi.setVolumes(???);
         }
     }
 
@@ -112,6 +139,23 @@ public class MachineConverter extends CommonIdConverter implements EntityConvert
      */
     protected void doCopyToService(final Context context, final CimiMachine dataCimi, final Machine dataService) {
         this.fill(dataCimi, dataService);
-        // TODO
+        if (null != dataCimi.getCpu()) {
+            dataService.setCpu((Cpu) context.getConverter(CimiCpu.class).toService(context, dataCimi.getCpu()));
+        }
+        if (null != dataCimi.getMemory()) {
+            dataService.setMemory((Memory) context.getConverter(CimiMemory.class).toService(context, dataCimi.getMemory()));
+        }
+        if ((null != dataCimi.getDisks()) && (dataCimi.getDisks().length > 0)) {
+            List<Disk> listServices = new ArrayList<Disk>();
+            EntityConverter converter = context.getConverter(CimiDisk.class);
+            for (CimiDisk itemCimi : dataCimi.getDisks()) {
+                listServices.add((Disk) converter.toService(context, itemCimi));
+            }
+        }
+        // TODO dataService.setNetworkInterfaces(???);
+        // TODO dataService.setVolumes(???);
+
+        // Next Read only
+        // dataService.setState(dataService.getState());
     }
 }

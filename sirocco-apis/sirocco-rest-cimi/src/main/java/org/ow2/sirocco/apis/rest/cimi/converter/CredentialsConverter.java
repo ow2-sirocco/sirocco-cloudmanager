@@ -99,7 +99,10 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
     protected void doCopyToCimi(final Context context, final Credentials dataService, final CimiCredentials dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.shouldBeExpanded(dataCimi)) {
-            // TODO
+            dataCimi.setUserName(dataService.getUserName());
+            // Next read only
+            // dataCimi.setKey(dataService.getPublicKey());
+            // dataCimi.setPassword(dataService.getPassword());
         }
     }
 
@@ -112,6 +115,8 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
      */
     protected void doCopyToService(final Context context, final CimiCredentials dataCimi, final Credentials dataService) {
         this.fill(dataCimi, dataService);
-        // TODO
+        dataService.setPublicKey(dataCimi.getKey());
+        dataService.setPassword(dataCimi.getPassword());
+        dataService.setUserName(dataCimi.getUserName());
     }
 }

@@ -85,7 +85,7 @@
 					"href":"hrefValue_2_0",
 					"cpu":{
 						"numberVirtualCpus":2,
-						"frequency":200,
+						"frequency":200.0,
 						"units":"unitValue_2_0"
 					},
 					"memory":{
@@ -208,7 +208,7 @@
 					"href":"hrefValue_2_1",
 					"cpu":{
 						"numberVirtualCpus":2,
-						"frequency":200,
+						"frequency":200.0,
 						"units":"unitValue_2_1"
 					},
 					"memory":{
@@ -334,7 +334,7 @@
 				"href":"hrefValue_2_0",
 				"cpu":{
 					"numberVirtualCpus":2,
-					"frequency":200,
+					"frequency":200.0,
 					"units":"unitValue_2_0"
 				},
 				"memory":{
@@ -383,7 +383,7 @@
 				"href":"hrefValue_2_1",
 				"cpu":{
 					"numberVirtualCpus":2,
-					"frequency":200,
+					"frequency":200.0,
 					"units":"unitValue_2_1"
 				},
 				"memory":{
@@ -609,7 +609,7 @@
 				"state":"stateValue_2_0",
 				"cpu":{
 					"numberVirtualCpus":2,
-					"frequency":200,
+					"frequency":200.0,
 					"units":"unitValue_2_0"
 				},
 				"memory":{
@@ -655,7 +655,7 @@
 				"state":"stateValue_2_1",
 				"cpu":{
 					"numberVirtualCpus":2,
-					"frequency":200,
+					"frequency":200.0,
 					"units":"unitValue_2_1"
 				},
 				"memory":{

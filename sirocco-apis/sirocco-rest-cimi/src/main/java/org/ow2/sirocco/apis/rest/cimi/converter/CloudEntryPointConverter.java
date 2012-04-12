@@ -25,6 +25,13 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 
@@ -60,7 +67,7 @@ public class CloudEntryPointConverter extends CommonIdConverter implements Entit
      */
     @Override
     public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (CloudEntryPoint) dataService, (CimiCloudEntryPoint) dataCimi);
+        this.doCopyToCimi(context, (CloudEntryPointAggregate) dataService, (CimiCloudEntryPoint) dataCimi);
     }
 
     /**
@@ -95,10 +102,34 @@ public class CloudEntryPointConverter extends CommonIdConverter implements Entit
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final CloudEntryPoint dataService, final CimiCloudEntryPoint dataCimi) {
+    protected void doCopyToCimi(final Context context, final CloudEntryPointAggregate dataService,
+        final CimiCloudEntryPoint dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.shouldBeExpanded(dataCimi)) {
-            // TODO
+            if (null != dataService.getCredentials()) {
+                dataCimi.setCredentials((CimiCredentialsCollection) context.getConverter(CimiCredentialsCollection.class)
+                    .toCimi(context, dataService.getCredentials()));
+            }
+            if (null != dataService.getCredentialsTemplates()) {
+                dataCimi.setCredentialsTemplates((CimiCredentialsTemplateCollection) context.getConverter(
+                    CimiCredentialsTemplateCollection.class).toCimi(context, dataService.getCredentialsTemplates()));
+            }
+            if (null != dataService.getMachineConfigs()) {
+                dataCimi.setMachineConfigs((CimiMachineConfigurationCollection) context.getConverter(
+                    CimiMachineConfigurationCollection.class).toCimi(context, dataService.getMachineConfigs()));
+            }
+            if (null != dataService.getMachineImages()) {
+                dataCimi.setMachineImages((CimiMachineImageCollection) context.getConverter(CimiMachineImageCollection.class)
+                    .toCimi(context, dataService.getMachineImages()));
+            }
+            if (null != dataService.getMachines()) {
+                dataCimi.setMachines((CimiMachineCollection) context.getConverter(CimiMachineCollection.class).toCimi(context,
+                    dataService.getMachines()));
+            }
+            if (null != dataService.getMachineTemplates()) {
+                dataCimi.setMachineTemplates((CimiMachineTemplateCollection) context.getConverter(
+                    CimiMachineTemplateCollection.class).toCimi(context, dataService.getMachineTemplates()));
+            }
         }
     }
 
@@ -111,7 +142,6 @@ public class CloudEntryPointConverter extends CommonIdConverter implements Entit
      */
     protected void doCopyToService(final Context context, final CimiCloudEntryPoint dataCimi, final CloudEntryPoint dataService) {
         this.fill(dataCimi, dataService);
-        // TODO
     }
 
 }

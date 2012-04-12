@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -31,8 +32,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
  * Class MachineTemplate.
- * <p>
- * </p>
  */
 @XmlRootElement(name = "MachineTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -45,56 +44,39 @@ public class CimiMachineTemplate extends CimiCommonId {
 
     /**
      * Field "machineConfig".
-     * <p>
-     * </p>
      */
+    @Valid
     private CimiMachineConfiguration machineConfig;
 
     /**
      * Field "machineImage".
-     * <p>
-     * </p>
      */
+    @Valid
     private CimiMachineImage machineImage;
 
     /**
-     * Field "Credentials".
-     * <p>
-     * </p>
+     * Field "Credls".
      */
+    @Valid
     private CimiCredentials credentials;
 
     /**
      * Field "volumes".
-     * <p>
-     * </p>
      */
+    @Valid
     private CimiVolumeMachine[] volumes;
 
     /**
      * Field "volumeTemplates".
-     * <p>
-     * </p>
      */
+    @Valid
     private CimiVolumeMachineTemplate[] volumeTemplates;
 
     /**
      * Field "networkInterfaces".
-     * <p>
-     * </p>
      */
+    @Valid
     private CimiNetworkInterface[] networkInterfaces;
-
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiMachineTemplate() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
 
     /**
      * Return the value of field "machineConfig".

@@ -24,22 +24,24 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
+import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiCredentialsTemplate}</li>
- * <li>Service model: {@link CredentialsTemplate}</li>
+ * <li>CIMI model: {@link CimiCapacity}</li>
+ * <li>Service model: {@link Disk} or {@link DiskTemplate}</li>
  * </ul>
  * </p>
  */
-public class CredentialsTemplateConverter extends CommonIdConverter implements EntityConverter {
-
+public class CapacityConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
@@ -48,7 +50,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public Object toCimi(final Context context, final Object dataService) {
-        CimiCredentialsTemplate cimi = new CimiCredentialsTemplate();
+        CimiCapacity cimi = new CimiCapacity();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -61,7 +63,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (CredentialsTemplate) dataService, (CimiCredentialsTemplate) dataCimi);
+        this.doCopyToCimi(context, (Disk) dataService, (CimiCapacity) dataCimi);
     }
 
     /**
@@ -72,7 +74,13 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public Object toService(final Context context, final Object dataCimi) {
-        CredentialsTemplate service = new CredentialsTemplate();
+        Object service;
+        if (dataCimi instanceof CimiDiskConfiguration) {
+            service = new DiskTemplate();
+
+        } else {
+            service = new Disk();
+        }
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -86,7 +94,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     @Override
     public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiCredentialsTemplate) dataCimi, (CredentialsTemplate) dataService);
+        this.doCopyToService(context, (CimiCapacity) dataCimi, (Disk) dataService);
     }
 
     /**
@@ -96,14 +104,9 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final CredentialsTemplate dataService,
-        final CimiCredentialsTemplate dataCimi) {
-        this.fill(context, dataService, dataCimi);
-        if (true == context.shouldBeExpanded(dataCimi)) {
-            dataCimi.setKey(dataService.getPublicKey());
-            dataCimi.setPassword(dataService.getPassword());
-            dataCimi.setUserName(dataService.getUserName());
-        }
+    protected void doCopyToCimi(final Context context, final Disk dataService, final CimiCapacity dataCimi) {
+        dataCimi.setQuantity(dataService.getQuantity().intValue());
+        dataCimi.setUnits((String) context.getConverter(StorageUnit.class).toCimi(context, dataService.getUnit()));
     }
 
     /**
@@ -113,12 +116,9 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiCredentialsTemplate dataCimi,
-        final CredentialsTemplate dataService) {
-        this.fill(dataCimi, dataService);
-        dataService.setPublicKey(dataCimi.getKey());
-        dataService.setPassword(dataCimi.getPassword());
-        dataService.setUserName(dataCimi.getUserName());
+    protected void doCopyToService(final Context context, final CimiCapacity dataCimi, final Disk dataService) {
+        dataService.setQuantity(dataCimi.getQuantity().floatValue());
+        dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
+            .toCimi(context, dataCimi.getUnits()));
     }
-
 }

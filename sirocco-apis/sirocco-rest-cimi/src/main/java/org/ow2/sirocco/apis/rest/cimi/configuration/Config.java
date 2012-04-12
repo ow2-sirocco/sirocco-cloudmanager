@@ -33,30 +33,32 @@ import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
 public class Config {
 
     /** Mapper by entity types. */
-    private Map<CimiEntityType, ItemConfig> byCimiEntityTypes;
+    private Map<CimiEntityType, ItemConfig> byEntityTypes;
 
     /** Mapper by entity classes. */
-    private Map<Class<?>, ItemConfig> byCimiEntityClasses;
+    private Map<Class<?>, ItemConfig> byClasses;
 
     /**
      * Set the configuration for CimiEntities.
      * 
      * @param configs A list of ItemConfig
      */
-    public void setCimiEntityItems(final List<ItemConfig> configs) {
-        this.buildCimiEntityMappers(configs);
+    public void setItems(final List<ItemConfig> configs) {
+        this.buildMappers(configs);
     }
 
     /**
-     * Build CimiEntity configuration mapper.
+     * Build configuration mapper.
      */
-    protected void buildCimiEntityMappers(final List<ItemConfig> configs) {
-        this.byCimiEntityTypes = new HashMap<CimiEntityType, ItemConfig>();
-        this.byCimiEntityClasses = new HashMap<Class<?>, ItemConfig>();
+    protected void buildMappers(final List<ItemConfig> configs) {
+        this.byEntityTypes = new HashMap<CimiEntityType, ItemConfig>();
+        this.byClasses = new HashMap<Class<?>, ItemConfig>();
 
         for (ItemConfig item : configs) {
-            this.byCimiEntityTypes.put(item.getType(), item);
-            this.byCimiEntityClasses.put(item.getKlass(), item);
+            if (null != item.getType()) {
+                this.byEntityTypes.put(item.getType(), item);
+            }
+            this.byClasses.put(item.getKlass(), item);
         }
     }
 
@@ -67,7 +69,7 @@ public class Config {
      * @return The item or null if class not found
      */
     public ItemConfig find(final Class<?> classToFind) {
-        return this.byCimiEntityClasses.get(classToFind);
+        return this.byClasses.get(classToFind);
     }
 
     /**
@@ -77,6 +79,6 @@ public class Config {
      * @return The item or null if type not found
      */
     public ItemConfig find(final CimiEntityType typeToFind) {
-        return this.byCimiEntityTypes.get(typeToFind);
+        return this.byEntityTypes.get(typeToFind);
     }
 }

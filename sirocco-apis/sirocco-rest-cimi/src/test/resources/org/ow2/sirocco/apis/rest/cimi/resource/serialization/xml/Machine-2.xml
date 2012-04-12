@@ -9,7 +9,7 @@
 	<operation href="hrefValue_2_0" rel="relValue_2_0" />
 	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 	<updated>2002-03-03T03:02:02.002+01:00</updated>
-	<cpu frequency="200" numberVirtualCpus="2" units="unitValue_2" />
+	<cpu frequency="200.0" numberVirtualCpus="2" units="unitValue_2" />
 	<disk>
 		<capacity quantity="2" units="unitValue_2_0" />
 	</disk>

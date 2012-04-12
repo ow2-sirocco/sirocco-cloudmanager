@@ -25,6 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -37,8 +38,6 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
 
 /**
  * Class MachineConfiguration.
- * <p>
- * </p>
  */
 @XmlRootElement(name = "MachineConfiguration")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -49,22 +48,20 @@ public class CimiMachineConfiguration extends CimiCommonId {
 
     /**
      * Field "cpu".
-     * <p>
-     * </p>
      */
+    @Valid
+    @NotNull(groups = {GroupCreate.class})
     private CimiCpu cpu;
 
     /**
      * Field "memory".
-     * <p>
-     * </p>
      */
+    @Valid
+    @NotNull(groups = {GroupCreate.class})
     private CimiMemory memory;
 
     /**
      * Field "disks".
-     * <p>
-     * </p>
      */
     @JsonProperty
     @Valid

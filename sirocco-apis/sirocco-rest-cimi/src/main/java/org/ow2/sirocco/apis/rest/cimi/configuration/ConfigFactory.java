@@ -29,35 +29,53 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ow2.sirocco.apis.rest.cimi.converter.CapacityConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CloudEntryPointConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.CpuConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.DiskConfigurationConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.DiskConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.FrequencyUnitConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.JobCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.JobConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MemoryConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MemoryUnitConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.StorageUnitConverter;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
+import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
+import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
+import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +100,19 @@ public class ConfigFactory {
      */
     public Config getConfig() {
         Config config = new Config();
-        config.setCimiEntityItems(this.buildEntityItems());
+        config.setItems(this.buildItems());
         return config;
+    }
+
+    /**
+     * Build the configuration for CimiEntities.
+     * 
+     * @return A list of entity configs
+     */
+    protected List<ItemConfig> buildItems() {
+        List<ItemConfig> items = this.buildEntityItems();
+        items.addAll(this.buildOtherItems());
+        return items;
     }
 
     /**
@@ -188,6 +217,11 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new MachineConfigurationCollectionConverter());
             break;
 
+        case MachineCreate:
+            item = new ItemConfig(CimiEntityType.MachineCreate, CimiMachineCreate.class);
+            item.putData(ConfigFactory.CONVERTER, new MachineCreateConverter());
+            break;
+
         case MachineImage:
             item = new ItemConfig(CimiEntityType.MachineImage, CimiMachineImage.class);
             item.putData(ConfigFactory.CONVERTER, new MachineImageConverter());
@@ -215,9 +249,54 @@ public class ConfigFactory {
             break;
 
         default:
-            ConfigFactory.LOGGER.error("None configuration for {}", type);
-            throw new RuntimeException("None configuration for " + type);
+            ConfigFactory.LOGGER.error("Configuration not found : {}", type);
+            throw new ConfigurationException("Configuration not found : " + type);
         }
         return item;
     }
+
+    /**
+     * Build the configuration for other classes.
+     * 
+     * @return A list of config items
+     */
+    protected List<ItemConfig> buildOtherItems() {
+        ItemConfig item;
+        List<ItemConfig> items = new ArrayList<ItemConfig>();
+
+        item = new ItemConfig(CimiCpu.class);
+        item.putData(ConfigFactory.CONVERTER, new CpuConverter());
+        items.add(item);
+
+        item = new ItemConfig(FrequencyUnit.class);
+        item.putData(ConfigFactory.CONVERTER, new FrequencyUnitConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiMemory.class);
+        item.putData(ConfigFactory.CONVERTER, new MemoryConverter());
+        items.add(item);
+
+        item = new ItemConfig(MemoryUnit.class);
+        item.putData(ConfigFactory.CONVERTER, new MemoryUnitConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiDisk.class);
+        item.putData(ConfigFactory.CONVERTER, new DiskConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiDiskConfiguration.class);
+        item.putData(ConfigFactory.CONVERTER, new DiskConfigurationConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiCapacity.class);
+        item.putData(ConfigFactory.CONVERTER, new CapacityConverter());
+        items.add(item);
+
+        item = new ItemConfig(StorageUnit.class);
+        item.putData(ConfigFactory.CONVERTER, new StorageUnitConverter());
+        items.add(item);
+
+        return items;
+    }
+
 }

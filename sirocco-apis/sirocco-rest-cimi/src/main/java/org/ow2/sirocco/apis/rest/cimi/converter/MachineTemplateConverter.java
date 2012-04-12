@@ -24,8 +24,14 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 
 /**
@@ -99,7 +105,64 @@ public class MachineTemplateConverter extends CommonIdConverter implements Entit
     protected void doCopyToCimi(final Context context, final MachineTemplate dataService, final CimiMachineTemplate dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.shouldBeExpanded(dataCimi)) {
-            // TODO
+            if (null != dataService.getCredentials()) {
+                dataCimi.setCredentials((CimiCredentials) context.getConverter(CimiCredentials.class).toCimi(context,
+                    dataService.getCredentials()));
+            }
+            if (null != dataService.getMachineConfiguration()) {
+                dataCimi.setMachineConfig((CimiMachineConfiguration) context.getConverter(CimiMachineConfiguration.class)
+                    .toCimi(context, dataService.getMachineConfiguration()));
+            }
+            if (null != dataService.getMachineImage()) {
+                dataCimi.setMachineImage((CimiMachineImage) context.getConverter(CimiMachineImage.class).toCimi(context,
+                    dataService.getMachineImage()));
+            }
+            // TODO NetworkInterfaces
+            // if ((null != dataService.getNetworkInterfaces()) &&
+            // (dataService.getNetworkInterfaces().size() > 0)) {
+            // List<CimiNetworkInterface> listCimis = new
+            // ArrayList<CimiNetworkInterface>();
+            // EntityConverter converter =
+            // context.getConverter(CimiNetworkInterface.class);
+            // for (NetworkInterface itemService :
+            // dataService.getNetworkInterfaces()) {
+            // listCimis.add((CimiNetworkInterface) converter.toCimi(context,
+            // itemService));
+            // }
+            // dataCimi.setNetworkInterfaces(listCimis.toArray(new
+            // CimiNetworkInterface[listCimis.size()]));
+            // }
+
+            // TODO MachineVolume
+            // if ((null != dataService.getVolumes()) &&
+            // (dataService.getVolumes().size() > 0)) {
+            // List<CimiMachineVolume> listCimis = new
+            // ArrayList<CimiMachineVolume>();
+            // EntityConverter converter =
+            // context.getConverter(CimiMachineVolume.class);
+            // for (MachineVolume itemService : dataService.getVolumes()) {
+            // listCimis.add((CimiVolume) converter.toCimi(context,
+            // itemService));
+            // }
+            // dataCimi.setVolumes(listCimis.toArray(new
+            // CimiMachineVolume[listCimis.size()]));
+            // }
+
+            // TODO VolumeTemplate
+            // if ((null != dataService.getVolumeTemplates()) &&
+            // (dataService.getVolumeTemplates().size() > 0)) {
+            // List<CimiVolumeTemplate> listCimis = new
+            // ArrayList<CimiVolumeTemplate>();
+            // EntityConverter converter =
+            // context.getConverter(CimiVolumeTemplate.class);
+            // for (VolumeTemplate itemService :
+            // dataService.getVolumeTemplates()) {
+            // listCimis.add((CimiVolumeTemplate) converter.toCimi(context,
+            // itemService));
+            // }
+            // dataCimi.setVolumeTemplates(listCimis.toArray(new
+            // CimiVolumeTemplate[listCimis.size()]));
+            // }
         }
     }
 
@@ -112,7 +175,24 @@ public class MachineTemplateConverter extends CommonIdConverter implements Entit
      */
     protected void doCopyToService(final Context context, final CimiMachineTemplate dataCimi, final MachineTemplate dataService) {
         this.fill(dataCimi, dataService);
-        // TODO
+        if (null != dataCimi.getCredentials()) {
+            dataService.setCredentials((Credentials) context.getConverter(CimiCredentials.class).toService(context,
+                dataCimi.getCredentials()));
+        }
+        if (null != dataCimi.getMachineImage()) {
+            dataService.setMachineImage((MachineImage) context.getConverter(CimiMachineImage.class).toService(context,
+                dataCimi.getMachineImage()));
+        }
+        if (null != dataCimi.getMachineConfig()) {
+            dataService.setMachineConfiguration((MachineConfiguration) context.getConverter(CimiMachineConfiguration.class)
+                .toService(context, dataCimi.getMachineConfig()));
+        }
+        // TODO NetworkInterfaces
+        // dataService.setNetworkInterfaces(dataCimi.getUserName());
+        // TODO MachineVolume
+        // dataService.setVolumes(dataCimi.getUserName());
+        // TODO VolumeTemplate
+        // dataService.setVolumeTemplates(dataCimi.getUserName());
     }
 
 }
