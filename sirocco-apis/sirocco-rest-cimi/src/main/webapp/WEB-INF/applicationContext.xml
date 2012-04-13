@@ -19,16 +19,24 @@
 	<!-- </jee:environment> -->
 	<!-- </jee:remote-slsb> -->
 
-	<jee:local-slsb id="IMachineImageManager" jndi-name="MachineImageManager"
-		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager"
+	<jee:local-slsb id="ICredentialsManager" jndi-name="CredentialsManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
+	<jee:local-slsb id="IJobManager" jndi-name="JobManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.IJobManager"
 		lookup-home-on-startup="false">
 	</jee:local-slsb>
 	<jee:local-slsb id="IMachineManager" jndi-name="MachineManager"
 		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineManager"
 		lookup-home-on-startup="false">
 	</jee:local-slsb>
-	<jee:local-slsb id="ICredentialsManager" jndi-name="CredentialsManager"
-		business-interface="org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager"
+	<jee:local-slsb id="IMachineConfigurationManager" jndi-name="MachineConfigurationManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineConfigurationManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
+	<jee:local-slsb id="IMachineImageManager" jndi-name="MachineImageManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager"
 		lookup-home-on-startup="false">
 	</jee:local-slsb>
 

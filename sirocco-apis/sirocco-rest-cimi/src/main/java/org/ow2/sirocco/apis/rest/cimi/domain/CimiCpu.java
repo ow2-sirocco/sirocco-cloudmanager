@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Class Cpu.
@@ -45,14 +45,9 @@ public class CimiCpu implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "numberVirtualCpus".
-     */
-    private Integer numberVirtualCpus;
-
-    /**
      * Field "frequency".
      */
-    @NotNull(groups = {GroupCreate.class})
+    @NotNull(groups = {GroupWrite.class})
     private Float frequency;
 
     /**
@@ -63,8 +58,34 @@ public class CimiCpu implements Serializable {
      * exahertz (EHz), zettahertz (ZHz), yottahertz (YHz)
      * </p>
      */
-    @NotNull(groups = {GroupCreate.class})
+    @NotNull(groups = {GroupWrite.class})
     private String units;
+
+    /**
+     * Field "numberVirtualCpus".
+     */
+    private Integer numberVirtualCpus;
+
+    /**
+     * Default constructor.
+     */
+    public CimiCpu() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param frequency
+     * @param units
+     * @param numberVirtualCpus
+     */
+    public CimiCpu(final Float frequency, final String units, final Integer numberVirtualCpus) {
+        super();
+        this.frequency = frequency;
+        this.numberVirtualCpus = numberVirtualCpus;
+        this.units = units;
+    }
 
     /**
      * Return the value of field "numberVirtualCpus".

@@ -24,11 +24,13 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Class MachineImageCollection.
@@ -43,6 +45,7 @@ public class CimiMachineImageCollection extends CimiCommonId {
     /**
      * Field "machineImages".
      */
+    @Null(groups = {GroupWrite.class})
     private CimiMachineImage[] machineImages;
 
     /**

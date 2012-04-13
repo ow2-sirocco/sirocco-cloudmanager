@@ -24,16 +24,17 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class Credentials.
- * <p>
- * </p>
  */
 @XmlRootElement(name = "Credentials")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -43,12 +44,16 @@ public class CimiCredentials extends CimiCommonId {
     private static final long serialVersionUID = 1L;
 
     /** The initial superuser's user name. */
+    @NotNull(groups = {GroupWrite.class})
     private String userName;
 
     /** Initial superuser's password. */
+    @NotNull(groups = {GroupWrite.class})
     private String password;
 
     /** The digit of the public key for the initial superuser. */
+    @NotNull(groups = {GroupWrite.class})
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private byte[] key;
 
     /**

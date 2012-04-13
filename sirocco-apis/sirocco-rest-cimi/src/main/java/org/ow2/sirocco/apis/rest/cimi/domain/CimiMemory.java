@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Class Memory.
@@ -51,7 +51,7 @@ public class CimiMemory implements Serializable {
      * <p>
      * </p>
      */
-    @NotNull(groups = {GroupCreate.class})
+    @NotNull(groups = {GroupWrite.class})
     private Integer quantity;
 
     /**
@@ -61,8 +61,27 @@ public class CimiMemory implements Serializable {
      * (TiB), pebibyte (PiB), exbibyte (EiB), zebibyte (ZiB), yobibyte (YiB)
      * </p>
      */
-    @NotNull(groups = {GroupCreate.class})
+    @NotNull(groups = {GroupWrite.class})
     private String units;
+
+    /**
+     * Default constructor.
+     */
+    public CimiMemory() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param quantity The quantity
+     * @param units The units
+     */
+    public CimiMemory(final Integer quantity, final String units) {
+        super();
+        this.quantity = quantity;
+        this.units = units;
+    }
 
     /**
      * Return the value of field "quantity".

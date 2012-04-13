@@ -34,7 +34,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
-import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -66,9 +65,6 @@ public class CimiManagerReadMachineImage extends CimiManagerReadAbstract {
             out = this.manager.getMachineImageById(request.getId());
         } else {
             out = this.manager.getMachineImageAttributes(request.getId(), select.getAttributes());
-        }
-        if (null == out) {
-            throw new ResourceNotFoundException();
         }
         return out;
     }

@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class CredentialsTemplate.
@@ -49,6 +51,7 @@ public class CimiCredentialsTemplate extends CimiCommonId {
     private String password;
 
     /** The digit of the public key for the initial superuser. */
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private byte[] key;
 
     /**

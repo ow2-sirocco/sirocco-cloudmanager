@@ -34,7 +34,7 @@ import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Abstract class for manage CREATE request.
@@ -54,7 +54,7 @@ public abstract class CimiManagerCreateAbstract extends CimiManagerAbstract {
             if (null == request.getCimiData()) {
                 valid = false;
             } else {
-                valid = CimiValidatorHelper.getInstance().validate(request.getCimiData(), Default.class, GroupCreate.class);
+                valid = CimiValidatorHelper.getInstance().validate(request.getCimiData(), Default.class, GroupWrite.class);
             }
         }
         return valid;

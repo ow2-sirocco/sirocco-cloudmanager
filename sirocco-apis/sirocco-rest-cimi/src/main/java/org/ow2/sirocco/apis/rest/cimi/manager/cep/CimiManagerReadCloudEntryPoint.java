@@ -33,7 +33,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -61,10 +60,6 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
         throws Exception {
         CloudEntryPoint out = null;
         out = this.manager.getCloudEntryPoint();
-
-        if (null == out) {
-            throw new ResourceNotFoundException();
-        }
         return out;
     }
 

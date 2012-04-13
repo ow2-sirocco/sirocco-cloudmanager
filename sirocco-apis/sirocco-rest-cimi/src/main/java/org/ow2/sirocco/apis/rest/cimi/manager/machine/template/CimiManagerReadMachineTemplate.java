@@ -22,25 +22,28 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.manager.machine;
+package org.ow2.sirocco.apis.rest.cimi.manager.machine.template;
 
-import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
+import javax.ws.rs.core.Response;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Manage UPDATE request of Machine Collection.
+ * Manage READ request of MachineTemplate.
  */
-@Component("CimiManagerUpdateMachineCollection")
-public class CimiManagerUpdateMachineCollection extends CimiManagerUpdateAbstract {
+@Component("CimiManagerReadMachineTemplate")
+public class CimiManagerReadMachineTemplate extends CimiManagerReadAbstract {
 
     @Autowired
     @Qualifier("IMachineManager")
@@ -56,29 +59,31 @@ public class CimiManagerUpdateMachineCollection extends CimiManagerUpdateAbstrac
     @Override
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
+        MachineTemplate out = null;
         CimiSelect select = request.getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            throw new UnsupportedOperationException();
+            out = this.manager.getMachineTemplateById(request.getId());
         } else {
-            this.manager.updateMachineCollection(select.dispatchAttributesValues(dataService));
+            // FIXME
+            throw new UnsupportedOperationException();
         }
-        return null;
+        return out;
     }
 
     /**
      * {@inheritDoc}
-     * <p>
-     * Copy only common attributes.
-     * </p>
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
      */
     @Override
-    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        Context context = new Context(request, CimiEntityType.MachineCollection);
-        MachineCollection service = (MachineCollection) context.getConverter().toService(context, request.getCimiData());
-        return service;
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        Context context = new Context(request, CimiEntityType.MachineTemplate);
+        CimiMachineTemplate cimi = (CimiMachineTemplate) context.getConverter().toCimi(context, dataService);
+        response.setCimiData(cimi);
+        response.setStatus(Response.Status.OK);
     }
 
 }

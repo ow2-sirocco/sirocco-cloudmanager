@@ -24,16 +24,16 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Class CredentialsTemplateCollection.
- * <p>
- * </p>
  */
 @XmlRootElement(name = "CredentialsTemplateCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -44,9 +44,8 @@ public class CimiCredentialsTemplateCollection extends CimiCommonId {
 
     /**
      * Field "CredentialsTemplates".
-     * <p>
-     * </p>
      */
+    @Null(groups = {GroupWrite.class})
     private CimiCredentialsTemplate[] credentialsTemplates;
 
     /**

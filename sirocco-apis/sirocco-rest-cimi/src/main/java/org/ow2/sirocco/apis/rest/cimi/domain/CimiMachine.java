@@ -25,7 +25,6 @@
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Size;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -33,7 +32,8 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class Machine.
@@ -67,21 +67,21 @@ public class CimiMachine extends CimiCommonId {
      */
     @JsonProperty
     @Valid
-    @Size(min = 1, groups = {GroupCreate.class})
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiDisk[] disks;
 
     /**
      * Field "volumes".
      */
     @Valid
-    @Size(min = 1, groups = {GroupCreate.class})
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiVolumeMachine[] volumes;
 
     /**
      * Field "networkInterfaces".
      */
     @Valid
-    @Size(min = 1, groups = {GroupCreate.class})
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiNetworkInterface[] networkInterfaces;
 
     /**

@@ -24,9 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -63,11 +60,7 @@ public class CimiManagerUpdateMachineConfiguration extends CimiManagerUpdateAbst
         if (true == select.isEmpty()) {
             this.manager.updateMachineConfiguration((MachineConfiguration) dataService);
         } else {
-            Map<String, Object> attrs = new HashMap<String, Object>();
-            for (String attr : select.getAttributes()) {
-                attrs.put(attr, dataService);
-            }
-            this.manager.updateMachineConfigurationAttributes(request.getId(), attrs);
+            this.manager.updateMachineConfigurationAttributes(request.getId(), select.dispatchAttributesValues(dataService));
         }
         return null;
     }

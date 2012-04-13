@@ -27,6 +27,6 @@ package org.ow2.sirocco.apis.rest.cimi.validator;
 /**
  * Validation group to valid a create request.
  */
-public interface GroupCreate {
+public interface GroupWrite {
 
 }

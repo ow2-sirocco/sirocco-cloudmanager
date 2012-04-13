@@ -24,44 +24,50 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
-import javax.ws.rs.core.Response.Status;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerCreateMachine {
+/**
+ * Manage CREATE request of Machine.
+ */
+@Component("CimiManagerCreateMachine")
+public class CimiManagerCreateMachine extends CimiManagerCreateAbstract {
 
-    public CimiManagerCreateMachine() {
+    @Autowired
+    @Qualifier("IMachineManager")
+    private IMachineManager manager;
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        return this.manager.createMachine((MachineCreate) dataService);
     }
 
-    public void execute(final CimiRequest request, final CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // createMachine((MachineTemplate) request.getHeader().getCimiData());
-        // // status = 201 Created
-        // response.setStatusHttp(Status.CREATED.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-    }
-
-    private void createMachine(final CimiMachineTemplate machineToCreate) {
-        // FIXME IMachineManager.create(machineToCreate);
-
-    }
-
-    public Status verifyRequest(final CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com +
-        // ConstantePath
-        if (request.getBaseUri().toString().equals("http://localhost:9998/")
-            && request.getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
-            return Status.OK;
-        } else {
-            return Status.BAD_REQUEST;
-        }
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     */
+    @Override
+    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+        Context context = new Context(request, CimiEntityType.Machine);
+        return context.getConverter().toService(context, request.getCimiData());
     }
 
 }

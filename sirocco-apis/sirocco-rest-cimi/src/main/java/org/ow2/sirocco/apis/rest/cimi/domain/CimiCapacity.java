@@ -32,7 +32,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Class Capacity.
@@ -47,7 +47,7 @@ public class CimiCapacity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** Field "quantity". */
-    @NotNull(groups = {GroupCreate.class})
+    @NotNull(groups = {GroupWrite.class})
     private Integer quantity;
 
     /**
@@ -57,7 +57,7 @@ public class CimiCapacity implements Serializable {
      * (TB), petabyte (PB), exabyte (EB), zettabyte (ZB), yottabyte (YB)
      * </p>
      */
-    @NotNull(groups = {GroupCreate.class})
+    @NotNull(groups = {GroupWrite.class})
     private String units;
 
     /**

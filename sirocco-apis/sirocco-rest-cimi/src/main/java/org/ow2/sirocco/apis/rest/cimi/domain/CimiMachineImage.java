@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Class MachineImage.
@@ -55,7 +55,7 @@ public class CimiMachineImage extends CimiCommonId {
      * <p>
      * </p>
      */
-    @NotNull(groups = {GroupCreate.class})
+    @NotNull(groups = {GroupWrite.class})
     private ImageLocation imageLocation;
 
     /**

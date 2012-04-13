@@ -29,12 +29,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Class Disk.
- * <p>
- * </p>
  */
 @XmlRootElement(name = "Disk")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -45,18 +43,14 @@ public class CimiDiskConfiguration extends CimiDisk {
 
     /**
      * Field "format".
-     * <p>
-     * </p>
      */
-    @NotNull(groups = {GroupCreate.class})
+    @NotNull(groups = {GroupWrite.class})
     private String format;
 
     /**
      * Field "attachmentPoint".
-     * <p>
-     * </p>
      */
-    @NotNull(groups = {GroupCreate.class})
+    @NotNull(groups = {GroupWrite.class})
     private String attachmentPoint;
 
     /**

@@ -24,48 +24,35 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
-import javax.ws.rs.core.Response.Status;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerDeleteAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerDeleteMachine {
+/**
+ * Manage DELETE request of Machine.
+ */
+@Component("CimiManagerDeleteMachine")
+public class CimiManagerDeleteMachine extends CimiManagerDeleteAbstract {
 
-    public CimiManagerDeleteMachine() {
-    }
+    @Autowired
+    @Qualifier("IMachineManager")
+    private IMachineManager manager;
 
-    public void execute(final CimiRequest request, final CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // response.setCimiData(getMachineById(request.getHeader().getId()));
-        // deleteMachine(request.getHeader().getId());
-        // // status = 200 OK
-        // response.setStatusHttp(status.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-    }
-
-    private void deleteMachine(final String id) {
-        // FIXME IMachineManager.deleteMachine(id);
-    }
-
-    public Status verifyRequest(final CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com +
-        // ConstantePath
-        if (request.getBaseUri().toString().equals("http://localhost:9998/")
-            && request.getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
-            return Status.OK;
-        } else {
-            return Status.BAD_REQUEST;
-        }
-    }
-
-    public CimiMachine getMachineById(final String id) {
-        // FIXME return IMachineManager.getMachineById(id);
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        this.manager.deleteMachine(request.getId());
         return null;
     }
 

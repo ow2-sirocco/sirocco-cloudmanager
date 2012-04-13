@@ -29,6 +29,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class MachineTemplate.
@@ -64,18 +66,21 @@ public class CimiMachineTemplate extends CimiCommonId {
      * Field "volumes".
      */
     @Valid
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiVolumeMachine[] volumes;
 
     /**
      * Field "volumeTemplates".
      */
     @Valid
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiVolumeMachineTemplate[] volumeTemplates;
 
     /**
      * Field "networkInterfaces".
      */
     @Valid
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiNetworkInterface[] networkInterfaces;
 
     /**

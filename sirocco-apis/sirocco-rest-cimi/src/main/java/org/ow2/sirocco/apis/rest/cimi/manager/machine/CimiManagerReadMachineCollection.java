@@ -24,47 +24,90 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
-import javax.ws.rs.core.Response.Status;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.ws.rs.core.Response;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerReadMachineCollection {
+/**
+ * Manage READ request of Machines collection.
+ */
+@Component("CimiManagerReadMachineCollection")
+public class CimiManagerReadMachineCollection extends CimiManagerReadAbstract {
 
-    public CimiManagerReadMachineCollection() {
-    }
+    @Autowired
+    @Qualifier("IMachineManager")
+    private IMachineManager manager;
 
-    public void execute(final CimiRequest request, final CimiResponse response) {
-        Status status = this.verifyRequest(request);
-        if (status.equals(Status.OK)) {
-            response.setCimiData(this.getMachineCollection());
-            // status = 200 OK
-            response.setStatus(status);
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        Object out = null;
+        CimiSelect select = request.getHeader().getCimiSelect();
+        if (true == select.isEmpty()) {
+            out = this.manager.getMachineCollection();
         } else {
-            // status = 400 BAD REQUEST
-            response.setStatus(Status.BAD_REQUEST);
+            if (true == select.isNumericArrayPresent()) {
+                List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());
+                out = this.manager
+                    .getMachines(numsArray.get(0).intValue(), numsArray.get(1).intValue(), select.getAttributes());
+            } else {
+                out = this.manager.getMachines(select.getAttributes(), select.getExpressionArray(select.getIndexFirstArray()));
+            }
         }
+        return out;
     }
 
     /**
-     * @return the machine collection
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
      */
-    private CimiMachineCollection getMachineCollection() {
-        // FIXME return IMachineManager.getMachineCollection();
-        return null;
+    @Override
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        Context context = new Context(request, CimiEntityType.MachineCollection);
+        CimiMachineCollection cimi = (CimiMachineCollection) context.getConverter().toCimi(context, dataService);
+        response.setCimiData(cimi);
+        response.setStatus(Response.Status.OK);
     }
 
-    public Status verifyRequest(final CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com +
-        // ConstantePath
-        if (request.getBaseUri().toString().equals("http://localhost:9998/")
-            && request.getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
-            return Status.OK;
-        } else {
-            return Status.BAD_REQUEST;
-        }
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#addOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void addOperations(final CimiRequest request, final CimiResponse response, final Object dataService) {
+        CimiCommonId common = (CimiCommonId) response.getCimiData();
+        List<CimiOperation> ops = new ArrayList<CimiOperation>();
+        ops.add(new CimiOperation(Operation.ADD.getRel(), common.getId()));
+        common.setOperations(ops.toArray(new CimiOperation[ops.size()]));
     }
-
 }
