@@ -26,14 +26,13 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeImage. <p> </p>
+ * Class VolumeImage.
  */
 @XmlRootElement(name = "volumeImage")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -42,42 +41,29 @@ public class CimiVolumeImage extends CimiCommonId implements Serializable {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-    private String href;
-
     /**
-     * Field "state". <p> </p>
+     * Field "state".
      */
     private String state;
 
     /**
-     * Field "imageLocation". <p> </p>
+     * Field "imageLocation".
      */
     private ImageLocation imageLocation;
 
     /**
-     * Field "imageData". <p> Marshaling to verify </p>
+     * Field "imageData". Marshaling to verify
      */
     private byte[] imageData;
 
     /**
-     * Field "bootable". <p> </p>
+     * Field "bootable".
      */
     private Boolean bootable;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiVolumeImage() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "state".
+     * 
      * @return The value
      */
     public String getState() {
@@ -86,14 +72,16 @@ public class CimiVolumeImage extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "state".
+     * 
      * @param state The value
      */
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
     /**
      * Return the value of field "imageLocation".
+     * 
      * @return The value
      */
     public ImageLocation getImageLocation() {
@@ -102,14 +90,16 @@ public class CimiVolumeImage extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "imageLocation".
+     * 
      * @param imageLocation The value
      */
-    public void setImageLocation(ImageLocation imageLocation) {
+    public void setImageLocation(final ImageLocation imageLocation) {
         this.imageLocation = imageLocation;
     }
 
     /**
      * Return the value of field "imageData".
+     * 
      * @return The value
      */
     public byte[] getImageData() {
@@ -118,14 +108,16 @@ public class CimiVolumeImage extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "imageData".
+     * 
      * @param imageData The value
      */
-    public void setImageData(byte[] imageData) {
+    public void setImageData(final byte[] imageData) {
         this.imageData = imageData;
     }
 
     /**
      * Return the value of field "bootable".
+     * 
      * @return The value
      */
     public Boolean getBootable() {
@@ -134,24 +126,22 @@ public class CimiVolumeImage extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "bootable".
+     * 
      * @param bootable The value
      */
-    public void setBootable(Boolean bootable) {
+    public void setBootable(final Boolean bootable) {
         this.bootable = bootable;
     }
 
     /**
-     * @return the href
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
      */
-    @XmlAttribute
-    public String getHref() {
-        return href;
+    @Override
+    public boolean hasValues() {
+        // TODO Auto-generated method stub
+        return false;
     }
 
-    /**
-     * @param href the href to set
-     */
-    public void setHref(String href) {
-        this.href = href;
-    }
 }

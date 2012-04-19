@@ -34,7 +34,6 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 /**
  * Class MachineImage.
  * <p>
- * </p>
  */
 @XmlRootElement(name = "MachineImage")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -45,32 +44,19 @@ public class CimiMachineImage extends CimiCommonId {
 
     /**
      * Field "state".
-     * <p>
-     * </p>
      */
     private String state;
 
     /**
      * Field "imageLocation".
-     * <p>
-     * </p>
      */
     @NotNull(groups = {GroupWrite.class})
     private ImageLocation imageLocation;
 
     /**
      * Field "type".
-     * <p>
-     * </p>
      */
     private String type;
-
-    /**
-     * Default constructor.
-     */
-    public CimiMachineImage() {
-        super();
-    }
 
     /**
      * Return the value of field "state".
@@ -120,6 +106,18 @@ public class CimiMachineImage extends CimiCommonId {
      */
     public void setType(final String type) {
         this.type = type;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getImageLocation());
+        return has;
     }
 
 }

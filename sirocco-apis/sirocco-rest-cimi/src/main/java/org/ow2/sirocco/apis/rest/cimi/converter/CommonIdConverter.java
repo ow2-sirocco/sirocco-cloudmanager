@@ -25,7 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 /**
@@ -47,14 +47,14 @@ public class CommonIdConverter extends CommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void fill(final Context context, final CloudEntity dataService, final CimiCommonId dataCimi) {
-        if (true == context.shouldBeExpanded(dataCimi)) {
+    protected void fill(final CimiContext context, final CloudEntity dataService, final CimiCommonId dataCimi) {
+        if (true == context.mustBeExpanded(dataCimi)) {
             this.fill(dataService, dataCimi);
             dataCimi.setCreated(dataService.getCreated());
             dataCimi.setUpdated(dataService.getUpdated());
             dataCimi.setId(context.makeHref(dataCimi, dataService.getId()));
         }
-        if (true == context.shouldBeReferenced(dataCimi)) {
+        if (true == context.mustBeReferenced(dataCimi)) {
             dataCimi.setHref(context.makeHref(dataCimi, dataService.getId()));
         }
     }

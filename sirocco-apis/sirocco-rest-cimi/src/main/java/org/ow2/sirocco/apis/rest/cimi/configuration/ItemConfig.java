@@ -27,7 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 
 public class ItemConfig {
 

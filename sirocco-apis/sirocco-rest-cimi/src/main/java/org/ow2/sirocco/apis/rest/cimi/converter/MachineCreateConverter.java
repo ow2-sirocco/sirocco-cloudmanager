@@ -29,7 +29,7 @@ import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 
@@ -48,11 +48,11 @@ public class MachineCreateConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         // Unnecessary
         return null;
     }
@@ -60,22 +60,22 @@ public class MachineCreateConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         // Unnecessary
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         MachineCreate service = new MachineCreate();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -85,11 +85,11 @@ public class MachineCreateConverter implements EntityConverter {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiMachineCreate) dataCimi, (MachineCreate) dataService);
     }
 
@@ -116,7 +116,7 @@ public class MachineCreateConverter implements EntityConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiMachineCreate dataCimi, final MachineCreate dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiMachineCreate dataCimi, final MachineCreate dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getMachineTemplate()) {
             dataService.setMachineTemplate((MachineTemplate) context.getConverter(CimiMachineTemplate.class).toService(context,

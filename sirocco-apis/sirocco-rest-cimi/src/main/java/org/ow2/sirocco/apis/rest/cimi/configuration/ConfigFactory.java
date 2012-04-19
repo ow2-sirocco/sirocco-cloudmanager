@@ -62,6 +62,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
@@ -76,7 +77,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
 import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

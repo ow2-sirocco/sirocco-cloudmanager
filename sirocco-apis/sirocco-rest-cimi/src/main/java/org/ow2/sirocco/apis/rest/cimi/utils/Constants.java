@@ -47,7 +47,4 @@ public abstract class Constants {
     /** Parameter name in Header : Location. */
     public static final String HEADER_LOCATION = "Location";
 
-    /** URI action. */
-    public static final String BASE_URI_ACTIONS = "http://www.dmtf.org/cimi/action/";
-
 }

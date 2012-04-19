@@ -26,10 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock;
 
 import org.ow2.sirocco.apis.rest.cimi.builder.CimiEntityBuilderHelper;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
+import org.ow2.sirocco.apis.rest.cimi.domain.PathType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.utils.MethodType;
-import org.ow2.sirocco.apis.rest.cimi.utils.PathType;
+import org.ow2.sirocco.apis.rest.cimi.request.MethodType;
 
 /**
  * Mock CimiManager.
@@ -147,7 +147,11 @@ public abstract class MockCimiManager implements CimiManager {
 
         switch (type) {
         case POST:
-            cimi = CimiEntityBuilderHelper.buildCimiMachineCreate(1);
+            if (null == request.getId()) {
+                cimi = CimiEntityBuilderHelper.buildCimiMachineCreate(1);
+            } else {
+                cimi = CimiEntityBuilderHelper.buildCimiAction(Integer.valueOf(request.getId()));
+            }
             break;
         case GET:
         case PUT:

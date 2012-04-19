@@ -22,11 +22,15 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.utils;
+package org.ow2.sirocco.apis.rest.cimi.validator;
+
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 
 /**
- *
+ * 
  */
-public enum MethodType {
-    GET, POST, PUT, DELETE;
+public interface CimiContextValidator {
+    CimiContext getCimiContext();
+
+    void setCimiContext(CimiContext context);
 }

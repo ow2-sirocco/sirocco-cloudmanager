@@ -65,4 +65,16 @@ public class CimiCredentialsCollection extends CimiCommonId {
         this.credentials = credentials;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getCredentials());
+        return has;
+    }
+
 }

@@ -35,6 +35,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
@@ -79,6 +80,10 @@ public class CimiMachineResource extends CimiResourceAbstract {
     @Qualifier("CimiManagerCreateMachine")
     private CimiManager cimiManagerCreateMachine;
 
+    @Autowired
+    @Qualifier("CimiManagerActionMachine")
+    private CimiManager cimiManagerActionMachine;
+
     /**
      * Get a machine.
      * 
@@ -122,6 +127,21 @@ public class CimiMachineResource extends CimiResourceAbstract {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();
         this.cimiManagerCreateMachine.execute(request, response);
+        return HelperResponse.buildResponse(response);
+    }
+
+    /**
+     * Actions on machine.
+     * 
+     * @return The REST response
+     */
+    @POST
+    @Path("{id}")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response action(@PathParam("id") final String id, final CimiAction cimiData) {
+        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
+        CimiResponse response = new CimiResponse();
+        this.cimiManagerActionMachine.execute(request, response);
         return HelperResponse.buildResponse(response);
     }
 

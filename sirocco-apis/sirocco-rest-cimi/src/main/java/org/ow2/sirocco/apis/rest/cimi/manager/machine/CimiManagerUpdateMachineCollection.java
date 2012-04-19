@@ -24,14 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -76,9 +74,8 @@ public class CimiManagerUpdateMachineCollection extends CimiManagerUpdateAbstrac
      */
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        Context context = new Context(request, CimiEntityType.MachineCollection);
-        MachineCollection service = (MachineCollection) context.getConverter().toService(context, request.getCimiData());
-        return service;
+        return request.getContext().getRootConverter(CimiEntityType.MachineCollection)
+            .toService(request.getContext(), request.getCimiData());
     }
 
 }

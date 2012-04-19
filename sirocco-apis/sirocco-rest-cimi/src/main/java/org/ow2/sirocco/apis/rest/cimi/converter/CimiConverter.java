@@ -24,7 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 
 /**
  * 
@@ -38,7 +38,7 @@ public interface CimiConverter {
      * @param dataService Service object to convert
      * @return Converted CIMI object
      */
-    Object toCimi(final Context context, final Object dataService);
+    Object toCimi(final CimiContext context, final Object dataService);
 
     /**
      * Convert a CIMI object to a service object.
@@ -47,5 +47,5 @@ public interface CimiConverter {
      * @param dataCimi Source CIMI object to convert
      * @return Converted service object
      */
-    Object toService(final Context context, final Object dataCimi);
+    Object toService(final CimiContext context, final Object dataCimi);
 }

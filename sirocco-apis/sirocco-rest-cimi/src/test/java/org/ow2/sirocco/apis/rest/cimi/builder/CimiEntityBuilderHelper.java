@@ -32,6 +32,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
@@ -377,6 +379,13 @@ public class CimiEntityBuilderHelper {
         cimi.setAttachmentPoint("attachmentPointValue" + postfix);
         cimi.setCapacity(CimiEntityBuilderHelper.buildCimiCapacity(id, index));
         cimi.setFormat("formatValue" + postfix);
+        return cimi;
+    }
+
+    public static CimiAction buildCimiAction(final Integer id) {
+        CimiAction cimi = new CimiAction();
+        CimiEntityBuilderHelper.fillCimiCommon(cimi, id, null);
+        cimi.setAction(ActionType.START.getPath());
         return cimi;
     }
 

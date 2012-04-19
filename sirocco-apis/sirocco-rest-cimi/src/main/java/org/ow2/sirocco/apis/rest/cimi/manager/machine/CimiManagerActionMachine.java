@@ -24,51 +24,120 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
-import javax.ws.rs.core.Response.Status;
+import javax.validation.groups.Default;
+import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
+import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
-public class CimiManagerActionMachine {
+/**
+ * Manage ACTION request of Machine.
+ */
+@Component("CimiManagerActionMachine")
+public class CimiManagerActionMachine extends CimiManagerAbstract {
 
-    public CimiManagerActionMachine() {
-    }
+    @Autowired
+    @Qualifier("IMachineManager")
+    private IMachineManager manager;
 
-    public void execute(final CimiRequest request, final CimiResponse response) {
-        // Status status = verifyRequest(request);
-        // if (status.equals(Status.OK)) {
-        // response.setCimiData(getMachineById(request.getHeader().getId()));
-        // doAction((Machine) request.getHeader().getCimiData());
-        // // status = 202 ACCEPTED
-        // response.setStatusHttp(Status.ACCEPTED.getStatusCode());
-        // } else {
-        // // status = 400 BAD REQUEST
-        // response.setStatusHttp(Status.BAD_REQUEST.getStatusCode());
-        // }
-    }
-
-    public Status verifyRequest(final CimiRequest request) {
-        // FIXME le path de la requete doit être au format http://example.com +
-        // ConstantePath
-        if (request.getBaseUri().toString().equals("http://localhost:9998/")
-            && request.getPath().startsWith(ConstantsPath.MACHINE.substring(1))) {
-            return Status.OK;
-        } else {
-            return Status.BAD_REQUEST;
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#validate(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     */
+    @Override
+    protected boolean validate(final CimiRequest request, final CimiResponse response) throws Exception {
+        boolean valid = CimiValidatorHelper.getInstance().validate(request, response, request.getHeader());
+        if (valid) {
+            if (null == request.getCimiData()) {
+                valid = false;
+            } else {
+                valid = CimiValidatorHelper.getInstance().validate(request, response, request.getCimiData(), Default.class,
+                    GroupWrite.class);
+            }
         }
+        return valid;
     }
 
-    public CimiMachine getMachineById(final String id) {
-        // FIXME return IMachineManager.getMachineById(id);
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     */
+    @Override
+    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+        // Nothing to do
         return null;
     }
 
-    private void doAction(final CimiMachine machine) {
-        // FIXME les AJB traite eux même les différents cas d'action ou on doit
-        // traiter nous même???
-        // FIXME IMachineManager.doAction(machine);
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        Object outService = null;
+        CimiAction cimiAction = (CimiAction) request.getCimiData();
+        ActionType type = ActionType.findPath(cimiAction.getAction());
+        switch (type) {
+        case START:
+            outService = this.manager.startMachine(request.getId());
+            break;
+        case STOP:
+            outService = this.manager.stopMachine(request.getId());
+            break;
+        default:
+            throw new UnsupportedOperationException();
+        }
+        return outService;
+    }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
+            .toCimi(request.getContext(), dataService);
+
+        response.setCimiData(cimi);
+        response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
+        response.putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
+        response.setStatus(Response.Status.ACCEPTED);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#addOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void addOperations(final CimiRequest request, final CimiResponse response, final Object dataService) {
+        // Nothing to do
     }
 }

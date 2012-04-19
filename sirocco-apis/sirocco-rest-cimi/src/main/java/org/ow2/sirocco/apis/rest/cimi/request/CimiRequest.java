@@ -43,6 +43,8 @@ public class CimiRequest {
 
     private String method;
 
+    private CimiContext context;
+
     public RequestHeader getHeader() {
         return this.header;
     }
@@ -71,12 +73,12 @@ public class CimiRequest {
         return this.baseUri;
     }
 
-    public String getPath() {
-        return this.path;
-    }
-
     public void setBaseUri(final String baseUri) {
         this.baseUri = baseUri;
+    }
+
+    public String getPath() {
+        return this.path;
     }
 
     public void setPath(final String path) {
@@ -89,6 +91,20 @@ public class CimiRequest {
 
     public void setMethod(final String method) {
         this.method = method;
+    }
+
+    /**
+     * @return the context
+     */
+    public CimiContext getContext() {
+        return this.context;
+    }
+
+    /**
+     * @param context the context to set
+     */
+    public void setContext(final CimiContext context) {
+        this.context = context;
     }
 
 }

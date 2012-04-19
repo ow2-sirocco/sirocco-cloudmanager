@@ -25,7 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
 
@@ -43,11 +43,11 @@ public class FrequencyUnitConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         String cimi = null;
         Frequency service = (Frequency) dataService;
         switch (service) {
@@ -69,11 +69,11 @@ public class FrequencyUnitConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         Frequency service;
         FrequencyUnit cimi = FrequencyUnit.findValueOf((String) dataCimi);
         switch (cimi) {

@@ -47,7 +47,7 @@ public abstract class CimiManagerReadAbstract extends CimiManagerAbstract {
      */
     @Override
     protected boolean validate(final CimiRequest request, final CimiResponse response) throws Exception {
-        return CimiValidatorHelper.getInstance().validate(request.getHeader());
+        return CimiValidatorHelper.getInstance().validate(request, response, request.getHeader());
     }
 
     /**

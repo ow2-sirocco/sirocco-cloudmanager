@@ -69,13 +69,6 @@ public class CimiMachineConfiguration extends CimiCommonId {
     private CimiDiskConfiguration[] disks;
 
     /**
-     * Default constructor.
-     */
-    public CimiMachineConfiguration() {
-        super();
-    }
-
-    /**
      * Return the value of field "cpu".
      * 
      * @return The value
@@ -129,6 +122,20 @@ public class CimiMachineConfiguration extends CimiCommonId {
      */
     public void setDisks(final CimiDiskConfiguration[] disks) {
         this.disks = disks;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getCpu());
+        has = has || (null != this.getDisks());
+        has = has || (null != this.getMemory());
+        return has;
     }
 
 }

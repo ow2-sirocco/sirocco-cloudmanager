@@ -67,4 +67,16 @@ public class CimiMachineTemplateCollection extends CimiCommonId {
         this.machineTemplates = machineTemplates;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getMachineTemplates());
+        return has;
+    }
+
 }

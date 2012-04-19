@@ -49,13 +49,6 @@ public class CimiMachineImageCollection extends CimiCommonId {
     private CimiMachineImage[] machineImages;
 
     /**
-     * Default constructor.
-     */
-    public CimiMachineImageCollection() {
-        super();
-    }
-
-    /**
      * Return the value of field "machineImages".
      * 
      * @return The value
@@ -73,4 +66,17 @@ public class CimiMachineImageCollection extends CimiCommonId {
     public void setMachineImages(final CimiMachineImage[] machineImages) {
         this.machineImages = machineImages;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getMachineImages());
+        return has;
+    }
+
 }

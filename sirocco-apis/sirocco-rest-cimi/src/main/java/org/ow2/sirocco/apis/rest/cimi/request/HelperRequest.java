@@ -50,6 +50,7 @@ public class HelperRequest {
     public static CimiRequest buildRequest(final CimiResourceAbstract.JaxRsRequestInfos infos, final String id,
         final CimiData cimiData) {
         CimiRequest request = new CimiRequest();
+        request.setContext(new CimiContextImpl(request));
         request.setHeader(HelperRequest.buildRequestHeader(infos));
         request.setId(id);
         request.setCimiData(cimiData);

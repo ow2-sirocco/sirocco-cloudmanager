@@ -32,7 +32,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeMachineTemplate. <p> </p>
+ * Class VolumeMachineTemplate.
  */
 @XmlRootElement(name = "volumeMachineTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -41,31 +41,19 @@ public class CimiVolumeMachineTemplate implements Serializable {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "attachmentPoint". <p> </p>
+     * Field "attachmentPoint".
      */
     private String attachmentPoint;
 
     /**
-     * Field "volumeTemplate". <p> </p>
+     * Field "volumeTemplate".
      */
     private CimiVolumeTemplate volumeTemplate;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiVolumeMachineTemplate() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "attachmentPoint".
+     * 
      * @return The value
      */
     public String getAttachmentPoint() {
@@ -74,14 +62,16 @@ public class CimiVolumeMachineTemplate implements Serializable {
 
     /**
      * Set the value of field "attachmentPoint".
+     * 
      * @param attachmentPoint The value
      */
-    public void setAttachmentPoint(String attachmentPoint) {
+    public void setAttachmentPoint(final String attachmentPoint) {
         this.attachmentPoint = attachmentPoint;
     }
 
     /**
      * Return the value of field "volumeTemplate".
+     * 
      * @return The value
      */
     public CimiVolumeTemplate getVolumeTemplate() {
@@ -90,9 +80,10 @@ public class CimiVolumeMachineTemplate implements Serializable {
 
     /**
      * Set the value of field "volumeTemplate".
+     * 
      * @param volumeTemplate The value
      */
-    public void setVolumeTemplate(CimiVolumeTemplate volumeTemplate) {
+    public void setVolumeTemplate(final CimiVolumeTemplate volumeTemplate) {
         this.volumeTemplate = volumeTemplate;
     }
 

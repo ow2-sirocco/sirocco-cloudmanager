@@ -32,7 +32,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 
 /**
@@ -45,15 +45,15 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
  * </ul>
  * </p>
  */
-public class CloudEntryPointConverter extends CommonIdConverter implements EntityConverter {
+public class CloudEntryPointConverter extends CommonConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiCloudEntryPoint cimi = new CimiCloudEntryPoint();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -62,22 +62,22 @@ public class CloudEntryPointConverter extends CommonIdConverter implements Entit
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         this.doCopyToCimi(context, (CloudEntryPointAggregate) dataService, (CimiCloudEntryPoint) dataCimi);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         CloudEntryPoint service = new CloudEntryPoint();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -87,11 +87,11 @@ public class CloudEntryPointConverter extends CommonIdConverter implements Entit
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiCloudEntryPoint) dataCimi, (CloudEntryPoint) dataService);
     }
 
@@ -102,10 +102,10 @@ public class CloudEntryPointConverter extends CommonIdConverter implements Entit
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final CloudEntryPointAggregate dataService,
+    protected void doCopyToCimi(final CimiContext context, final CloudEntryPointAggregate dataService,
         final CimiCloudEntryPoint dataCimi) {
-        this.fill(context, dataService, dataCimi);
-        if (true == context.shouldBeExpanded(dataCimi)) {
+        this.fill(dataService, dataCimi);
+        if (true == context.mustBeExpanded(dataCimi)) {
             if (null != dataService.getCredentials()) {
                 dataCimi.setCredentials((CimiCredentialsCollection) context.getConverter(CimiCredentialsCollection.class)
                     .toCimi(context, dataService.getCredentials()));
@@ -140,7 +140,8 @@ public class CloudEntryPointConverter extends CommonIdConverter implements Entit
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiCloudEntryPoint dataCimi, final CloudEntryPoint dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiCloudEntryPoint dataCimi,
+        final CloudEntryPoint dataService) {
         this.fill(dataCimi, dataService);
     }
 

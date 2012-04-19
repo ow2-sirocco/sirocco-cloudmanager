@@ -32,7 +32,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeConfigurationCollection. <p> </p>
+ * Class VolumeConfigurationCollection.
  */
 @XmlRootElement(name = "volumeConfigurationCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -44,23 +44,13 @@ public class CimiVolumeConfigurationCollection extends CimiCommonId implements S
     // ---------------------------------------- Fields
 
     /**
-     * Field "volumeConfigurations". <p> </p>
+     * Field "volumeConfigurations".
      */
     private CimiVolumeConfiguration[] volumeConfigurations;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiVolumeConfigurationCollection() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "volumeConfigurations".
+     * 
      * @return The value
      */
     public CimiVolumeConfiguration[] getVolumeConfigurations() {
@@ -69,10 +59,22 @@ public class CimiVolumeConfigurationCollection extends CimiCommonId implements S
 
     /**
      * Set the value of field "volumeConfigurations".
+     * 
      * @param volumeConfigurations The value
      */
-    public void setVolumeConfigurations(CimiVolumeConfiguration[] volumeConfigurations) {
+    public void setVolumeConfigurations(final CimiVolumeConfiguration[] volumeConfigurations) {
         this.volumeConfigurations = volumeConfigurations;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

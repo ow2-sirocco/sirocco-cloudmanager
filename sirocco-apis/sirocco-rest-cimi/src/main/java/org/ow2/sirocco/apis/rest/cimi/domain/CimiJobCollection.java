@@ -49,13 +49,6 @@ public class CimiJobCollection extends CimiCommonId {
     private CimiJob[] jobs;
 
     /**
-     * Default constructor.
-     */
-    public CimiJobCollection() {
-        super();
-    }
-
-    /**
      * Return the value of field "jobs".
      * 
      * @return The value
@@ -72,6 +65,18 @@ public class CimiJobCollection extends CimiCommonId {
      */
     public void setJobs(final CimiJob[] jobs) {
         this.jobs = jobs;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getJobs());
+        return has;
     }
 
 }

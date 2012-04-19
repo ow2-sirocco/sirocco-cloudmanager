@@ -27,11 +27,10 @@ package org.ow2.sirocco.apis.rest.cimi.manager.cep;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,8 +72,8 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        Context context = new Context(request, CimiEntityType.CloudEntryPoint);
-        CimiCloudEntryPoint cimi = (CimiCloudEntryPoint) context.getConverter().toCimi(context, dataService);
+        CimiCloudEntryPoint cimi = (CimiCloudEntryPoint) request.getContext().getRootConverter(CimiEntityType.CloudEntryPoint)
+            .toCimi(request.getContext(), dataService);
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }

@@ -32,7 +32,6 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 /**
  * Class NetworkInterface.
  * <p>
- * </p>
  */
 @XmlRootElement(name = "NetworkInterface")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -43,64 +42,46 @@ public class CimiNetworkInterface extends CimiCommonId {
 
     /**
      * Field "hostname".
-     * <p>
-     * </p>
      */
     private String hostname;
 
     /**
      * Field "macAddress".
-     * <p>
-     * </p>
      */
     private String macAddress;
 
     /**
      * Field "state".
-     * <p>
-     * </p>
      */
     private String state;
 
     /**
      * Field "protocol".
-     * <p>
-     * </p>
      */
     private String protocol;
 
     /**
      * Field "allocation".
-     * <p>
-     * </p>
      */
     private String allocation;
 
     /**
      * Field "address".
-     * <p>
-     * </p>
      */
     private String address;
 
     /**
      * Field "defaultGateway".
-     * <p>
-     * </p>
      */
     private String defaultGateway;
 
     /**
      * Field "dns".
-     * <p>
-     * </p>
      */
     private String dns;
 
     /**
      * Field "macTransmissionUnit".
-     * <p>
-     * </p>
      */
     private Integer macTransmissionUnit;
 
@@ -264,6 +245,17 @@ public class CimiNetworkInterface extends CimiCommonId {
      */
     public void setMacTransmissionUnit(final Integer macTransmissionUnit) {
         this.macTransmissionUnit = macTransmissionUnit;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

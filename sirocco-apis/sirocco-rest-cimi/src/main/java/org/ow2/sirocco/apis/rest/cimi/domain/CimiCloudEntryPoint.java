@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -34,91 +32,66 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 /**
  * Class CloudEntryPoint.
  * <p>
- * </p>
  */
 @XmlRootElement(name = "CloudEntryPoint")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCloudEntryPoint extends CimiCommonId implements Serializable {
+public class CimiCloudEntryPoint extends CimiCommonId {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
      * Field "machineTemplates".
-     * <p>
-     * </p>
      */
     private CimiMachineTemplateCollection machineTemplates;
 
     /**
      * Field "machineConfigs".
-     * <p>
-     * </p>
      */
     private CimiMachineConfigurationCollection machineConfigs;
 
     /**
      * Field "machineImages".
-     * <p>
-     * </p>
      */
     private CimiMachineImageCollection machineImages;
 
     /**
      * Field "CredentialsTemplates".
-     * <p>
-     * </p>
      */
     private CimiCredentialsTemplateCollection CredentialsTemplates;
 
     /**
      * Field "Credentials".
-     * <p>
-     * </p>
      */
     private CimiCredentialsCollection credentials;
 
     /**
      * Field "machines".
-     * <p>
-     * </p>
      */
     private CimiMachineCollection machines;
 
     /**
      * Field "volumeTemplates".
-     * <p>
-     * </p>
      */
     private CimiVolumeTemplateCollection volumeTemplates;
 
     /**
      * Field "volumeConfigurations".
-     * <p>
-     * </p>
      */
     private CimiVolumeConfigurationCollection volumeConfigurations;
 
     /**
      * Field "volumeImages".
-     * <p>
-     * </p>
      */
     private CimiVolumeImageCollection volumeImages;
 
     /**
      * Field "volumes".
-     * <p>
-     * </p>
      */
     private CimiVolumeCollection volumes;
 
     /**
      * Field "jobTime".
-     * <p>
-     * </p>
      */
     private Integer jobTime;
 

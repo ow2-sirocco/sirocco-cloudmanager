@@ -102,4 +102,19 @@ public class CimiCredentials extends CimiCommonId {
     public void setKey(final byte[] key) {
         this.key = key;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getKey());
+        has = has || (null != this.getPassword());
+        has = has || (null != this.getUserName());
+        return has;
+    }
+
 }

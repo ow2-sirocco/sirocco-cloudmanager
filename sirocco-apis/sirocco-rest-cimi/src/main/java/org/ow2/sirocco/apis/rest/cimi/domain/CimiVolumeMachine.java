@@ -32,7 +32,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeMachine. <p> </p>
+ * Class VolumeMachine.
  */
 @XmlRootElement(name = "volumeMachine")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -44,12 +44,12 @@ public class CimiVolumeMachine implements Serializable {
     // ---------------------------------------- Fields
 
     /**
-     * Field "attachmentPoint". <p> </p>
+     * Field "attachmentPoint".
      */
     private String attachmentPoint;
 
     /**
-     * Field "volume". <p> </p>
+     * Field "volume".
      */
     private CimiVolume volume;
 
@@ -66,6 +66,7 @@ public class CimiVolumeMachine implements Serializable {
 
     /**
      * Return the value of field "attachmentPoint".
+     * 
      * @return The value
      */
     public String getAttachmentPoint() {
@@ -74,14 +75,16 @@ public class CimiVolumeMachine implements Serializable {
 
     /**
      * Set the value of field "attachmentPoint".
+     * 
      * @param attachmentPoint The value
      */
-    public void setAttachmentPoint(String attachmentPoint) {
+    public void setAttachmentPoint(final String attachmentPoint) {
         this.attachmentPoint = attachmentPoint;
     }
 
     /**
      * Return the value of field "volume".
+     * 
      * @return The value
      */
     public CimiVolume getVolume() {
@@ -90,9 +93,10 @@ public class CimiVolumeMachine implements Serializable {
 
     /**
      * Set the value of field "volume".
+     * 
      * @param volume The value
      */
-    public void setVolume(CimiVolume volume) {
+    public void setVolume(final CimiVolume volume) {
         this.volume = volume;
     }
 

@@ -26,13 +26,12 @@ package org.ow2.sirocco.apis.rest.cimi.manager.job;
 
 import javax.ws.rs.core.Response;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,8 +78,8 @@ public class CimiManagerReadJob extends CimiManagerReadAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        Context context = new Context(request, CimiEntityType.Job);
-        CimiJob cimi = (CimiJob) context.getConverter().toCimi(context, dataService);
+        CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
+            .toCimi(request.getContext(), dataService);
 
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);

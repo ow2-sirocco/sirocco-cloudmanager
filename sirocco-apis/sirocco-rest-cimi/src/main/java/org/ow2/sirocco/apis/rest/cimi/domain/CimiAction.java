@@ -24,16 +24,16 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertActionPath;
 
-@XmlRootElement(name = "action")
+@XmlRootElement(name = "Action")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiAction implements Serializable {
+public class CimiAction extends CimiCommon {
 
     /**
      * Serial number
@@ -41,19 +41,14 @@ public class CimiAction implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * field action <p> </p>
+     * Field action
      */
+    @AssertActionPath(groups = GroupWrite.class)
     private String action;
 
     /**
-     * Default constructor.
-     */
-    private CimiAction() {
-        super();
-    }
-
-    /**
      * Return the action of action.
+     * 
      * @return The action of action
      */
     public String getAction() {
@@ -62,9 +57,11 @@ public class CimiAction implements Serializable {
 
     /**
      * Set the value of the field action
+     * 
      * @param action the value
      */
-    public void setAction(String action) {
+    public void setAction(final String action) {
         this.action = action;
     }
+
 }

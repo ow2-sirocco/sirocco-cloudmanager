@@ -29,8 +29,12 @@ import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
+import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
 
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,27 +73,23 @@ public class CimiValidatorHelper {
      * @return True if the bean is valid
      */
     public <T> boolean validate(final T beanToValidate) {
-        boolean valid = true;
-        Validator validator = CimiValidatorHelper.factory.getValidator();
-
-        CimiValidatorHelper.LOGGER.debug("Validation of {}", beanToValidate.getClass().getName());
-
-        Set<ConstraintViolation<T>> violations = validator.validate(beanToValidate);
-        if (violations.size() > 0) {
-            valid = false;
-            if (CimiValidatorHelper.LOGGER.isInfoEnabled()) {
-                for (ConstraintViolation<T> constraintViolation : violations) {
-                    CimiValidatorHelper.LOGGER.info("Validation error: {}, Bean: {}, Property: {}, Value: {}", new Object[] {
-                        constraintViolation.getMessage(), constraintViolation.getRootBeanClass().getSimpleName(),
-                        constraintViolation.getPropertyPath(), constraintViolation.getInvalidValue()});
-                }
-            }
-        }
-        return valid;
+        return this.validate(null, null, beanToValidate);
     }
 
     /**
-     * /** Validate a bean with a filter.
+     * Validate a bean.
+     * 
+     * @param <T> The type of bean
+     * @param beanToValidate Bean to validate
+     * @return True if the bean is valid
+     */
+    public <T> boolean validate(final CimiRequest request, final CimiResponse response, final T beanToValidate) {
+        CimiValidatorHelper.LOGGER.debug("Validation of {}", beanToValidate.getClass().getName());
+        return this.checkViolations(response, this.getValidator(request).validate(beanToValidate));
+    }
+
+    /**
+     * Validate a bean with a filter.
      * 
      * @param <T> Type of bean to validate
      * @param beanToValidate Bean to validate
@@ -97,23 +97,22 @@ public class CimiValidatorHelper {
      * @return True if the bean is valid
      */
     public <T> boolean validate(final T beanToValidate, final Class<?> filterClass) {
-        boolean valid = true;
-        Validator validator = CimiValidatorHelper.factory.getValidator();
+        return this.validate(null, null, beanToValidate, filterClass);
+    }
 
+    /**
+     * Validate a bean with a filter.
+     * 
+     * @param <T> Type of bean to validate
+     * @param beanToValidate Bean to validate
+     * @param filterClass Filter class
+     * @return True if the bean is valid
+     */
+    public <T> boolean validate(final CimiRequest request, final CimiResponse response, final T beanToValidate,
+        final Class<?> filterClass) {
         CimiValidatorHelper.LOGGER.debug("Validation of {} with {}", beanToValidate.getClass().getName(),
             filterClass.getSimpleName());
-        Set<ConstraintViolation<T>> violations = validator.validate(beanToValidate, filterClass);
-        if (violations.size() > 0) {
-            valid = false;
-            if (CimiValidatorHelper.LOGGER.isInfoEnabled()) {
-                for (ConstraintViolation<T> constraintViolation : violations) {
-                    CimiValidatorHelper.LOGGER.info("Validation error: {}, Bean: {}, Property: {}, Value: {}", new Object[] {
-                        constraintViolation.getMessage(), constraintViolation.getRootBeanClass().getSimpleName(),
-                        constraintViolation.getPropertyPath(), constraintViolation.getInvalidValue()});
-                }
-            }
-        }
-        return valid;
+        return this.checkViolations(response, this.getValidator(request).validate(beanToValidate, filterClass));
     }
 
     /**
@@ -125,9 +124,19 @@ public class CimiValidatorHelper {
      * @return True if the bean is valid
      */
     public <T> boolean validate(final T beanToValidate, final Class<?>... filters) {
-        boolean valid = true;
-        Validator validator = CimiValidatorHelper.factory.getValidator();
+        return this.validate(null, null, beanToValidate, filters);
+    }
 
+    /**
+     * Validate a bean with a array of filters.
+     * 
+     * @param <T> Type of bean to validate
+     * @param beanToValidate Bean to validate
+     * @param filters Group to validate
+     * @return True if the bean is valid
+     */
+    public <T> boolean validate(final CimiRequest request, final CimiResponse response, final T beanToValidate,
+        final Class<?>... filters) {
         if (CimiValidatorHelper.LOGGER.isDebugEnabled()) {
             StringBuilder sb = new StringBuilder();
             for (int i = 0; i < filters.length; i++) {
@@ -138,14 +147,43 @@ public class CimiValidatorHelper {
             }
             CimiValidatorHelper.LOGGER.debug("Validation of {} with {}", beanToValidate.getClass().getName(), sb);
         }
-        Set<ConstraintViolation<T>> violations = validator.validate(beanToValidate, filters);
+        return this.checkViolations(response, this.getValidator(request).validate(beanToValidate, filters));
+    }
+
+    private Validator getValidator(final CimiRequest request) {
+        Validator validator = null;
+        CimiContext context = null;
+        if (null != request) {
+            context = request.getContext();
+        }
+        if (null == context) {
+            validator = CimiValidatorHelper.factory.getValidator();
+        } else {
+            ValidatorContext validatorContext = CimiValidatorHelper.factory.usingContext();
+            validatorContext.constraintValidatorFactory(new CimiConstraintValidatorFactoryImpl(context));
+            validator = validatorContext.getValidator();
+        }
+        return validator;
+    }
+
+    private <T> boolean checkViolations(final CimiResponse response, final Set<ConstraintViolation<T>> violations) {
+        boolean valid = true;
         if (violations.size() > 0) {
             valid = false;
-            if (CimiValidatorHelper.LOGGER.isInfoEnabled()) {
+            if ((null != response) || (CimiValidatorHelper.LOGGER.isDebugEnabled())) {
+                StringBuilder sb = new StringBuilder();
                 for (ConstraintViolation<T> constraintViolation : violations) {
-                    CimiValidatorHelper.LOGGER.info("Validation error: {}, Bean: {}, Property: {}, Value: {}", new Object[] {
-                        constraintViolation.getMessage(), constraintViolation.getRootBeanClass().getSimpleName(),
-                        constraintViolation.getPropertyPath(), constraintViolation.getInvalidValue()});
+                    sb.append("Validation error: ").append(constraintViolation.getMessage());
+                    sb.append(", Bean: ").append(constraintViolation.getRootBeanClass().getName());
+                    sb.append(", Property: ").append(constraintViolation.getPropertyPath());
+                    // sb.append(", Value: ").append(constraintViolation.getInvalidValue());
+                    sb.append('\n');
+                }
+                if (null != response) {
+                    response.setErrorMessage(sb.toString());
+                }
+                if (CimiValidatorHelper.LOGGER.isDebugEnabled()) {
+                    CimiValidatorHelper.LOGGER.debug(sb.toString());
                 }
             }
         }

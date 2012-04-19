@@ -42,8 +42,6 @@ public class CimiMachineTemplate extends CimiCommonId {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
      * Field "machineConfig".
      */
@@ -57,7 +55,7 @@ public class CimiMachineTemplate extends CimiCommonId {
     private CimiMachineImage machineImage;
 
     /**
-     * Field "Credls".
+     * Field "credentials".
      */
     @Valid
     private CimiCredentials credentials;
@@ -189,6 +187,22 @@ public class CimiMachineTemplate extends CimiCommonId {
      */
     public void setNetworkInterfaces(final CimiNetworkInterface[] networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getCredentials());
+        has = has || (null != this.getMachineConfig());
+        has = has || (null != this.getMachineImage());
+        has = has || (null != this.getNetworkInterfaces());
+        has = has || (null != this.getVolumes());
+        return has;
     }
 
 }

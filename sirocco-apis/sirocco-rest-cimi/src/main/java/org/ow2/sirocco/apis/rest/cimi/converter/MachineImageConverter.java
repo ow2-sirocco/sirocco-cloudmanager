@@ -26,7 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
 /**
@@ -44,11 +44,11 @@ public class MachineImageConverter extends CommonIdConverter implements EntityCo
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiMachineImage cimi = new CimiMachineImage();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -57,22 +57,22 @@ public class MachineImageConverter extends CommonIdConverter implements EntityCo
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         this.doCopyToCimi(context, (MachineImage) dataService, (CimiMachineImage) dataCimi);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         MachineImage service = new MachineImage();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -82,11 +82,11 @@ public class MachineImageConverter extends CommonIdConverter implements EntityCo
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiMachineImage) dataCimi, (MachineImage) dataService);
     }
 
@@ -97,9 +97,9 @@ public class MachineImageConverter extends CommonIdConverter implements EntityCo
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final MachineImage dataService, final CimiMachineImage dataCimi) {
+    protected void doCopyToCimi(final CimiContext context, final MachineImage dataService, final CimiMachineImage dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if (true == context.shouldBeExpanded(dataCimi)) {
+        if (true == context.mustBeExpanded(dataCimi)) {
             if (null != dataService.getImageLocation()) {
                 dataCimi.setImageLocation(new ImageLocation(dataService.getImageLocation()));
             }
@@ -115,7 +115,7 @@ public class MachineImageConverter extends CommonIdConverter implements EntityCo
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiMachineImage dataCimi, final MachineImage dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiMachineImage dataCimi, final MachineImage dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getImageLocation()) {
             dataService.setImageLocation(dataCimi.getImageLocation().getHref());

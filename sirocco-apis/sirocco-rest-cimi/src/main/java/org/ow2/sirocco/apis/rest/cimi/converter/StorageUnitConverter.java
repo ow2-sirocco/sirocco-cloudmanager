@@ -25,7 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -42,11 +42,11 @@ public class StorageUnitConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         String cimi = null;
         org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit service = (org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) dataService;
         switch (service) {
@@ -86,11 +86,11 @@ public class StorageUnitConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit service;
         StorageUnit cimi = StorageUnit.findValueOf((String) dataCimi);
         switch (cimi) {

@@ -24,11 +24,13 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
+import javax.validation.groups.Default;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Abstract class for manage UPDATE request.
@@ -43,12 +45,13 @@ public abstract class CimiManagerUpdateAbstract extends CimiManagerAbstract {
      */
     @Override
     protected boolean validate(final CimiRequest request, final CimiResponse response) throws Exception {
-        boolean valid = CimiValidatorHelper.getInstance().validate(request.getHeader());
+        boolean valid = CimiValidatorHelper.getInstance().validate(request, response, request.getHeader());
         if (valid) {
             if (null == request.getCimiData()) {
                 valid = false;
             } else {
-                valid = CimiValidatorHelper.getInstance().validate(request.getCimiData());
+                valid = CimiValidatorHelper.getInstance().validate(request, response, request.getCimiData(), Default.class,
+                    GroupWrite.class);
             }
         }
         return valid;

@@ -22,7 +22,9 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.utils;
+package org.ow2.sirocco.apis.rest.cimi.domain;
+
+import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 /**
  * Enumeration of all the path name used.

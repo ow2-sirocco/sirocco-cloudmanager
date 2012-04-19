@@ -31,10 +31,10 @@ import junit.framework.ComparisonFailure;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
+import org.ow2.sirocco.apis.rest.cimi.domain.PathType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.SerializationHelper;
-import org.ow2.sirocco.apis.rest.cimi.utils.PathType;
 
 /**
  * Mock CimiManagerUpdate.

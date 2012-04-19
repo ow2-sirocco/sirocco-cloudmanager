@@ -28,6 +28,7 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -83,8 +84,6 @@ public class CimiCommonId extends CimiCommon implements CimiHref {
 
     /**
      * Field "href".
-     * <p>
-     * </p>
      */
     private String href;
 
@@ -163,18 +162,68 @@ public class CimiCommonId extends CimiCommon implements CimiHref {
     }
 
     /**
-     * @return the href
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiHref#getHref()
      */
     @XmlAttribute
+    @Override
     public String getHref() {
         return this.href;
     }
 
     /**
-     * @param href the href to set
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiHref#setHref(java.lang.String)
      */
+    @Override
     public void setHref(final String href) {
         this.href = href;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiHref#hasReference()
+     */
+    @Override
+    public boolean hasReference() {
+        return (null != this.href);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiHref#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = false;
+        has = has || (null != this.getDescription());
+        has = has || (null != this.getName());
+        has = has || (null != this.getProperties());
+        return has;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiHref#getPassingType()
+     */
+    @XmlTransient
+    @JsonIgnore
+    @Override
+    public PassingType getPassingType() {
+        PassingType type = PassingType.None;
+        if ((true == this.hasReference()) && (true == this.hasValues())) {
+            type = PassingType.ByReferenceWithOverrides;
+        } else if (true == this.hasReference()) {
+            type = PassingType.ByReference;
+        } else if (true == this.hasValues()) {
+            type = PassingType.ByValue;
+        }
+        return type;
     }
 
 }

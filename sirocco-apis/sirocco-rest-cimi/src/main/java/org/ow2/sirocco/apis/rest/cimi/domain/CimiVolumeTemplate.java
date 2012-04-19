@@ -33,7 +33,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeTemplate. <p> </p>
+ * Class VolumeTemplate.
  */
 @XmlRootElement(name = "volumeTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -42,28 +42,16 @@ public class CimiVolumeTemplate extends CimiCommonId implements Serializable {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     private String href;
 
     /**
-     * Field "volumeConfig". <p> </p>
+     * Field "volumeConfig".
      */
     private CimiVolumeConfiguration volumeConfig;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiVolumeTemplate() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "volumeConfig".
+     * 
      * @return The value
      */
     public CimiVolumeConfiguration getVolumeConfig() {
@@ -72,24 +60,39 @@ public class CimiVolumeTemplate extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "volumeConfig".
+     * 
      * @param volumeConfig The value
      */
-    public void setVolumeConfig(CimiVolumeConfiguration volumeConfig) {
+    public void setVolumeConfig(final CimiVolumeConfiguration volumeConfig) {
         this.volumeConfig = volumeConfig;
     }
 
     /**
      * @return the href
      */
+    @Override
     @XmlAttribute
     public String getHref() {
-        return href;
+        return this.href;
     }
 
     /**
      * @param href the href to set
      */
-    public void setHref(String href) {
+    @Override
+    public void setHref(final String href) {
         this.href = href;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

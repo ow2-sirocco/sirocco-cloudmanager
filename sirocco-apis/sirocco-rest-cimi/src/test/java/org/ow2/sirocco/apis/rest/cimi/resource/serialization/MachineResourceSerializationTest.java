@@ -556,6 +556,86 @@ public class MachineResourceSerializationTest extends SerializationTestBase {
             entityResponse));
     }
 
+    /**
+     * Test POST.
+     * 
+     * @throws Exception In case of error
+     */
+    @Test
+    public final void testPostActionXml() throws Exception {
+        ClientResponse clientResponse = null;
+        String entityResponse;
+        int statusResponse;
+        MultivaluedMap<String, String> heardersResponse;
+
+        // XML : id = 1
+        clientResponse = this.resource().path(ConstantsPath.MACHINE + "/1").accept(MediaType.APPLICATION_XML_TYPE)
+            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "Action-1.xml"), MediaType.APPLICATION_XML)
+            .post(ClientResponse.class);
+
+        statusResponse = clientResponse.getStatus();
+        entityResponse = clientResponse.getEntity(String.class);
+        heardersResponse = clientResponse.getHeaders();
+
+        MachineResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", heardersResponse);
+
+        Assert.assertEquals(202, statusResponse);
+
+        Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_CIMI_JOB_URI));
+        Assert.assertTrue(heardersResponse.get(Constants.HEADER_CIMI_JOB_URI).get(0).endsWith("idValue_1"));
+
+        Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_LOCATION));
+        Assert.assertTrue(heardersResponse.get(Constants.HEADER_LOCATION).get(0)
+            .endsWith(ConstantsPath.MACHINE + "/" + "targetEntityValue_1"));
+
+        XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "Job-1.xml"), new StringReader(
+            entityResponse));
+    }
+
+    /**
+     * Test POST.
+     * 
+     * @throws Exception In case of error
+     */
+    @Test
+    public final void testPostActionJson() throws Exception {
+        ClientResponse clientResponse = null;
+        String entityResponse;
+        int statusResponse;
+        MultivaluedMap<String, String> heardersResponse;
+
+        // JSON : id = 1
+        clientResponse = this.resource().path(ConstantsPath.MACHINE + "/1").accept(MediaType.APPLICATION_JSON_TYPE)
+            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+            .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "Action-1.json"), MediaType.APPLICATION_JSON)
+            .post(ClientResponse.class);
+
+        statusResponse = clientResponse.getStatus();
+        entityResponse = clientResponse.getEntity(String.class);
+        heardersResponse = clientResponse.getHeaders();
+
+        MachineResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
+        MachineResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
+        MachineResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
+        MachineResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", heardersResponse);
+
+        Assert.assertEquals(202, statusResponse);
+
+        Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_CIMI_JOB_URI));
+        Assert.assertTrue(heardersResponse.get(Constants.HEADER_CIMI_JOB_URI).get(0).endsWith("idValue_1"));
+
+        Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_LOCATION));
+        Assert.assertTrue(heardersResponse.get(Constants.HEADER_LOCATION).get(0)
+            .endsWith(ConstantsPath.MACHINE + "/" + "targetEntityValue_1"));
+
+        JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "Job-1.json"), new StringReader(
+            entityResponse));
+    }
+
     @Test
     public final void testDeleteMachine() {
         ClientResponse clientResponse = null;

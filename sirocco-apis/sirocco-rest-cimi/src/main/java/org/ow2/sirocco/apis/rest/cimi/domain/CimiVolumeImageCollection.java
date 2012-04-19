@@ -32,7 +32,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeImageCollection. <p> </p>
+ * Class VolumeImageCollection.
  */
 @XmlRootElement(name = "volumeImageCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -41,26 +41,14 @@ public class CimiVolumeImageCollection extends CimiCommonId implements Serializa
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "volumeImages". <p> </p>
+     * Field "volumeImages".
      */
     private CimiVolumeImage[] volumeImages;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiVolumeImageCollection() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "volumeImages".
+     * 
      * @return The value
      */
     public CimiVolumeImage[] getVolumeImages() {
@@ -69,10 +57,22 @@ public class CimiVolumeImageCollection extends CimiCommonId implements Serializa
 
     /**
      * Set the value of field "volumeImages".
+     * 
      * @param volumeImages The value
      */
-    public void setVolumeImages(CimiVolumeImage[] volumeImages) {
+    public void setVolumeImages(final CimiVolumeImage[] volumeImages) {
         this.volumeImages = volumeImages;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

@@ -32,7 +32,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeCollection. <p> </p>
+ * Class VolumeCollection.
+ * <p>
  */
 @XmlRootElement(name = "volumeCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -41,26 +42,14 @@ public class CimiVolumeCollection extends CimiCommonId implements Serializable {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "volumes". <p> </p>
+     * Field "volumes".
      */
     private CimiVolume[] volumes;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiVolumeCollection() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "volumes".
+     * 
      * @return The value
      */
     public CimiVolume[] getVolumes() {
@@ -69,10 +58,22 @@ public class CimiVolumeCollection extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "volumes".
+     * 
      * @param volumes The value
      */
-    public void setVolumes(CimiVolume[] volumes) {
+    public void setVolumes(final CimiVolume[] volumes) {
         this.volumes = volumes;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

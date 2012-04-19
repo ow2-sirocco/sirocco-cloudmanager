@@ -24,9 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.configuration;
 
+import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 
 public class AppConfig {
 
@@ -41,6 +42,17 @@ public class AppConfig {
      */
     private AppConfig() {
         this.config = null;
+    }
+
+    /**
+     * Initialize with a specific config.
+     * 
+     * @param config The config
+     */
+    public static void initialize(final Config config) {
+        synchronized (AppConfig.SINGLETON) {
+            AppConfig.SINGLETON.setConfig(config);
+        }
     }
 
     /**
@@ -83,7 +95,7 @@ public class AppConfig {
         this.setConfig(factory.getConfig());
     }
 
-    public static CimiEntityType getType(final CimiCommon data) {
+    public static CimiEntityType getType(final CimiData data) {
         CimiEntityType type = null;
         ItemConfig item = AppConfig.getInstance().getConfig().find(data.getClass());
         if (null != item) {
@@ -92,30 +104,30 @@ public class AppConfig {
         return type;
     }
 
-    public static EntityConverter getConverter(final Class<?> klass) {
+    public static EntityConverter getEntityConverter(final Class<?> klass) {
+        return (EntityConverter) AppConfig.getConverter(klass);
+    }
+
+    public static CimiConverter getConverter(final Class<?> klass) {
         ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
         if (null == item) {
             throw new ConfigurationException("ItemConfig not found in configuration for " + klass.getName());
         }
-        EntityConverter converter = (EntityConverter) item.getData(ConfigFactory.CONVERTER);
+        CimiConverter converter = (CimiConverter) item.getData(ConfigFactory.CONVERTER);
         if (null == converter) {
-            throw new ConfigurationException("EntityConverter not found in configuration for " + klass.getName());
+            throw new ConfigurationException("CimiConverter not found in configuration for " + klass.getName());
         }
         return converter;
     }
 
-    public static EntityConverter getConverter(final CimiCommon data) {
-        return AppConfig.getConverter(data.getClass());
-    }
-
-    public static EntityConverter getConverter(final CimiEntityType type) {
+    public static CimiConverter getConverter(final CimiEntityType type) {
         ItemConfig item = AppConfig.getInstance().getConfig().find(type);
         if (null == item) {
             throw new ConfigurationException("ItemConfig not found in configuration for " + type);
         }
-        EntityConverter converter = (EntityConverter) item.getData(ConfigFactory.CONVERTER);
+        CimiConverter converter = (CimiConverter) item.getData(ConfigFactory.CONVERTER);
         if (null == converter) {
-            throw new ConfigurationException("EntityConverter not found in configuration for " + type);
+            throw new ConfigurationException("CimiConverter not found in configuration for " + type);
         }
         return converter;
     }

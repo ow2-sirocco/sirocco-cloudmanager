@@ -32,7 +32,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeTemplateCollection. <p> </p>
+ * Class VolumeTemplateCollection.
  */
 @XmlRootElement(name = "volumeTemplateCollection")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -41,26 +41,14 @@ public class CimiVolumeTemplateCollection extends CimiCommonId implements Serial
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "volumeTemplates". <p> </p>
+     * Field "volumeTemplates".
      */
     private CimiVolumeTemplate[] volumeTemplates;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiVolumeTemplateCollection() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "volumeTemplates".
+     * 
      * @return The value
      */
     public CimiVolumeTemplate[] getVolumeTemplates() {
@@ -69,10 +57,22 @@ public class CimiVolumeTemplateCollection extends CimiCommonId implements Serial
 
     /**
      * Set the value of field "volumeTemplates".
+     * 
      * @param volumeTemplates The value
      */
-    public void setVolumeTemplates(CimiVolumeTemplate[] volumeTemplates) {
+    public void setVolumeTemplates(final CimiVolumeTemplate[] volumeTemplates) {
         this.volumeTemplates = volumeTemplates;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

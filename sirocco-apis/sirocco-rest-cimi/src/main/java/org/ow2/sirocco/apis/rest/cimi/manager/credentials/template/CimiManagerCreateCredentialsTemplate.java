@@ -24,11 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.credentials.template;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,8 +65,8 @@ public class CimiManagerCreateCredentialsTemplate extends CimiManagerCreateAbstr
      */
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        Context context = new Context(request, CimiEntityType.CredentialsTemplate);
-        return context.getConverter().toService(context, request.getCimiData());
+        return request.getContext().getRootConverter(CimiEntityType.CredentialsTemplate)
+            .toService(request.getContext(), request.getCimiData());
     }
 
 }

@@ -30,6 +30,7 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
@@ -37,8 +38,6 @@ import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -89,8 +88,8 @@ public class CimiManagerReadJobCollection extends CimiManagerReadAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        Context context = new Context(request, CimiEntityType.JobCollection);
-        CimiJobCollection cimi = (CimiJobCollection) context.getConverter().toCimi(context, dataService);
+        CimiJobCollection cimi = (CimiJobCollection) request.getContext().getRootConverter(CimiEntityType.JobCollection)
+            .toCimi(request.getContext(), dataService);
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }

@@ -33,7 +33,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class Volume. <p> </p>
+ * Class Volume.
+ * <p>
  */
 @XmlRootElement(name = "volume")
 @JsonSerialize(include = Inclusion.NON_NULL)
@@ -42,52 +43,41 @@ public class CimiVolume extends CimiCommonId implements Serializable {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
     private String href;
 
     /**
-     * Field "state". <p> </p>
+     * Field "state".
      */
     private String state;
 
     /**
-     * Field "capacity". <p> </p>
+     * Field "capacity".
      */
     private CimiCapacity capacity;
 
     /**
-     * Field "bootable". <p> </p>
+     * Field "bootable".
      */
     private Boolean bootable;
 
     /**
-     * Field "supportsSnapshots". <p> </p>
+     * Field "supportsSnapshots".
      */
     private Boolean supportsSnapshots;
 
     /**
-     * Field "snapShots". <p> </p>
+     * Field "snapShots".
      */
     private SnapShot[] snapShots;
 
     /**
-     * Field "guestInterface". <p> </p>
+     * Field "guestInterface".
      */
     private String guestInterface;
 
-    // ---------------------------------------- Constructors
-
-    /**
-     * Default constructor.
-     */
-    public CimiVolume() {
-        super();
-    }
-
-    // ---------------------------------------- ???com-accesseurs???
-
     /**
      * Return the value of field "state".
+     * 
      * @return The value
      */
     public String getState() {
@@ -96,14 +86,16 @@ public class CimiVolume extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "state".
+     * 
      * @param state The value
      */
-    public void setState(String state) {
+    public void setState(final String state) {
         this.state = state;
     }
 
     /**
      * Return the value of field "capacity".
+     * 
      * @return The value
      */
     public CimiCapacity getCapacity() {
@@ -112,14 +104,16 @@ public class CimiVolume extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "capacity".
+     * 
      * @param capacity The value
      */
-    public void setCapacity(CimiCapacity capacity) {
+    public void setCapacity(final CimiCapacity capacity) {
         this.capacity = capacity;
     }
 
     /**
      * Return the value of field "bootable".
+     * 
      * @return The value
      */
     public Boolean getBootable() {
@@ -128,14 +122,16 @@ public class CimiVolume extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "bootable".
+     * 
      * @param bootable The value
      */
-    public void setBootable(Boolean bootable) {
+    public void setBootable(final Boolean bootable) {
         this.bootable = bootable;
     }
 
     /**
      * Return the value of field "supportsSnapshots".
+     * 
      * @return The value
      */
     public Boolean getSupportsSnapshots() {
@@ -144,14 +140,16 @@ public class CimiVolume extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "supportsSnapshots".
+     * 
      * @param supportsSnapshots The value
      */
-    public void setSupportsSnapshots(Boolean supportsSnapshots) {
+    public void setSupportsSnapshots(final Boolean supportsSnapshots) {
         this.supportsSnapshots = supportsSnapshots;
     }
 
     /**
      * Return the value of field "snapShots".
+     * 
      * @return The value
      */
     public SnapShot[] getSnapShots() {
@@ -160,14 +158,16 @@ public class CimiVolume extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "snapShots".
+     * 
      * @param snapShots The value
      */
-    public void setSnapShots(SnapShot[] snapShots) {
+    public void setSnapShots(final SnapShot[] snapShots) {
         this.snapShots = snapShots;
     }
 
     /**
      * Return the value of field "guestInterface".
+     * 
      * @return The value
      */
     public String getGuestInterface() {
@@ -176,24 +176,39 @@ public class CimiVolume extends CimiCommonId implements Serializable {
 
     /**
      * Set the value of field "guestInterface".
+     * 
      * @param guestInterface The value
      */
-    public void setGuestInterface(String guestInterface) {
+    public void setGuestInterface(final String guestInterface) {
         this.guestInterface = guestInterface;
     }
 
     /**
      * @return the href
      */
+    @Override
     @XmlAttribute
     public String getHref() {
-        return href;
+        return this.href;
     }
 
     /**
      * @param href the href to set
      */
-    public void setHref(String href) {
+    @Override
+    public void setHref(final String href) {
         this.href = href;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
 }

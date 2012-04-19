@@ -26,7 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 
 /**
@@ -43,11 +43,11 @@ public class DiskConfigurationConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiDiskConfiguration cimi = new CimiDiskConfiguration();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -56,22 +56,22 @@ public class DiskConfigurationConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         this.doCopyToCimi(context, (DiskTemplate) dataService, (CimiDiskConfiguration) dataCimi);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         DiskTemplate service = new DiskTemplate();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -81,11 +81,11 @@ public class DiskConfigurationConverter implements EntityConverter {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiDiskConfiguration) dataCimi, (DiskTemplate) dataService);
     }
 
@@ -96,7 +96,7 @@ public class DiskConfigurationConverter implements EntityConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final DiskTemplate dataService, final CimiDiskConfiguration dataCimi) {
+    protected void doCopyToCimi(final CimiContext context, final DiskTemplate dataService, final CimiDiskConfiguration dataCimi) {
         dataCimi.setAttachmentPoint(dataService.getAttachmentPoint());
         dataCimi.setCapacity((CimiCapacity) context.getConverter(CimiCapacity.class).toCimi(context, dataService));
         dataCimi.setFormat(dataService.getFormat());
@@ -109,9 +109,10 @@ public class DiskConfigurationConverter implements EntityConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiDiskConfiguration dataCimi, final DiskTemplate dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiDiskConfiguration dataCimi,
+        final DiskTemplate dataService) {
         dataService.setAttachmentPoint(dataCimi.getAttachmentPoint());
-        context.getConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
+        context.getEntityConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
         dataService.setFormat(dataCimi.getFormat());
     }
 }

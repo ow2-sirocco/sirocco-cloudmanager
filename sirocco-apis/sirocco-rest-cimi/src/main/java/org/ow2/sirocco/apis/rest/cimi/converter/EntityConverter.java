@@ -24,7 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 
 /**
  * 
@@ -38,7 +38,7 @@ public interface EntityConverter extends CimiConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    void copyToCimi(final Context context, final Object dataService, final Object dataCimi);
+    void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi);
 
     /**
      * Copy data from a CIMI object to a service object.
@@ -47,5 +47,5 @@ public interface EntityConverter extends CimiConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    void copyToService(final Context context, final Object dataCimi, final Object dataService);
+    void copyToService(final CimiContext context, final Object dataCimi, final Object dataService);
 }

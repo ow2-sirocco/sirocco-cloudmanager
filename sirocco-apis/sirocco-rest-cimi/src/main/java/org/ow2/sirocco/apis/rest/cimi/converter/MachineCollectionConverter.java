@@ -29,8 +29,7 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 
@@ -50,11 +49,11 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiMachineCollection cimi = new CimiMachineCollection();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -63,12 +62,12 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         MachineCollection use;
         if (dataService instanceof List<?>) {
             use = new MachineCollection();
@@ -82,11 +81,11 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         MachineCollection service = new MachineCollection();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -96,11 +95,11 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiMachineCollection) dataCimi, (MachineCollection) dataService);
     }
 
@@ -111,9 +110,10 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final MachineCollection dataService, final CimiMachineCollection dataCimi) {
+    protected void doCopyToCimi(final CimiContext context, final MachineCollection dataService,
+        final CimiMachineCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        EntityConverter converter = context.getConverter(CimiEntityType.Machine);
+        CimiConverter converter = context.getConverter(CimiMachine.class);
         List<CimiMachine> cimiList = new ArrayList<CimiMachine>();
         for (Machine machineImage : dataService.getMachines()) {
             cimiList.add((CimiMachine) converter.toCimi(context, machineImage));
@@ -129,12 +129,12 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiMachineCollection dataCimi,
+    protected void doCopyToService(final CimiContext context, final CimiMachineCollection dataCimi,
         final MachineCollection dataService) {
         List<Machine> listServicesImages = new ArrayList<Machine>();
         dataService.setMachines(listServicesImages);
 
-        EntityConverter converter = context.getConverter(CimiEntityType.Machine);
+        CimiConverter converter = context.getConverter(CimiMachine.class);
         CimiMachine[] images = dataCimi.getMachines();
         for (CimiMachine cimiImage : images) {
             listServicesImages.add((Machine) converter.toService(context, cimiImage));

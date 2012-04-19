@@ -25,7 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 
 /**
@@ -43,11 +43,11 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiCredentials cimi = new CimiCredentials();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -56,22 +56,22 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         this.doCopyToCimi(context, (Credentials) dataService, (CimiCredentials) dataCimi);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         Credentials service = new Credentials();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -81,11 +81,11 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiCredentials) dataCimi, (Credentials) dataService);
     }
 
@@ -96,9 +96,9 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final Credentials dataService, final CimiCredentials dataCimi) {
+    protected void doCopyToCimi(final CimiContext context, final Credentials dataService, final CimiCredentials dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if (true == context.shouldBeExpanded(dataCimi)) {
+        if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setUserName(dataService.getUserName());
             // Next read only
             // dataCimi.setKey(dataService.getPublicKey());
@@ -113,7 +113,7 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiCredentials dataCimi, final Credentials dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiCredentials dataCimi, final Credentials dataService) {
         this.fill(dataCimi, dataService);
         dataService.setPublicKey(dataCimi.getKey());
         dataService.setPassword(dataCimi.getPassword());

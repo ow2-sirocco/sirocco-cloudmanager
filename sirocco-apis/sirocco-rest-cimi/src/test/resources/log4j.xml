@@ -21,7 +21,7 @@
 	<category name="org.springframework">
 		<priority value="error" />
 	</category>
-	<category name="org.hibernate">
+	<category name="org.hibernate.validator">
 		<priority value="error" />
 	</category>
 

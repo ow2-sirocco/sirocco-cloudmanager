@@ -24,11 +24,48 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.ValidReference;
 
 /**
- * Referenced entity can reference another entity.
+ * Referenced entity who can be referenced by another entity.
  */
-public interface CimiHref extends Serializable {
+@ValidReference(groups = GroupWrite.class)
+public interface CimiHref extends CimiData {
+
+    /**
+     * Get the entity reference.
+     * 
+     * @return The reference
+     */
+    String getHref();
+
+    /**
+     * Set the entity reference.
+     * 
+     * @param href The reference
+     */
+    void setHref(final String href);
+
+    /**
+     * Flag indicating whether the contents of the entity has a reference.
+     * 
+     * @return True if the entity has a reference
+     */
+    boolean hasReference();
+
+    /**
+     * Flag indicating whether the contents of the entity has values.
+     * 
+     * @return True if the entity has values
+     */
+    boolean hasValues();
+
+    /**
+     * Get the type of parameters passing.
+     * 
+     * @return The type of parameters passing
+     */
+    PassingType getPassingType();
 
 }

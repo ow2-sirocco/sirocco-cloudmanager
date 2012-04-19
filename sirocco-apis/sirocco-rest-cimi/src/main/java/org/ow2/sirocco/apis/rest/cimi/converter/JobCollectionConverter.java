@@ -29,8 +29,7 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 
@@ -50,11 +49,11 @@ public class JobCollectionConverter extends CommonIdConverter implements EntityC
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiJobCollection cimi = new CimiJobCollection();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -63,12 +62,12 @@ public class JobCollectionConverter extends CommonIdConverter implements EntityC
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         JobCollection use;
         if (dataService instanceof List<?>) {
             use = new JobCollection();
@@ -82,11 +81,11 @@ public class JobCollectionConverter extends CommonIdConverter implements EntityC
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         JobCollection service = new JobCollection();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -96,11 +95,11 @@ public class JobCollectionConverter extends CommonIdConverter implements EntityC
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiJobCollection) dataCimi, (JobCollection) dataService);
     }
 
@@ -111,9 +110,9 @@ public class JobCollectionConverter extends CommonIdConverter implements EntityC
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final JobCollection dataService, final CimiJobCollection dataCimi) {
+    protected void doCopyToCimi(final CimiContext context, final JobCollection dataService, final CimiJobCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        EntityConverter converter = context.getConverter(CimiEntityType.Job);
+        CimiConverter converter = context.getConverter(CimiJob.class);
         List<CimiJob> cimiList = new ArrayList<CimiJob>();
         for (Job machineImage : dataService.getJobs()) {
             cimiList.add((CimiJob) converter.toCimi(context, machineImage));
@@ -129,12 +128,12 @@ public class JobCollectionConverter extends CommonIdConverter implements EntityC
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiJobCollection dataCimi, final JobCollection dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiJobCollection dataCimi, final JobCollection dataService) {
         List<Job> listServicesImages = new ArrayList<Job>();
         dataService.setJobs(listServicesImages);
         CimiJob[] images = dataCimi.getJobs();
         if (null != images) {
-            EntityConverter converter = context.getConverter(CimiEntityType.Job);
+            CimiConverter converter = context.getConverter(CimiJob.class);
             for (CimiJob cimiImage : images) {
                 listServicesImages.add((Job) converter.toService(context, cimiImage));
             }

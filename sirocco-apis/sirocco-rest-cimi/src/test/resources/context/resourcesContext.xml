@@ -51,6 +51,8 @@
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
 	<!-- Machine -->
+	<bean id="CimiManagerActionMachine"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerAction" />
 	<bean id="CimiManagerCreateMachine"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
 	<bean id="CimiManagerDeleteMachine"

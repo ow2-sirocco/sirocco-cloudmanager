@@ -22,7 +22,7 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.utils;
+package org.ow2.sirocco.apis.rest.cimi.domain;
 
 /**
  * Enumeration of all the entities used.

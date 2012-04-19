@@ -29,8 +29,7 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 
@@ -50,11 +49,11 @@ public class CredentialsTemplateCollectionConverter extends CommonIdConverter im
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiCredentialsTemplateCollection cimi = new CimiCredentialsTemplateCollection();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -63,12 +62,12 @@ public class CredentialsTemplateCollectionConverter extends CommonIdConverter im
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         CredentialsTemplateCollection use;
         if (dataService instanceof List<?>) {
             use = new CredentialsTemplateCollection();
@@ -82,11 +81,11 @@ public class CredentialsTemplateCollectionConverter extends CommonIdConverter im
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         CredentialsTemplateCollection service = new CredentialsTemplateCollection();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -96,11 +95,11 @@ public class CredentialsTemplateCollectionConverter extends CommonIdConverter im
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiCredentialsTemplateCollection) dataCimi, (CredentialsTemplateCollection) dataService);
     }
 
@@ -111,10 +110,10 @@ public class CredentialsTemplateCollectionConverter extends CommonIdConverter im
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final CredentialsTemplateCollection dataService,
+    protected void doCopyToCimi(final CimiContext context, final CredentialsTemplateCollection dataService,
         final CimiCredentialsTemplateCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        EntityConverter converter = context.getConverter(CimiEntityType.CredentialsTemplate);
+        CimiConverter converter = context.getConverter(CimiCredentialsTemplate.class);
         List<CimiCredentialsTemplate> cimiList = new ArrayList<CimiCredentialsTemplate>();
         for (CredentialsTemplate machineImage : dataService.getCredentialsTemplates()) {
             cimiList.add((CimiCredentialsTemplate) converter.toCimi(context, machineImage));
@@ -130,12 +129,12 @@ public class CredentialsTemplateCollectionConverter extends CommonIdConverter im
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiCredentialsTemplateCollection dataCimi,
+    protected void doCopyToService(final CimiContext context, final CimiCredentialsTemplateCollection dataCimi,
         final CredentialsTemplateCollection dataService) {
         List<CredentialsTemplate> listServicesImages = new ArrayList<CredentialsTemplate>();
         dataService.setCredentialsTemplates(listServicesImages);
 
-        EntityConverter converter = context.getConverter(CimiEntityType.CredentialsTemplate);
+        CimiConverter converter = context.getConverter(CimiCredentialsTemplate.class);
         CimiCredentialsTemplate[] images = dataCimi.getCredentialsTemplates();
         for (CimiCredentialsTemplate cimiImage : images) {
             listServicesImages.add((CredentialsTemplate) converter.toService(context, cimiImage));

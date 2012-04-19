@@ -27,7 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 
@@ -45,11 +45,11 @@ public class CapacityConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiCapacity cimi = new CimiCapacity();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -58,22 +58,22 @@ public class CapacityConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         this.doCopyToCimi(context, (Disk) dataService, (CimiCapacity) dataCimi);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         Object service;
         if (dataCimi instanceof CimiDiskConfiguration) {
             service = new DiskTemplate();
@@ -89,11 +89,11 @@ public class CapacityConverter implements EntityConverter {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiCapacity) dataCimi, (Disk) dataService);
     }
 
@@ -104,7 +104,7 @@ public class CapacityConverter implements EntityConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final Disk dataService, final CimiCapacity dataCimi) {
+    protected void doCopyToCimi(final CimiContext context, final Disk dataService, final CimiCapacity dataCimi) {
         dataCimi.setQuantity(dataService.getQuantity().intValue());
         dataCimi.setUnits((String) context.getConverter(StorageUnit.class).toCimi(context, dataService.getUnit()));
     }
@@ -116,7 +116,7 @@ public class CapacityConverter implements EntityConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiCapacity dataCimi, final Disk dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiCapacity dataCimi, final Disk dataService) {
         dataService.setQuantity(dataCimi.getQuantity().floatValue());
         dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
             .toCimi(context, dataCimi.getUnits()));

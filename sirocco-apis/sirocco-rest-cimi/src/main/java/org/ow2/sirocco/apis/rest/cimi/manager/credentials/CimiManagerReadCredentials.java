@@ -27,12 +27,11 @@ package org.ow2.sirocco.apis.rest.cimi.manager.credentials;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,8 +81,8 @@ public class CimiManagerReadCredentials extends CimiManagerReadAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        Context context = new Context(request, CimiEntityType.Credentials);
-        CimiCredentials cimi = (CimiCredentials) context.getConverter().toCimi(context, dataService);
+        CimiCredentials cimi = (CimiCredentials) request.getContext().getRootConverter(CimiEntityType.Credentials)
+            .toCimi(request.getContext(), dataService);
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }

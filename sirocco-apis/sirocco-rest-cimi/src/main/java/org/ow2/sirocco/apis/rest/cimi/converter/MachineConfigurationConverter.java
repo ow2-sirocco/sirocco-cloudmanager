@@ -31,7 +31,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -51,11 +51,11 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiMachineConfiguration cimi = new CimiMachineConfiguration();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -64,22 +64,22 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         this.doCopyToCimi(context, (MachineConfiguration) dataService, (CimiMachineConfiguration) dataCimi);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         MachineConfiguration service = new MachineConfiguration();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -89,11 +89,11 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiMachineConfiguration) dataCimi, (MachineConfiguration) dataService);
     }
 
@@ -104,10 +104,10 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final MachineConfiguration dataService,
+    protected void doCopyToCimi(final CimiContext context, final MachineConfiguration dataService,
         final CimiMachineConfiguration dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if (true == context.shouldBeExpanded(dataCimi)) {
+        if (true == context.mustBeExpanded(dataCimi)) {
             if (null != dataService.getCpu()) {
                 dataCimi.setCpu((CimiCpu) context.getConverter(CimiCpu.class).toCimi(context, dataService.getCpu()));
             }
@@ -117,7 +117,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
             }
             if ((null != dataService.getDiskTemplates()) && (dataService.getDiskTemplates().size() > 0)) {
                 List<CimiDiskConfiguration> listCimis = new ArrayList<CimiDiskConfiguration>();
-                EntityConverter converter = context.getConverter(CimiDiskConfiguration.class);
+                CimiConverter converter = context.getConverter(CimiDiskConfiguration.class);
                 for (DiskTemplate itemService : dataService.getDiskTemplates()) {
                     listCimis.add((CimiDiskConfiguration) converter.toCimi(context, itemService));
                 }
@@ -133,7 +133,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiMachineConfiguration dataCimi,
+    protected void doCopyToService(final CimiContext context, final CimiMachineConfiguration dataCimi,
         final MachineConfiguration dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getCpu()) {
@@ -144,7 +144,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
         }
         if ((null != dataCimi.getDisks()) && (dataCimi.getDisks().length > 0)) {
             List<DiskTemplate> listServices = new ArrayList<DiskTemplate>();
-            EntityConverter converter = context.getConverter(CimiDiskConfiguration.class);
+            CimiConverter converter = context.getConverter(CimiDiskConfiguration.class);
             for (CimiDiskConfiguration itemCimi : dataCimi.getDisks()) {
                 listServices.add((DiskTemplate) converter.toService(context, itemCimi));
             }

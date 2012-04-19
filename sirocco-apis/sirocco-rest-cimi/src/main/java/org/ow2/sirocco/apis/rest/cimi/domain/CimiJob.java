@@ -44,82 +44,53 @@ public class CimiJob extends CimiCommonId {
 
     /**
      * Field "targetEntity".
-     * <p>
-     * </p>
      */
     private String targetEntity;
 
     /**
-     * Field "action".
-     * <p>
-     * URI
-     * </p>
+     * Field "action". URI
      */
     private String action;
 
     /**
      * Field "status".
-     * <p>
-     * </p>
      */
     private String status;
 
     /**
      * Field "returnCode".
-     * <p>
-     * </p>
      */
     private Integer returnCode;
 
     /**
      * Field "progress".
-     * <p>
-     * </p>
      */
     private Integer progress;
 
     /**
      * Field "statusMessage".
-     * <p>
-     * </p>
      */
     private String statusMessage;
 
     /**
-     * Field "timeOfStatusChange".
-     * <p>
-     * DateTimeUTC Format ISO 8601 ?
-     * </p>
+     * Field "timeOfStatusChange". DateTimeUTC Format ISO 8601 ?
      */
     private Date timeOfStatusChange;
 
     /**
      * Field "isCancellable".
-     * <p>
-     * </p>
      */
     private Boolean isCancellable;
 
     /**
      * Field "parentJob".
-     * <p>
-     * </p>
      */
     private ParentJob parentJob;
 
     /**
      * Field "nestedJobs".
-     * <p>
-     * </p>
      */
     private NestedJob[] nestedJobs;
-
-    /**
-     * Default constructor.
-     */
-    public CimiJob() {
-        super();
-    }
 
     /**
      * Return the value of field "targetEntity".
@@ -301,4 +272,5 @@ public class CimiJob extends CimiCommonId {
     public void setNestedJobs(final NestedJob[] nestedJobs) {
         this.nestedJobs = nestedJobs;
     }
+
 }

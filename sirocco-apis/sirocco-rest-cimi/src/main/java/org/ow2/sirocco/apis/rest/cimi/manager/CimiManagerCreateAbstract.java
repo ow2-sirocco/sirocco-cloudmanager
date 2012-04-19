@@ -27,12 +27,11 @@ package org.ow2.sirocco.apis.rest.cimi.manager;
 import javax.validation.groups.Default;
 import javax.ws.rs.core.Response;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
@@ -49,12 +48,13 @@ public abstract class CimiManagerCreateAbstract extends CimiManagerAbstract {
      */
     @Override
     protected boolean validate(final CimiRequest request, final CimiResponse response) throws Exception {
-        boolean valid = CimiValidatorHelper.getInstance().validate(request.getHeader());
+        boolean valid = CimiValidatorHelper.getInstance().validate(request, response, request.getHeader());
         if (valid) {
             if (null == request.getCimiData()) {
                 valid = false;
             } else {
-                valid = CimiValidatorHelper.getInstance().validate(request.getCimiData(), Default.class, GroupWrite.class);
+                valid = CimiValidatorHelper.getInstance().validate(request, response, request.getCimiData(), Default.class,
+                    GroupWrite.class);
             }
         }
         return valid;
@@ -70,12 +70,12 @@ public abstract class CimiManagerCreateAbstract extends CimiManagerAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        Context context = new Context(request, CimiEntityType.Job);
-        CimiJob cimi = (CimiJob) context.getConverter().toCimi(context, dataService);
+        CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
+            .toCimi(request.getContext(), dataService);
 
         response.setCimiData(cimi);
         response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
-        response.putHeader(Constants.HEADER_LOCATION, context.makeHref(cimi, cimi.getTargetEntity()));
+        response.putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
         response.setStatus(Response.Status.ACCEPTED);
     }
 

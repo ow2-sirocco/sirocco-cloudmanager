@@ -193,4 +193,21 @@ public class CimiMachine extends CimiCommonId {
     public void setNetworkInterfaces(final CimiNetworkInterface[] networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getCpu());
+        has = has || (null != this.getDisks());
+        has = has || (null != this.getMemory());
+        has = has || (null != this.getNetworkInterfaces());
+        has = has || (null != this.getVolumes());
+        return has;
+    }
+
 }

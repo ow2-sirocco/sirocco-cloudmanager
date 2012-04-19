@@ -28,7 +28,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
@@ -49,11 +49,11 @@ public class MachineTemplateConverter extends CommonIdConverter implements Entit
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toCimi(final Context context, final Object dataService) {
+    public Object toCimi(final CimiContext context, final Object dataService) {
         CimiMachineTemplate cimi = new CimiMachineTemplate();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
@@ -62,22 +62,22 @@ public class MachineTemplateConverter extends CommonIdConverter implements Entit
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToCimi(final Context context, final Object dataService, final Object dataCimi) {
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
         this.doCopyToCimi(context, (MachineTemplate) dataService, (CimiMachineTemplate) dataCimi);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.Context,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#toService(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object)
      */
     @Override
-    public Object toService(final Context context, final Object dataCimi) {
+    public Object toService(final CimiContext context, final Object dataCimi) {
         MachineTemplate service = new MachineTemplate();
         this.copyToService(context, dataCimi, service);
         return service;
@@ -87,11 +87,11 @@ public class MachineTemplateConverter extends CommonIdConverter implements Entit
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
-     *      (org.ow2.sirocco.apis.rest.cimi.utils.Context, java.lang.Object,
-     *      java.lang.Object)
+     *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final Context context, final Object dataCimi, final Object dataService) {
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiMachineTemplate) dataCimi, (MachineTemplate) dataService);
     }
 
@@ -102,9 +102,9 @@ public class MachineTemplateConverter extends CommonIdConverter implements Entit
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final Context context, final MachineTemplate dataService, final CimiMachineTemplate dataCimi) {
+    protected void doCopyToCimi(final CimiContext context, final MachineTemplate dataService, final CimiMachineTemplate dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if (true == context.shouldBeExpanded(dataCimi)) {
+        if (true == context.mustBeExpanded(dataCimi)) {
             if (null != dataService.getCredentials()) {
                 dataCimi.setCredentials((CimiCredentials) context.getConverter(CimiCredentials.class).toCimi(context,
                     dataService.getCredentials()));
@@ -173,7 +173,8 @@ public class MachineTemplateConverter extends CommonIdConverter implements Entit
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final Context context, final CimiMachineTemplate dataCimi, final MachineTemplate dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiMachineTemplate dataCimi,
+        final MachineTemplate dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getCredentials()) {
             dataService.setCredentials((Credentials) context.getConverter(CimiCredentials.class).toService(context,

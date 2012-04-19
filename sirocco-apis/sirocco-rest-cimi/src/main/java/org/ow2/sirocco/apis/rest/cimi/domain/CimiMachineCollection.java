@@ -66,4 +66,16 @@ public class CimiMachineCollection extends CimiCommonId {
     public void setMachines(final CimiMachine[] machines) {
         this.machines = machines;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getMachines());
+        return has;
+    }
 }

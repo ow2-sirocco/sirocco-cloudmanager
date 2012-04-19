@@ -24,11 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.utils.Context;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,8 +65,8 @@ public class CimiManagerCreateMachineConfiguration extends CimiManagerCreateAbst
      */
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        Context context = new Context(request, CimiEntityType.MachineConfiguration);
-        return context.getConverter().toService(context, request.getCimiData());
+        return request.getContext().getRootConverter(CimiEntityType.MachineConfiguration)
+            .toService(request.getContext(), request.getCimiData());
     }
 
 }
