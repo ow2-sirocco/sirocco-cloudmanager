@@ -24,7 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
+import javax.ws.rs.core.Response;
+
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -41,7 +44,7 @@ import org.springframework.stereotype.Component;
 public class CimiManagerCreateMachineConfiguration extends CimiManagerCreateAbstract {
 
     @Autowired
-    @Qualifier("IMachineConfigurationManager")
+    @Qualifier("IMachineManager")
     private IMachineManager manager;
 
     /**
@@ -69,4 +72,19 @@ public class CimiManagerCreateMachineConfiguration extends CimiManagerCreateAbst
             .toService(request.getContext(), request.getCimiData());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        CimiMachineConfiguration cimi = (CimiMachineConfiguration) request.getContext()
+            .getRootConverter(CimiEntityType.MachineConfiguration).toCimi(request.getContext(), dataService);
+        response.setCimiData(cimi);
+        response.setStatus(Response.Status.CREATED);
+    }
 }

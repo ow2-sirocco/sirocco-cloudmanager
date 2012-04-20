@@ -48,37 +48,41 @@ public class MemoryUnitConverter implements CimiConverter {
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
         String cimi = null;
-        Memory.MemoryUnit service = (Memory.MemoryUnit) dataService;
-        switch (service) {
-        case BYTE:
-            cimi = MemoryUnit.BYTE.getLabel();
-            break;
-        case KIBIBYTE:
-            cimi = MemoryUnit.KibiBYTE.getLabel();
-            break;
-        case MEGIBYTE:
-            cimi = MemoryUnit.MebiBYTE.getLabel();
-            break;
-        case GIGIBYTE:
-            cimi = MemoryUnit.GibiBYTE.getLabel();
-            break;
-        case TEBIBYTE:
-            cimi = MemoryUnit.TebiBYTE.getLabel();
-            break;
-        case PETIBYTE:
-            cimi = MemoryUnit.PebiBYTE.getLabel();
-            break;
-        case EXBIBYTE:
-            cimi = MemoryUnit.ExbiBYTE.getLabel();
-            break;
-        case ZEBIBYTE:
-            cimi = MemoryUnit.ZebiBYTE.getLabel();
-            break;
-        case YOBIBYTE:
-            cimi = MemoryUnit.YobiBYTE.getLabel();
-            break;
-        default:
-            throw new UnsupportedOperationException("Unknown MemoryUnit Unit : " + service);
+        try {
+            Memory.MemoryUnit service = (Memory.MemoryUnit) dataService;
+            switch (service) {
+            case BYTE:
+                cimi = MemoryUnit.BYTE.getLabel();
+                break;
+            case KIBIBYTE:
+                cimi = MemoryUnit.KibiBYTE.getLabel();
+                break;
+            case MEGIBYTE:
+                cimi = MemoryUnit.MebiBYTE.getLabel();
+                break;
+            case GIGIBYTE:
+                cimi = MemoryUnit.GibiBYTE.getLabel();
+                break;
+            case TEBIBYTE:
+                cimi = MemoryUnit.TebiBYTE.getLabel();
+                break;
+            case PETIBYTE:
+                cimi = MemoryUnit.PebiBYTE.getLabel();
+                break;
+            case EXBIBYTE:
+                cimi = MemoryUnit.ExbiBYTE.getLabel();
+                break;
+            case ZEBIBYTE:
+                cimi = MemoryUnit.ZebiBYTE.getLabel();
+                break;
+            case YOBIBYTE:
+                cimi = MemoryUnit.YobiBYTE.getLabel();
+                break;
+            default:
+                throw new InvalidConversionException("Unknown MemoryUnit Unit : " + service);
+            }
+        } catch (ClassCastException e) {
+            throw new InvalidConversionException("Unknown MemoryUnit Unit : " + dataService);
         }
         return cimi;
     }
@@ -93,6 +97,9 @@ public class MemoryUnitConverter implements CimiConverter {
     public Object toService(final CimiContext context, final Object dataCimi) {
         Memory.MemoryUnit service;
         MemoryUnit cimi = MemoryUnit.findValueOf((String) dataCimi);
+        if (null == cimi) {
+            throw new InvalidConversionException("Unknown MemoryUnit Unit : " + dataCimi);
+        }
         switch (cimi) {
         case BYTE:
             service = Memory.MemoryUnit.BYTE;
@@ -122,7 +129,7 @@ public class MemoryUnitConverter implements CimiConverter {
             service = Memory.MemoryUnit.YOBIBYTE;
             break;
         default:
-            throw new UnsupportedOperationException("Unknown MemoryUnit Unit : " + dataCimi);
+            throw new InvalidConversionException("Unknown MemoryUnit Unit : " + dataCimi);
         }
         return service;
     }

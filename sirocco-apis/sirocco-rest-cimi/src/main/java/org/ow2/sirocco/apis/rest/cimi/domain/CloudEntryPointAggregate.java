@@ -97,6 +97,24 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     private Integer jobTime;
 
     /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CloudEntryPointAggregate(final CloudEntryPoint cloud) {
+        this.setCreated(cloud.getCreated());
+        this.setDeleted(cloud.getDeleted());
+        this.setDescription(cloud.getDescription());
+        this.setId(cloud.getId());
+        this.setLocation(cloud.getLocation());
+        this.setName(cloud.getName());
+        this.setProperties(cloud.getProperties());
+        this.setProviderAssignedId(cloud.getProviderAssignedId());
+        this.setUpdated(cloud.getUpdated());
+        this.setUser(cloud.getUser());
+    }
+
+    /**
      * Return the value of field "machineTemplates".
      * 
      * @return The value

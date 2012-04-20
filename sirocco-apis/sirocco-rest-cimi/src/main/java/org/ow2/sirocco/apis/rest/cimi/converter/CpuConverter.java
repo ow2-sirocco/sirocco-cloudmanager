@@ -113,6 +113,7 @@ public class CpuConverter implements EntityConverter {
     protected void doCopyToService(final CimiContext context, final CimiCpu dataCimi, final Cpu dataService) {
         dataService.setQuantity(dataCimi.getFrequency());
         dataService.setNumberCpu(dataCimi.getNumberVirtualCpus());
-        dataService.setCpuSpeedUnit((Frequency) context.getConverter(FrequencyUnit.class).toCimi(context, dataCimi.getUnits()));
+        dataService.setCpuSpeedUnit((Frequency) context.getConverter(FrequencyUnit.class).toService(context,
+            dataCimi.getUnits()));
     }
 }

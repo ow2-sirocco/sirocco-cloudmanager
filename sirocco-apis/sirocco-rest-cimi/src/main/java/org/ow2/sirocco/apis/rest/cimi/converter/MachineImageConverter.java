@@ -103,8 +103,12 @@ public class MachineImageConverter extends CommonIdConverter implements EntityCo
             if (null != dataService.getImageLocation()) {
                 dataCimi.setImageLocation(new ImageLocation(dataService.getImageLocation()));
             }
-            dataCimi.setState(dataService.getState().toString());
-            dataCimi.setType(dataService.getType().toString());
+            if (null != dataService.getState()) {
+                dataCimi.setState(dataService.getState().toString());
+            }
+            if (null != dataService.getType()) {
+                dataCimi.setType(dataService.getType().toString());
+            }
         }
     }
 

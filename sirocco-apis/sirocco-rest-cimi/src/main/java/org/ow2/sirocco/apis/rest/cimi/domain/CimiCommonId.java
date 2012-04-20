@@ -88,6 +88,22 @@ public class CimiCommonId extends CimiCommon implements CimiHref {
     private String href;
 
     /**
+     * Default constructor.
+     */
+    public CimiCommonId() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiCommonId(final String href) {
+        this.href = href;
+    }
+
+    /**
      * Return the value of field "id".
      * 
      * @return The value

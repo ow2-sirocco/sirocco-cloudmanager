@@ -31,7 +31,7 @@ public enum CimiEntityType {
     /** */
     CloudEntryPoint(PathType.CloudEntryPoint),
     /** */
-    Credentials(PathType.Credentials), CredentialsCollection(PathType.Credentials),
+    Credentials(PathType.Credentials), CredentialsCollection(PathType.Credentials), CredentialsCreate(PathType.Credentials),
     /** */
     CredentialsTemplate(PathType.CredentialsTemplate), CredentialsTemplateCollection(PathType.CredentialsTemplate),
     /** */

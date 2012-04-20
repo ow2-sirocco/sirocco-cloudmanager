@@ -24,12 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.validator;
 
-import javax.validation.groups.Default;
-
 /**
- * Validation group to valid a data writing through a query "Create" or
- * "Update".
+ * Validation group to valid a data creating.
  */
-public interface GroupWrite extends Default {
+public interface GroupCreateByValue extends GroupWrite {
 
 }

@@ -42,7 +42,7 @@ import org.springframework.stereotype.Component;
 public class CimiManagerUpdateMachineConfiguration extends CimiManagerUpdateAbstract {
 
     @Autowired
-    @Qualifier("IMachineConfigurationManager")
+    @Qualifier("IMachineManager")
     private IMachineManager manager;
 
     /**
@@ -75,7 +75,7 @@ public class CimiManagerUpdateMachineConfiguration extends CimiManagerUpdateAbst
      */
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        return (MachineConfiguration) request.getContext().getRootConverter(CimiEntityType.MachineConfiguration)
+        return request.getContext().getRootConverter(CimiEntityType.MachineConfiguration)
             .toService(request.getContext(), request.getCimiData());
     }
 

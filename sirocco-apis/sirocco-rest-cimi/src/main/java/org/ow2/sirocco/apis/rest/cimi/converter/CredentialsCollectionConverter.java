@@ -119,7 +119,6 @@ public class CredentialsCollectionConverter extends CommonIdConverter implements
             cimiList.add((CimiCredentials) converter.toCimi(context, machineImage));
         }
         dataCimi.setCredentials(cimiList.toArray(new CimiCredentials[cimiList.size()]));
-
     }
 
     /**

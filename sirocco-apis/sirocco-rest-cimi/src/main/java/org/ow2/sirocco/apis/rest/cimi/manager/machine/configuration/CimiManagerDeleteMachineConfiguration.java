@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 public class CimiManagerDeleteMachineConfiguration extends CimiManagerDeleteAbstract {
 
     @Autowired
-    @Qualifier("IMachineConfigurationManager")
+    @Qualifier("IMachineManager")
     private IMachineManager manager;
 
     /**

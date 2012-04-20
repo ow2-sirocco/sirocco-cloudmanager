@@ -26,13 +26,18 @@ package org.ow2.sirocco.apis.rest.cimi.manager;
 
 import javax.ws.rs.core.Response;
 
+import org.ow2.sirocco.apis.rest.cimi.converter.InvalidConversionException;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,6 +150,8 @@ public abstract class CimiManagerAbstract implements CimiManager {
         Object dataService = null;
         try {
             dataService = this.convertToDataService(request, response);
+        } catch (InvalidConversionException e) {
+            this.convertToResponse(request, response, e);
         } catch (Exception e) {
             this.convertToResponse(request, response, e);
         }
@@ -234,8 +241,27 @@ public abstract class CimiManagerAbstract implements CimiManager {
      */
     private void doConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService) {
         try {
-            this.convertToResponse(request, response, dataService);
+            // null
+            if (null == dataService) {
+                response.setCimiData(null);
+                response.setStatus(Response.Status.OK);
+            }
+            // Job
+            else if (dataService instanceof Job) {
+                CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
+                    .toCimi(request.getContext(), dataService);
+                response.setCimiData(cimi);
+                response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
+                response.putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
+                response.setStatus(Response.Status.ACCEPTED);
+            }
+            // Other
+            else {
+                this.convertToResponse(request, response, dataService);
+            }
             this.addOperations(request, response, dataService);
+        } catch (InvalidConversionException e) {
+            this.convertToResponse(request, response, e);
         } catch (Exception e) {
             this.convertToResponse(request, response, e);
         }
@@ -275,6 +301,19 @@ public abstract class CimiManagerAbstract implements CimiManager {
      */
     private void convertToResponse(final CimiRequest request, final CimiResponse response,
         final InvalidRequestException exception) {
+        CimiManagerAbstract.LOGGER.debug(exception.getMessage(), exception);
+        response.setStatus(Response.Status.BAD_REQUEST);
+    }
+
+    /**
+     * Convert exception to HTTP status "BAD REQUEST" (400).
+     * 
+     * @param request The CIMI request
+     * @param response The CIMI response
+     * @param exception The exception to convert
+     */
+    private void convertToResponse(final CimiRequest request, final CimiResponse response,
+        final InvalidConversionException exception) {
         CimiManagerAbstract.LOGGER.debug(exception.getMessage(), exception);
         response.setStatus(Response.Status.BAD_REQUEST);
     }

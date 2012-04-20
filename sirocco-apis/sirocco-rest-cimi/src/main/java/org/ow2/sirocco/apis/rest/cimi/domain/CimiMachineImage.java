@@ -24,12 +24,13 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 
 /**
  * Class MachineImage.
@@ -50,8 +51,34 @@ public class CimiMachineImage extends CimiCommonId {
     /**
      * Field "imageLocation".
      */
-    @NotNull(groups = {GroupWrite.class})
+    @Valid
+    @NotNull(groups = {GroupCreateByValue.class})
     private ImageLocation imageLocation;
+
+    /**
+     * Default constructor.
+     */
+    public CimiMachineImage() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiMachineImage(final String href) {
+        super(href);
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param imageLocation The image location
+     */
+    public CimiMachineImage(final ImageLocation imageLocation) {
+        this.imageLocation = imageLocation;
+    }
 
     /**
      * Field "type".

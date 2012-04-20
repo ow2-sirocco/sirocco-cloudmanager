@@ -52,8 +52,7 @@ public class CimiManagerDeleteMachine extends CimiManagerDeleteAbstract {
     @Override
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        this.manager.deleteMachine(request.getId());
-        return null;
+        return this.manager.deleteMachine(request.getId());
     }
 
 }

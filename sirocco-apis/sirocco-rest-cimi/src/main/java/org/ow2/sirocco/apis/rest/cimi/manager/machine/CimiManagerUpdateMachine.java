@@ -55,13 +55,14 @@ public class CimiManagerUpdateMachine extends CimiManagerUpdateAbstract {
     @Override
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
+        Object out;
         CimiSelect select = request.getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            this.manager.updateMachine((Machine) dataService);
+            out = this.manager.updateMachine((Machine) dataService);
         } else {
-            this.manager.updateMachineAttributes(request.getId(), select.dispatchAttributesValues(dataService));
+            out = this.manager.updateMachineAttributes(request.getId(), select.dispatchAttributesValues(dataService));
         }
-        return null;
+        return out;
     }
 
     /**

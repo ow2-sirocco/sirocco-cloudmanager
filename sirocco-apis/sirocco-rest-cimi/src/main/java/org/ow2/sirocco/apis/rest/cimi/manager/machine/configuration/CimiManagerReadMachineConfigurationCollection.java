@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
 public class CimiManagerReadMachineConfigurationCollection extends CimiManagerReadAbstract {
 
     @Autowired
-    @Qualifier("IMachineConfigurationManager")
+    @Qualifier("IMachineManager")
     private IMachineManager manager;
 
     /**

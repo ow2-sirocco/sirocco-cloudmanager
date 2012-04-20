@@ -24,6 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.credentials.template;
 
+import javax.ws.rs.core.Response;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
@@ -69,4 +72,19 @@ public class CimiManagerCreateCredentialsTemplate extends CimiManagerCreateAbstr
             .toService(request.getContext(), request.getCimiData());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        CimiCredentialsTemplate cimi = (CimiCredentialsTemplate) request.getContext()
+            .getRootConverter(CimiEntityType.CredentialsTemplate).toCimi(request.getContext(), dataService);
+        response.setCimiData(cimi);
+        response.setStatus(Response.Status.CREATED);
+    }
 }

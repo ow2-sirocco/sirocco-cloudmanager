@@ -25,16 +25,12 @@
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
 import javax.validation.groups.Default;
-import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
@@ -94,20 +90,20 @@ public class CimiManagerActionMachine extends CimiManagerAbstract {
     @Override
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        Object outService = null;
+        Object out = null;
         CimiAction cimiAction = (CimiAction) request.getCimiData();
         ActionType type = ActionType.findPath(cimiAction.getAction());
         switch (type) {
         case START:
-            outService = this.manager.startMachine(request.getId());
+            out = this.manager.startMachine(request.getId());
             break;
         case STOP:
-            outService = this.manager.stopMachine(request.getId());
+            out = this.manager.stopMachine(request.getId());
             break;
         default:
             throw new UnsupportedOperationException();
         }
-        return outService;
+        return out;
     }
 
     /**
@@ -120,13 +116,7 @@ public class CimiManagerActionMachine extends CimiManagerAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
-            .toCimi(request.getContext(), dataService);
-
-        response.setCimiData(cimi);
-        response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
-        response.putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
-        response.setStatus(Response.Status.ACCEPTED);
+        // Nothing to do
     }
 
     /**

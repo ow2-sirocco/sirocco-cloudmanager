@@ -123,7 +123,9 @@ public class MachineConverter extends CommonIdConverter implements EntityConvert
                 }
                 dataCimi.setDisks(listCimis.toArray(new CimiDisk[listCimis.size()]));
             }
-            dataCimi.setState(dataService.getState().toString());
+            if (null != dataService.getState()) {
+                dataCimi.setState(dataService.getState().toString());
+            }
 
             // TODO dataCimi.setNetworkInterfaces(???);
             // TODO dataCimi.setVolumes(???);

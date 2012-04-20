@@ -24,7 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.template;
 
+import javax.ws.rs.core.Response;
+
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -69,4 +72,19 @@ public class CimiManagerCreateMachineTemplate extends CimiManagerCreateAbstract 
             .toService(request.getContext(), request.getCimiData());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
+        throws Exception {
+        CimiMachineTemplate cimi = (CimiMachineTemplate) request.getContext().getRootConverter(CimiEntityType.MachineTemplate)
+            .toCimi(request.getContext(), dataService);
+        response.setCimiData(cimi);
+        response.setStatus(Response.Status.CREATED);
+    }
 }

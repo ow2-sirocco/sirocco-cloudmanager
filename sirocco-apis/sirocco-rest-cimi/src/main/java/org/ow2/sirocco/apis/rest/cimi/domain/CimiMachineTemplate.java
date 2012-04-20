@@ -25,10 +25,12 @@
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
@@ -46,12 +48,14 @@ public class CimiMachineTemplate extends CimiCommonId {
      * Field "machineConfig".
      */
     @Valid
+    @NotNull(groups = GroupCreateByValue.class)
     private CimiMachineConfiguration machineConfig;
 
     /**
      * Field "machineImage".
      */
     @Valid
+    @NotNull(groups = GroupCreateByValue.class)
     private CimiMachineImage machineImage;
 
     /**

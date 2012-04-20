@@ -24,26 +24,27 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
-import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
-import org.ow2.sirocco.apis.rest.cimi.domain.ParentJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiJob}</li>
- * <li>Service model: {@link Job}</li>
+ * <li>CIMI model: {@link CimiCredentialsCreate}</li>
+ * <li>Service model: {@link CredentialsCreate}</li>
  * </ul>
  * </p>
  */
-public class JobConverter extends CommonIdConverter implements EntityConverter {
+public class CredentialsCreateConverter implements EntityConverter {
+
     /**
      * {@inheritDoc}
      * 
@@ -52,9 +53,8 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiJob cimi = new CimiJob();
-        this.copyToCimi(context, dataService, cimi);
-        return cimi;
+        // Unnecessary
+        return null;
     }
 
     /**
@@ -65,7 +65,7 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (Job) dataService, (CimiJob) dataCimi);
+        // Unnecessary
     }
 
     /**
@@ -76,7 +76,7 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Job service = new Job();
+        CredentialsCreate service = new CredentialsCreate();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -90,41 +90,22 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiJob) dataCimi, (Job) dataService);
+        this.doCopyToService(context, (CimiCredentialsCreate) dataCimi, (CredentialsCreate) dataService);
     }
 
     /**
-     * Copy data from a service object to a CIMI object.
+     * Fill the common data from a CIMI object to a service object.
      * 
-     * @param context The current context
-     * @param dataService Source service object
-     * @param dataCimi Destination CIMI object
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
      */
-    protected void doCopyToCimi(final CimiContext context, final Job dataService, final CimiJob dataCimi) {
-        this.fill(context, dataService, dataCimi);
-        if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setAction(dataService.getAction());
-            dataCimi.setIsCancellable(dataService.getIsCancellable());
-            dataCimi.setProgress(dataService.getProgress());
-            dataCimi.setReturnCode(dataService.getReturnCode());
-            if (null != dataService.getStatus()) {
-                dataCimi.setStatus(dataService.getStatus().toString());
-            }
-            dataCimi.setStatusMessage(dataService.getStatusMessage());
-            // FIXME TargetEntity
-            dataCimi.setTargetEntity(dataService.getTargetEntity());
-            dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
-
-            if (null != dataService.getParentJob()) {
-                dataCimi.setParentJob(new ParentJob(context.makeHref(dataCimi, dataService.getParentJob().getId())));
-            }
-            if (null != dataService.getNestedJobs()) {
-                List<NestedJob> list = new ArrayList<NestedJob>();
-                for (Job job : dataService.getNestedJobs()) {
-                    list.add(new NestedJob(context.makeHref(dataCimi, job.getId())));
-                }
-                dataCimi.setNestedJobs(list.toArray(new NestedJob[list.size()]));
-            }
+    protected void fill(final CimiCredentialsCreate dataCimi, final CredentialsCreate dataService) {
+        dataService.setDescription(dataCimi.getDescription());
+        dataService.setName(dataCimi.getName());
+        if (null != dataCimi.getProperties()) {
+            Map<String, String> props = new HashMap<String, String>();
+            dataService.setProperties(props);
+            props.putAll(dataCimi.getProperties());
         }
     }
 
@@ -135,7 +116,13 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final CimiContext context, final CimiJob dataCimi, final Job dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiCredentialsCreate dataCimi,
+        final CredentialsCreate dataService) {
         this.fill(dataCimi, dataService);
+        if (null != dataCimi.getCredentialsTemplate()) {
+            dataService.setCredentialTemplate((CredentialsTemplate) context.getConverter(CimiCredentialsTemplate.class)
+                .toService(context, dataCimi.getCredentialsTemplate()));
+        }
     }
+
 }

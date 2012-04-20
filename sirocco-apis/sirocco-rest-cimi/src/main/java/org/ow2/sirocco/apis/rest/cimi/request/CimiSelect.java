@@ -25,6 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.request;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -91,6 +92,16 @@ public class CimiSelect {
      */
     public void setSelects(final List<String> selects) {
         this.selects = selects;
+        this.analyze();
+    }
+
+    /**
+     * Set the original CimiSelect list and build the instance variables.
+     * 
+     * @param selects The CimiSelect list
+     */
+    public void setSelects(final String[] selects) {
+        this.selects = Arrays.asList(selects);
         this.analyze();
     }
 

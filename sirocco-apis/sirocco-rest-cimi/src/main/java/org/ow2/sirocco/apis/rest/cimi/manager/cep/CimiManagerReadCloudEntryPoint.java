@@ -28,11 +28,13 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -45,7 +47,15 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
 
     @Autowired
     @Qualifier("IMachineManager")
-    private IMachineManager manager;
+    private IMachineManager machineManager;
+
+    @Autowired
+    @Qualifier("ICredentialsManager")
+    private ICredentialsManager credentialsManager;
+
+    @Autowired
+    @Qualifier("IMachineImageManager")
+    private IMachineImageManager machineImageManager;
 
     /**
      * {@inheritDoc}
@@ -57,8 +67,14 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        CloudEntryPoint out = null;
-        out = this.manager.getCloudEntryPoint();
+        CloudEntryPointAggregate out = new CloudEntryPointAggregate(this.machineManager.getCloudEntryPoint());
+        out.setMachineConfigs(this.machineManager.getMachineConfigurationCollection());
+        out.setMachines(this.machineManager.getMachineCollection());
+        out.setMachineTemplates(this.machineManager.getMachineTemplateCollection());
+        out.setMachineImages(this.machineImageManager.getMachineImageCollection());
+        out.setCredentials(this.credentialsManager.getCredentialsCollection());
+        out.setCredentialsTemplates(this.credentialsManager.getCredentialsTemplateCollection());
+        // TODO Volumes, ...
         return out;
     }
 

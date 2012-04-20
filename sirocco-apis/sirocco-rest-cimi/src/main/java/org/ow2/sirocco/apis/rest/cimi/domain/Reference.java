@@ -26,13 +26,14 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.io.Serializable;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlAttribute;
+
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Class Reference.
  */
-// @XmlRootElement(name = "reference")
-// @JsonSerialize(include = Inclusion.NON_NULL)
 public class Reference implements Serializable {
 
     /** Serial number */
@@ -41,6 +42,7 @@ public class Reference implements Serializable {
     /**
      * Field "href".
      */
+    @NotNull(groups = GroupWrite.class)
     private String href;
 
     /**

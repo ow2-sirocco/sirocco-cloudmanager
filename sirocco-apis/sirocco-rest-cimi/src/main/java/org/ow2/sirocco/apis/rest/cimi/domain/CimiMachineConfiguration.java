@@ -33,6 +33,7 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
@@ -50,14 +51,14 @@ public class CimiMachineConfiguration extends CimiCommonId {
      * Field "cpu".
      */
     @Valid
-    @NotNull(groups = {GroupWrite.class})
+    @NotNull(groups = {GroupCreateByValue.class})
     private CimiCpu cpu;
 
     /**
      * Field "memory".
      */
     @Valid
-    @NotNull(groups = {GroupWrite.class})
+    @NotNull(groups = {GroupCreateByValue.class})
     private CimiMemory memory;
 
     /**
@@ -67,6 +68,33 @@ public class CimiMachineConfiguration extends CimiCommonId {
     @Valid
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiDiskConfiguration[] disks;
+
+    /**
+     * Default constructor.
+     */
+    public CimiMachineConfiguration() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiMachineConfiguration(final String href) {
+        super(href);
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param cpu The CPU
+     * @param memory The memory
+     */
+    public CimiMachineConfiguration(final CimiCpu cpu, final CimiMemory memory) {
+        this.cpu = cpu;
+        this.memory = memory;
+    }
 
     /**
      * Return the value of field "cpu".

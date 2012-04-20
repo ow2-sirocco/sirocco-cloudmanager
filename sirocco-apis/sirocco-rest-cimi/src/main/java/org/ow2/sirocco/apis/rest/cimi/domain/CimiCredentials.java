@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
@@ -44,17 +45,46 @@ public class CimiCredentials extends CimiCommonId {
     private static final long serialVersionUID = 1L;
 
     /** The initial superuser's user name. */
-    @NotNull(groups = {GroupWrite.class})
+    @NotNull(groups = GroupCreateByValue.class)
     private String userName;
 
     /** Initial superuser's password. */
-    @NotNull(groups = {GroupWrite.class})
+    @NotNull(groups = GroupCreateByValue.class)
     private String password;
 
     /** The digit of the public key for the initial superuser. */
-    @NotNull(groups = {GroupWrite.class})
-    @NotEmptyIfNotNull(groups = {GroupWrite.class})
+    @NotNull(groups = GroupCreateByValue.class)
+    @NotEmptyIfNotNull(groups = GroupWrite.class)
     private byte[] key;
+
+    /**
+     * Default constructor.
+     */
+    public CimiCredentials() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiCredentials(final String href) {
+        super(href);
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param userName The login
+     * @param password The password
+     * @param key The public key
+     */
+    public CimiCredentials(final String userName, final String password, final byte[] key) {
+        this.userName = userName;
+        this.password = password;
+        this.key = key;
+    }
 
     /**
      * @return the userName

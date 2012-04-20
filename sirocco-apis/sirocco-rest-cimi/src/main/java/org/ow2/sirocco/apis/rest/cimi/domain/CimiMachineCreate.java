@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 
 /**
  * Class Machine Create.
@@ -48,7 +48,7 @@ public class CimiMachineCreate extends CimiCommon {
      * Field "machineTemplate".
      */
     @Valid
-    @NotNull(groups = {GroupWrite.class})
+    @NotNull(groups = {GroupCreateByValue.class})
     private CimiMachineTemplate machineTemplate;
 
     /**

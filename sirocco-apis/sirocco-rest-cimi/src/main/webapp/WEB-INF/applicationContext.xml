@@ -31,10 +31,6 @@
 		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineManager"
 		lookup-home-on-startup="false">
 	</jee:local-slsb>
-	<jee:local-slsb id="IMachineConfigurationManager" jndi-name="MachineConfigurationManager"
-		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineConfigurationManager"
-		lookup-home-on-startup="false">
-	</jee:local-slsb>
 	<jee:local-slsb id="IMachineImageManager" jndi-name="MachineImageManager"
 		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager"
 		lookup-home-on-startup="false">

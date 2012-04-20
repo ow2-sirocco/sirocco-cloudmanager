@@ -65,7 +65,7 @@ public class CimiManagerCreateMachine extends CimiManagerCreateAbstract {
      */
     @Override
     protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        return request.getContext().getRootConverter(CimiEntityType.Machine)
+        return request.getContext().getRootConverter(CimiEntityType.MachineCreate)
             .toService(request.getContext(), request.getCimiData());
     }
 

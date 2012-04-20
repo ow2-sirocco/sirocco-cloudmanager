@@ -34,6 +34,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CloudEntryPointConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CpuConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.DiskConfigurationConverter;
@@ -58,6 +59,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
@@ -66,6 +68,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
@@ -165,6 +168,11 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new CredentialsCollectionConverter());
             break;
 
+        case CredentialsCreate:
+            item = new ItemConfig(CimiEntityType.CredentialsCreate, CimiCredentialsCreate.class);
+            item.putData(ConfigFactory.CONVERTER, new CredentialsCreateConverter());
+            break;
+
         case CredentialsTemplate:
             item = new ItemConfig(CimiEntityType.CredentialsTemplate, CimiCredentialsTemplate.class);
             item.putData(ConfigFactory.CONVERTER, new CredentialsTemplateConverter());
@@ -197,7 +205,7 @@ public class ConfigFactory {
             break;
 
         case MachineCollection:
-            item = new ItemConfig(CimiEntityType.MachineCollection, CimiMachine.class);
+            item = new ItemConfig(CimiEntityType.MachineCollection, CimiMachineCollection.class);
             associatedNames = new HashMap<String, CimiEntityType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
             associatedNames.put("machines", CimiEntityType.Machine);

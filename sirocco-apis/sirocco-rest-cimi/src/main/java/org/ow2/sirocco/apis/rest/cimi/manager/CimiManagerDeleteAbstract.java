@@ -24,14 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
-import javax.ws.rs.core.Response;
-
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
 
 /**
- * Abstract class for manage READ request.
+ * Abstract class for manage DELETE request.
  */
 public abstract class CimiManagerDeleteAbstract extends CimiManagerAbstract {
 
@@ -67,8 +65,7 @@ public abstract class CimiManagerDeleteAbstract extends CimiManagerAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        response.setCimiData(null);
-        response.setStatus(Response.Status.OK);
+        // Nothing to do
     }
 
     /**

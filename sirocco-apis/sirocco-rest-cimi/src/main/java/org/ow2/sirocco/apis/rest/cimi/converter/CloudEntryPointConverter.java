@@ -45,7 +45,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
  * </ul>
  * </p>
  */
-public class CloudEntryPointConverter extends CommonConverter implements EntityConverter {
+public class CloudEntryPointConverter extends CommonIdConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
@@ -104,8 +104,8 @@ public class CloudEntryPointConverter extends CommonConverter implements EntityC
      */
     protected void doCopyToCimi(final CimiContext context, final CloudEntryPointAggregate dataService,
         final CimiCloudEntryPoint dataCimi) {
-        this.fill(dataService, dataCimi);
-        if (true == context.mustBeExpanded(dataCimi)) {
+        this.fill(context, dataService, dataCimi);
+        if ((true == context.mustBeExpanded(dataCimi)) || (true == context.mustBeReferenced(dataCimi))) {
             if (null != dataService.getCredentials()) {
                 dataCimi.setCredentials((CimiCredentialsCollection) context.getConverter(CimiCredentialsCollection.class)
                     .toCimi(context, dataService.getCredentials()));

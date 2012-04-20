@@ -22,50 +22,46 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.domain;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.codehaus.jackson.map.annotate.JsonSerialize;
-import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+package org.ow2.sirocco.apis.rest.cimi.converter;
 
 /**
- * Class CredentialsTemplate.
+ * Runtime conversion exception.
  * <p>
+ * Occurs when a data to convert is invalid (or not found).
  * </p>
  */
-@XmlRootElement(name = "CredentialsTemplate")
-@JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsTemplate extends CimiCredentials {
+public class InvalidConversionException extends RuntimeException {
 
-    /** Serial number */
+    /** Serial. */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Default constructor.
+     * 
      */
-    public CimiCredentialsTemplate() {
+    public InvalidConversionException() {
         super();
     }
 
     /**
-     * Parameterized constructor.
-     * 
-     * @param href The reference
+     * @param message
+     * @param cause
      */
-    public CimiCredentialsTemplate(final String href) {
-        super(href);
+    public InvalidConversionException(final String message, final Throwable cause) {
+        super(message, cause);
     }
 
     /**
-     * Parameterized constructor.
-     * 
-     * @param userName The login
-     * @param password The password
-     * @param key The public key
+     * @param message
      */
-    public CimiCredentialsTemplate(final String userName, final String password, final byte[] key) {
-        super(userName, password, key);
+    public InvalidConversionException(final String message) {
+        super(message);
+    }
+
+    /**
+     * @param cause
+     */
+    public InvalidConversionException(final Throwable cause) {
+        super(cause);
     }
 
 }

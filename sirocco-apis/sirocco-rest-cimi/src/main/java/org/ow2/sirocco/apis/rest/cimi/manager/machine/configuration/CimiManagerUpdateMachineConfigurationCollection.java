@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 public class CimiManagerUpdateMachineConfigurationCollection extends CimiManagerUpdateAbstract {
 
     @Autowired
-    @Qualifier("IMachineConfigurationManager")
+    @Qualifier("IMachineManager")
     private IMachineManager manager;
 
     /**

@@ -48,37 +48,41 @@ public class StorageUnitConverter implements CimiConverter {
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
         String cimi = null;
-        org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit service = (org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) dataService;
-        switch (service) {
-        case BYTE:
-            cimi = StorageUnit.BYTE.getLabel();
-            break;
-        case KILOBYTE:
-            cimi = StorageUnit.KILOBYTE.getLabel();
-            break;
-        case MEGABYTE:
-            cimi = StorageUnit.MEGABYTE.getLabel();
-            break;
-        case GIGABYTE:
-            cimi = StorageUnit.GIGABYTE.getLabel();
-            break;
-        case TERABYTE:
-            cimi = StorageUnit.TERABYTE.getLabel();
-            break;
-        case PETABYTE:
-            cimi = StorageUnit.PETABYTE.getLabel();
-            break;
-        case EXABYTE:
-            cimi = StorageUnit.EXABYTE.getLabel();
-            break;
-        case ZETTABYTE:
-            cimi = StorageUnit.ZETTABYTE.getLabel();
-            break;
-        case YOTTABYTE:
-            cimi = StorageUnit.YOTTABYTE.getLabel();
-            break;
-        default:
-            throw new UnsupportedOperationException("Unknown StorageUnit Unit : " + service);
+        try {
+            org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit service = (org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) dataService;
+            switch (service) {
+            case BYTE:
+                cimi = StorageUnit.BYTE.getLabel();
+                break;
+            case KILOBYTE:
+                cimi = StorageUnit.KILOBYTE.getLabel();
+                break;
+            case MEGABYTE:
+                cimi = StorageUnit.MEGABYTE.getLabel();
+                break;
+            case GIGABYTE:
+                cimi = StorageUnit.GIGABYTE.getLabel();
+                break;
+            case TERABYTE:
+                cimi = StorageUnit.TERABYTE.getLabel();
+                break;
+            case PETABYTE:
+                cimi = StorageUnit.PETABYTE.getLabel();
+                break;
+            case EXABYTE:
+                cimi = StorageUnit.EXABYTE.getLabel();
+                break;
+            case ZETTABYTE:
+                cimi = StorageUnit.ZETTABYTE.getLabel();
+                break;
+            case YOTTABYTE:
+                cimi = StorageUnit.YOTTABYTE.getLabel();
+                break;
+            default:
+                throw new InvalidConversionException("Unknown StorageUnit Unit : " + service);
+            }
+        } catch (ClassCastException e) {
+            throw new InvalidConversionException("Unknown StorageUnit Unit : " + dataService);
         }
         return cimi;
     }
@@ -93,6 +97,9 @@ public class StorageUnitConverter implements CimiConverter {
     public Object toService(final CimiContext context, final Object dataCimi) {
         org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit service;
         StorageUnit cimi = StorageUnit.findValueOf((String) dataCimi);
+        if (null == cimi) {
+            throw new InvalidConversionException("Unknown StorageUnit Unit : " + dataCimi);
+        }
         switch (cimi) {
         case BYTE:
             service = org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.BYTE;
@@ -122,7 +129,7 @@ public class StorageUnitConverter implements CimiConverter {
             service = org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.YOTTABYTE;
             break;
         default:
-            throw new UnsupportedOperationException("Unknown StorageUnit Unit : " + dataCimi);
+            throw new InvalidConversionException("Unknown StorageUnit Unit : " + dataCimi);
         }
         return service;
     }

@@ -25,7 +25,6 @@
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
 import javax.validation.groups.Default;
-import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -67,8 +66,7 @@ public abstract class CimiManagerUpdateAbstract extends CimiManagerAbstract {
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        response.setCimiData(null);
-        response.setStatus(Response.Status.OK);
+        // Nothing to do
     }
 
     /**

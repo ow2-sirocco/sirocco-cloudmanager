@@ -49,19 +49,23 @@ public class FrequencyUnitConverter implements CimiConverter {
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
         String cimi = null;
-        Frequency service = (Frequency) dataService;
-        switch (service) {
-        case HERTZ:
-            cimi = FrequencyUnit.HERTZ.getLabel();
-            break;
-        case MEGA:
-            cimi = FrequencyUnit.MEGAHERTZ.getLabel();
-            break;
-        case GIGA:
-            cimi = FrequencyUnit.GIGAHERTZ.getLabel();
-            break;
-        default:
-            throw new UnsupportedOperationException("Unknown Frequency Unit : " + service);
+        try {
+            Frequency service = (Frequency) dataService;
+            switch (service) {
+            case HERTZ:
+                cimi = FrequencyUnit.HERTZ.getLabel();
+                break;
+            case MEGA:
+                cimi = FrequencyUnit.MEGAHERTZ.getLabel();
+                break;
+            case GIGA:
+                cimi = FrequencyUnit.GIGAHERTZ.getLabel();
+                break;
+            default:
+                throw new InvalidConversionException("Unknown Frequency Unit : " + service);
+            }
+        } catch (ClassCastException e) {
+            throw new InvalidConversionException("Unknown Frequency Unit : " + dataService);
         }
         return cimi;
     }
@@ -76,6 +80,9 @@ public class FrequencyUnitConverter implements CimiConverter {
     public Object toService(final CimiContext context, final Object dataCimi) {
         Frequency service;
         FrequencyUnit cimi = FrequencyUnit.findValueOf((String) dataCimi);
+        if (null == cimi) {
+            throw new InvalidConversionException("Unknown Frequency Unit : " + dataCimi);
+        }
         switch (cimi) {
         case HERTZ:
             service = Frequency.HERTZ;
@@ -87,7 +94,7 @@ public class FrequencyUnitConverter implements CimiConverter {
             service = Frequency.GIGA;
             break;
         default:
-            throw new UnsupportedOperationException("Unknown Frequency Unit : " + dataCimi);
+            throw new InvalidConversionException("Unknown Frequency Unit : " + dataCimi);
         }
         return service;
     }
