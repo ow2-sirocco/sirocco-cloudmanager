@@ -113,13 +113,14 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
     protected void doCopyToCimi(final CimiContext context, final MachineCollection dataService,
         final CimiMachineCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        CimiConverter converter = context.getConverter(CimiMachine.class);
-        List<CimiMachine> cimiList = new ArrayList<CimiMachine>();
-        for (Machine machineImage : dataService.getMachines()) {
-            cimiList.add((CimiMachine) converter.toCimi(context, machineImage));
+        if (null != dataService.getMachines()) {
+            CimiConverter converter = context.getConverter(CimiMachine.class);
+            List<CimiMachine> cimiList = new ArrayList<CimiMachine>();
+            for (Machine machineImage : dataService.getMachines()) {
+                cimiList.add((CimiMachine) converter.toCimi(context, machineImage));
+            }
+            dataCimi.setMachines(cimiList.toArray(new CimiMachine[cimiList.size()]));
         }
-        dataCimi.setMachines(cimiList.toArray(new CimiMachine[cimiList.size()]));
-
     }
 
     /**

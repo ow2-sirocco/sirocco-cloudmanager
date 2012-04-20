@@ -113,13 +113,14 @@ public class MachineImageCollectionConverter extends CommonIdConverter implement
     protected void doCopyToCimi(final CimiContext context, final MachineImageCollection dataService,
         final CimiMachineImageCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        CimiConverter converter = context.getConverter(CimiMachineImage.class);
-        List<CimiMachineImage> cimiList = new ArrayList<CimiMachineImage>();
-        for (MachineImage machineImage : dataService.getImages()) {
-            cimiList.add((CimiMachineImage) converter.toCimi(context, machineImage));
+        if (null != dataService.getImages()) {
+            CimiConverter converter = context.getConverter(CimiMachineImage.class);
+            List<CimiMachineImage> cimiList = new ArrayList<CimiMachineImage>();
+            for (MachineImage machineImage : dataService.getImages()) {
+                cimiList.add((CimiMachineImage) converter.toCimi(context, machineImage));
+            }
+            dataCimi.setMachineImages(cimiList.toArray(new CimiMachineImage[cimiList.size()]));
         }
-        dataCimi.setMachineImages(cimiList.toArray(new CimiMachineImage[cimiList.size()]));
-
     }
 
     /**
