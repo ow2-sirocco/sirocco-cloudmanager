@@ -241,13 +241,8 @@ public abstract class CimiManagerAbstract implements CimiManager {
      */
     private void doConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService) {
         try {
-            // null
-            if (null == dataService) {
-                response.setCimiData(null);
-                response.setStatus(Response.Status.OK);
-            }
             // Job
-            else if (dataService instanceof Job) {
+            if (dataService instanceof Job) {
                 CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
                     .toCimi(request.getContext(), dataService);
                 response.setCimiData(cimi);

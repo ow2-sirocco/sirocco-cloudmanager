@@ -75,6 +75,7 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
         out.setCredentials(this.credentialsManager.getCredentialsCollection());
         out.setCredentialsTemplates(this.credentialsManager.getCredentialsTemplateCollection());
         // TODO Volumes, ...
+        // TODO CimiSelect
         return out;
     }
 

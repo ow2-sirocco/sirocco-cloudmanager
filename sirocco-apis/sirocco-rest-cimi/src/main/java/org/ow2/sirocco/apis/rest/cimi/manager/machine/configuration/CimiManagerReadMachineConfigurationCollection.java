@@ -31,7 +31,7 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
@@ -39,7 +39,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -64,12 +63,10 @@ public class CimiManagerReadMachineConfigurationCollection extends CimiManagerRe
     @Override
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        List<MachineConfiguration> out = null;
+        Object out = null;
         CimiSelect select = request.getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            // FIXME
-            throw new UnsupportedOperationException();
-            // out = this.manager.getMachineConfigurations();
+            out = this.manager.getMachineConfigurationCollection();
         } else {
             if (true == select.isNumericArrayPresent()) {
                 List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());
@@ -93,8 +90,8 @@ public class CimiManagerReadMachineConfigurationCollection extends CimiManagerRe
     @Override
     protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
-        CimiMachineConfiguration cimi = (CimiMachineConfiguration) request.getContext()
-            .getRootConverter(CimiEntityType.MachineConfiguration).toCimi(request.getContext(), dataService);
+        CimiMachineConfigurationCollection cimi = (CimiMachineConfigurationCollection) request.getContext()
+            .getRootConverter(CimiEntityType.MachineConfigurationCollection).toCimi(request.getContext(), dataService);
         response.setCimiData(cimi);
         response.setStatus(Response.Status.OK);
     }
