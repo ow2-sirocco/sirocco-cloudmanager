@@ -103,6 +103,15 @@ public interface CimiContext {
     boolean mustBeReferenced(CimiData data);
 
     /**
+     * Returns true if the given entity must have an identifier in its
+     * reference.
+     * 
+     * @param entity The instance of a CIMI entity
+     * @return True if must have a ID.
+     */
+    boolean mustHaveIdInReference(final CimiHref entity);
+
+    /**
      * Make the base HREF without ID.
      * 
      * @param data

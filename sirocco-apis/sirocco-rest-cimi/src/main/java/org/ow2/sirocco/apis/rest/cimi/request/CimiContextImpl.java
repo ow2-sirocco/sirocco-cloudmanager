@@ -181,6 +181,32 @@ public class CimiContextImpl implements CimiContext {
     /**
      * {@inheritDoc}
      * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#mustHaveIdInReference(org.ow2.sirocco.apis.rest.cimi.domain.CimiHref)
+     */
+    @Override
+    public boolean mustHaveIdInReference(final CimiHref data) {
+        boolean withId = true;
+        CimiEntityType type = AppConfig.getType(data);
+        switch (type) {
+        case CloudEntryPoint:
+        case CredentialsCollection:
+        case CredentialsTemplateCollection:
+        case JobCollection:
+        case MachineCollection:
+        case MachineConfigurationCollection:
+        case MachineImageCollection:
+        case MachineTemplateCollection:
+            withId = false;
+            break;
+        default:
+            break;
+        }
+        return withId;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(org.ow2.sirocco
      *      .apis.rest.cimi.domain.CimiCommonId, java.lang.String)
      */
@@ -210,25 +236,13 @@ public class CimiContextImpl implements CimiContext {
     public String makeHref(final CimiHref data, final Integer id) {
         StringBuilder sb = new StringBuilder();
         CimiEntityType type = AppConfig.getType(data);
-        switch (type) {
-        case CloudEntryPoint:
-        case CredentialsCollection:
-        case CredentialsTemplateCollection:
-        case JobCollection:
-        case MachineCollection:
-        case MachineConfigurationCollection:
-        case MachineImageCollection:
-        case MachineTemplateCollection:
-            sb.append(this.request.getBaseUri()).append(type.getPathType().getPathname());
-            break;
-        default:
-            sb.append(this.request.getBaseUri()).append(type.getPathType().getPathname()).append('/');
+        sb.append(this.request.getBaseUri()).append(type.getPathType().getPathname());
+        if (true == this.mustHaveIdInReference(data)) {
+            sb.append('/');
             if (null != id) {
                 sb.append(id);
             }
-            break;
         }
-
         return sb.toString();
     }
 }

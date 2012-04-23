@@ -58,14 +58,14 @@ public class ValidReferenceValidator extends CimiContextValidatorAbstract<ValidR
                 String hrefNoId = this.getCimiContext().makeHrefBase(cimiHref);
                 if (false == href.startsWith(hrefNoId)) {
                     valid = false;
-                } else if (href.length() != hrefNoId.length()) {
-                    if (true == hrefNoId.endsWith("/")) {
-                        int index = href.lastIndexOf('/');
-                        String sub = href.substring(0, index + 1);
-                        if (false == sub.equals(hrefNoId)) {
-                            valid = false;
-                        }
-                    } else {
+                } else if (false == this.getCimiContext().mustHaveIdInReference(cimiHref)) {
+                    if (false == href.equals(hrefNoId)) {
+                        valid = false;
+                    }
+                } else {
+                    int index = href.lastIndexOf('/');
+                    String sub = href.substring(0, index + 1);
+                    if ((false == sub.equals(hrefNoId)) || (href.length() == hrefNoId.length())) {
                         valid = false;
                     }
                 }

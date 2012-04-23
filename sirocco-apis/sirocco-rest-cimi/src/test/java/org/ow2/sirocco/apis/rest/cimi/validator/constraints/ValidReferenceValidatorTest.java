@@ -30,7 +30,9 @@ public class ValidReferenceValidatorTest {
             protected ItemConfig buildEntityItem(final CimiEntityType type) {
                 ItemConfig item = null;
                 switch (type) {
-
+                case CloudEntryPoint:
+                    item = new ItemConfig(CimiEntityType.CloudEntryPoint, MyCloudEntryPoint.class);
+                    break;
                 case Credentials:
                     item = new ItemConfig(CimiEntityType.Credentials, MyCredentials.class);
                     break;
@@ -69,6 +71,11 @@ public class ValidReferenceValidatorTest {
     }
 
     @ValidReference(groups = GroupWrite.class)
+    private class MyCloudEntryPoint extends CimiCommonId {
+        private static final long serialVersionUID = 1L;
+    }
+
+    @ValidReference(groups = GroupWrite.class)
     private class MyCredentials extends CimiCommonId {
         private static final long serialVersionUID = 1L;
     }
@@ -86,6 +93,37 @@ public class ValidReferenceValidatorTest {
     @ValidReference(groups = GroupWrite.class)
     private class MyCollectionConfig extends CimiCommonId {
         private static final long serialVersionUID = 1L;
+    }
+
+    @Test
+    public void testMyCloudEntryPoint() {
+
+        MyCloudEntryPoint toTest = new MyCloudEntryPoint();
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref(this.request.getBaseUri() + CimiEntityType.CloudEntryPoint.getPathType().getPathname());
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref("A");
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref("");
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref(this.request.getBaseUri());
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref(this.request.getBaseUri() + CimiEntityType.Credentials.getPathType().getPathname());
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref(this.request.getBaseUri() + "foo/1");
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref(this.request.getBaseUri() + CimiEntityType.Credentials.getPathType().getPathname() + "/foo/1");
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref(this.request.getContext().makeHrefBase(toTest));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
     }
 
     @Test
@@ -115,6 +153,8 @@ public class ValidReferenceValidatorTest {
         toTest.setHref(this.request.getBaseUri() + CimiEntityType.Credentials.getPathType().getPathname() + "/foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
 
+        toTest.setHref(this.request.getContext().makeHrefBase(toTest));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
     }
 
     @Test
@@ -139,6 +179,9 @@ public class ValidReferenceValidatorTest {
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
 
         toTest.setHref(this.request.getBaseUri() + "toto/1");
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref(this.request.getContext().makeHrefBase(toTest));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
     }
 
@@ -165,6 +208,9 @@ public class ValidReferenceValidatorTest {
 
         toTest.setHref(this.request.getBaseUri() + "toto/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref(this.request.getContext().makeHrefBase(toTest));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
     }
 
     @Test
@@ -191,5 +237,8 @@ public class ValidReferenceValidatorTest {
 
         toTest.setHref(this.request.getBaseUri() + "toto/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
+
+        toTest.setHref(this.request.getContext().makeHrefBase(toTest));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest, GroupWrite.class));
     }
 }
