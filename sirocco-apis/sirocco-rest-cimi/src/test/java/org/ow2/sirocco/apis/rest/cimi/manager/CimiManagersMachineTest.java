@@ -136,7 +136,7 @@ public class CimiManagersMachineTest {
     }
 
     @Test
-    public void testAction() throws Exception {
+    public void testActionStart() throws Exception {
         Job job = new Job();
         job.setId(123);
 
@@ -145,6 +145,25 @@ public class CimiManagersMachineTest {
 
         CimiAction cimi = new CimiAction();
         cimi.setAction(ActionType.START.getPath());
+        this.request.setId("1");
+        this.request.setCimiData(cimi);
+        this.managerAction.execute(this.request, this.response);
+
+        Assert.assertEquals(202, this.response.getStatus());
+        Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        EasyMock.verify(this.service);
+    }
+
+    @Test
+    public void testActionStop() throws Exception {
+        Job job = new Job();
+        job.setId(123);
+
+        EasyMock.expect(this.service.stopMachine("1")).andReturn(job);
+        EasyMock.replay(this.service);
+
+        CimiAction cimi = new CimiAction();
+        cimi.setAction(ActionType.STOP.getPath());
         this.request.setId("1");
         this.request.setCimiData(cimi);
         this.managerAction.execute(this.request, this.response);
