@@ -22,25 +22,23 @@
  *  $Id$
  *
  */
+
 package org.ow2.sirocco.cloudmanager.connector.api;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
 
-public interface ICloudProviderConnector {
-    String getCloudProviderId();
+public interface ISystemService {
+    Job createSystem(SystemCreate systemCreate);
 
-    CloudProviderAccount getCloudProviderAccount();
+    Job startSystem(String systemId) throws ConnectorException;
 
-    CloudProviderLocation getCloudProviderLocation();
+    Job stopSystem(String systemId) throws ConnectorException;
 
-    IComputeService getComputeService() throws ConnectorException;
+    Job restartSystem(String systemId) throws ConnectorException;
 
-    IVolumeService getVolumeService() throws ConnectorException;
+    Job pauseSystem(String systemId) throws ConnectorException;
 
-    IImageService getImageService() throws ConnectorException;
+    Job suspendSystem(String systemId) throws ConnectorException;
 
-    ISystemService getSystemService() throws ConnectorException;
-
-    void setNotificationOnJobCompletion(final String jobId) throws ConnectorException;
 }

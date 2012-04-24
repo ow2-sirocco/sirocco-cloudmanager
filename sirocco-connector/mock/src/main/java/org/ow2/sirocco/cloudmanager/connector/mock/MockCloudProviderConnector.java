@@ -36,6 +36,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
+import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
@@ -47,16 +48,18 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface.InterfaceState;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
-public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, IVolumeService, IImageService {
+public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, IVolumeService,
+    IImageService {
 
     private static Log logger = LogFactory.getLog(MockCloudProviderConnector.class);
 
@@ -99,6 +102,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public IComputeService getComputeService() throws ConnectorException {
+        return this;
+    }
+
+    @Override
+    public ISystemService getSystemService() throws ConnectorException {
         return this;
     }
 
@@ -383,6 +391,42 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public Job uploadImage(final MachineImage imageUpload) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job createSystem(final SystemCreate systemCreate) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job startSystem(final String systemId) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job stopSystem(final String systemId) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job restartSystem(final String systemId) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job pauseSystem(final String systemId) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job suspendSystem(final String systemId) throws ConnectorException {
         // TODO Auto-generated method stub
         return null;
     }
