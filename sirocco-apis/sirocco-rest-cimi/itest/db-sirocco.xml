@@ -1,0 +1,475 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <table name="CLOUDPROVIDERLOCATION">
+    <column>ID</column>
+    <column>GPS_ALTITUDE</column>
+    <column>GPS_LATITUDE</column>
+    <column>GPS_LONGITUDE</column>
+    <column>CITYNAME</column>
+    <column>COUNTRYNAME</column>
+    <column>ISO3166_1</column>
+    <column>ISO3166_2</column>
+    <column>POSTAL_CODE</column>
+    <column>STATENAME</column>
+  </table>
+  <table name="USER">
+    <column>ID</column>
+    <column>CREATEDATE</column>
+    <column>EMAIL</column>
+    <column>FIRSTNAME</column>
+    <column>LASTNAME</column>
+    <column>PASSWORD</column>
+    <column>USERNAME</column>
+  </table>
+  <table name="CLOUDENTRYPOINT">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="CLOUDENTRYPOINT_PROPERTIES">
+    <column>CLOUDENTRYPOINT_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="CLOUDPROVIDER">
+    <column>ID</column>
+    <column>CLOUDPROVIDERTYPE</column>
+    <column>DESCRIPTION</column>
+  </table>
+  <table name="CLOUDPROVIDERACCOUNT">
+    <column>ID</column>
+    <column>LOGIN</column>
+    <column>PASSWORD</column>
+    <column>CLOUDPROVIDER_ID</column>
+  </table>
+  <table name="CLOUDPROVIDERACCOUNT_USER">
+    <column>CLOUDPROVIDERACCOUNTS_ID</column>
+    <column>USERS_ID</column>
+  </table>
+  <table name="CLOUDPROVIDERLOCATION_CLOUDPROVIDER">
+    <column>CLOUDPROVIDERLOCATIONS_ID</column>
+    <column>CLOUDPROVIDERS_ID</column>
+  </table>
+  <table name="CREDENTIALS">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>PASSWORD</column>
+    <column>PUBLICKEY</column>
+    <column>USERNAME</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="CREDENTIALSCOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="CREDENTIALSCOLLECTION_PROPERTIES">
+    <column>CREDENTIALSCOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="CREDENTIALSTEMPLATE">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>PASSWORD</column>
+    <column>PUBLICKEY</column>
+    <column>USERNAME</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="CREDENTIALSTEMPLATECOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="CREDENTIALSTEMPLATECOLLECTION_PROPERTIES">
+    <column>CREDENTIALSTEMPLATECOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="CREDENTIALSTEMPLATE_PROPERTIES">
+    <column>CREDENTIALSTEMPLATE_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="CREDENTIALS_PROPERTIES">
+    <column>CREDENTIALS_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="JOB">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>ACTION</column>
+    <column>ISCANCELLABLE</column>
+    <column>PROGRESS</column>
+    <column>RETURNCODE</column>
+    <column>STATUS</column>
+    <column>STATUSMESSAGE</column>
+    <column>TARGETENTITY</column>
+    <column>TIMEOFSTATUSCHANGE</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+    <column>PARENTJOB_ID</column>
+  </table>
+  <table name="JOBCOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="JOBCOLLECTION_PROPERTIES">
+    <column>JOBCOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="JOB_PROPERTIES">
+    <column>JOB_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="MACHINE">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>CPUSPEEDUNIT</column>
+    <column>NUMBERCPU</column>
+    <column>CPU_QUANTITY</column>
+    <column>MEMORY_QUANTITY</column>
+    <column>UNIT</column>
+    <column>STATE</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+    <column>CLOUDPROVIDERACCOUNT_ID</column>
+  </table>
+  <table name="MACHINECOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="MACHINECOLLECTION_PROPERTIES">
+    <column>MACHINECOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="MACHINECONFIGURATION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>CPUSPEEDUNIT</column>
+    <column>NUMBERCPU</column>
+    <column>CPU_QUANTITY</column>
+    <column>MEMORY_QUANTITY</column>
+    <column>UNIT</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="MACHINECONFIGURATIONCOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="MACHINECONFIGURATIONCOLLECTION_PROPERTIES">
+    <column>MACHINECONFIGURATIONCOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="MACHINECONFIGURATION_DISKTEMPLATES">
+    <column>MACHINECONFIGURATION_ID</column>
+    <column>ATTACHMENTPOINT</column>
+    <column>FORMAT</column>
+    <column>QUANTITY</column>
+    <column>UNIT</column>
+  </table>
+  <table name="MACHINECONFIGURATION_PROPERTIES">
+    <column>MACHINECONFIGURATION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="MACHINEIMAGE">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>IMAGELOCATION</column>
+    <column>STATE</column>
+    <column>TYPE</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+    <column>CLOUDPROVIDERACCOUNT_ID</column>
+    <column>RELATEDIMAGE_ID</column>
+  </table>
+  <table name="MACHINEIMAGECOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="MACHINEIMAGECOLLECTION_PROPERTIES">
+    <column>MACHINEIMAGECOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="MACHINEIMAGE_PROPERTIES">
+    <column>MACHINEIMAGE_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="MACHINETEMPLATE">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+    <column>CREDENTIALS_ID</column>
+    <column>MACHINECONFIGURATION_ID</column>
+    <column>MACHINEIMAGE_ID</column>
+  </table>
+  <table name="MACHINETEMPLATECOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="MACHINETEMPLATECOLLECTION_PROPERTIES">
+    <column>MACHINETEMPLATECOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="VOLUME">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>BOOTABLE</column>
+    <column>QUANTITY</column>
+    <column>UNIT</column>
+    <column>STATE</column>
+    <column>SUPPORTSSNAPSHOTS</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+    <column>CLOUDPROVIDERACCOUNT_ID</column>
+  </table>
+  <table name="MACHINEVOLUME">
+    <column>ID</column>
+    <column>ATTACHMENTPOINT</column>
+    <column>VOLUME_ID</column>
+  </table>
+  <table name="MACHINETEMPLATE_MACHINEVOLUME">
+    <column>MACHINETEMPLATE_ID</column>
+    <column>VOLUMES_ID</column>
+  </table>
+  <table name="MACHINETEMPLATE_NETWORKINTERFACES">
+    <column>MACHINETEMPLATE_ID</column>
+    <column>ADDRESS</column>
+    <column>ALLOCATION</column>
+    <column>DEFAULTGATEWAY</column>
+    <column>HOSTNAME</column>
+    <column>MACADDRESS</column>
+    <column>PROTOCOL</column>
+    <column>STATE</column>
+  </table>
+  <table name="MACHINETEMPLATE_PROPERTIES">
+    <column>MACHINETEMPLATE_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="MACHINETEMPLATE_VOLUMETEMPLATES">
+    <column>MACHINETEMPLATE_ID</column>
+    <column>ATTACHMENTPOINT</column>
+  </table>
+  <table name="MACHINE_DISKS">
+    <column>MACHINE_ID</column>
+    <column>QUANTITY</column>
+    <column>UNIT</column>
+  </table>
+  <table name="MACHINE_MACHINEVOLUME">
+    <column>MACHINE_ID</column>
+    <column>VOLUMES_ID</column>
+  </table>
+  <table name="MACHINE_NETWORKINTERFACES">
+    <column>MACHINE_ID</column>
+    <column>ADDRESS</column>
+    <column>ALLOCATION</column>
+    <column>DEFAULTGATEWAY</column>
+    <column>HOSTNAME</column>
+    <column>MACADDRESS</column>
+    <column>PROTOCOL</column>
+    <column>STATE</column>
+  </table>
+  <table name="MACHINE_PROPERTIES">
+    <column>MACHINE_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="VOLUMECOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="VOLUMECOLLECTION_PROPERTIES">
+    <column>VOLUMECOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="VOLUMECONFIGURATION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>QUANTITY</column>
+    <column>UNIT</column>
+    <column>FORMAT</column>
+    <column>GUESTINTERFACE</column>
+    <column>SUPPORTSSNAPSHOTS</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="VOLUMECONFIGURATIONCOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="VOLUMECONFIGURATIONCOLLECTION_PROPERTIES">
+    <column>VOLUMECONFIGURATIONCOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="VOLUMECONFIGURATION_PROPERTIES">
+    <column>VOLUMECONFIGURATION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="VOLUMETEMPLATE">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+    <column>VOLUMECONFIG_ID</column>
+  </table>
+  <table name="VOLUMETEMPLATECOLLECTION">
+    <column>ID</column>
+    <column>CREATED</column>
+    <column>DELETED</column>
+    <column>DESCRIPTION</column>
+    <column>NAME</column>
+    <column>PROVIDERASSIGNEDID</column>
+    <column>UPDATED</column>
+    <column>LOCATION_ID</column>
+    <column>USER_ID</column>
+  </table>
+  <table name="VOLUMETEMPLATECOLLECTION_PROPERTIES">
+    <column>VOLUMETEMPLATECOLLECTION_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="VOLUMETEMPLATE_PROPERTIES">
+    <column>VOLUMETEMPLATE_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+  <table name="VOLUME_PROPERTIES">
+    <column>VOLUME_ID</column>
+    <column>ELEMENT</column>
+    <column>MAPKEY</column>
+  </table>
+</dataset>
