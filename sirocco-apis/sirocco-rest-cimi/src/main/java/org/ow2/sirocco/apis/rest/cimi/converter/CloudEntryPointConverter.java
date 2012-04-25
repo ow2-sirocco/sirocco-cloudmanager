@@ -142,7 +142,7 @@ public class CloudEntryPointConverter extends CommonIdConverter implements Entit
      */
     protected void doCopyToService(final CimiContext context, final CimiCloudEntryPoint dataCimi,
         final CloudEntryPoint dataService) {
-        this.fill(dataCimi, dataService);
+        this.fill(context, dataCimi, dataService);
     }
 
 }

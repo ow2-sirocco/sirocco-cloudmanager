@@ -113,12 +113,14 @@ public class JobCollectionConverter extends CommonIdConverter implements EntityC
     protected void doCopyToCimi(final CimiContext context, final JobCollection dataService, final CimiJobCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
         CimiConverter converter = context.getConverter(CimiJob.class);
-        if (null != dataService.getJobs()) {
-            List<CimiJob> cimiList = new ArrayList<CimiJob>();
-            for (Job machineImage : dataService.getJobs()) {
-                cimiList.add((CimiJob) converter.toCimi(context, machineImage));
+        if (true == context.mustBeExpanded(dataCimi)) {
+            if ((null != dataService.getJobs()) && (dataService.getJobs().size() > 0)) {
+                List<CimiJob> cimiList = new ArrayList<CimiJob>();
+                for (Job machineImage : dataService.getJobs()) {
+                    cimiList.add((CimiJob) converter.toCimi(context, machineImage));
+                }
+                dataCimi.setJobs(cimiList.toArray(new CimiJob[cimiList.size()]));
             }
-            dataCimi.setJobs(cimiList.toArray(new CimiJob[cimiList.size()]));
         }
     }
 

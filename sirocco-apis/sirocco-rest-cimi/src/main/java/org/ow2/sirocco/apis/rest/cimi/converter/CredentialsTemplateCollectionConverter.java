@@ -113,13 +113,15 @@ public class CredentialsTemplateCollectionConverter extends CommonIdConverter im
     protected void doCopyToCimi(final CimiContext context, final CredentialsTemplateCollection dataService,
         final CimiCredentialsTemplateCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if (null != dataService.getCredentialsTemplates()) {
-            CimiConverter converter = context.getConverter(CimiCredentialsTemplate.class);
-            List<CimiCredentialsTemplate> cimiList = new ArrayList<CimiCredentialsTemplate>();
-            for (CredentialsTemplate machineImage : dataService.getCredentialsTemplates()) {
-                cimiList.add((CimiCredentialsTemplate) converter.toCimi(context, machineImage));
+        if (true == context.mustBeExpanded(dataCimi)) {
+            if ((null != dataService.getCredentialsTemplates()) && (dataService.getCredentialsTemplates().size() > 0)) {
+                CimiConverter converter = context.getConverter(CimiCredentialsTemplate.class);
+                List<CimiCredentialsTemplate> cimiList = new ArrayList<CimiCredentialsTemplate>();
+                for (CredentialsTemplate machineImage : dataService.getCredentialsTemplates()) {
+                    cimiList.add((CimiCredentialsTemplate) converter.toCimi(context, machineImage));
+                }
+                dataCimi.setCredentialsTemplates(cimiList.toArray(new CimiCredentialsTemplate[cimiList.size()]));
             }
-            dataCimi.setCredentialsTemplates(cimiList.toArray(new CimiCredentialsTemplate[cimiList.size()]));
         }
     }
 

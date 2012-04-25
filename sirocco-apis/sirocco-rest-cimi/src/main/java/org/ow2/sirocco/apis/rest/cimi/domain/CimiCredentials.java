@@ -53,7 +53,6 @@ public class CimiCredentials extends CimiCommonId {
     private String password;
 
     /** The digit of the public key for the initial superuser. */
-    @NotNull(groups = GroupCreateByValue.class)
     @NotEmptyIfNotNull(groups = GroupWrite.class)
     private byte[] key;
 

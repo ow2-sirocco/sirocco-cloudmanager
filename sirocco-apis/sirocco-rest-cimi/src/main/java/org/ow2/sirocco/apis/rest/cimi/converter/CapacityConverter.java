@@ -63,7 +63,11 @@ public class CapacityConverter implements EntityConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (Disk) dataService, (CimiCapacity) dataCimi);
+        if (dataService instanceof DiskTemplate) {
+            this.doCopyToCimi(context, (DiskTemplate) dataService, (CimiCapacity) dataCimi);
+        } else {
+            this.doCopyToCimi(context, (Disk) dataService, (CimiCapacity) dataCimi);
+        }
     }
 
     /**
@@ -77,7 +81,6 @@ public class CapacityConverter implements EntityConverter {
         Object service;
         if (dataCimi instanceof CimiDiskConfiguration) {
             service = new DiskTemplate();
-
         } else {
             service = new Disk();
         }
@@ -94,7 +97,11 @@ public class CapacityConverter implements EntityConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiCapacity) dataCimi, (Disk) dataService);
+        if (dataService instanceof Disk) {
+            this.doCopyToService(context, (CimiCapacity) dataCimi, (Disk) dataService);
+        } else {
+            this.doCopyToService(context, (CimiCapacity) dataCimi, (DiskTemplate) dataService);
+        }
     }
 
     /**
@@ -110,6 +117,18 @@ public class CapacityConverter implements EntityConverter {
     }
 
     /**
+     * Copy data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void doCopyToCimi(final CimiContext context, final DiskTemplate dataService, final CimiCapacity dataCimi) {
+        dataCimi.setQuantity(dataService.getQuantity().intValue());
+        dataCimi.setUnits((String) context.getConverter(StorageUnit.class).toCimi(context, dataService.getUnit()));
+    }
+
+    /**
      * Copy data from a CIMI object to a service object.
      * 
      * @param context The current context
@@ -119,6 +138,19 @@ public class CapacityConverter implements EntityConverter {
     protected void doCopyToService(final CimiContext context, final CimiCapacity dataCimi, final Disk dataService) {
         dataService.setQuantity(dataCimi.getQuantity().floatValue());
         dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
-            .toCimi(context, dataCimi.getUnits()));
+            .toService(context, dataCimi.getUnits()));
+    }
+
+    /**
+     * Copy data from a CIMI object to a service object.
+     * 
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
+     */
+    protected void doCopyToService(final CimiContext context, final CimiCapacity dataCimi, final DiskTemplate dataService) {
+        dataService.setQuantity(dataCimi.getQuantity().floatValue());
+        dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
+            .toService(context, dataCimi.getUnits()));
     }
 }

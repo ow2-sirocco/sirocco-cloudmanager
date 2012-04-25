@@ -115,7 +115,7 @@ public class CredentialsTemplateConverter extends CommonIdConverter implements E
      */
     protected void doCopyToService(final CimiContext context, final CimiCredentialsTemplate dataCimi,
         final CredentialsTemplate dataService) {
-        this.fill(dataCimi, dataService);
+        this.fill(context, dataCimi, dataService);
         dataService.setPublicKey(dataCimi.getKey());
         dataService.setPassword(dataCimi.getPassword());
         dataService.setUserName(dataCimi.getUserName());

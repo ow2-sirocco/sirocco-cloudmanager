@@ -54,6 +54,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MemoryConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MemoryUnitConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.StorageUnitConverter;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
@@ -202,6 +203,10 @@ public class ConfigFactory {
         case Machine:
             item = new ItemConfig(CimiEntityType.Machine, CimiMachine.class);
             item.putData(ConfigFactory.CONVERTER, new MachineConverter());
+            break;
+
+        case MachineAction:
+            item = new ItemConfig(CimiEntityType.MachineAction, CimiAction.class);
             break;
 
         case MachineCollection:

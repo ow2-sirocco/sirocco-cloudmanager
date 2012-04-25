@@ -135,7 +135,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineConfiguration dataCimi,
         final MachineConfiguration dataService) {
-        this.fill(dataCimi, dataService);
+        this.fill(context, dataCimi, dataService);
         if (null != dataCimi.getCpu()) {
             dataService.setCpu((Cpu) context.getConverter(CimiCpu.class).toService(context, dataCimi.getCpu()));
         }
@@ -148,6 +148,7 @@ public class MachineConfigurationConverter extends CommonIdConverter implements 
             for (CimiDiskConfiguration itemCimi : dataCimi.getDisks()) {
                 listServices.add((DiskTemplate) converter.toService(context, itemCimi));
             }
+            dataService.setDiskTemplates(listServices);
         }
     }
 

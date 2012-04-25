@@ -136,6 +136,6 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiJob dataCimi, final Job dataService) {
-        this.fill(dataCimi, dataService);
+        this.fill(context, dataCimi, dataService);
     }
 }

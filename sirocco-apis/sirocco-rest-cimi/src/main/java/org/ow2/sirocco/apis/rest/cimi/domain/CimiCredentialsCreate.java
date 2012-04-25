@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -41,6 +42,7 @@ public class CimiCredentialsCreate extends CimiCommon {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
+    @Valid
     @NotNull(groups = GroupCreateByValue.class)
     private CimiCredentialsTemplate credentialsTemplate;
 

@@ -47,7 +47,8 @@ public abstract class CimiManagerCreateAbstract extends CimiManagerAbstract {
             if (null == request.getCimiData()) {
                 valid = false;
             } else {
-                valid = CimiValidatorHelper.getInstance().validate(request, response, request.getCimiData(), GroupCreateByValue.class);
+                valid = CimiValidatorHelper.getInstance().validate(request, response, request.getCimiData(),
+                    GroupCreateByValue.class);
             }
         }
         return valid;
@@ -66,15 +67,4 @@ public abstract class CimiManagerCreateAbstract extends CimiManagerAbstract {
         // Nothing to do
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#addOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void addOperations(final CimiRequest request, final CimiResponse response, final Object dataService) {
-        // Nothing to do
-    }
 }

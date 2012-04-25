@@ -114,7 +114,7 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiCredentials dataCimi, final Credentials dataService) {
-        this.fill(dataCimi, dataService);
+        this.fill(context, dataCimi, dataService);
         dataService.setPublicKey(dataCimi.getKey());
         dataService.setPassword(dataCimi.getPassword());
         dataService.setUserName(dataCimi.getUserName());

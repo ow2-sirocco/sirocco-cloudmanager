@@ -70,16 +70,4 @@ public abstract class CimiManagerDeleteAbstract extends CimiManagerAbstract {
         response.setCimiData(null);
         response.setStatus(Response.Status.OK);
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#addOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void addOperations(final CimiRequest request, final CimiResponse response, final Object dataService) {
-        // Nothing to do
-    }
 }

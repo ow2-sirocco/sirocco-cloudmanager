@@ -51,7 +51,7 @@ public class CommonConverter {
     protected void fill(final CloudEntity dataService, final CimiCommon dataCimi) {
         dataCimi.setDescription(dataService.getDescription());
         dataCimi.setName(dataService.getName());
-        if (null != dataService.getProperties()) {
+        if ((null != dataService.getProperties()) && (dataService.getProperties().size() > 0)) {
             Map<String, String> props = new HashMap<String, String>();
             dataCimi.setProperties(props);
             props.putAll(dataService.getProperties());

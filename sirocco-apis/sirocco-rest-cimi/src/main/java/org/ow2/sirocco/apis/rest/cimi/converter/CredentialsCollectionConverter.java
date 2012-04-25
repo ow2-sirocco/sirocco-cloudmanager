@@ -113,13 +113,15 @@ public class CredentialsCollectionConverter extends CommonIdConverter implements
     protected void doCopyToCimi(final CimiContext context, final CredentialsCollection dataService,
         final CimiCredentialsCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if (null != dataService.getCredentials()) {
-            CimiConverter converter = context.getConverter(CimiCredentials.class);
-            List<CimiCredentials> cimiList = new ArrayList<CimiCredentials>();
-            for (Credentials machineImage : dataService.getCredentials()) {
-                cimiList.add((CimiCredentials) converter.toCimi(context, machineImage));
+        if (true == context.mustBeExpanded(dataCimi)) {
+            if ((null != dataService.getCredentials()) && (dataService.getCredentials().size() > 0)) {
+                CimiConverter converter = context.getConverter(CimiCredentials.class);
+                List<CimiCredentials> cimiList = new ArrayList<CimiCredentials>();
+                for (Credentials machineImage : dataService.getCredentials()) {
+                    cimiList.add((CimiCredentials) converter.toCimi(context, machineImage));
+                }
+                dataCimi.setCredentials(cimiList.toArray(new CimiCredentials[cimiList.size()]));
             }
-            dataCimi.setCredentials(cimiList.toArray(new CimiCredentials[cimiList.size()]));
         }
     }
 

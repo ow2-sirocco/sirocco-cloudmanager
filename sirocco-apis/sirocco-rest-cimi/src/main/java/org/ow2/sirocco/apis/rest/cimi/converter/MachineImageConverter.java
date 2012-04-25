@@ -120,7 +120,7 @@ public class MachineImageConverter extends CommonIdConverter implements EntityCo
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineImage dataCimi, final MachineImage dataService) {
-        this.fill(dataCimi, dataService);
+        this.fill(context, dataCimi, dataService);
         if (null != dataCimi.getImageLocation()) {
             dataService.setImageLocation(dataCimi.getImageLocation().getHref());
         }

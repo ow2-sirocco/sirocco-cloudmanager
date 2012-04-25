@@ -112,13 +112,15 @@ public class MachineConfigurationCollectionConverter extends CommonIdConverter i
     protected void doCopyToCimi(final CimiContext context, final MachineConfigurationCollection dataService,
         final CimiMachineConfigurationCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if (null != dataService.getMachineConfigurations()) {
-            CimiConverter converter = context.getConverter(CimiMachineConfiguration.class);
-            List<CimiMachineConfiguration> cimiList = new ArrayList<CimiMachineConfiguration>();
-            for (MachineConfiguration machineImage : dataService.getMachineConfigurations()) {
-                cimiList.add((CimiMachineConfiguration) converter.toCimi(context, machineImage));
+        if (true == context.mustBeExpanded(dataCimi)) {
+            if ((null != dataService.getMachineConfigurations()) && (dataService.getMachineConfigurations().size() > 0)) {
+                CimiConverter converter = context.getConverter(CimiMachineConfiguration.class);
+                List<CimiMachineConfiguration> cimiList = new ArrayList<CimiMachineConfiguration>();
+                for (MachineConfiguration machineImage : dataService.getMachineConfigurations()) {
+                    cimiList.add((CimiMachineConfiguration) converter.toCimi(context, machineImage));
+                }
+                dataCimi.setMachineConfigurations(cimiList.toArray(new CimiMachineConfiguration[cimiList.size()]));
             }
-            dataCimi.setMachineConfigurations(cimiList.toArray(new CimiMachineConfiguration[cimiList.size()]));
         }
     }
 

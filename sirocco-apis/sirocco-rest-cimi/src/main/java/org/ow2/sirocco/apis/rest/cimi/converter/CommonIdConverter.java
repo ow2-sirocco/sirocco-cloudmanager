@@ -59,4 +59,30 @@ public class CommonIdConverter extends CommonConverter {
         }
     }
 
+    /**
+     * Fill the common data from a CIMI object to a service object.
+     * 
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination service object
+     */
+    protected void fill(final CimiContext context, final CimiCommonId dataCimi, final CloudEntity dataService) {
+        this.fill(dataCimi, dataService);
+        if (null != dataCimi.getId()) {
+            dataService.setId(CommonIdConverter.extractId(dataCimi.getId()));
+        }
+    }
+
+    /**
+     * Extract the ID service of the HREF.
+     * 
+     * @param href The HREF
+     * @return The ID service
+     */
+    public static Integer extractId(final String href) {
+        Integer id = null;
+        int posId = href.lastIndexOf('/');
+        id = Integer.valueOf(href.substring(posId + 1));
+        return id;
+    }
 }

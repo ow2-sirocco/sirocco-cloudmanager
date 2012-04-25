@@ -37,7 +37,8 @@ public enum CimiEntityType {
     /** */
     Job(PathType.Job), JobCollection(PathType.Job),
     /** */
-    Machine(PathType.Machine), MachineCollection(PathType.Machine), MachineCreate(PathType.Machine),
+    Machine(PathType.Machine), MachineCollection(PathType.Machine), MachineCreate(PathType.Machine), MachineAction(
+        PathType.Machine),
     /** */
     MachineConfiguration(PathType.MachineConfiguration), MachineConfigurationCollection(PathType.MachineConfiguration),
     /** */

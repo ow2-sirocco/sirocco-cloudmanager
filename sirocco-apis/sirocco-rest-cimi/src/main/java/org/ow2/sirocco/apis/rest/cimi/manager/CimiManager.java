@@ -29,6 +29,12 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 
 public interface CimiManager {
 
+    /**
+     * Execute request and call service.
+     * 
+     * @param request The CIMI request
+     * @param response The CIMI response
+     */
     void execute(CimiRequest request, CimiResponse response);
 
 }

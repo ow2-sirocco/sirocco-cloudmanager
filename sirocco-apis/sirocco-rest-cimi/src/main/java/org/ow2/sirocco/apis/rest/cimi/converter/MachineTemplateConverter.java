@@ -175,7 +175,7 @@ public class MachineTemplateConverter extends CommonIdConverter implements Entit
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineTemplate dataCimi,
         final MachineTemplate dataService) {
-        this.fill(dataCimi, dataService);
+        this.fill(context, dataCimi, dataService);
         if (null != dataCimi.getCredentials()) {
             dataService.setCredentials((Credentials) context.getConverter(CimiCredentials.class).toService(context,
                 dataCimi.getCredentials()));
