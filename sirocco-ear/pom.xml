@@ -46,6 +46,12 @@
 			<version>${project.version}</version>
 			<type>ejb</type>
 		</dependency>
+		<dependency>
+			<groupId>org.ow2.sirocco.apis</groupId>
+			<artifactId>sirocco-rest-cimi</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
 
 	</dependencies>
 
@@ -66,6 +72,12 @@
 							<artifactId>sirocco-cloudmanager-core-manager</artifactId>
 							<bundleFileName>sirocco-core.jar</bundleFileName>
 						</ejbModule>
+						<webModule>
+							<groupId>org.ow2.sirocco.apis</groupId>
+							<artifactId>sirocco-rest-cimi</artifactId>
+							<bundleFileName>sirocco-rest-cimi.war</bundleFileName>
+							<contextRoot>sirocco-rest</contextRoot> 
+						</webModule>
 					</modules>
 					<archive>
 						<manifestEntries>
