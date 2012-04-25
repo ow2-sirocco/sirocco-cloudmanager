@@ -33,7 +33,6 @@ import junit.framework.Assert;
 import net.javacrumbs.jsonunit.JsonAssert;
 
 import org.custommonkey.xmlunit.XMLAssert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.json.JsonLocator;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.xml.XmlLocator;
@@ -172,169 +171,225 @@ public class CredentialsTemplateResourceSerializationTest extends SerializationT
      * 
      * @throws Exception In case of error
      */
-    @Test
-    @Ignore
-    public final void testGetCredentialsCollectionJson() throws Exception {
-        ClientResponse clientResponse = null;
-        String entityResponse;
-        int statusResponse;
-
-        // JSON : id = 0
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_JSON_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 0).get(ClientResponse.class);
-
-        statusResponse = clientResponse.getStatus();
-        entityResponse = clientResponse.getEntity(String.class);
-
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
-
-        Assert.assertEquals(200, statusResponse);
-        JsonAssert.assertJsonEquals(
-            SerializationHelper.getResourceAsReader(JsonLocator.class, "CredentialsTemplateCollection-0.json"),
-            new StringReader(entityResponse));
-
-        // JSON : id = 1
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_JSON_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 1).get(ClientResponse.class);
-
-        statusResponse = clientResponse.getStatus();
-        entityResponse = clientResponse.getEntity(String.class);
-
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
-
-        Assert.assertEquals(200, statusResponse);
-        JsonAssert.assertJsonEquals(
-            SerializationHelper.getResourceAsReader(JsonLocator.class, "CredentialsTemplateCollection-1.json"),
-            new StringReader(entityResponse));
-
-        // JSON : id = 3
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_JSON_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).get(ClientResponse.class);
-
-        statusResponse = clientResponse.getStatus();
-        entityResponse = clientResponse.getEntity(String.class);
-
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
-
-        Assert.assertEquals(200, statusResponse);
-        JsonAssert.assertJsonEquals(
-            SerializationHelper.getResourceAsReader(JsonLocator.class, "CredentialsTemplateCollection-3.json"),
-            new StringReader(entityResponse));
-
-        // JSON : id = 3, expand
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_JSON_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
-            .get(ClientResponse.class);
-
-        statusResponse = clientResponse.getStatus();
-        entityResponse = clientResponse.getEntity(String.class);
-
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
-
-        Assert.assertEquals(200, statusResponse);
-        JsonAssert.assertJsonEquals(
-            SerializationHelper.getResourceAsReader(JsonLocator.class, "CredentialsTemplateCollection-3-expand.json"),
-            new StringReader(entityResponse));
-    }
+    // @Test
+    // @Ignore
+    // public final void testGetCredentialsCollectionJson() throws Exception {
+    // ClientResponse clientResponse = null;
+    // String entityResponse;
+    // int statusResponse;
+    //
+    // // JSON : id = 0
+    // clientResponse =
+    // this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_JSON_TYPE)
+    // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+    // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
+    // 0).get(ClientResponse.class);
+    //
+    // statusResponse = clientResponse.getStatus();
+    // entityResponse = clientResponse.getEntity(String.class);
+    //
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}",
+    // clientResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}",
+    // statusResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}",
+    // entityResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}",
+    // clientResponse.getHeaders());
+    //
+    // Assert.assertEquals(200, statusResponse);
+    // JsonAssert.assertJsonEquals(
+    // SerializationHelper.getResourceAsReader(JsonLocator.class,
+    // "CredentialsTemplateCollection-0.json"),
+    // new StringReader(entityResponse));
+    //
+    // // JSON : id = 1
+    // clientResponse =
+    // this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_JSON_TYPE)
+    // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+    // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
+    // 1).get(ClientResponse.class);
+    //
+    // statusResponse = clientResponse.getStatus();
+    // entityResponse = clientResponse.getEntity(String.class);
+    //
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}",
+    // clientResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}",
+    // statusResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}",
+    // entityResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}",
+    // clientResponse.getHeaders());
+    //
+    // Assert.assertEquals(200, statusResponse);
+    // JsonAssert.assertJsonEquals(
+    // SerializationHelper.getResourceAsReader(JsonLocator.class,
+    // "CredentialsTemplateCollection-1.json"),
+    // new StringReader(entityResponse));
+    //
+    // // JSON : id = 3
+    // clientResponse =
+    // this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_JSON_TYPE)
+    // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+    // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
+    // 3).get(ClientResponse.class);
+    //
+    // statusResponse = clientResponse.getStatus();
+    // entityResponse = clientResponse.getEntity(String.class);
+    //
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}",
+    // clientResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}",
+    // statusResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}",
+    // entityResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}",
+    // clientResponse.getHeaders());
+    //
+    // Assert.assertEquals(200, statusResponse);
+    // JsonAssert.assertJsonEquals(
+    // SerializationHelper.getResourceAsReader(JsonLocator.class,
+    // "CredentialsTemplateCollection-3.json"),
+    // new StringReader(entityResponse));
+    //
+    // // JSON : id = 3, expand
+    // clientResponse =
+    // this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_JSON_TYPE)
+    // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+    // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
+    // 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
+    // .get(ClientResponse.class);
+    //
+    // statusResponse = clientResponse.getStatus();
+    // entityResponse = clientResponse.getEntity(String.class);
+    //
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}",
+    // clientResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}",
+    // statusResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}",
+    // entityResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}",
+    // clientResponse.getHeaders());
+    //
+    // Assert.assertEquals(200, statusResponse);
+    // JsonAssert.assertJsonEquals(
+    // SerializationHelper.getResourceAsReader(JsonLocator.class,
+    // "CredentialsTemplateCollection-3-expand.json"),
+    // new StringReader(entityResponse));
+    // }
 
     /**
      * Test GET.
      * 
      * @throws Exception In case of error
      */
-    @Test
-    @Ignore
-    public final void testGetCredentialsCollectionXml() throws Exception {
-        ClientResponse clientResponse = null;
-        String entityResponse;
-        int statusResponse;
-
-        // XML : id = 0
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_XML_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 0).get(ClientResponse.class);
-
-        statusResponse = clientResponse.getStatus();
-        entityResponse = clientResponse.getEntity(String.class);
-
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
-
-        Assert.assertEquals(200, statusResponse);
-        XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class,
-            "CredentialsTemplateCollection-0.xml"), new StringReader(entityResponse));
-
-        // XML : id = 1
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_XML_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 1).get(ClientResponse.class);
-
-        statusResponse = clientResponse.getStatus();
-        entityResponse = clientResponse.getEntity(String.class);
-
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
-
-        Assert.assertEquals(200, statusResponse);
-        XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class,
-            "CredentialsTemplateCollection-1.xml"), new StringReader(entityResponse));
-
-        // XML : id = 3
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_XML_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).get(ClientResponse.class);
-
-        statusResponse = clientResponse.getStatus();
-        entityResponse = clientResponse.getEntity(String.class);
-
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
-
-        Assert.assertEquals(200, statusResponse);
-        XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class,
-            "CredentialsTemplateCollection-3.xml"), new StringReader(entityResponse));
-
-        // XML : id = 3, expand
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_XML_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
-            .get(ClientResponse.class);
-
-        statusResponse = clientResponse.getStatus();
-        entityResponse = clientResponse.getEntity(String.class);
-
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}", clientResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}", statusResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}", entityResponse);
-        CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}", clientResponse.getHeaders());
-
-        Assert.assertEquals(200, statusResponse);
-        XMLAssert.assertXMLEqual(
-            SerializationHelper.getResourceAsReader(XmlLocator.class, "CredentialsTemplateCollection-3-expand.xml"),
-            new StringReader(entityResponse));
-    }
+    // @Test
+    // @Ignore
+    // public final void testGetCredentialsCollectionXml() throws Exception {
+    // ClientResponse clientResponse = null;
+    // String entityResponse;
+    // int statusResponse;
+    //
+    // // XML : id = 0
+    // clientResponse =
+    // this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_XML_TYPE)
+    // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+    // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
+    // 0).get(ClientResponse.class);
+    //
+    // statusResponse = clientResponse.getStatus();
+    // entityResponse = clientResponse.getEntity(String.class);
+    //
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}",
+    // clientResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}",
+    // statusResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}",
+    // entityResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}",
+    // clientResponse.getHeaders());
+    //
+    // Assert.assertEquals(200, statusResponse);
+    // XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class,
+    // "CredentialsTemplateCollection-0.xml"), new
+    // StringReader(entityResponse));
+    //
+    // // XML : id = 1
+    // clientResponse =
+    // this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_XML_TYPE)
+    // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+    // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
+    // 1).get(ClientResponse.class);
+    //
+    // statusResponse = clientResponse.getStatus();
+    // entityResponse = clientResponse.getEntity(String.class);
+    //
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}",
+    // clientResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}",
+    // statusResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}",
+    // entityResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}",
+    // clientResponse.getHeaders());
+    //
+    // Assert.assertEquals(200, statusResponse);
+    // XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class,
+    // "CredentialsTemplateCollection-1.xml"), new
+    // StringReader(entityResponse));
+    //
+    // // XML : id = 3
+    // clientResponse =
+    // this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_XML_TYPE)
+    // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+    // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
+    // 3).get(ClientResponse.class);
+    //
+    // statusResponse = clientResponse.getStatus();
+    // entityResponse = clientResponse.getEntity(String.class);
+    //
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}",
+    // clientResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}",
+    // statusResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}",
+    // entityResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}",
+    // clientResponse.getHeaders());
+    //
+    // Assert.assertEquals(200, statusResponse);
+    // XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class,
+    // "CredentialsTemplateCollection-3.xml"), new
+    // StringReader(entityResponse));
+    //
+    // // XML : id = 3, expand
+    // clientResponse =
+    // this.resource().path(ConstantsPath.CREDENTIALS_TEMPLATE).accept(MediaType.APPLICATION_XML_TYPE)
+    // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+    // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
+    // 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
+    // .get(ClientResponse.class);
+    //
+    // statusResponse = clientResponse.getStatus();
+    // entityResponse = clientResponse.getEntity(String.class);
+    //
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("COMPLETE:\n\t{}",
+    // clientResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("STATUS: {}",
+    // statusResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("ENTITY:\n\t{}",
+    // entityResponse);
+    // CredentialsTemplateResourceSerializationTest.LOGGER.debug("HEADER:\n\t{}",
+    // clientResponse.getHeaders());
+    //
+    // Assert.assertEquals(200, statusResponse);
+    // XMLAssert.assertXMLEqual(
+    // SerializationHelper.getResourceAsReader(XmlLocator.class,
+    // "CredentialsTemplateCollection-3-expand.xml"),
+    // new StringReader(entityResponse));
+    // }
 
     /**
      * Test PUT.

@@ -69,7 +69,7 @@ public class CreatingEntityByValueValidatorTest {
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, cimi,
             GroupCreateByValue.class));
 
-        template = new CimiCredentialsTemplate("user", "pass", new byte[1]);
+        template = new CimiCredentialsTemplate("user", "pass", null);
         cimi = new CimiCredentialsCreate();
         cimi.setCredentialsTemplate(template);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, cimi,
@@ -84,19 +84,19 @@ public class CreatingEntityByValueValidatorTest {
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, cimi,
             GroupCreateByValue.class));
 
+        cimi = new CimiCredentialsTemplate("user", "pass", null);
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, cimi,
+            GroupCreateByValue.class));
+
         cimi = new CimiCredentialsTemplate("user", "pass", new byte[1]);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, cimi,
             GroupCreateByValue.class));
 
-        cimi = new CimiCredentialsTemplate("user", "pass", null);
+        cimi = new CimiCredentialsTemplate("user", null, null);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, cimi,
             GroupCreateByValue.class));
 
-        cimi = new CimiCredentialsTemplate("user", null, new byte[1]);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, cimi,
-            GroupCreateByValue.class));
-
-        cimi = new CimiCredentialsTemplate(null, "pass", new byte[1]);
+        cimi = new CimiCredentialsTemplate(null, "pass", null);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, cimi,
             GroupCreateByValue.class));
     }

@@ -57,7 +57,7 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>SiroccoRestCimiServlet</servlet-name>
-		<url-pattern>/sirocco-rest/*</url-pattern>
+		<url-pattern>/cimi/*</url-pattern>
 	</servlet-mapping>
 </web-app>
 

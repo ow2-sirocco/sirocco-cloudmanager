@@ -250,6 +250,9 @@ public class WritingEntityValidatorTest {
             case Machine:
                 cimi = new CimiMachine();
                 break;
+            case MachineAction:
+                cimi = null;
+                break;
             case MachineCollection:
                 cimi = new CimiMachineCollection();
                 break;

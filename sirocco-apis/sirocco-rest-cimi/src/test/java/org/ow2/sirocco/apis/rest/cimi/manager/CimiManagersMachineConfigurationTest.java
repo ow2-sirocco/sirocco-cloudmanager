@@ -43,6 +43,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
+import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -124,8 +125,8 @@ public class CimiManagersMachineConfigurationTest {
         MachineConfiguration create = new MachineConfiguration();
         create.setId(456);
 
-        EasyMock.expect(this.service.createMachineConfiguration(EasyMock.anyObject(MachineConfiguration.class)))
-            .andReturn(create);
+        EasyMock.expect(this.service.createMachineConfiguration(EasyMock.anyObject(MachineConfiguration.class))).andReturn(
+            create);
         EasyMock.replay(this.service);
 
         CimiMachineConfiguration cimi = new CimiMachineConfiguration();
@@ -136,6 +137,9 @@ public class CimiManagersMachineConfigurationTest {
         this.managerCreate.execute(this.request, this.response);
 
         Assert.assertEquals(201, this.response.getStatus());
+        Assert.assertNotNull(this.response.getHeaders());
+        Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH + "/456",
+            this.response.getHeaders().get(Constants.HEADER_LOCATION));
         Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH + "/456",
             ((CimiMachineConfiguration) this.response.getCimiData()).getId());
         EasyMock.verify(this.service);

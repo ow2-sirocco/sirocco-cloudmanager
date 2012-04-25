@@ -139,6 +139,7 @@ public class CimiManagersMachineTest {
     public void testActionStart() throws Exception {
         Job job = new Job();
         job.setId(123);
+        job.setTargetEntity("1789");
 
         EasyMock.expect(this.service.startMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
@@ -151,6 +152,8 @@ public class CimiManagersMachineTest {
 
         Assert.assertEquals(202, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/1789", ((CimiJob) this.response.getCimiData()).getTargetEntity());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/1789", this.response.getHeaders().get("Location"));
         EasyMock.verify(this.service);
     }
 
@@ -158,6 +161,7 @@ public class CimiManagersMachineTest {
     public void testActionStop() throws Exception {
         Job job = new Job();
         job.setId(123);
+        job.setTargetEntity("7");
 
         EasyMock.expect(this.service.stopMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
@@ -170,6 +174,8 @@ public class CimiManagersMachineTest {
 
         Assert.assertEquals(202, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/7", ((CimiJob) this.response.getCimiData()).getTargetEntity());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/7", this.response.getHeaders().get("Location"));
         EasyMock.verify(this.service);
     }
 
@@ -177,6 +183,7 @@ public class CimiManagersMachineTest {
     public void testCreate() throws Exception {
         Job job = new Job();
         job.setId(123);
+        job.setTargetEntity("789");
 
         EasyMock.expect(this.service.createMachine(EasyMock.anyObject(MachineCreate.class))).andReturn(job);
         EasyMock.replay(this.service);
@@ -192,6 +199,8 @@ public class CimiManagersMachineTest {
 
         Assert.assertEquals(202, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/789", ((CimiJob) this.response.getCimiData()).getTargetEntity());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/789", this.response.getHeaders().get("Location"));
         EasyMock.verify(this.service);
     }
 
@@ -233,6 +242,7 @@ public class CimiManagersMachineTest {
     public void testDelete() throws Exception {
         Job job = new Job();
         job.setId(123);
+        job.setTargetEntity("1789");
 
         EasyMock.expect(this.service.deleteMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
@@ -242,6 +252,8 @@ public class CimiManagersMachineTest {
 
         Assert.assertEquals(202, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/1789", ((CimiJob) this.response.getCimiData()).getTargetEntity());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/1789", this.response.getHeaders().get("Location"));
         EasyMock.verify(this.service);
     }
 
@@ -249,6 +261,7 @@ public class CimiManagersMachineTest {
     public void testUpdate() throws Exception {
         Job job = new Job();
         job.setId(123);
+        job.setTargetEntity("789");
 
         EasyMock.expect(this.service.updateMachine(EasyMock.anyObject(Machine.class))).andReturn(job);
         EasyMock.replay(this.service);
@@ -262,6 +275,8 @@ public class CimiManagersMachineTest {
 
         Assert.assertEquals(202, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/789", ((CimiJob) this.response.getCimiData()).getTargetEntity());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/789", this.response.getHeaders().get("Location"));
         EasyMock.verify(this.service);
     }
 
@@ -272,6 +287,7 @@ public class CimiManagersMachineTest {
         map.put("description", "fooDescription");
         Job job = new Job();
         job.setId(123);
+        job.setTargetEntity("654");
 
         EasyMock.expect(this.service.updateMachineAttributes(EasyMock.eq("1"), EasyMock.eq(map))).andReturn(job);
         EasyMock.replay(this.service);
@@ -287,6 +303,8 @@ public class CimiManagersMachineTest {
 
         Assert.assertEquals(202, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/654", ((CimiJob) this.response.getCimiData()).getTargetEntity());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/654", this.response.getHeaders().get("Location"));
         EasyMock.verify(this.service);
     }
 

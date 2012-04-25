@@ -43,6 +43,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
+import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
@@ -135,6 +136,8 @@ public class CimiManagersCredentialsTest {
         this.managerCreate.execute(this.request, this.response);
 
         Assert.assertEquals(201, this.response.getStatus());
+        Assert.assertNotNull(this.response.getHeaders());
+        Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH + "/456", this.response.getHeaders().get(Constants.HEADER_LOCATION));
         Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH + "/456", ((CimiCredentials) this.response.getCimiData()).getId());
         EasyMock.verify(this.service);
     }
