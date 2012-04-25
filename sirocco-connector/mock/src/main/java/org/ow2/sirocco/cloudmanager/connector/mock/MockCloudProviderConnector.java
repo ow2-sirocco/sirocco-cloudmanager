@@ -197,25 +197,29 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         machine.setCpu(new Cpu(machineCreate.getMachineTemplate().getMachineConfiguration().getCpu()));
         machine.setMemory(machineCreate.getMachineTemplate().getMachineConfiguration().getMemory());
         List<Disk> disks = new ArrayList<Disk>();
-        for (DiskTemplate diskTemplate : machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates()) {
-            Disk disk = new Disk();
-            // TODO
-            // disk.setDiskUnit(diskTemplate.getDiskUnit());
-            disk.setQuantity(diskTemplate.getQuantity());
-            disks.add(disk);
+        if (machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates() != null) {
+            for (DiskTemplate diskTemplate : machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates()) {
+                Disk disk = new Disk();
+                // TODO
+                // disk.setDiskUnit(diskTemplate.getDiskUnit());
+                disk.setQuantity(diskTemplate.getQuantity());
+                disks.add(disk);
+            }
         }
         machine.setDisks(disks);
         List<NetworkInterface> networkInterfaces = new ArrayList<NetworkInterface>();
-        for (NetworkInterface networkInterface : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
-            NetworkInterface newNetIntf = new NetworkInterface();
-            newNetIntf.setAddress(networkInterface.getAddress());
-            newNetIntf.setAllocation(networkInterface.getAllocation());
-            newNetIntf.setDefaultGateway(networkInterface.getDefaultGateway());
-            newNetIntf.setHostname(networkInterface.getHostname());
-            newNetIntf.setMacAddress(networkInterface.getMacAddress());
-            newNetIntf.setProtocol(networkInterface.getProtocol());
-            newNetIntf.setState(InterfaceState.STANDBY);
-            networkInterfaces.add(newNetIntf);
+        if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
+            for (NetworkInterface networkInterface : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
+                NetworkInterface newNetIntf = new NetworkInterface();
+                newNetIntf.setAddress(networkInterface.getAddress());
+                newNetIntf.setAllocation(networkInterface.getAllocation());
+                newNetIntf.setDefaultGateway(networkInterface.getDefaultGateway());
+                newNetIntf.setHostname(networkInterface.getHostname());
+                newNetIntf.setMacAddress(networkInterface.getMacAddress());
+                newNetIntf.setProtocol(networkInterface.getProtocol());
+                newNetIntf.setState(InterfaceState.STANDBY);
+                networkInterfaces.add(newNetIntf);
+            }
         }
         machine.setNetworkInterfaces(networkInterfaces);
 
