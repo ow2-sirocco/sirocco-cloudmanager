@@ -24,11 +24,17 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.cep;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -72,8 +78,10 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
         out.setMachines(this.machineManager.getMachineCollection());
         out.setMachineTemplates(this.machineManager.getMachineTemplateCollection());
         out.setMachineImages(this.machineImageManager.getMachineImageCollection());
-        out.setCredentials(this.credentialsManager.getCredentialsCollection());
-        out.setCredentialsTemplates(this.credentialsManager.getCredentialsTemplateCollection());
+        // FIXME
+        // out.setCredentials(this.credentialsManager.getCredentialsCollection());
+        // FIXME
+        // out.setCredentialsTemplates(this.credentialsManager.getCredentialsTemplateCollection());
         // TODO Volumes, ...
         // TODO CimiSelect
         return out;
@@ -95,4 +103,20 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
         response.setStatus(Response.Status.OK);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void afterConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService) {
+        super.afterConvertToResponse(request, response, dataService);
+
+        CimiCommonId common = (CimiCommonId) response.getCimiData();
+        List<CimiOperation> ops = new ArrayList<CimiOperation>();
+        ops.add(new CimiOperation(Operation.EDIT.getRel(), common.getId()));
+        common.setOperations(ops.toArray(new CimiOperation[ops.size()]));
+    }
 }

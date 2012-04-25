@@ -28,7 +28,6 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiHref;
 
 /**
  *
@@ -109,7 +108,7 @@ public interface CimiContext {
      * @param entity The instance of a CIMI entity
      * @return True if must have a ID.
      */
-    boolean mustHaveIdInReference(final CimiHref entity);
+    boolean mustHaveIdInReference(final CimiData entity);
 
     /**
      * Make the base HREF without ID.
@@ -117,7 +116,7 @@ public interface CimiContext {
      * @param data
      * @return
      */
-    String makeHrefBase(final CimiHref data);
+    String makeHrefBase(final CimiData data);
 
     /**
      * Make a HREF.
@@ -126,7 +125,7 @@ public interface CimiContext {
      * @param id Service ID
      * @return The HREF made
      */
-    String makeHref(final CimiHref entity, final String id);
+    String makeHref(final CimiData entity, final String id);
 
     /**
      * Make a HREF.
@@ -135,6 +134,6 @@ public interface CimiContext {
      * @param id Service ID
      * @return The HREF made
      */
-    String makeHref(final CimiHref entity, final Integer id);
+    String makeHref(final CimiData entity, final Integer id);
 
 }

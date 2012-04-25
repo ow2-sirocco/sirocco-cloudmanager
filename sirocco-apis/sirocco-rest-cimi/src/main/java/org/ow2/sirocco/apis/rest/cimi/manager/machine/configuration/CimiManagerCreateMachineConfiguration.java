@@ -31,6 +31,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,7 @@ public class CimiManagerCreateMachineConfiguration extends CimiManagerCreateAbst
         CimiMachineConfiguration cimi = (CimiMachineConfiguration) request.getContext()
             .getRootConverter(CimiEntityType.MachineConfiguration).toCimi(request.getContext(), dataService);
         response.setCimiData(cimi);
+        response.putHeader(Constants.HEADER_LOCATION, cimi.getId());
         response.setStatus(Response.Status.CREATED);
     }
 }

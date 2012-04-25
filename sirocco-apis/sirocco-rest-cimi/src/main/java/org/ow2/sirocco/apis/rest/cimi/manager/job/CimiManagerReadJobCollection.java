@@ -97,12 +97,14 @@ public class CimiManagerReadJobCollection extends CimiManagerReadAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#addOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
      *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
      *      java.lang.Object)
      */
     @Override
-    protected void addOperations(final CimiRequest request, final CimiResponse response, final Object dataService) {
+    protected void afterConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService) {
+        super.afterConvertToResponse(request, response, dataService);
+
         CimiCommonId common = (CimiCommonId) response.getCimiData();
         List<CimiOperation> ops = new ArrayList<CimiOperation>();
         ops.add(new CimiOperation(Operation.ADD.getRel(), common.getId()));

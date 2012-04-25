@@ -31,6 +31,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,6 +86,7 @@ public class CimiManagerCreateCredentials extends CimiManagerCreateAbstract {
         CimiCredentials cimi = (CimiCredentials) request.getContext().getRootConverter(CimiEntityType.Credentials)
             .toCimi(request.getContext(), dataService);
         response.setCimiData(cimi);
+        response.putHeader(Constants.HEADER_LOCATION, cimi.getId());
         response.setStatus(Response.Status.CREATED);
     }
 }

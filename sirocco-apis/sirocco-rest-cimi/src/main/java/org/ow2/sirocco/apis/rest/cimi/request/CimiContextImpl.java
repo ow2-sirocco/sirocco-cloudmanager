@@ -29,7 +29,6 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiHref;
 
 /**
  * .
@@ -181,10 +180,10 @@ public class CimiContextImpl implements CimiContext {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#mustHaveIdInReference(org.ow2.sirocco.apis.rest.cimi.domain.CimiHref)
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#mustHaveIdInReference(org.ow2.sirocco.apis.rest.cimi.domain.CimiData)
      */
     @Override
-    public boolean mustHaveIdInReference(final CimiHref data) {
+    public boolean mustHaveIdInReference(final CimiData data) {
         boolean withId = true;
         CimiEntityType type = AppConfig.getType(data);
         switch (type) {
@@ -208,10 +207,10 @@ public class CimiContextImpl implements CimiContext {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(org.ow2.sirocco
-     *      .apis.rest.cimi.domain.CimiCommonId, java.lang.String)
+     *      .apis.rest.cimi.domain.CimiData, java.lang.String)
      */
     @Override
-    public String makeHrefBase(final CimiHref data) {
+    public String makeHrefBase(final CimiData data) {
         return this.makeHref(data, (Integer) null);
     }
 
@@ -219,10 +218,10 @@ public class CimiContextImpl implements CimiContext {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(org.ow2.sirocco
-     *      .apis.rest.cimi.domain.CimiCommonId, java.lang.String)
+     *      .apis.rest.cimi.domain.CimiData, java.lang.String)
      */
     @Override
-    public String makeHref(final CimiHref data, final String id) {
+    public String makeHref(final CimiData data, final String id) {
         return this.makeHref(data, Integer.valueOf(id));
     }
 
@@ -230,10 +229,10 @@ public class CimiContextImpl implements CimiContext {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(org.ow2.sirocco
-     *      .apis.rest.cimi.domain.CimiCommonId, java.lang.Integer)
+     *      .apis.rest.cimi.domain.CimiData, java.lang.Integer)
      */
     @Override
-    public String makeHref(final CimiHref data, final Integer id) {
+    public String makeHref(final CimiData data, final Integer id) {
         StringBuilder sb = new StringBuilder();
         CimiEntityType type = AppConfig.getType(data);
         sb.append(this.request.getBaseUri()).append(type.getPathType().getPathname());

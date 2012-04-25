@@ -24,10 +24,17 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
+import javax.ws.rs.core.Response;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerDeleteAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -55,4 +62,26 @@ public class CimiManagerDeleteMachine extends CimiManagerDeleteAbstract {
         return this.manager.deleteMachine(request.getId());
     }
 
+    /**
+     * Call after the conversion.
+     * 
+     * @param request The CIMI request
+     * @param response The CIMI response
+     * @param dataService The output service data
+     */
+    @Override
+    protected void afterConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService) {
+        if (null == response.getCimiData()) {
+            // Job
+            if (dataService instanceof Job) {
+                CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
+                    .toCimi(request.getContext(), dataService);
+                response.setCimiData(cimi);
+                response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
+                cimi.setTargetEntity(request.getContext().makeHref(new CimiMachine(), cimi.getTargetEntity()));
+                response.putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
+                response.setStatus(Response.Status.ACCEPTED);
+            }
+        }
+    }
 }
