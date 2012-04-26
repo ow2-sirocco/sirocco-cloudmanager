@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration debug="false"
+	xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+
+	<appender name="NULL" class="org.apache.log4j.ConsoleAppender">
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="" />
+		</layout>
+	</appender>
+
+	<appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-8p [%t]:%C - %m%n" />
+		</layout>
+	</appender>
+
+
+	<category name="org.springframework">
+		<priority value="error" />
+	</category>
+	<category name="org.hibernate.validator">
+		<priority value="error" />
+	</category>
+
+	<root>
+		<priority value="error" />
+		<appender-ref ref="CONSOLE" />
+	</root>
+</log4j:configuration>

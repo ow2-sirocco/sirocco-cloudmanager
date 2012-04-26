@@ -1,0 +1,43 @@
+{
+	"id":"idValue_2",
+	"name":"nameValue_2",
+	"description":"descriptionValue_2",
+	"created":"2002-03-03T02:02:02.002+0000",
+	"updated":"2002-03-03T02:02:02.002+0000",
+	"href":"hrefValue_2",
+	"properties":{
+		"keyProp_2_0":"valueProp_2_0",
+		"keyProp_2_1":"valueProp_2_1"
+	},
+	"operations":[
+		{
+			"rel":"relValue_2_0",
+			"href":"hrefValue_2_0"
+		},
+		{
+			"rel":"relValue_2_1",
+			"href":"hrefValue_2_1"
+		}
+		
+	],
+	"targetEntity":"targetEntityValue_2",
+	"action":"actionValue_2",
+	"status":"statusValue_2",
+	"returnCode":2,
+	"progress":2,
+	"statusMessage":"statusMessageValue_2",
+	"timeOfStatusChange":"2002-03-03T02:02:02.002+0000",
+	"isCancellable":true,
+	"parentJob":{
+		"href":"hrefParentValue_2"
+	},
+	"nestedJobs":[
+		{
+			"href":"hrefNestedValue_2_2_0"
+		},
+		{
+			"href":"hrefNestedValue_2_2_1"
+		}
+		
+	]
+}

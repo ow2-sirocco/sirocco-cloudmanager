@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MachineImage href="hrefValue_2">
+	<id>idValue_2</id>
+	<name>nameValue_2</name>
+	<description>descriptionValue_2</description>
+	<created>2002-03-03T03:02:02.002+01:00</created>
+	<updated>2002-03-03T03:02:02.002+01:00</updated>
+	<property key="keyProp_2_0">valueProp_2_0</property>
+	<property key="keyProp_2_1">valueProp_2_1</property>
+	<state>stateValue_2</state>
+	<type>typeValue_2</type>
+	<imageLocation href="hrefImageLocation_2" />
+	<operation href="hrefValue_2_0" rel="relValue_2_0" />
+	<operation href="hrefValue_2_1" rel="relValue_2_1" />
+</MachineImage>

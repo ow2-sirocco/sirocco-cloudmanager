@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MachineConfigurationCollection href="hrefValue_3">
+	<description>descriptionValue_3</description>
+	<name>nameValue_3</name>
+	<property key="keyProp_3_0">valueProp_3_0</property>
+	<property key="keyProp_3_2">valueProp_3_2</property>
+	<property key="keyProp_3_1">valueProp_3_1</property>
+	<created>2003-04-04T04:03:03.003+02:00</created>
+	<id>idValue_3</id>
+	<operation href="hrefValue_3_0" rel="relValue_3_0" />
+	<operation href="hrefValue_3_1" rel="relValue_3_1" />
+	<operation href="hrefValue_3_2" rel="relValue_3_2" />
+	<updated>2003-04-04T04:03:03.003+02:00</updated>
+	<machineConfiguration href="hrefValue_3_0">
+		<description>descriptionValue_3_0</description>
+		<name>nameValue_3_0</name>
+		<property key="keyProp_3_0">valueProp_3_0</property>
+		<property key="keyProp_3_2">valueProp_3_2</property>
+		<property key="keyProp_3_1">valueProp_3_1</property>
+		<created>2003-04-04T04:03:03.003+02:00</created>
+		<id>idValue_3_0</id>
+		<operation href="hrefValue_3_0" rel="relValue_3_0" />
+		<operation href="hrefValue_3_1" rel="relValue_3_1" />
+		<operation href="hrefValue_3_2" rel="relValue_3_2" />
+		<updated>2003-04-04T04:03:03.003+02:00</updated>
+		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_0" />
+		<disk>
+			<capacity quantity="3" units="unitValue_3_0" />
+			<attachmentPoint>attachmentPointValue_3_0</attachmentPoint>
+			<format>formatValue_3_0</format>
+		</disk>
+		<disk>
+			<capacity quantity="3" units="unitValue_3_1" />
+			<attachmentPoint>attachmentPointValue_3_1</attachmentPoint>
+			<format>formatValue_3_1</format>
+		</disk>
+		<disk>
+			<capacity quantity="3" units="unitValue_3_2" />
+			<attachmentPoint>attachmentPointValue_3_2</attachmentPoint>
+			<format>formatValue_3_2</format>
+		</disk>
+		<memory quantity="3" units="unitValue_3_0" />
+	</machineConfiguration>
+	<machineConfiguration href="hrefValue_3_1">
+		<description>descriptionValue_3_1</description>
+		<name>nameValue_3_1</name>
+		<property key="keyProp_3_0">valueProp_3_0</property>
+		<property key="keyProp_3_2">valueProp_3_2</property>
+		<property key="keyProp_3_1">valueProp_3_1</property>
+		<created>2003-04-04T04:03:03.003+02:00</created>
+		<id>idValue_3_1</id>
+		<operation href="hrefValue_3_0" rel="relValue_3_0" />
+		<operation href="hrefValue_3_1" rel="relValue_3_1" />
+		<operation href="hrefValue_3_2" rel="relValue_3_2" />
+		<updated>2003-04-04T04:03:03.003+02:00</updated>
+		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_1" />
+		<disk>
+			<capacity quantity="3" units="unitValue_3_0" />
+			<attachmentPoint>attachmentPointValue_3_0</attachmentPoint>
+			<format>formatValue_3_0</format>
+		</disk>
+		<disk>
+			<capacity quantity="3" units="unitValue_3_1" />
+			<attachmentPoint>attachmentPointValue_3_1</attachmentPoint>
+			<format>formatValue_3_1</format>
+		</disk>
+		<disk>
+			<capacity quantity="3" units="unitValue_3_2" />
+			<attachmentPoint>attachmentPointValue_3_2</attachmentPoint>
+			<format>formatValue_3_2</format>
+		</disk>
+		<memory quantity="3" units="unitValue_3_1" />
+	</machineConfiguration>
+	<machineConfiguration href="hrefValue_3_2">
+		<description>descriptionValue_3_2</description>
+		<name>nameValue_3_2</name>
+		<property key="keyProp_3_0">valueProp_3_0</property>
+		<property key="keyProp_3_2">valueProp_3_2</property>
+		<property key="keyProp_3_1">valueProp_3_1</property>
+		<created>2003-04-04T04:03:03.003+02:00</created>
+		<id>idValue_3_2</id>
+		<operation href="hrefValue_3_0" rel="relValue_3_0" />
+		<operation href="hrefValue_3_1" rel="relValue_3_1" />
+		<operation href="hrefValue_3_2" rel="relValue_3_2" />
+		<updated>2003-04-04T04:03:03.003+02:00</updated>
+		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_2" />
+		<disk>
+			<capacity quantity="3" units="unitValue_3_0" />
+			<attachmentPoint>attachmentPointValue_3_0</attachmentPoint>
+			<format>formatValue_3_0</format>
+		</disk>
+		<disk>
+			<capacity quantity="3" units="unitValue_3_1" />
+			<attachmentPoint>attachmentPointValue_3_1</attachmentPoint>
+			<format>formatValue_3_1</format>
+		</disk>
+		<disk>
+			<capacity quantity="3" units="unitValue_3_2" />
+			<attachmentPoint>attachmentPointValue_3_2</attachmentPoint>
+			<format>formatValue_3_2</format>
+		</disk>
+		<memory quantity="3" units="unitValue_3_2" />
+	</machineConfiguration>
+</MachineConfigurationCollection>

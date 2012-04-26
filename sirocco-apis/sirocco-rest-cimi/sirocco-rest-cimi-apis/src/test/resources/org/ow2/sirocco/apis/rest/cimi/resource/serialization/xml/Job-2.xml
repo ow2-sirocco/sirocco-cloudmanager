@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Job href="hrefValue_2">
+	<created>2002-03-03T03:02:02.002+01:00</created>
+	<description>descriptionValue_2</description>
+	<id>idValue_2</id>
+	<name>nameValue_2</name>
+	<operation href="hrefValue_2_0" rel="relValue_2_0" />
+	<operation href="hrefValue_2_1" rel="relValue_2_1" />
+	<property key="keyProp_2_0">valueProp_2_0</property>
+	<property key="keyProp_2_1">valueProp_2_1</property>
+	<updated>2002-03-03T03:02:02.002+01:00</updated>
+	<action>actionValue_2</action>
+	<isCancellable>true</isCancellable>
+	<nestedJob href="hrefNestedValue_2_2_0" />
+	<nestedJob href="hrefNestedValue_2_2_1" />
+	<parentJob href="hrefParentValue_2" />
+	<progress>2</progress>
+	<returnCode>2</returnCode>
+	<status>statusValue_2</status>
+	<statusMessage>statusMessageValue_2</statusMessage>
+	<targetEntity>targetEntityValue_2</targetEntity>
+	<timeOfStatusChange>2002-03-03T03:02:02.002+01:00</timeOfStatusChange>
+</Job>

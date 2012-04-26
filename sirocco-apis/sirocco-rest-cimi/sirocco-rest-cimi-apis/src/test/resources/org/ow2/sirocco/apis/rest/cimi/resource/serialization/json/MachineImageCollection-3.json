@@ -1,0 +1,40 @@
+{
+	"id":"idValue_3",
+	"name":"nameValue_3",
+	"description":"descriptionValue_3",
+	"created":"2003-04-04T02:03:03.003+0000",
+	"updated":"2003-04-04T02:03:03.003+0000",
+	"properties":{
+		"keyProp_3_0":"valueProp_3_0",
+		"keyProp_3_2":"valueProp_3_2",
+		"keyProp_3_1":"valueProp_3_1"
+	},
+	"operations":[
+		{
+			"rel":"relValue_3_0",
+			"href":"hrefValue_3_0"
+		},
+		{
+			"rel":"relValue_3_1",
+			"href":"hrefValue_3_1"
+		},
+		{
+			"rel":"relValue_3_2",
+			"href":"hrefValue_3_2"
+		}
+		
+	],
+	"href":"hrefValue_3",
+	"machineImages":[
+		{
+			"href":"hrefValue_3_0"
+		},
+		{
+			"href":"hrefValue_3_1"
+		},
+		{
+			"href":"hrefValue_3_2"
+		}
+		
+	]
+}

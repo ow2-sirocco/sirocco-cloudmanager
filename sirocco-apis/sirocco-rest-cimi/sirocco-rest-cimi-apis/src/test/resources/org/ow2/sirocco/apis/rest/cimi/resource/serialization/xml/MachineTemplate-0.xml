@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<MachineTemplate href="hrefValue_0">
+	<description>descriptionValue_0</description>
+	<name>nameValue_0</name>
+	<created>2000-01-01T01:00:00+01:00</created>
+	<id>idValue_0</id>
+	<updated>2000-01-01T01:00:00+01:00</updated>
+	<credentials href="hrefValue_0">
+		<description>descriptionValue_0</description>
+		<name>nameValue_0</name>
+		<created>2000-01-01T01:00:00+01:00</created>
+		<id>idValue_0</id>
+		<updated>2000-01-01T01:00:00+01:00</updated>
+		<password>passwordValue_0</password>
+		<userName>userNameValue_0</userName>
+	</credentials>
+	<machineConfig href="hrefValue_0">
+		<description>descriptionValue_0</description>
+		<name>nameValue_0</name>
+		<created>2000-01-01T01:00:00+01:00</created>
+		<id>idValue_0</id>
+		<updated>2000-01-01T01:00:00+01:00</updated>
+		<cpu frequency="0.0" numberVirtualCpus="0" units="unitValue_0" />
+		<memory quantity="0" units="unitValue_0" />
+	</machineConfig>
+	<machineImage href="hrefValue_0">
+		<description>descriptionValue_0</description>
+		<name>nameValue_0</name>
+		<created>2000-01-01T01:00:00+01:00</created>
+		<id>idValue_0</id>
+		<updated>2000-01-01T01:00:00+01:00</updated>
+		<imageLocation href="hrefImageLocation_0" />
+		<state>stateValue_0</state>
+		<type>typeValue_0</type>
+	</machineImage>
+</MachineTemplate>
