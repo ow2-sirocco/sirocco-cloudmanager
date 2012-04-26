@@ -39,6 +39,7 @@
 
 	<modules>
 		<module>itests-ejb</module>
+		<module>itests-rest-cimi</module>
 	</modules>
 
 </project>

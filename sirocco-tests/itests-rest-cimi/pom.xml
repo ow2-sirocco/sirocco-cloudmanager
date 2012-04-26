@@ -1,0 +1,571 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+   SIROCCO
+   Copyright (C) 2010 France Telecom
+   Contact: sirocco@ow2.org
+
+   This library is free software; you can redistribute it and/or
+   modify it under the terms of the GNU Lesser General Public
+   License as published by the Free Software Foundation; either
+   version 2.1 of the License, or any later version.
+
+   This library is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+   Lesser General Public License for more details.
+
+   You should have received a copy of the GNU Lesser General Public
+   License along with this library; if not, write to the Free Software
+   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+   USA
+
+   $Id$
+
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>org.ow2.sirocco.cloudmanager</groupId>
+		<artifactId>sirocco-cloudmanager-itests</artifactId>
+		<version>0.5.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>org.ow2.sirocco.cloudmanager</groupId>
+	<artifactId>sirocco-cloudmanager-itests-rest-cimi</artifactId>
+	<packaging>pom</packaging>
+	<name>SIROCCO :: CloudManager :: ITESTS :: REST :: CIMI</name>
+
+	<properties>
+		<cargo.version>1.1.4</cargo.version>
+		<jonas.root>${project.build.directory}/jonas-full-${ow2.jonas.version}</jonas.root>
+		<jonas.base>${project.build.directory}/jonas-base</jonas.base>
+		<dbunit.file>target/db/sirocco.xml</dbunit.file>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-ear</artifactId>
+			<version>${project.version}</version>
+			<type>ear</type>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-core-manager</artifactId>
+			<version>${project.version}</version>
+			<type>ejb</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ow2.sirocco.apis</groupId>
+			<artifactId>sirocco-rest-cimi-apis</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.ow2.spec.ee</groupId>
+			<artifactId>ow2-ejb-3.0-spec</artifactId>
+			<version>1.0.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.geronimo.specs</groupId>
+			<artifactId>geronimo-jms_1.1_spec</artifactId>
+			<version>1.1.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.persistence</groupId>
+			<artifactId>persistence-api</artifactId>
+			<version>1.0</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>javax.transaction</groupId>
+			<artifactId>jta</artifactId>
+			<version>1.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.dbunit</groupId>
+			<artifactId>dbunit</artifactId>
+			<version>2.4.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>5.1.18</version>
+		</dependency>
+		
+		<dependency>
+    		<groupId>com.sun.jersey</groupId>
+    		<artifactId>jersey-client</artifactId>
+    		<version>1.12</version>
+		</dependency>
+		
+	</dependencies>
+
+	<profiles>
+		<profile>
+			<id>default</id>
+			<activation>
+				<property>
+					<name>!env</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<!-- Make sure tests always use randomly assigned and available ports -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.7</version>
+						<executions>
+							<execution>
+								<id>generate-port-numbers</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>reserve-network-port</goal>
+								</goals>
+								<configuration>
+									<portNames>
+										<portName>webcontainer.port</portName>
+										<portName>carol.port</portName>
+										<portName>jms.port</portName>
+										<portName>db.port</portName>
+									</portNames>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<properties>
+				<env>test</env>
+				<database.url>jdbc:hsqldb:hsql://localhost:${db.port}/db_jonas</database.url>
+				<database.driver>org.hsqldb.jdbcDriver</database.driver>
+				<database.mapper>rdb.hsql</database.mapper>
+				<database.schema>PUBLIC</database.schema>
+				<database.username>jonas</database.username>
+				<database.password>jonas</database.password>
+				<database.teststmt>select count(1) from
+					information_schema.system_tables</database.teststmt>
+				<dbunit.databasefactory>org.dbunit.ext.hsqldb.HsqldbDataTypeFactory</dbunit.databasefactory>
+			</properties>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<activation>
+				<property>
+					<name>env</name>
+					<value>prod</value>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<!-- Make sure tests always use randomly assigned and available ports -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>1.7</version>
+						<executions>
+							<execution>
+								<id>generate-port-numbers</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>reserve-network-port</goal>
+								</goals>
+								<configuration>
+									<portNames>
+										<portName>webcontainer.port</portName>
+										<portName>carol.port</portName>
+										<portName>jms.port</portName>
+										<portName>db.port</portName>
+									</portNames>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+			<properties>
+				<database.url>jdbc:mysql://localhost:3306/sirocco</database.url>
+				<database.driver>org.gjt.mm.mysql.Driver</database.driver>
+				<database.mapper>rdb.mysql</database.mapper>
+				<database.name>sirocco</database.name>
+				<database.schema>sirocco</database.schema>
+				<database.username>admcloud</database.username>
+				<database.password>admcloud</database.password>
+				<database.teststmt>select count(1) from information_schema.tables</database.teststmt>
+				<dbunit.databasefactory>org.dbunit.ext.mysql.MySqlDataTypeFactory</dbunit.databasefactory>
+			</properties>
+		</profile>
+		<profile>
+			<id>integration-tests</id>
+			<activation>
+				<property>
+					<name>!maven.test.skip</name>
+				</property>
+			</activation>
+			<build>
+				<plugins>
+					<!-- Unpack JOnAS and copy Sirocco artifacts in local directory to be 
+						used as a HTTP repository by Sirocco deployment plan -->
+					<plugin>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>unpack-jonas</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.ow2.jonas.assemblies.profiles</groupId>
+											<artifactId>jonas-full</artifactId>
+											<version>${ow2.jonas.version}</version>
+											<classifier>bin</classifier>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+									<outputDirectory>${project.build.directory}</outputDirectory>
+								</configuration>
+							</execution>
+							<execution>
+								<id>copy</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.ow2.sirocco.cloudmanager</groupId>
+											<artifactId>sirocco-cloudmanager-ear</artifactId>
+											<version>${project.version}</version>
+											<type>ear</type>
+											<overWrite>true</overWrite>
+											<destFileName>sirocco-cloudmanager-ear.ear</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.ow2.sirocco.cloudmanager</groupId>
+											<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
+											<version>${project.version}</version>
+											<overWrite>true</overWrite>
+											<destFileName>sirocco-cloudmanager-model-cimi.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.ow2.sirocco.cloudmanager</groupId>
+											<artifactId>sirocco-cloudmanager-connector-api</artifactId>
+											<version>${project.version}</version>
+											<overWrite>true</overWrite>
+											<destFileName>sirocco-cloudmanager-connector-api.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.ow2.sirocco.cloudmanager</groupId>
+											<artifactId>sirocco-cloudmanager-connector-util-jobmanager</artifactId>
+											<version>${project.version}</version>
+											<overWrite>true</overWrite>
+											<destFileName>sirocco-cloudmanager-connector-util-jobmanager.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.ow2.sirocco.cloudmanager</groupId>
+											<artifactId>sirocco-cloudmanager-connector-mock</artifactId>
+											<version>${project.version}</version>
+											<overWrite>true</overWrite>
+											<destFileName>sirocco-cloudmanager-connector-mock.jar</destFileName>
+										</artifactItem>
+									</artifactItems>
+									<outputDirectory>${project.build.directory}/repository</outputDirectory>
+									<overWriteReleases>true</overWriteReleases>
+									<overWriteSnapshots>true</overWriteSnapshots>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- Copy JOnAS base -->
+					<plugin>
+						<artifactId>maven-antrun-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>configure-jonas</id>
+								<phase>pre-integration-test</phase>
+								<configuration>
+									<tasks>
+										<!-- Ensure that the JONAS BASE directory is always clean -->
+										<delete dir="${jonas.base}" />
+										<mkdir dir="${jonas.base}/deploy" />
+
+										<property name="carol.protocol" value="jrmp" />
+
+										<typedef resource="org/ow2/jonas/ant/antlib.xml" classpath="${jonas.root}/lib/common/ow_jonas_ant.jar" />
+
+										<jonasbase jonasRoot="${jonas.root}" destDir="${jonas.base}" update="off">
+											<!--<jonasProperties services="db,resource,ejb3,depmonitor" /> -->
+											<services names="jtm,db,security,resource,ejb3,validation,web,ear,depmonitor" />
+											<webcontainer ondemandenabled="false">
+												<tomcat>
+													<http port="${webcontainer.port}" />
+												</tomcat>
+												<jetty>
+													<http port="${webcontainer.port}" />
+												</jetty>
+											</webcontainer>
+											<jms port="${jms.port}" initialTopics="JobCompletion" initialQueues="" />
+											<carol defaultPort="${carol.port}" protocols="${carol.protocol}" />
+											<db port="${db.port}" />
+										</jonasbase>
+
+
+										<copy todir="${jonas.base}/deploy">
+											<fileset dir="src/sirocco-config/deploy" />
+										</copy>
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.url@" value="${database.url}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.driver@" value="${database.driver}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.user@" value="${database.username}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.password@" value="${database.password}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.mapper@" value="${database.mapper}" />
+										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.teststmt@" value="${database.teststmt}" />
+
+
+
+
+										token="@sirocco.version@" value="${project.version}" /&gt;
+
+										<copy todir="${jonas.base}/etc">
+											<fileset dir="src/sirocco-config/etc" />
+										</copy>
+										<copy todir="${jonas.base}/conf" overwrite="true">
+											<fileset dir="src/sirocco-config/conf" />
+										</copy>
+
+										<replace file="${jonas.base}/conf/initial-repositories.xml" token="@local.repository@" value="${project.build.directory}/repository" />
+
+									</tasks>
+								</configuration>
+								<goals>
+									<goal>run</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- Replace persistence.xml in ear with production or test version -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>truezip-maven-plugin</artifactId>
+						<version>1.0-beta-7</version>
+						<executions>
+							<execution>
+								<id>copy-into</id>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<phase>pre-integration-test</phase>
+								<configuration>
+									<files>
+										<file>
+											<source>src/sirocco-config/persistence/persistence-${env}.xml</source>
+											<outputDirectory>${project.build.directory}/repository/sirocco-cloudmanager-ear.ear/sirocco-core.jar/META-INF</outputDirectory>
+											<destName>persistence.xml</destName>
+										</file>
+									</files>
+									<!-- <fileset> <directory>src/sirocco-config/persistence</directory> 
+										<includes> <include>persistence-${env}.xml</include> </includes> <outputDirectory>${project.build.directory}/repository/sirocco-cloudmanager-ear.ear/sirocco-core.jar/META-INF</outputDirectory> 
+										</fileset> -->
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+
+					<!-- Compile tests -->
+					<plugin>
+						<artifactId>maven-compiler-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>compile-tests</id>
+								<phase>test-compile</phase>
+								<goals>
+									<goal>testCompile</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+
+					<!-- Start/stop JOnAS -->
+					<plugin>
+						<groupId>org.codehaus.cargo</groupId>
+						<artifactId>cargo-maven2-plugin</artifactId>
+						<version>${cargo.version}</version>
+						<executions>
+							<execution>
+								<id>start-jonas</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>start</goal>
+								</goals>
+							</execution>
+							<execution>
+								<id>stop-jonas</id>
+								<phase>post-integration-test</phase>
+								<goals>
+									<goal>stop</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<container>
+								<containerId>jonas5x</containerId>
+								<type>installed</type>
+								<home>${jonas.root}</home>
+								<output>${project.build.directory}/jonas5x.log</output>
+								<log>${project.build.directory}/cargo.log</log>
+								<systemProperties>
+									<carol.port>${carol.port}</carol.port>
+									<java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
+								</systemProperties>
+							</container>
+							<configuration>
+								<type>existing</type>
+								<home>${jonas.base}</home>
+								<properties>
+									<cargo.hostname>localhost</cargo.hostname>
+									<cargo.rmi.port>${carol.port}</cargo.rmi.port>
+									<cargo.servlet.port>${webcontainer.port}</cargo.servlet.port>
+									<cargo.protocol>http</cargo.protocol>
+								</properties>
+							</configuration>
+						</configuration>
+					</plugin>
+
+					<!-- Export database in DbUnit format -->
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>dbunit-maven-plugin</artifactId>
+						<version>1.0-beta-3</version>
+
+						<!--jar file that has the jdbc driver -->
+						<dependencies>
+							<dependency>
+								<groupId>mysql</groupId>
+								<artifactId>mysql-connector-java</artifactId>
+								<version>5.1.18</version>
+							</dependency>
+							<dependency>
+								<groupId>hsqldb</groupId>
+								<artifactId>hsqldb</artifactId>
+								<version>1.8.0.10</version>
+							</dependency>
+
+						</dependencies>
+
+						<!-- common configurations -->
+						<configuration>
+							<driver>${database.driver}</driver>
+							<url>${database.url}</url>
+							<username>${database.username}</username>
+							<password>${database.password}</password>
+						</configuration>
+
+						<executions>
+							<execution>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>export</goal>
+								</goals>
+								<configuration>
+									<dataTypeFactoryName>${dbunit.databasefactory}</dataTypeFactoryName>
+									<format>xml</format>
+									<dest>${dbunit.file}</dest>
+									<ordered>true</ordered>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+
+
+					<!-- run tests -->
+					<plugin>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.12</version>
+						<configuration>
+							<skip>true</skip>
+						</configuration>
+						<executions>
+							<execution>
+								<id>surefire-it</id>
+								<phase>integration-test</phase>
+								<goals>
+									<goal>test</goal>
+								</goals>
+								<configuration>
+									<skip>${maven.test.skip}</skip>
+									<additionalClasspathElements>
+										<additionalClasspathElement>${jonas.root}/lib/client.jar</additionalClasspathElement>
+									</additionalClasspathElements>
+									<systemProperties>
+										<property>
+											<name>webcontainer.port</name>
+											<value>${webcontainer.port}</value>
+										</property>
+										<property>
+											<name>carol.port</name>
+											<value>${carol.port}</value>
+										</property>
+										<property>
+											<name>dbunit.connectionUrl</name>
+											<value>${database.url}</value>
+										</property>
+										<property>
+											<name>dbunit.driverClass</name>
+											<value>${database.driver}</value>
+										</property>
+										<property>
+											<name>dbunit.username</name>
+											<value>${database.username}</value>
+										</property>
+										<property>
+											<name>dbunit.password</name>
+											<value>${database.password}</value>
+										</property>
+										<property>
+											<name>dbunit.schema</name>
+											<value>${database.schema}</value>
+										</property>
+										<property>
+											<name>dbunit.dataset</name>
+											<value>${dbunit.file}</value>
+										</property>
+									</systemProperties>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
+
+</project>
