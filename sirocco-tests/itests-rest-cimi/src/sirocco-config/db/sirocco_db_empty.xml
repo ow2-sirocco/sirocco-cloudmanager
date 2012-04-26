@@ -1,0 +1,424 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+  <table name="CloudProviderLocation">
+    <column>id</column>
+    <column>gps_altitude</column>
+    <column>gps_latitude</column>
+    <column>gps_longitude</column>
+    <column>cityName</column>
+    <column>countryName</column>
+    <column>iso3166_1</column>
+    <column>iso3166_2</column>
+    <column>postal_code</column>
+    <column>stateName</column>
+  </table>
+  <table name="User">
+    <column>id</column>
+    <column>createDate</column>
+    <column>email</column>
+    <column>firstName</column>
+    <column>lastName</column>
+    <column>password</column>
+    <column>username</column>
+  </table>
+  <table name="CloudEntryPoint">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="CloudEntryPoint_properties">
+    <column>CloudEntryPoint_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="CloudProvider">
+    <column>id</column>
+    <column>cloudProviderType</column>
+    <column>description</column>
+  </table>
+  <table name="CloudProviderAccount">
+    <column>id</column>
+    <column>login</column>
+    <column>password</column>
+    <column>cloudProvider_id</column>
+  </table>
+  <table name="CloudProviderAccount_User">
+    <column>cloudProviderAccounts_id</column>
+    <column>users_id</column>
+  </table>
+  <table name="CloudProviderLocation_CloudProvider">
+    <column>cloudProviderLocations_id</column>
+    <column>cloudProviders_id</column>
+  </table>
+  <table name="Credentials">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>password</column>
+    <column>publicKey</column>
+    <column>userName</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="Credentials_properties">
+    <column>Credentials_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="Job">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>action</column>
+    <column>isCancellable</column>
+    <column>progress</column>
+    <column>returnCode</column>
+    <column>status</column>
+    <column>statusMessage</column>
+    <column>targetEntity</column>
+    <column>timeOfStatusChange</column>
+    <column>location_id</column>
+    <column>user_id</column>
+    <column>parentJob_id</column>
+  </table>
+  <table name="JobCollection">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="JobCollection_properties">
+    <column>JobCollection_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="Job_properties">
+    <column>Job_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="Machine">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>cpuSpeedUnit</column>
+    <column>numberCpu</column>
+    <column>cpu_quantity</column>
+    <column>memory_quantity</column>
+    <column>unit</column>
+    <column>state</column>
+    <column>location_id</column>
+    <column>user_id</column>
+    <column>cloudProviderAccount_id</column>
+  </table>
+  <table name="MachineCollection">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="MachineCollection_properties">
+    <column>MachineCollection_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="MachineConfiguration">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>cpuSpeedUnit</column>
+    <column>numberCpu</column>
+    <column>cpu_quantity</column>
+    <column>memory_quantity</column>
+    <column>unit</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="MachineConfigurationCollection">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="MachineConfigurationCollection_properties">
+    <column>MachineConfigurationCollection_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="MachineConfiguration_diskTemplates">
+    <column>MachineConfiguration_id</column>
+    <column>attachmentPoint</column>
+    <column>format</column>
+    <column>quantity</column>
+    <column>unit</column>
+  </table>
+  <table name="MachineConfiguration_properties">
+    <column>MachineConfiguration_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="MachineImage">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>imageLocation</column>
+    <column>state</column>
+    <column>type</column>
+    <column>location_id</column>
+    <column>user_id</column>
+    <column>cloudProviderAccount_id</column>
+    <column>relatedImage_id</column>
+  </table>
+  <table name="MachineImageCollection">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="MachineImageCollection_properties">
+    <column>MachineImageCollection_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="MachineImage_properties">
+    <column>MachineImage_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="MachineTemplate">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+    <column>credentials_id</column>
+    <column>machineConfiguration_id</column>
+    <column>machineImage_id</column>
+  </table>
+  <table name="MachineTemplateCollection">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="MachineTemplateCollection_properties">
+    <column>MachineTemplateCollection_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="Volume">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>bootable</column>
+    <column>quantity</column>
+    <column>unit</column>
+    <column>state</column>
+    <column>supportsSnapshots</column>
+    <column>location_id</column>
+    <column>user_id</column>
+    <column>cloudProviderAccount_id</column>
+  </table>
+  <table name="MachineVolume">
+    <column>id</column>
+    <column>attachmentPoint</column>
+    <column>volume_id</column>
+  </table>
+  <table name="MachineTemplate_MachineVolume">
+    <column>MachineTemplate_id</column>
+    <column>volumes_id</column>
+  </table>
+  <table name="MachineTemplate_networkInterfaces">
+    <column>MachineTemplate_id</column>
+    <column>address</column>
+    <column>allocation</column>
+    <column>defaultGateway</column>
+    <column>hostname</column>
+    <column>macAddress</column>
+    <column>protocol</column>
+    <column>state</column>
+  </table>
+  <table name="MachineTemplate_properties">
+    <column>MachineTemplate_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="MachineTemplate_volumeTemplates">
+    <column>MachineTemplate_id</column>
+    <column>attachmentPoint</column>
+  </table>
+  <table name="Machine_MachineVolume">
+    <column>Machine_id</column>
+    <column>volumes_id</column>
+  </table>
+  <table name="Machine_disks">
+    <column>Machine_id</column>
+    <column>quantity</column>
+    <column>unit</column>
+  </table>
+  <table name="Machine_networkInterfaces">
+    <column>Machine_id</column>
+    <column>address</column>
+    <column>allocation</column>
+    <column>defaultGateway</column>
+    <column>hostname</column>
+    <column>macAddress</column>
+    <column>protocol</column>
+    <column>state</column>
+  </table>
+  <table name="Machine_properties">
+    <column>Machine_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="VolumeCollection">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="VolumeCollection_properties">
+    <column>VolumeCollection_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="VolumeConfiguration">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>quantity</column>
+    <column>unit</column>
+    <column>format</column>
+    <column>guestInterface</column>
+    <column>supportsSnapshots</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="VolumeConfigurationCollection">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="VolumeConfigurationCollection_properties">
+    <column>VolumeConfigurationCollection_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="VolumeConfiguration_properties">
+    <column>VolumeConfiguration_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="VolumeTemplate">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+    <column>volumeConfig_id</column>
+  </table>
+  <table name="VolumeTemplateCollection">
+    <column>id</column>
+    <column>created</column>
+    <column>deleted</column>
+    <column>description</column>
+    <column>name</column>
+    <column>providerAssignedId</column>
+    <column>updated</column>
+    <column>location_id</column>
+    <column>user_id</column>
+  </table>
+  <table name="VolumeTemplateCollection_properties">
+    <column>VolumeTemplateCollection_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="VolumeTemplate_properties">
+    <column>VolumeTemplate_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+  <table name="Volume_properties">
+    <column>Volume_id</column>
+    <column>element</column>
+    <column>mapkey</column>
+  </table>
+</dataset>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<deployment-plan xmlns="http://jonas.ow2.org/ns/deployment-plan/1.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:m2="http://jonas.ow2.org/ns/deployment-plan/maven2/1.0"
+	xmlns:url="http://jonas.ow2.org/ns/deployment-plan/url/1.0">
+
+
+	<deployment xsi:type="url:url-deploymentType" id="dep100"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-model-cimi.jar</url:resource>
+	</deployment>
+	
+	<deployment xsi:type="url:url-deploymentType" id="dep150"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-connector-api.jar</url:resource>
+	</deployment>
+	
+	<deployment xsi:type="url:url-deploymentType" id="dep200"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-connector-util-jobmanager.jar</url:resource>
+	</deployment>
+	
+	<deployment xsi:type="url:url-deploymentType" id="dep900"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-connector-mock.jar</url:resource>
+	</deployment>
+	
+	<deployment xsi:type="url:url-deploymentType" id="dep1000"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-ear.ear</url:resource>
+	</deployment>
+	
+
+</deployment-plan>
