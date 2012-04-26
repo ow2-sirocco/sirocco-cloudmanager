@@ -1,8 +1,0 @@
-{
-	"name":"nameValue_1",
-	"description":"descriptionValue_1",
-	"properties":{
-		"keyProp_1_0":"valueProp_1_0"
-	},
-	"action":"http://www.dmtf.org/cimi/action/start"
-}
