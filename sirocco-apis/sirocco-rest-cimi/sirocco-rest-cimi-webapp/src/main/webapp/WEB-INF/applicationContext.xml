@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xsi:schemaLocation="
+	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+	http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd">
+
+	<context:property-placeholder location="WEB-INF/ejb.properties" />
+
+	<!-- Remote example -->
+	<!-- <jee:remote-slsb id="IMachineImageManager" -->
+	<!-- business-interface="org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager" -->
+	<!-- jndi-name="MachineImageManager" lookup-home-on-startup="false"> -->
+	<!-- <jee:environment> -->
+	<!-- java.naming.factory.initial=org.ow2.carol.jndi.spi.MultiOrbInitialContextFactory -->
+	<!-- java.naming.provider.url=rmi://localhost:${carol.port} -->
+	<!-- </jee:environment> -->
+	<!-- </jee:remote-slsb> -->
+
+	<jee:local-slsb id="ICredentialsManager" jndi-name="CredentialsManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
+	<jee:local-slsb id="IJobManager" jndi-name="JobManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.IJobManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
+	<jee:local-slsb id="IMachineManager" jndi-name="MachineManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
+	<jee:local-slsb id="IMachineImageManager" jndi-name="MachineImageManager"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
+
+	<context:annotation-config />
+	<context:component-scan base-package="org.ow2.sirocco.apis.rest.cimi" />
+</beans>
