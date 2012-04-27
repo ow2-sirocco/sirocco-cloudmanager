@@ -48,7 +48,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.ow2.sirocco.apis</groupId>
-			<artifactId>sirocco-rest-cimi</artifactId>
+			<artifactId>sirocco-rest-cimi-webapp</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
@@ -74,7 +74,7 @@
 						</ejbModule>
 						<webModule>
 							<groupId>org.ow2.sirocco.apis</groupId>
-							<artifactId>sirocco-rest-cimi</artifactId>
+							<artifactId>sirocco-rest-cimi-webapp</artifactId>
 							<bundleFileName>sirocco-rest-cimi.war</bundleFileName>
 							<contextRoot>sirocco-rest</contextRoot> 
 						</webModule>
