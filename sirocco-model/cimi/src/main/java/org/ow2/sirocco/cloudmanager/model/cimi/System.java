@@ -26,17 +26,20 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "SYSTEMINSTANCE")
 public class System extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static enum State {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, MIXED, DELETING, ERROR
     }
-    
+
     private CredentialsCollection credentialColl;
 
     private MachineCollection machineColl;
@@ -46,48 +49,48 @@ public class System extends CloudEntity implements Serializable {
     private State state;
 
     private VolumeCollection volumeColl;
-    
+
     public System() {
     }
 
     public VolumeCollection getVolumeColl() {
-        return volumeColl;
+        return this.volumeColl;
     }
 
-    public void setVolumeColl(VolumeCollection volumeColl) {
+    public void setVolumeColl(final VolumeCollection volumeColl) {
         this.volumeColl = volumeColl;
     }
 
     public CredentialsCollection getCredentialColl() {
-        return credentialColl;
+        return this.credentialColl;
     }
 
-    public void setCredentialColl(CredentialsCollection credentialColl) {
+    public void setCredentialColl(final CredentialsCollection credentialColl) {
         this.credentialColl = credentialColl;
     }
 
     public MachineCollection getMachineColl() {
-        return machineColl;
+        return this.machineColl;
     }
 
-    public void setMachineColl(MachineCollection machineColl) {
+    public void setMachineColl(final MachineCollection machineColl) {
         this.machineColl = machineColl;
     }
 
     @ManyToOne
     public SystemCollection getSystemColl() {
-        return systemColl;
+        return this.systemColl;
     }
 
-    public void setSystemColl(SystemCollection systemColl) {
+    public void setSystemColl(final SystemCollection systemColl) {
         this.systemColl = systemColl;
     }
 
     public State getState() {
-        return state;
+        return this.state;
     }
 
-    public void setState(State state) {
+    public void setState(final State state) {
         this.state = state;
     }
 
