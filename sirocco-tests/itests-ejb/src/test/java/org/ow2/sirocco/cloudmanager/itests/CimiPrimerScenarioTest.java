@@ -298,7 +298,7 @@ public class CimiPrimerScenarioTest {
         machineCreate.setMachineTemplate(machineTemplate);
 
         Job job = this.machineManager.createMachine(machineCreate);
-        String machineId = job.getTargetEntity();
+        String machineId = job.getTargetEntity().getId().toString();
 
         this.waitForJobCompletion(job);
 

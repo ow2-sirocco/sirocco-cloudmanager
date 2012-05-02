@@ -121,7 +121,7 @@ public class VolumeManager implements IVolumeManager {
 
         Volume volume = new Volume();
 
-        volume.setProviderAssignedId(providerJob.getTargetEntity());
+        volume.setProviderAssignedId(providerJob.getTargetEntity().getId().toString());
         volume.setCloudProviderAccount(defaultAccount);
         volume.setCapacity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity());
         volume.setBootable(false);
@@ -139,7 +139,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             Job job = new Job();
-            job.setTargetEntity(volume.getId().toString());
+            job.setTargetEntity(volume);
             job.setCreated(new Date());
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
             job.setStatus(providerJob.getStatus());
@@ -158,7 +158,7 @@ public class VolumeManager implements IVolumeManager {
             // job is done and successful: retrieve the state of the volume and
             // persist volume+job
             try {
-                volume.setState(connector.getVolumeService().getVolumeState(providerJob.getTargetEntity()));
+                volume.setState(connector.getVolumeService().getVolumeState(providerJob.getTargetEntity().getId().toString()));
             } catch (ConnectorException e) {
                 throw new CloudProviderException(e.getMessage());
             }
@@ -166,7 +166,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.persist(volume);
 
             Job job = new Job();
-            job.setTargetEntity(volume.getId().toString());
+            job.setTargetEntity(volume);
             job.setCreated(new Date());
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
             job.setStatus(providerJob.getStatus());
@@ -474,7 +474,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             Job job = new Job();
-            job.setTargetEntity(volume.getId().toString());
+            job.setTargetEntity(volume);
             job.setCreated(new Date());
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
             job.setStatus(providerJob.getStatus());
@@ -496,7 +496,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             Job job = new Job();
-            job.setTargetEntity(volume.getId().toString());
+            job.setTargetEntity(volume);
             job.setCreated(new Date());
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
             job.setStatus(providerJob.getStatus());
@@ -613,7 +613,7 @@ public class VolumeManager implements IVolumeManager {
         Volume volume = null;
 
         try {
-            volume = this.getVolumeByProviderAssignedId(providerJob.getTargetEntity());
+            volume = this.getVolumeByProviderAssignedId(providerJob.getTargetEntity().getId().toString());
         } catch (PersistenceException e) {
             VolumeManager.logger.error("Cannot find Volume with provider-assigned id " + providerJob.getTargetEntity());
             return false;

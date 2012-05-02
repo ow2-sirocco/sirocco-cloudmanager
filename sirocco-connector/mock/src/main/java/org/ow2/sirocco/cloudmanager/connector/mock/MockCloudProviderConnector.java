@@ -147,7 +147,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Volume> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volumeProviderAssignedId, "volume.create", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volume, "volume.create", result);
     }
 
     @Override
@@ -167,7 +167,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volumeId, "volume.delete", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volume, "volume.delete", result);
 
     }
 
@@ -235,7 +235,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             }
         };
         ListenableFuture<Machine> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machineProviderAssignedId, "machine.create",
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.create",
             result);
 
     }
@@ -262,7 +262,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(startTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machineId, "machine.start", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.start", result);
     }
 
     @Override
@@ -289,7 +289,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(stopTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machineId, "machine.stop", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.stop", result);
     }
 
     @Override
@@ -317,7 +317,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(suspendTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machineId, "machine.suspend", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.suspend", result);
     }
 
     @Override
@@ -351,7 +351,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(pauseTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machineId, "machine.paused", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.paused", result);
     }
 
     @Override
@@ -373,7 +373,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machineId, "machine.delete", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.delete", result);
     }
 
     @Override

@@ -186,7 +186,7 @@ public class VolumeManagerTest {
 
         Assert.assertNotNull(job.getId());
         Assert.assertTrue("job action is invalid", job.getAction().equals("volume.create"));
-        String volumeId = job.getTargetEntity();
+        String volumeId = job.getTargetEntity().getId().toString();
         Assert.assertNotNull("job target entity is invalid", volumeId);
 
         String jobId = job.getId().toString();

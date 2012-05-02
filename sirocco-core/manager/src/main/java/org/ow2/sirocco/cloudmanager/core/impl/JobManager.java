@@ -11,6 +11,7 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
+import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
@@ -18,6 +19,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
@@ -36,7 +38,7 @@ public class JobManager implements IJobManager {
     @Resource
     private EJBContext ctx;
 
-    public Job createJob(final String targetEntity, final String action, final String parentJob) throws CloudProviderException {
+    public Job createJob(final CloudEntity targetEntity, final String action, final String parentJob) throws CloudProviderException {
 
         Job j = new Job();
         j.setTargetEntity(targetEntity);
@@ -135,6 +137,19 @@ public class JobManager implements IJobManager {
     public void updateJobAttributes(final String id, final Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
+    }
+    
+    @SuppressWarnings("unchecked")
+    public CloudEntity getCloudEntityById(String cloudEntityId)
+    {
+       Query query = this.em.createQuery("SELECT c FROM CloudEntity c WHERE c.id=:ceid");
+       List<CloudEntity> templates = query.setParameter("ceid", cloudEntityId).getResultList();
+
+
+        
+        
+        return templates.get(0);
+        
     }
 
 }

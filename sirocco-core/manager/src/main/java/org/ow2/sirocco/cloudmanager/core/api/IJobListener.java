@@ -19,24 +19,18 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: IJobManager.java 1007 2012-02-24 12:48:27Z ycas7461 $
+ *  $Id: IJobListener.java 913 2012-02-20 09:34:20Z ycas7461 $
  *
  */
-package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api;
+package org.ow2.sirocco.cloudmanager.core.api;
 
-import java.util.List;
-
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 
-import com.google.common.util.concurrent.ListenableFuture;
+/**
+ * Job event handling
+ */
+public interface IJobListener {
 
-public interface IJobManager {
-	Job newJob(CloudEntity targetEntity, String action, ListenableFuture<?> result);
+    boolean completionHandler(Job providerJob);
 
-	Job getJobById(String id);
-
-	List<Job> getAllJobs();
-
-	void setNotificationOnJobCompletion(String jobId) throws Exception;
 }

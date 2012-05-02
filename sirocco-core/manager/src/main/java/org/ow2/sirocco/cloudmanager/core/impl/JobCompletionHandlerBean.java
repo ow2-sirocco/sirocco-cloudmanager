@@ -48,6 +48,7 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 
@@ -66,6 +67,9 @@ public class JobCompletionHandlerBean implements MessageListener {
 
     @EJB
     private IMachineManager machineManager;
+    
+    @EJB
+    private ISystemManager systemManager;
 
     @PersistenceContext
     private EntityManager em;
@@ -88,6 +92,9 @@ public class JobCompletionHandlerBean implements MessageListener {
             } else if (providerJob.getAction().startsWith("volume")) {
                 done = this.volumeManager.volumeCompletionHandler(providerJob);
             } else if (providerJob.getAction().startsWith("image")) {
+            }
+            else if (providerJob.getAction().startsWith("system")) {
+                done = this.systemManager.completionHandler(providerJob);
             }
 
             // update Job entity

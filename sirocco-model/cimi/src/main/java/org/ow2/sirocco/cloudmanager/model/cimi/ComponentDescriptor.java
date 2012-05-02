@@ -36,11 +36,21 @@ import javax.persistence.ManyToOne;
 public class ComponentDescriptor extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     
+    public static enum ComponentType {
+        SYSTEM,VOLUME,MACHINE,CREDENTIALS
+    }
+    
     private String componentName;
     private String componentDescription;
     private Map<String,Object> componentProperties;
-    private String componentType;
-    private Object componentTemplate;
+    /**
+     * Type of component to be instanciated
+     */
+    private ComponentType componentType;
+    /**
+     * Id of template entity to be used to instanciate the component
+     */
+    private String componentTemplateId;
     private Integer componentQuantity;
     
     private SystemTemplate systemTemplate;
@@ -64,18 +74,17 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
     public void setComponentProperties(Map<String, Object> properties) {
         this.componentProperties = properties;
     }
-    public String getComponentType() {
+    public ComponentType getComponentType() {
         return componentType;
     }
-    public void setComponentType(String type) {
+    public void setComponentType(ComponentType type) {
         this.componentType = type;
     }
-    @Lob
-    public Object getComponentTemplate() {
-        return componentTemplate;
+    public String getComponentTemplate() {
+        return componentTemplateId;
     }
-    public void setComponentTemplate(Object componentTemplate) {
-        this.componentTemplate = componentTemplate;
+    public void setComponentTemplate(String componentTemplateId) {
+        this.componentTemplateId = componentTemplateId;
     }
     public Integer getComponentQuantity() {
         return componentQuantity;

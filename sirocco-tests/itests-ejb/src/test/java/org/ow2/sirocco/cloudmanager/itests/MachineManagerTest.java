@@ -271,7 +271,7 @@ public class MachineManagerTest {
         int loop = 0;
         while (done != true) {
             int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
-            i = this.machineImageManager.getMachineImageById(out_j.getTargetEntity());
+            i = this.machineImageManager.getMachineImageById(out_j.getTargetEntity().getId().toString());
 
             if (i == null) {
 
@@ -341,7 +341,7 @@ public class MachineManagerTest {
 
         Assert.assertNotNull(job.getId());
         Assert.assertTrue("job action is invalid", job.getAction().equals("machine.create"));
-        String machineId = job.getTargetEntity();
+        String machineId = job.getTargetEntity().getId().toString();
         Assert.assertNotNull("job target entity is invalid", machineId);
 
         String jobId = job.getId().toString();

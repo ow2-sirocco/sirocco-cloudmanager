@@ -31,10 +31,16 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+
 @Entity
 @Table(name = "SYSTEMINSTANCE")
 public class System extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    private CloudProviderLocation location;
 
     public static enum State {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, MIXED, DELETING, ERROR
@@ -50,6 +56,8 @@ public class System extends CloudEntity implements Serializable {
 
     private VolumeCollection volumeColl;
 
+    private CloudProviderAccount cloudProviderAccount;
+    
     public System() {
     }
 
@@ -92,6 +100,23 @@ public class System extends CloudEntity implements Serializable {
 
     public void setState(final State state) {
         this.state = state;
+    }
+
+    public CloudProviderAccount getCloudProviderAccount() {
+        return cloudProviderAccount;
+    }
+
+    public void setCloudProviderAccount(CloudProviderAccount cloudProviderAccount) {
+        this.cloudProviderAccount = cloudProviderAccount;
+    }
+
+    @ManyToOne
+    public CloudProviderLocation getLocation() {
+        return location;
+    }
+
+    public void setLocation(CloudProviderLocation location) {
+        this.location = location;
     }
 
 }

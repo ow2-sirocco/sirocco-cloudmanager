@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id$
+ *  $Id: JobManager.java 1007 2012-02-24 12:48:27Z ycas7461 $
  *
  */
 package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl;
@@ -52,6 +52,7 @@ import javax.naming.InitialContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
@@ -168,12 +169,12 @@ public class JobManager implements IJobManager, ManagedService {
 		return jobManager;
 	}
 
-	public Job newJob(final String targetEntityId, final String action,
+	public Job newJob(final CloudEntity targetEntity, final String action,
 			final ListenableFuture<?> result) {
 		String jobId = UUID.randomUUID().toString();
 		final Job job = new Job();
 		job.setProviderAssignedId(jobId);
-		job.setTargetEntity(targetEntityId);
+		job.setTargetEntity(targetEntity);
 		job.setAction(action);
 		job.setIsCancellable(false);
 		job.setStatus(Job.Status.RUNNING);

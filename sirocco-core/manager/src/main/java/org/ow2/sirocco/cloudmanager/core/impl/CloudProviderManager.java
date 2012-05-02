@@ -189,8 +189,7 @@ public class CloudProviderManager implements ICloudProviderManager {
      */
     @Override
     public void addCloudProviderAccountToUser(String userId,
-            String cloudProviderAccountId) throws CloudProviderException,
-            CloudProviderException {
+            String cloudProviderAccountId) throws CloudProviderException {
 
         CloudProviderAccount cpa = this
                 .getCloudProviderAccountById(cloudProviderAccountId);
@@ -211,8 +210,7 @@ public class CloudProviderManager implements ICloudProviderManager {
      */
     @Override
     public void addCloudProviderAccountToUserByName(String userName,
-            String cloudProviderAccountId) throws CloudProviderException,
-            CloudProviderException {
+            String cloudProviderAccountId) throws CloudProviderException {
 
         this.addCloudProviderAccountToUser(
                 userManager.getUserByUsername(userName).getId().toString(),
@@ -228,8 +226,7 @@ public class CloudProviderManager implements ICloudProviderManager {
      */
     @Override
     public void removeCloudProviderAccountFromUser(String userId,
-            String cloudProviderAccountId) throws CloudProviderException,
-            CloudProviderException {
+            String cloudProviderAccountId) throws CloudProviderException {
 
         CloudProviderAccount cpa = this
                 .getCloudProviderAccountById(cloudProviderAccountId);
@@ -249,8 +246,7 @@ public class CloudProviderManager implements ICloudProviderManager {
      */
     @Override
     public void removeCloudProviderAccountFromUserByName(String userName,
-            String cloudProviderAccountId) throws CloudProviderException,
-            CloudProviderException {
+            String cloudProviderAccountId) throws CloudProviderException {
 
         this.removeCloudProviderAccountFromUser(
                 userManager.getUserByUsername(userName).getId().toString(),

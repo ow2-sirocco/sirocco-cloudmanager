@@ -39,13 +39,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 @Entity
 public class User implements Serializable {
@@ -69,19 +63,7 @@ public class User implements Serializable {
 
     private String password;
 
-    private Set<MachineImage> images;
-
-    private Set<Machine> machines;
-
-    private Set<Volume> volumes;
-
-    private Set<MachineTemplate> machineTemplates;
-
-    private Set<MachineConfiguration> machineConfigurations;
-
-    private Set<VolumeTemplate> volumeTemplates;
-
-    private Set<VolumeConfiguration> volumeConfigurations;
+    private Set<CloudEntity> cloudEntities;
 
     private Set<CloudProviderAccount> cloudProviderAccounts;
 
@@ -92,21 +74,6 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
         return this.id;
-    }
-
-    @OneToMany(mappedBy = "user")
-    public Set<MachineImage> getImages() {
-        return this.images;
-    }
-
-    @OneToMany(mappedBy = "user")
-    public Set<Machine> getMachines() {
-        return this.machines;
-    }
-
-    @OneToMany(mappedBy = "user")
-    public Set<Volume> getVolumes() {
-        return this.volumes;
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -154,18 +121,6 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public void setImages(final Set<MachineImage> images) {
-        this.images = images;
-    }
-
-    public void setMachines(final Set<Machine> machines) {
-        this.machines = machines;
-    }
-
-    public void setVolumes(final Set<Volume> volumes) {
-        this.volumes = volumes;
-    }
-
     @Column(unique = true)
     public String getUsername() {
         return this.username;
@@ -175,42 +130,6 @@ public class User implements Serializable {
         this.username = username;
     }
 
-    @OneToMany(mappedBy = "user")
-    public Set<MachineTemplate> getMachineTemplates() {
-        return this.machineTemplates;
-    }
-
-    public void setMachineTemplates(final Set<MachineTemplate> machineTemplates) {
-        this.machineTemplates = machineTemplates;
-    }
-
-    @OneToMany(mappedBy = "user")
-    public Set<MachineConfiguration> getMachineConfigurations() {
-        return this.machineConfigurations;
-    }
-
-    public void setMachineConfigurations(final Set<MachineConfiguration> machineConfigurations) {
-        this.machineConfigurations = machineConfigurations;
-    }
-
-    @OneToMany(mappedBy = "user")
-    public Set<VolumeTemplate> getVolumeTemplates() {
-        return this.volumeTemplates;
-    }
-
-    public void setVolumeTemplates(final Set<VolumeTemplate> volumeTemplates) {
-        this.volumeTemplates = volumeTemplates;
-    }
-
-    @OneToMany(mappedBy = "user")
-    public Set<VolumeConfiguration> getVolumeConfigurations() {
-        return this.volumeConfigurations;
-    }
-
-    public void setVolumeConfigurations(final Set<VolumeConfiguration> volumeConfigurations) {
-        this.volumeConfigurations = volumeConfigurations;
-    }
-
     @ManyToMany(mappedBy = "users")
     public Set<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
@@ -218,6 +137,15 @@ public class User implements Serializable {
 
     public void setCloudProviderAccounts(final Set<CloudProviderAccount> cloudProviderAccounts) {
         this.cloudProviderAccounts = cloudProviderAccounts;
+    }
+
+    @OneToMany(mappedBy="user")
+    public Set<CloudEntity> getCloudEntities() {
+        return cloudEntities;
+    }
+
+    public void setCloudEntities(Set<CloudEntity> cloudEntities) {
+        this.cloudEntities = cloudEntities;
     }
 
 }

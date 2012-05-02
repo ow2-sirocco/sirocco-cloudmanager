@@ -3,7 +3,10 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Entity
 public class SystemTemplate extends CloudEntity {

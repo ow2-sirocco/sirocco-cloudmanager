@@ -30,14 +30,16 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @Entity
 public class Job extends CloudEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    private CloudProviderLocation location;
 
     public static enum Status {
         RUNNING, SUCCESS, FAILED, CANCELLED
@@ -45,7 +47,7 @@ public class Job extends CloudEntity implements Serializable {
     
     private Status status;
     private Date timeOfStatusChange;
-    private String targetEntity;
+    private CloudEntity targetEntity;
     private Integer returnCode;
     private String action;
     private String statusMessage;
@@ -74,11 +76,12 @@ public class Job extends CloudEntity implements Serializable {
         this.timeOfStatusChange = timeOfStatusChange;
     }
 
-    public String getTargetEntity() {
+    @ManyToOne
+    public CloudEntity getTargetEntity() {
         return targetEntity;
     }
 
-    public void setTargetEntity(String targetEntity) {
+    public void setTargetEntity(CloudEntity targetEntity) {
         this.targetEntity = targetEntity;
     }
 
@@ -132,7 +135,7 @@ public class Job extends CloudEntity implements Serializable {
     }
 
 
-    @OneToMany(mappedBy="parentJob",fetch=FetchType.EAGER)
+    @OneToMany(mappedBy="parentJob")
     public List<Job> getNestedJobs() {
         return nestedJobs;
     }
@@ -140,6 +143,16 @@ public class Job extends CloudEntity implements Serializable {
 
     public void setNestedJobs(List<Job> nestedJobs) {
         this.nestedJobs = nestedJobs;
+    }
+
+    @ManyToOne
+    public CloudProviderLocation getLocation() {
+        return location;
+    }
+
+
+    public void setLocation(CloudProviderLocation location) {
+        this.location = location;
     }
 
 }

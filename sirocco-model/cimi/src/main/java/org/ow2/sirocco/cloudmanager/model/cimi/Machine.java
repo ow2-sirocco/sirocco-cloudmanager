@@ -46,12 +46,16 @@ import javax.persistence.NamedQuery;
 import org.hibernate.annotations.CollectionOfElements;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
 @NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
 public class Machine extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    private CloudProviderLocation location;
 
     public static final String GET_MACHINE_BY_STATE = "GET_MACHINE_BY_STATE";
 
@@ -220,5 +224,14 @@ public class Machine extends CloudEntity implements Serializable {
     	Set<String> operations = fsm.getActionsAtState(state);
 		operations.remove(new String("internal"));
     	return operations;
+    }
+
+    @ManyToOne
+    public CloudProviderLocation getLocation() {
+        return location;
+    }
+
+    public void setLocation(CloudProviderLocation location) {
+        this.location = location;
     }
 }

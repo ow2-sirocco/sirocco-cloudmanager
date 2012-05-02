@@ -226,7 +226,6 @@ public class UserManager implements IUserManager {
         List<CloudEntity> l = this.em.createQuery("FROM " + Type + " t WHERE t.user=:usrid").setParameter("usrid", u)
             .getResultList();
         for (CloudEntity lmic : l) {
-            lmic.setUser(null);
             this.em.remove(lmic);
         }
     }

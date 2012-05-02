@@ -28,33 +28,35 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.CollectionOfElements;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
-@MappedSuperclass
+@Entity
+@Inheritance(strategy=InheritanceType.JOINED)
 public abstract class CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected Integer id;
+    
+    protected User user;
 
     protected String name;
 
     protected String description;
-
-    protected User user;
-
-    protected CloudProviderLocation location;
 
     protected Date created;
 
@@ -63,6 +65,10 @@ public abstract class CloudEntity implements Serializable {
     protected Date updated;
     
     protected String providerAssignedId;
+    /**
+     * Jobs working on this entity or about to work on it (targetEntity)
+     */
+    protected Set<Job> workingJobs;
 
     //protected Collection<CloudProvider> cloudProviders;
 
@@ -99,16 +105,6 @@ public abstract class CloudEntity implements Serializable {
         this.description = description;
     }
 
-    @ManyToOne
-    public User getUser() {
-        return this.user;
-    }
-
-    @ManyToOne
-    public CloudProviderLocation getLocation() {
-        return this.location;
-    }
-
     @Temporal(TemporalType.TIMESTAMP)
     public Date getCreated() {
         return this.created;
@@ -126,23 +122,15 @@ public abstract class CloudEntity implements Serializable {
         this.name = name;
     }
 
-    public void setUser(final User user) {
-        this.user = user;
-    }
-
     public void setCreated(final Date created) {
         this.created = created;
-    }
-
-    public void setLocation(final CloudProviderLocation location) {
-        this.location = location;
     }
 
     public void setProperties(final Map<String, String> properties) {
         this.properties = properties;
     }
 
-    @CollectionOfElements(fetch = FetchType.EAGER)
+    @CollectionOfElements(fetch = FetchType.LAZY)
     public Map<String, String> getProperties() {
         return this.properties;
     }
@@ -163,5 +151,23 @@ public abstract class CloudEntity implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     public Date getUpdated() {
         return this.updated;
+    }
+
+    @OneToMany(mappedBy="targetEntity")
+    public Set<Job> getWorkingJobs() {
+        return workingJobs;
+    }
+
+    public void setWorkingJobs(Set<Job> workingJobs) {
+        this.workingJobs = workingJobs;
+    }
+
+    @ManyToOne
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

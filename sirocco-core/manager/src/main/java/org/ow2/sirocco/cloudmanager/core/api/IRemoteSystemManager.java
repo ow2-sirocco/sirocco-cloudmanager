@@ -19,39 +19,12 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: System.java 788 2012-04-17 11:49:55Z ycas7461 $
+ *  $Id$
  *
  */
 
-package org.ow2.sirocco.cloudmanager.model.cimi;
+package org.ow2.sirocco.cloudmanager.core.api;
 
-import java.io.Serializable;
-import java.util.Set;
+public interface IRemoteSystemManager extends ISystemManager {
 
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
-
-@Entity
-public class SystemCollection extends CloudEntity implements ICollection<System>,Serializable{
-    private static final long serialVersionUID = 1L;
-    
-    private Set<System> items;
-
-
-    public SystemCollection() {
-    }
-    
-    @OneToMany(mappedBy = "systemColl")
-    public Set<System> getItems() {
-        return this.items;
-    }
-    
-    public void setItems(Set<System> items) {
-        this.items = items;
-    }
-
-    
 }

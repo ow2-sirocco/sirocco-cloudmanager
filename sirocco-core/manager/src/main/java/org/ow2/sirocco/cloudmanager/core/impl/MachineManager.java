@@ -342,7 +342,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         m.setMemory(mt.getMachineConfiguration().getMemory());
 
         m.setCloudProviderAccount(account);
-        m.setProviderAssignedId(creationJob.getTargetEntity());
+        m.setProviderAssignedId(creationJob.getTargetEntity().getId().toString());
         /** set cloud provider location */
         m.setLocation(mylocation);
 
@@ -390,12 +390,12 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 
         if (creationJob.getStatus() == Job.Status.SUCCESS) {
             try {
-                m.setState(computeService.getMachineState(creationJob.getTargetEntity()));
+                m.setState(computeService.getMachineState(creationJob.getTargetEntity().getId().toString()));
             } catch (ConnectorException ce) {
                 throw new ServiceUnavailableException(ce.getMessage());
             }
             this.em.persist(m);
-            j.setTargetEntity(m.getId().toString());
+            j.setTargetEntity(m);
             this.em.persist(j);
             this.em.flush();
 
@@ -403,7 +403,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
             /** Job is RUNNING. Will be notified when creation completes */
 
             this.em.persist(m);
-            j.setTargetEntity(m.getId().toString());
+            j.setTargetEntity(m);
             this.em.persist(j);
             this.em.flush();
 
@@ -515,7 +515,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         // TODO machine create may be dispatched as a set of jobs
         persistedJob.setNestedJobs(null);
         persistedJob.setStatusMessage(j.getStatusMessage());
-        persistedJob.setTargetEntity(m.getId().toString());
+        persistedJob.setTargetEntity(m);
         persistedJob.setProviderAssignedId(j.getProviderAssignedId().toString());
         persistedJob.setCreated(new Date());
         persistedJob.setLocation(m.getLocation());
@@ -762,7 +762,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         }
 
         j = new Job();
-        j.setTargetEntity(m.getId().toString());
+        j.setTargetEntity(m);
         j.setStatus(Job.Status.SUCCESS);
         j.setAction("update");
         j.setParentJob(null);
@@ -1266,7 +1266,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     private void removeMachine(final Machine deleted) {
         MachineManager.logger.info(" deleting machine " + deleted.getId());
         User u = deleted.getUser();
-        u.getMachines().remove(deleted);
+        u.getCloudEntities().remove(deleted);
 
         deleted.setCloudProviderAccount(null);
 
@@ -1287,7 +1287,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
          */
         String jid = notification.getProviderAssignedId().toString();
         /** providerAssignedMachineId */
-        String pamid = notification.getTargetEntity();
+        String pamid = notification.getTargetEntity().getId().toString();
         Job jpersisted = null;
         MachineManager.logger.info(" Notification for job " + notification.getProviderAssignedId() + " " + pamid);
         try {
@@ -1318,7 +1318,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
 
             } else {
                 /** find the machine from its id */
-                Integer mid = Integer.valueOf(jpersisted.getTargetEntity());
+                Integer mid = Integer.valueOf(jpersisted.getTargetEntity().getId().toString());
                 mpersisted = this.em.find(Machine.class, mid);
             }
 

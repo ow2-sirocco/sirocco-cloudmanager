@@ -34,10 +34,14 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Entity
 public class MachineImage extends CloudEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
+	
+	private CloudProviderLocation location;
 
     public static enum State {
         CREATING, AVAILABLE, DELETING, ERROR
@@ -99,6 +103,14 @@ public class MachineImage extends CloudEntity implements Serializable {
 	public void setCloudProviderAccount(CloudProviderAccount cloudProviderAccount) {
 		this.cloudProviderAccount = cloudProviderAccount;
 	}
+
+    public CloudProviderLocation getLocation() {
+        return location;
+    }
+    @ManyToOne
+    public void setLocation(CloudProviderLocation location) {
+        this.location = location;
+    }
 	
 }
 

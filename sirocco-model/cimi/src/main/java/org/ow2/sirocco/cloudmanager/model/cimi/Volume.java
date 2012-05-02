@@ -40,11 +40,15 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM Volume v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
 public class Volume extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+    
+    private CloudProviderLocation location;
 
     public static final String GET_VOLUME_BY_PROVIDER_ASSIGNED_ID = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID";
 
@@ -94,7 +98,7 @@ public class Volume extends CloudEntity implements Serializable {
         this.bootable = bootable;
     }
 
-    @OneToMany(mappedBy = "volume", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "volume")
     public Collection<MachineVolume> getMachineVolumes() {
         return this.machineVolumes;
     }
@@ -118,6 +122,15 @@ public class Volume extends CloudEntity implements Serializable {
 
     public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
         this.cloudProviderAccount = cloudProviderAccount;
+    }
+
+    @ManyToOne
+    public CloudProviderLocation getLocation() {
+        return location;
+    }
+
+    public void setLocation(CloudProviderLocation location) {
+        this.location = location;
     }
 
 }
