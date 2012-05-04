@@ -30,23 +30,35 @@ import javax.persistence.Transient;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 public class MachineCollection  extends CloudEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	public MachineCollection() {}
 
 	@Transient
+	protected List<String> operations = new ArrayList<String>() {{
+		add("add");
+	}};
+
+	@Transient
 	List<Machine> machines;
-	
+
 	@Transient
 	public List<Machine> getMachines(){
 		return this.machines;
 	}
+
 	@Transient
 	public void setMachines(List<Machine> machines){
 		this.machines = machines;
+	}
+
+	@Transient
+	public List<String> getOperations() {
+		return operations;
 	}
 }
 

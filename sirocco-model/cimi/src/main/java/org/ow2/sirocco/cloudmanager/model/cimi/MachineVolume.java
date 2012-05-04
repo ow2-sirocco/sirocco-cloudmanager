@@ -33,6 +33,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.JoinColumn;
 
 @Entity
@@ -42,23 +43,26 @@ public class MachineVolume implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	private String				attachmentPoint;
-	private Volume				volume;
 	private Integer 			id;
-	
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Integer getId() {
-        return this.id;
-    }
-    
+	private String			initialLocation;
+	private Volume			volume;
+
+	@ManyToOne
+	private MachineVolumeCollection 	machineVolumeCollection;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	public Integer getId() {
+		return this.id;
+	}
+
 
 	public void setId(Integer id) {
 		this.id = id;
 	}
 
-
-	@ManyToOne
+	// unidirectional
+	@OneToOne
 	public Volume getVolume() {
 		return volume;
 	}
@@ -67,17 +71,21 @@ public class MachineVolume implements Serializable {
 		this.volume = volume;
 	}
 
-
-	public String getAttachmentPoint() {
-		return attachmentPoint;
+	public String getInitialLocation() {
+		return initialLocation;
 	}
 
-	public void setAttachmentPoint(String attachmentPoint) {
-		this.attachmentPoint = attachmentPoint;
+	public void setInitialLocation(String initialLocation) {
+		this.initialLocation = initialLocation;
 	}
 
 
+	@ManyToOne
+	public MachineVolumeCollection getMachineVolumeCollection() {
+		return this.machineVolumeCollection;
+	}
 
-
+	public void setMachineVolumeCollection(final MachineVolumeCollection machineVolumeColl) {
+		this.machineVolumeCollection = machineVolumeColl;
+	}
 }
-

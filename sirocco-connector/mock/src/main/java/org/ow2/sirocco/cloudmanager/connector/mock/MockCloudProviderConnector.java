@@ -51,6 +51,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface.InterfaceState;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.util.log.Log;
@@ -196,17 +199,21 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         machine.setState(Machine.State.CREATING);
         machine.setCpu(new Cpu(machineCreate.getMachineTemplate().getMachineConfiguration().getCpu()));
         machine.setMemory(machineCreate.getMachineTemplate().getMachineConfiguration().getMemory());
-        List<Disk> disks = new ArrayList<Disk>();
+        List<MachineDisk> disks = new ArrayList<MachineDisk>();
         if (machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates() != null) {
             for (DiskTemplate diskTemplate : machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates()) {
-                Disk disk = new Disk();
+            	 MachineDisk mdisk = new MachineDisk();
                 // TODO
                 // disk.setDiskUnit(diskTemplate.getDiskUnit());
-                disk.setQuantity(diskTemplate.getQuantity());
-                disks.add(disk);
+            	 mdisk.getDisk().setQuantity(diskTemplate.getQuantity());
+                 mdisk.setInitialLocation(diskTemplate.getInitialLocation());
+                 disks.add(mdisk);
             }
         }
-        machine.setDisks(disks);
+        MachineDiskCollection diskCollection = new MachineDiskCollection();
+        diskCollection.setItems(disks);
+        machine.setDisks(diskCollection);
+        
         List<NetworkInterface> networkInterfaces = new ArrayList<NetworkInterface>();
         if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
             for (NetworkInterface networkInterface : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
@@ -435,4 +442,15 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return null;
     }
 
+    @Override
+    public Job addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job removeVolumeFromMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

@@ -26,19 +26,39 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import javax.persistence.Embeddable;
+import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 
-
-@Embeddable
+@Entity
 public class MachineVolumeTemplate implements Serializable {
 
-	private String			attachmentPoint;
-/**
+	private static final long serialVersionUID = 1L;
+	private Integer 			id;
+	private String				initialLocation;
+
 	private VolumeTemplate		volumeTemplate;
 
+
 	@ManyToOne
-	@JoinColumn (name="volumeTemplate")
+	private MachineVolumeTemplateCollection 	machineVolumeTemplateCollection;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	public Integer getId() {
+		return this.id;
+	}
+
+
+	public void setId(Integer id) {
+		this.id = id;
+	}
+
+	// TODO unidirectional
+	@OneToOne
 	public VolumeTemplate getVolumeTemplate() {
 		return volumeTemplate;
 	}
@@ -46,16 +66,24 @@ public class MachineVolumeTemplate implements Serializable {
 	public void setVolumeTemplate(VolumeTemplate volumeTemplate) {
 		this.volumeTemplate = volumeTemplate;
 	}
-*/
 
-	public String getAttachmentPoint() {
-		return attachmentPoint;
+	public String getInitialLocation() {
+		return initialLocation;
 	}
 
-	public void setAttachmentPoint(String attachmentPoint) {
-		this.attachmentPoint = attachmentPoint;
+	public void setInitialLocation(String initialLocation) {
+		this.initialLocation = initialLocation;
 	}
 
 
+	@ManyToOne
+	public MachineVolumeTemplateCollection getMachineVolumeTemplateCollection() {
+		return this.machineVolumeTemplateCollection;
+	}
+
+	public void setMachineVolumeTemplateCollection(final MachineVolumeTemplateCollection machineVolumeTemplateColl) {
+		this.machineVolumeTemplateCollection = machineVolumeTemplateColl;
+	}
 }
+
 

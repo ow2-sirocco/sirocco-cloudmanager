@@ -37,33 +37,32 @@ import org.hibernate.annotations.CollectionOfElements;
 public class MachineConfiguration extends CloudEntity implements Serializable {
 	private static final long serialVersionUID = 1L;
 
-	private	Cpu			cpu;
-	private Memory			memory;
+	private	Cpu					cpu;
+	private Memory				memory;
 	private List<DiskTemplate>	diskTemplates;	
 
 	public Cpu	getCpu() {
-	    return this.cpu;
+		return this.cpu;
 	}
 
 	public void setCpu(Cpu cpu) {
-	    this.cpu = cpu;
+		this.cpu = cpu;
 	}
 
 	public Memory getMemory() {
-	    return this.memory;
+		return this.memory;
 	}
 
 	public void setMemory(Memory memory) {
-	    this.memory = memory;
+		this.memory = memory;
 	}
 
 	@CollectionOfElements
 	public List<DiskTemplate> getDiskTemplates() {
-	    return this.diskTemplates;
-	}
-
-	public void setDiskTemplates(List<DiskTemplate> diskTemplates) {
-	    this.diskTemplates = diskTemplates;
+		return this.diskTemplates;
 	}
 	
+	public void setDiskTemplates(List<DiskTemplate> diskTemplates) {
+		this.diskTemplates = diskTemplates;
+	}
 }

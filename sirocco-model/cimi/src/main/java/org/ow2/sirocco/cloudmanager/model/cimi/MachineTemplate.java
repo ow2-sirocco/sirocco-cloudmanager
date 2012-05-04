@@ -34,82 +34,88 @@ import javax.persistence.Entity;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Embedded;
+import javax.persistence.Transient;
+
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 public class MachineTemplate extends CloudEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private MachineConfiguration machineConfiguration;
+	private MachineConfiguration machineConfiguration;
 
-    private MachineImage machineImage;
+	private MachineImage machineImage;
 
-    private Credentials credentials;
+	private Credentials credentials;
 
-    private List<MachineVolume> volumes;
-    private List<MachineVolumeTemplate> volumeTemplates;
-    private List<NetworkInterface> networkInterfaces;
+	@OneToOne
+	private MachineVolumeCollection volumes;
 
-    public MachineTemplate() {
-        this.volumes = new ArrayList<MachineVolume>();
-        this.networkInterfaces = new ArrayList<NetworkInterface>();
-    }
+	@OneToOne
+	private MachineVolumeTemplateCollection volumeTemplates;
 
-    @ManyToOne
-    public MachineConfiguration getMachineConfiguration() {
-        return this.machineConfiguration;
-    }
 
-    public void setMachineConfiguration(final MachineConfiguration machineConfiguration) {
-        this.machineConfiguration = machineConfiguration;
-    }
+	private List<NetworkInterface> networkInterfaces;
 
-    @ManyToOne
-    public MachineImage getMachineImage() {
-        return this.machineImage;
-    }
+	public MachineTemplate() {
+		
+		this.networkInterfaces = new ArrayList<NetworkInterface>();
+	}
 
-    public void setMachineImage(final MachineImage machineImage) {
-        this.machineImage = machineImage;
-    }
+	@ManyToOne
+	public MachineConfiguration getMachineConfiguration() {
+		return this.machineConfiguration;
+	}
 
-    @ManyToOne
-    public Credentials getCredentials() {
-        return this.credentials;
-    }
+	public void setMachineConfiguration(final MachineConfiguration machineConfiguration) {
+		this.machineConfiguration = machineConfiguration;
+	}
 
-    public void setCredentials(final Credentials credentials) {
-        this.credentials = credentials;
-    }
+	@ManyToOne
+	public MachineImage getMachineImage() {
+		return this.machineImage;
+	}
 
-    @CollectionOfElements
-    public List<MachineVolume> getVolumes() {
-        return this.volumes;
-    }
+	public void setMachineImage(final MachineImage machineImage) {
+		this.machineImage = machineImage;
+	}
 
-    public void setVolumes(final List<MachineVolume> volumes) {
-        this.volumes = volumes;
-    }
-    
-    
-    
-    @CollectionOfElements
-    public List<MachineVolumeTemplate> getVolumeTemplates() {
-    	return this.volumeTemplates; 
-    }
-    
-    public void setVolumeTemplates(final List<MachineVolumeTemplate> volumeTemplates) {
-    	this.volumeTemplates = volumeTemplates; 
-    }
- 
+	@ManyToOne
+	public Credentials getCredentials() {
+		return this.credentials;
+	}
 
-    @CollectionOfElements
-    public List<NetworkInterface> getNetworkInterfaces() {
-        return this.networkInterfaces;
-    }
+	public void setCredentials(final Credentials credentials) {
+		this.credentials = credentials;
+	}
 
-    public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
-        this.networkInterfaces = networkInterfaces;
-    }
+	@OneToOne
+	public MachineVolumeCollection getVolumes() {
+		return this.volumes;
+	}
+
+	public void setVolumes(final MachineVolumeCollection volumes) {
+		this.volumes = volumes;
+	}
+
+	@OneToOne
+	public MachineVolumeTemplateCollection getVolumeTemplates() {
+		return this.volumeTemplates;
+	}
+
+	public void setVolumeTemplates(final MachineVolumeTemplateCollection volumeTemplates) {
+		this.volumeTemplates = volumeTemplates;
+	}    
+
+
+	@CollectionOfElements
+	public List<NetworkInterface> getNetworkInterfaces() {
+		return this.networkInterfaces;
+	}
+
+	public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
+		this.networkInterfaces = networkInterfaces;
+	}
 }

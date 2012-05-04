@@ -33,66 +33,75 @@ import javax.persistence.Enumerated;
 
 @Embeddable
 public class Disk implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private StorageUnit unit;
+	private StorageUnit units;
 
-    private Float quantity;
+	private Float quantity;
 
-    @Enumerated(EnumType.STRING)
-    public StorageUnit getUnit() {
-        return this.unit;
-    }
+	@Enumerated(EnumType.STRING)
+	public StorageUnit getUnits() {
+		return this.units;
+	}
 
-    public void setUnit(final StorageUnit unit) {
-        this.unit = unit;
-    }
+	public void setUnits(final StorageUnit units) {
+		this.units = units;
+	}
 
-    public Float getQuantity() {
-        return this.quantity;
-    }
+	// To remove
+	public StorageUnit getUnit() {
+		return getUnits();
+	}
 
-    public void setQuantity(final Float quantity) {
-        this.quantity = quantity;
-    }
+	public void setUnit(final StorageUnit units) {
+		setUnits(units);
+	}
+	
+	public Float getQuantity() {
+		return this.quantity;
+	}
 
-    @Override
-    public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((this.quantity == null) ? 0 : this.quantity.hashCode());
-        result = prime * result + ((this.unit == null) ? 0 : this.unit.hashCode());
-        return result;
-    }
+	public void setQuantity(final Float quantity) {
+		this.quantity = quantity;
+	}
 
-    @Override
-    public boolean equals(final Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (this.getClass() != obj.getClass()) {
-            return false;
-        }
-        Disk other = (Disk) obj;
-        if (this.quantity == null) {
-            if (other.quantity != null) {
-                return false;
-            }
-        } else if (!this.quantity.equals(other.quantity)) {
-            return false;
-        }
-        if (this.unit != other.unit) {
-            return false;
-        }
-        return true;
-    }
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((this.quantity == null) ? 0 : this.quantity.hashCode());
+		result = prime * result + ((this.units == null) ? 0 : this.units.hashCode());
+		return result;
+	}
 
-    @Override
-    public String toString() {
-        return "Disk [unit=" + this.unit + ", quantity=" + this.quantity + "]";
-    }
+	@Override
+	public boolean equals(final Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (this.getClass() != obj.getClass()) {
+			return false;
+		}
+		Disk other = (Disk) obj;
+		if (this.quantity == null) {
+			if (other.quantity != null) {
+				return false;
+			}
+		} else if (!this.quantity.equals(other.quantity)) {
+			return false;
+		}
+		if (this.units != other.units) {
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "Disk [units=" + this.units + ", quantity=" + this.quantity + "]";
+	}
 
 }

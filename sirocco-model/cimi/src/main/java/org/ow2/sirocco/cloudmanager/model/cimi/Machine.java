@@ -40,6 +40,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
@@ -53,110 +54,110 @@ import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 @Entity
 @NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
 public class Machine extends CloudEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
+
+	public static final String GET_MACHINE_BY_STATE = "GET_MACHINE_BY_STATE";
     
     private CloudProviderLocation location;
 
-    public static final String GET_MACHINE_BY_STATE = "GET_MACHINE_BY_STATE";
+	public static enum State {
+		CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
+	}
 
-    public static enum State {
-        CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
-    }
+	private State state;
 
-    private State state;
+	private Cpu cpu;
+	private Memory 		memory;
 
-    private Cpu cpu;
+	@OneToOne
+	private MachineVolumeCollection volumes;
 
-    private List<MachineVolume> volumes;
-    private List<NetworkInterface>  networkInterfaces;
+	@OneToOne
+	private MachineDiskCollection disks;
 
-    private CloudProviderAccount cloudProviderAccount;
+	private List<NetworkInterface>  networkInterfaces;
 
-    private Memory 		memory;
-    private List<Disk> disks;
-
-    @Transient
-    private FSM			fsm;
-
-	
-
-    public Machine() {
-        this.disks = new ArrayList<Disk>();
-        this.volumes = new ArrayList<MachineVolume>();
-        this.networkInterfaces = new ArrayList<NetworkInterface>();
-    }
-
-    @Enumerated(EnumType.STRING)
-    public State getState() {
-        return this.state;
-    }
-
-    public void setState(final State state) {
-        this.state = state;
-    }
-
-    @Embedded
-    public Cpu getCpu() {
-        return this.cpu;
-    }
-
-    public void setCpu(final Cpu cpu) {
-        this.cpu = cpu;
-    }
-
-    @Embedded
-    public Memory getMemory() {
-        return this.memory;
-    }
-
-    public void setMemory(final Memory memory) {
-        this.memory = memory;
-    }
-
-    @CollectionOfElements
-    public List<Disk> getDisks() {
-        return this.disks;
-    }
-
-    public void setDisks(List<Disk> disks) {
-        disks = this.disks;
-    }
-
-    @OneToMany
-    public List<MachineVolume> getVolumes() {
-        return this.volumes;
-    }
-
-    public void setVolumes(final List<MachineVolume> volumes) {
-        this.volumes = volumes;
-    }
+	private CloudProviderAccount cloudProviderAccount;
 
 
-    @CollectionOfElements
-    public List<NetworkInterface> getNetworkInterfaces() {
-        return this.networkInterfaces;
-    }
+	@Transient
+	private FSM			fsm;
 
-    public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
-        this.networkInterfaces = networkInterfaces;
-    }
 
-    @ManyToOne
-    public CloudProviderAccount getCloudProviderAccount() {
-        return this.cloudProviderAccount;
-    }
+	public Machine() {
+		this.networkInterfaces = new ArrayList<NetworkInterface>();
+	}
 
-    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
-        this.cloudProviderAccount = cloudProviderAccount;
-    }
-    
-    /**
-     * Ideally: create and persist an FSM per entity per provider.
-     * Machines should then refer appropriate FSM.
-     */
-    public void initFSM() {
-    	this.fsm = new FSM(State.CREATING.toString());
-    	fsm.addAction(State.CREATING, "delete", State.DELETING);
+	@Enumerated(EnumType.STRING)
+	public State getState() {
+		return this.state;
+	}
+
+	public void setState(final State state) {
+		this.state = state;
+	}
+
+	@Embedded
+	public Cpu getCpu() {
+		return this.cpu;
+	}
+
+	public void setCpu(final Cpu cpu) {
+		this.cpu = cpu;
+	}
+
+	@Embedded
+	public Memory getMemory() {
+		return this.memory;
+	}
+
+	public void setMemory(final Memory memory) {
+		this.memory = memory;
+	}
+
+	@OneToOne
+	public MachineDiskCollection getDisks() {
+		return this.disks;
+	}
+
+	public void setDisks(final MachineDiskCollection disks) {
+		this.disks = disks;
+	}
+
+	@OneToOne
+	public MachineVolumeCollection getVolumes() {
+		return this.volumes;
+	}
+
+	public void setVolumes(final MachineVolumeCollection volumes) {
+		this.volumes = volumes;
+	}
+
+	@CollectionOfElements
+	public List<NetworkInterface> getNetworkInterfaces() {
+		return this.networkInterfaces;
+	}
+
+	public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
+		this.networkInterfaces = networkInterfaces;
+	}
+
+	@ManyToOne
+	public CloudProviderAccount getCloudProviderAccount() {
+		return this.cloudProviderAccount;
+	}
+
+	public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
+		this.cloudProviderAccount = cloudProviderAccount;
+	}
+
+	/**
+	 * Ideally: create and persist an FSM per entity per provider.
+	 * Machines should then refer appropriate FSM.
+	 */
+	 public void initFSM() {
+		this.fsm = new FSM(State.CREATING.toString());
+		fsm.addAction(State.CREATING, "delete", State.DELETING);
 		fsm.addAction(State.CREATING, "delete", State.ERROR);
 		fsm.addAction(State.CREATING, "internal", State.STOPPED);
 		fsm.addAction(State.CREATING, "internal", State.ERROR);
@@ -217,14 +218,14 @@ public class Machine extends CloudEntity implements Serializable {
 
 		fsm.addAction(State.DELETING, "delete", State.DELETING);
 		fsm.addAction(State.DELETING, "internal", State.DELETED);
-    }
-    /** get operations allowed in this state */
-    @Transient
-    public Set<String> getOperations() {
-    	Set<String> operations = fsm.getActionsAtState(state);
-		operations.remove(new String("internal"));
-    	return operations;
-    }
+	 }
+	 /** get operations allowed in this state */
+	 @Transient
+	 public Set<String> getOperations() {
+		 Set<String> operations = fsm.getActionsAtState(state);
+		 operations.remove(new String("internal"));
+		 return operations;
+	 }
 
     @ManyToOne
     public CloudProviderLocation getLocation() {

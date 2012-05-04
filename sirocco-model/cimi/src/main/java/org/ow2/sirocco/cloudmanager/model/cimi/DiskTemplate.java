@@ -33,53 +33,64 @@ import javax.persistence.Enumerated;
 
 @Embeddable
 public class DiskTemplate implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private StorageUnit unit;
+	private StorageUnit unit;
 
-    private Float quantity;
+	private Float quantity;
 
-    private String format;
+	private String format;
 
-    private String attachmentPoint;
+	private String initialLocation;
 
-    @Enumerated(EnumType.STRING)
-    public StorageUnit getUnit() {
-        return this.unit;
-    }
+	@Enumerated(EnumType.STRING)
+	public StorageUnit getUnit() {
+		return this.unit;
+	}
 
-    public void setUnit(final StorageUnit unit) {
-        this.unit = unit;
-    }
+	public void setUnit(final StorageUnit unit) {
+		this.unit = unit;
+	}
 
-    public Float getQuantity() {
-        return this.quantity;
-    }
+	public Float getQuantity() {
+		return this.quantity;
+	}
 
-    public void setQuantity(final Float quantity) {
-        this.quantity = quantity;
-    }
+	public void setQuantity(final Float quantity) {
+		this.quantity = quantity;
+	}
 
-    public String getFormat() {
-        return this.format;
-    }
+	public String getFormat() {
+		return this.format;
+	}
 
-    public void setFormat(final String format) {
-        this.format = format;
-    }
+	public void setFormat(final String format) {
+		this.format = format;
+	}
 
-    public String getAttachmentPoint() {
-        return this.attachmentPoint;
-    }
+	public String getInitialLocation() {
+		return this.initialLocation;
+	}
 
-    public void setAttachmentPoint(final String attachmentPoint) {
-        this.attachmentPoint = attachmentPoint;
-    }
+	
+	public void setInitialLocation(final String initialLocation) {
+		this.initialLocation = initialLocation;
+	}
 
-    @Override
-    public String toString() {
-        return "DiskTemplate [unit=" + this.unit + ", quantity=" + this.quantity + ", format=" + this.format
-            + ", attachmentPoint=" + this.attachmentPoint + "]";
-    }
+	// To remove
+	public String getAttachmentPoint() {
+		return getInitialLocation();
+	}
+	
+	// To remove
+	public void setAttachmentPoint(final String attachmentPoint) {
+		setInitialLocation(attachmentPoint);
+	}
+	
+	@Override
+	public String toString() {
+		return "DiskTemplate [unit=" + this.unit + ", quantity=" + this.quantity + ", format=" + this.format
+				+ ", initialLocation=" + this.initialLocation + "]";
+	}
 
 }

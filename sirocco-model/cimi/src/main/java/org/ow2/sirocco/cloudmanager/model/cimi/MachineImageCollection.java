@@ -30,16 +30,22 @@ import javax.persistence.Transient;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 public class MachineImageCollection  extends CloudEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	public MachineImageCollection() {}
 
 	@Transient
+	List<String> operations = new ArrayList<String>() {{
+		add("add");
+	}};
+
+	@Transient
 	List<MachineImage> images;
-	
+
 	@Transient
 	public List<MachineImage> getImages(){
 		return this.images;
@@ -47,6 +53,11 @@ public class MachineImageCollection  extends CloudEntity implements Serializable
 	@Transient
 	public void setImages(List<MachineImage> images){
 		this.images = images;
+	}
+
+	@Transient
+	public List<String> getOperations() {
+		return operations;
 	}
 }
 

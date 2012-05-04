@@ -30,16 +30,22 @@ import javax.persistence.Transient;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 public class MachineTemplateCollection  extends CloudEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
 	public MachineTemplateCollection() {}
-	
+
+	@Transient
+	List<String> operations = new ArrayList<String>() {{
+		add("add");
+	}};
+
 	@Transient
 	List<MachineTemplate> machineTemplates;
-	
+
 	@Transient
 	public List<MachineTemplate> getMachineTemplates(){
 		return this.machineTemplates;
@@ -47,6 +53,11 @@ public class MachineTemplateCollection  extends CloudEntity implements Serializa
 	@Transient
 	public void setMachineTemplates(List<MachineTemplate> machineTemplates){
 		this.machineTemplates = machineTemplates;
+	}
+
+	@Transient
+	public List<String> getOperations() {
+		return operations;
 	}
 }
 

@@ -45,7 +45,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
@@ -292,8 +294,12 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setMachineImage(image);
         machineTemplate.setCredentials(credentials);
 
-        machineTemplate.setVolumes(Collections.<MachineVolume> emptyList());
-        machineTemplate.setVolumeTemplates(Collections.<MachineVolumeTemplate> emptyList());
+        MachineVolumeCollection volColl = new MachineVolumeCollection();
+        volColl.setItems(Collections.<MachineVolume> emptyList());
+        machineTemplate.setVolumes(volColl);
+        MachineVolumeTemplateCollection vtColl = new MachineVolumeTemplateCollection();
+        vtColl.setItems(Collections.<MachineVolumeTemplate> emptyList());
+        machineTemplate.setVolumeTemplates(vtColl);
         machineTemplate.setNetworkInterfaces(Collections.<NetworkInterface> emptyList());
         machineCreate.setMachineTemplate(machineTemplate);
 
