@@ -46,7 +46,7 @@ import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Entity
-@Inheritance(strategy=InheritanceType.JOINED)
+@Inheritance(strategy=InheritanceType.SINGLE_TABLE)
 public abstract class CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
