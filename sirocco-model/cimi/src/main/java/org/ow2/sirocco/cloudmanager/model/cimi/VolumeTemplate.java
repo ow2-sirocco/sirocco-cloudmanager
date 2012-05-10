@@ -36,6 +36,8 @@ public class VolumeTemplate extends CloudEntity implements Serializable {
 
     private VolumeConfiguration volumeConfig;
 
+    private VolumeImage volumeImage;
+
     @ManyToOne
     public VolumeConfiguration getVolumeConfig() {
         return this.volumeConfig;
@@ -43,6 +45,15 @@ public class VolumeTemplate extends CloudEntity implements Serializable {
 
     public void setVolumeConfig(final VolumeConfiguration volumeConfig) {
         this.volumeConfig = volumeConfig;
+    }
+
+    @ManyToOne
+    public VolumeImage getVolumeImage() {
+        return this.volumeImage;
+    }
+
+    public void setVolumeImage(final VolumeImage volumeImage) {
+        this.volumeImage = volumeImage;
     }
 
 }

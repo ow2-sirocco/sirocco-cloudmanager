@@ -37,6 +37,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 
@@ -417,6 +419,24 @@ public interface IVolumeManager {
      *         completed
      */
     void updateVolumeTemplateCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
+
+    VolumeImageCollection getVolumeImageCollection() throws CloudProviderException;
+
+    Job createVolumeImage(VolumeImage volumeImage) throws InvalidRequestException, CloudProviderException;
+
+    List<VolumeImage> getVolumeImages(int first, int last, List<String> attributes) throws InvalidRequestException,
+        CloudProviderException;
+
+    List<VolumeImage> getVolumeImages(List<String> attributes, String filterExpression) throws InvalidRequestException,
+        CloudProviderException;
+
+    Job updateVolumeImage(VolumeImage volumeImage) throws InvalidRequestException, ResourceNotFoundException,
+        CloudProviderException;
+
+    Job updateVolumeImageAttributes(String volumeImageId, Map<String, Object> updatedAttributes)
+        throws InvalidRequestException, ResourceNotFoundException, CloudProviderException;
+
+    Job deleteVolumeImage(String volumeImageId) throws ResourceNotFoundException, CloudProviderException;
 
     boolean volumeCompletionHandler(final Job job);
 

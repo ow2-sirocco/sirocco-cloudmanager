@@ -36,6 +36,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -121,7 +123,7 @@ public class VolumeManager implements IVolumeManager {
 
         Volume volume = new Volume();
 
-        volume.setProviderAssignedId(providerJob.getTargetEntity().getId().toString());
+        volume.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
         volume.setCloudProviderAccount(defaultAccount);
         volume.setCapacity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity());
         volume.setBootable(false);
@@ -158,7 +160,8 @@ public class VolumeManager implements IVolumeManager {
             // job is done and successful: retrieve the state of the volume and
             // persist volume+job
             try {
-                volume.setState(connector.getVolumeService().getVolumeState(providerJob.getTargetEntity().getId().toString()));
+                volume.setState(connector.getVolumeService().getVolumeState(
+                    providerJob.getTargetEntity().getProviderAssignedId()));
             } catch (ConnectorException e) {
                 throw new CloudProviderException(e.getMessage());
             }
@@ -276,7 +279,7 @@ public class VolumeManager implements IVolumeManager {
             throw new UnsupportedOperationException();
         }
         User user = this.getUser();
-        return this.em.createQuery("FROM Volume v WHERE v.user.username=:username ORDER BY v.id")
+        return this.em.createQuery("FROM Volume v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id ")
             .setParameter("username", user.getUsername()).getResultList();
     }
 
@@ -285,7 +288,7 @@ public class VolumeManager implements IVolumeManager {
     public List<Volume> getVolumes(final int first, final int last, final List<String> attributes)
         throws CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM Volume v WHERE v.user.username=:username ORDER BY v.id");
+        Query query = this.em.createQuery("FROM Volume v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id");
         query.setParameter("username", user.getUsername());
         query.setMaxResults(last - first + 1);
         query.setFirstResult(first);
@@ -492,7 +495,9 @@ public class VolumeManager implements IVolumeManager {
         } else {
             // job is done and successful: retrieve the state of the volume and
             // persist volume+job
-            this.em.remove(volume);
+            volume.setState(Volume.State.DELETED);
+            this.em.persist(volume);
+            // this.em.remove(volume);
             this.em.flush();
 
             Job job = new Job();
@@ -531,7 +536,8 @@ public class VolumeManager implements IVolumeManager {
     public VolumeCollection getVolumeCollection() throws CloudProviderException {
         User user = this.getUser();
         @SuppressWarnings("unchecked")
-        List<Volume> volumes = this.em.createQuery("SELECT v FROM Volume v WHERE v.user.username=:username")
+        List<Volume> volumes = this.em
+            .createQuery("SELECT v FROM Volume v WHERE v.user.username=:username AND v.state<>'DELETED'")
             .setParameter("username", user.getUsername()).getResultList();
         VolumeCollection collection = (VolumeCollection) this.em
             .createQuery("FROM VolumeCollection m WHERE m.user.username=:username")
@@ -613,7 +619,7 @@ public class VolumeManager implements IVolumeManager {
         Volume volume = null;
 
         try {
-            volume = this.getVolumeByProviderAssignedId(providerJob.getTargetEntity().getId().toString());
+            volume = this.getVolumeByProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
         } catch (PersistenceException e) {
             VolumeManager.logger.error("Cannot find Volume with provider-assigned id " + providerJob.getTargetEntity());
             return false;
@@ -639,7 +645,9 @@ public class VolumeManager implements IVolumeManager {
             }
         } else if (providerJob.getAction().equals("volume.delete")) {
             if (providerJob.getStatus() == Job.Status.SUCCESS) {
-                this.em.remove(volume);
+                volume.setState(Volume.State.DELETED);
+                this.em.persist(volume);
+                this.em.flush();
             } else if (providerJob.getStatus() == Job.Status.FAILED) {
                 volume.setState(Volume.State.ERROR);
                 VolumeManager.logger.error("Failed to delete volume  " + volume.getName() + ": "
@@ -649,6 +657,52 @@ public class VolumeManager implements IVolumeManager {
         }
 
         return true;
+    }
+
+    @Override
+    public VolumeImageCollection getVolumeImageCollection() throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job createVolumeImage(final VolumeImage volumeImage) throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<VolumeImage> getVolumeImages(final int first, final int last, final List<String> attributes)
+        throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<VolumeImage> getVolumeImages(final List<String> attributes, final String filterExpression)
+        throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job updateVolumeImage(final VolumeImage volumeImage) throws InvalidRequestException, ResourceNotFoundException,
+        CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job updateVolumeImageAttributes(final String volumeImageId, final Map<String, Object> updatedAttributes)
+        throws InvalidRequestException, ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job deleteVolumeImage(final String volumeImageId) throws ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
