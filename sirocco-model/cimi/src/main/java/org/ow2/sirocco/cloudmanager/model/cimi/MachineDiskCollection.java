@@ -32,50 +32,49 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 public class MachineDiskCollection implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	protected Integer id;
+    protected Integer id;
 
-	@OneToOne(mappedBy = "disks")
-	protected Machine machine;
+    @OneToOne(mappedBy = "disks")
+    protected Machine machine;
 
-	private List<MachineDisk> items;
+    private List<MachineDisk> items;
 
-	public MachineDiskCollection() {
-	}
+    public MachineDiskCollection() {
+    }
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Integer getId() {
-		return this.id;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return this.id;
+    }
 
-	public void setId(final Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
-	@CollectionOfElements
-	public List<MachineDisk> getItems() {
-		return this.items;
-	}
+    @CollectionOfElements
+    public List<MachineDisk> getItems() {
+        return this.items;
+    }
 
-	public void setItems(List<MachineDisk> items) {
-		this.items = items;
-	}
+    public void setItems(final List<MachineDisk> items) {
+        this.items = items;
+    }
 
-	@OneToOne(mappedBy = "disks")
-	public Machine getMachine() {
-		return machine;
-	}
+    @OneToOne(mappedBy = "disks")
+    public Machine getMachine() {
+        return this.machine;
+    }
 
-	public void setMachine(Machine machine) {
-		this.machine = machine;
-	}
+    public void setMachine(final Machine machine) {
+        this.machine = machine;
+    }
 }
