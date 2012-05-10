@@ -45,6 +45,7 @@ public class Memory implements Serializable {
     private Float quantity;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "memory_unit")
     public MemoryUnit getUnit() {
         return this.unit;
     }

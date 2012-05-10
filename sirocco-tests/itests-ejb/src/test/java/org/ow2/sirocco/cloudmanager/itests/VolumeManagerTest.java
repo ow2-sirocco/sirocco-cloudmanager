@@ -222,7 +222,7 @@ public class VolumeManagerTest {
         Assert.assertTrue(volume.getProperties().get("department").equals("MAPS"));
         Assert.assertNotNull(volume.getCapacity());
         Assert.assertEquals(volume.getCapacity().getQuantity().intValue(), 512);
-        Assert.assertEquals(volume.getCapacity().getUnit(), StorageUnit.MEGABYTE);
+        Assert.assertEquals(volume.getCapacity().getUnits(), StorageUnit.MEGABYTE);
 
         // TODO update volume
 
