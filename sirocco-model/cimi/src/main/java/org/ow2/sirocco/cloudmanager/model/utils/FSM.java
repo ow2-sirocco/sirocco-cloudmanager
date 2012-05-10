@@ -25,93 +25,85 @@
 
 package org.ow2.sirocco.cloudmanager.model.utils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Formatter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
+public class FSM<S, A> implements Serializable {
 
+    private final HashMap<S, StateEntry> states = new HashMap<S, StateEntry>();;
 
-public class FSM<S, A> {
+    private final StateEntry initialState;
 
-	private final HashMap<S, StateEntry> states = new HashMap<S, StateEntry>();;
-	private final StateEntry initialState;
+    public FSM(final S state) {
+        this.initialState = new StateEntry(state);
+    }
 
+    public void addAction(final S fromState, final A action, final S toState) {
+        StateEntry entry = null;
+        if (fromState == null) {
+            return;
+        }
 
-	public FSM(S state) { 
-		initialState = new StateEntry(state);
-	}
+        entry = this.states.get(fromState);
+        if (entry == null) {
+            entry = new StateEntry(fromState);
+            this.states.put(fromState, entry);
+        }
 
+        entry.addAction(action, toState);
+        entry = this.states.get(toState);
+        if (entry == null) {
+            entry = new StateEntry(toState);
+            this.states.put(toState, entry);
+        }
+        entry.addFromAction(action, fromState);
+    }
 
-	public void addAction(S fromState, A action, S toState) {
-		StateEntry entry = null;
-		if (fromState == null) {
-			return;
-		}
+    /**
+     * Get possible operations from state @s
+     */
+    public Set<A> getActionsAtState(final S s) {
+        StateEntry entry = this.states.get(s);
+        return entry.nextStates.keySet();
+    }
 
-		entry = states.get(fromState);
-		if (entry == null) {
-			entry = new StateEntry(fromState);
-			states.put(fromState, entry);
-		}
+    /**
+     * Get next state reached when starting from @s and executing action @a
+     */
+    public S getNextState(final S s, final A a) {
 
-		entry.addAction(action, toState);
-		entry = states.get(toState);
-		if (entry == null) {
-			entry = new StateEntry(toState);
-			states.put(toState, entry);
-		}
-		entry.addFromAction(action, fromState);
-	}
+        StateEntry entry = null;
+        if (s == null) {
+            return null;
+        }
+        entry = this.states.get(s);
+        return entry.nextStates.get(a);
+    }
 
-	/**
-	 * Get possible operations from state @s
-	 */
-	public Set<A> getActionsAtState(S s) {
-		StateEntry entry = states.get(s);
-		return entry.nextStates.keySet();
-	}
-	
+    private class StateEntry implements Serializable {
+        public S state;
 
-	/**
-	 * Get next state reached when starting from @s and executing
-	 * action @a
-	 */
-	public S getNextState(S s, A a) {
+        public HashMap<A, S> nextStates = new HashMap<A, S>();
 
-		StateEntry entry = null;
-		if (s == null) {
-			return null;
-		}
-		entry = states.get(s);
-		return entry.nextStates.get(a);
-	}
+        public HashMap<A, List<S>> prevStates = new HashMap<A, List<S>>();
 
-	private class StateEntry {
-		public S state;
-		public HashMap<A, S> nextStates = new HashMap<A, S>();
-		public HashMap<A, List<S>> prevStates = new HashMap<A, List<S>>();
+        public StateEntry(final S state) {
+            this.state = state;
+        }
 
-		public StateEntry(S state) {
-			this.state = state;
-		}
+        public void addAction(final A action, final S state) {
+            this.nextStates.put(action, state);
+        }
 
-		public void addAction(A action, S state) {
-			nextStates.put(action, state);
-		}
-
-		public void addFromAction(A action, S state) {
-			List<S> prev = prevStates.get(action);
-			if (prev == null) {
-				prev = new ArrayList<S>();
-			}
-			prev.add(state);
-		}
-	}	
+        public void addFromAction(final A action, final S state) {
+            List<S> prev = this.prevStates.get(action);
+            if (prev == null) {
+                prev = new ArrayList<S>();
+            }
+            prev.add(state);
+        }
+    }
 }
-
-
-
-
