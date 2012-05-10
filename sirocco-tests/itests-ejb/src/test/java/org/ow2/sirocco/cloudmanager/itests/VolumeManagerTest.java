@@ -234,7 +234,7 @@ public class VolumeManagerTest {
         Assert.assertNotNull("deleteVolume returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("volume.delete"));
-        Assert.assertEquals("job target entity is invalid", volumeId, job.getTargetEntity());
+        Assert.assertEquals("job target entity is invalid", volumeId, job.getTargetEntity().getId().toString());
 
         String jobId = job.getId().toString();
 

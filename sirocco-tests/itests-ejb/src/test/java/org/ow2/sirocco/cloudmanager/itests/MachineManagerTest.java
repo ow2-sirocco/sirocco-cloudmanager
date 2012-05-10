@@ -64,12 +64,13 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
@@ -331,8 +332,8 @@ public class MachineManagerTest {
         machineTemplate.setMachineImage(this.createMachineImage());
 
         machineTemplate.setCredentials(this.createCredentials());
-        machineTemplate.setVolumes(new ArrayList<MachineVolume>());
-        machineTemplate.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
+        machineTemplate.setVolumes(new MachineVolumeCollection());
+        machineTemplate.setVolumeTemplates(new MachineVolumeTemplateCollection());
         machineTemplate.setNetworkInterfaces(new ArrayList<NetworkInterface>());
         machineCreate.setMachineTemplate(machineTemplate);
 
@@ -386,7 +387,7 @@ public class MachineManagerTest {
         } catch (Exception e) {
 
         }
-        Assert.assertNull(" deleted machine still there", mm);
+        Assert.assertEquals(" deleted machine still there", mm.getState(), State.DELETED);
         System.out.println(" end of testCreateMachine until delete ");
     }
 
@@ -396,7 +397,7 @@ public class MachineManagerTest {
         Assert.assertNotNull("deleteMachine returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("machine.delete"));
-        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity());
+        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity().getId().toString());
 
         String jobId = job.getId().toString();
 
@@ -422,7 +423,7 @@ public class MachineManagerTest {
         Assert.assertNotNull("startMachine returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("machine.start"));
-        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity());
+        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity().getId().toString());
 
         String jobId = job.getId().toString();
 
@@ -448,7 +449,7 @@ public class MachineManagerTest {
         Assert.assertNotNull("stopMachine returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("machine.stop"));
-        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity());
+        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity().getId().toString());
 
         String jobId = job.getId().toString();
 
