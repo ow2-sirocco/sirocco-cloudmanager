@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.connector.mock;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -45,15 +46,16 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface.InterfaceState;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.util.log.Log;
@@ -66,7 +68,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static Log logger = LogFactory.getLog(MockCloudProviderConnector.class);
 
-    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS = 1;
+    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS = 200;
 
     private final String cloudProviderId;
 
@@ -143,7 +145,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Volume> createTask = new Callable<Volume>() {
             @Override
             public Volume call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 volume.setState(Volume.State.AVAILABLE);
                 return volume;
             }
@@ -163,7 +165,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> deleteTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 MockCloudProviderConnector.this.volumes.remove(volumeId);
                 return null;
             }
@@ -202,18 +204,19 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         List<MachineDisk> disks = new ArrayList<MachineDisk>();
         if (machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates() != null) {
             for (DiskTemplate diskTemplate : machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates()) {
-            	 MachineDisk mdisk = new MachineDisk();
+                MachineDisk mdisk = new MachineDisk();
                 // TODO
                 // disk.setDiskUnit(diskTemplate.getDiskUnit());
-            	 mdisk.getDisk().setQuantity(diskTemplate.getQuantity());
-                 mdisk.setInitialLocation(diskTemplate.getInitialLocation());
-                 disks.add(mdisk);
+                mdisk.setDisk(new Disk());
+                mdisk.getDisk().setQuantity(diskTemplate.getQuantity());
+                mdisk.setInitialLocation(diskTemplate.getInitialLocation());
+                disks.add(mdisk);
             }
         }
         MachineDiskCollection diskCollection = new MachineDiskCollection();
         diskCollection.setItems(disks);
         machine.setDisks(diskCollection);
-        
+
         List<NetworkInterface> networkInterfaces = new ArrayList<NetworkInterface>();
         if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
             for (NetworkInterface networkInterface : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
@@ -233,7 +236,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Machine> createTask = new Callable<Machine>() {
             @Override
             public Machine call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 for (NetworkInterface networkInterface : machine.getNetworkInterfaces()) {
                     networkInterface.setState(InterfaceState.ACTIVE);
                 }
@@ -241,9 +244,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 return machine;
             }
         };
+        // TODO create and attach volumes
+        MachineVolumeCollection volumeCollection = new MachineVolumeCollection();
+        volumeCollection.setItems(Collections.<MachineVolume> emptyList());
+        machine.setVolumes(volumeCollection);
         ListenableFuture<Machine> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.create",
-            result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.create", result);
 
     }
 
@@ -262,7 +268,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> startTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 machine.setState(Machine.State.STARTED);
                 return null;
             }
@@ -289,7 +295,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> stopTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 machine.setState(Machine.State.STOPPED);
                 return null;
             }
@@ -317,7 +323,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> suspendTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 machine.setState(Machine.State.SUSPENDED);
                 return null;
             }
@@ -351,7 +357,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> pauseTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 machine.setState(Machine.State.PAUSED);
                 return null;
             }
@@ -372,7 +378,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final Callable<Void> deleteTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
-                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000);
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 MockCloudProviderConnector.this.machines.remove(machineId);
                 MockCloudProviderConnector.logger.info("Machine " + machineId + " deleted");
                 return null;
