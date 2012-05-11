@@ -119,6 +119,16 @@ public class CustomDBUnitDeleteAllOperation extends AbstractOperation{
         }
         finally
         {
+            if (databaseType.equals("MYSQL"))
+            {
+                statement.addBatch("SET FOREIGN_KEY_CHECKS=1;");
+            }
+            if (databaseType.equals("HSQLDB"))
+            {
+                statement.addBatch("SET REFERENTIAL_INTEGRITY TRUE;");
+            }
+            statement.executeBatch();
+            statement.clearBatch();
             statement.close();
         }
     }
