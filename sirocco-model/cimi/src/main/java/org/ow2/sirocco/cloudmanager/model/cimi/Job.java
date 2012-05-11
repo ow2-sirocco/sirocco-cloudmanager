@@ -28,134 +28,253 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Entity
-public class Job extends CloudEntity implements Serializable {
-
+public class Job implements Serializable {
     private static final long serialVersionUID = 1L;
-    
-    private CloudProviderLocation location;
 
     public static enum Status {
         RUNNING, SUCCESS, FAILED, CANCELLED
     };
-    
+
+    private Integer id;
+
+    private User user;
+
+    private String name;
+
+    private String description;
+
+    private Map<String, String> properties;
+
+    private Date created;
+
+    private Date deleted;
+
+    private Date updated;
+
+    private String providerAssignedId;
+
+    private CloudProviderLocation location;
+
     private Status status;
+
     private Date timeOfStatusChange;
+
     private CloudEntity targetEntity;
+
     private Integer returnCode;
+
     private String action;
+
     private String statusMessage;
+
     private Job parentJob;
+
     private List<Job> nestedJobs;
+
     private Boolean isCancellable;
+
     private Integer progress;
+
+    private List<CloudEntity> affectedEntities;
 
     public Job() {
     }
 
-
     public Status getStatus() {
-        return status;
+        return this.status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(final Status status) {
         this.status = status;
     }
 
     public Date getTimeOfStatusChange() {
-        return timeOfStatusChange;
+        return this.timeOfStatusChange;
     }
 
-    public void setTimeOfStatusChange(Date timeOfStatusChange) {
+    public void setTimeOfStatusChange(final Date timeOfStatusChange) {
         this.timeOfStatusChange = timeOfStatusChange;
     }
 
     @ManyToOne
     public CloudEntity getTargetEntity() {
-        return targetEntity;
+        return this.targetEntity;
     }
 
-    public void setTargetEntity(CloudEntity targetEntity) {
+    public void setTargetEntity(final CloudEntity targetEntity) {
         this.targetEntity = targetEntity;
     }
 
     public Integer getReturnCode() {
-        return returnCode;
+        return this.returnCode;
     }
 
-    public void setReturnCode(Integer returnCode) {
+    public void setReturnCode(final Integer returnCode) {
         this.returnCode = returnCode;
     }
 
     public String getAction() {
-        return action;
+        return this.action;
     }
 
-    public void setAction(String action) {
+    public void setAction(final String action) {
         this.action = action;
     }
 
     public String getStatusMessage() {
-        return statusMessage;
+        return this.statusMessage;
     }
 
-    public void setStatusMessage(String statusMessage) {
+    public void setStatusMessage(final String statusMessage) {
         this.statusMessage = statusMessage;
     }
 
     @ManyToOne
     public Job getParentJob() {
-        return parentJob;
+        return this.parentJob;
     }
 
-    public void setParentJob(Job parentJob) {
+    public void setParentJob(final Job parentJob) {
         this.parentJob = parentJob;
     }
 
     public Boolean getIsCancellable() {
-        return isCancellable;
+        return this.isCancellable;
     }
 
-    public void setIsCancellable(Boolean isCancellable) {
+    public void setIsCancellable(final Boolean isCancellable) {
         this.isCancellable = isCancellable;
     }
 
     public Integer getProgress() {
-        return progress;
+        return this.progress;
     }
 
-    public void setProgress(Integer progress) {
+    public void setProgress(final Integer progress) {
         this.progress = progress;
     }
 
-
-    @OneToMany(mappedBy="parentJob")
+    @OneToMany(mappedBy = "parentJob")
     public List<Job> getNestedJobs() {
-        return nestedJobs;
+        return this.nestedJobs;
     }
 
-
-    public void setNestedJobs(List<Job> nestedJobs) {
+    public void setNestedJobs(final List<Job> nestedJobs) {
         this.nestedJobs = nestedJobs;
     }
 
     @ManyToOne
     public CloudProviderLocation getLocation() {
-        return location;
+        return this.location;
     }
 
-
-    public void setLocation(CloudProviderLocation location) {
+    public void setLocation(final CloudProviderLocation location) {
         this.location = location;
     }
 
+    public String getProviderAssignedId() {
+        return this.providerAssignedId;
+    }
+
+    public void setProviderAssignedId(final String providerAssignedId) {
+        this.providerAssignedId = providerAssignedId;
+    }
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return this.id;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    public void setProperties(final Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+    @CollectionOfElements(fetch = FetchType.EAGER)
+    public Map<String, String> getProperties() {
+        return this.properties;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getCreated() {
+        return this.created;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setId(final Integer id) {
+        this.id = id;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public void setCreated(final Date created) {
+        this.created = created;
+    }
+
+    public void setDeleted(final Date deleted) {
+        this.deleted = deleted;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getDeleted() {
+        return this.deleted;
+    }
+
+    public void setUpdated(final Date updated) {
+        this.updated = updated;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getUpdated() {
+        return this.updated;
+    }
+
+    @ManyToOne
+    public User getUser() {
+        return this.user;
+    }
+
+    public void setUser(final User user) {
+        this.user = user;
+    }
+
+    @OneToMany
+    public List<CloudEntity> getAffectedEntities() {
+        return this.affectedEntities;
+    }
+
+    public void setAffectedEntities(final List<CloudEntity> affectedEntities) {
+        this.affectedEntities = affectedEntities;
+    }
+
 }
-
-
-
