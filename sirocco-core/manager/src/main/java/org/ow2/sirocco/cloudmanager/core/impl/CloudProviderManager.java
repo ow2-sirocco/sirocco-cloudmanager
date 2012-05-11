@@ -178,6 +178,7 @@ public class CloudProviderManager implements ICloudProviderManager {
 
         CloudProviderAccount result = this.em.find(CloudProviderAccount.class,
                 new Integer(cloudProviderAccountId));
+        if (result!=null){result.getUsers().size();}
         return result;
     }
 
@@ -329,17 +330,18 @@ public class CloudProviderManager implements ICloudProviderManager {
 
         cpl.setIso3166_1(Iso3166_1_Code);
         cpl.setIso3166_2(Iso3166_2_Code);
+        cpl.setPostalCode(postalCode);
         cpl.setGPS_Altitude(altitude);
         cpl.setGPS_Latitude(latitude);
         cpl.setGPS_Longitude(longitude);
         cpl.setCountryName(countryName);
         cpl.setStateName(stateName);
+        cpl.setCityName(cityName);
         
         return this.createCloudProviderLocation(cpl);
     }
     
-    @Override
-    public CloudProviderLocation createCloudProviderLocation(CloudProviderLocation cpl) throws CloudProviderException
+    private CloudProviderLocation normalizeCloudProviderLocation(CloudProviderLocation cpl) throws CloudProviderException
     {
         cpl.setCityName(normalizeLabel(cpl.getCityName()));
         cpl.setCountryName(normalizeLabel(cpl.getCountryName()));
@@ -347,6 +349,13 @@ public class CloudProviderManager implements ICloudProviderManager {
         cpl.setIso3166_1(normalizeLabel(cpl.getIso3166_1()));
         cpl.setIso3166_2(normalizeLabel(cpl.getIso3166_2()));
         cpl.setPostalCode(normalizeLabel(cpl.getPostalCode()));
+        return cpl;        
+    }
+    
+    @Override
+    public CloudProviderLocation createCloudProviderLocation(CloudProviderLocation cpl) throws CloudProviderException
+    {
+        normalizeCloudProviderLocation(cpl);
         
         //if (!isCloudProviderLocationValid(cpl)){throw new CloudProviderException("CloudProviderLocation validation failed");}
       
@@ -414,6 +423,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         //if (!isCloudProviderLocationValid(CPL)){throw new CloudProviderException("CloudProviderLocation validation failed");}
         
         Integer CPLId = CPL.getId();
+        normalizeCloudProviderLocation(CPL);
         this.em.merge(CPL);
 
         return this.getCloudProviderLocationById(CPLId.toString());

@@ -7,6 +7,9 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import org.hibernate.proxy.HibernateProxy;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+
 public class UtilsForManagers {
     
     
@@ -34,6 +37,17 @@ public class UtilsForManagers {
                 return pd.getWriteMethod().invoke(targetObj, attrValue);
         throw new NoSuchFieldException(targetObj.getClass() + " has no field "
                 + attrName);
+    }
+    
+    public static Object getEntityThroughProxy(Object o)
+    {
+        if (o instanceof HibernateProxy)
+        {
+            HibernateProxy oProxy=(HibernateProxy) o;
+            o=(Object) oProxy.getHibernateLazyInitializer().getImplementation();
+        }
+        return o;
+        
     }
 
 
