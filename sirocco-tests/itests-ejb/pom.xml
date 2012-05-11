@@ -150,6 +150,7 @@
 				<database.driver>org.hsqldb.jdbcDriver</database.driver>
 				<database.mapper>rdb.hsql</database.mapper>
 				<database.schema>PUBLIC</database.schema>
+				<database.type>HSQLDB</database.type>
 				<database.username>jonas</database.username>
 				<database.password>jonas</database.password>
 				<database.teststmt>select count(1) from
@@ -198,6 +199,7 @@
 				<database.mapper>rdb.mysql</database.mapper>
 				<database.name>sirocco</database.name>
 				<database.schema>sirocco</database.schema>
+				<database.type>MYSQL</database.type>
 				<database.username>admcloud</database.username>
 				<database.password>admcloud</database.password>
 				<database.teststmt>select count(1) from information_schema.tables</database.teststmt>
@@ -534,6 +536,10 @@
 										<property>
 											<name>dbunit.schema</name>
 											<value>${database.schema}</value>
+										</property>
+										<property>
+											<name>database.type</name>
+											<value>${database.type}</value>
 										</property>
 										<property>
 											<name>dbunit.dataset</name>
