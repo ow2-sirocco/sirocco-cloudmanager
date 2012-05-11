@@ -25,11 +25,8 @@
 package org.ow2.sirocco.apis.rest.cimi.resource.serialization;
 
 import org.custommonkey.xmlunit.XMLUnit;
-import org.junit.After;
 import org.junit.BeforeClass;
 import org.ow2.sirocco.apis.rest.cimi.server.SiroccoRestCimiApplication;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.context.ContextLoaderListener;
 
 import com.sun.jersey.api.json.JSONConfiguration;
@@ -40,8 +37,6 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 import com.sun.jersey.test.framework.spi.container.TestContainerException;
 
 public class SerializationTestBase extends JerseyTest {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SerializationTestBase.class);
 
     /**
      * {@inheritDoc}
@@ -67,24 +62,16 @@ public class SerializationTestBase extends JerseyTest {
     }
 
     @Override
-    @After
-    public void tearDown() throws Exception {
-        super.tearDown();
-        int delay = 1;
-        String propDelay = System.getProperty("SIROCCO_TEST_DELAY");
-        if (null != propDelay) {
+    protected int getPort(final int defaultPort) {
+        int port = super.getPort(defaultPort);
+        String propPort = System.getProperty("grizzly.port");
+        if (null != propPort) {
             try {
-                delay = Integer.parseInt(propDelay);
+                port = Integer.parseInt(propPort);
             } catch (NumberFormatException e) {
-                throw new TestContainerException("SIROCCO_TEST_DELAY with a value of \"" + propDelay
-                    + "\" is not a valid integer.", e);
+                throw new TestContainerException("grizzly.port with a value of \"" + propPort + "\" is not a valid integer.", e);
             }
         }
-
-        if (delay > 0) {
-            SerializationTestBase.LOGGER.debug("Begin delay : {}ms", delay);
-            Thread.sleep(delay);
-            SerializationTestBase.LOGGER.debug("End delay");
-        }
+        return port;
     }
 }
