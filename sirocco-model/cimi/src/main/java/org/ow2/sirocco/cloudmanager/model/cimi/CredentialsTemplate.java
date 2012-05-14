@@ -64,6 +64,6 @@ public class CredentialsTemplate extends CloudEntity implements Serializable {
     }
 
     public void setPublicKey(final byte[] key) {
-        this.publicKey = this.publicKey;
+        this.publicKey = key;
     }
 }
