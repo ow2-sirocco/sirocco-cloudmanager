@@ -56,6 +56,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface.InterfaceState;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.util.log.Log;
@@ -79,6 +80,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     private final MockCloudProviderConnectorFactory mockCloudProviderConnectorFactory;
 
     private Map<String, Volume> volumes = new ConcurrentHashMap<String, Volume>();
+
+    private Map<String, VolumeImage> volumeImages = new ConcurrentHashMap<String, VolumeImage>();
 
     private Map<String, Machine> machines = new ConcurrentHashMap<String, Machine>();
 
@@ -152,7 +155,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Volume> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volume, "volume.create", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volume, null, "add", result);
     }
 
     @Override
@@ -172,7 +175,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volume, "volume.delete", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volume, null, "delete", result);
 
     }
 
@@ -249,7 +252,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         volumeCollection.setItems(Collections.<MachineVolume> emptyList());
         machine.setVolumes(volumeCollection);
         ListenableFuture<Machine> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.create", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, null, "add", result);
 
     }
 
@@ -275,7 +278,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(startTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.start", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, null, "start", result);
     }
 
     @Override
@@ -302,7 +305,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(stopTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.stop", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, null, "stop", result);
     }
 
     @Override
@@ -330,13 +333,25 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(suspendTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.suspend", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, null, "suspend", result);
     }
 
     @Override
     public synchronized Job restartMachine(final String machineId) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        final Machine machine = this.machines.get(machineId);
+        if (machine == null) {
+            throw new ConnectorException("Machine " + machineId + " doesn't exist");
+        }
+        final Callable<Void> restartTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(restartTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, null, "restart", result);
     }
 
     @Override
@@ -364,7 +379,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(pauseTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.paused", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, null, "pause", result);
     }
 
     @Override
@@ -386,7 +401,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, "machine.delete", result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, null, "delete", result);
     }
 
     @Override
@@ -414,49 +429,155 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public Job createSystem(final SystemCreate systemCreate) {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job startSystem(final String systemId) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job stopSystem(final String systemId) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job restartSystem(final String systemId) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job pauseSystem(final String systemId) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job suspendSystem(final String systemId) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        final Machine machine = this.machines.get(machineId);
+        if (machine == null) {
+            throw new ConnectorException("Machine " + machineId + " doesn't exist");
+        }
+
+        final Callable<Void> attachTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                machine.getVolumes().getItems().add(machineVolume);
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(attachTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, machineVolume.getVolume(), "add", result);
     }
 
     @Override
     public Job removeVolumeFromMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        final Machine machine = this.machines.get(machineId);
+        if (machine == null) {
+            throw new ConnectorException("Machine " + machineId + " doesn't exist");
+        }
+
+        final Callable<Void> detachTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                machine.getVolumes().getItems().remove(machineVolume);
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(detachTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, machineVolume.getVolume(), "delete",
+            result);
     }
+
+    @Override
+    public Job createVolumeImage(final VolumeImage from) throws ConnectorException {
+        final String volumeImageProviderAssignedId = UUID.randomUUID().toString();
+        final VolumeImage volumeImage = new VolumeImage();
+        volumeImage.setBootable(from.getBootable());
+        volumeImage.setImageLocation(from.getImageLocation());
+        volumeImage.setOwner(null);
+        volumeImage.setProviderAssignedId(volumeImageProviderAssignedId);
+        this.volumeImages.put(volumeImageProviderAssignedId, volumeImage);
+        volumeImage.setState(VolumeImage.State.CREATING);
+
+        final Callable<VolumeImage> createTask = new Callable<VolumeImage>() {
+            @Override
+            public VolumeImage call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                volumeImage.setState(VolumeImage.State.AVAILABLE);
+                return volumeImage;
+            }
+        };
+
+        ListenableFuture<VolumeImage> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volumeImage, null, "add", result);
+    }
+
+    @Override
+    public Job createVolumeSnapshot(final String volumeId, final VolumeImage from) throws ConnectorException {
+        final Volume volume = this.volumes.get(volumeId);
+        if (volume == null) {
+            throw new ConnectorException("Volume " + volumeId + " doesn't exist");
+        }
+        final String volumeImageProviderAssignedId = UUID.randomUUID().toString();
+        final VolumeImage volumeImage = new VolumeImage();
+        volumeImage.setBootable(from.getBootable());
+        volumeImage.setImageLocation(from.getImageLocation());
+        volumeImage.setOwner(volume);
+        volumeImage.setProviderAssignedId(volumeImageProviderAssignedId);
+        this.volumeImages.put(volumeImageProviderAssignedId, volumeImage);
+        volumeImage.setState(VolumeImage.State.CREATING);
+
+        final Callable<VolumeImage> createTask = new Callable<VolumeImage>() {
+            @Override
+            public VolumeImage call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                volumeImage.setState(VolumeImage.State.AVAILABLE);
+                volume.getImages().add(volumeImage);
+                return volumeImage;
+            }
+        };
+
+        ListenableFuture<VolumeImage> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volumeImage, null, "add", result);
+    }
+
+    @Override
+    public VolumeImage getVolumeImage(final String volumeImageId) throws ConnectorException {
+        final VolumeImage volumeImage = this.volumeImages.get(volumeImageId);
+        if (volumeImage == null) {
+            throw new ConnectorException("VolumeImage " + volumeImageId + " doesn't exist");
+        }
+        return volumeImage;
+    }
+
+    @Override
+    public Job deleteVolumeImage(final String volumeImageId) throws ConnectorException {
+        VolumeImage volumeImage = this.volumeImages.get(volumeImageId);
+        if (volumeImage == null) {
+            throw new ConnectorException("VolumeImage " + volumeImageId + " doesn't exist");
+        }
+        volumeImage.setState(VolumeImage.State.DELETING);
+        final Callable<Void> deleteTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                MockCloudProviderConnector.this.volumeImages.remove(volumeImageId);
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volumeImage, null, "delete", result);
+    }
+
 }
