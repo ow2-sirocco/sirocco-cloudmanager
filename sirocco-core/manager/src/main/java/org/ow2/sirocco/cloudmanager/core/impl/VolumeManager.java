@@ -31,6 +31,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
@@ -126,8 +127,9 @@ public class VolumeManager implements IVolumeManager {
         volume.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
         volume.setCloudProviderAccount(defaultAccount);
         volume.setCapacity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity());
+        volume.setType(volumeCreate.getVolumeTemplate().getVolumeConfig().getType());
+        // XXX no way to specify whether the volume is bootable ?
         volume.setBootable(false);
-        volume.setSupportsSnapshots(volumeCreate.getVolumeTemplate().getVolumeConfig().isSupportsSnapshots());
         volume.setName(volumeCreate.getName());
         volume.setDescription(volumeCreate.getDescription());
         volume.setProperties(volumeCreate.getProperties());
@@ -218,7 +220,7 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public Volume getVolumeById(final String volumeId) throws ResourceNotFoundException {
         Volume volume = this.em.find(Volume.class, Integer.valueOf(volumeId));
-        if (volume == null) {
+        if (volume == null || volume.getState() == Volume.State.DELETED) {
             throw new ResourceNotFoundException(" Invalid volume id " + volumeId);
         }
         return volume;
@@ -274,7 +276,7 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<Volume> getVolumes(final List<String> attributes, final String filterExpression) throws CloudProviderException {
-        // TODO Auto-generated method stub
+        // TODO
         if (filterExpression != null && !filterExpression.isEmpty()) {
             throw new UnsupportedOperationException();
         }
@@ -408,12 +410,8 @@ public class VolumeManager implements IVolumeManager {
             volumeConfig.setCapacity((Disk) attributes.get("capacity"));
             updated = true;
         }
-        if (attributes.containsKey("supportSnapshots")) {
-            volumeConfig.setSupportsSnapshots((Boolean) attributes.get("supportSnapshots"));
-            updated = true;
-        }
-        if (attributes.containsKey("guestInterface")) {
-            volumeConfig.setGuestInterface((String) attributes.get("guestInterface"));
+        if (attributes.containsKey("type")) {
+            volumeConfig.setType((String) attributes.get("type"));
             updated = true;
         }
         if (updated) {
@@ -497,7 +495,6 @@ public class VolumeManager implements IVolumeManager {
             // persist volume+job
             volume.setState(Volume.State.DELETED);
             this.em.persist(volume);
-            // this.em.remove(volume);
             this.em.flush();
 
             Job job = new Job();
@@ -613,7 +610,22 @@ public class VolumeManager implements IVolumeManager {
         return volume;
     }
 
+    private VolumeImage getVolumeImageByProviderAssignedId(final String providerAssignedId) {
+        VolumeImage volumeImage = (VolumeImage) this.em.createNamedQuery(VolumeImage.GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID)
+            .setParameter("providerAssignedId", providerAssignedId).getSingleResult();
+        return volumeImage;
+    }
+
     @Override
+    public boolean jobCompletionHandler(final Job job) {
+        if (job.getTargetEntity() instanceof Volume) {
+            return this.volumeCompletionHandler(job);
+        } else if (job.getTargetEntity() instanceof VolumeImage) {
+            return this.volumeImageCompletionHandler(job);
+        }
+        return false;
+    }
+
     public boolean volumeCompletionHandler(final Job providerJob) {
         // retrieve the Volume whose providerAssignedId is job.getTargetEntity()
         Volume volume = null;
@@ -628,7 +640,7 @@ public class VolumeManager implements IVolumeManager {
         // update Volume entity
         ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount());
 
-        if (providerJob.getAction().equals("volume.create")) {
+        if (providerJob.getAction().equals("add")) {
             if (providerJob.getStatus() == Job.Status.SUCCESS) {
                 try {
                     volume.setState(connector.getVolumeService().getVolumeState(volume.getProviderAssignedId()));
@@ -643,7 +655,7 @@ public class VolumeManager implements IVolumeManager {
                     + providerJob.getStatusMessage());
                 this.em.persist(volume);
             }
-        } else if (providerJob.getAction().equals("volume.delete")) {
+        } else if (providerJob.getAction().equals("delete")) {
             if (providerJob.getStatus() == Job.Status.SUCCESS) {
                 volume.setState(Volume.State.DELETED);
                 this.em.persist(volume);
@@ -659,50 +671,292 @@ public class VolumeManager implements IVolumeManager {
         return true;
     }
 
+    public boolean volumeImageCompletionHandler(final Job providerJob) {
+        VolumeImage volumeImage = null;
+
+        try {
+            volumeImage = this.getVolumeImageByProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+        } catch (PersistenceException e) {
+            VolumeManager.logger.error("Cannot find VolumeImage with provider-assigned id " + providerJob.getTargetEntity());
+            return false;
+        }
+
+        ICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount());
+
+        if (providerJob.getAction().equals("add")) {
+            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+                try {
+                    volumeImage.setState(connector.getVolumeService().getVolumeImage(volumeImage.getProviderAssignedId())
+                        .getState());
+                    volumeImage.setCreated(new Date());
+                    this.em.persist(volumeImage);
+                    Volume snapshottedVolume = volumeImage.getOwner();
+                    if (snapshottedVolume != null) {
+                        snapshottedVolume.getImages().add(volumeImage);
+                        this.em.persist(volumeImage);
+                    }
+                } catch (Exception ex) {
+                    VolumeManager.logger.error("Failed to create volume image " + volumeImage.getName(), ex);
+                }
+            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+                volumeImage.setState(VolumeImage.State.ERROR);
+                VolumeManager.logger.error("Failed to create volume image  " + volumeImage.getName() + ": "
+                    + providerJob.getStatusMessage());
+                this.em.persist(volumeImage);
+            }
+        } else if (providerJob.getAction().equals("delete")) {
+            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+                volumeImage.setState(VolumeImage.State.DELETED);
+                this.em.persist(volumeImage);
+                this.em.flush();
+            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+                volumeImage.setState(VolumeImage.State.ERROR);
+                VolumeManager.logger.error("Failed to delete volume image  " + volumeImage.getName() + ": "
+                    + providerJob.getStatusMessage());
+                this.em.persist(volumeImage);
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public VolumeImageCollection getVolumeImageCollection() throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        User user = this.getUser();
+        @SuppressWarnings("unchecked")
+        List<VolumeImage> volumeImages = this.em
+            .createQuery("SELECT v FROM VolumeImage v WHERE v.user.username=:username AND v.state<>'DELETED'")
+            .setParameter("username", user.getUsername()).getResultList();
+        VolumeImageCollection collection = (VolumeImageCollection) this.em
+            .createQuery("FROM VolumeImageCollection m WHERE m.user.username=:username")
+            .setParameter("username", user.getUsername()).getSingleResult();
+        collection.setVolumeImages(volumeImages);
+        return collection;
+    }
+
+    @Override
+    public List<VolumeImage> getVolumeImagesCollection(final String volumeId) throws ResourceNotFoundException,
+        CloudProviderException {
+        Volume volume = this.getVolumeById(volumeId);
+        return volume.getImages();
+    }
+
+    @Override
+    public VolumeImage getVolumeImageById(final String volumeImageId) throws ResourceNotFoundException {
+        VolumeImage volumeImage = this.em.find(VolumeImage.class, Integer.valueOf(volumeImageId));
+        if (volumeImage == null || volumeImage.getState() == VolumeImage.State.DELETED) {
+            throw new ResourceNotFoundException(" Invalid volumeImage id " + volumeImageId);
+        }
+        return volumeImage;
     }
 
     @Override
     public Job createVolumeImage(final VolumeImage volumeImage) throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return this.newVolumeImage(volumeImage, null);
+    }
+
+    @Override
+    public Job createVolumeSnapshot(final Volume volume, final VolumeImage volumeImage) throws InvalidRequestException,
+        CloudProviderException {
+        return this.newVolumeImage(volumeImage, volume);
+    }
+
+    /**
+     * Create a new VolumeImage either from binary data (initialLocation) or by
+     * snapshotting a volume
+     * 
+     * @param volumeImage
+     * @param volumeToSnapshot if not null, volume to snapshot
+     * @return
+     * @throws InvalidRequestException
+     * @throws CloudProviderException
+     */
+    private Job newVolumeImage(final VolumeImage volumeImage, final Volume volumeToSnapshot) throws InvalidRequestException,
+        CloudProviderException {
+        VolumeManager.logger.info("Creating VolumeImage");
+
+        // retrieve user
+        User user = this.getUser();
+
+        // pick up first cloud provider account associated with user
+        if (user.getCloudProviderAccounts().isEmpty()) {
+            throw new CloudProviderException("No cloud provider account for user " + user.getUsername());
+        }
+        CloudProviderAccount defaultAccount = user.getCloudProviderAccounts().iterator().next();
+        ICloudProviderConnector connector = this.getCloudProviderConnector(defaultAccount);
+        if (connector == null) {
+            throw new CloudProviderException("Cannot find cloud provider connector "
+                + defaultAccount.getCloudProvider().getCloudProviderType());
+        }
+
+        // delegates volume creation to cloud provider connector
+        Job providerJob = null;
+
+        try {
+            IVolumeService volumeService = connector.getVolumeService();
+            providerJob = volumeService.createVolumeImage(volumeImage);
+        } catch (ConnectorException e) {
+            VolumeManager.logger.error("Failed to create volume: ", e);
+            throw new CloudProviderException(e.getMessage());
+        }
+
+        // if by chance the job is done and has failed, bail out
+        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+            throw new CloudProviderException(providerJob.getStatusMessage());
+        }
+
+        // prepare the VolumeImage entity to be persisted
+
+        volumeImage.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+        volumeImage.setCloudProviderAccount(defaultAccount);
+        volumeImage.setUser(user);
+
+        volumeImage.setState(VolumeImage.State.CREATING);
+        volumeImage.setOwner(volumeToSnapshot);
+        this.em.persist(volumeImage);
+        this.em.flush();
+
+        Job job = new Job();
+        job.setTargetEntity(volumeImage);
+        job.setCreated(new Date());
+        job.setProviderAssignedId(providerJob.getProviderAssignedId());
+        job.setStatus(providerJob.getStatus());
+        job.setAction(providerJob.getAction());
+        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
+        this.em.persist(job);
+        this.em.flush();
+
+        try {
+            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
+        } catch (ConnectorException e) {
+            VolumeManager.logger.error(e.getMessage(), e);
+        }
+        return job;
     }
 
     @Override
     public List<VolumeImage> getVolumeImages(final int first, final int last, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        User user = this.getUser();
+        Query query = this.em
+            .createQuery("FROM VolumeImage v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id");
+        query.setParameter("username", user.getUsername());
+        query.setMaxResults(last - first + 1);
+        query.setFirstResult(first);
+        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
     }
 
     @Override
     public List<VolumeImage> getVolumeImages(final List<String> attributes, final String filterExpression)
         throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        // TODO
+        if (filterExpression != null && !filterExpression.isEmpty()) {
+            throw new UnsupportedOperationException();
+        }
+        User user = this.getUser();
+        return this.em.createQuery("FROM VolumeImage v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id ")
+            .setParameter("username", user.getUsername()).getResultList();
     }
 
     @Override
     public Job updateVolumeImage(final VolumeImage volumeImage) throws InvalidRequestException, ResourceNotFoundException,
         CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        VolumeImage volumeImageInDb = this.getVolumeImageById(volumeImage.getId().toString());
+        if (volumeImageInDb == null) {
+            throw new ResourceNotFoundException("VolumeImage " + volumeImage.getId() + " doesn't not exist");
+        }
+        // TODO
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Job updateVolumeImageAttributes(final String volumeImageId, final Map<String, Object> updatedAttributes)
         throws InvalidRequestException, ResourceNotFoundException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        VolumeImage volumeImage = this.getVolumeImageById(volumeImageId);
+        if (volumeImage == null) {
+            throw new ResourceNotFoundException("VolumeImage " + volumeImageId + " doesn't not exist");
+        }
+        boolean updated = this.updateCloudEntityAttributes(volumeImage, updatedAttributes);
+        if (updated) {
+            volumeImage.setUpdated(new Date());
+        }
+        // TODO call job manager
+        Job j = new Job();
+        j.setTargetEntity(volumeImage);
+        j.setAction("edit");
+        j.setStatus(Status.SUCCESS);
+        this.em.persist(j);
+        return j;
     }
 
     @Override
     public Job deleteVolumeImage(final String volumeImageId) throws ResourceNotFoundException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        VolumeImage volumeImage = this.getVolumeImageById(volumeImageId);
+        if (volumeImage == null) {
+            throw new ResourceNotFoundException("VolumeImage " + volumeImageId + " doesn't not exist");
+        }
+
+        // delegates volume deletion to cloud provider connector
+        ICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount());
+        Job providerJob = null;
+
+        try {
+            IVolumeService volumeService = connector.getVolumeService();
+            providerJob = volumeService.deleteVolumeImage(volumeImage.getProviderAssignedId());
+        } catch (ConnectorException e) {
+            VolumeManager.logger.error("Failed to delete volumeImage: ", e);
+            throw new CloudProviderException(e.getMessage());
+        }
+
+        // if by change the job is done and has failed, bail out
+        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+            throw new CloudProviderException(providerJob.getStatusMessage());
+        }
+
+        volumeImage.setState(VolumeImage.State.DELETING);
+        this.em.persist(volumeImage);
+        this.em.flush();
+
+        Job job = new Job();
+        job.setTargetEntity(volumeImage);
+        job.setCreated(new Date());
+        job.setProviderAssignedId(providerJob.getProviderAssignedId());
+        job.setStatus(providerJob.getStatus());
+        job.setAction(providerJob.getAction());
+        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
+        this.em.persist(job);
+        this.em.flush();
+
+        try {
+            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
+        } catch (ConnectorException e) {
+            VolumeManager.logger.error("", e);
+        }
+        return job;
+    }
+
+    @Override
+    public Job removeImageFromVolume(final String volumeId, final String imageId) throws ResourceNotFoundException,
+        CloudProviderException {
+        // XXX ask the connector to perform the operation ?
+        Volume volume = this.getVolumeById(volumeId);
+        if (volume == null) {
+            throw new ResourceNotFoundException("Volume " + volumeId + " doesn't not exist");
+        }
+        VolumeImage volumeImage = this.getVolumeImageById(imageId);
+        if (volumeImage == null) {
+            throw new ResourceNotFoundException("VolumeImage " + imageId + " doesn't not exist");
+        }
+        volume.getImages().remove(volumeImage);
+        volumeImage.setOwner(null);
+
+        // TODO call job manager
+        Job j = new Job();
+        j.setTargetEntity(volume);
+        j.setAction("delete");
+        j.setStatus(Status.SUCCESS);
+        this.em.persist(j);
+        return j;
     }
 
 }
