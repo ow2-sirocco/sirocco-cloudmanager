@@ -33,13 +33,19 @@ import javax.persistence.Entity;
 public class VolumeConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private String type;
+
     private String format;
 
     private Disk capacity;
 
-    private Boolean supportsSnapshots;
+    public String getType() {
+        return this.type;
+    }
 
-    private String guestInterface;
+    public void setType(final String type) {
+        this.type = type;
+    }
 
     public Disk getCapacity() {
         return this.capacity;
@@ -57,20 +63,11 @@ public class VolumeConfiguration extends CloudEntity implements Serializable {
         this.format = format;
     }
 
-    public String getGuestInterface() {
-        return this.guestInterface;
-    }
-
-    public void setGuestInterface(final String guestInterface) {
-        this.guestInterface = guestInterface;
-    }
-
-    public boolean isSupportsSnapshots() {
-        return this.supportsSnapshots;
-    }
-
-    public void setSupportsSnapshots(final boolean supportsSnapshots) {
-        this.supportsSnapshots = supportsSnapshots;
+    @Override
+    public String toString() {
+        return "VolumeConfiguration [id=" + this.id + ", name=" + this.name + ", description=" + this.description
+            + ", created=" + this.created + ", updated=" + this.updated + ", properties=" + this.properties + ", type="
+            + this.type + ", format=" + this.format + ", capacity=" + this.capacity + "]";
     }
 
 }

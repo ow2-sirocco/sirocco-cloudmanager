@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
@@ -41,13 +42,12 @@ import javax.persistence.OneToMany;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM Volume v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
 public class Volume extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     private CloudProviderLocation location;
 
     public static final String GET_VOLUME_BY_PROVIDER_ASSIGNED_ID = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID";
@@ -58,11 +58,13 @@ public class Volume extends CloudEntity implements Serializable {
 
     private State state;
 
+    private String type;
+
     private Disk capacity;
 
     private Boolean bootable;
 
-    private Boolean supportsSnapshots;
+    private List<VolumeImage> images;
 
     private Collection<MachineVolume> machineVolumes;
 
@@ -107,12 +109,21 @@ public class Volume extends CloudEntity implements Serializable {
         this.machineVolumes = machineVs;
     }
 
-    public Boolean isSupportsSnapshots() {
-        return this.supportsSnapshots;
+    public String getType() {
+        return this.type;
     }
 
-    public void setSupportsSnapshots(final boolean supportsSnapshots) {
-        this.supportsSnapshots = supportsSnapshots;
+    public void setType(final String type) {
+        this.type = type;
+    }
+
+    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
+    public List<VolumeImage> getImages() {
+        return this.images;
+    }
+
+    public void setImages(final List<VolumeImage> images) {
+        this.images = images;
     }
 
     @ManyToOne
@@ -126,11 +137,19 @@ public class Volume extends CloudEntity implements Serializable {
 
     @ManyToOne
     public CloudProviderLocation getLocation() {
-        return location;
+        return this.location;
     }
 
-    public void setLocation(CloudProviderLocation location) {
+    public void setLocation(final CloudProviderLocation location) {
         this.location = location;
+    }
+
+    @Override
+    public String toString() {
+        return "Volume [id=" + this.id + ", name=" + this.name + ", description=" + this.description + ", created="
+            + this.created + ", updated=" + this.updated + ", properties=" + this.properties + ", state=" + this.state
+            + ", type=" + this.type + ", capacity=" + this.capacity + ", bootable=" + this.bootable + ", images=" + this.images
+            + "]";
     }
 
 }

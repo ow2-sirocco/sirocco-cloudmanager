@@ -31,13 +31,18 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
+@NamedQueries(value = {@NamedQuery(name = "GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM VolumeImage v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
 public class VolumeImage extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static final String GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID = "GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID";
 
     public static enum State {
         CREATING, AVAILABLE, DELETING, DELETED, ERROR
@@ -46,6 +51,8 @@ public class VolumeImage extends CloudEntity implements Serializable {
     private State state;
 
     private String imageLocation;
+
+    private Volume owner;
 
     private Boolean bootable;
 
@@ -68,6 +75,15 @@ public class VolumeImage extends CloudEntity implements Serializable {
 
     public void setImageLocation(final String imageLocation) {
         this.imageLocation = imageLocation;
+    }
+
+    @ManyToOne
+    public Volume getOwner() {
+        return this.owner;
+    }
+
+    public void setOwner(final Volume owner) {
+        this.owner = owner;
     }
 
     public Boolean getBootable() {
