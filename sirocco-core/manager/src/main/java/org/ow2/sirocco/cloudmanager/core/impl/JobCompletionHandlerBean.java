@@ -50,7 +50,12 @@ import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 
 @MessageDriven(activationConfig = {
     @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
@@ -67,7 +72,7 @@ public class JobCompletionHandlerBean implements MessageListener {
 
     @EJB
     private IMachineManager machineManager;
-    
+
     @EJB
     private ISystemManager systemManager;
 
@@ -87,13 +92,13 @@ public class JobCompletionHandlerBean implements MessageListener {
             }
             Job providerJob = (Job) payload;
             boolean done = false;
-            if (providerJob.getAction().startsWith("machine")) {
+            CloudEntity targetEntity = providerJob.getTargetEntity();
+            if (targetEntity instanceof Machine) {
                 done = this.machineManager.machineCompletionHandler(providerJob);
-            } else if (providerJob.getAction().startsWith("volume")) {
-                done = this.volumeManager.volumeCompletionHandler(providerJob);
-            } else if (providerJob.getAction().startsWith("image")) {
-            }
-            else if (providerJob.getAction().startsWith("system")) {
+            } else if ((targetEntity instanceof Volume) || (targetEntity instanceof VolumeImage)) {
+                done = this.volumeManager.jobCompletionHandler(providerJob);
+            } else if (targetEntity instanceof MachineImage) {
+            } else if (providerJob.getAction().startsWith("system")) {
                 done = this.systemManager.completionHandler(providerJob);
             }
 
