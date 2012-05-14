@@ -26,13 +26,10 @@
 package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -43,6 +40,7 @@ import javax.persistence.OneToMany;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 
 @Entity
 public class CloudProviderAccount implements Serializable {
@@ -53,12 +51,14 @@ public class CloudProviderAccount implements Serializable {
     private String login;
 
     private String password;
-    
+
     private Set<User> users;
 
     private Set<Machine> machines;
 
     private Set<Volume> volumes;
+
+    private Set<VolumeImage> volumeImages;
 
     private Set<MachineImage> images;
 
@@ -68,6 +68,7 @@ public class CloudProviderAccount implements Serializable {
         this.machines = new HashSet<Machine>();
         this.volumes = new HashSet<Volume>();
         this.images = new HashSet<MachineImage>();
+        this.volumeImages = new HashSet<VolumeImage>();
     }
 
     @Id
@@ -123,6 +124,15 @@ public class CloudProviderAccount implements Serializable {
         this.images = images;
     }
 
+    @OneToMany(mappedBy = "cloudProviderAccount")
+    public Set<VolumeImage> getVolumeImages() {
+        return this.volumeImages;
+    }
+
+    public void setVolumeImages(final Set<VolumeImage> volumeImages) {
+        this.volumeImages = volumeImages;
+    }
+
     @ManyToOne
     public CloudProvider getCloudProvider() {
         return this.cloudProvider;
@@ -133,12 +143,12 @@ public class CloudProviderAccount implements Serializable {
     }
 
     @ManyToMany
-	public Set<User> getUsers() {
-		return users;
-	}
+    public Set<User> getUsers() {
+        return this.users;
+    }
 
-	public void setUsers(Set<User> users) {
-		this.users = users;
-	}
+    public void setUsers(final Set<User> users) {
+        this.users = users;
+    }
 
 }
