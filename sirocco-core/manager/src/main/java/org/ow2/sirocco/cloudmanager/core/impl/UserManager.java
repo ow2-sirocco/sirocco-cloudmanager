@@ -52,6 +52,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
@@ -109,6 +110,8 @@ public class UserManager implements IUserManager {
         vtc.setUser(u);
         VolumeConfigurationCollection vcc = new VolumeConfigurationCollection();
         vcc.setUser(u);
+        VolumeImageCollection vic = new VolumeImageCollection();
+        vic.setUser(u);
         CloudEntryPoint cep = new CloudEntryPoint();
         cep.setUser(u);
 
@@ -120,6 +123,7 @@ public class UserManager implements IUserManager {
         this.em.persist(mcc);
         this.em.persist(vtc);
         this.em.persist(vcc);
+        this.em.persist(vic);
         this.em.persist(cep);
     }
 
