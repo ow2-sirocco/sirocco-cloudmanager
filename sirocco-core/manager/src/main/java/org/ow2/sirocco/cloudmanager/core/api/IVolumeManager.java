@@ -422,7 +422,13 @@ public interface IVolumeManager {
 
     VolumeImageCollection getVolumeImageCollection() throws CloudProviderException;
 
+    List<VolumeImage> getVolumeImagesCollection(String volumeId) throws ResourceNotFoundException, CloudProviderException;
+
     Job createVolumeImage(VolumeImage volumeImage) throws InvalidRequestException, CloudProviderException;
+
+    Job createVolumeSnapshot(Volume volume, VolumeImage volumeImage) throws InvalidRequestException, CloudProviderException;
+
+    VolumeImage getVolumeImageById(final String volumeImageId) throws ResourceNotFoundException;
 
     List<VolumeImage> getVolumeImages(int first, int last, List<String> attributes) throws InvalidRequestException,
         CloudProviderException;
@@ -438,6 +444,8 @@ public interface IVolumeManager {
 
     Job deleteVolumeImage(String volumeImageId) throws ResourceNotFoundException, CloudProviderException;
 
-    boolean volumeCompletionHandler(final Job job);
+    Job removeImageFromVolume(String volumeId, String imageId) throws ResourceNotFoundException, CloudProviderException;
+
+    boolean jobCompletionHandler(final Job job);
 
 }
