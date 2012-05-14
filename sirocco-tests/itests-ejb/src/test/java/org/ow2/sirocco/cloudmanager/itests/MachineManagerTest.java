@@ -341,7 +341,7 @@ public class MachineManagerTest {
         Assert.assertNotNull("machineCreate returns no job", job);
 
         Assert.assertNotNull(job.getId());
-        Assert.assertTrue("job action is invalid", job.getAction().equals("machine.create"));
+        Assert.assertTrue("job action is invalid", job.getAction().equals("add"));
         String machineId = job.getTargetEntity().getId().toString();
         Assert.assertNotNull("job target entity is invalid", machineId);
 
@@ -396,7 +396,7 @@ public class MachineManagerTest {
         Job job = this.machineManager.deleteMachine(machineId);
         Assert.assertNotNull("deleteMachine returns no job", job);
 
-        Assert.assertTrue("job action is invalid", job.getAction().equals("machine.delete"));
+        Assert.assertTrue("job action is invalid", job.getAction().equals("delete"));
         Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity().getId().toString());
 
         String jobId = job.getId().toString();
@@ -422,7 +422,7 @@ public class MachineManagerTest {
         Job job = this.machineManager.startMachine(machineId);
         Assert.assertNotNull("startMachine returns no job", job);
 
-        Assert.assertTrue("job action is invalid", job.getAction().equals("machine.start"));
+        Assert.assertTrue("job action is invalid", job.getAction().equals("start"));
         Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity().getId().toString());
 
         String jobId = job.getId().toString();
@@ -448,7 +448,7 @@ public class MachineManagerTest {
         Job job = this.machineManager.stopMachine(machineId);
         Assert.assertNotNull("stopMachine returns no job", job);
 
-        Assert.assertTrue("job action is invalid", job.getAction().equals("machine.stop"));
+        Assert.assertTrue("job action is invalid", job.getAction().equals("stop"));
         Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity().getId().toString());
 
         String jobId = job.getId().toString();

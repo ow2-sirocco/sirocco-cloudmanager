@@ -31,12 +31,15 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -51,6 +54,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
@@ -78,6 +85,8 @@ public class CimiPrimerScenarioTest {
 
     private IRemoteMachineManager machineManager;
 
+    private IVolumeManager volumeManager;
+
     private IRemoteCredentialsManager credManager;
 
     private IRemoteMachineImageManager machineImageManager;
@@ -101,6 +110,7 @@ public class CimiPrimerScenarioTest {
             try {
                 Context context = new InitialContext(env);
                 this.machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
+                this.volumeManager = (IRemoteVolumeManager) context.lookup(IVolumeManager.EJB_JNDI_NAME);
                 this.cloudProviderManager = (IRemoteCloudProviderManager) context.lookup(ICloudProviderManager.EJB_JNDI_NAME);
                 this.userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
                 this.credManager = (IRemoteCredentialsManager) context.lookup(ICredentialsManager.EJB_JNDI_NAME);
@@ -189,6 +199,19 @@ public class CimiPrimerScenarioTest {
         return machineConfig;
     }
 
+    private VolumeConfiguration buildVolumeConfiguration(final String name, final String description, final String format,
+        final int capacityInMBytes) {
+        VolumeConfiguration volumeConfig = new VolumeConfiguration();
+        volumeConfig.setName(name);
+        volumeConfig.setDescription(description);
+        volumeConfig.setFormat(format);
+        volumeConfig.setType("http://schemas.dmtf.org/cimi/1/mapped");
+        Disk disk = new Disk();
+        disk.setUnit(StorageUnit.MEGABYTE);
+        disk.setQuantity((float) capacityInMBytes);
+        return volumeConfig;
+    }
+
     private void initDatabase() throws Exception {
         MachineImage image = new MachineImage();
         image.setName("WinXP SP2");
@@ -216,17 +239,16 @@ public class CimiPrimerScenarioTest {
         this.machineManager.createMachineConfiguration(machineConfig);
         machineConfig = this.buildMachineConfiguration("large", "large: 4 CPU 3.5Ghz, 8GB RAM, 50GB disk", 4, 8 * 1024, 50);
         this.machineManager.createMachineConfiguration(machineConfig);
+
+        VolumeConfiguration volumeConfig = this.buildVolumeConfiguration("small", "Small Ext3 Volume", "ext3", 60);
+        this.volumeManager.createVolumeConfiguration(volumeConfig);
+        volumeConfig = this.buildVolumeConfiguration("medium", "Medium Ext3 Volume", "ext3", 120);
+        this.volumeManager.createVolumeConfiguration(volumeConfig);
+        volumeConfig = this.buildVolumeConfiguration("large", "Large Ext3 Volume", "ext3", 240);
+        this.volumeManager.createVolumeConfiguration(volumeConfig);
     }
 
-    @Test
-    public void testScenarioOne() throws Exception {
-        this.initDatabase();
-        /**
-         * Retrieve the CEP
-         */
-
-        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
-
+    String createMachine() throws Exception {
         /**
          * Retrieve the list of Machine Images
          */
@@ -307,6 +329,19 @@ public class CimiPrimerScenarioTest {
         String machineId = job.getTargetEntity().getId().toString();
 
         this.waitForJobCompletion(job);
+        return machineId;
+    }
+
+    @Test
+    public void testScenarioOne() throws Exception {
+        this.initDatabase();
+        /**
+         * Retrieve the CEP
+         */
+
+        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
+
+        String machineId = this.createMachine();
 
         /**
          * Query the Machine
@@ -322,7 +357,7 @@ public class CimiPrimerScenarioTest {
          * Start the Machine
          */
 
-        job = this.machineManager.startMachine(machineId);
+        Job job = this.machineManager.startMachine(machineId);
         this.waitForJobCompletion(job);
 
         /**
@@ -356,6 +391,78 @@ public class CimiPrimerScenarioTest {
             + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
             + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
             + machine.getNetworkInterfaces() + "]");
+
+    }
+
+    @Test
+    public void testScenarioTwo() throws Exception {
+        this.initDatabase();
+        /**
+         * Retrieve the CEP
+         */
+
+        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
+
+        String machineId = this.createMachine();
+
+        /**
+         * Retrieve the list of Volume Configurations
+         */
+
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurationCollection()
+            .getVolumeConfigurations();
+        for (VolumeConfiguration volumeConfig : volumeConfigs) {
+            System.out.println("VolumeConfiguration id=" + volumeConfig.getId());
+        }
+
+        /**
+         * Choose a VolumeConfiguration (first one)
+         */
+
+        VolumeConfiguration smallVolumeConfig = this.volumeManager.getVolumeConfigurationById(volumeConfigs.get(0).getId()
+            .toString());
+        System.out.println(smallVolumeConfig);
+
+        /**
+         * Create Volume
+         */
+
+        VolumeCreate volumeCreate = new VolumeCreate();
+        volumeCreate.setName("myVolume1");
+        volumeCreate.setDescription("My first new volume");
+        VolumeTemplate volumeTemplate = new VolumeTemplate();
+        volumeTemplate.setVolumeConfig(smallVolumeConfig);
+        volumeCreate.setVolumeTemplate(volumeTemplate);
+
+        Job job = this.volumeManager.createVolume(volumeCreate);
+
+        String volumeId = job.getTargetEntity().getId().toString();
+
+        this.waitForJobCompletion(job);
+
+        /**
+         * Retrieve the Volume information
+         */
+
+        Volume volume = this.volumeManager.getVolumeById(volumeId);
+        System.out.println(volume);
+
+        /**
+         * Connect the new Volume to the Machine
+         */
+
+        job = this.machineManager.addVolumeToMachine(machineId, volumeId, "/dev/sdb");
+
+        this.waitForJobCompletion(job);
+
+        /**
+         * Query the Machine's volume collection to verify the update
+         */
+
+        List<MachineVolume> machineVolumes = this.machineManager.getMachineVolumes(machineId);
+        for (MachineVolume machineVolume : machineVolumes) {
+            System.out.println(machineVolume);
+        }
 
     }
 }

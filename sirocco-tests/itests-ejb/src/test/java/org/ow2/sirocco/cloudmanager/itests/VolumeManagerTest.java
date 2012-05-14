@@ -61,6 +61,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
@@ -164,6 +165,22 @@ public class VolumeManagerTest {
     public void tearDown() throws Exception {
     }
 
+    private void waitForJobCompletion(Job job) throws Exception {
+        int counter = VolumeManagerTest.VOLUME_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
+        String jobId = job.getId().toString();
+        while (true) {
+            job = this.jobManager.getJobById(jobId);
+            if (job.getStatus() != Job.Status.RUNNING) {
+                break;
+            }
+            Thread.sleep(1000);
+            if (counter-- == 0) {
+                throw new Exception("Operation time out");
+            }
+        }
+        Assert.assertTrue("Job failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+    }
+
     String createVolume() throws Exception {
         VolumeCreate volumeCreate = new VolumeCreate();
         volumeCreate.setName("myVolume" + this.counterVolume++);
@@ -177,7 +194,7 @@ public class VolumeManagerTest {
         capacity.setQuantity((float) 512);
         capacity.setUnit(StorageUnit.MEGABYTE);
         volumeConfig.setCapacity(capacity);
-        volumeConfig.setSupportsSnapshots(false);
+        volumeConfig.setType("http://schemas.dmtf.org/cimi/1/mapped");
         volumeTemplate.setVolumeConfig(volumeConfig);
         volumeCreate.setVolumeTemplate(volumeTemplate);
 
@@ -185,25 +202,12 @@ public class VolumeManagerTest {
         Assert.assertNotNull("createVolume returns no job", job);
 
         Assert.assertNotNull(job.getId());
-        Assert.assertTrue("job action is invalid", job.getAction().equals("volume.create"));
+        Assert.assertTrue("job action is invalid", job.getAction().equals("add"));
         String volumeId = job.getTargetEntity().getId().toString();
         Assert.assertNotNull("job target entity is invalid", volumeId);
 
-        String jobId = job.getId().toString();
+        this.waitForJobCompletion(job);
 
-        int counter = VolumeManagerTest.VOLUME_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
-        while (true) {
-            job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
-                break;
-            }
-            Thread.sleep(1000);
-            if (counter-- == 0) {
-                throw new Exception("Volume creation time out");
-            }
-        }
-
-        Assert.assertTrue("volume creation failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
         return volumeId;
     }
 
@@ -212,7 +216,7 @@ public class VolumeManagerTest {
         String volumeId = this.createVolume();
 
         Volume volume = this.volumeManager.getVolumeById(volumeId);
-        Assert.assertNotNull("cannot find volume juste created", volume);
+        Assert.assertNotNull("cannot find volume just created", volume);
         Assert.assertEquals("Created volume is not AVAILABLE", volume.getState(), Volume.State.AVAILABLE);
         Assert.assertNotNull(volume.getProviderAssignedId());
         Assert.assertNotNull(volume.getId());
@@ -233,26 +237,14 @@ public class VolumeManagerTest {
         Job job = this.volumeManager.deleteVolume(volumeId);
         Assert.assertNotNull("deleteVolume returns no job", job);
 
-        Assert.assertTrue("job action is invalid", job.getAction().equals("volume.delete"));
+        Assert.assertTrue("job action is invalid", job.getAction().equals("delete"));
         Assert.assertEquals("job target entity is invalid", volumeId, job.getTargetEntity().getId().toString());
 
-        String jobId = job.getId().toString();
+        this.waitForJobCompletion(job);
 
-        int counter = VolumeManagerTest.VOLUME_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
-        while (true) {
-            job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
-                break;
-            }
-            Thread.sleep(1000);
-            if (counter-- == 0) {
-                throw new Exception("Volume operation time out");
-            }
-        }
-
-        Assert.assertTrue("volume deletion failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
         try {
             this.volumeManager.getVolumeById(volumeId);
+            throw new Exception();
         } catch (ResourceNotFoundException e) {
         }
     }
@@ -263,7 +255,7 @@ public class VolumeManagerTest {
         capacity.setQuantity((float) 512);
         capacity.setUnit(StorageUnit.MEGABYTE);
         inVolumeConfig.setCapacity(capacity);
-        inVolumeConfig.setSupportsSnapshots(false);
+        inVolumeConfig.setType("http://schemas.dmtf.org/cimi/1/mapped");
         inVolumeConfig.setName("myVolumeConfig" + this.counterVolumeConfig++);
         inVolumeConfig.setDescription("a volume config");
 
@@ -271,7 +263,7 @@ public class VolumeManagerTest {
         Assert.assertNotNull(outVolumeConfiguration);
         Assert.assertNotNull(outVolumeConfiguration.getId());
         Assert.assertEquals(inVolumeConfig.getCapacity(), outVolumeConfiguration.getCapacity());
-        Assert.assertFalse(outVolumeConfiguration.isSupportsSnapshots());
+        Assert.assertEquals(inVolumeConfig.getType(), outVolumeConfiguration.getType());
         Assert.assertEquals(inVolumeConfig.getName(), outVolumeConfiguration.getName());
         Assert.assertEquals(inVolumeConfig.getDescription(), outVolumeConfiguration.getDescription());
 
@@ -323,6 +315,99 @@ public class VolumeManagerTest {
             this.volumeManager.getVolumeConfigurationById(createdVolumeTemplate.getVolumeConfig().getId().toString());
         } catch (ResourceNotFoundException e) {
         }
+    }
+
+    String createVolumeImage(final Volume volumeToSnapshot) throws Exception {
+        VolumeImage volumeImage = new VolumeImage();
+        volumeImage.setName("myVolumeImage" + this.counterVolume++);
+        volumeImage.setDescription("my volumeImage");
+        Map<String, String> properties = new HashMap<String, String>();
+        properties.put("department", "MAPS");
+        volumeImage.setProperties(properties);
+        volumeImage.setBootable(false);
+        volumeImage.setImageLocation("http://dummy");
+
+        Job job;
+        if (volumeToSnapshot == null) {
+            job = this.volumeManager.createVolumeImage(volumeImage);
+        } else {
+            job = this.volumeManager.createVolumeSnapshot(volumeToSnapshot, volumeImage);
+        }
+
+        Assert.assertNotNull("createVolumeImage returns no job", job);
+
+        Assert.assertNotNull(job.getId());
+        Assert.assertTrue("job action is invalid", job.getAction().equals("add"));
+        String volumeImageId = job.getTargetEntity().getId().toString();
+        Assert.assertNotNull("job target entity is invalid", volumeImageId);
+
+        this.waitForJobCompletion(job);
+
+        return volumeImageId;
+    }
+
+    void deleteVolumeImage(final String volumeImageId) throws Exception {
+        Job job = this.volumeManager.deleteVolumeImage(volumeImageId);
+        Assert.assertNotNull("deleteVolumeImage returns no job", job);
+
+        Assert.assertTrue("job action is invalid", job.getAction().equals("delete"));
+        Assert.assertEquals("job target entity is invalid", volumeImageId, job.getTargetEntity().getId().toString());
+
+        this.waitForJobCompletion(job);
+
+        try {
+            this.volumeManager.getVolumeImageById(volumeImageId);
+            throw new Exception();
+        } catch (ResourceNotFoundException e) {
+        }
+    }
+
+    @Test
+    public void testCRUDVolumeImage() throws Exception {
+        String volumeId = this.createVolume();
+        Volume volume = this.volumeManager.getVolumeById(volumeId);
+
+        String volumeImageId = this.createVolumeImage(volume);
+
+        // CREATE
+
+        VolumeImage volumeImage = this.volumeManager.getVolumeImageById(volumeImageId);
+        Assert.assertNotNull("Cannot find volume image just created", volumeImage);
+        Assert.assertEquals("Created volume  image is not AVAILABLE", volumeImage.getState(), VolumeImage.State.AVAILABLE);
+        Assert.assertNotNull(volumeImage.getId());
+        Assert.assertFalse(volumeImage.getBootable());
+        Assert.assertEquals(volumeImage.getImageLocation(), "http://dummy");
+        Assert.assertEquals(volumeImage.getName(), "myVolumeImage1");
+        Assert.assertEquals(volumeImage.getDescription(), "my volumeImage");
+        Assert.assertNotNull(volumeImage.getProperties());
+        Assert.assertTrue(volumeImage.getProperties().get("department").equals("MAPS"));
+        Assert.assertEquals(volumeImage.getOwner().getName(), "myVolume0");
+
+        volume = this.volumeManager.getVolumeById(volumeId);
+        List<VolumeImage> snapshots = this.volumeManager.getVolumeImagesCollection(volumeId);
+        Assert.assertTrue(snapshots.contains(volumeImage));
+
+        // UPDATE
+
+        Map<String, Object> updatedAttributes = new HashMap<String, Object>();
+        updatedAttributes.put("name", "myNewVolumeImage");
+        Job job = this.volumeManager.updateVolumeImageAttributes(volumeImageId, updatedAttributes);
+        this.waitForJobCompletion(job);
+        volumeImage = this.volumeManager.getVolumeImageById(volumeImageId);
+        Assert.assertEquals(volumeImage.getName(), "myNewVolumeImage");
+
+        // Remove from Volume
+
+        job = this.volumeManager.removeImageFromVolume(volumeId, volumeImageId);
+        volumeImage = this.volumeManager.getVolumeImageById(volumeImageId);
+        volume = this.volumeManager.getVolumeById(volumeId);
+        Assert.assertNull(volumeImage.getOwner());
+        Assert.assertEquals(volume.getImages().size(), 0);
+
+        // DELETE
+
+        this.deleteVolumeImage(volumeImage.getId().toString());
+        this.deleteVolume(volume.getId().toString());
     }
 
     @Test
