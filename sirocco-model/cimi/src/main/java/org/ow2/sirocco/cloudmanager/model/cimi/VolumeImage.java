@@ -112,4 +112,46 @@ public class VolumeImage extends CloudEntity implements Serializable {
         this.location = location;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.bootable == null) ? 0 : this.bootable.hashCode());
+        result = prime * result + ((this.imageLocation == null) ? 0 : this.imageLocation.hashCode());
+        result = prime * result + ((this.state == null) ? 0 : this.state.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        VolumeImage other = (VolumeImage) obj;
+        if (this.bootable == null) {
+            if (other.bootable != null) {
+                return false;
+            }
+        } else if (!this.bootable.equals(other.bootable)) {
+            return false;
+        }
+        if (this.imageLocation == null) {
+            if (other.imageLocation != null) {
+                return false;
+            }
+        } else if (!this.imageLocation.equals(other.imageLocation)) {
+            return false;
+        }
+        if (this.state != other.state) {
+            return false;
+        }
+        return true;
+    }
+
 }
