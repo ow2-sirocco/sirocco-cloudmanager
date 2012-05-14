@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: IJobManager.java 1007 2012-02-24 12:48:27Z ycas7461 $
+ *  $Id$
  *
  */
 package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api;
@@ -32,7 +32,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import com.google.common.util.concurrent.ListenableFuture;
 
 public interface IJobManager {
-	Job newJob(CloudEntity targetEntity, String action, ListenableFuture<?> result);
+	Job newJob(CloudEntity targetEntity, CloudEntity affectedEntity,
+			String action, ListenableFuture<?> result);
 
 	Job getJobById(String id);
 

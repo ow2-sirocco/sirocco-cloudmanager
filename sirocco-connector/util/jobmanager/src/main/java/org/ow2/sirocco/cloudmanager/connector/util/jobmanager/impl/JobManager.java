@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: JobManager.java 1007 2012-02-24 12:48:27Z ycas7461 $
+ *  $Id$
  *
  */
 package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl;
@@ -169,7 +169,8 @@ public class JobManager implements IJobManager, ManagedService {
 		return jobManager;
 	}
 
-	public Job newJob(final CloudEntity targetEntity, final String action,
+	public Job newJob(final CloudEntity targetEntity,
+			final CloudEntity affectedEntity, final String action,
 			final ListenableFuture<?> result) {
 		String jobId = UUID.randomUUID().toString();
 		final Job job = new Job();
@@ -178,6 +179,11 @@ public class JobManager implements IJobManager, ManagedService {
 		job.setAction(action);
 		job.setIsCancellable(false);
 		job.setStatus(Job.Status.RUNNING);
+		List<CloudEntity> affectedEntities = new ArrayList<CloudEntity>();
+		job.setAffectedEntities(affectedEntities);
+		if (affectedEntity != null) {
+			affectedEntities.add(affectedEntity);
+		}
 		this.jobs.put(jobId, new JobEntry(job, result));
 		return job;
 	}
@@ -262,15 +268,14 @@ public class JobManager implements IJobManager, ManagedService {
 				.createTopicConnection();
 		TopicSession session = connection.createTopicSession(false,
 				Session.AUTO_ACKNOWLEDGE);
-		Topic cloudAdminTopic = (Topic) ctx
-				.lookup(JobManager.JMS_TOPIC_NAME);
+		Topic cloudAdminTopic = (Topic) ctx.lookup(JobManager.JMS_TOPIC_NAME);
 		TopicPublisher topicPublisher = session
 				.createPublisher(cloudAdminTopic);
 		ObjectMessage message = session.createObjectMessage();
 		message.setObject(payload);
 		topicPublisher.publish(message);
-		JobManager.logger.info("EMITTED EVENT " + payload.toString()
-				+ " on " + JobManager.JMS_TOPIC_NAME + " topic");
+		JobManager.logger.info("EMITTED EVENT " + payload.toString() + " on "
+				+ JobManager.JMS_TOPIC_NAME + " topic");
 		topicPublisher.close();
 		session.close();
 		connection.close();
