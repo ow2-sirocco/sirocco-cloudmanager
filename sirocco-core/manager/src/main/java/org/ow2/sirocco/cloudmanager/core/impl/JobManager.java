@@ -20,6 +20,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
@@ -38,7 +39,8 @@ public class JobManager implements IJobManager {
     @Resource
     private EJBContext ctx;
 
-    public Job createJob(final CloudEntity targetEntity, final String action, final String parentJob) throws CloudProviderException {
+    public Job createJob(final CloudResource targetEntity, final String action, final String parentJob)
+        throws CloudProviderException {
 
         Job j = new Job();
         j.setTargetEntity(targetEntity);
@@ -138,18 +140,14 @@ public class JobManager implements IJobManager {
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
     }
-    
+
     @SuppressWarnings("unchecked")
-    public CloudEntity getCloudEntityById(String cloudEntityId)
-    {
-       Query query = this.em.createQuery("SELECT c FROM CloudEntity c WHERE c.id=:ceid");
-       List<CloudEntity> templates = query.setParameter("ceid", cloudEntityId).getResultList();
+    public CloudEntity getCloudEntityById(final String cloudEntityId) {
+        Query query = this.em.createQuery("SELECT c FROM CloudEntity c WHERE c.id=:ceid");
+        List<CloudEntity> templates = query.setParameter("ceid", cloudEntityId).getResultList();
 
-
-        
-        
         return templates.get(0);
-        
+
     }
 
 }

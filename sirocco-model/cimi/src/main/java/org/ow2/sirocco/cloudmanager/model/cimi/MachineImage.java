@@ -28,92 +28,89 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Entity
-public class MachineImage extends CloudEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
-	private CloudProviderLocation location;
+public class MachineImage extends CloudResource implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private CloudProviderLocation location;
 
     public static enum State {
         CREATING, AVAILABLE, DELETING, ERROR
     }
 
     public static enum Type {
-		IMAGE, SNAPSHOT, PARTIAL_SNAPSHOT
+        IMAGE, SNAPSHOT, PARTIAL_SNAPSHOT
     }
 
-	private State		state;
-	private Type		type;
+    private State state;
 
-	private String			imageLocation;
-	private MachineImage	relatedImage;
-	
-	private CloudProviderAccount cloudProviderAccount;
-	
+    private Type type;
 
-	@Enumerated(EnumType.STRING)
-	public State getState() {
-		return this.state;
-	}
+    private String imageLocation;
 
-	public void setState(final State state) {
+    private MachineImage relatedImage;
+
+    private CloudProviderAccount cloudProviderAccount;
+
+    @Enumerated(EnumType.STRING)
+    public State getState() {
+        return this.state;
+    }
+
+    public void setState(final State state) {
         this.state = state;
     }
 
-	@Enumerated(EnumType.STRING)
-	public Type getType() {
-		return this.type;
-	}
+    @Enumerated(EnumType.STRING)
+    public Type getType() {
+        return this.type;
+    }
 
-	public void setType(final Type type) {
+    public void setType(final Type type) {
         this.type = type;
     }
 
-	@OneToOne
-	public MachineImage getRelatedImage() {
-		return relatedImage;
-	}
+    @OneToOne
+    public MachineImage getRelatedImage() {
+        return this.relatedImage;
+    }
 
-	public void setRelatedImage(MachineImage relatedImage) {
-		this.relatedImage = relatedImage;
-	}
+    public void setRelatedImage(final MachineImage relatedImage) {
+        this.relatedImage = relatedImage;
+    }
 
-	public String getImageLocation() {
-		return imageLocation;
-	}
-	
-	public void setImageLocation(String imageLocation){
-		this.imageLocation = imageLocation;
-	}
-	
-	@ManyToOne
-	public CloudProviderAccount getCloudProviderAccount() {
-		return cloudProviderAccount;
-	}
+    public String getImageLocation() {
+        return this.imageLocation;
+    }
 
-	public void setCloudProviderAccount(CloudProviderAccount cloudProviderAccount) {
-		this.cloudProviderAccount = cloudProviderAccount;
-	}
+    public void setImageLocation(final String imageLocation) {
+        this.imageLocation = imageLocation;
+    }
+
+    @ManyToOne
+    public CloudProviderAccount getCloudProviderAccount() {
+        return this.cloudProviderAccount;
+    }
+
+    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
+        this.cloudProviderAccount = cloudProviderAccount;
+    }
 
     public CloudProviderLocation getLocation() {
-        return location;
+        return this.location;
     }
+
     @ManyToOne
-    public void setLocation(CloudProviderLocation location) {
+    public void setLocation(final CloudProviderLocation location) {
         this.location = location;
     }
-	
+
 }
-
-
-
-

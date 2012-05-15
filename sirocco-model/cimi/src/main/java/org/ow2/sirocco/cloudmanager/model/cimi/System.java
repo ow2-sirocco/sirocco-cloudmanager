@@ -33,13 +33,12 @@ import javax.persistence.Table;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Entity
 @Table(name = "SYSTEMINSTANCE")
-public class System extends CloudEntity implements Serializable {
+public class System extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     private CloudProviderLocation location;
 
     public static enum State {
@@ -57,7 +56,7 @@ public class System extends CloudEntity implements Serializable {
     private VolumeCollection volumeColl;
 
     private CloudProviderAccount cloudProviderAccount;
-    
+
     public System() {
     }
 
@@ -103,19 +102,19 @@ public class System extends CloudEntity implements Serializable {
     }
 
     public CloudProviderAccount getCloudProviderAccount() {
-        return cloudProviderAccount;
+        return this.cloudProviderAccount;
     }
 
-    public void setCloudProviderAccount(CloudProviderAccount cloudProviderAccount) {
+    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
         this.cloudProviderAccount = cloudProviderAccount;
     }
 
     @ManyToOne
     public CloudProviderLocation getLocation() {
-        return location;
+        return this.location;
     }
 
-    public void setLocation(CloudProviderLocation location) {
+    public void setLocation(final CloudProviderLocation location) {
         this.location = location;
     }
 

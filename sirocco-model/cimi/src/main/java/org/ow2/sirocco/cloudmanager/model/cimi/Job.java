@@ -28,47 +28,20 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
-import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Entity
-public class Job implements Serializable {
+public class Job extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static enum Status {
         RUNNING, SUCCESS, FAILED, CANCELLED
     };
-
-    private Integer id;
-
-    private User user;
-
-    private String name;
-
-    private String description;
-
-    private Map<String, String> properties;
-
-    private Date created;
-
-    private Date deleted;
-
-    private Date updated;
-
-    private String providerAssignedId;
 
     private CloudProviderLocation location;
 
@@ -76,7 +49,7 @@ public class Job implements Serializable {
 
     private Date timeOfStatusChange;
 
-    private CloudEntity targetEntity;
+    private CloudResource targetEntity;
 
     private Integer returnCode;
 
@@ -92,7 +65,7 @@ public class Job implements Serializable {
 
     private Integer progress;
 
-    private List<CloudEntity> affectedEntities;
+    private List<CloudResource> affectedEntities;
 
     public Job() {
     }
@@ -114,11 +87,11 @@ public class Job implements Serializable {
     }
 
     @ManyToOne
-    public CloudEntity getTargetEntity() {
+    public CloudResource getTargetEntity() {
         return this.targetEntity;
     }
 
-    public void setTargetEntity(final CloudEntity targetEntity) {
+    public void setTargetEntity(final CloudResource targetEntity) {
         this.targetEntity = targetEntity;
     }
 
@@ -189,91 +162,12 @@ public class Job implements Serializable {
         this.location = location;
     }
 
-    public String getProviderAssignedId() {
-        return this.providerAssignedId;
-    }
-
-    public void setProviderAssignedId(final String providerAssignedId) {
-        this.providerAssignedId = providerAssignedId;
-    }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Integer getId() {
-        return this.id;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public void setProperties(final Map<String, String> properties) {
-        this.properties = properties;
-    }
-
-    @CollectionOfElements(fetch = FetchType.EAGER)
-    public Map<String, String> getProperties() {
-        return this.properties;
-    }
-
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getCreated() {
-        return this.created;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setId(final Integer id) {
-        this.id = id;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public void setCreated(final Date created) {
-        this.created = created;
-    }
-
-    public void setDeleted(final Date deleted) {
-        this.deleted = deleted;
-    }
-
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getDeleted() {
-        return this.deleted;
-    }
-
-    public void setUpdated(final Date updated) {
-        this.updated = updated;
-    }
-
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getUpdated() {
-        return this.updated;
-    }
-
-    @ManyToOne
-    public User getUser() {
-        return this.user;
-    }
-
-    public void setUser(final User user) {
-        this.user = user;
-    }
-
     @OneToMany
-    public List<CloudEntity> getAffectedEntities() {
+    public List<CloudResource> getAffectedEntities() {
         return this.affectedEntities;
     }
 
-    public void setAffectedEntities(final List<CloudEntity> affectedEntities) {
+    public void setAffectedEntities(final List<CloudResource> affectedEntities) {
         this.affectedEntities = affectedEntities;
     }
 

@@ -50,7 +50,7 @@ import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
@@ -92,7 +92,7 @@ public class JobCompletionHandlerBean implements MessageListener {
             }
             Job providerJob = (Job) payload;
             boolean done = false;
-            CloudEntity targetEntity = providerJob.getTargetEntity();
+            CloudResource targetEntity = providerJob.getTargetEntity();
             if (targetEntity instanceof Machine) {
                 done = this.machineManager.machineCompletionHandler(providerJob);
             } else if ((targetEntity instanceof Volume) || (targetEntity instanceof VolumeImage)) {

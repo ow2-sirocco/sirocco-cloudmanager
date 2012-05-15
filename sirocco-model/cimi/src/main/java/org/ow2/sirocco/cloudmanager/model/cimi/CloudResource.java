@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: CloudEntity.java 897 2012-02-15 10:13:25Z ycas7461 $
+ *  $Id$
  *
  */
 
@@ -28,21 +28,26 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.Set;
 
+import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
-@MappedSuperclass
-public abstract class CloudEntity implements Serializable {
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected Integer id;
@@ -60,6 +65,11 @@ public abstract class CloudEntity implements Serializable {
     protected Date updated;
 
     protected String providerAssignedId;
+
+    /**
+     * Jobs working on this entity or about to work on it (targetEntity)
+     */
+    protected Set<Job> workingJobs;
 
     // protected Collection<CloudProvider> cloudProviders;
 
@@ -143,6 +153,15 @@ public abstract class CloudEntity implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     public Date getUpdated() {
         return this.updated;
+    }
+
+    @OneToMany(mappedBy = "targetEntity")
+    public Set<Job> getWorkingJobs() {
+        return this.workingJobs;
+    }
+
+    public void setWorkingJobs(final Set<Job> workingJobs) {
+        this.workingJobs = workingJobs;
     }
 
     @ManyToOne

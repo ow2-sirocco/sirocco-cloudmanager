@@ -26,13 +26,13 @@ package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api;
 
 import java.util.List;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
 public interface IJobManager {
-	Job newJob(CloudEntity targetEntity, CloudEntity affectedEntity,
+	Job newJob(CloudResource targetEntity, CloudResource affectedEntity,
 			String action, ListenableFuture<?> result);
 
 	Job getJobById(String id);

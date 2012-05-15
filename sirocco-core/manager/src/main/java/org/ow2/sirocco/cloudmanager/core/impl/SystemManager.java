@@ -25,14 +25,6 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +35,6 @@ import javax.ejb.EJB;
 import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -52,34 +43,31 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.Query;
 
-import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 import org.ow2.easybeans.osgi.annotation.OSGiResource;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
-import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
-import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
-import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
-import org.ow2.sirocco.cloudmanager.core.api.IJobListener;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
-import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
-import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
-import org.ow2.sirocco.cloudmanager.model.cimi.*;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.System.State;
+import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -91,8 +79,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 @SuppressWarnings("unused")
 public class SystemManager implements ISystemManager {
 
-    private static Logger logger = Logger.getLogger(MachineImageManager.class
-            .getName());
+    private static Logger logger = Logger.getLogger(MachineImageManager.class.getName());
+
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
@@ -113,19 +101,18 @@ public class SystemManager implements ISystemManager {
 
     @EJB
     private ICredentialsManager credentialsManager;
-    
-    private User getUser() throws CloudProviderException{
+
+    private User getUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
         return this.userManager.getUserByUsername(username);
     }
 
     @Override
-    public Job createSystem(SystemCreate systemCreate)
-            throws CloudProviderException {
+    public Job createSystem(final SystemCreate systemCreate) throws CloudProviderException {
 
         // this.checkQuota(userManager.getUserByUsername(this.user), system);
 
-        ICloudProviderConnector connector = getCloudProviderConnector();
+        ICloudProviderConnector connector = this.getCloudProviderConnector();
         if (connector == null) {
             throw new CloudProviderException("no connector found");
         }
@@ -152,56 +139,49 @@ public class SystemManager implements ISystemManager {
         this.em.persist(system);
         this.em.flush();// useless?
         job.setTargetEntity(system);
-        
+
         // Ask for connector to notify when job completes
         try {
             connector.setNotificationOnJobCompletion(job.getProviderAssignedId());
         } catch (Exception e) {
             throw new ServiceUnavailableException(e.getMessage());
         }
-        
+
         this.relConnector(system, connector);
 
         return job;
     }
 
     @Override
-    public SystemTemplate createSystemTemplate(SystemTemplate systemT)
-            throws CloudProviderException {
-        
+    public SystemTemplate createSystemTemplate(final SystemTemplate systemT) throws CloudProviderException {
+
         systemT.setUser(this.getUser());
         systemT.setCreated(new Date());
-        
-        
+
         this.em.persist(systemT);
         this.em.flush();
         return systemT;
     }
 
     @Override
-    public System getSystemById(String systemId) throws CloudProviderException {
+    public System getSystemById(final String systemId) throws CloudProviderException {
         System result = this.em.find(System.class, new Integer(systemId));
         return result;
     }
 
     @Override
-    public SystemTemplate getSystemTemplateById(String systemTemplateId)
-            throws CloudProviderException {
-        SystemTemplate result = this.em.find(SystemTemplate.class, new Integer(
-                systemTemplateId));
+    public SystemTemplate getSystemTemplateById(final String systemTemplateId) throws CloudProviderException {
+        SystemTemplate result = this.em.find(SystemTemplate.class, new Integer(systemTemplateId));
         return result;
     }
 
-    private ComponentDescriptor getComponentDescriptorById(
-            String componentDescriptorId) throws CloudProviderException {
-        ComponentDescriptor result = this.em.find(ComponentDescriptor.class,
-                new Integer(componentDescriptorId));
+    private ComponentDescriptor getComponentDescriptorById(final String componentDescriptorId) throws CloudProviderException {
+        ComponentDescriptor result = this.em.find(ComponentDescriptor.class, new Integer(componentDescriptorId));
         return result;
     }
 
     @Override
-    public Job addVolumeToSystem(Volume volume, String systemId)
-            throws CloudProviderException {
+    public Job addVolumeToSystem(final Volume volume, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Volume> vols = s.getVolumeColl().getVolumes();
         vols.add(volume);
@@ -210,7 +190,7 @@ public class SystemManager implements ISystemManager {
 
         // TODO: Jobs...
 
-        Job job = createJob("addVolumeToSystem", s);
+        Job job = this.createJob("addVolumeToSystem", s);
 
         this.em.persist(job);
 
@@ -218,8 +198,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job removeVolumeFromSystem(String volumeId, String systemId)
-            throws CloudProviderException {
+    public Job removeVolumeFromSystem(final String volumeId, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Volume> vols = s.getVolumeColl().getVolumes();
         Volume v = this.volumeManager.getVolumeById(volumeId);
@@ -235,7 +214,7 @@ public class SystemManager implements ISystemManager {
 
         // TODO: Jobs...
 
-        Job job = createJob("removeVolumeFromSystem", s);
+        Job job = this.createJob("removeVolumeFromSystem", s);
 
         this.em.persist(job);
 
@@ -243,8 +222,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job addSystemToSystem(System system, String systemId)
-            throws CloudProviderException {
+    public Job addSystemToSystem(final System system, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         Set<System> syss = s.getSystemColl().getItems();
         syss.add(system);
@@ -253,7 +231,7 @@ public class SystemManager implements ISystemManager {
 
         // TODO: Jobs...
 
-        Job job = createJob("addSystemToSystem", s);
+        Job job = this.createJob("addSystemToSystem", s);
 
         this.em.persist(job);
 
@@ -261,8 +239,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job removeSystemFromSystem(String systemToRemoveId, String systemId)
-            throws CloudProviderException {
+    public Job removeSystemFromSystem(final String systemToRemoveId, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         Set<System> syss = s.getSystemColl().getItems();
         System sRemove = this.getSystemById(systemToRemoveId);
@@ -278,7 +255,7 @@ public class SystemManager implements ISystemManager {
 
         // TODO: Jobs...
 
-        Job job = createJob("removeSystemFromSystem", s);
+        Job job = this.createJob("removeSystemFromSystem", s);
 
         this.em.persist(job);
 
@@ -286,8 +263,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job addMachineToSystem(Machine machine, String systemId)
-            throws CloudProviderException {
+    public Job addMachineToSystem(final Machine machine, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Machine> machines = s.getMachineColl().getMachines();
         machines.add(machine);
@@ -296,7 +272,7 @@ public class SystemManager implements ISystemManager {
 
         // TODO: Jobs...
 
-        Job job = createJob("addMachineToSystem", s);
+        Job job = this.createJob("addMachineToSystem", s);
 
         this.em.persist(job);
 
@@ -304,8 +280,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job removeMachineFromSystem(String machineId, String systemId)
-            throws CloudProviderException {
+    public Job removeMachineFromSystem(final String machineId, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Machine> machines = s.getMachineColl().getMachines();
         Machine m = this.machineManager.getMachineById(machineId);
@@ -321,7 +296,7 @@ public class SystemManager implements ISystemManager {
 
         // TODO: Jobs...
 
-        Job job = createJob("removeMachineFromSystem", s);
+        Job job = this.createJob("removeMachineFromSystem", s);
 
         this.em.persist(job);
 
@@ -329,8 +304,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job addCredentialToSystem(Credentials credential, String systemId)
-            throws CloudProviderException {
+    public Job addCredentialToSystem(final Credentials credential, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Credentials> credentials = s.getCredentialColl().getCredentials();
         credentials.add(credential);
@@ -339,7 +313,7 @@ public class SystemManager implements ISystemManager {
 
         // TODO: Jobs...
 
-        Job job = createJob("addCredentialToSystem", s);
+        Job job = this.createJob("addCredentialToSystem", s);
 
         this.em.persist(job);
 
@@ -347,12 +321,10 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job removeCredentialFromSystem(String credentialId, String systemId)
-            throws CloudProviderException {
+    public Job removeCredentialFromSystem(final String credentialId, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Credentials> credentials = s.getCredentialColl().getCredentials();
-        Credentials c = this.credentialsManager
-                .getCredentialsById(credentialId);
+        Credentials c = this.credentialsManager.getCredentialsById(credentialId);
 
         for (Credentials cred : credentials) {
             if (cred.getId().equals(c.getId())) {
@@ -365,7 +337,7 @@ public class SystemManager implements ISystemManager {
 
         // TODO: Jobs...
 
-        Job job = createJob("removeMachineFromSystem", s);
+        Job job = this.createJob("removeMachineFromSystem", s);
 
         this.em.persist(job);
 
@@ -373,9 +345,8 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public boolean addComponentDescriptorToSystemTemplate(
-            ComponentDescriptor componentDescriptor, String systemTemplateId)
-            throws CloudProviderException {
+    public boolean addComponentDescriptorToSystemTemplate(final ComponentDescriptor componentDescriptor,
+        final String systemTemplateId) throws CloudProviderException {
         SystemTemplate s = this.getSystemTemplateById(systemTemplateId);
         Set<ComponentDescriptor> descrs = s.getComponentDescriptors();
 
@@ -389,13 +360,11 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public boolean removeComponentDescriptorFromSystemTemplate(
-            String componentDescriptorId, String systemTemplateId)
-            throws CloudProviderException {
+    public boolean removeComponentDescriptorFromSystemTemplate(final String componentDescriptorId, final String systemTemplateId)
+        throws CloudProviderException {
         SystemTemplate s = this.getSystemTemplateById(systemTemplateId);
         Set<ComponentDescriptor> descrs = s.getComponentDescriptors();
-        ComponentDescriptor cd = this
-                .getComponentDescriptorById(componentDescriptorId);
+        ComponentDescriptor cd = this.getComponentDescriptorById(componentDescriptorId);
 
         for (ComponentDescriptor cdesc : descrs) {
             if (cdesc.getId().equals(cd.getId())) {
@@ -411,53 +380,49 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public System updateComponentDescriptor(String id,
-            Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public System updateComponentDescriptor(final String id, final Map<String, Object> updatedAttributes)
+        throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public System updateSystem(String id, Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public System updateSystem(final String id, final Map<String, Object> updatedAttributes) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public SystemTemplate updateSystemTemplate(String id,
-            Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public SystemTemplate updateSystemTemplate(final String id, final Map<String, Object> updatedAttributes)
+        throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Job startSystem(String systemId) throws CloudProviderException {
+    public Job startSystem(final String systemId) throws CloudProviderException {
         Job j = this.doService(systemId, "start");
         return j;
     }
 
     @Override
-    public Job stopSystem(String systemId) throws CloudProviderException {
+    public Job stopSystem(final String systemId) throws CloudProviderException {
         Job j = this.doService(systemId, "stop");
         return j;
     }
 
     @Override
-    public Job deleteSystem(String systemId) throws CloudProviderException {
+    public Job deleteSystem(final String systemId) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     // private methods
 
-    private Job doService(final String systemId, final String action)
-            throws CloudProviderException {
+    private Job doService(final String systemId, final String action) throws CloudProviderException {
 
         System s = this.getSystemById(systemId);
-        ICloudProviderConnector connector = getConnector(s);
+        ICloudProviderConnector connector = this.getConnector(s);
         if (connector == null) {
             throw new CloudProviderException("no connector found");
         }
@@ -465,48 +430,42 @@ public class SystemManager implements ISystemManager {
 
         try {
             if (action.equals("start")) {
-                j = connector.getSystemService().startSystem(
-                        s.getProviderAssignedId());
+                j = connector.getSystemService().startSystem(s.getProviderAssignedId());
                 s.setState(System.State.STARTING);
             } else if (action.equals("stop")) {
-                j = connector.getSystemService().stopSystem(
-                        s.getProviderAssignedId());
+                j = connector.getSystemService().stopSystem(s.getProviderAssignedId());
                 s.setState(System.State.STOPPING);
             } else {
-                throw new ServiceUnavailableException(
-                        "Unsupported operation action " + action
-                                + " on system id " + s.getProviderAssignedId()
-                                + " " + s.getId());
+                throw new ServiceUnavailableException("Unsupported operation action " + action + " on system id "
+                    + s.getProviderAssignedId() + " " + s.getId());
             }
         } catch (ConnectorException e) {
-            throw new ServiceUnavailableException(e.getMessage() + " action "
-                    + action + " system id " + s.getProviderAssignedId() + " "
-                    + s.getId());
+            throw new ServiceUnavailableException(e.getMessage() + " action " + action + " system id "
+                + s.getProviderAssignedId() + " " + s.getId());
 
         }
-        
+
         j.setTargetEntity(s);
         j.setUser(this.getUser());
-        
+
         this.em.persist(j);
         this.em.flush();
-        
+
         if (j.getStatus() == Job.Status.RUNNING) {
             try {
                 connector.setNotificationOnJobCompletion(j.getProviderAssignedId());
             } catch (Exception e) {
-                throw new ServiceUnavailableException(e.getMessage() + "  system " +action);
+                throw new ServiceUnavailableException(e.getMessage() + "  system " + action);
             }
         }
-        
-        
+
         // Ask for connector to notify when job completes
         try {
             connector.setNotificationOnJobCompletion(j.getProviderAssignedId());
         } catch (Exception e) {
             throw new ServiceUnavailableException(e.getMessage());
         }
-        
+
         this.relConnector(s, connector);
 
         return null;
@@ -519,7 +478,7 @@ public class SystemManager implements ISystemManager {
          */
         return true;
     }
-    
+
     private void relConnector(final System ce, final ICloudProviderConnector connector) throws CloudProviderException {
         String cpType = ce.getCloudProviderAccount().getCloudProvider().getCloudProviderType();
         ICloudProviderConnectorFactory cFactory = null;
@@ -533,8 +492,7 @@ public class SystemManager implements ISystemManager {
     }
 
     private CloudProvider selectCloudProvider() {
-        Query q = this.em
-                .createQuery("FROM CloudProvider c WHERE c.cloudProviderType=:type");
+        Query q = this.em.createQuery("FROM CloudProvider c WHERE c.cloudProviderType=:type");
         q.setParameter("type", "mock");
 
         q.setMaxResults(1);
@@ -548,18 +506,15 @@ public class SystemManager implements ISystemManager {
         return null;
     }
 
-    private CloudProviderAccount selectCloudProviderAccount(
-            CloudProvider provider) {
-        Set<CloudProviderAccount> accounts = provider
-                .getCloudProviderAccounts();
+    private CloudProviderAccount selectCloudProviderAccount(final CloudProvider provider) {
+        Set<CloudProviderAccount> accounts = provider.getCloudProviderAccounts();
         if (accounts.isEmpty() == false) {
             return accounts.iterator().next();
         }
         return null;
     }
 
-    private ICloudProviderConnector getConnector(final System s)
-            throws CloudProviderException {
+    private ICloudProviderConnector getConnector(final System s) throws CloudProviderException {
 
         ICloudProviderConnector connector = null;
 
@@ -567,14 +522,13 @@ public class SystemManager implements ISystemManager {
         return connector;
     }
 
-    private ICloudProviderConnector getCloudProviderConnector()
-            throws CloudProviderException {
+    private ICloudProviderConnector getCloudProviderConnector() throws CloudProviderException {
 
-        CloudProvider cloudProvider = selectCloudProvider();
+        CloudProvider cloudProvider = this.selectCloudProvider();
         if (cloudProvider == null) {
             throw new CloudProviderException("no provider found");
         }
-        CloudProviderAccount cloudProviderAccount = selectCloudProviderAccount(cloudProvider);
+        CloudProviderAccount cloudProviderAccount = this.selectCloudProviderAccount(cloudProvider);
         if (cloudProviderAccount == null) {
             throw new CloudProviderException("no provider account found");
         }
@@ -583,22 +537,18 @@ public class SystemManager implements ISystemManager {
             throw new CloudProviderException("Cloud provider account ");
         }
         ICloudProviderConnectorFactory connectorFactory = this.cloudProviderConnectorFactoryFinder
-                .getCloudProviderConnectorFactory(cloudProviderAccount
-                        .getCloudProvider().getCloudProviderType());
+            .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
         if (connectorFactory == null) {
-            throw new CloudProviderException(
-                    " Internal error in connector factory ");
+            throw new CloudProviderException(" Internal error in connector factory ");
         }
 
         CloudProviderLocation location = null;
 
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount,
-                location);
+        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
     }
 
-    private ICloudProviderConnector getCloudProviderConnector(
-            CloudProviderAccount cloudProviderAccount)
-            throws CloudProviderException {
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
+        throws CloudProviderException {
 
         CloudProvider cloudProvider = cloudProviderAccount.getCloudProvider();
 
@@ -606,21 +556,17 @@ public class SystemManager implements ISystemManager {
             throw new CloudProviderException("Cloud provider account ");
         }
         ICloudProviderConnectorFactory connectorFactory = this.cloudProviderConnectorFactoryFinder
-                .getCloudProviderConnectorFactory(cloudProviderAccount
-                        .getCloudProvider().getCloudProviderType());
+            .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
         if (connectorFactory == null) {
-            throw new CloudProviderException(
-                    " Internal error in connector factory ");
+            throw new CloudProviderException(" Internal error in connector factory ");
         }
 
         CloudProviderLocation location = null;
 
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount,
-                location);
+        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
     }
 
-    private Job createJob(String action, CloudEntity targetEntity)
-            throws CloudProviderException {
+    private Job createJob(final String action, final CloudResource targetEntity) throws CloudProviderException {
 
         Job job = new Job();
         job.setAction(action);
@@ -636,7 +582,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public boolean completionHandler(Job job) {
+    public boolean completionHandler(final Job job) {
         /**
          * Find the system by providerAssignedId (or the job as well)
          */
@@ -698,13 +644,11 @@ public class SystemManager implements ISystemManager {
             SystemManager.logger.info("Could not get cloud connector " + e.getMessage());
             return false;
         }
-        
-        //TODO: update system in the database...
+
+        // TODO: update system in the database...
 
         this.em.flush();
         return true;
     }
-    
-    
 
 }

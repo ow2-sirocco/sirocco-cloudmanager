@@ -52,7 +52,7 @@ import javax.naming.InitialContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
@@ -169,8 +169,8 @@ public class JobManager implements IJobManager, ManagedService {
 		return jobManager;
 	}
 
-	public Job newJob(final CloudEntity targetEntity,
-			final CloudEntity affectedEntity, final String action,
+	public Job newJob(final CloudResource targetEntity,
+			final CloudResource affectedEntity, final String action,
 			final ListenableFuture<?> result) {
 		String jobId = UUID.randomUUID().toString();
 		final Job job = new Job();
@@ -179,7 +179,7 @@ public class JobManager implements IJobManager, ManagedService {
 		job.setAction(action);
 		job.setIsCancellable(false);
 		job.setStatus(Job.Status.RUNNING);
-		List<CloudEntity> affectedEntities = new ArrayList<CloudEntity>();
+		List<CloudResource> affectedEntities = new ArrayList<CloudResource>();
 		job.setAffectedEntities(affectedEntities);
 		if (affectedEntity != null) {
 			affectedEntities.add(affectedEntity);

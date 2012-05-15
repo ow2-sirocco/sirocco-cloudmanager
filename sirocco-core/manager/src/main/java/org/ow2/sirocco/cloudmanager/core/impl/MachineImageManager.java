@@ -28,7 +28,6 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -49,7 +48,6 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
@@ -162,10 +160,7 @@ public class MachineImageManager implements IMachineImageManager {
         if (templates != null) {
             throw new CloudProviderException("Machine templates refer to this image " + imageId);
         }
-        Set<CloudEntity> entities = this.user.getCloudEntities();
-        entities.remove(image);
-        this.user.setCloudEntities(entities);
-
+        
         this.em.remove(image);
         this.em.flush();
 

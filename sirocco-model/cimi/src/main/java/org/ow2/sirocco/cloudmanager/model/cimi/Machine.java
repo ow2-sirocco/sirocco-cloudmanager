@@ -30,209 +30,202 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
+import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.CollectionOfElements;
-
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
 @NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
-public class Machine extends CloudEntity implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class Machine extends CloudResource implements Serializable {
+    private static final long serialVersionUID = 1L;
 
-	public static final String GET_MACHINE_BY_STATE = "GET_MACHINE_BY_STATE";
-    
+    public static final String GET_MACHINE_BY_STATE = "GET_MACHINE_BY_STATE";
+
     private CloudProviderLocation location;
 
-	public static enum State {
-		CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
-	}
+    public static enum State {
+        CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
+    }
 
-	private State state;
+    private State state;
 
-	private Cpu cpu;
-	private Memory 		memory;
+    private Cpu cpu;
 
-	@OneToOne
-	private MachineVolumeCollection volumes;
+    private Memory memory;
 
-	@OneToOne
-	private MachineDiskCollection disks;
+    @OneToOne
+    private MachineVolumeCollection volumes;
 
-	private List<NetworkInterface>  networkInterfaces;
+    @OneToOne
+    private MachineDiskCollection disks;
 
-	private CloudProviderAccount cloudProviderAccount;
+    private List<NetworkInterface> networkInterfaces;
 
+    private CloudProviderAccount cloudProviderAccount;
 
-	@Transient
-	private FSM			fsm;
+    @Transient
+    private FSM fsm;
 
+    public Machine() {
+        this.networkInterfaces = new ArrayList<NetworkInterface>();
+    }
 
-	public Machine() {
-		this.networkInterfaces = new ArrayList<NetworkInterface>();
-	}
+    @Enumerated(EnumType.STRING)
+    public State getState() {
+        return this.state;
+    }
 
-	@Enumerated(EnumType.STRING)
-	public State getState() {
-		return this.state;
-	}
+    public void setState(final State state) {
+        this.state = state;
+    }
 
-	public void setState(final State state) {
-		this.state = state;
-	}
+    @Embedded
+    public Cpu getCpu() {
+        return this.cpu;
+    }
 
-	@Embedded
-	public Cpu getCpu() {
-		return this.cpu;
-	}
+    public void setCpu(final Cpu cpu) {
+        this.cpu = cpu;
+    }
 
-	public void setCpu(final Cpu cpu) {
-		this.cpu = cpu;
-	}
+    @Embedded
+    public Memory getMemory() {
+        return this.memory;
+    }
 
-	@Embedded
-	public Memory getMemory() {
-		return this.memory;
-	}
+    public void setMemory(final Memory memory) {
+        this.memory = memory;
+    }
 
-	public void setMemory(final Memory memory) {
-		this.memory = memory;
-	}
+    @OneToOne
+    public MachineDiskCollection getDisks() {
+        return this.disks;
+    }
 
-	@OneToOne
-	public MachineDiskCollection getDisks() {
-		return this.disks;
-	}
+    public void setDisks(final MachineDiskCollection disks) {
+        this.disks = disks;
+    }
 
-	public void setDisks(final MachineDiskCollection disks) {
-		this.disks = disks;
-	}
+    @OneToOne
+    public MachineVolumeCollection getVolumes() {
+        return this.volumes;
+    }
 
-	@OneToOne
-	public MachineVolumeCollection getVolumes() {
-		return this.volumes;
-	}
+    public void setVolumes(final MachineVolumeCollection volumes) {
+        this.volumes = volumes;
+    }
 
-	public void setVolumes(final MachineVolumeCollection volumes) {
-		this.volumes = volumes;
-	}
+    @CollectionOfElements
+    public List<NetworkInterface> getNetworkInterfaces() {
+        return this.networkInterfaces;
+    }
 
-	@CollectionOfElements
-	public List<NetworkInterface> getNetworkInterfaces() {
-		return this.networkInterfaces;
-	}
+    public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
+        this.networkInterfaces = networkInterfaces;
+    }
 
-	public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
-		this.networkInterfaces = networkInterfaces;
-	}
+    @ManyToOne
+    public CloudProviderAccount getCloudProviderAccount() {
+        return this.cloudProviderAccount;
+    }
 
-	@ManyToOne
-	public CloudProviderAccount getCloudProviderAccount() {
-		return this.cloudProviderAccount;
-	}
+    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
+        this.cloudProviderAccount = cloudProviderAccount;
+    }
 
-	public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
-		this.cloudProviderAccount = cloudProviderAccount;
-	}
+    /**
+     * Ideally: create and persist an FSM per entity per provider. Machines
+     * should then refer appropriate FSM.
+     */
+    public void initFSM() {
+        this.fsm = new FSM(State.CREATING.toString());
+        this.fsm.addAction(State.CREATING, "delete", State.DELETING);
+        this.fsm.addAction(State.CREATING, "delete", State.ERROR);
+        this.fsm.addAction(State.CREATING, "internal", State.STOPPED);
+        this.fsm.addAction(State.CREATING, "internal", State.ERROR);
+        this.fsm.addAction(State.ERROR, "start", State.STARTING);
+        this.fsm.addAction(State.ERROR, "stop", State.STOPPING);
+        this.fsm.addAction(State.ERROR, "restart", State.STARTING);
+        this.fsm.addAction(State.ERROR, "delete", State.DELETING);
 
-	/**
-	 * Ideally: create and persist an FSM per entity per provider.
-	 * Machines should then refer appropriate FSM.
-	 */
-	 public void initFSM() {
-		this.fsm = new FSM(State.CREATING.toString());
-		fsm.addAction(State.CREATING, "delete", State.DELETING);
-		fsm.addAction(State.CREATING, "delete", State.ERROR);
-		fsm.addAction(State.CREATING, "internal", State.STOPPED);
-		fsm.addAction(State.CREATING, "internal", State.ERROR);
-		fsm.addAction(State.ERROR, "start", State.STARTING);
-		fsm.addAction(State.ERROR, "stop", State.STOPPING);
-		fsm.addAction(State.ERROR, "restart", State.STARTING);
-		fsm.addAction(State.ERROR, "delete", State.DELETING);
+        this.fsm.addAction(State.STOPPED, "start", State.STARTING);
+        this.fsm.addAction(State.STOPPED, "delete", State.DELETING);
+        this.fsm.addAction(State.STOPPED, "capture", State.STOPPED);
+        this.fsm.addAction(State.STOPPED, "restart", State.STARTING);
 
+        this.fsm.addAction(State.STARTING, "internal", State.STARTED);
+        this.fsm.addAction(State.STARTING, "start", State.STARTING);
+        this.fsm.addAction(State.STARTING, "restart", State.STARTING);
+        this.fsm.addAction(State.STARTING, "delete", State.DELETING);
+        this.fsm.addAction(State.STARTING, "stop", State.STOPPING);
 
-		fsm.addAction(State.STOPPED, "start", State.STARTING);
-		fsm.addAction(State.STOPPED, "delete", State.DELETING);
-		fsm.addAction(State.STOPPED, "capture", State.STOPPED);
-		fsm.addAction(State.STOPPED, "restart", State.STARTING);
+        this.fsm.addAction(State.STARTED, "restart", State.STARTING);
+        this.fsm.addAction(State.STARTED, "stop", State.STOPPING);
+        this.fsm.addAction(State.STARTED, "delete", State.DELETING);
+        this.fsm.addAction(State.STARTED, "capture", State.STARTED);
+        this.fsm.addAction(State.STARTED, "pause", State.PAUSING);
+        this.fsm.addAction(State.STARTED, "suspend", State.SUSPENDING);
 
-		fsm.addAction(State.STARTING, "internal", State.STARTED);
-		fsm.addAction(State.STARTING, "start", State.STARTING);
-		fsm.addAction(State.STARTING, "restart", State.STARTING);
-		fsm.addAction(State.STARTING, "delete", State.DELETING);
-		fsm.addAction(State.STARTING, "stop", State.STOPPING);
+        this.fsm.addAction(State.STOPPING, "internal", State.STOPPED);
+        this.fsm.addAction(State.STOPPING, "start", State.STARTING);
+        this.fsm.addAction(State.STOPPING, "restart", State.STARTING);
+        this.fsm.addAction(State.STOPPING, "delete", State.DELETING);
 
-		fsm.addAction(State.STARTED, "restart", State.STARTING);
-		fsm.addAction(State.STARTED, "stop", State.STOPPING);
-		fsm.addAction(State.STARTED, "delete", State.DELETING);
-		fsm.addAction(State.STARTED, "capture", State.STARTED);
-		fsm.addAction(State.STARTED, "pause", State.PAUSING);
-		fsm.addAction(State.STARTED, "suspend", State.SUSPENDING);
+        this.fsm.addAction(State.STOPPED, "start", State.STARTING);
+        this.fsm.addAction(State.STOPPED, "restart", State.STARTING);
+        this.fsm.addAction(State.STOPPED, "capture", State.STOPPED);
+        this.fsm.addAction(State.STOPPED, "delete", State.DELETING);
 
-		fsm.addAction(State.STOPPING, "internal", State.STOPPED);
-		fsm.addAction(State.STOPPING, "start", State.STARTING);
-		fsm.addAction(State.STOPPING, "restart", State.STARTING);
-		fsm.addAction(State.STOPPING, "delete", State.DELETING);
+        this.fsm.addAction(State.PAUSING, "internal", State.PAUSED);
+        this.fsm.addAction(State.PAUSING, "start", State.STARTING);
+        this.fsm.addAction(State.PAUSING, "restart", State.STARTING);
+        this.fsm.addAction(State.PAUSING, "delete", State.DELETING);
 
-		fsm.addAction(State.STOPPED, "start", State.STARTING);
-		fsm.addAction(State.STOPPED, "restart", State.STARTING);
-		fsm.addAction(State.STOPPED, "capture", State.STOPPED);
-		fsm.addAction(State.STOPPED, "delete", State.DELETING);
+        this.fsm.addAction(State.PAUSED, "start", State.STARTING);
+        this.fsm.addAction(State.PAUSED, "capture", State.PAUSED);
+        this.fsm.addAction(State.PAUSED, "restart", State.STARTING);
+        this.fsm.addAction(State.PAUSED, "stop", State.STOPPING);
+        this.fsm.addAction(State.PAUSED, "delete", State.DELETING);
 
-		fsm.addAction(State.PAUSING, "internal", State.PAUSED);
-		fsm.addAction(State.PAUSING, "start", State.STARTING);
-		fsm.addAction(State.PAUSING, "restart", State.STARTING);
-		fsm.addAction(State.PAUSING, "delete", State.DELETING);
+        this.fsm.addAction(State.SUSPENDING, "start", State.STARTING);
+        this.fsm.addAction(State.SUSPENDING, "restart", State.STARTING);
+        this.fsm.addAction(State.SUSPENDING, "delete", State.DELETING);
+        this.fsm.addAction(State.SUSPENDING, "internal", State.SUSPENDED);
 
-		fsm.addAction(State.PAUSED, "start", State.STARTING);
-		fsm.addAction(State.PAUSED, "capture", State.PAUSED);
-		fsm.addAction(State.PAUSED, "restart", State.STARTING);
-		fsm.addAction(State.PAUSED, "stop", State.STOPPING);
-		fsm.addAction(State.PAUSED, "delete", State.DELETING);
+        this.fsm.addAction(State.SUSPENDED, "start", State.STARTING);
+        this.fsm.addAction(State.SUSPENDED, "restart", State.STARTING);
+        this.fsm.addAction(State.SUSPENDED, "capture", State.SUSPENDED);
+        this.fsm.addAction(State.SUSPENDED, "delete", State.DELETING);
 
-		fsm.addAction(State.SUSPENDING, "start", State.STARTING);
-		fsm.addAction(State.SUSPENDING, "restart", State.STARTING);
-		fsm.addAction(State.SUSPENDING, "delete", State.DELETING);
-		fsm.addAction(State.SUSPENDING, "internal", State.SUSPENDED);
+        this.fsm.addAction(State.DELETING, "delete", State.DELETING);
+        this.fsm.addAction(State.DELETING, "internal", State.DELETED);
+    }
 
-		fsm.addAction(State.SUSPENDED, "start", State.STARTING);
-		fsm.addAction(State.SUSPENDED, "restart", State.STARTING);
-		fsm.addAction(State.SUSPENDED, "capture", State.SUSPENDED);
-		fsm.addAction(State.SUSPENDED, "delete", State.DELETING);
-
-		fsm.addAction(State.DELETING, "delete", State.DELETING);
-		fsm.addAction(State.DELETING, "internal", State.DELETED);
-	 }
-	 /** get operations allowed in this state */
-	 @Transient
-	 public Set<String> getOperations() {
-		 Set<String> operations = fsm.getActionsAtState(state);
-		 operations.remove(new String("internal"));
-		 return operations;
-	 }
+    /** get operations allowed in this state */
+    @Transient
+    public Set<String> getOperations() {
+        Set<String> operations = this.fsm.getActionsAtState(this.state);
+        operations.remove(new String("internal"));
+        return operations;
+    }
 
     @ManyToOne
     public CloudProviderLocation getLocation() {
-        return location;
+        return this.location;
     }
 
-    public void setLocation(CloudProviderLocation location) {
+    public void setLocation(final CloudProviderLocation location) {
         this.location = location;
     }
 }

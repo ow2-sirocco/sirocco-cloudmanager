@@ -29,6 +29,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
@@ -347,6 +348,26 @@ public class VolumeManager implements IVolumeManager {
 
     @SuppressWarnings("unchecked")
     private boolean updateCloudEntityAttributes(final CloudEntity entity, final Map<String, Object> attributes) {
+        boolean updated = false;
+        if (attributes.containsKey("name")) {
+            entity.setName((String) attributes.get("name"));
+            updated = true;
+        }
+
+        if (attributes.containsKey("description")) {
+            entity.setDescription((String) attributes.get("description"));
+            updated = true;
+        }
+
+        if (attributes.containsKey("properties")) {
+            entity.setProperties((Map<String, String>) attributes.get("properties"));
+            updated = true;
+        }
+        return updated;
+    }
+
+    @SuppressWarnings("unchecked")
+    private boolean updateCloudResourceAttributes(final CloudResource entity, final Map<String, Object> attributes) {
         boolean updated = false;
         if (attributes.containsKey("name")) {
             entity.setName((String) attributes.get("name"));
@@ -876,7 +897,7 @@ public class VolumeManager implements IVolumeManager {
         if (volumeImage == null) {
             throw new ResourceNotFoundException("VolumeImage " + volumeImageId + " doesn't not exist");
         }
-        boolean updated = this.updateCloudEntityAttributes(volumeImage, updatedAttributes);
+        boolean updated = this.updateCloudResourceAttributes(volumeImage, updatedAttributes);
         if (updated) {
             volumeImage.setUpdated(new Date());
         }
