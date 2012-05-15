@@ -63,8 +63,6 @@ public class User implements Serializable {
 
     private String password;
 
-    private Set<CloudEntity> cloudEntities;
-
     private Set<CloudProviderAccount> cloudProviderAccounts;
 
     public User() {
@@ -137,15 +135,6 @@ public class User implements Serializable {
 
     public void setCloudProviderAccounts(final Set<CloudProviderAccount> cloudProviderAccounts) {
         this.cloudProviderAccounts = cloudProviderAccounts;
-    }
-
-    @OneToMany(mappedBy="user")
-    public Set<CloudEntity> getCloudEntities() {
-        return cloudEntities;
-    }
-
-    public void setCloudEntities(Set<CloudEntity> cloudEntities) {
-        this.cloudEntities = cloudEntities;
     }
 
 }
