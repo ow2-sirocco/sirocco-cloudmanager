@@ -40,7 +40,6 @@ import javax.naming.NamingException;
 
 import org.dbunit.PropertiesBasedJdbcDatabaseTester;
 import org.dbunit.dataset.xml.XmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -57,6 +56,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
@@ -64,7 +64,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
@@ -166,7 +165,9 @@ public class MachineManagerTest {
         XmlDataSet dataSet = new XmlDataSet(reader);
         databaseTest = new PropertiesBasedJdbcDatabaseTester();
         databaseTest.setDataSet(dataSet);
-        databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        Assert.assertNotNull("database.type not set!", System.getProperty("database.type"));
+        // databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        databaseTest.setSetUpOperation(new CustomDBUnitDeleteAllOperation(System.getProperty("database.type")));
         databaseTest.onSetup();
     }
 
@@ -387,7 +388,7 @@ public class MachineManagerTest {
         } catch (Exception e) {
 
         }
-        Assert.assertEquals(" deleted machine still there", mm.getState(), State.DELETED);
+        Assert.assertNull(" deleted machine still there", mm);
         System.out.println(" end of testCreateMachine until delete ");
     }
 

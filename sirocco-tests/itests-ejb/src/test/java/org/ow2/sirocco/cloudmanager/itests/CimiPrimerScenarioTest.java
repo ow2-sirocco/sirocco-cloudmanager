@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -16,7 +15,6 @@ import javax.naming.NamingException;
 
 import org.dbunit.PropertiesBasedJdbcDatabaseTester;
 import org.dbunit.dataset.xml.XmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -35,6 +33,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
@@ -55,7 +54,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMT;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
@@ -137,7 +135,9 @@ public class CimiPrimerScenarioTest {
         XmlDataSet dataSet = new XmlDataSet(reader);
         databaseTest = new PropertiesBasedJdbcDatabaseTester();
         databaseTest.setDataSet(dataSet);
-        databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        Assert.assertNotNull("database.type not set!", System.getProperty("database.type"));
+        // databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        databaseTest.setSetUpOperation(new CustomDBUnitDeleteAllOperation(System.getProperty("database.type")));
         databaseTest.onSetup();
     }
 
@@ -146,7 +146,7 @@ public class CimiPrimerScenarioTest {
      */
     @Before
     public void setUp() throws Exception {
-        //this.setUpDatabase();
+        this.setUpDatabase();
         this.connectToCloudManager();
         User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
         CloudProvider provider = this.cloudProviderManager.createCloudProvider(CimiPrimerScenarioTest.CLOUD_PROVIDER_TYPE,
@@ -252,7 +252,7 @@ public class CimiPrimerScenarioTest {
     }
 
     void testMachineTemplateCreate() throws Exception {
-    	 /**
+        /**
          * Retrieve the list of Machine Images
          */
 
@@ -278,7 +278,7 @@ public class CimiPrimerScenarioTest {
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
-        
+
         /**
          * Choose a Machine Configuration (first one)
          */
@@ -304,7 +304,7 @@ public class CimiPrimerScenarioTest {
         Credentials credentials = this.credManager.createCredentials(credentialsCreate);
 
         System.out.println("New Credentials id=" + credentials.getId());
-    	MachineTemplate machineTemplate = new MachineTemplate();
+        MachineTemplate machineTemplate = new MachineTemplate();
 
         machineTemplate.setMachineConfiguration(machineConfig);
         machineTemplate.setMachineImage(image);
@@ -316,37 +316,37 @@ public class CimiPrimerScenarioTest {
         MachineVolumeTemplateCollection vtColl = new MachineVolumeTemplateCollection();
         vtColl.setItems(Collections.<MachineVolumeTemplate> emptyList());
         machineTemplate.setVolumeTemplates(vtColl);
-        
-    	// create network interfaces
+
+        // create network interfaces
         NetworkInterfaceMT mtnic = null;
         for (int i = 0; i < 2; i++) {
-        	mtnic = new NetworkInterfaceMT();
-        	mtnic.setState(NetworkInterface.InterfaceState.STANDBY);
-        	machineTemplate.addNetworkInterface(mtnic);
+            mtnic = new NetworkInterfaceMT();
+            mtnic.setState(NetworkInterface.InterfaceState.STANDBY);
+            machineTemplate.addNetworkInterface(mtnic);
         }
         MachineTemplate mt = null;
         try {
-        	mt = this.machineManager.createMachineTemplate(machineTemplate);
+            mt = this.machineManager.createMachineTemplate(machineTemplate);
         } catch (Exception e) {
-        	System.out.println("testMachineTemplateCreate failed " +e.getMessage());
-        	throw new Exception("machine template create failed ");
+            System.out.println("testMachineTemplateCreate failed " + e.getMessage());
+            throw new Exception("machine template create failed ");
         }
-        System.out.println("testMachineTemplateCreate returned " +mt.getId());
-        
+        System.out.println("testMachineTemplateCreate returned " + mt.getId());
+
         try {
-        	MachineTemplate mtt = this.machineManager.getMachineTemplateById(mt.getId().toString());
-        	List<NetworkInterface> items = mtt.getNetworkInterfaces();
-        	if (items.size() == 0) {
-        		System.out.println(" Strange no network interface?");
-        	}
-        	for (NetworkInterface intf : items) {
-        		System.out.println("testMachineTemplateCreate " +intf.getId() +" "+intf.getState());
-        	}
+            MachineTemplate mtt = this.machineManager.getMachineTemplateById(mt.getId().toString());
+            List<NetworkInterface> items = mtt.getNetworkInterfaces();
+            if (items.size() == 0) {
+                System.out.println(" Strange no network interface?");
+            }
+            for (NetworkInterface intf : items) {
+                System.out.println("testMachineTemplateCreate " + intf.getId() + " " + intf.getState());
+            }
         } catch (Exception e) {
-        	throw new Exception("read of newly created machine template create failed ");
+            throw new Exception("read of newly created machine template create failed ");
         }
     }
-    
+
     String createMachine() throws Exception {
         /**
          * Retrieve the list of Machine Images
@@ -401,7 +401,6 @@ public class CimiPrimerScenarioTest {
 
         System.out.println("New Credentials id=" + credentials.getId());
 
-       
         /**
          * Create a new Machine
          */
@@ -422,9 +421,7 @@ public class CimiPrimerScenarioTest {
         MachineVolumeTemplateCollection vtColl = new MachineVolumeTemplateCollection();
         vtColl.setItems(Collections.<MachineVolumeTemplate> emptyList());
         machineTemplate.setVolumeTemplates(vtColl);
-        
-        
-        
+
         machineTemplate.setNetworkInterfaces(Collections.<NetworkInterface> emptyList());
         machineCreate.setMachineTemplate(machineTemplate);
 
@@ -444,7 +441,7 @@ public class CimiPrimerScenarioTest {
 
         CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
         System.out.println(" test machinetemplate create");
-        testMachineTemplateCreate();
+        this.testMachineTemplateCreate();
         System.out.println(" test machine create ");
         String machineId = this.createMachine();
 
@@ -557,7 +554,8 @@ public class CimiPrimerScenarioTest {
          */
         System.out.println(" testScenarioTwo: add volume to machine ");
         job = this.machineManager.addVolumeToMachine(machineId, volumeId, "/dev/sdb");
-        System.out.println(" testScenarioTwo: add volume to machine wait for job completion " +job.getId() +" " +job.getStatus());
+        System.out.println(" testScenarioTwo: add volume to machine wait for job completion " + job.getId() + " "
+            + job.getStatus());
         this.waitForJobCompletion(job);
 
         /**
@@ -565,7 +563,7 @@ public class CimiPrimerScenarioTest {
          */
         System.out.println(" testScenarioTwo: get machine volumes ");
         List<MachineVolume> machineVolumes = this.machineManager.getMachineVolumes(machineId);
-        System.out.println(" testScenarioTwo: found " +machineVolumes.size() +" machine volumes ");
+        System.out.println(" testScenarioTwo: found " + machineVolumes.size() + " machine volumes ");
         for (MachineVolume machineVolume : machineVolumes) {
             System.out.println(machineVolume);
         }

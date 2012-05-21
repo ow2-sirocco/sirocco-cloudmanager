@@ -39,7 +39,6 @@ import javax.naming.NamingException;
 
 import org.dbunit.PropertiesBasedJdbcDatabaseTester;
 import org.dbunit.dataset.xml.XmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -53,6 +52,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
@@ -138,7 +138,9 @@ public class VolumeManagerTest {
         XmlDataSet dataSet = new XmlDataSet(reader);
         databaseTest = new PropertiesBasedJdbcDatabaseTester();
         databaseTest.setDataSet(dataSet);
-        databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        Assert.assertNotNull("database.type not set!", System.getProperty("database.type"));
+        // databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        databaseTest.setSetUpOperation(new CustomDBUnitDeleteAllOperation(System.getProperty("database.type")));
         databaseTest.onSetup();
     }
 
