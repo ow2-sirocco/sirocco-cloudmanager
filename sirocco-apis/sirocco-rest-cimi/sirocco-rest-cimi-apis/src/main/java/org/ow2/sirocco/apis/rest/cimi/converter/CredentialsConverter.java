@@ -100,7 +100,7 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setUserName(dataService.getUserName());
-            // Next read only
+            // Next write only
             if (true == context.isConvertedWriteOnly()) {
                 dataCimi.setKey(dataService.getPublicKey());
                 dataCimi.setPassword(dataService.getPassword());
