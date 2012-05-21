@@ -126,7 +126,9 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
                 dataCimi.setStatus(dataService.getStatus().toString());
             }
             dataCimi.setStatusMessage(dataService.getStatusMessage());
-            dataCimi.setTargetEntity(this.makeHrefTargetEntity(context, dataService.getTargetEntity()));
+            if (null != dataService.getTargetEntity()) {
+                dataCimi.setTargetEntity(this.makeHrefTargetEntity(context, dataService.getTargetEntity()));
+            }
             dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
 
             if (null != dataService.getParentJob()) {
@@ -155,13 +157,8 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
 
     protected String makeHrefTargetEntity(final CimiContext context, final Object targetDataService) {
         String href = null;
-        if (null == targetDataService) {
-            throw new InvalidConversionException("Job conversion : target service is null");
-        }
         CimiEntityType targetType = this.findType(targetDataService);
-        if (null == targetType) {
-            throw new InvalidConversionException("Job conversion : target type not found");
-        }
+
         href = context.makeHref(targetType, this.getTargetId(targetDataService));
         return href;
     }
@@ -205,6 +202,8 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
             type = CimiEntityType.MachineImage;
         } else if (targetDataService instanceof MachineImageCollection) {
             type = CimiEntityType.MachineImageCollection;
+        } else {
+            throw new InvalidConversionException("Job conversion : target type not found");
         }
         return type;
     }

@@ -125,11 +125,12 @@ public class CimiManagersMachineImageTest {
 
     @Test
     public void testCreate() throws Exception {
+        MachineImage target = new MachineImage();
+        target.setId(654);
 
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("654");
+        job.setTargetEntity(target);
         EasyMock.expect(this.service.createMachineImage(EasyMock.anyObject(MachineImage.class))).andReturn(job);
         EasyMock.replay(this.service);
 
@@ -154,10 +155,12 @@ public class CimiManagersMachineImageTest {
         reference.setName("nameValue");
         reference.setImageLocation("imageLocationValue");
 
+        MachineImage target = new MachineImage();
+        target.setId(654);
+
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("654");
+        job.setTargetEntity(target);
 
         EasyMock.expect(this.service.getMachineImageById("13")).andReturn(reference);
         EasyMock.expect(this.service.createMachineImage(EasyMock.anyObject(MachineImage.class))).andReturn(job);

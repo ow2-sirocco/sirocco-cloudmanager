@@ -155,10 +155,12 @@ public class CimiManagersMachineTest {
 
     @Test
     public void testActionStart() throws Exception {
+        Machine target = new Machine();
+        target.setId(1789);
+
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("1789");
+        job.setTargetEntity(target);
 
         EasyMock.expect(this.service.startMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
@@ -178,10 +180,12 @@ public class CimiManagersMachineTest {
 
     @Test
     public void testActionStop() throws Exception {
+        Machine target = new Machine();
+        target.setId(7);
+
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("7");
+        job.setTargetEntity(target);
 
         EasyMock.expect(this.service.stopMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
@@ -201,10 +205,12 @@ public class CimiManagersMachineTest {
 
     @Test
     public void testCreate() throws Exception {
+        Machine target = new Machine();
+        target.setId(789);
+
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("789");
+        job.setTargetEntity(target);
 
         EasyMock.expect(this.service.createMachine(EasyMock.anyObject(MachineCreate.class))).andReturn(job);
         EasyMock.replay(this.service);
@@ -227,6 +233,8 @@ public class CimiManagersMachineTest {
 
     @Test
     public void testCreateWithRef() throws Exception {
+        Machine target = new Machine();
+        target.setId(654);
 
         MachineTemplate reference = new MachineTemplate();
         reference.setId(13);
@@ -234,8 +242,7 @@ public class CimiManagersMachineTest {
 
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("654");
+        job.setTargetEntity(target);
 
         EasyMock.expect(this.service.getMachineTemplateById("13")).andReturn(reference);
         EasyMock.expect(this.service.createMachine(EasyMock.anyObject(MachineCreate.class))).andReturn(job);
@@ -268,10 +275,12 @@ public class CimiManagersMachineTest {
         refCredentials.setId(345);
         refCredentials.setName("credentials");
 
+        Machine target = new Machine();
+        target.setId(654);
+
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("654");
+        job.setTargetEntity(target);
 
         EasyMock.expect(this.serviceCredentials.getCredentialsById("345")).andReturn(refCredentials);
         EasyMock.replay(this.serviceCredentials);
@@ -337,10 +346,12 @@ public class CimiManagersMachineTest {
 
     @Test
     public void testDelete() throws Exception {
+        Machine target = new Machine();
+        target.setId(1789);
+
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("1789");
+        job.setTargetEntity(target);
 
         EasyMock.expect(this.service.deleteMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
@@ -357,10 +368,12 @@ public class CimiManagersMachineTest {
 
     @Test
     public void testUpdate() throws Exception {
+        Machine target = new Machine();
+        target.setId(789);
+
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("789");
+        job.setTargetEntity(target);
 
         EasyMock.expect(this.service.updateMachine(EasyMock.anyObject(Machine.class))).andReturn(job);
         EasyMock.replay(this.service);
@@ -384,10 +397,13 @@ public class CimiManagersMachineTest {
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("name", "fooName");
         map.put("description", "fooDescription");
+
+        Machine target = new Machine();
+        target.setId(654);
+
         Job job = new Job();
         job.setId(123);
-        // FIXME TagertEntity
-        // job.setTargetEntity("654");
+        job.setTargetEntity(target);
 
         EasyMock.expect(this.service.updateMachineAttributes(EasyMock.eq("1"), EasyMock.eq(map))).andReturn(job);
         EasyMock.replay(this.service);

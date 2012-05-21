@@ -191,7 +191,6 @@ public abstract class CimiManagerAbstract implements CimiManager {
                     .toCimi(request.getContext(), dataService);
                 response.setCimiData(cimi);
                 response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
-                cimi.setTargetEntity(request.getContext().makeHref(request.getCimiData(), cimi.getTargetEntity()));
                 response.putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
                 response.setStatus(Response.Status.ACCEPTED);
             }
