@@ -25,6 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -50,8 +51,11 @@ public class CapacityConverter implements EntityConverter {
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiCapacity cimi = new CimiCapacity();
-        this.copyToCimi(context, dataService, cimi);
+        CimiCapacity cimi = null;
+        if (null != dataService) {
+            cimi = new CimiCapacity();
+            this.copyToCimi(context, dataService, cimi);
+        }
         return cimi;
     }
 
@@ -78,13 +82,15 @@ public class CapacityConverter implements EntityConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Object service;
-        if (dataCimi instanceof CimiDiskConfiguration) {
-            service = new DiskTemplate();
-        } else {
-            service = new Disk();
+        Object service = null;
+        if (null != dataCimi) {
+            if (dataCimi instanceof CimiDiskConfiguration) {
+                service = new DiskTemplate();
+            } else {
+                service = new Disk();
+            }
+            this.copyToService(context, dataCimi, service);
         }
-        this.copyToService(context, dataCimi, service);
         return service;
     }
 
@@ -97,10 +103,16 @@ public class CapacityConverter implements EntityConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        if (dataService instanceof Disk) {
-            this.doCopyToService(context, (CimiCapacity) dataCimi, (Disk) dataService);
+        if (dataCimi instanceof CimiDiskConfiguration) {
+            this.doCopyToService(context, ((CimiDiskConfiguration) dataCimi).getCapacity(), (DiskTemplate) dataService);
+        } else if (dataCimi instanceof CimiDisk) {
+            this.doCopyToService(context, ((CimiDisk) dataCimi).getCapacity(), (Disk) dataService);
         } else {
-            this.doCopyToService(context, (CimiCapacity) dataCimi, (DiskTemplate) dataService);
+            if (dataService instanceof DiskTemplate) {
+                this.doCopyToService(context, (CimiCapacity) dataCimi, (DiskTemplate) dataService);
+            } else {
+                this.doCopyToService(context, (CimiCapacity) dataCimi, (Disk) dataService);
+            }
         }
     }
 
@@ -112,8 +124,12 @@ public class CapacityConverter implements EntityConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final Disk dataService, final CimiCapacity dataCimi) {
-        dataCimi.setQuantity(dataService.getQuantity().intValue());
-        dataCimi.setUnits((String) context.getConverter(StorageUnit.class).toCimi(context, dataService.getUnit()));
+        if (null != dataService) {
+            if (null != dataService.getQuantity()) {
+                dataCimi.setQuantity(dataService.getQuantity().intValue());
+            }
+            dataCimi.setUnits((String) context.getConverter(StorageUnit.class).toCimi(context, dataService.getUnits()));
+        }
     }
 
     /**
@@ -124,8 +140,12 @@ public class CapacityConverter implements EntityConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final DiskTemplate dataService, final CimiCapacity dataCimi) {
-        dataCimi.setQuantity(dataService.getQuantity().intValue());
-        dataCimi.setUnits((String) context.getConverter(StorageUnit.class).toCimi(context, dataService.getUnit()));
+        if (null != dataService) {
+            if (null != dataService.getQuantity()) {
+                dataCimi.setQuantity(dataService.getQuantity().intValue());
+            }
+            dataCimi.setUnits((String) context.getConverter(StorageUnit.class).toCimi(context, dataService.getUnit()));
+        }
     }
 
     /**
@@ -136,9 +156,11 @@ public class CapacityConverter implements EntityConverter {
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiCapacity dataCimi, final Disk dataService) {
-        dataService.setQuantity(dataCimi.getQuantity().floatValue());
-        dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
-            .toService(context, dataCimi.getUnits()));
+        if (null != dataCimi) {
+            dataService.setQuantity(dataCimi.getQuantity().floatValue());
+            dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
+                .toService(context, dataCimi.getUnits()));
+        }
     }
 
     /**
@@ -149,8 +171,12 @@ public class CapacityConverter implements EntityConverter {
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiCapacity dataCimi, final DiskTemplate dataService) {
-        dataService.setQuantity(dataCimi.getQuantity().floatValue());
-        dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
-            .toService(context, dataCimi.getUnits()));
+        if (null != dataCimi) {
+            if (null != dataCimi.getQuantity()) {
+                dataService.setQuantity(dataCimi.getQuantity().floatValue());
+            }
+            dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
+                .toService(context, dataCimi.getUnits()));
+        }
     }
 }

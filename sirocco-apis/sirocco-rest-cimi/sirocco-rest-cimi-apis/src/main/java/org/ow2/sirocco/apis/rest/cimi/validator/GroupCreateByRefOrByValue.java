@@ -25,8 +25,8 @@
 package org.ow2.sirocco.apis.rest.cimi.validator;
 
 /**
- * Validation group to valid a entity creating by value.
+ * Validation group to valid a entity creating by reference or by value.
  */
-public interface GroupCreateByValue {
+public interface GroupCreateByRefOrByValue {
 
 }

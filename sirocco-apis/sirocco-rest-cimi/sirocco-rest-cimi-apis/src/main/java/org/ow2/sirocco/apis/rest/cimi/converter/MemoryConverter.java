@@ -97,7 +97,9 @@ public class MemoryConverter implements EntityConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final Memory dataService, final CimiMemory dataCimi) {
-        dataCimi.setQuantity(dataService.getQuantity().intValue());
+        if (null != dataService.getQuantity()) {
+            dataCimi.setQuantity(dataService.getQuantity().intValue());
+        }
         dataCimi.setUnits((String) context.getConverter(MemoryUnit.class).toCimi(context, dataService.getUnit()));
     }
 
@@ -109,7 +111,9 @@ public class MemoryConverter implements EntityConverter {
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiMemory dataCimi, final Memory dataService) {
-        dataService.setQuantity(dataCimi.getQuantity().floatValue());
+        if (null != dataCimi.getQuantity()) {
+            dataService.setQuantity(dataCimi.getQuantity().floatValue());
+        }
         dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit) context.getConverter(MemoryUnit.class)
             .toService(context, dataCimi.getUnits()));
     }

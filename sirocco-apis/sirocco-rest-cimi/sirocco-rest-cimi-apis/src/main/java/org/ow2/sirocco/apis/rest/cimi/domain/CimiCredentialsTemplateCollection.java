@@ -28,6 +28,8 @@ import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
@@ -45,6 +47,7 @@ public class CimiCredentialsTemplateCollection extends CimiCommonId {
     /**
      * Field "CredentialsTemplates".
      */
+    @JsonProperty
     @Null(groups = {GroupWrite.class})
     private CimiCredentialsTemplate[] credentialsTemplates;
 
@@ -54,6 +57,7 @@ public class CimiCredentialsTemplateCollection extends CimiCommonId {
      * @return The value
      */
     @XmlElement(name = "credentialsTemplate")
+    @JsonIgnore
     public CimiCredentialsTemplate[] getCredentialsTemplates() {
         return this.credentialsTemplates;
     }

@@ -39,6 +39,8 @@ public class CimiContextImpl implements CimiContext {
 
     private CimiRequest request;
 
+    private boolean convertedWriteOnly;
+
     /**
      * Set constructor.
      * 
@@ -94,7 +96,18 @@ public class CimiContextImpl implements CimiContext {
      */
     @Override
     public CimiConverter getRootConverter(final CimiEntityType type) {
+        return this.getRootConverter(type, false);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#getRootConverter(CimiEntityType)
+     */
+    @Override
+    public CimiConverter getRootConverter(final CimiEntityType type, final boolean convertedWriteOnly) {
         this.currentRoot = type;
+        this.convertedWriteOnly = convertedWriteOnly;
         return AppConfig.getConverter(type);
     }
 
@@ -184,8 +197,17 @@ public class CimiContextImpl implements CimiContext {
      */
     @Override
     public boolean mustHaveIdInReference(final CimiData data) {
+        return this.mustHaveIdInReference(AppConfig.getType(data));
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#mustHaveIdInReference(org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType)
+     */
+    @Override
+    public boolean mustHaveIdInReference(final CimiEntityType type) {
         boolean withId = true;
-        CimiEntityType type = AppConfig.getType(data);
         switch (type) {
         case CloudEntryPoint:
         case CredentialsCollection:
@@ -243,5 +265,44 @@ public class CimiContextImpl implements CimiContext {
             }
         }
         return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#makeHref(org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType,
+     *      java.lang.Integer)
+     */
+    @Override
+    public String makeHref(final CimiEntityType type, final Integer id) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.request.getBaseUri()).append(type.getPathType().getPathname());
+        if (true == this.mustHaveIdInReference(type)) {
+            sb.append('/');
+            if (null != id) {
+                sb.append(id);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#isConvertedWriteOnly()
+     */
+    @Override
+    public boolean isConvertedWriteOnly() {
+        return this.convertedWriteOnly;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#setConvertedWriteOnly(boolean)
+     */
+    @Override
+    public void setConvertedWriteOnly(final boolean convertedWriteOnly) {
+        this.convertedWriteOnly = convertedWriteOnly;
     }
 }

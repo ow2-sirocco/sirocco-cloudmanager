@@ -28,6 +28,8 @@ import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
@@ -47,6 +49,7 @@ public class CimiMachineConfigurationCollection extends CimiCommonId {
     /**
      * Field "machineConfigurations".
      */
+    @JsonProperty
     @Null(groups = {GroupWrite.class})
     private CimiMachineConfiguration[] machineConfigurations;
 
@@ -56,6 +59,7 @@ public class CimiMachineConfigurationCollection extends CimiCommonId {
      * @return The value
      */
     @XmlElement(name = "machineConfiguration")
+    @JsonIgnore
     public CimiMachineConfiguration[] getMachineConfigurations() {
         return this.machineConfigurations;
     }

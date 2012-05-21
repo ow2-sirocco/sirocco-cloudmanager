@@ -27,6 +27,8 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
@@ -44,6 +46,7 @@ public class CimiCredentialsCollection extends CimiCommonId {
     /**
      * Field "credentials".
      */
+    @JsonProperty
     @Null(groups = {GroupWrite.class})
     private CimiCredentials[] credentials;
 
@@ -52,6 +55,7 @@ public class CimiCredentialsCollection extends CimiCommonId {
      * 
      * @return The value
      */
+    @JsonIgnore
     public CimiCredentials[] getCredentials() {
         return this.credentials;
     }

@@ -78,14 +78,16 @@ public enum MemoryUnit {
      */
     public static MemoryUnit findValueOf(final String toFind) {
         MemoryUnit unit = null;
-        for (MemoryUnit value : MemoryUnit.values()) {
-            if (toFind.equalsIgnoreCase(value.getLabel())) {
-                unit = value;
-                break;
-            }
-            if (toFind.equalsIgnoreCase(value.getSymbol())) {
-                unit = value;
-                break;
+        if (null != toFind) {
+            for (MemoryUnit value : MemoryUnit.values()) {
+                if (toFind.equalsIgnoreCase(value.getLabel())) {
+                    unit = value;
+                    break;
+                }
+                if (toFind.equalsIgnoreCase(value.getSymbol())) {
+                    unit = value;
+                    break;
+                }
             }
         }
         return unit;

@@ -24,13 +24,16 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByRefOrByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
-import org.ow2.sirocco.apis.rest.cimi.validator.constraints.ValidReference;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertEntityBy;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertReferencePath;
 
 /**
  * Referenced entity who can be referenced by another entity.
  */
-@ValidReference(groups = GroupWrite.class)
+@AssertEntityBy(groups = GroupCreateByRefOrByValue.class)
+@AssertReferencePath(groups = GroupWrite.class)
 public interface CimiHref extends CimiData {
 
     /**

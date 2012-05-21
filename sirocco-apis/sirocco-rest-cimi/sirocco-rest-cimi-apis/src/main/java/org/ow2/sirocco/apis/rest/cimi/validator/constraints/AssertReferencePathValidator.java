@@ -30,12 +30,12 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiHref;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiContextValidatorAbstract;
 
 /**
- * Implementation of {@link ValidReference} validator.
+ * Implementation of {@link AssertReferencePath} validator.
  **/
-public class ValidReferenceValidator extends CimiContextValidatorAbstract<ValidReference, Object> {
+public class AssertReferencePathValidator extends CimiContextValidatorAbstract<AssertReferencePath, Object> {
 
     @Override
-    public void initialize(final ValidReference annotation) {
+    public void initialize(final AssertReferencePath annotation) {
         // Nothing to do
     }
 

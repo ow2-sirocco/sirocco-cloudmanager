@@ -106,7 +106,6 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
         this.setDeleted(cloud.getDeleted());
         this.setDescription(cloud.getDescription());
         this.setId(cloud.getId());
-        this.setLocation(cloud.getLocation());
         this.setName(cloud.getName());
         this.setProperties(cloud.getProperties());
         this.setProviderAssignedId(cloud.getProviderAssignedId());

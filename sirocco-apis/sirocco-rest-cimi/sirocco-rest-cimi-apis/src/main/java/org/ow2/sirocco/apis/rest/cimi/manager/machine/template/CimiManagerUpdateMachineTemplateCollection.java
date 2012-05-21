@@ -55,11 +55,12 @@ public class CimiManagerUpdateMachineTemplateCollection extends CimiManagerUpdat
     protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
         throws Exception {
         CimiSelect select = request.getHeader().getCimiSelect();
-        if (true == select.isEmpty()) {
-            throw new UnsupportedOperationException();
-        } else {
-            this.manager.updateMachineTemplateCollection(select.dispatchAttributesValues(dataService));
-        }
+        // FIXME Collection
+        // if (true == select.isEmpty()) {
+        // throw new UnsupportedOperationException();
+        // } else {
+        // this.manager.updateMachineTemplateCollection(select.dispatchAttributesValues(dataService));
+        // }
         return null;
     }
 

@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -52,7 +53,30 @@ public class CommonIdConverter extends CommonConverter {
             this.fill(dataService, dataCimi);
             dataCimi.setCreated(dataService.getCreated());
             dataCimi.setUpdated(dataService.getUpdated());
+            // if (null != dataService.getId()) {
             dataCimi.setId(context.makeHref(dataCimi, dataService.getId()));
+            // }
+        }
+        if (true == context.mustBeReferenced(dataCimi)) {
+            dataCimi.setHref(context.makeHref(dataCimi, dataService.getId()));
+        }
+    }
+
+    /**
+     * Fill the common data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void fill(final CimiContext context, final CloudResource dataService, final CimiCommonId dataCimi) {
+        if (true == context.mustBeExpanded(dataCimi)) {
+            this.fill(dataService, dataCimi);
+            dataCimi.setCreated(dataService.getCreated());
+            dataCimi.setUpdated(dataService.getUpdated());
+            // if (null != dataService.getId()) {
+            dataCimi.setId(context.makeHref(dataCimi, dataService.getId()));
+            // }
         }
         if (true == context.mustBeReferenced(dataCimi)) {
             dataCimi.setHref(context.makeHref(dataCimi, dataService.getId()));
@@ -74,15 +98,39 @@ public class CommonIdConverter extends CommonConverter {
     }
 
     /**
+     * Fill the common data from a CIMI object to a service object.
+     * 
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination service object
+     */
+    protected void fill(final CimiContext context, final CimiCommonId dataCimi, final CloudResource dataService) {
+        this.fill(dataCimi, dataService);
+        if (null != dataCimi.getId()) {
+            dataService.setId(CommonIdConverter.extractId(dataCimi.getId()));
+        }
+    }
+
+    /**
+     * Extract the ID service of the HREF.
+     * 
+     * @param href The HREF
+     * @return The ID service
+     */
+    public static String extractIdString(final String href) {
+        String id = null;
+        int posId = href.lastIndexOf('/');
+        id = href.substring(posId + 1);
+        return id;
+    }
+
+    /**
      * Extract the ID service of the HREF.
      * 
      * @param href The HREF
      * @return The ID service
      */
     public static Integer extractId(final String href) {
-        Integer id = null;
-        int posId = href.lastIndexOf('/');
-        id = Integer.valueOf(href.substring(posId + 1));
-        return id;
+        return Integer.valueOf(CommonIdConverter.extractIdString(href));
     }
 }

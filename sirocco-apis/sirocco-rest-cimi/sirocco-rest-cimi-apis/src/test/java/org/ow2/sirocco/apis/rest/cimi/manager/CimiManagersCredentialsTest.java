@@ -38,6 +38,7 @@ import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -48,6 +49,7 @@ import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -139,6 +141,34 @@ public class CimiManagersCredentialsTest {
         Assert.assertNotNull(this.response.getHeaders());
         Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH + "/456", this.response.getHeaders().get(Constants.HEADER_LOCATION));
         Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH + "/456", ((CimiCredentials) this.response.getCimiData()).getId());
+        EasyMock.verify(this.service);
+    }
+
+    @Test
+    public void testCreateWithRef() throws Exception {
+        CredentialsTemplate reference = new CredentialsTemplate();
+        reference.setId(13);
+        reference.setName("nameValue");
+        reference.setPassword("passwordValue");
+
+        Credentials create = new Credentials();
+        create.setId(789);
+
+        EasyMock.expect(this.service.getCredentialsTemplateById("13")).andReturn(reference);
+        EasyMock.expect(this.service.createCredentials(EasyMock.anyObject(CredentialsCreate.class))).andReturn(create);
+        EasyMock.replay(this.service);
+
+        CimiCredentialsTemplate template = new CimiCredentialsTemplate(this.request.getBaseUri()
+            + CimiEntityType.CredentialsTemplate.getPathType().getPathname() + "/13");
+        CimiCredentialsCreate cimi = new CimiCredentialsCreate();
+        cimi.setCredentialsTemplate(template);
+        this.request.setCimiData(cimi);
+        this.managerCreate.execute(this.request, this.response);
+
+        Assert.assertEquals(201, this.response.getStatus());
+        Assert.assertNotNull(this.response.getHeaders());
+        Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH + "/789", this.response.getHeaders().get(Constants.HEADER_LOCATION));
+        Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH + "/789", ((CimiCredentials) this.response.getCimiData()).getId());
         EasyMock.verify(this.service);
     }
 

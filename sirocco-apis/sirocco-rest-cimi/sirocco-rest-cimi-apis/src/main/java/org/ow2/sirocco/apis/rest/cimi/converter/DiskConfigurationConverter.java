@@ -112,7 +112,9 @@ public class DiskConfigurationConverter implements EntityConverter {
     protected void doCopyToService(final CimiContext context, final CimiDiskConfiguration dataCimi,
         final DiskTemplate dataService) {
         dataService.setAttachmentPoint(dataCimi.getAttachmentPoint());
-        context.getEntityConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
+        if (null != dataCimi.getCapacity()) {
+            context.getEntityConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
+        }
         dataService.setFormat(dataCimi.getFormat());
     }
 }

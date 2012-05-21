@@ -104,6 +104,28 @@
 	<bean id="CimiManagerUpdateMachineConfigurationCollection"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
+	<!-- Services -->
+	<bean id="IJobManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.IJobManager" />
+	</bean>
+	<bean id="ICredentialsManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager" />
+	</bean>
+	<bean id="IMachineImageManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager" />
+	</bean>
+	<bean id="IMachineManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.IMachineManager" />
+	</bean>
+
 
 	<context:annotation-config />
 	<context:component-scan base-package="org.ow2.sirocco.apis.rest.cimi" />

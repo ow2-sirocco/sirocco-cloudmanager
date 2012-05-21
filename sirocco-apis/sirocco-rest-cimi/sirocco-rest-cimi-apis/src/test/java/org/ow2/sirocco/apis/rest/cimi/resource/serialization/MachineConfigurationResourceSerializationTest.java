@@ -26,6 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.resource.serialization;
 
 import java.io.StringReader;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import junit.framework.Assert;
@@ -37,7 +38,6 @@ import org.ow2.sirocco.apis.rest.cimi.resource.serialization.json.JsonLocator;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.xml.XmlLocator;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
-import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,8 +60,8 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
 
         // JSON : id = 0
         clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
+            .accept(MediaType.APPLICATION_JSON_TYPE).header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+            .get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
@@ -76,8 +76,8 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
 
         // JSON : id = 1
         clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION + "/1")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
+            .accept(MediaType.APPLICATION_JSON_TYPE).header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+            .get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
@@ -92,8 +92,8 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
 
         // JSON : id = 2
         clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION + "/2")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
+            .accept(MediaType.APPLICATION_JSON_TYPE).header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+            .get(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -121,8 +121,8 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
 
         // XML : id = 0
         clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
+            .accept(MediaType.APPLICATION_XML_TYPE).header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+            .get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
@@ -137,8 +137,8 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
 
         // XML : id = 1
         clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION + "/1")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
+            .accept(MediaType.APPLICATION_XML_TYPE).header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+            .get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
 
@@ -153,8 +153,8 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
 
         // XML : id = 2
         clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION + "/2")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML_TYPE)
-            .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
+            .accept(MediaType.APPLICATION_XML_TYPE).header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
+            .get(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -181,8 +181,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         int statusResponse;
 
         // JSON : id = 0
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION).accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 0).get(ClientResponse.class);
 
@@ -200,8 +199,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
             new StringReader(entityResponse));
 
         // JSON : id = 1
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION).accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 1).get(ClientResponse.class);
 
@@ -219,8 +217,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
             new StringReader(entityResponse));
 
         // JSON : id = 3
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION).accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).get(ClientResponse.class);
 
@@ -238,8 +235,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
             new StringReader(entityResponse));
 
         // JSON : id = 3, expand
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION).accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
             .get(ClientResponse.class);
@@ -270,8 +266,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         int statusResponse;
 
         // XML : id = 0
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 0).get(ClientResponse.class);
 
@@ -289,8 +284,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
             new StringReader(entityResponse));
 
         // XML : id = 1
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 1).get(ClientResponse.class);
 
@@ -308,8 +302,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
             new StringReader(entityResponse));
 
         // XML : id = 3
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).get(ClientResponse.class);
 
@@ -327,8 +320,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
             new StringReader(entityResponse));
 
         // XML : id = 3, expand
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
             .get(ClientResponse.class);
@@ -362,10 +354,10 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_CONFIGURATION + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_JSON_TYPE)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "MachineConfiguration-0.json"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON).put(ClientResponse.class);
+                MediaType.APPLICATION_JSON).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -383,10 +375,10 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_CONFIGURATION + "/1")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_JSON_TYPE)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "MachineConfiguration-1.json"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON).put(ClientResponse.class);
+                MediaType.APPLICATION_JSON).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -404,10 +396,10 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_CONFIGURATION + "/2")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_JSON_TYPE)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "MachineConfiguration-2.json"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON).put(ClientResponse.class);
+                MediaType.APPLICATION_JSON).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -438,10 +430,10 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_CONFIGURATION + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_XML_TYPE)
+            .accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineConfiguration-0.xml"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML).put(ClientResponse.class);
+                MediaType.APPLICATION_XML).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -459,10 +451,10 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_CONFIGURATION + "/1")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_XML_TYPE)
+            .accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineConfiguration-1.xml"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML).put(ClientResponse.class);
+                MediaType.APPLICATION_XML).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -480,10 +472,10 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_CONFIGURATION + "/2")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_XML_TYPE)
+            .accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineConfiguration-2.xml"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML).put(ClientResponse.class);
+                MediaType.APPLICATION_XML).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -515,10 +507,10 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_JSON_TYPE)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "MachineConfiguration-1.json"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_JSON).post(ClientResponse.class);
+                MediaType.APPLICATION_JSON).post(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -558,10 +550,10 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_CONFIGURATION)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_XML_TYPE)
+            .accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineConfiguration-1.xml"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_XML).post(ClientResponse.class);
+                MediaType.APPLICATION_XML).post(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);

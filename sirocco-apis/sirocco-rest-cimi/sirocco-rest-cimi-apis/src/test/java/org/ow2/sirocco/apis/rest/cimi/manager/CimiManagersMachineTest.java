@@ -40,6 +40,8 @@ import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
@@ -54,10 +56,16 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -73,6 +81,14 @@ public class CimiManagersMachineTest {
     @Autowired
     @Qualifier("IMachineManager")
     private IMachineManager service;
+
+    @Autowired
+    @Qualifier("IMachineImageManager")
+    private IMachineImageManager serviceImage;
+
+    @Autowired
+    @Qualifier("ICredentialsManager")
+    private ICredentialsManager serviceCredentials;
 
     @Autowired
     @Qualifier("CimiManagerActionMachine")
@@ -133,13 +149,16 @@ public class CimiManagersMachineTest {
     @After
     public void tearDown() throws Exception {
         EasyMock.reset(this.service);
+        EasyMock.reset(this.serviceCredentials);
+        EasyMock.reset(this.serviceImage);
     }
 
     @Test
     public void testActionStart() throws Exception {
         Job job = new Job();
         job.setId(123);
-        job.setTargetEntity("1789");
+        // FIXME TagertEntity
+        // job.setTargetEntity("1789");
 
         EasyMock.expect(this.service.startMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
@@ -161,7 +180,8 @@ public class CimiManagersMachineTest {
     public void testActionStop() throws Exception {
         Job job = new Job();
         job.setId(123);
-        job.setTargetEntity("7");
+        // FIXME TagertEntity
+        // job.setTargetEntity("7");
 
         EasyMock.expect(this.service.stopMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
@@ -183,7 +203,8 @@ public class CimiManagersMachineTest {
     public void testCreate() throws Exception {
         Job job = new Job();
         job.setId(123);
-        job.setTargetEntity("789");
+        // FIXME TagertEntity
+        // job.setTargetEntity("789");
 
         EasyMock.expect(this.service.createMachine(EasyMock.anyObject(MachineCreate.class))).andReturn(job);
         EasyMock.replay(this.service);
@@ -201,6 +222,82 @@ public class CimiManagersMachineTest {
         Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
         Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/789", ((CimiJob) this.response.getCimiData()).getTargetEntity());
         Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/789", this.response.getHeaders().get("Location"));
+        EasyMock.verify(this.service);
+    }
+
+    @Test
+    public void testCreateWithRef() throws Exception {
+
+        MachineTemplate reference = new MachineTemplate();
+        reference.setId(13);
+        reference.setName("nameValue");
+
+        Job job = new Job();
+        job.setId(123);
+        // FIXME TagertEntity
+        // job.setTargetEntity("654");
+
+        EasyMock.expect(this.service.getMachineTemplateById("13")).andReturn(reference);
+        EasyMock.expect(this.service.createMachine(EasyMock.anyObject(MachineCreate.class))).andReturn(job);
+        EasyMock.replay(this.service);
+
+        CimiMachineTemplate template = new CimiMachineTemplate(this.request.getBaseUri()
+            + CimiEntityType.MachineTemplate.getPathType().getPathname() + "/13");
+        CimiMachineCreate cimi = new CimiMachineCreate();
+        cimi.setMachineTemplate(template);
+        this.request.setCimiData(cimi);
+
+        this.managerCreate.execute(this.request, this.response);
+
+        Assert.assertEquals(202, this.response.getStatus());
+        Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/654", ((CimiJob) this.response.getCimiData()).getTargetEntity());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/654", this.response.getHeaders().get("Location"));
+        EasyMock.verify(this.service);
+    }
+
+    @Test
+    public void testCreateWithTemplateByValueAndOtherByReference() throws Exception {
+        MachineConfiguration refConf = new MachineConfiguration();
+        refConf.setId(123);
+        refConf.setName("machineConfiguration");
+        MachineImage refImage = new MachineImage();
+        refImage.setId(234);
+        refImage.setName("machineImage");
+        Credentials refCredentials = new Credentials();
+        refCredentials.setId(345);
+        refCredentials.setName("credentials");
+
+        Job job = new Job();
+        job.setId(123);
+        // FIXME TagertEntity
+        // job.setTargetEntity("654");
+
+        EasyMock.expect(this.serviceCredentials.getCredentialsById("345")).andReturn(refCredentials);
+        EasyMock.replay(this.serviceCredentials);
+        EasyMock.expect(this.serviceImage.getMachineImageById("234")).andReturn(refImage);
+        EasyMock.replay(this.serviceImage);
+        EasyMock.expect(this.service.getMachineConfigurationById("123")).andReturn(refConf);
+        EasyMock.expect(this.service.createMachine(EasyMock.anyObject(MachineCreate.class))).andReturn(job);
+        EasyMock.replay(this.service);
+
+        CimiMachineTemplate template = new CimiMachineTemplate();
+        template.setMachineConfig(new CimiMachineConfiguration(this.request.getBaseUri()
+            + CimiEntityType.MachineConfiguration.getPathType().getPathname() + "/123"));
+        template.setMachineImage(new CimiMachineImage(this.request.getBaseUri()
+            + CimiEntityType.MachineImage.getPathType().getPathname() + "/234"));
+        template.setCredentials(new CimiCredentials(this.request.getBaseUri()
+            + CimiEntityType.Credentials.getPathType().getPathname() + "/345"));
+        CimiMachineCreate cimi = new CimiMachineCreate();
+        cimi.setMachineTemplate(template);
+        this.request.setCimiData(cimi);
+
+        this.managerCreate.execute(this.request, this.response);
+
+        Assert.assertEquals(202, this.response.getStatus());
+        Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/654", ((CimiJob) this.response.getCimiData()).getTargetEntity());
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/654", this.response.getHeaders().get("Location"));
         EasyMock.verify(this.service);
     }
 
@@ -242,7 +339,8 @@ public class CimiManagersMachineTest {
     public void testDelete() throws Exception {
         Job job = new Job();
         job.setId(123);
-        job.setTargetEntity("1789");
+        // FIXME TagertEntity
+        // job.setTargetEntity("1789");
 
         EasyMock.expect(this.service.deleteMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
@@ -261,7 +359,8 @@ public class CimiManagersMachineTest {
     public void testUpdate() throws Exception {
         Job job = new Job();
         job.setId(123);
-        job.setTargetEntity("789");
+        // FIXME TagertEntity
+        // job.setTargetEntity("789");
 
         EasyMock.expect(this.service.updateMachine(EasyMock.anyObject(Machine.class))).andReturn(job);
         EasyMock.replay(this.service);
@@ -287,7 +386,8 @@ public class CimiManagersMachineTest {
         map.put("description", "fooDescription");
         Job job = new Job();
         job.setId(123);
-        job.setTargetEntity("654");
+        // FIXME TagertEntity
+        // job.setTargetEntity("654");
 
         EasyMock.expect(this.service.updateMachineAttributes(EasyMock.eq("1"), EasyMock.eq(map))).andReturn(job);
         EasyMock.replay(this.service);

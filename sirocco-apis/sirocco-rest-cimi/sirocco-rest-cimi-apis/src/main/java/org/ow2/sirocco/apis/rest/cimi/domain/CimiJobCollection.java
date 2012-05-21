@@ -28,6 +28,8 @@ import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
@@ -45,6 +47,7 @@ public class CimiJobCollection extends CimiCommonId {
     /**
      * Field "jobs".
      */
+    @JsonProperty
     @Null(groups = {GroupWrite.class})
     private CimiJob[] jobs;
 
@@ -54,6 +57,7 @@ public class CimiJobCollection extends CimiCommonId {
      * @return The value
      */
     @XmlElement(name = "job")
+    @JsonIgnore
     public CimiJob[] getJobs() {
         return this.jobs;
     }

@@ -1,5 +1,5 @@
 <html>
 <body>
-<h2>Hello World!</h2>
+<h2>Use the specification "DMTF CIMI" to access Sirocco REST!</h2>
 </body>
 </html>

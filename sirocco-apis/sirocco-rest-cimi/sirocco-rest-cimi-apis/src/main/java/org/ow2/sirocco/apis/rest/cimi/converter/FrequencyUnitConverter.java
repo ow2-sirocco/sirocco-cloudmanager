@@ -49,23 +49,25 @@ public class FrequencyUnitConverter implements CimiConverter {
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
         String cimi = null;
-        try {
-            Frequency service = (Frequency) dataService;
-            switch (service) {
-            case HERTZ:
-                cimi = FrequencyUnit.HERTZ.getLabel();
-                break;
-            case MEGA:
-                cimi = FrequencyUnit.MEGAHERTZ.getLabel();
-                break;
-            case GIGA:
-                cimi = FrequencyUnit.GIGAHERTZ.getLabel();
-                break;
-            default:
-                throw new InvalidConversionException("Unknown Frequency Unit : " + service);
+        if (null != dataService) {
+            try {
+                Frequency service = (Frequency) dataService;
+                switch (service) {
+                case HERTZ:
+                    cimi = FrequencyUnit.HERTZ.getLabel();
+                    break;
+                case MEGA:
+                    cimi = FrequencyUnit.MEGAHERTZ.getLabel();
+                    break;
+                case GIGA:
+                    cimi = FrequencyUnit.GIGAHERTZ.getLabel();
+                    break;
+                default:
+                    throw new InvalidConversionException("Unknown Frequency Unit : " + service);
+                }
+            } catch (ClassCastException e) {
+                throw new InvalidConversionException("Unknown Frequency Unit : " + dataService);
             }
-        } catch (ClassCastException e) {
-            throw new InvalidConversionException("Unknown Frequency Unit : " + dataService);
         }
         return cimi;
     }
@@ -78,23 +80,25 @@ public class FrequencyUnitConverter implements CimiConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Frequency service;
-        FrequencyUnit cimi = FrequencyUnit.findValueOf((String) dataCimi);
-        if (null == cimi) {
-            throw new InvalidConversionException("Unknown Frequency Unit : " + dataCimi);
-        }
-        switch (cimi) {
-        case HERTZ:
-            service = Frequency.HERTZ;
-            break;
-        case MEGAHERTZ:
-            service = Frequency.MEGA;
-            break;
-        case GIGAHERTZ:
-            service = Frequency.GIGA;
-            break;
-        default:
-            throw new InvalidConversionException("Unknown Frequency Unit : " + dataCimi);
+        Frequency service = null;
+        if (null != dataCimi) {
+            FrequencyUnit cimi = FrequencyUnit.findValueOf((String) dataCimi);
+            if (null == cimi) {
+                throw new InvalidConversionException("Unknown Frequency Unit : " + dataCimi);
+            }
+            switch (cimi) {
+            case HERTZ:
+                service = Frequency.HERTZ;
+                break;
+            case MEGAHERTZ:
+                service = Frequency.MEGA;
+                break;
+            case GIGAHERTZ:
+                service = Frequency.GIGA;
+                break;
+            default:
+                throw new InvalidConversionException("Unknown Frequency Unit : " + dataCimi);
+            }
         }
         return service;
     }

@@ -113,16 +113,16 @@ public class MachineImageCollectionConverter extends CommonIdConverter implement
     protected void doCopyToCimi(final CimiContext context, final MachineImageCollection dataService,
         final CimiMachineImageCollection dataCimi) {
         this.fill(context, dataService, dataCimi);
-        // if (true == context.mustBeExpanded(dataCimi)) {
-        if ((null != dataService.getImages()) && (dataService.getImages().size() > 0)) {
-            CimiConverter converter = context.getConverter(CimiMachineImage.class);
-            List<CimiMachineImage> cimiList = new ArrayList<CimiMachineImage>();
-            for (MachineImage machineImage : dataService.getImages()) {
-                cimiList.add((CimiMachineImage) converter.toCimi(context, machineImage));
+        if (true == context.mustBeExpanded(dataCimi)) {
+            if ((null != dataService.getImages()) && (dataService.getImages().size() > 0)) {
+                CimiConverter converter = context.getConverter(CimiMachineImage.class);
+                List<CimiMachineImage> cimiList = new ArrayList<CimiMachineImage>();
+                for (MachineImage machineImage : dataService.getImages()) {
+                    cimiList.add((CimiMachineImage) converter.toCimi(context, machineImage));
+                }
+                dataCimi.setMachineImages(cimiList.toArray(new CimiMachineImage[cimiList.size()]));
             }
-            dataCimi.setMachineImages(cimiList.toArray(new CimiMachineImage[cimiList.size()]));
         }
-        // }
     }
 
     /**
@@ -134,13 +134,15 @@ public class MachineImageCollectionConverter extends CommonIdConverter implement
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineImageCollection dataCimi,
         final MachineImageCollection dataService) {
-        List<MachineImage> listServicesImages = new ArrayList<MachineImage>();
-        dataService.setImages(listServicesImages);
-        CimiMachineImage[] images = dataCimi.getMachineImages();
-        if (null != images) {
-            CimiConverter converter = context.getConverter(CimiMachineImage.class);
-            for (CimiMachineImage cimiImage : images) {
-                listServicesImages.add((MachineImage) converter.toService(context, cimiImage));
+        if ((null != dataCimi.getMachineImages()) && ((dataCimi.getMachineImages().length > 0))) {
+            List<MachineImage> listServicesImages = new ArrayList<MachineImage>();
+            dataService.setImages(listServicesImages);
+            CimiMachineImage[] images = dataCimi.getMachineImages();
+            if (null != images) {
+                CimiConverter converter = context.getConverter(CimiMachineImage.class);
+                for (CimiMachineImage cimiImage : images) {
+                    listServicesImages.add((MachineImage) converter.toService(context, cimiImage));
+                }
             }
         }
     }

@@ -33,6 +33,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
@@ -73,14 +74,14 @@ public class CimiMachine extends CimiCommonId {
     /**
      * Field "volumes".
      */
-    @Valid
+    @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiVolumeMachine[] volumes;
 
     /**
      * Field "networkInterfaces".
      */
-    @Valid
+    @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiNetworkInterface[] networkInterfaces;
 

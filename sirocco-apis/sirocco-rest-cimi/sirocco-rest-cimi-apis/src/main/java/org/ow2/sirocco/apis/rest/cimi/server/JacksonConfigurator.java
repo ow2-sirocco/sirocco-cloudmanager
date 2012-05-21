@@ -24,21 +24,16 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.server;
 
-import javax.ws.rs.Produces;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
-import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
 
 /**
  * Configure the Jackson module use to marshalling Json to objects.
  */
 @Provider
-@Produces({"application/json", MediaTypeCimi.APPLICATION_CIMI_JOB_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON,
-    MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON, MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
-    MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON})
 public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
 
     /**

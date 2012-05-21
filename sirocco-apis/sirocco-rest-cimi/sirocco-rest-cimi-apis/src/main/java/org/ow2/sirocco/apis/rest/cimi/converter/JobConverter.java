@@ -27,11 +27,26 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.ParentJob;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -111,14 +126,13 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
                 dataCimi.setStatus(dataService.getStatus().toString());
             }
             dataCimi.setStatusMessage(dataService.getStatusMessage());
-            // FIXME TargetEntity
-            dataCimi.setTargetEntity(dataService.getTargetEntity());
+            dataCimi.setTargetEntity(this.makeHrefTargetEntity(context, dataService.getTargetEntity()));
             dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
 
             if (null != dataService.getParentJob()) {
                 dataCimi.setParentJob(new ParentJob(context.makeHref(dataCimi, dataService.getParentJob().getId())));
             }
-            if (null != dataService.getNestedJobs()) {
+            if ((null != dataService.getNestedJobs()) && (dataService.getNestedJobs().size() > 0)) {
                 List<NestedJob> list = new ArrayList<NestedJob>();
                 for (Job job : dataService.getNestedJobs()) {
                     list.add(new NestedJob(context.makeHref(dataCimi, job.getId())));
@@ -138,4 +152,61 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
     protected void doCopyToService(final CimiContext context, final CimiJob dataCimi, final Job dataService) {
         this.fill(context, dataCimi, dataService);
     }
+
+    protected String makeHrefTargetEntity(final CimiContext context, final Object targetDataService) {
+        String href = null;
+        if (null == targetDataService) {
+            throw new InvalidConversionException("Job conversion : target service is null");
+        }
+        CimiEntityType targetType = this.findType(targetDataService);
+        if (null == targetType) {
+            throw new InvalidConversionException("Job conversion : target type not found");
+        }
+        href = context.makeHref(targetType, this.getTargetId(targetDataService));
+        return href;
+    }
+
+    protected Integer getTargetId(final Object targetDataService) {
+        Integer id = null;
+        if (true == CloudResource.class.isAssignableFrom(targetDataService.getClass())) {
+            id = ((CloudResource) targetDataService).getId();
+        } else {
+            id = ((CloudEntity) targetDataService).getId();
+        }
+        return id;
+    }
+
+    protected CimiEntityType findType(final Object targetDataService) {
+        CimiEntityType type = null;
+        // TODO Complete with all service entities
+        if (targetDataService instanceof CloudEntryPoint) {
+            type = CimiEntityType.CloudEntryPoint;
+        } else if (targetDataService instanceof Credentials) {
+            type = CimiEntityType.Credentials;
+        } else if (targetDataService instanceof CredentialsTemplate) {
+            type = CimiEntityType.CredentialsTemplate;
+        } else if (targetDataService instanceof CredentialsCollection) {
+            type = CimiEntityType.CredentialsCollection;
+        } else if (targetDataService instanceof Job) {
+            type = CimiEntityType.Job;
+        } else if (targetDataService instanceof JobCollection) {
+            type = CimiEntityType.JobCollection;
+        } else if (targetDataService instanceof Machine) {
+            type = CimiEntityType.Machine;
+        } else if (targetDataService instanceof MachineTemplate) {
+            type = CimiEntityType.MachineTemplate;
+        } else if (targetDataService instanceof MachineCollection) {
+            type = CimiEntityType.MachineCollection;
+        } else if (targetDataService instanceof MachineConfiguration) {
+            type = CimiEntityType.MachineConfiguration;
+        } else if (targetDataService instanceof MachineConfigurationCollection) {
+            type = CimiEntityType.MachineConfigurationCollection;
+        } else if (targetDataService instanceof MachineImage) {
+            type = CimiEntityType.MachineImage;
+        } else if (targetDataService instanceof MachineImageCollection) {
+            type = CimiEntityType.MachineImageCollection;
+        }
+        return type;
+    }
+
 }

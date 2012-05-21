@@ -78,14 +78,16 @@ public enum FrequencyUnit {
      */
     public static FrequencyUnit findValueOf(final String toFind) {
         FrequencyUnit unit = null;
-        for (FrequencyUnit value : FrequencyUnit.values()) {
-            if (toFind.equalsIgnoreCase(value.getLabel())) {
-                unit = value;
-                break;
-            }
-            if (toFind.equalsIgnoreCase(value.getSymbol())) {
-                unit = value;
-                break;
+        if (null != toFind) {
+            for (FrequencyUnit value : FrequencyUnit.values()) {
+                if (toFind.equalsIgnoreCase(value.getLabel())) {
+                    unit = value;
+                    break;
+                }
+                if (toFind.equalsIgnoreCase(value.getSymbol())) {
+                    unit = value;
+                    break;
+                }
             }
         }
         return unit;

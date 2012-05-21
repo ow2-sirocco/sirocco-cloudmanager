@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
+import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
@@ -47,6 +48,10 @@ public class CimiManagerCreateMachineTemplate extends CimiManagerCreateAbstract 
     @Autowired
     @Qualifier("IMachineManager")
     private IMachineManager manager;
+
+    @Autowired
+    @Qualifier("MergeReferenceHelper")
+    private MergeReferenceHelper mergeReference;
 
     /**
      * {@inheritDoc}
@@ -88,5 +93,16 @@ public class CimiManagerCreateMachineTemplate extends CimiManagerCreateAbstract 
         response.setCimiData(cimi);
         response.putHeader(Constants.HEADER_LOCATION, cimi.getId());
         response.setStatus(Response.Status.CREATED);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#beforeConvertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     */
+    @Override
+    protected void beforeConvertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+        this.mergeReference.merge(request.getContext(), (CimiMachineTemplate) request.getCimiData());
     }
 }

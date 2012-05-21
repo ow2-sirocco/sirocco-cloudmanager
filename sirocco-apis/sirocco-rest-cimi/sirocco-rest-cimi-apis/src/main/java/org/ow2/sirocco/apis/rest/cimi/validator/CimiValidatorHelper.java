@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.validator;
 
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.Set;
 
 import javax.validation.ConstraintViolation;
@@ -31,10 +33,13 @@ import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorContext;
 import javax.validation.ValidatorFactory;
+import javax.validation.groups.Default;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiHref;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.utils.ReflectionHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,6 +71,94 @@ public class CimiValidatorHelper {
     }
 
     /**
+     * Validate a bean to create.
+     * 
+     * @param <T> The type of bean
+     * @param beanToValidate Bean to validate
+     * @return True if the bean is valid
+     * @throws Exception In case of reflection error
+     */
+    public <T> boolean validateToCreate(final CimiRequest request, final CimiResponse response, final T beanToValidate)
+        throws Exception {
+        boolean valid = false;
+        Class<?> group = GroupCreateByValue.class;
+        if (true == CimiHref.class.isAssignableFrom(beanToValidate.getClass())) {
+            if (true == ((CimiHref) beanToValidate).hasReference()) {
+                group = GroupCreateByRefOrByValue.class;
+            }
+        }
+        valid = CimiValidatorHelper.getInstance().validate(request, response, beanToValidate, group);
+        if (true == valid) {
+            valid = this.validateToWrite(request, response, beanToValidate);
+            if (true == valid) {
+                Set<Field> fields = ReflectionHelper.getInstance().findAnnotationInFields(beanToValidate.getClass(),
+                    ValidChild.class);
+                Map<Field, Object> props = ReflectionHelper.getInstance().getProperties(fields, beanToValidate, true);
+                for (Object obj : props.values()) {
+                    valid = this.validateToCreate(request, response, obj);
+                    if (false == valid) {
+                        break;
+                    }
+                }
+            }
+        }
+        return valid;
+    }
+
+    /**
+     * Validate a bean to create.
+     * 
+     * @param <T> The type of bean
+     * @param beanToValidate Bean to validate
+     * @return True if the bean is valid
+     * @throws Exception In case of reflection error
+     */
+    public <T> boolean validateToWrite(final T beanToValidate) throws Exception {
+        boolean valid = false;
+        valid = CimiValidatorHelper.getInstance().validate(null, null, beanToValidate, GroupWrite.class);
+        if (true == valid) {
+            Set<Field> fields = ReflectionHelper.getInstance().findAnnotationInFields(beanToValidate.getClass(),
+                ValidChild.class);
+            Map<Field, Object> props = ReflectionHelper.getInstance().getProperties(fields, beanToValidate, true);
+            for (Object obj : props.values()) {
+                valid = this.validateToWrite(null, null, obj);
+                if (false == valid) {
+                    break;
+                }
+            }
+        }
+        return valid;
+    }
+
+    /**
+     * Validate a bean to create.
+     * 
+     * @param <T> The type of bean
+     * @param request
+     * @param response
+     * @param beanToValidate Bean to validate
+     * @return True if the bean is valid
+     * @throws Exception In case of reflection error
+     */
+    public <T> boolean validateToWrite(final CimiRequest request, final CimiResponse response, final T beanToValidate)
+        throws Exception {
+        boolean valid = false;
+        valid = CimiValidatorHelper.getInstance().validate(request, response, beanToValidate, Default.class, GroupWrite.class);
+        if (true == valid) {
+            Set<Field> fields = ReflectionHelper.getInstance().findAnnotationInFields(beanToValidate.getClass(),
+                ValidChild.class);
+            Map<Field, Object> props = ReflectionHelper.getInstance().getProperties(fields, beanToValidate, true);
+            for (Object obj : props.values()) {
+                valid = this.validateToWrite(request, response, obj);
+                if (false == valid) {
+                    break;
+                }
+            }
+        }
+        return valid;
+    }
+
+    /**
      * Validate a bean.
      * 
      * @param <T> The type of bean
@@ -76,44 +169,51 @@ public class CimiValidatorHelper {
         return this.validate(null, null, beanToValidate);
     }
 
-    /**
-     * Validate a bean.
-     * 
-     * @param <T> The type of bean
-     * @param beanToValidate Bean to validate
-     * @return True if the bean is valid
-     */
-    public <T> boolean validate(final CimiRequest request, final CimiResponse response, final T beanToValidate) {
-        CimiValidatorHelper.LOGGER.debug("Validation of {}", beanToValidate.getClass().getName());
-        return this.checkViolations(response, this.getValidator(request).validate(beanToValidate));
-    }
+    // /**
+    // * Validate a bean.
+    // *
+    // * @param <T> The type of bean
+    // * @param beanToValidate Bean to validate
+    // * @return True if the bean is valid
+    // */
+    // private <T> boolean validate(final CimiRequest request, final
+    // CimiResponse response, final T beanToValidate) {
+    // CimiValidatorHelper.LOGGER.debug("Validation of {}",
+    // beanToValidate.getClass().getName());
+    // return this.checkViolations(response,
+    // this.getValidator(request).validate(beanToValidate));
+    // }
 
-    /**
-     * Validate a bean with a filter.
-     * 
-     * @param <T> Type of bean to validate
-     * @param beanToValidate Bean to validate
-     * @param filterClass Filter class
-     * @return True if the bean is valid
-     */
-    public <T> boolean validate(final T beanToValidate, final Class<?> filterClass) {
-        return this.validate(null, null, beanToValidate, filterClass);
-    }
+    // /**
+    // * Validate a bean with a filter.
+    // *
+    // * @param <T> Type of bean to validate
+    // * @param beanToValidate Bean to validate
+    // * @param filterClass Filter class
+    // * @return True if the bean is valid
+    // */
+    // private <T> boolean validate(final T beanToValidate, final Class<?>
+    // filterClass) {
+    // return this.validate(null, null, beanToValidate, filterClass);
+    // }
 
-    /**
-     * Validate a bean with a filter.
-     * 
-     * @param <T> Type of bean to validate
-     * @param beanToValidate Bean to validate
-     * @param filterClass Filter class
-     * @return True if the bean is valid
-     */
-    public <T> boolean validate(final CimiRequest request, final CimiResponse response, final T beanToValidate,
-        final Class<?> filterClass) {
-        CimiValidatorHelper.LOGGER.debug("Validation of {} with {}", beanToValidate.getClass().getName(),
-            filterClass.getSimpleName());
-        return this.checkViolations(response, this.getValidator(request).validate(beanToValidate, filterClass));
-    }
+    // /**
+    // * Validate a bean with a filter.
+    // *
+    // * @param <T> Type of bean to validate
+    // * @param beanToValidate Bean to validate
+    // * @param filterClass Filter class
+    // * @return True if the bean is valid
+    // */
+    // private <T> boolean validate(final CimiRequest request, final
+    // CimiResponse response, final T beanToValidate,
+    // final Class<?> filterClass) {
+    // CimiValidatorHelper.LOGGER.debug("Validation of {} with {}",
+    // beanToValidate.getClass().getName(),
+    // filterClass.getSimpleName());
+    // return this.checkViolations(response,
+    // this.getValidator(request).validate(beanToValidate, filterClass));
+    // }
 
     /**
      * Validate a bean with a array of filters.

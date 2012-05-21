@@ -25,7 +25,9 @@
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
+import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
@@ -43,6 +45,10 @@ public class CimiManagerCreateMachineImage extends CimiManagerCreateAbstract {
     @Autowired
     @Qualifier("IMachineImageManager")
     private IMachineImageManager manager;
+
+    @Autowired
+    @Qualifier("MergeReferenceHelper")
+    private MergeReferenceHelper mergeReference;
 
     /**
      * {@inheritDoc}
@@ -69,4 +75,14 @@ public class CimiManagerCreateMachineImage extends CimiManagerCreateAbstract {
             .toService(request.getContext(), request.getCimiData());
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#beforeConvertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
+     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     */
+    @Override
+    protected void beforeConvertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+        this.mergeReference.merge(request.getContext(), (CimiMachineImage) request.getCimiData());
+    }
 }

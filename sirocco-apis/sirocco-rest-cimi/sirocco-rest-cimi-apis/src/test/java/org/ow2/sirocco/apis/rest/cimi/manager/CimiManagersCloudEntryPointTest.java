@@ -62,15 +62,15 @@ public class CimiManagersCloudEntryPointTest {
 
     @Autowired
     @Qualifier("IMachineManager")
-    private IMachineManager machineService;
+    private IMachineManager serviceMachine;
 
     @Autowired
     @Qualifier("ICredentialsManager")
-    private ICredentialsManager credentialsService;
+    private ICredentialsManager serviceCredentials;
 
     @Autowired
     @Qualifier("IMachineImageManager")
-    private IMachineImageManager machineImageService;
+    private IMachineImageManager serviceMachineImage;
 
     @Autowired
     @Qualifier("CimiManagerReadCloudEntryPoint")
@@ -114,9 +114,9 @@ public class CimiManagersCloudEntryPointTest {
      */
     @After
     public void tearDown() throws Exception {
-        EasyMock.reset(this.machineService);
-        EasyMock.reset(this.machineImageService);
-        EasyMock.reset(this.credentialsService);
+        EasyMock.reset(this.serviceMachine);
+        EasyMock.reset(this.serviceMachineImage);
+        EasyMock.reset(this.serviceCredentials);
     }
 
     @Test
@@ -138,14 +138,14 @@ public class CimiManagersCloudEntryPointTest {
         // CredentialsTemplateCollection();
         // credentialsTemplateCollection.setId(700);
 
-        EasyMock.expect(this.machineService.getCloudEntryPoint()).andReturn(cloud);
-        EasyMock.expect(this.machineService.getMachineCollection()).andReturn(machineCollection);
-        EasyMock.expect(this.machineService.getMachineTemplateCollection()).andReturn(machineTemplateCollection);
-        EasyMock.expect(this.machineService.getMachineConfigurationCollection()).andReturn(machineConfigurationCollection);
-        EasyMock.replay(this.machineService);
+        EasyMock.expect(this.serviceMachine.getCloudEntryPoint()).andReturn(cloud);
+        EasyMock.expect(this.serviceMachine.getMachineCollection()).andReturn(machineCollection);
+        EasyMock.expect(this.serviceMachine.getMachineTemplateCollection()).andReturn(machineTemplateCollection);
+        EasyMock.expect(this.serviceMachine.getMachineConfigurationCollection()).andReturn(machineConfigurationCollection);
+        EasyMock.replay(this.serviceMachine);
 
-        EasyMock.expect(this.machineImageService.getMachineImageCollection()).andReturn(machineImageCollection);
-        EasyMock.replay(this.machineImageService);
+        EasyMock.expect(this.serviceMachineImage.getMachineImageCollection()).andReturn(machineImageCollection);
+        EasyMock.replay(this.serviceMachineImage);
 
         // EasyMock.expect(this.credentialsService.getCredentialsCollection()).andReturn(credentialsCollection);
 
@@ -168,8 +168,8 @@ public class CimiManagersCloudEntryPointTest {
         // Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH,
         // cimiCloud.getCredentialsTemplates().getHref());
 
-        EasyMock.verify(this.machineService);
-        EasyMock.verify(this.machineImageService);
+        EasyMock.verify(this.serviceMachine);
+        EasyMock.verify(this.serviceMachineImage);
         // EasyMock.verify(this.credentialsService);
     }
 

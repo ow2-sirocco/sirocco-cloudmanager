@@ -32,6 +32,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
@@ -42,7 +43,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
-import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -95,8 +95,7 @@ public class CimiMachineConfigurationResource extends CimiResourceAbstract {
      * @return The REST response
      */
     @GET
-    @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
-        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
     public Response read(@PathParam("id") final String id) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
@@ -111,8 +110,7 @@ public class CimiMachineConfigurationResource extends CimiResourceAbstract {
      * @return The REST response
      */
     @GET
-    @Produces({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_JSON,
-        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCOLLECTION_XML})
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readMachineConfigurationCollection() {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos());
         CimiResponse response = new CimiResponse();
@@ -127,8 +125,7 @@ public class CimiMachineConfigurationResource extends CimiResourceAbstract {
      * @return The REST response
      */
     @PUT
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
-        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
     public Response update(@PathParam("id") final String id, final CimiMachineConfiguration cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
@@ -143,8 +140,7 @@ public class CimiMachineConfigurationResource extends CimiResourceAbstract {
      * @return The REST response
      */
     @PUT
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_JSON,
-        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATION_XML})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateMachineConfigurationCollection(final CimiMachineConfigurationCollection cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();
@@ -158,8 +154,7 @@ public class CimiMachineConfigurationResource extends CimiResourceAbstract {
      * @return The REST response
      */
     @POST
-    @Consumes({MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_JSON,
-        MediaTypeCimi.APPLICATION_CIMI_MACHINECONFIGURATIONCREATE_XML})
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response create(final CimiMachineConfiguration cimiData) {
         CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
         CimiResponse response = new CimiResponse();

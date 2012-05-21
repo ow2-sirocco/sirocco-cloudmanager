@@ -22,11 +22,31 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.validator;
+package org.ow2.sirocco.apis.rest.cimi.validator.constraints;
+
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
 
 /**
- * Validation group to valid a entity creating by value.
- */
-public interface GroupCreateByValue {
+ * Annotation to validate an entity is passed by reference or by value.
+ **/
+@Target({ElementType.TYPE})
+@Retention(RUNTIME)
+@Constraint(validatedBy = AssertEntityByValidator.class)
+@Documented
+public @interface AssertEntityBy {
+
+    String message() default "{AssertEntityBy.message}";
+
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
 
 }

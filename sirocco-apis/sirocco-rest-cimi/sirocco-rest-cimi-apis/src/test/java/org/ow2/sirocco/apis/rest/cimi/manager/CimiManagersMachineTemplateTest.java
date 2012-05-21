@@ -36,6 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
@@ -125,15 +126,42 @@ public class CimiManagersMachineTemplateTest {
 
     @Test
     public void testCreate() throws Exception {
-        MachineTemplate service = new MachineTemplate();
-        service.setId(789);
+        MachineTemplate create = new MachineTemplate();
+        create.setId(789);
 
-        EasyMock.expect(this.service.createMachineTemplate(EasyMock.anyObject(MachineTemplate.class))).andReturn(service);
+        EasyMock.expect(this.service.createMachineTemplate(EasyMock.anyObject(MachineTemplate.class))).andReturn(create);
         EasyMock.replay(this.service);
 
         CimiMachineTemplate cimi = new CimiMachineTemplate();
         cimi.setMachineConfig(new CimiMachineConfiguration(new CimiCpu(1f, "MHz", 1), new CimiMemory(1, "MiB")));
         cimi.setMachineImage(new CimiMachineImage(new ImageLocation("foo")));
+        this.request.setCimiData(cimi);
+        this.managerCreate.execute(this.request, this.response);
+
+        Assert.assertEquals(201, this.response.getStatus());
+        Assert.assertNotNull(this.response.getHeaders());
+        Assert.assertEquals(ConstantsPath.MACHINE_TEMPLATE_PATH + "/789",
+            this.response.getHeaders().get(Constants.HEADER_LOCATION));
+        Assert.assertEquals(ConstantsPath.MACHINE_TEMPLATE_PATH + "/789",
+            ((CimiMachineTemplate) this.response.getCimiData()).getId());
+        EasyMock.verify(this.service);
+    }
+
+    @Test
+    public void testCreateWithRef() throws Exception {
+        MachineTemplate reference = new MachineTemplate();
+        reference.setId(13);
+        reference.setName("nameValue");
+
+        MachineTemplate create = new MachineTemplate();
+        create.setId(789);
+
+        EasyMock.expect(this.service.getMachineTemplateById("13")).andReturn(reference);
+        EasyMock.expect(this.service.createMachineTemplate(EasyMock.anyObject(MachineTemplate.class))).andReturn(create);
+        EasyMock.replay(this.service);
+
+        CimiMachineTemplate cimi = new CimiMachineTemplate(this.request.getBaseUri()
+            + CimiEntityType.MachineTemplate.getPathType().getPathname() + "/13");
         this.request.setCimiData(cimi);
         this.managerCreate.execute(this.request, this.response);
 

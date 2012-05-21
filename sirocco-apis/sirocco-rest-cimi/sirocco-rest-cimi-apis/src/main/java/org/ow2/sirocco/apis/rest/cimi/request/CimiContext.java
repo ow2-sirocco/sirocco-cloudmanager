@@ -46,13 +46,30 @@ public interface CimiContext {
      * Get the converter for the entity root to convert.
      * <p>
      * The given type is saved in context and can be got with
-     * {@link #getCurrentRootConverting()}.
+     * {@link #getCurrentRootConverting()}. In this case, the process don't
+     * convert the write-only data.
      * </p>
      * 
      * @param type The type of entity to convert
      * @return The converter
+     * @see #getRootConverter(CimiEntityType, boolean)
      */
     CimiConverter getRootConverter(CimiEntityType type);
+
+    /**
+     * Get the converter for the entity root to convert.
+     * <p>
+     * The given type is saved in context and can be got with
+     * {@link #getCurrentRootConverting()}.
+     * </p>
+     * 
+     * @param type The type of entity to convert
+     * @param convertedWriteOnly Sets the process the conversion of write-only
+     * @return The converter
+     * @see #isConvertedWriteOnly()
+     * @see #setConvertedWriteOnly(boolean)
+     */
+    CimiConverter getRootConverter(CimiEntityType type, boolean convertedWriteOnly);
 
     /**
      * Get the converter for a class.
@@ -111,6 +128,15 @@ public interface CimiContext {
     boolean mustHaveIdInReference(final CimiData entity);
 
     /**
+     * Returns true if the given entity must have an identifier in its
+     * reference.
+     * 
+     * @param type The type of a CIMI entity
+     * @return True if must have a ID.
+     */
+    boolean mustHaveIdInReference(final CimiEntityType type);
+
+    /**
      * Make the base HREF without ID.
      * 
      * @param data
@@ -135,5 +161,30 @@ public interface CimiContext {
      * @return The HREF made
      */
     String makeHref(final CimiData entity, final Integer id);
+
+    /**
+     * Make a HREF.
+     * 
+     * @param type The type of entity
+     * @param id Service ID
+     * @return The HREF made
+     */
+    String makeHref(final CimiEntityType type, final Integer id);
+
+    /**
+     * Returns true if the converters must process the write-only data when
+     * convert service data to CIMI data.
+     * 
+     * @return True if must convert the write-only data.
+     */
+    boolean isConvertedWriteOnly();
+
+    /**
+     * Set the indicator to process the conversion of write-only data when
+     * convert service data to CIMI data.
+     * 
+     * @param convertedWriteOnly True to convert the write-only data
+     */
+    void setConvertedWriteOnly(boolean convertedWriteOnly);
 
 }

@@ -36,6 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
@@ -133,6 +134,35 @@ public class CimiManagersMachineConfigurationTest {
         cimi.setCpu(new CimiCpu(1f, "gigaHertz", 1));
         cimi.setMemory(new CimiMemory(1, "MiB"));
 
+        this.request.setCimiData(cimi);
+        this.managerCreate.execute(this.request, this.response);
+
+        Assert.assertEquals(201, this.response.getStatus());
+        Assert.assertNotNull(this.response.getHeaders());
+        Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH + "/456",
+            this.response.getHeaders().get(Constants.HEADER_LOCATION));
+        Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH + "/456",
+            ((CimiMachineConfiguration) this.response.getCimiData()).getId());
+        EasyMock.verify(this.service);
+    }
+
+    @Test
+    public void testCreateWithRef() throws Exception {
+
+        MachineConfiguration ref = new MachineConfiguration();
+        ref.setId(13);
+        ref.setName("nameValue");
+
+        MachineConfiguration create = new MachineConfiguration();
+        create.setId(456);
+
+        EasyMock.expect(this.service.getMachineConfigurationById("13")).andReturn(ref);
+        EasyMock.expect(this.service.createMachineConfiguration(EasyMock.anyObject(MachineConfiguration.class))).andReturn(
+            create);
+        EasyMock.replay(this.service);
+
+        CimiMachineConfiguration cimi = new CimiMachineConfiguration(this.request.getBaseUri()
+            + CimiEntityType.MachineConfiguration.getPathType().getPathname() + "/13");
         this.request.setCimiData(cimi);
         this.managerCreate.execute(this.request, this.response);
 

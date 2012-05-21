@@ -37,7 +37,7 @@ import javax.validation.Constraint;
 import javax.validation.Payload;
 
 /**
- * Annotation to validate the CIMI version.
+ * Annotation to validate the path of a action on entity.
  **/
 @Target({FIELD, METHOD, ANNOTATION_TYPE})
 @Retention(RUNTIME)

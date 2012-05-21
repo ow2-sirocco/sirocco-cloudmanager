@@ -24,13 +24,13 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 
 /**
  * Class Credentials Create.
@@ -42,7 +42,7 @@ public class CimiCredentialsCreate extends CimiCommon {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    @Valid
+    @ValidChild
     @NotNull(groups = GroupCreateByValue.class)
     private CimiCredentialsTemplate credentialsTemplate;
 

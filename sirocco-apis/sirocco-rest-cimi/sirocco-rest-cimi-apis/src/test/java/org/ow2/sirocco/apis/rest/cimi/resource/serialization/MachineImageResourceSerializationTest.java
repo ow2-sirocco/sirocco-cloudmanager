@@ -26,6 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.resource.serialization;
 
 import java.io.StringReader;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import junit.framework.Assert;
@@ -37,7 +38,6 @@ import org.ow2.sirocco.apis.rest.cimi.resource.serialization.json.JsonLocator;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.xml.XmlLocator;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
-import org.ow2.sirocco.apis.rest.cimi.utils.MediaTypeCimi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +59,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         int statusResponse;
 
         // JSON : id = 0
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/0").accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -75,8 +74,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
             new StringReader(entityResponse));
 
         // JSON : id = 1
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/1")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/1").accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -91,8 +89,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
             new StringReader(entityResponse));
 
         // JSON : id = 2
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/2")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/2").accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
@@ -120,8 +117,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         int statusResponse;
 
         // XML : id = 0
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/0").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -136,8 +132,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
             new StringReader(entityResponse));
 
         // XML : id = 1
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/1")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/1").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -152,8 +147,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
             new StringReader(entityResponse));
 
         // XML : id = 2
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/2")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/2").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
@@ -181,8 +175,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         int statusResponse;
 
         // JSON : id = 0
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE).accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 0).get(ClientResponse.class);
 
@@ -200,8 +193,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
                 entityResponse));
 
         // JSON : id = 1
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE).accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 1).get(ClientResponse.class);
 
@@ -219,8 +211,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
                 entityResponse));
 
         // JSON : id = 3
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE).accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).get(ClientResponse.class);
 
@@ -238,8 +229,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
                 entityResponse));
 
         // JSON : id = 3, expand
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE).accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
             .get(ClientResponse.class);
@@ -270,8 +260,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         int statusResponse;
 
         // XML : id = 0
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 0).get(ClientResponse.class);
 
@@ -288,8 +277,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
             new StringReader(entityResponse));
 
         // XML : id = 1
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 1).get(ClientResponse.class);
 
@@ -306,8 +294,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
             new StringReader(entityResponse));
 
         // XML : id = 3
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).get(ClientResponse.class);
 
@@ -324,8 +311,7 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
             new StringReader(entityResponse));
 
         // XML : id = 3, expand
-        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECOLLECTION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
             .get(ClientResponse.class);
@@ -358,10 +344,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_IMAGE + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_JSON_TYPE)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "MachineImage-0.json"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON).put(ClientResponse.class);
+                MediaType.APPLICATION_JSON).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -379,10 +365,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_IMAGE + "/1")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_JSON_TYPE)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "MachineImage-1.json"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON).put(ClientResponse.class);
+                MediaType.APPLICATION_JSON).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -400,10 +386,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_IMAGE + "/2")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_JSON_TYPE)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "MachineImage-2.json"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON).put(ClientResponse.class);
+                MediaType.APPLICATION_JSON).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -434,10 +420,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_IMAGE + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_JSON_TYPE)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "MachineImage-0_malformed.json"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_JSON).put(ClientResponse.class);
+                MediaType.APPLICATION_JSON).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -462,13 +448,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         int statusResponse;
 
         // XML : id = 0
-        clientResponse = this
-            .resource()
-            .path(ConstantsPath.MACHINE_IMAGE + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/0").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineImage-0.xml"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML).put(ClientResponse.class);
+            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineImage-0.xml"), MediaType.APPLICATION_XML)
+            .put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -483,13 +466,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
             entityResponse));
 
         // XML : id = 1
-        clientResponse = this
-            .resource()
-            .path(ConstantsPath.MACHINE_IMAGE + "/1")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/1").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineImage-1.xml"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML).put(ClientResponse.class);
+            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineImage-1.xml"), MediaType.APPLICATION_XML)
+            .put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -504,13 +484,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
             entityResponse));
 
         // XML : id = 2
-        clientResponse = this
-            .resource()
-            .path(ConstantsPath.MACHINE_IMAGE + "/2")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE + "/2").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineImage-2.xml"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML).put(ClientResponse.class);
+            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineImage-2.xml"), MediaType.APPLICATION_XML)
+            .put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -541,10 +518,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_IMAGE + "/0")
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_XML_TYPE)
+            .accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineImage-0_malformed.xml"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGE_XML).put(ClientResponse.class);
+                MediaType.APPLICATION_XML).put(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -573,10 +550,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         clientResponse = this
             .resource()
             .path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_JSON_TYPE)
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "MachineImage-1.json"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECREATE_JSON).post(ClientResponse.class);
+                MediaType.APPLICATION_JSON).post(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -613,13 +590,10 @@ public class MachineImageResourceSerializationTest extends SerializationTestBase
         MultivaluedMap<String, String> heardersResponse;
 
         // XML : id = 1
-        clientResponse = this
-            .resource()
-            .path(ConstantsPath.MACHINE_IMAGE)
-            .accept(MediaTypeCimi.APPLICATION_CIMI_JOB_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.MACHINE_IMAGE).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineImage-1.xml"),
-                MediaTypeCimi.APPLICATION_CIMI_MACHINEIMAGECREATE_XML).post(ClientResponse.class);
+            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "MachineImage-1.xml"), MediaType.APPLICATION_XML)
+            .post(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);

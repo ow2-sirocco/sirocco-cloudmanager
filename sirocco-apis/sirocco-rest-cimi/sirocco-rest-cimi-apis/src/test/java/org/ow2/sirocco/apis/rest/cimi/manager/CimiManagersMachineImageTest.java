@@ -37,6 +37,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
@@ -127,12 +128,43 @@ public class CimiManagersMachineImageTest {
 
         Job job = new Job();
         job.setId(123);
-        job.setTargetEntity("654");
+        // FIXME TagertEntity
+        // job.setTargetEntity("654");
         EasyMock.expect(this.service.createMachineImage(EasyMock.anyObject(MachineImage.class))).andReturn(job);
         EasyMock.replay(this.service);
 
         CimiMachineImage cimi = new CimiMachineImage();
         cimi.setImageLocation(new ImageLocation("foo"));
+        this.request.setCimiData(cimi);
+        this.managerCreate.execute(this.request, this.response);
+
+        Assert.assertEquals(202, this.response.getStatus());
+        Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH + "/654",
+            ((CimiJob) this.response.getCimiData()).getTargetEntity());
+        Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH + "/654", this.response.getHeaders().get("Location"));
+        EasyMock.verify(this.service);
+    }
+
+    @Test
+    public void testCreateWithRef() throws Exception {
+
+        MachineImage reference = new MachineImage();
+        reference.setId(13);
+        reference.setName("nameValue");
+        reference.setImageLocation("imageLocationValue");
+
+        Job job = new Job();
+        job.setId(123);
+        // FIXME TagertEntity
+        // job.setTargetEntity("654");
+
+        EasyMock.expect(this.service.getMachineImageById("13")).andReturn(reference);
+        EasyMock.expect(this.service.createMachineImage(EasyMock.anyObject(MachineImage.class))).andReturn(job);
+        EasyMock.replay(this.service);
+
+        CimiMachineImage cimi = new CimiMachineImage(this.request.getBaseUri()
+            + CimiEntityType.MachineImage.getPathType().getPathname() + "/13");
         this.request.setCimiData(cimi);
         this.managerCreate.execute(this.request, this.response);
 

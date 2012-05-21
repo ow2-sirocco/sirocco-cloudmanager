@@ -26,8 +26,8 @@ package org.ow2.sirocco.apis.rest.cimi.validator;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorFactory;
+import javax.validation.ValidationException;
 
-import org.hibernate.validator.util.ReflectionHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 
 /**
@@ -54,7 +54,15 @@ public class CimiConstraintValidatorFactoryImpl implements ConstraintValidatorFa
     public <T extends ConstraintValidator<?, ?>> T getInstance(final Class<T> key) {
         T instance = null;
 
-        instance = ReflectionHelper.newInstance(key, "ConstraintValidator");
+        try {
+            instance = key.newInstance();
+        } catch (InstantiationException e) {
+            throw new ValidationException("Unable to instantiate ConstraintValidator: " + key, e);
+        } catch (IllegalAccessException e) {
+            throw new ValidationException("Unable to instantiate " + key, e);
+        } catch (RuntimeException e) {
+            throw new ValidationException("Unable to instantiate " + key, e);
+        }
 
         if (true == CimiContextValidator.class.isAssignableFrom(key)) {
             CimiContextValidator validator = (CimiContextValidator) instance;

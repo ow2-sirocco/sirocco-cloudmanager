@@ -22,31 +22,22 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.validator.constraints;
+package org.ow2.sirocco.apis.rest.cimi.validator;
 
+import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.validation.Constraint;
-import javax.validation.Payload;
-
 /**
- * Annotation to validate a valid CIMI reference.
- **/
-@Target({ElementType.TYPE})
+ * Annotation to indicate the validation of the annotated fields.
+ */
+
+@Target(FIELD)
 @Retention(RUNTIME)
-@Constraint(validatedBy = ValidReferenceValidator.class)
 @Documented
-public @interface ValidReference {
-
-    String message() default "{ValidReference.message}";
-
-    Class<?>[] groups() default {};
-
-    Class<? extends Payload>[] payload() default {};
+public @interface ValidChild {
 
 }

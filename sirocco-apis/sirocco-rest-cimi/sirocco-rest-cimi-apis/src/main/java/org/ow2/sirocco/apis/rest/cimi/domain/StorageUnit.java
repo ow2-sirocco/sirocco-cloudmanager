@@ -77,14 +77,16 @@ public enum StorageUnit {
      */
     public static StorageUnit findValueOf(final String toFind) {
         StorageUnit unit = null;
-        for (StorageUnit value : StorageUnit.values()) {
-            if (toFind.equalsIgnoreCase(value.getLabel())) {
-                unit = value;
-                break;
-            }
-            if (toFind.equalsIgnoreCase(value.getSymbol())) {
-                unit = value;
-                break;
+        if (null != toFind) {
+            for (StorageUnit value : StorageUnit.values()) {
+                if (toFind.equalsIgnoreCase(value.getLabel())) {
+                    unit = value;
+                    break;
+                }
+                if (toFind.equalsIgnoreCase(value.getSymbol())) {
+                    unit = value;
+                    break;
+                }
             }
         }
         return unit;

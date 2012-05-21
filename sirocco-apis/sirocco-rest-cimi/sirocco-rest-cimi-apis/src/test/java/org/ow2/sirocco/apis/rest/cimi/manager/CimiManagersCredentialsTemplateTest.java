@@ -36,6 +36,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -120,14 +121,43 @@ public class CimiManagersCredentialsTemplateTest {
 
     @Test
     public void testCreate() throws Exception {
-        CredentialsTemplate service = new CredentialsTemplate();
-        service.setId(789);
+        CredentialsTemplate create = new CredentialsTemplate();
+        create.setId(789);
 
-        EasyMock.expect(this.service.createCredentialsTemplate(EasyMock.anyObject(CredentialsTemplate.class))).andReturn(
-            service);
+        EasyMock.expect(this.service.createCredentialsTemplate(EasyMock.anyObject(CredentialsTemplate.class)))
+            .andReturn(create);
         EasyMock.replay(this.service);
 
         CimiCredentialsTemplate cimi = new CimiCredentialsTemplate("user", "pass", new byte[1]);
+        this.request.setCimiData(cimi);
+        this.managerCreate.execute(this.request, this.response);
+
+        Assert.assertEquals(201, this.response.getStatus());
+        Assert.assertNotNull(this.response.getHeaders());
+        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH + "/789",
+            this.response.getHeaders().get(Constants.HEADER_LOCATION));
+        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH + "/789",
+            ((CimiCredentialsTemplate) this.response.getCimiData()).getId());
+        EasyMock.verify(this.service);
+    }
+
+    @Test
+    public void testCreateWithRef() throws Exception {
+        CredentialsTemplate reference = new CredentialsTemplate();
+        reference.setId(13);
+        reference.setName("nameValue");
+        reference.setPassword("passwordValue");
+
+        CredentialsTemplate create = new CredentialsTemplate();
+        create.setId(789);
+
+        EasyMock.expect(this.service.getCredentialsTemplateById("13")).andReturn(reference);
+        EasyMock.expect(this.service.createCredentialsTemplate(EasyMock.anyObject(CredentialsTemplate.class)))
+            .andReturn(create);
+        EasyMock.replay(this.service);
+
+        CimiCredentialsTemplate cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
+            + CimiEntityType.CredentialsTemplate.getPathType().getPathname() + "/13");
         this.request.setCimiData(cimi);
         this.managerCreate.execute(this.request, this.response);
 

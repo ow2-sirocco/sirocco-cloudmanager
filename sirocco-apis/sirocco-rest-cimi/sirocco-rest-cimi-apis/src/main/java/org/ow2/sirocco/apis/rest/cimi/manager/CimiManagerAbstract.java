@@ -199,6 +199,17 @@ public abstract class CimiManagerAbstract implements CimiManager {
     }
 
     /**
+     * Call before the conversion.
+     * 
+     * @param request The CIMI request
+     * @param response The CIMI response
+     * @throws Exception In case of error
+     */
+    protected void beforeConvertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+        // Nothing to do
+    }
+
+    /**
      * Manage the request validation.
      * 
      * @param request The CIMI request
@@ -225,6 +236,7 @@ public abstract class CimiManagerAbstract implements CimiManager {
      */
     private Object doConvertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
         Object dataService = null;
+        this.beforeConvertToDataService(request, response);
         dataService = this.convertToDataService(request, response);
         return dataService;
     }

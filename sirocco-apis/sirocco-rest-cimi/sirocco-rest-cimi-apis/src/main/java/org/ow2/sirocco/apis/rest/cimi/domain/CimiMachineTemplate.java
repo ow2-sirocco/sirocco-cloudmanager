@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -32,6 +31,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
@@ -47,43 +47,59 @@ public class CimiMachineTemplate extends CimiCommonId {
     /**
      * Field "machineConfig".
      */
-    @Valid
+    @ValidChild
     @NotNull(groups = GroupCreateByValue.class)
     private CimiMachineConfiguration machineConfig;
 
     /**
      * Field "machineImage".
      */
-    @Valid
+    @ValidChild
     @NotNull(groups = GroupCreateByValue.class)
     private CimiMachineImage machineImage;
 
     /**
      * Field "credentials".
      */
-    @Valid
+    @ValidChild
     private CimiCredentials credentials;
 
     /**
      * Field "volumes".
      */
-    @Valid
+    @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiVolumeMachine[] volumes;
 
     /**
      * Field "volumeTemplates".
      */
-    @Valid
+    @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiVolumeMachineTemplate[] volumeTemplates;
 
     /**
      * Field "networkInterfaces".
      */
-    @Valid
+    @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiNetworkInterface[] networkInterfaces;
+
+    /**
+     * Default constructor.
+     */
+    public CimiMachineTemplate() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiMachineTemplate(final String href) {
+        super(href);
+    }
 
     /**
      * Return the value of field "machineConfig".
