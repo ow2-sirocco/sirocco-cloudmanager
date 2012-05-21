@@ -27,53 +27,56 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
+import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
+import javax.persistence.OneToOne;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 
+import java.util.List;
 
-@Embeddable
-public class NetworkInterface implements Serializable {
+@Entity
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class NetworkInterface implements Serializable {
 	private static final long serialVersionUID = 1L;
+	
+	protected Integer id;
+	
     public static enum InterfaceState {
 		ACTIVE, STANDBY
     }
+    
+    @OneToMany
+    private List<Address>			addresses;
 
-    public static enum IpAllocation {
-		STATIC, DHCP
-    }
+    @ManyToOne
+    private Network					network;
 
-    public static enum Protocol {
-		IPv4, IPv6
-    }
+    @OneToOne
+    private NetworkPort				networkPort;
+    
+    private InterfaceState			state;
+  
+	private Integer					mtu;
 
+	
 
-	private String			hostname;
-	private String			macAddress;
-	private InterfaceState	state;
-
-	private Protocol		protocol;
-	private IpAllocation		allocation;
-	private String			address;
-	private String			defaultGateway;
-
-
-	public String getHostname() {
-		return hostname;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	public Integer getId() {
+		return this.id;
 	}
 
-	public void setHostname(String hostname) {
-		this.hostname = hostname;
+	public void setId(final Integer id) {
+		this.id = id;
 	}
-
-	public String getMacAddress() {
-		return macAddress;
-	}
-
-	public void setMacAddress(String macAddress) {
-		this.macAddress = macAddress;
-	}
-
+	
 	@Enumerated(EnumType.STRING)
 	public InterfaceState getState() {
 		return state;
@@ -83,38 +86,39 @@ public class NetworkInterface implements Serializable {
 		this.state = state;
 	}
 
-
-	@Enumerated(EnumType.STRING)
-	public Protocol getProtocol() {
-		return protocol;
+	public Integer getMtu() {
+		return mtu;
 	}
-
-	public void setProtocol(Protocol protocol) {
-		this.protocol = protocol;
+	
+	public void setMtu(Integer mtu) {
+		this.mtu = mtu;
 	}
-
-	@Enumerated(EnumType.STRING)
-	public IpAllocation getAllocation() {
-		return allocation;
+	
+	public void setNetworkPort(NetworkPort networkPort) {
+		this.networkPort = networkPort;
 	}
-
-	public void setAllocation(IpAllocation allocation) {
-		this.allocation = allocation;
+	
+	public NetworkPort getNetworkPort() {
+		return networkPort;
 	}
-
-	public String getAddress() {
-		return address;
+	
+	@OneToMany
+	public List<Address> getAddresses() {
+		return addresses;
 	}
-
-	public void setAddress(String address) {
-		this.address = address;
+	
+	public void setAddresses(List<Address> addresses) {
+		this.addresses = addresses;
 	}
-
-	public String getDefaultGateway() {
-		return defaultGateway;
+	
+	@ManyToOne
+	public Network getNetwork() {
+		return this.network;
 	}
-
-	public void setDefaultGateway(String defaultGateway) {
-		this.defaultGateway = defaultGateway;
+	
+	public void setNetwork(Network network) {
+		this.network = network;
 	}
+	
+	
 }

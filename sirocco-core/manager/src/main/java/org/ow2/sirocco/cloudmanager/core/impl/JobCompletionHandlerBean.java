@@ -94,7 +94,7 @@ public class JobCompletionHandlerBean implements MessageListener {
             boolean done = false;
             CloudResource targetEntity = providerJob.getTargetEntity();
             if (targetEntity instanceof Machine) {
-                done = this.machineManager.machineCompletionHandler(providerJob);
+                done = this.machineManager.jobCompletionHandler(providerJob);
             } else if ((targetEntity instanceof Volume) || (targetEntity instanceof VolumeImage)) {
                 done = this.volumeManager.jobCompletionHandler(providerJob);
             } else if (targetEntity instanceof MachineImage) {

@@ -176,6 +176,6 @@ public interface IMachineManager {
 
 	Job updateMachineVolume(String machineId, MachineVolume machineVolume) throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
 
-	boolean machineCompletionHandler(final Job job);
+	boolean jobCompletionHandler(final Job job);
 
 }

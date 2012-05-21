@@ -52,6 +52,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMT;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface.InterfaceState;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
@@ -220,21 +222,22 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         diskCollection.setItems(disks);
         machine.setDisks(diskCollection);
 
-        List<NetworkInterface> networkInterfaces = new ArrayList<NetworkInterface>();
+        
         if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
             for (NetworkInterface networkInterface : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
-                NetworkInterface newNetIntf = new NetworkInterface();
-                newNetIntf.setAddress(networkInterface.getAddress());
-                newNetIntf.setAllocation(networkInterface.getAllocation());
-                newNetIntf.setDefaultGateway(networkInterface.getDefaultGateway());
-                newNetIntf.setHostname(networkInterface.getHostname());
-                newNetIntf.setMacAddress(networkInterface.getMacAddress());
-                newNetIntf.setProtocol(networkInterface.getProtocol());
+                NetworkInterfaceMachine newNetIntf = new NetworkInterfaceMachine();
+                // TODO 
+                newNetIntf.setAddresses(networkInterface.getAddresses());
+                
+
+                newNetIntf.setMacAddress("00:11:22:33:44:55");
+             
                 newNetIntf.setState(InterfaceState.STANDBY);
-                networkInterfaces.add(newNetIntf);
+                
+                machine.addNetworkInterface(newNetIntf);
             }
         }
-        machine.setNetworkInterfaces(networkInterfaces);
+       
 
         final Callable<Machine> createTask = new Callable<Machine>() {
             @Override

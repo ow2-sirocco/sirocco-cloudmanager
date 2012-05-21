@@ -35,10 +35,10 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.Embedded;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
+import javax.persistence.JoinColumn;
 
-import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 public class MachineTemplate extends CloudEntity implements Serializable {
@@ -56,7 +56,8 @@ public class MachineTemplate extends CloudEntity implements Serializable {
 	@OneToOne
 	private MachineVolumeTemplateCollection volumeTemplates;
 
-
+	@OneToMany
+    @JoinColumn(name = "machinetemplate_id", referencedColumnName="id")
 	private List<NetworkInterface> networkInterfaces;
 
 	public MachineTemplate() {
@@ -110,11 +111,18 @@ public class MachineTemplate extends CloudEntity implements Serializable {
 	}    
 
 
-	@CollectionOfElements
+	@OneToMany
+    @JoinColumn(name = "machinetemplate_id", referencedColumnName="id")
 	public List<NetworkInterface> getNetworkInterfaces() {
 		return this.networkInterfaces;
 	}
 
+	public void addNetworkInterface(final NetworkInterface networkInterface) {
+		if (!getNetworkInterfaces().contains(networkInterface)) {
+			getNetworkInterfaces().add(networkInterface);
+		}
+	}
+	
 	public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
 		this.networkInterfaces = networkInterfaces;
 	}

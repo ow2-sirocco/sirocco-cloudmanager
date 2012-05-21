@@ -38,6 +38,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
 import org.hibernate.annotations.CollectionOfElements;
@@ -63,14 +65,18 @@ public class Machine extends CloudResource implements Serializable {
     private Cpu cpu;
 
     private Memory memory;
-
+    
+    
     @OneToOne
     private MachineVolumeCollection volumes;
 
     @OneToOne
     private MachineDiskCollection disks;
 
+    @OneToMany
+    @JoinColumn(name = "machine_id", referencedColumnName="id")
     private List<NetworkInterface> networkInterfaces;
+    
 
     private CloudProviderAccount cloudProviderAccount;
 
@@ -126,11 +132,18 @@ public class Machine extends CloudResource implements Serializable {
         this.volumes = volumes;
     }
 
-    @CollectionOfElements
+    @OneToMany
+    @JoinColumn(name = "machine_id", referencedColumnName="id")
     public List<NetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
+    public void addNetworkInterface(final NetworkInterface networkInterface) {
+    	if (!getNetworkInterfaces().contains(networkInterface)) {
+    		getNetworkInterfaces().add(networkInterface);
+    	}
+    }
+    
     public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
