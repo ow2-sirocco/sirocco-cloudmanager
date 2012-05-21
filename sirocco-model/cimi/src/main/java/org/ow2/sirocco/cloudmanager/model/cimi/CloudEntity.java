@@ -42,7 +42,7 @@ import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @MappedSuperclass
-public abstract class CloudEntity implements Serializable {
+public abstract class CloudEntity implements Serializable, Resource {
     private static final long serialVersionUID = 1L;
 
     protected Integer id;

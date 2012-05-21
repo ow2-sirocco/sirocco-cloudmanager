@@ -47,7 +47,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class CloudResource implements Serializable {
+public abstract class CloudResource implements Serializable, Resource {
     private static final long serialVersionUID = 1L;
 
     protected Integer id;
