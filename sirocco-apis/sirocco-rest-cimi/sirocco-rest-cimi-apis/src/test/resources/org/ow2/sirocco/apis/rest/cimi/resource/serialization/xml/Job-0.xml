@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Job href="hrefValue_0">
-	<created>2000-01-01T01:00:00+01:00</created>
+	<created>2000-01-01T00:00:00Z</created>
 	<description>descriptionValue_0</description>
 	<id>idValue_0</id>
 	<name>nameValue_0</name>
-	<updated>2000-01-01T01:00:00+01:00</updated>
+	<updated>2000-01-01T00:00:00Z</updated>
 	<action>actionValue_0</action>
 	<isCancellable>true</isCancellable>
 	<progress>0</progress>
@@ -12,5 +12,5 @@
 	<status>statusValue_0</status>
 	<statusMessage>statusMessageValue_0</statusMessage>
 	<targetEntity>targetEntityValue_0</targetEntity>
-	<timeOfStatusChange>2000-01-01T01:00:00+01:00</timeOfStatusChange>
+	<timeOfStatusChange>2000-01-01T00:00:00Z</timeOfStatusChange>
 </Job>

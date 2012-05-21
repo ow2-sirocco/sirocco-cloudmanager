@@ -4,11 +4,11 @@
 	<name>nameValue_2</name>
 	<property key="keyProp_2_0">valueProp_2_0</property>
 	<property key="keyProp_2_1">valueProp_2_1</property>
-	<created>2002-03-03T03:02:02.002+01:00</created>
+	<created>2002-03-03T02:02:02.002Z</created>
 	<id>idValue_2</id>
 	<operation href="hrefValue_2_0" rel="relValue_2_0" />
 	<operation href="hrefValue_2_1" rel="relValue_2_1" />
-	<updated>2002-03-03T03:02:02.002+01:00</updated>
+	<updated>2002-03-03T02:02:02.002Z</updated>
 	<cpu frequency="200.0" numberVirtualCpus="2" units="unitValue_2" />
 	<disk>
 		<attachmentPoint>attachmentPointValue_2_0</attachmentPoint>

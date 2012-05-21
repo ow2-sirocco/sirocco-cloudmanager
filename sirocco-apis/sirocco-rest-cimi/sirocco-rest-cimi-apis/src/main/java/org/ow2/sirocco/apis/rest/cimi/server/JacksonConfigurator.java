@@ -24,6 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.server;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
+
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
@@ -47,7 +51,10 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
     public JacksonConfigurator() {
         this.mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
 
-        // mapper.setDateFormat(new
+        DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("Zulu"));
+        this.mapper.setDateFormat(dateFormat);
+        // this.mapper.setDateFormat(new
         // SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SZ"));
 
         // FIXME Use to avoid Error 500 when a field is unknown

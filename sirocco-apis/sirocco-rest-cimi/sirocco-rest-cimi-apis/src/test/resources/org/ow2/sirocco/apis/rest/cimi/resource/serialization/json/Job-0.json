@@ -2,8 +2,8 @@
 	"id":"idValue_0",
 	"name":"nameValue_0",
 	"description":"descriptionValue_0",
-	"created":"2000-01-01T00:00:00.000+0000",
-	"updated":"2000-01-01T00:00:00.000+0000",
+	"created":"2000-01-01T00:00:00.000Z",
+	"updated":"2000-01-01T00:00:00.000Z",
 	"href":"hrefValue_0",
 	"targetEntity":"targetEntityValue_0",
 	"action":"actionValue_0",
@@ -11,6 +11,6 @@
 	"returnCode":0,
 	"progress":0,
 	"statusMessage":"statusMessageValue_0",
-	"timeOfStatusChange":"2000-01-01T00:00:00.000+0000",
+	"timeOfStatusChange":"2000-01-01T00:00:00.000Z",
 	"isCancellable":true
 }

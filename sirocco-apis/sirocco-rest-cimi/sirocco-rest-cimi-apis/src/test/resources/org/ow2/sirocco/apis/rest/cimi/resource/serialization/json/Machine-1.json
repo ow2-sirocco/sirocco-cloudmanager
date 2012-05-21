@@ -5,8 +5,8 @@
 		"keyProp_1_0":"valueProp_1_0"
 	},
 	"id":"idValue_1",
-	"created":"2001-02-02T01:01:01.001+0000",
-	"updated":"2001-02-02T01:01:01.001+0000",
+	"created":"2001-02-02T01:01:01.001Z",
+	"updated":"2001-02-02T01:01:01.001Z",
 	"operations":[
 		{
 			"rel":"relValue_1_0",

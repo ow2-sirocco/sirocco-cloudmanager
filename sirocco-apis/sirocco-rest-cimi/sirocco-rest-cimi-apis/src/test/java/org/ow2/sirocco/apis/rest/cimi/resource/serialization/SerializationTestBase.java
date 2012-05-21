@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.resource.serialization;
 
+import java.util.TimeZone;
+
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.BeforeClass;
 import org.ow2.sirocco.apis.rest.cimi.server.SiroccoRestCimiApplication;
@@ -59,6 +61,7 @@ public class SerializationTestBase extends JerseyTest {
         XMLUnit.setIgnoreWhitespace(true);
         XMLUnit.setIgnoreComments(true);
         XMLUnit.setIgnoreAttributeOrder(true);
+        TimeZone.setDefault(TimeZone.getTimeZone("Zulu"));
     }
 
     @Override

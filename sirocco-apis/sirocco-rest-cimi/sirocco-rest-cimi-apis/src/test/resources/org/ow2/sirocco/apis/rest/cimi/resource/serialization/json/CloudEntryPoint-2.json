@@ -6,8 +6,8 @@
 		"keyProp_2_1":"valueProp_2_1"
 	},
 	"id":"idValue_2",
-	"created":"2002-03-03T02:02:02.002+0000",
-	"updated":"2002-03-03T02:02:02.002+0000",
+	"created":"2002-03-03T02:02:02.002Z",
+	"updated":"2002-03-03T02:02:02.002Z",
 	"operations":[
 		{
 			"rel":"relValue_2_0",
@@ -27,8 +27,8 @@
 			"keyProp_2_1":"valueProp_2_1"
 		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002+0000",
-		"updated":"2002-03-03T02:02:02.002+0000",
+		"created":"2002-03-03T02:02:02.002Z",
+		"updated":"2002-03-03T02:02:02.002Z",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -49,8 +49,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -70,8 +70,8 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_0",
-					"created":"2002-03-03T02:02:02.002+0000",
-					"updated":"2002-03-03T02:02:02.002+0000",
+					"created":"2002-03-03T02:02:02.002Z",
+					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
 						{
 							"rel":"relValue_2_0",
@@ -119,8 +119,8 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_0",
-					"created":"2002-03-03T02:02:02.002+0000",
-					"updated":"2002-03-03T02:02:02.002+0000",
+					"created":"2002-03-03T02:02:02.002Z",
+					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
 						{
 							"rel":"relValue_2_0",
@@ -146,8 +146,8 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_0",
-					"created":"2002-03-03T02:02:02.002+0000",
-					"updated":"2002-03-03T02:02:02.002+0000",
+					"created":"2002-03-03T02:02:02.002Z",
+					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
 						{
 							"rel":"relValue_2_0",
@@ -172,8 +172,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -193,8 +193,8 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_1",
-					"created":"2002-03-03T02:02:02.002+0000",
-					"updated":"2002-03-03T02:02:02.002+0000",
+					"created":"2002-03-03T02:02:02.002Z",
+					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
 						{
 							"rel":"relValue_2_0",
@@ -242,8 +242,8 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_1",
-					"created":"2002-03-03T02:02:02.002+0000",
-					"updated":"2002-03-03T02:02:02.002+0000",
+					"created":"2002-03-03T02:02:02.002Z",
+					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
 						{
 							"rel":"relValue_2_0",
@@ -269,8 +269,8 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_1",
-					"created":"2002-03-03T02:02:02.002+0000",
-					"updated":"2002-03-03T02:02:02.002+0000",
+					"created":"2002-03-03T02:02:02.002Z",
+					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
 						{
 							"rel":"relValue_2_0",
@@ -297,8 +297,8 @@
 			"keyProp_2_1":"valueProp_2_1"
 		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002+0000",
-		"updated":"2002-03-03T02:02:02.002+0000",
+		"created":"2002-03-03T02:02:02.002Z",
+		"updated":"2002-03-03T02:02:02.002Z",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -319,8 +319,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -368,8 +368,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -419,8 +419,8 @@
 			"keyProp_2_1":"valueProp_2_1"
 		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002+0000",
-		"updated":"2002-03-03T02:02:02.002+0000",
+		"created":"2002-03-03T02:02:02.002Z",
+		"updated":"2002-03-03T02:02:02.002Z",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -441,8 +441,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -468,8 +468,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -497,8 +497,8 @@
 			"keyProp_2_1":"valueProp_2_1"
 		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002+0000",
-		"updated":"2002-03-03T02:02:02.002+0000",
+		"created":"2002-03-03T02:02:02.002Z",
+		"updated":"2002-03-03T02:02:02.002Z",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -519,8 +519,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -544,8 +544,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -571,8 +571,8 @@
 			"keyProp_2_1":"valueProp_2_1"
 		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002+0000",
-		"updated":"2002-03-03T02:02:02.002+0000",
+		"created":"2002-03-03T02:02:02.002Z",
+		"updated":"2002-03-03T02:02:02.002Z",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -593,8 +593,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -639,8 +639,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -688,8 +688,8 @@
 			"keyProp_2_1":"valueProp_2_1"
 		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002+0000",
-		"updated":"2002-03-03T02:02:02.002+0000",
+		"created":"2002-03-03T02:02:02.002Z",
+		"updated":"2002-03-03T02:02:02.002Z",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -710,8 +710,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",
@@ -735,8 +735,8 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
-				"created":"2002-03-03T02:02:02.002+0000",
-				"updated":"2002-03-03T02:02:02.002+0000",
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
 					{
 						"rel":"relValue_2_0",

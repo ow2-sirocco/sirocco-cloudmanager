@@ -3,8 +3,8 @@
 	<id>idValue_2</id>
 	<name>nameValue_2</name>
 	<description>descriptionValue_2</description>
-	<created>2002-03-03T03:02:02.002+01:00</created>
-	<updated>2002-03-03T03:02:02.002+01:00</updated>
+	<created>2002-03-03T02:02:02.002Z</created>
+	<updated>2002-03-03T02:02:02.002Z</updated>
 	<property key="keyProp_2_0">valueProp_2_0</property>
 	<property key="keyProp_2_1">valueProp_2_1</property>
 	<state>stateValue_2</state>

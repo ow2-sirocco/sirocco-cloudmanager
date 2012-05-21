@@ -2,8 +2,8 @@
 	"id":"idValue_3",
 	"name":"nameValue_3",
 	"description":"descriptionValue_3",
-	"created":"2003-04-04T02:03:03.003+0000",
-	"updated":"2003-04-04T02:03:03.003+0000",
+	"created":"2003-04-04T03:03:03.003Z",
+	"updated":"2003-04-04T03:03:03.003Z",
 	"properties":{
 		"keyProp_3_0":"valueProp_3_0",
 		"keyProp_3_2":"valueProp_3_2",

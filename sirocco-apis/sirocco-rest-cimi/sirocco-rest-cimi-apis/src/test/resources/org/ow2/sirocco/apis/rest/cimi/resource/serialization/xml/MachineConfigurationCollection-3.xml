@@ -5,12 +5,12 @@
 	<property key="keyProp_3_0">valueProp_3_0</property>
 	<property key="keyProp_3_2">valueProp_3_2</property>
 	<property key="keyProp_3_1">valueProp_3_1</property>
-	<created>2003-04-04T04:03:03.003+02:00</created>
+	<created>2003-04-04T03:03:03.003Z</created>
 	<id>idValue_3</id>
 	<operation href="hrefValue_3_0" rel="relValue_3_0" />
 	<operation href="hrefValue_3_1" rel="relValue_3_1" />
 	<operation href="hrefValue_3_2" rel="relValue_3_2" />
-	<updated>2003-04-04T04:03:03.003+02:00</updated>
+	<updated>2003-04-04T03:03:03.003Z</updated>
 	<machineConfiguration href="hrefValue_3_0" />
 	<machineConfiguration href="hrefValue_3_1" />
 	<machineConfiguration href="hrefValue_3_2" />

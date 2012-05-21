@@ -2,8 +2,8 @@
 	"id":"idValue_3",
 	"name":"nameValue_3",
 	"description":"descriptionValue_3",
-	"created":"2003-04-04T02:03:03.003+0000",
-	"updated":"2003-04-04T02:03:03.003+0000",
+	"created":"2003-04-04T03:03:03.003Z",
+	"updated":"2003-04-04T03:03:03.003Z",
 	"properties":{
 		"keyProp_3_0":"valueProp_3_0",
 		"keyProp_3_2":"valueProp_3_2",
@@ -31,8 +31,8 @@
 			"id":"idValue_3_0",
 			"name":"nameValue_3_0",
 			"description":"descriptionValue_3_0",
-			"created":"2003-04-04T02:03:03.003+0000",
-			"updated":"2003-04-04T02:03:03.003+0000",
+			"created":"2003-04-04T03:03:03.003Z",
+			"updated":"2003-04-04T03:03:03.003Z",
 			"properties":{
 				"keyProp_3_0":"valueProp_3_0",
 				"keyProp_3_2":"valueProp_3_2",
@@ -65,8 +65,8 @@
 			"id":"idValue_3_1",
 			"name":"nameValue_3_1",
 			"description":"descriptionValue_3_1",
-			"created":"2003-04-04T02:03:03.003+0000",
-			"updated":"2003-04-04T02:03:03.003+0000",
+			"created":"2003-04-04T03:03:03.003Z",
+			"updated":"2003-04-04T03:03:03.003Z",
 			"properties":{
 				"keyProp_3_0":"valueProp_3_0",
 				"keyProp_3_2":"valueProp_3_2",
@@ -99,8 +99,8 @@
 			"id":"idValue_3_2",
 			"name":"nameValue_3_2",
 			"description":"descriptionValue_3_2",
-			"created":"2003-04-04T02:03:03.003+0000",
-			"updated":"2003-04-04T02:03:03.003+0000",
+			"created":"2003-04-04T03:03:03.003Z",
+			"updated":"2003-04-04T03:03:03.003Z",
 			"properties":{
 				"keyProp_3_0":"valueProp_3_0",
 				"keyProp_3_2":"valueProp_3_2",

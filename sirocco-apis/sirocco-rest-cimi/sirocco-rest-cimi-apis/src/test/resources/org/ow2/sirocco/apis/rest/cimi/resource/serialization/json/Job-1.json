@@ -2,8 +2,8 @@
 	"id":"idValue_1",
 	"name":"nameValue_1",
 	"description":"descriptionValue_1",
-	"created":"2001-02-02T01:01:01.001+0000",
-	"updated":"2001-02-02T01:01:01.001+0000",
+	"created":"2001-02-02T01:01:01.001Z",
+	"updated":"2001-02-02T01:01:01.001Z",
 	"href":"hrefValue_1",
 	"properties":{
 		"keyProp_1_0":"valueProp_1_0"
@@ -21,7 +21,7 @@
 	"returnCode":1,
 	"progress":1,
 	"statusMessage":"statusMessageValue_1",
-	"timeOfStatusChange":"2001-02-02T01:01:01.001+0000",
+	"timeOfStatusChange":"2001-02-02T01:01:01.001Z",
 	"isCancellable":false,
 	"parentJob":{
 		"href":"hrefParentValue_1"

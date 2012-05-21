@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <Job href="hrefValue_2">
-	<created>2002-03-03T03:02:02.002+01:00</created>
+	<created>2002-03-03T02:02:02.002Z</created>
 	<description>descriptionValue_2</description>
 	<id>idValue_2</id>
 	<name>nameValue_2</name>
@@ -8,7 +8,7 @@
 	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 	<property key="keyProp_2_0">valueProp_2_0</property>
 	<property key="keyProp_2_1">valueProp_2_1</property>
-	<updated>2002-03-03T03:02:02.002+01:00</updated>
+	<updated>2002-03-03T02:02:02.002Z</updated>
 	<action>actionValue_2</action>
 	<isCancellable>true</isCancellable>
 	<nestedJob href="hrefNestedValue_2_2_0" />
@@ -19,5 +19,5 @@
 	<status>statusValue_2</status>
 	<statusMessage>statusMessageValue_2</statusMessage>
 	<targetEntity>targetEntityValue_2</targetEntity>
-	<timeOfStatusChange>2002-03-03T03:02:02.002+01:00</timeOfStatusChange>
+	<timeOfStatusChange>2002-03-03T02:02:02.002Z</timeOfStatusChange>
 </Job>

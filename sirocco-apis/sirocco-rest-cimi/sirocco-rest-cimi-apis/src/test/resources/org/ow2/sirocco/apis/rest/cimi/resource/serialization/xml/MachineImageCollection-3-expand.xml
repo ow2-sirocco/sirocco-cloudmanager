@@ -3,8 +3,8 @@
 	<id>idValue_3</id>
 	<name>nameValue_3</name>
 	<description>descriptionValue_3</description>
-	<created>2003-04-04T04:03:03.003+02:00</created>
-	<updated>2003-04-04T04:03:03.003+02:00</updated>
+	<created>2003-04-04T03:03:03.003Z</created>
+	<updated>2003-04-04T03:03:03.003Z</updated>
 	<property key="keyProp_3_0">valueProp_3_0</property>
 	<property key="keyProp_3_2">valueProp_3_2</property>
 	<property key="keyProp_3_1">valueProp_3_1</property>
@@ -12,8 +12,8 @@
 		<id>idValue_3_0</id>
 		<name>nameValue_3_0</name>
 		<description>descriptionValue_3_0</description>
-		<created>2003-04-04T04:03:03.003+02:00</created>
-		<updated>2003-04-04T04:03:03.003+02:00</updated>
+		<created>2003-04-04T03:03:03.003Z</created>
+		<updated>2003-04-04T03:03:03.003Z</updated>
 		<property key="keyProp_3_0">valueProp_3_0</property>
 		<property key="keyProp_3_2">valueProp_3_2</property>
 		<property key="keyProp_3_1">valueProp_3_1</property>
@@ -28,8 +28,8 @@
 		<id>idValue_3_1</id>
 		<name>nameValue_3_1</name>
 		<description>descriptionValue_3_1</description>
-		<created>2003-04-04T04:03:03.003+02:00</created>
-		<updated>2003-04-04T04:03:03.003+02:00</updated>
+		<created>2003-04-04T03:03:03.003Z</created>
+		<updated>2003-04-04T03:03:03.003Z</updated>
 		<property key="keyProp_3_0">valueProp_3_0</property>
 		<property key="keyProp_3_2">valueProp_3_2</property>
 		<property key="keyProp_3_1">valueProp_3_1</property>
@@ -44,8 +44,8 @@
 		<id>idValue_3_2</id>
 		<name>nameValue_3_2</name>
 		<description>descriptionValue_3_2</description>
-		<created>2003-04-04T04:03:03.003+02:00</created>
-		<updated>2003-04-04T04:03:03.003+02:00</updated>
+		<created>2003-04-04T03:03:03.003Z</created>
+		<updated>2003-04-04T03:03:03.003Z</updated>
 		<property key="keyProp_3_0">valueProp_3_0</property>
 		<property key="keyProp_3_2">valueProp_3_2</property>
 		<property key="keyProp_3_1">valueProp_3_1</property>
