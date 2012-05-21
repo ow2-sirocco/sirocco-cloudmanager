@@ -27,7 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -48,28 +48,7 @@ public class CommonIdConverter extends CommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void fill(final CimiContext context, final CloudEntity dataService, final CimiCommonId dataCimi) {
-        if (true == context.mustBeExpanded(dataCimi)) {
-            this.fill(dataService, dataCimi);
-            dataCimi.setCreated(dataService.getCreated());
-            dataCimi.setUpdated(dataService.getUpdated());
-            // if (null != dataService.getId()) {
-            dataCimi.setId(context.makeHref(dataCimi, dataService.getId()));
-            // }
-        }
-        if (true == context.mustBeReferenced(dataCimi)) {
-            dataCimi.setHref(context.makeHref(dataCimi, dataService.getId()));
-        }
-    }
-
-    /**
-     * Fill the common data from a service object to a CIMI object.
-     * 
-     * @param context The current context
-     * @param dataService Source service object
-     * @param dataCimi Destination CIMI object
-     */
-    protected void fill(final CimiContext context, final CloudResource dataService, final CimiCommonId dataCimi) {
+    protected void fill(final CimiContext context, final Resource dataService, final CimiCommonId dataCimi) {
         if (true == context.mustBeExpanded(dataCimi)) {
             this.fill(dataService, dataCimi);
             dataCimi.setCreated(dataService.getCreated());
@@ -90,21 +69,7 @@ public class CommonIdConverter extends CommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination service object
      */
-    protected void fill(final CimiContext context, final CimiCommonId dataCimi, final CloudEntity dataService) {
-        this.fill(dataCimi, dataService);
-        if (null != dataCimi.getId()) {
-            dataService.setId(CommonIdConverter.extractId(dataCimi.getId()));
-        }
-    }
-
-    /**
-     * Fill the common data from a CIMI object to a service object.
-     * 
-     * @param context The current context
-     * @param dataCimi Source CIMI object
-     * @param dataService Destination service object
-     */
-    protected void fill(final CimiContext context, final CimiCommonId dataCimi, final CloudResource dataService) {
+    protected void fill(final CimiContext context, final CimiCommonId dataCimi, final Resource dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getId()) {
             dataService.setId(CommonIdConverter.extractId(dataCimi.getId()));

@@ -77,6 +77,12 @@
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<!-- Validation dependencies -->
 		<dependency>
