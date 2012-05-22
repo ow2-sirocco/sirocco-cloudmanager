@@ -29,9 +29,11 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiDateAdapter;
 
 /**
  * Class Common with ID.
@@ -126,6 +128,7 @@ public class CimiCommonId extends CimiCommon implements CimiHref {
      * 
      * @return The value
      */
+    @XmlJavaTypeAdapter(CimiDateAdapter.class)
     public Date getCreated() {
         return this.created;
     }
@@ -144,6 +147,7 @@ public class CimiCommonId extends CimiCommon implements CimiHref {
      * 
      * @return The value
      */
+    @XmlJavaTypeAdapter(CimiDateAdapter.class)
     public Date getUpdated() {
         return this.updated;
     }

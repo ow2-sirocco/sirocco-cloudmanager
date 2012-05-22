@@ -28,9 +28,11 @@ import java.util.Date;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiDateAdapter;
 
 /**
  * Class Job.
@@ -205,6 +207,7 @@ public class CimiJob extends CimiCommonId {
      * 
      * @return The value
      */
+    @XmlJavaTypeAdapter(CimiDateAdapter.class)
     public Date getTimeOfStatusChange() {
         return this.timeOfStatusChange;
     }

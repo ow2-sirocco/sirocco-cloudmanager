@@ -54,8 +54,6 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         dateFormat.setTimeZone(TimeZone.getTimeZone("Zulu"));
         this.mapper.setDateFormat(dateFormat);
-        // this.mapper.setDateFormat(new
-        // SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SZ"));
 
         // FIXME Use to avoid Error 500 when a field is unknown
         // this.mapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES,

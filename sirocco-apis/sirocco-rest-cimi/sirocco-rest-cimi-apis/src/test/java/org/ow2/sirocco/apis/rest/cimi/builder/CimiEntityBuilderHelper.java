@@ -31,6 +31,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
@@ -83,6 +84,7 @@ public class CimiEntityBuilderHelper {
             cal.set(Calendar.ZONE_OFFSET, 0);
             cal.set(year, month, day, hour, minute, second);
             cal.set(Calendar.MILLISECOND, milli);
+            cal.setTimeZone(TimeZone.getTimeZone("Zulu"));
             ret = cal.getTime();
         }
         return ret;
