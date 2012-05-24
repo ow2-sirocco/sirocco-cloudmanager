@@ -32,7 +32,7 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 
 @Entity
-public class ForwardingGroup extends CloudEntity implements Serializable {
+public class ForwardingGroup extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private List<Network> networks;
