@@ -69,6 +69,7 @@ public class JobManager implements IJobManager {
         if (result == null) {
             throw new ResourceNotFoundException("Invalid Job id " + id);
         }
+        result.getNestedJobs().size();
         return result;
     }
 
