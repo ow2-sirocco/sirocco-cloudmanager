@@ -234,10 +234,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     private void checkVolumes(final MachineTemplate mt, final User u) throws CloudProviderException {
 
         MachineVolumeCollection volColl = mt.getVolumes();
-        if (volColl == null) {
-            throw new InvalidRequestException("Volumes array null");
-        }
-        if ((volColl.getItems() == null) || volColl.getItems().size() == 0) {
+        if (volColl == null || (volColl.getItems() == null) || volColl.getItems().size() == 0) {
             return;
         }
         List<MachineVolume> volumes = volColl.getItems();
