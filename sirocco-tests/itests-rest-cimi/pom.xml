@@ -114,7 +114,15 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.18</version>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>org.hsqldb</groupId>
+			<artifactId>hsqldb</artifactId>
+			<version>1.8.0.10</version>
+			<type>jar</type>
+			<scope>runtime</scope>
+		</dependency>
+		
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-client</artifactId>
@@ -169,6 +177,7 @@
 				<database.driver>org.hsqldb.jdbcDriver</database.driver>
 				<database.mapper>rdb.hsql</database.mapper>
 				<database.schema>PUBLIC</database.schema>
+				<database.type>HSQLDB</database.type>
 				<database.username>jonas</database.username>
 				<database.password>jonas</database.password>
 				<database.teststmt>select count(1) from
@@ -217,6 +226,7 @@
 				<database.mapper>rdb.mysql</database.mapper>
 				<database.name>sirocco</database.name>
 				<database.schema>sirocco</database.schema>
+				<database.type>MYSQL</database.type>
 				<database.username>admcloud</database.username>
 				<database.password>admcloud</database.password>
 				<database.teststmt>select count(1) from information_schema.tables</database.teststmt>
@@ -558,6 +568,10 @@
 										<property>
 											<name>dbunit.schema</name>
 											<value>${database.schema}</value>
+										</property>
+										<property>
+											<name>database.type</name>
+											<value>${database.type}</value>
 										</property>
 										<property>
 											<name>dbunit.dataset</name>

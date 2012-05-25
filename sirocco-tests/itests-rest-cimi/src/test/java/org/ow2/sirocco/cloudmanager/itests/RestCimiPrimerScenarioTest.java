@@ -13,7 +13,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.dbunit.PropertiesBasedJdbcDatabaseTester;
 import org.dbunit.dataset.xml.XmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -48,6 +47,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -133,13 +133,25 @@ public class RestCimiPrimerScenarioTest {
         }
     }
 
+    // private void setUpDatabase() throws Exception {
+    // PropertiesBasedJdbcDatabaseTester databaseTest;
+    // Reader reader = new FileReader(new
+    // File(System.getProperty("dbunit.dataset")));
+    // XmlDataSet dataSet = new XmlDataSet(reader);
+    // databaseTest = new PropertiesBasedJdbcDatabaseTester();
+    // databaseTest.setDataSet(dataSet);
+    // databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+    // databaseTest.onSetup();
+    // }
     private void setUpDatabase() throws Exception {
         PropertiesBasedJdbcDatabaseTester databaseTest;
         Reader reader = new FileReader(new File(System.getProperty("dbunit.dataset")));
         XmlDataSet dataSet = new XmlDataSet(reader);
         databaseTest = new PropertiesBasedJdbcDatabaseTester();
         databaseTest.setDataSet(dataSet);
-        databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        Assert.assertNotNull("database.type not set!", System.getProperty("database.type"));
+        // databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        databaseTest.setSetUpOperation(new CustomDBUnitDeleteAllOperation(System.getProperty("database.type")));
         databaseTest.onSetup();
     }
 
@@ -195,6 +207,7 @@ public class RestCimiPrimerScenarioTest {
             /*
              * Read Job
              */
+            this.printTitleTest("Read Job", true);
             response = service.path(this.extractPath(idJob)).accept(mediaType).get(ClientResponse.class);
             Assert.assertEquals(200, response.getStatus());
             jobRead = response.getEntity(CimiJob.class);
@@ -203,6 +216,7 @@ public class RestCimiPrimerScenarioTest {
             System.out.println("jobRead.getId:" + jobRead.getId());
             System.out.println("jobRead.getStatus:" + jobRead.getStatus());
             System.out.println("jobRead.getTargetEntity:" + jobRead.getTargetEntity());
+            this.printTitleTest("Read Job", false);
 
             if (false == "RUNNING".equals(jobRead.getStatus())) {
                 break;
@@ -281,6 +295,18 @@ public class RestCimiPrimerScenarioTest {
         return href.substring(this.baseURI.length());
     }
 
+    private void printTitleTest(final String title, final boolean begin) {
+        StringBuilder sb = new StringBuilder();
+        if (true == begin) {
+            sb.append('\n');
+            sb.append(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
+        } else {
+            sb.append("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<");
+        }
+        sb.append(' ').append(title);
+        System.out.println(sb.toString());
+    }
+
     private void runScenarioOne(final MediaType mediaType) throws Exception {
         ClientResponse response;
         // Init data
@@ -295,6 +321,7 @@ public class RestCimiPrimerScenarioTest {
         /*
          * Retrieve the CEP
          */
+        this.printTitleTest("Retrieve the CEP", true);
         response = service.path(ConstantsPath.CLOUDENTRYPOINT_PATH).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         CimiCloudEntryPoint cloudEntryPoint = response.getEntity(CimiCloudEntryPoint.class);
@@ -320,10 +347,12 @@ public class RestCimiPrimerScenarioTest {
         if (null != cloudEntryPoint.getMachineTemplates()) {
             System.out.println("getMachineTemplates: " + cloudEntryPoint.getMachineTemplates().getHref());
         }
+        this.printTitleTest("Retrieve the CEP", false);
 
         /*
          * Retrieve the list of Machine Images
          */
+        this.printTitleTest("Retrieve the list of Machine Images", true);
         response = service.path(this.extractPath(cloudEntryPoint.getMachineImages().getHref())).accept(mediaType)
             .get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
@@ -336,10 +365,12 @@ public class RestCimiPrimerScenarioTest {
                 System.out.println("machineImage: " + mImage.getHref());
             }
         }
+        this.printTitleTest("Retrieve the list of Machine Images", false);
 
         /*
          * Choose a Machine Image (first one)
          */
+        this.printTitleTest("Choose a Machine Image (first one)", true);
         response = service.path(this.extractPath(machineImagesCollection.getMachineImages()[0].getHref())).accept(mediaType)
             .get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
@@ -349,10 +380,12 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("ID: " + machineImage.getId());
         System.out.println("name: " + machineImage.getName());
         System.out.println("imageLocation: " + machineImage.getImageLocation().getHref());
+        this.printTitleTest("Choose a Machine Image (first one)", false);
 
         /*
          * Retrieve the list of Machine Configurations
          */
+        this.printTitleTest("Retrieve the list of Machine Configurations", true);
         response = service.path(this.extractPath(cloudEntryPoint.getMachineConfigs().getHref())).accept(mediaType)
             .get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
@@ -366,10 +399,12 @@ public class RestCimiPrimerScenarioTest {
                 System.out.println("machineConfiguration: " + mConfig.getHref());
             }
         }
+        this.printTitleTest("Retrieve the list of Machine Configurations", false);
 
         /*
          * Choose a Machine Configuration (first one)
          */
+        this.printTitleTest("Choose a Machine Configuration (first one)", true);
         response = service.path(this.extractPath(machineConfigsCollection.getMachineConfigurations()[0].getHref()))
             .accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
@@ -391,6 +426,7 @@ public class RestCimiPrimerScenarioTest {
             System.out.println("disk.getCapacity.getUnits: " + diskConfig.getCapacity().getUnits());
             System.out.println("disk.getFormat: " + diskConfig.getFormat());
         }
+        this.printTitleTest("Choose a Machine Configuration (first one)", false);
 
         /*
          * Retrieve the list of Credentials
@@ -399,8 +435,9 @@ public class RestCimiPrimerScenarioTest {
         // database
 
         /*
-         * Create a new Credentials entity
+         * Create a new Credentials resource
          */
+        this.printTitleTest("Create a new Credentials resource", true);
         CimiCredentialsTemplate credentialsTemplate = new CimiCredentialsTemplate();
         credentialsTemplate.setUserName("JoeSmith");
         credentialsTemplate.setPassword("letmein");
@@ -422,6 +459,7 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("credentials.getUserNam: " + credentials.getUserName());
         System.out.println("credentials.getPassword: " + credentials.getPassword());
         System.out.println("credentials.getCreated: " + credentials.getCreated());
+        this.printTitleTest("Create a new Credentials resource", false);
 
         /*
          * Retrieve the list of Machine
@@ -444,6 +482,7 @@ public class RestCimiPrimerScenarioTest {
         /*
          * Create a new Machine
          */
+        this.printTitleTest("Create a new Machine", true);
         CimiMachineTemplate machineTemplate = new CimiMachineTemplate();
         machineTemplate.setMachineConfig(new CimiMachineConfiguration(machineConfiguration.getId()));
         machineTemplate.setMachineImage(new CimiMachineImage(machineImage.getId()));
@@ -465,6 +504,7 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("jobMachineCreate.ID:" + jobMachineCreate.getId());
         System.out.println("jobMachineCreate.Status:" + jobMachineCreate.getStatus());
         System.out.println("jobMachineCreate.TargetEntity:" + jobMachineCreate.getTargetEntity());
+        this.printTitleTest("Create a new Machine", false);
 
         /*
          * Read and wait end of Job
@@ -474,6 +514,7 @@ public class RestCimiPrimerScenarioTest {
         /*
          * Query the Machine
          */
+        this.printTitleTest("Query the Machine", true);
         response = service.path(this.extractPath(jobMachineCreate.getTargetEntity())).accept(mediaType)
             .get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
@@ -500,16 +541,19 @@ public class RestCimiPrimerScenarioTest {
         for (CimiOperation operation : machine.getOperations()) {
             System.out.println("operation: " + operation.getRel() + ", " + operation.getHref());
         }
+        this.printTitleTest("Query the Machine", false);
 
         /*
          * Start the Machine
          */
+        this.printTitleTest("Start the Machine", true);
         CimiAction actionStart = new CimiAction();
         actionStart.setAction(ActionType.START.getPath());
         response = service.path(this.extractPath(machine.getId())).accept(mediaType).entity(actionStart, mediaType)
             .post(ClientResponse.class);
         Assert.assertEquals(202, response.getStatus());
         CimiJob jobMachineStart = response.getEntity(CimiJob.class);
+        this.printTitleTest("Start the Machine", false);
 
         /*
          * Read and wait end of Job
@@ -519,6 +563,7 @@ public class RestCimiPrimerScenarioTest {
         /*
          * Query the Machine to verify if it started
          */
+        this.printTitleTest("Query the Machine to verify if it started", true);
         response = service.path(this.extractPath(jobMachineCreate.getTargetEntity())).accept(mediaType)
             .get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
@@ -532,16 +577,19 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("getCreated: " + machine.getCreated());
         System.out.println("getUpdated: " + machine.getUpdated());
         System.out.println("State: " + machine.getState());
+        this.printTitleTest("Query the Machine to verify if it started", false);
 
         /*
          * Stop the Machine
          */
+        this.printTitleTest("Stop the Machine", true);
         CimiAction actionStop = new CimiAction();
         actionStop.setAction(ActionType.STOP.getPath());
         response = service.path(this.extractPath(machine.getId())).accept(mediaType).entity(actionStop, mediaType)
             .post(ClientResponse.class);
         Assert.assertEquals(202, response.getStatus());
         CimiJob jobMachineStop = response.getEntity(CimiJob.class);
+        this.printTitleTest("Stop the Machine", false);
 
         /*
          * Read and wait end of Job
@@ -551,6 +599,7 @@ public class RestCimiPrimerScenarioTest {
         /*
          * Query the Machine to verify if it stopped
          */
+        this.printTitleTest("Query the Machine to verify if it stopped", true);
         response = service.path(this.extractPath(jobMachineCreate.getTargetEntity())).accept(mediaType)
             .get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
@@ -564,10 +613,12 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("getCreated: " + machine.getCreated());
         System.out.println("getUpdated: " + machine.getUpdated());
         System.out.println("State: " + machine.getState());
+        this.printTitleTest("Query the Machine to verify if it stopped", false);
 
         /*
          * Update the Machine's name and description
          */
+        this.printTitleTest("Update the Machine's name and description", true);
         CimiMachine machineToUpdate = new CimiMachine();
         machineToUpdate.setName("myMachine1Updated");
         response = service.path(this.extractPath(machine.getId())).queryParam(Constants.PARAM_CIMI_SELECT, "name")
@@ -575,6 +626,7 @@ public class RestCimiPrimerScenarioTest {
             .put(ClientResponse.class);
         Assert.assertEquals(202, response.getStatus());
         CimiJob jobMachineUpdate = response.getEntity(CimiJob.class);
+        this.printTitleTest("Update the Machine's name and description", false);
 
         /*
          * Read and wait end of Job
@@ -584,6 +636,7 @@ public class RestCimiPrimerScenarioTest {
         /*
          * Query the Machine to verify if it updated
          */
+        this.printTitleTest("Query the Machine to verify if it updated", true);
         response = service.path(this.extractPath(jobMachineCreate.getTargetEntity())).accept(mediaType)
             .get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
@@ -597,7 +650,7 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("getCreated: " + machine.getCreated());
         System.out.println("getUpdated: " + machine.getUpdated());
         System.out.println("State: " + machine.getState());
-
+        this.printTitleTest("Query the Machine to verify if it updated", false);
     }
 
     @Test

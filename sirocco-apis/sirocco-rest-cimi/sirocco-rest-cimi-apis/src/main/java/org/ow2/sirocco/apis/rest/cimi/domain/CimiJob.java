@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.utils.CimiDateAdapter;
@@ -263,6 +264,7 @@ public class CimiJob extends CimiCommonId {
      * @return The value
      */
     @XmlElement(name = "nestedJob")
+    @JsonProperty(value = "nestedJobs")
     public NestedJob[] getNestedJobs() {
         return this.nestedJobs;
     }
