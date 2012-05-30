@@ -30,10 +30,13 @@ import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.AddressCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
@@ -46,6 +49,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 
 public interface INetworkManager {
+    static final String EJB_JNDI_NAME = "NetworkManager";
 
     // Network operations
 
@@ -59,6 +63,8 @@ public interface INetworkManager {
 
     Network getNetworkAttributes(final String networkId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
+
+    List<Network> getNetworks() throws CloudProviderException;
 
     List<Network> getNetworks(int first, int last, List<String> attributes) throws InvalidRequestException,
         CloudProviderException;
@@ -75,7 +81,10 @@ public interface INetworkManager {
 
     // NetworkConfiguration operations
 
-    Job createNetworkConfiguration(NetworkConfiguration networkConfig) throws InvalidRequestException, CloudProviderException;
+    NetworkConfiguration createNetworkConfiguration(NetworkConfiguration networkConfig) throws InvalidRequestException,
+        CloudProviderException;
+
+    List<NetworkConfiguration> getNetworkConfigurations() throws CloudProviderException;
 
     NetworkConfiguration getNetworkConfigurationById(String networkConfigId) throws ResourceNotFoundException;
 
@@ -88,17 +97,21 @@ public interface INetworkManager {
     List<NetworkConfiguration> getNetworkConfigurations(List<String> attributes, String filterExpression)
         throws InvalidRequestException, CloudProviderException;
 
-    Job updateNetworkConfiguration(NetworkConfiguration networkConfig) throws ResourceNotFoundException,
+    void updateNetworkConfiguration(NetworkConfiguration networkConfig) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
-    Job updateNetworkConfigurationAttributes(String networkConfigId, Map<String, Object> updatedAttributes)
+    void updateNetworkConfigurationAttributes(String networkConfigId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-    Job deleteNetworkConfiguration(String networkConfigId) throws ResourceNotFoundException, CloudProviderException;
+    void deleteNetworkConfiguration(String networkConfigId) throws ResourceNotFoundException, ResourceConflictException,
+        CloudProviderException;
 
     // NetworkTemplate operations
 
-    Job createNetworkTemplate(NetworkTemplate networkTemplate) throws InvalidRequestException, CloudProviderException;
+    NetworkTemplate createNetworkTemplate(NetworkTemplate networkTemplate) throws InvalidRequestException,
+        CloudProviderException;
+
+    List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException;
 
     NetworkTemplate getNetworkTemplateById(String networkTemplateId) throws ResourceNotFoundException;
 
@@ -111,13 +124,13 @@ public interface INetworkManager {
     List<NetworkTemplate> getNetworkTemplates(List<String> attributes, String filterExpression) throws InvalidRequestException,
         CloudProviderException;
 
-    Job updateNetworkTemplate(NetworkTemplate networkTemplate) throws ResourceNotFoundException, InvalidRequestException,
+    void updateNetworkTemplate(NetworkTemplate networkTemplate) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
 
-    Job updateNetworkTemplateAttributes(String networkTemplateId, Map<String, Object> updatedAttributes)
+    void updateNetworkTemplateAttributes(String networkTemplateId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-    Job deleteNetworkTemplate(String networkConfigId) throws ResourceNotFoundException, CloudProviderException;
+    void deleteNetworkTemplate(String networkConfigId) throws ResourceNotFoundException, CloudProviderException;
 
     // NetworkPort operations
 
@@ -126,6 +139,8 @@ public interface INetworkManager {
     Job startNetworkPort(String networkPortId) throws ResourceNotFoundException, CloudProviderException;
 
     Job stopNetworkPort(String networkPortId) throws ResourceNotFoundException, CloudProviderException;
+
+    List<NetworkPort> getNetworkPorts() throws CloudProviderException;
 
     NetworkPort getNetworkPortById(String networkPortId) throws ResourceNotFoundException;
 
@@ -148,8 +163,10 @@ public interface INetworkManager {
 
     // NetworkPortConfiguration operations
 
-    Job createNetworkPortConfiguration(NetworkPortConfiguration networkPortConfiguration) throws InvalidRequestException,
-        CloudProviderException;
+    NetworkPortConfiguration createNetworkPortConfiguration(NetworkPortConfiguration networkPortConfiguration)
+        throws InvalidRequestException, CloudProviderException;
+
+    List<NetworkPortConfiguration> getNetworkPortConfigurations() throws CloudProviderException;
 
     NetworkPortConfiguration getNetworkPortConfigurationById(String networkPortConfigurationId)
         throws ResourceNotFoundException;
@@ -163,19 +180,21 @@ public interface INetworkManager {
     List<NetworkPortConfiguration> getNetworkPortConfigurations(List<String> attributes, String filterExpression)
         throws InvalidRequestException, CloudProviderException;
 
-    Job updateNetworkPortConfiguration(NetworkPortConfiguration networkPort) throws ResourceNotFoundException,
+    void updateNetworkPortConfiguration(NetworkPortConfiguration networkPort) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
-    Job updateNetworkPortConfigurationAttributes(String networkPortConfigurationId, Map<String, Object> updatedAttributes)
+    void updateNetworkPortConfigurationAttributes(String networkPortConfigurationId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-    Job deleteNetworkPortConfiguration(String networkPortConfigurationId) throws ResourceNotFoundException,
+    void deleteNetworkPortConfiguration(String networkPortConfigurationId) throws ResourceNotFoundException,
         CloudProviderException;
 
     // NetworkPortTemplate operations
 
-    Job createNetworkPortTemplate(NetworkPortTemplate networkPortTemplate) throws InvalidRequestException,
+    NetworkPortTemplate createNetworkPortTemplate(NetworkPortTemplate networkPortTemplate) throws InvalidRequestException,
         CloudProviderException;
+
+    List<NetworkPortTemplate> getNetworkPortTemplates() throws CloudProviderException;
 
     NetworkPortTemplate getNetworkPortTemplateById(String networkPortTemplateId) throws ResourceNotFoundException;
 
@@ -188,18 +207,20 @@ public interface INetworkManager {
     List<NetworkPortTemplate> getNetworkPortTemplates(List<String> attributes, String filterExpression)
         throws InvalidRequestException, CloudProviderException;
 
-    Job updateNetworkPortTemplate(NetworkPortTemplate networkPort) throws ResourceNotFoundException, InvalidRequestException,
+    void updateNetworkPortTemplate(NetworkPortTemplate networkPort) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
 
-    Job updateNetworkPortTemplateAttributes(String networkPortTemplateId, Map<String, Object> updatedAttributes)
+    void updateNetworkPortTemplateAttributes(String networkPortTemplateId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-    Job deleteNetworkPortTemplate(String networkPortTemplateId) throws ResourceNotFoundException, CloudProviderException;
+    void deleteNetworkPortTemplate(String networkPortTemplateId) throws ResourceNotFoundException, CloudProviderException;
 
-    // ForwardingGroup template operations
+    // ForwardingGroupTemplate operations
 
-    Job createForwardingGroupTemplate(ForwardingGroupTemplate forwardingGroupTemplate) throws InvalidRequestException,
-        CloudProviderException;
+    ForwardingGroupTemplate createForwardingGroupTemplate(ForwardingGroupTemplate forwardingGroupTemplate)
+        throws InvalidRequestException, CloudProviderException;
+
+    List<ForwardingGroupTemplate> getForwardingGroupTemplates() throws CloudProviderException;
 
     ForwardingGroupTemplate getForwardingGroupTemplateById(String forwardingGroupTemplateId) throws ResourceNotFoundException;
 
@@ -212,18 +233,52 @@ public interface INetworkManager {
     List<ForwardingGroupTemplate> getForwardingGroupTemplates(List<String> attributes, String filterExpression)
         throws InvalidRequestException, CloudProviderException;
 
-    Job updateForwardingGroupTemplate(ForwardingGroupTemplate forwardingGroupTemplate) throws ResourceNotFoundException,
+    void updateForwardingGroupTemplate(ForwardingGroupTemplate forwardingGroupTemplate) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
-    Job updateForwardingGroupTemplateAttributes(String forwardingGroupTemplateId, Map<String, Object> updatedAttributes)
+    void updateForwardingGroupTemplateAttributes(String forwardingGroupTemplateId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-    Job deleteForwardingGroupTemplate(String forwardingGroupTemplateId) throws ResourceNotFoundException,
+    void deleteForwardingGroupTemplate(String forwardingGroupTemplateId) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    // ForwardingGroup operations
+
+    Job createForwardingGroup(ForwardingGroupCreate forwardingGroupCreate) throws InvalidRequestException,
+        CloudProviderException;
+
+    List<ForwardingGroup> getForwardingGroups() throws CloudProviderException;
+
+    ForwardingGroup getForwardingGroupById(String forwardingGroupId) throws ResourceNotFoundException;
+
+    ForwardingGroup getForwardingGroupAttributes(final String forwardingGroupId, List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException;
+
+    List<ForwardingGroup> getForwardingGroups(int first, int last, List<String> attributes) throws InvalidRequestException,
+        CloudProviderException;
+
+    List<ForwardingGroup> getForwardingGroups(List<String> attributes, String filterExpression) throws InvalidRequestException,
+        CloudProviderException;
+
+    Job updateForwardingGroup(ForwardingGroup forwardingGroup) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException;
+
+    Job updateForwardingGroupAttributes(String forwardingGroupId, Map<String, Object> updatedAttributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
+
+    Job deleteForwardingGroup(String forwardingGroupId) throws ResourceNotFoundException, CloudProviderException;
+
+    Job addNetworkToForwardingGroup(String forwardingGroupId, String networkId) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    Job removeNetworkFromForwardingGroup(String forwardingGroupId, String networkId) throws ResourceNotFoundException,
         CloudProviderException;
 
     // Address operations
 
     Job createAddress(AddressCreate addressCreate) throws InvalidRequestException, CloudProviderException;
+
+    List<Address> getAddresses() throws CloudProviderException;
 
     Address getAddressById(String addressId) throws ResourceNotFoundException;
 
@@ -245,25 +300,30 @@ public interface INetworkManager {
 
     // AddressTemplate operations
 
-    Job createAddressTemplate(AddressTemplate addressTemplate) throws InvalidRequestException, CloudProviderException;
+    AddressTemplate createAddressTemplate(AddressTemplate addressTemplate) throws InvalidRequestException,
+        CloudProviderException;
+
+    List<AddressTemplate> getAddressTemplates() throws CloudProviderException;
 
     AddressTemplate getAddressTemplateById(String addressTemplateId) throws ResourceNotFoundException;
 
     AddressTemplate getAddressTemplateAttributes(final String addressTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
 
-    List<AddressTemplate> getAddressTemplatees(int first, int last, List<String> attributes) throws InvalidRequestException,
+    List<AddressTemplate> getAddressTemplates(int first, int last, List<String> attributes) throws InvalidRequestException,
         CloudProviderException;
 
-    List<AddressTemplate> getAddressTemplatees(List<String> attributes, String filterExpression)
-        throws InvalidRequestException, CloudProviderException;
-
-    Job updateAddressTemplate(AddressTemplate addressTemplate) throws ResourceNotFoundException, InvalidRequestException,
+    List<AddressTemplate> getAddressTemplates(List<String> attributes, String filterExpression) throws InvalidRequestException,
         CloudProviderException;
 
-    Job updateAddressTemplateAttributes(String addressTemplateId, Map<String, Object> updatedAttributes)
+    void updateAddressTemplate(AddressTemplate addressTemplate) throws ResourceNotFoundException, InvalidRequestException,
+        CloudProviderException;
+
+    void updateAddressTemplateAttributes(String addressTemplateId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-    Job deleteAddressTemplate(String addressTemplateId) throws ResourceNotFoundException, CloudProviderException;
+    void deleteAddressTemplate(String addressTemplateId) throws ResourceNotFoundException, CloudProviderException;
+
+    boolean jobCompletionHandler(final Job job);
 
 }

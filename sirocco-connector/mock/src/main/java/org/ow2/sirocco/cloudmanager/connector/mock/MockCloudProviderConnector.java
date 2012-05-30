@@ -37,11 +37,14 @@ import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
+import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
@@ -51,10 +54,13 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMT;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface.InterfaceState;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -67,7 +73,7 @@ import org.ow2.util.log.LogFactory;
 import com.google.common.util.concurrent.ListenableFuture;
 
 public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, IVolumeService,
-    IImageService {
+    INetworkService, IImageService {
 
     private static Log logger = LogFactory.getLog(MockCloudProviderConnector.class);
 
@@ -86,6 +92,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     private Map<String, VolumeImage> volumeImages = new ConcurrentHashMap<String, VolumeImage>();
 
     private Map<String, Machine> machines = new ConcurrentHashMap<String, Machine>();
+
+    private Map<String, Network> networks = new ConcurrentHashMap<String, Network>();
+
+    private Map<String, NetworkPort> networkPorts = new ConcurrentHashMap<String, NetworkPort>();
+
+    private Map<String, ForwardingGroup> forwardingGroups = new ConcurrentHashMap<String, ForwardingGroup>();
 
     public MockCloudProviderConnector(final MockCloudProviderConnectorFactory mockCloudProviderConnectorFactory,
         final CloudProviderAccount cloudProviderAccount, final CloudProviderLocation cloudProviderLocation) {
@@ -127,6 +139,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public IImageService getImageService() throws ConnectorException {
+        return this;
+    }
+
+    @Override
+    public INetworkService getNetworkService() throws ConnectorException {
         return this;
     }
 
@@ -222,22 +239,19 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         diskCollection.setItems(disks);
         machine.setDisks(diskCollection);
 
-        
         if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
             for (NetworkInterface networkInterface : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
                 NetworkInterfaceMachine newNetIntf = new NetworkInterfaceMachine();
-                // TODO 
+                // TODO
                 newNetIntf.setAddresses(networkInterface.getAddresses());
-                
 
                 newNetIntf.setMacAddress("00:11:22:33:44:55");
-             
+
                 newNetIntf.setState(InterfaceState.STANDBY);
-                
+
                 machine.addNetworkInterface(newNetIntf);
             }
         }
-       
 
         final Callable<Machine> createTask = new Callable<Machine>() {
             @Override
@@ -581,6 +595,347 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
         return this.mockCloudProviderConnectorFactory.getJobManager().newJob(volumeImage, null, "delete", result);
+    }
+
+    @Override
+    public Job createNetwork(final NetworkCreate networkCreate) throws ConnectorException {
+        final ForwardingGroup fg;
+        if (networkCreate.getNetworkTemplate().getForwardingGroup() != null) {
+            String forwardingGroupId = networkCreate.getNetworkTemplate().getForwardingGroup().getProviderAssignedId();
+            fg = this.forwardingGroups.get(forwardingGroupId);
+            if (fg == null) {
+                throw new ConnectorException("Unknown forwarding group with id=" + forwardingGroupId);
+            }
+        } else {
+            fg = null;
+        }
+        final String networkProviderAssignedId = UUID.randomUUID().toString();
+        final Network network = new Network();
+        network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
+        network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
+        network.setProviderAssignedId(networkProviderAssignedId);
+        network.setForwardingGroup(fg);
+        network.setNetworkPorts(new ArrayList<NetworkPort>());
+        this.networks.put(networkProviderAssignedId, network);
+        network.setState(Network.State.CREATING);
+
+        final Callable<Network> createTask = new Callable<Network>() {
+            @Override
+            public Network call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                network.setState(Network.State.STARTED);
+                if (fg != null) {
+                    fg.getNetworks().add(network);
+                }
+                return network;
+            }
+        };
+
+        ListenableFuture<Network> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(network, null, "add", result);
+    }
+
+    @Override
+    public Network getNetwork(final String networkId) throws ConnectorException {
+        return this.networks.get(networkId);
+    }
+
+    @Override
+    public Job deleteNetwork(final String networkId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Deleting network with providerAssignedId " + networkId);
+        Network network = this.networks.get(networkId);
+        if (network == null) {
+            throw new ConnectorException("Network " + networkId + " doesn't exist");
+        }
+        network.setState(Network.State.DELETING);
+        final Callable<Void> deleteTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                MockCloudProviderConnector.this.networks.remove(networkId);
+                MockCloudProviderConnector.logger.info("Network " + networkId + " deleted");
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(network, null, "delete", result);
+    }
+
+    @Override
+    public Job startNetwork(final String networkId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Starting network with providerAssignedId " + networkId);
+        final Network network = this.networks.get(networkId);
+        if (network == null) {
+            throw new ConnectorException("Network " + networkId + " doesn't exist");
+        }
+        if (network.getState() != Network.State.STOPPED) {
+            throw new ConnectorException("Illegal operation");
+        }
+        network.setState(Network.State.STARTING);
+        final Callable<Void> deleteTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                network.setState(Network.State.STARTED);
+                MockCloudProviderConnector.logger.info("Network " + networkId + " started");
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(network, null, "start", result);
+    }
+
+    @Override
+    public Job stopNetwork(final String networkId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Stopping network with providerAssignedId " + networkId);
+        final Network network = this.networks.get(networkId);
+        if (network == null) {
+            throw new ConnectorException("Network " + networkId + " doesn't exist");
+        }
+        if (network.getState() != Network.State.STARTED) {
+            throw new ConnectorException("Illegal operation");
+        }
+        network.setState(Network.State.STOPPING);
+        final Callable<Void> deleteTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                network.setState(Network.State.STOPPED);
+                MockCloudProviderConnector.logger.info("Network " + networkId + " stopped");
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(network, null, "stop", result);
+    }
+
+    @Override
+    public Job createNetworkPort(final NetworkPortCreate networkPortCreate) throws ConnectorException {
+        if (networkPortCreate.getNetworkPortTemplate().getNetwork() == null) {
+            throw new ConnectorException("Wrong network port template: null network");
+        }
+        final Network network;
+        String networkId = networkPortCreate.getNetworkPortTemplate().getNetwork().getProviderAssignedId();
+        network = this.networks.get(networkId);
+        if (network == null) {
+            throw new ConnectorException("Unknown network with id=" + networkId);
+        }
+        final String networkPortProviderAssignedId = UUID.randomUUID().toString();
+        final NetworkPort networkPort = new NetworkPort();
+        networkPort.setClassOfService(networkPortCreate.getNetworkPortTemplate().getNetworkPortConfig().getClassOfService());
+        networkPort.setPortType(networkPortCreate.getNetworkPortTemplate().getNetworkPortConfig().getPortType());
+        networkPort.setProviderAssignedId(networkPortProviderAssignedId);
+        this.networkPorts.put(networkPortProviderAssignedId, networkPort);
+        networkPort.setState(NetworkPort.State.CREATING);
+
+        final Callable<NetworkPort> createTask = new Callable<NetworkPort>() {
+            @Override
+            public NetworkPort call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                networkPort.setState(NetworkPort.State.STARTED);
+                networkPort.setNetwork(network);
+                network.getNetworkPorts().add(networkPort);
+                return networkPort;
+            }
+        };
+
+        ListenableFuture<NetworkPort> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(networkPort, null, "add", result);
+    }
+
+    @Override
+    public NetworkPort getNetworkPort(final String networkPortId) throws ConnectorException {
+        return this.networkPorts.get(networkPortId);
+    }
+
+    @Override
+    public Job deleteNetworkPort(final String networkPortId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Deleting network port with providerAssignedId " + networkPortId);
+        NetworkPort networkPort = this.networkPorts.get(networkPortId);
+        if (networkPort == null) {
+            throw new ConnectorException("NetworkPort " + networkPortId + " doesn't exist");
+        }
+        networkPort.setState(NetworkPort.State.DELETING);
+        final Callable<Void> deleteTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                MockCloudProviderConnector.this.networkPorts.remove(networkPortId);
+                MockCloudProviderConnector.logger.info("NetworkPort " + networkPortId + " deleted");
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(networkPort, null, "delete", result);
+    }
+
+    @Override
+    public Job startNetworkPort(final String networkPortId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Starting network port with providerAssignedId " + networkPortId);
+        final NetworkPort networkPort = this.networkPorts.get(networkPortId);
+        if (networkPort == null) {
+            throw new ConnectorException("Network " + networkPortId + " doesn't exist");
+        }
+        if (networkPort.getState() != NetworkPort.State.STOPPED) {
+            throw new ConnectorException("Illegal operation");
+        }
+        networkPort.setState(NetworkPort.State.STARTING);
+        final Callable<Void> deleteTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                networkPort.setState(NetworkPort.State.STARTED);
+                MockCloudProviderConnector.logger.info("NetworkPort " + networkPortId + " started");
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(networkPort, null, "start", result);
+    }
+
+    @Override
+    public Job stopNetworkPort(final String networkPortId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Stopping network port with providerAssignedId " + networkPortId);
+        final NetworkPort networkPort = this.networkPorts.get(networkPortId);
+        if (networkPort == null) {
+            throw new ConnectorException("Network " + networkPortId + " doesn't exist");
+        }
+        if (networkPort.getState() != NetworkPort.State.STARTED) {
+            throw new ConnectorException("Illegal operation");
+        }
+        networkPort.setState(NetworkPort.State.STOPPING);
+        final Callable<Void> deleteTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                networkPort.setState(NetworkPort.State.STOPPED);
+                MockCloudProviderConnector.logger.info("NetworkPort " + networkPortId + " stopped");
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(networkPort, null, "stop", result);
+    }
+
+    @Override
+    public Job createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws ConnectorException {
+        final List<Network> networksToAdd = new ArrayList<Network>();
+        if (forwardingGroupCreate.getForwardingGroupTemplate().getNetworks() != null) {
+            for (Network net : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
+                String netId = net.getProviderAssignedId();
+                Network providerNetwork = this.networks.get(netId);
+                if (providerNetwork == null) {
+                    throw new ConnectorException("Unknown network with id " + netId);
+                }
+                networksToAdd.add(providerNetwork);
+            }
+        }
+        final String forwardingGroupProviderAssignedId = UUID.randomUUID().toString();
+        final ForwardingGroup forwardingGroup = new ForwardingGroup();
+        forwardingGroup.setProviderAssignedId(forwardingGroupProviderAssignedId);
+        forwardingGroup.setNetworks(new ArrayList<Network>());
+        this.forwardingGroups.put(forwardingGroupProviderAssignedId, forwardingGroup);
+        forwardingGroup.setState(ForwardingGroup.State.CREATING);
+
+        final Callable<ForwardingGroup> createTask = new Callable<ForwardingGroup>() {
+            @Override
+            public ForwardingGroup call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                forwardingGroup.getNetworks().addAll(networksToAdd);
+                forwardingGroup.setState(ForwardingGroup.State.AVAILABLE);
+                return forwardingGroup;
+            }
+        };
+
+        ListenableFuture<ForwardingGroup> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(
+            createTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(forwardingGroup, null, "add", result);
+    }
+
+    @Override
+    public ForwardingGroup getForwardingGroup(final String forwardingGroupId) throws ConnectorException {
+        return this.forwardingGroups.get(forwardingGroupId);
+    }
+
+    @Override
+    public Job deleteForwardingGroup(final String forwardingGroupId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("Deleting forwarding group with providerAssignedId " + forwardingGroupId);
+        ForwardingGroup forwardingGroup = this.forwardingGroups.get(forwardingGroupId);
+        if (forwardingGroup == null) {
+            throw new ConnectorException("NetworkPort " + forwardingGroupId + " doesn't exist");
+        }
+        forwardingGroup.setState(ForwardingGroup.State.DELETING);
+        final Callable<Void> deleteTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                MockCloudProviderConnector.this.forwardingGroups.remove(forwardingGroupId);
+                MockCloudProviderConnector.logger.info("ForwardingGroup " + forwardingGroupId + " deleted");
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(deleteTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(forwardingGroup, null, "delete", result);
+    }
+
+    @Override
+    public Job addNetworkToForwardingGroup(final String forwardingGroupId, final String networkId) throws ConnectorException {
+        final ForwardingGroup forwardingGroup = this.forwardingGroups.get(forwardingGroupId);
+        if (forwardingGroup == null) {
+            throw new ConnectorException("NetworkPort " + forwardingGroupId + " doesn't exist");
+        }
+        final Network network = this.networks.get(networkId);
+        if (network == null) {
+            throw new ConnectorException("Unknown network with id=" + networkId);
+        }
+        final Callable<Void> attachTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                forwardingGroup.getNetworks().add(network);
+                MockCloudProviderConnector.logger.info("Added network to ForwardingGroup " + forwardingGroupId);
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(attachTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(forwardingGroup, network, "add", result);
+    }
+
+    @Override
+    public Job removeNetworkFromForwardingGroup(final String forwardingGroupId, final String networkId)
+        throws ConnectorException {
+        final ForwardingGroup forwardingGroup = this.forwardingGroups.get(forwardingGroupId);
+        if (forwardingGroup == null) {
+            throw new ConnectorException("NetworkPort " + forwardingGroupId + " doesn't exist");
+        }
+        final Network network = this.networks.get(networkId);
+        if (network == null) {
+            throw new ConnectorException("Unknown network with id=" + networkId);
+        }
+        if (!forwardingGroup.getNetworks().contains(network)) {
+            throw new ConnectorException("Network with id=" + networkId + " is not a member of forwarding group with id="
+                + forwardingGroupId);
+        }
+        final Callable<Void> attachTask = new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                forwardingGroup.getNetworks().remove(network);
+                MockCloudProviderConnector.logger.info("Removed Network from ForwardingGroup " + forwardingGroupId);
+                return null;
+            }
+        };
+
+        ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(attachTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(forwardingGroup, network, "delete", result);
     }
 
 }

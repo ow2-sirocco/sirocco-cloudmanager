@@ -48,12 +48,16 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 
@@ -72,6 +76,9 @@ public class JobCompletionHandlerBean implements MessageListener {
 
     @EJB
     private IMachineManager machineManager;
+
+    @EJB
+    private INetworkManager networkManager;
 
     @EJB
     private ISystemManager systemManager;
@@ -97,6 +104,9 @@ public class JobCompletionHandlerBean implements MessageListener {
                 done = this.machineManager.jobCompletionHandler(providerJob);
             } else if ((targetEntity instanceof Volume) || (targetEntity instanceof VolumeImage)) {
                 done = this.volumeManager.jobCompletionHandler(providerJob);
+            } else if ((targetEntity instanceof Network) || (targetEntity instanceof NetworkPort)
+                || (targetEntity instanceof ForwardingGroup)) {
+                done = this.networkManager.jobCompletionHandler(providerJob);
             } else if (targetEntity instanceof MachineImage) {
             } else if (providerJob.getAction().startsWith("system")) {
                 done = this.systemManager.completionHandler(providerJob);

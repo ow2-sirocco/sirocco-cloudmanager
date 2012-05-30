@@ -31,13 +31,18 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
+@NamedQueries(value = {@NamedQuery(name = "GET_NETWORKPORT_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM NetworkPort n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
 public class NetworkPort extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static final String GET_NETWORKPORT_BY_PROVIDER_ASSIGNED_ID = "GET_NETWORKPORT_BY_PROVIDER_ASSIGNED_ID";
 
     public static enum State {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, DELETING, DELETED, ERROR

@@ -29,13 +29,43 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+
+@NamedQueries(value = {@NamedQuery(name = "GET_FORWARDINGGROUP_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM ForwardingGroup n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
 public class ForwardingGroup extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    public static final String GET_FORWARDINGGROUP_BY_PROVIDER_ASSIGNED_ID = "GET_FORWARDINGGROUP_BY_PROVIDER_ASSIGNED_ID";
+
+    public static enum State {
+        CREATING, AVAILABLE, DELETING, DELETED, ERROR
+    }
+
+    private CloudProviderAccount cloudProviderAccount;
+
+    private CloudProviderLocation location;
+
+    private State state;
+
     private List<Network> networks;
+
+    @Enumerated(EnumType.STRING)
+    public State getState() {
+        return this.state;
+    }
+
+    public void setState(final State state) {
+        this.state = state;
+    }
 
     @OneToMany
     public List<Network> getNetworks() {
@@ -44,6 +74,24 @@ public class ForwardingGroup extends CloudResource implements Serializable {
 
     public void setNetworks(final List<Network> networks) {
         this.networks = networks;
+    }
+
+    @ManyToOne
+    public CloudProviderAccount getCloudProviderAccount() {
+        return this.cloudProviderAccount;
+    }
+
+    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
+        this.cloudProviderAccount = cloudProviderAccount;
+    }
+
+    @ManyToOne
+    public CloudProviderLocation getLocation() {
+        return this.location;
+    }
+
+    public void setLocation(final CloudProviderLocation location) {
+        this.location = location;
     }
 
 }

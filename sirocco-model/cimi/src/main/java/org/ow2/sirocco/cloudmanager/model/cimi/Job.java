@@ -30,6 +30,9 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -70,6 +73,7 @@ public class Job extends CloudEntity implements Serializable {
     public Job() {
     }
 
+    @Enumerated(EnumType.STRING)
     public Status getStatus() {
         return this.status;
     }
@@ -162,7 +166,7 @@ public class Job extends CloudEntity implements Serializable {
         this.location = location;
     }
 
-    @OneToMany
+    @ManyToMany
     public List<CloudResource> getAffectedEntities() {
         return this.affectedEntities;
     }

@@ -40,6 +40,8 @@ public interface ICloudProviderConnector {
 
     IImageService getImageService() throws ConnectorException;
 
+    INetworkService getNetworkService() throws ConnectorException;
+
     ISystemService getSystemService() throws ConnectorException;
 
     void setNotificationOnJobCompletion(final String jobId) throws ConnectorException;

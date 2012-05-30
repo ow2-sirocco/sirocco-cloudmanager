@@ -32,15 +32,19 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
+@NamedQueries(value = {@NamedQuery(name = "GET_NETWORK_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM Network n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
 public class Network extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static final String GET_NETWORK_BY_PROVIDER_ASSIGNED_ID = "GET_NETWORK_BY_PROVIDER_ASSIGNED_ID";
 
     public static enum State {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, DELETING, DELETED, ERROR
@@ -122,7 +126,7 @@ public class Network extends CloudResource implements Serializable {
         this.networkPorts = networkPorts;
     }
 
-    @OneToOne
+    @ManyToOne
     public ForwardingGroup getForwardingGroup() {
         return this.forwardingGroup;
     }
