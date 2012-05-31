@@ -52,7 +52,7 @@
 			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
 			<param-value>true</param-value>
 		</init-param>
-		<!-- Format serialized data-->
+		<!-- Format serialized data -->
 		<init-param>
 			<param-name>com.sun.jersey.config.feature.Formatted</param-name>
 			<param-value>true</param-value>
@@ -63,6 +63,25 @@
 		<servlet-name>SiroccoRestCimiServlet</servlet-name>
 		<url-pattern>/cimi/*</url-pattern>
 	</servlet-mapping>
+
+	<security-constraint>
+		<web-resource-collection>
+			<web-resource-name>Secure CIMI Content</web-resource-name>
+			<url-pattern>/cimi/*</url-pattern>
+		</web-resource-collection>
+		<auth-constraint>
+			<role-name>sirocco-user</role-name>
+		</auth-constraint>
+	</security-constraint>
+
+	<security-role>
+		<role-name>sirocco-user</role-name>
+	</security-role>
+
+	<login-config>
+		<auth-method>BASIC</auth-method>
+	</login-config>
+
 </web-app>
 
 

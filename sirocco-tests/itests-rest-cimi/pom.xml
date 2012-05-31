@@ -41,7 +41,8 @@
 		<cargo.version>1.1.4</cargo.version>
 		<jonas.root>${project.build.directory}/jonas-full-${ow2.jonas.version}</jonas.root>
 		<jonas.base>${project.build.directory}/jonas-base</jonas.base>
-		<dbunit.file>target/db/sirocco.xml</dbunit.file>
+		<dbunit.file>${project.build.directory}/db/sirocco.xml</dbunit.file>
+		<jaas.config.file>${basedir}/src/test/resources/jaas.config</jaas.config.file>
 	</properties>
 
 	<dependencies>
@@ -134,6 +135,13 @@
 			<version>1.12</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.ow2.jonas</groupId>
+			<artifactId>jonas-client</artifactId>
+			<version>${ow2.jonas.version}</version>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
 	<profiles>
@@ -337,7 +345,6 @@
 										<typedef resource="org/ow2/jonas/ant/antlib.xml" classpath="${jonas.root}/lib/common/ow_jonas_ant.jar" />
 
 										<jonasbase jonasRoot="${jonas.root}" destDir="${jonas.base}" update="off">
-											<!--<jonasProperties services="db,resource,ejb3,depmonitor" /> -->
 											<services names="jtm,db,security,resource,ejb3,validation,web,ear,depmonitor" />
 											<webcontainer ondemandenabled="false">
 												<tomcat>
@@ -376,7 +383,7 @@
 										</copy>
 
 										<replace file="${jonas.base}/conf/initial-repositories.xml" token="@local.repository@" value="${project.build.directory}/repository" />
-
+									
 									</tasks>
 								</configuration>
 								<goals>
@@ -576,6 +583,10 @@
 										<property>
 											<name>dbunit.dataset</name>
 											<value>${dbunit.file}</value>
+										</property>
+										<property>
+											<name>jaas.config.file</name>
+											<value>${jaas.config.file}</value>
 										</property>
 									</systemProperties>
 								</configuration>
