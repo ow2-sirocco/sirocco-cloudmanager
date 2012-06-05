@@ -136,6 +136,9 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     private void setUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
         this.user = this.userManager.getUserByUsername(username);
+        if (this.user == null) {
+            throw new CloudProviderException("User " + username + " unknown");
+        }
     }
 
     private List<CloudProvider> selectCloudProviders(final MachineTemplate mt) {

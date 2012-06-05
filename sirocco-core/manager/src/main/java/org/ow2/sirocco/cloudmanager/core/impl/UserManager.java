@@ -176,7 +176,12 @@ public class UserManager implements IUserManager {
         List<User> l = this.em.createQuery("FROM User u WHERE u.username=:usrname").setParameter("usrname", userName)
             .getResultList();
 
-        return l.get(0);
+        if (!l.isEmpty()) {
+            return l.get(0);
+        } else {
+            UserManager.logger.info("User " + userName + " unknown");
+            return null;
+        }
     }
 
     @Override
