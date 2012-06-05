@@ -47,7 +47,7 @@
 
 	<properties>
 		<product.name>Sirocco</product.name>
-		<ow2.jonas.version>5.2.2</ow2.jonas.version>
+		<ow2.jonas.version>5.2.3</ow2.jonas.version>
 	</properties>
 
 	<modules>
@@ -149,35 +149,7 @@
 
 		</plugins>
 
-		<extensions>
-			<extension>
-				<groupId>org.apache.maven.wagon</groupId>
-				<artifactId>wagon-ssh-external</artifactId>
-				<version>1.0-beta-6</version>
-			</extension>
-		</extensions>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>OrangeOpenCloud</id>
-			<properties>
-				<product.name>OrangeOpenCloud</product.name>
-			</properties>
-		</profile>
-		<profile>
-			<id>lab-test</id>
-			<distributionManagement>
-				<snapshotRepository>
-					<uniqueVersion>false</uniqueVersion>
-					<id>lab-repository</id>
-					<name>Lab Repository</name>
-					<url>scpexe://p-sirocco/opt/maven-repository</url>
-					<layout>default</layout>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-	</profiles>
 
 	<scm>
 		<connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/sirocco//cloudmanager/trunk</connection>
