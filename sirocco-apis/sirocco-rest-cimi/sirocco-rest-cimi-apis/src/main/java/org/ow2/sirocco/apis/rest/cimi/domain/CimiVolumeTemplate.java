@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -37,7 +35,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "volumeTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeTemplate extends CimiCommonId implements Serializable {
+public class CimiVolumeTemplate extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -48,6 +46,22 @@ public class CimiVolumeTemplate extends CimiCommonId implements Serializable {
      * Field "volumeConfig".
      */
     private CimiVolumeConfiguration volumeConfig;
+
+    /**
+     * Default constructor.
+     */
+    public CimiVolumeTemplate() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiVolumeTemplate(final String href) {
+        super(href);
+    }
 
     /**
      * Return the value of field "volumeConfig".
@@ -87,12 +101,11 @@ public class CimiVolumeTemplate extends CimiCommonId implements Serializable {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl#hasValues()
      */
     @Override
     public boolean hasValues() {
         // TODO Auto-generated method stub
         return false;
     }
-
 }

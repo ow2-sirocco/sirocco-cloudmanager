@@ -40,7 +40,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
  * </ul>
  * </p>
  */
-public class CpuConverter implements EntityConverter {
+public class CpuConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
@@ -57,7 +57,7 @@ public class CpuConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -81,7 +81,7 @@ public class CpuConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */

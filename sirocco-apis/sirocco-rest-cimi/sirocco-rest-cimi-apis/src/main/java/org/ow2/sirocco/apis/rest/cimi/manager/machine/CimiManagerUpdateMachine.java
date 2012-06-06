@@ -24,10 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -48,19 +47,18 @@ public class CimiManagerUpdateMachine extends CimiManagerUpdateAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out;
-        CimiSelect select = request.getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.updateMachine((Machine) dataService);
         } else {
-            out = this.manager.updateMachineAttributes(request.getId(), select.dispatchAttributesValues(dataService));
+            out = this.manager.updateMachineAttributes(context.getRequest().getId(),
+                select.dispatchAttributesValues(dataService));
         }
         return out;
     }
@@ -71,13 +69,11 @@ public class CimiManagerUpdateMachine extends CimiManagerUpdateAbstract {
      * Copy only common attributes.
      * </p>
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        return request.getContext().getRootConverter(CimiEntityType.Machine)
-            .toService(request.getContext(), request.getCimiData());
+    protected Object convertToDataService(final CimiContext context) throws Exception {
+        return context.getRootConverter(ResourceType.Machine).toService(context, context.getRequest().getCimiData());
     }
 
 }

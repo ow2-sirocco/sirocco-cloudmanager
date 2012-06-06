@@ -24,17 +24,15 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 
 public interface CimiManager {
 
     /**
-     * Execute request and call service.
+     * Execute request and call service with the data of context.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The current context of the REST request
      */
-    void execute(CimiRequest request, CimiResponse response);
+    void execute(CimiContext context);
 
 }

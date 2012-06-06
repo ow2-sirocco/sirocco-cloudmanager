@@ -24,56 +24,67 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeCollection.
- * <p>
+ * Collection of Volume.
  */
-@XmlRootElement(name = "volumeCollection")
+@XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeCollection extends CimiCommonId implements Serializable {
+public class CimiVolumeCollection extends CimiCollectionAbstract<CimiVolume> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "volumes".
-     */
-    private CimiVolume[] volumes;
-
-    /**
-     * Return the value of field "volumes".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
-    public CimiVolume[] getVolumes() {
-        return this.volumes;
-    }
-
-    /**
-     * Set the value of field "volumes".
-     * 
-     * @param volumes The value
-     */
-    public void setVolumes(final CimiVolume[] volumes) {
-        this.volumes = volumes;
+    @Override
+    @XmlElement(name = "Volume")
+    @JsonProperty(value = "volumes")
+    public CimiVolume[] getArray() {
+        return super.getArray();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+    @JsonProperty(value = "volumes")
+    public void setArray(final CimiVolume[] items) {
+        super.setArray(items);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiVolume> newCollection() {
+        return new CimiVolumeArray();
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiVolumeArray extends CimiArrayAbstract<CimiVolume> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public CimiVolume[] newEmptyArraySized() {
+            return new CimiVolume[this.size()];
+        }
+    }
 }

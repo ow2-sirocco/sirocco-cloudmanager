@@ -24,12 +24,11 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,36 +52,31 @@ public class CimiManagerCreateMachineImage extends CimiManagerCreateAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         return this.manager.createMachineImage((MachineImage) dataService);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        return request.getContext().getRootConverter(CimiEntityType.MachineImage)
-            .toService(request.getContext(), request.getCimiData());
+    protected Object convertToDataService(final CimiContext context) throws Exception {
+        return context.getRootConverter(ResourceType.MachineImage).toService(context, context.getRequest().getCimiData());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#beforeConvertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#beforeConvertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected void beforeConvertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        this.mergeReference.merge(request.getContext(), (CimiMachineImage) request.getCimiData());
+    protected void beforeConvertToDataService(final CimiContext context) throws Exception {
+        this.mergeReference.merge(context, (CimiMachineImage) context.getRequest().getCimiData());
     }
 }

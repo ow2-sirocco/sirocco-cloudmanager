@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineConfigurationCollection href="hrefValue_0">
-	<description>descriptionValue_0</description>
-	<name>nameValue_0</name>
-	<created>2000-01-01T00:00:00.000Z</created>
+<Collection href="hrefValue_0">
 	<id>idValue_0</id>
-	<updated>2000-01-01T00:00:00.000Z</updated>
-</MachineConfigurationCollection>
+</Collection>

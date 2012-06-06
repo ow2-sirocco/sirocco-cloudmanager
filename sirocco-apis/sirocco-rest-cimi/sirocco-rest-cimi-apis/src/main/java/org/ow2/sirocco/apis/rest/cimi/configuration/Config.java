@@ -28,12 +28,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 
 public class Config {
 
     /** Mapper by entity types. */
-    private Map<CimiEntityType, ItemConfig> byEntityTypes;
+    private Map<ResourceType, ItemConfig> byEntityTypes;
 
     /** Mapper by entity classes. */
     private Map<Class<?>, ItemConfig> byClasses;
@@ -51,7 +51,7 @@ public class Config {
      * Build configuration mapper.
      */
     protected void buildMappers(final List<ItemConfig> configs) {
-        this.byEntityTypes = new HashMap<CimiEntityType, ItemConfig>();
+        this.byEntityTypes = new HashMap<ResourceType, ItemConfig>();
         this.byClasses = new HashMap<Class<?>, ItemConfig>();
 
         for (ItemConfig item : configs) {
@@ -78,7 +78,7 @@ public class Config {
      * @param typeToFind The CimiEntityType to find
      * @return The item or null if type not found
      */
-    public ItemConfig find(final CimiEntityType typeToFind) {
+    public ItemConfig find(final ResourceType typeToFind) {
         return this.byEntityTypes.get(typeToFind);
     }
 }

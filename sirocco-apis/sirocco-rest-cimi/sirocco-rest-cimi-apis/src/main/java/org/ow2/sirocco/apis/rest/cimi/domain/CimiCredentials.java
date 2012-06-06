@@ -39,7 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
  */
 @XmlRootElement(name = "Credentials")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentials extends CimiCommonId {
+public class CimiCredentials extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -80,6 +80,7 @@ public class CimiCredentials extends CimiCommonId {
      * @param key The public key
      */
     public CimiCredentials(final String userName, final String password, final byte[] key) {
+        super();
         this.userName = userName;
         this.password = password;
         this.key = key;
@@ -135,7 +136,7 @@ public class CimiCredentials extends CimiCommonId {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl#hasValues()
      */
     @Override
     public boolean hasValues() {

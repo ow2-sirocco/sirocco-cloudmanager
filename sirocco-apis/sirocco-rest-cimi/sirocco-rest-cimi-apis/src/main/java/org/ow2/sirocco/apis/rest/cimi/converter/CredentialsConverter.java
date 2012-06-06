@@ -38,7 +38,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
  * </ul>
  * </p>
  */
-public class CredentialsConverter extends CommonIdConverter implements EntityConverter {
+public class CredentialsConverter extends ObjectCommonConverter implements ResourceConverter {
 
     /**
      * {@inheritDoc}
@@ -56,7 +56,7 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -80,7 +80,7 @@ public class CredentialsConverter extends CommonIdConverter implements EntityCon
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */

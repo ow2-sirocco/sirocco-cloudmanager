@@ -27,8 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.validator.constraints;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiHref;
-import org.ow2.sirocco.apis.rest.cimi.domain.PassingType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 
 /**
  * Implementation of {@link AssertEntityBy} validator.
@@ -54,16 +53,9 @@ public class AssertEntityByValidator implements ConstraintValidator<AssertEntity
         boolean valid = true;
         if (value != null) {
             valid = false;
-
-            PassingType type = ((CimiHref) value).getPassingType();
-            if (null != type) {
-                switch (type) {
-                case ByReference:
-                case ByValue:
-                case ByReferenceWithOverrides:
-                    valid = true;
-                    break;
-                }
+            CimiResource resource = (CimiResource) value;
+            if ((true == resource.hasReference()) || (true == resource.hasValues())) {
+                valid = true;
             }
         }
         return valid;

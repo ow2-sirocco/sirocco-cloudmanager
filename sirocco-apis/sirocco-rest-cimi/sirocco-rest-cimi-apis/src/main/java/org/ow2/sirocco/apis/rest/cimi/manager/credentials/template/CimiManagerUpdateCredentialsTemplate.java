@@ -24,10 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.credentials.template;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -48,18 +47,17 @@ public class CimiManagerUpdateCredentialsTemplate extends CimiManagerUpdateAbstr
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
-        CimiSelect select = request.getHeader().getCimiSelect();
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
+        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
             this.manager.updateCredentialsTemplate((CredentialsTemplate) dataService);
         } else {
-            this.manager.updateCredentialsTemplateAttributes(request.getId(), select.dispatchAttributesValues(dataService));
+            this.manager.updateCredentialsTemplateAttributes(context.getRequest().getId(),
+                select.dispatchAttributesValues(dataService));
         }
         return null;
     }
@@ -70,13 +68,12 @@ public class CimiManagerUpdateCredentialsTemplate extends CimiManagerUpdateAbstr
      * Copy only common attributes.
      * </p>
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
-        return request.getContext().getRootConverter(CimiEntityType.CredentialsTemplate)
-            .toService(request.getContext(), request.getCimiData());
+    protected Object convertToDataService(final CimiContext context) throws Exception {
+        return context.getRootConverter(ResourceType.CredentialsTemplate)
+            .toService(context, context.getRequest().getCimiData());
     }
 
 }

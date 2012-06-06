@@ -24,19 +24,17 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.configuration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,15 +54,13 @@ public class CimiManagerReadMachineConfigurationCollection extends CimiManagerRe
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = request.getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.getMachineConfigurationCollection();
         } else {
@@ -83,33 +79,30 @@ public class CimiManagerReadMachineConfigurationCollection extends CimiManagerRe
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
-        CimiMachineConfigurationCollection cimi = (CimiMachineConfigurationCollection) request.getContext()
-            .getRootConverter(CimiEntityType.MachineConfigurationCollection).toCimi(request.getContext(), dataService);
-        response.setCimiData(cimi);
-        response.setStatus(Response.Status.OK);
+    protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
+        CimiMachineConfigurationCollection cimi = (CimiMachineConfigurationCollection) context.getRootConverter(
+            ResourceType.MachineConfigurationCollection).toCimi(context, dataService);
+        context.getResponse().setCimiData(cimi);
+        context.getResponse().setStatus(Response.Status.OK);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected void afterConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService) {
-        super.afterConvertToResponse(request, response, dataService);
+    protected void afterConvertToResponse(final CimiContext context, final Object dataService) {
+        super.afterConvertToResponse(context, dataService);
 
-        CimiCommonId common = (CimiCommonId) response.getCimiData();
-        List<CimiOperation> ops = new ArrayList<CimiOperation>();
-        ops.add(new CimiOperation(Operation.ADD.getRel(), common.getId()));
-        common.setOperations(ops.toArray(new CimiOperation[ops.size()]));
+        CimiResource resource = (CimiResource) context.getResponse().getCimiData();
+
+        resource.add(new CimiOperation(Operation.ADD.getRel(), resource.getId()));
+
     }
 }

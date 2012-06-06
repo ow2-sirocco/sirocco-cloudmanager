@@ -25,8 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.template;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerDeleteAbstract;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -45,14 +44,12 @@ public class CimiManagerDeleteMachineTemplate extends CimiManagerDeleteAbstract 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
-        this.manager.deleteMachineTemplate(request.getId());
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
+        this.manager.deleteMachineTemplate(context.getRequest().getId());
         return null;
     }
 

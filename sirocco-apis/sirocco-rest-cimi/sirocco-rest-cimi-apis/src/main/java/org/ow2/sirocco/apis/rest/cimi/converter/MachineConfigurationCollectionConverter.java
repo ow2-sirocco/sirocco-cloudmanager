@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -43,7 +44,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
  * </ul>
  * </p>
  */
-public class MachineConfigurationCollectionConverter extends CommonIdConverter implements EntityConverter {
+public class MachineConfigurationCollectionConverter extends CollectionConverter {
+
     /**
      * {@inheritDoc}
      * 
@@ -60,7 +62,7 @@ public class MachineConfigurationCollectionConverter extends CommonIdConverter i
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
@@ -92,7 +94,7 @@ public class MachineConfigurationCollectionConverter extends CommonIdConverter i
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -115,11 +117,12 @@ public class MachineConfigurationCollectionConverter extends CommonIdConverter i
         if (true == context.mustBeExpanded(dataCimi)) {
             if ((null != dataService.getMachineConfigurations()) && (dataService.getMachineConfigurations().size() > 0)) {
                 CimiConverter converter = context.getConverter(CimiMachineConfiguration.class);
-                List<CimiMachineConfiguration> cimiList = new ArrayList<CimiMachineConfiguration>();
-                for (MachineConfiguration machineImage : dataService.getMachineConfigurations()) {
-                    cimiList.add((CimiMachineConfiguration) converter.toCimi(context, machineImage));
+                CimiArray<CimiMachineConfiguration> cimiList = dataCimi.newCollection();
+
+                for (MachineConfiguration serviceItem : dataService.getMachineConfigurations()) {
+                    cimiList.add((CimiMachineConfiguration) converter.toCimi(context, serviceItem));
                 }
-                dataCimi.setMachineConfigurations(cimiList.toArray(new CimiMachineConfiguration[cimiList.size()]));
+                dataCimi.setCollection(cimiList);
             }
         }
     }
@@ -133,14 +136,15 @@ public class MachineConfigurationCollectionConverter extends CommonIdConverter i
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineConfigurationCollection dataCimi,
         final MachineConfigurationCollection dataService) {
-        List<MachineConfiguration> listServicesImages = new ArrayList<MachineConfiguration>();
-        dataService.setMachineConfigurations(listServicesImages);
+        CimiArray<CimiMachineConfiguration> cimiList = dataCimi.getCollection();
+        if ((null != cimiList) && (cimiList.size() > 0)) {
+            List<MachineConfiguration> serviceList = new ArrayList<MachineConfiguration>();
+            dataService.setMachineConfigurations(serviceList);
 
-        CimiConverter converter = context.getConverter(CimiMachineConfiguration.class);
-        CimiMachineConfiguration[] images = dataCimi.getMachineConfigurations();
-        for (CimiMachineConfiguration cimiImage : images) {
-            listServicesImages.add((MachineConfiguration) converter.toService(context, cimiImage));
+            CimiConverter converter = context.getConverter(CimiMachineConfiguration.class);
+            for (CimiMachineConfiguration cimiItem : cimiList) {
+                serviceList.add((MachineConfiguration) converter.toService(context, cimiItem));
+            }
         }
     }
-
 }

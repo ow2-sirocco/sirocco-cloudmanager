@@ -93,18 +93,4 @@ public class CimiRequest {
         this.method = method;
     }
 
-    /**
-     * @return the context
-     */
-    public CimiContext getContext() {
-        return this.context;
-    }
-
-    /**
-     * @param context the context to set
-     */
-    public void setContext(final CimiContext context) {
-        this.context = context;
-    }
-
 }

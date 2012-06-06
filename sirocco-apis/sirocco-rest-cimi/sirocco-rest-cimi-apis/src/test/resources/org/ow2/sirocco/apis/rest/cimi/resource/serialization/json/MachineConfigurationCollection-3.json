@@ -1,14 +1,6 @@
 {
-	"name":"nameValue_3",
-	"description":"descriptionValue_3",
-	"properties":{
-		"keyProp_3_0":"valueProp_3_0",
-		"keyProp_3_2":"valueProp_3_2",
-		"keyProp_3_1":"valueProp_3_1"
-	},
 	"id":"idValue_3",
-	"created":"2003-04-04T03:03:03.003Z",
-	"updated":"2003-04-04T03:03:03.003Z",
+	"href":"hrefValue_3",
 	"operations":[
 		{
 			"rel":"relValue_3_0",
@@ -24,7 +16,6 @@
 		}
 		
 	],
-	"href":"hrefValue_3",
 	"machineConfigurations":[
 		{
 			"href":"hrefValue_3_0"

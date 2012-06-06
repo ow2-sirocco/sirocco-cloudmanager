@@ -27,7 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.ParentJob;
@@ -58,7 +58,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
  * </ul>
  * </p>
  */
-public class JobConverter extends CommonIdConverter implements EntityConverter {
+public class JobConverter extends ObjectCommonConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
@@ -75,7 +75,7 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -99,7 +99,7 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -157,7 +157,7 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
 
     protected String makeHrefTargetEntity(final CimiContext context, final Object targetDataService) {
         String href = null;
-        CimiEntityType targetType = this.findType(targetDataService);
+        ResourceType targetType = this.findType(targetDataService);
 
         href = context.makeHref(targetType, this.getTargetId(targetDataService));
         return href;
@@ -173,35 +173,35 @@ public class JobConverter extends CommonIdConverter implements EntityConverter {
         return id;
     }
 
-    protected CimiEntityType findType(final Object targetDataService) {
-        CimiEntityType type = null;
+    protected ResourceType findType(final Object targetDataService) {
+        ResourceType type = null;
         // TODO Complete with all service entities
         if (targetDataService instanceof CloudEntryPoint) {
-            type = CimiEntityType.CloudEntryPoint;
+            type = ResourceType.CloudEntryPoint;
         } else if (targetDataService instanceof Credentials) {
-            type = CimiEntityType.Credentials;
+            type = ResourceType.Credentials;
         } else if (targetDataService instanceof CredentialsTemplate) {
-            type = CimiEntityType.CredentialsTemplate;
+            type = ResourceType.CredentialsTemplate;
         } else if (targetDataService instanceof CredentialsCollection) {
-            type = CimiEntityType.CredentialsCollection;
+            type = ResourceType.CredentialsCollection;
         } else if (targetDataService instanceof Job) {
-            type = CimiEntityType.Job;
+            type = ResourceType.Job;
         } else if (targetDataService instanceof JobCollection) {
-            type = CimiEntityType.JobCollection;
+            type = ResourceType.JobCollection;
         } else if (targetDataService instanceof Machine) {
-            type = CimiEntityType.Machine;
+            type = ResourceType.Machine;
         } else if (targetDataService instanceof MachineTemplate) {
-            type = CimiEntityType.MachineTemplate;
+            type = ResourceType.MachineTemplate;
         } else if (targetDataService instanceof MachineCollection) {
-            type = CimiEntityType.MachineCollection;
+            type = ResourceType.MachineCollection;
         } else if (targetDataService instanceof MachineConfiguration) {
-            type = CimiEntityType.MachineConfiguration;
+            type = ResourceType.MachineConfiguration;
         } else if (targetDataService instanceof MachineConfigurationCollection) {
-            type = CimiEntityType.MachineConfigurationCollection;
+            type = ResourceType.MachineConfigurationCollection;
         } else if (targetDataService instanceof MachineImage) {
-            type = CimiEntityType.MachineImage;
+            type = ResourceType.MachineImage;
         } else if (targetDataService instanceof MachineImageCollection) {
-            type = CimiEntityType.MachineImageCollection;
+            type = ResourceType.MachineImageCollection;
         } else {
             throw new InvalidConversionException("Job conversion : target type not found");
         }

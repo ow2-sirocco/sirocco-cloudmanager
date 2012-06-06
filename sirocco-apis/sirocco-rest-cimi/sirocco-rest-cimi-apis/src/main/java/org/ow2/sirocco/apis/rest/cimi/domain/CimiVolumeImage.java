@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.codehaus.jackson.map.annotate.JsonSerialize;
@@ -36,7 +34,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "volumeImage")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeImage extends CimiCommonId implements Serializable {
+public class CimiVolumeImage extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -60,6 +58,22 @@ public class CimiVolumeImage extends CimiCommonId implements Serializable {
      * Field "bootable".
      */
     private Boolean bootable;
+
+    /**
+     * Default constructor.
+     */
+    public CimiVolumeImage() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiVolumeImage(final String href) {
+        super(href);
+    }
 
     /**
      * Return the value of field "state".
@@ -136,7 +150,7 @@ public class CimiVolumeImage extends CimiCommonId implements Serializable {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl#hasValues()
      */
     @Override
     public boolean hasValues() {

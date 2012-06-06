@@ -27,8 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
@@ -36,8 +35,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiCommon}</li>
- * <li>Service model: {@link CloudEntity}</li>
+ * <li>CIMI model: {@link CimiDataCommon}</li>
+ * <li>Service model: {@link Resource}</li>
  * </ul>
  * </p>
  */
@@ -49,7 +48,7 @@ public class CommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void fill(final Resource dataService, final CimiCommon dataCimi) {
+    protected void fill(final Resource dataService, final CimiDataCommon dataCimi) {
         dataCimi.setDescription(dataService.getDescription());
         dataCimi.setName(dataService.getName());
         if ((null != dataService.getProperties()) && (dataService.getProperties().size() > 0)) {
@@ -65,7 +64,7 @@ public class CommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void fill(final CimiCommon dataCimi, final Resource dataService) {
+    protected void fill(final CimiDataCommon dataCimi, final Resource dataService) {
         dataService.setDescription(dataCimi.getDescription());
         dataService.setName(dataCimi.getName());
         if (null != dataCimi.getProperties()) {

@@ -40,7 +40,7 @@ import org.ow2.sirocco.apis.rest.cimi.utils.CimiDateAdapter;
  */
 @XmlRootElement(name = "Job")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiJob extends CimiCommonId {
+public class CimiJob extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -94,6 +94,22 @@ public class CimiJob extends CimiCommonId {
      * Field "nestedJobs".
      */
     private NestedJob[] nestedJobs;
+
+    /**
+     * Default constructor.
+     */
+    public CimiJob() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiJob(final String href) {
+        super(href);
+    }
 
     /**
      * Return the value of field "targetEntity".

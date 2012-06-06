@@ -24,10 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+
 /**
  * Enumeration of all the entities used.
  */
-public enum CimiEntityType {
+public enum ResourceType {
     /** */
     CloudEntryPoint(PathType.CloudEntryPoint),
     /** */
@@ -46,16 +48,27 @@ public enum CimiEntityType {
     /** */
     MachineTemplate(PathType.MachineTemplate), MachineTemplateCollection(PathType.MachineTemplate);
 
-    /** The path type of the entity. */
+    /** The path type of the resource. */
     PathType pathType;
 
     /** Constructor. */
-    private CimiEntityType(final PathType pathType) {
+    private ResourceType(final PathType pathType) {
         this.pathType = pathType;
     }
 
     /**
-     * Get the path type of the entity.
+     * Get the type URI of the resource.
+     * 
+     * @return The type URI
+     */
+    public String getTypeURI() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(ConstantsPath.CIMI_XML_NAMESPACE).append('/').append(this.name());
+        return sb.toString();
+    }
+
+    /**
+     * Get the path type of the resource.
      * 
      * @return The path type
      */
@@ -63,4 +76,12 @@ public enum CimiEntityType {
         return this.pathType;
     }
 
+    /**
+     * Get the pathname of the resource.
+     * 
+     * @return The path
+     */
+    public String getPathname() {
+        return this.pathType.getPathname();
+    }
 }

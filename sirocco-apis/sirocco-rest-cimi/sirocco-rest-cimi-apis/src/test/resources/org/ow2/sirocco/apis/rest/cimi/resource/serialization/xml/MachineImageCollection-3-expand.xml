@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineImageCollection href="hrefValue_3">
+<Collection href="hrefValue_3">
 	<id>idValue_3</id>
-	<name>nameValue_3</name>
-	<description>descriptionValue_3</description>
-	<created>2003-04-04T03:03:03.003Z</created>
-	<updated>2003-04-04T03:03:03.003Z</updated>
-	<property key="keyProp_3_0">valueProp_3_0</property>
-	<property key="keyProp_3_2">valueProp_3_2</property>
-	<property key="keyProp_3_1">valueProp_3_1</property>
-	<machineImage href="hrefValue_3_0">
+	<MachineImage href="hrefValue_3_0">
 		<id>idValue_3_0</id>
 		<name>nameValue_3_0</name>
 		<description>descriptionValue_3_0</description>
@@ -23,8 +16,8 @@
 		<operation href="hrefValue_3_0" rel="relValue_3_0" />
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
-	</machineImage>
-	<machineImage href="hrefValue_3_1">
+	</MachineImage>
+	<MachineImage href="hrefValue_3_1">
 		<id>idValue_3_1</id>
 		<name>nameValue_3_1</name>
 		<description>descriptionValue_3_1</description>
@@ -39,8 +32,8 @@
 		<operation href="hrefValue_3_0" rel="relValue_3_0" />
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
-	</machineImage>
-	<machineImage href="hrefValue_3_2">
+	</MachineImage>
+	<MachineImage href="hrefValue_3_2">
 		<id>idValue_3_2</id>
 		<name>nameValue_3_2</name>
 		<description>descriptionValue_3_2</description>
@@ -55,8 +48,8 @@
 		<operation href="hrefValue_3_0" rel="relValue_3_0" />
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
-	</machineImage>
+	</MachineImage>
 	<operation href="hrefValue_3_0" rel="relValue_3_0" />
 	<operation href="hrefValue_3_1" rel="relValue_3_1" />
 	<operation href="hrefValue_3_2" rel="relValue_3_2" />
-</MachineImageCollection>
+</Collection>

@@ -53,16 +53,12 @@ public class CimiVolumeMachine implements Serializable {
      */
     private CimiVolume volume;
 
-    // ---------------------------------------- Constructors
-
     /**
      * Default constructor.
      */
     public CimiVolumeMachine() {
         super();
     }
-
-    // ---------------------------------------- ???com-accesseurs???
 
     /**
      * Return the value of field "attachmentPoint".

@@ -24,63 +24,67 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
- * Class CredentialsTemplateCollection.
+ * Collection of CredentialsTemplate.
  */
-@XmlRootElement(name = "CredentialsTemplateCollection")
+@XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsTemplateCollection extends CimiCommonId {
+public class CimiCredentialsTemplateCollection extends CimiCollectionAbstract<CimiCredentialsTemplate> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "CredentialsTemplates".
-     */
-    @JsonProperty
-    @Null(groups = {GroupWrite.class})
-    private CimiCredentialsTemplate[] credentialsTemplates;
-
-    /**
-     * Return the value of field "CredentialsTemplates".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
-    @XmlElement(name = "credentialsTemplate")
-    @JsonIgnore
-    public CimiCredentialsTemplate[] getCredentialsTemplates() {
-        return this.credentialsTemplates;
-    }
-
-    /**
-     * Set the value of field "CredentialsTemplates".
-     * 
-     * @param CredentialsTemplates The value
-     */
-    public void setCredentialsTemplates(final CimiCredentialsTemplate[] credentialsTemplates) {
-        this.credentialsTemplates = credentialsTemplates;
+    @Override
+    @XmlElement(name = "CredentialsTemplate")
+    @JsonProperty(value = "credentialsTemplates")
+    public CimiCredentialsTemplate[] getArray() {
+        return super.getArray();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    public boolean hasValues() {
-        boolean has = super.hasValues();
-        has = has || (null != this.getCredentialsTemplates());
-        return has;
+    @JsonProperty(value = "credentialsTemplates")
+    public void setArray(final CimiCredentialsTemplate[] items) {
+        super.setArray(items);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiCredentialsTemplate> newCollection() {
+        return new CimiCredentialsTemplateArray();
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiCredentialsTemplateArray extends CimiArrayAbstract<CimiCredentialsTemplate> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public CimiCredentialsTemplate[] newEmptyArraySized() {
+            return new CimiCredentialsTemplate[this.size()];
+        }
+    }
 }

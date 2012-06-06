@@ -40,9 +40,9 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
@@ -55,10 +55,12 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
 import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
@@ -89,9 +91,8 @@ public class ConverterTest {
     public void setUp() throws Exception {
 
         this.request = new CimiRequest();
-        this.request.setContext(new CimiContextImpl(this.request));
         this.request.setBaseUri("http://www.test.org/");
-        this.context = this.request.getContext();
+        this.context = new CimiContextImpl(this.request, new CimiResponse());
     }
 
     @Test
@@ -413,7 +414,7 @@ public class ConverterTest {
 
     @Test
     public void testCimiCommonFill() throws Exception {
-        CimiCommon cimi;
+        CimiDataCommon cimi;
         MachineImage service;
         CommonConverter converter = new CommonConverter();
 
@@ -466,10 +467,10 @@ public class ConverterTest {
     public void testCimiCommonIdFill() throws Exception {
         CimiMachineImage cimi;
         MachineImage service;
-        CommonIdConverter converter = new CommonIdConverter();
+        ObjectCommonConverter converter = new ObjectCommonConverter();
 
         // Force to test ID and HREF
-        this.context.getRootConverter(CimiEntityType.MachineImage);
+        this.context.getRootConverter(ResourceType.MachineImage);
 
         // Empty
         cimi = new CimiMachineImage();
@@ -489,8 +490,8 @@ public class ConverterTest {
 
         // Full
         cimi = new CimiMachineImage();
-        cimi.setId(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/13");
-        cimi.setHref(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/13");
+        cimi.setId(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/13");
+        cimi.setHref(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/13");
         cimi.setCreated(new Date());
         cimi.setUpdated(new Date());
         cimi.setOperations(new CimiOperation[] {new CimiOperation("rel", "href")});
@@ -510,19 +511,19 @@ public class ConverterTest {
         service.setUpdated(updated);
 
         converter.fill(this.context, service, cimi);
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/29",
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/29",
             cimi.getId());
         Assert.assertNull(cimi.getHref());
         Assert.assertEquals(created, cimi.getCreated());
         Assert.assertEquals(updated, cimi.getUpdated());
 
         // Force to test ID and HREF with mustBeReferenced = true
-        this.context.getRootConverter(CimiEntityType.MachineImageCollection);
+        this.context.getRootConverter(ResourceType.MachineImageCollection);
         // Full with mustBeReferenced = true
         converter.fill(this.context, service, cimi);
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/29",
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/29",
             cimi.getId());
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/29",
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/29",
             cimi.getHref());
         Assert.assertEquals(created, cimi.getCreated());
         Assert.assertEquals(updated, cimi.getUpdated());
@@ -534,7 +535,7 @@ public class ConverterTest {
         CimiCredentials cimi;
         Credentials service;
 
-        converter = this.context.getRootConverter(CimiEntityType.Credentials);
+        converter = this.context.getRootConverter(ResourceType.Credentials);
 
         // Empty Cimi -> Service
         service = (Credentials) converter.toService(this.context, new CimiCredentials());
@@ -570,7 +571,7 @@ public class ConverterTest {
         Assert.assertEquals("userName", cimi.getUserName());
         Assert.assertNull(cimi.getKey());
 
-        converter = this.context.getRootConverter(CimiEntityType.Credentials, true);
+        converter = this.context.getRootConverter(ResourceType.Credentials, true);
         cimi = (CimiCredentials) converter.toCimi(this.context, service);
         Assert.assertEquals("password", cimi.getPassword());
         Assert.assertEquals("userName", cimi.getUserName());
@@ -583,7 +584,7 @@ public class ConverterTest {
         CimiCredentialsTemplate cimi;
         CredentialsTemplate service;
 
-        converter = this.context.getRootConverter(CimiEntityType.CredentialsTemplate);
+        converter = this.context.getRootConverter(ResourceType.CredentialsTemplate);
 
         // Empty Cimi -> Service
         service = (CredentialsTemplate) converter.toService(this.context, new CimiCredentialsTemplate());
@@ -614,7 +615,7 @@ public class ConverterTest {
         service.setUserName("userName");
         service.setPublicKey(new byte[] {6, 7, 8, 9, 10, 11});
 
-        converter = this.context.getRootConverter(CimiEntityType.CredentialsTemplate, true);
+        converter = this.context.getRootConverter(ResourceType.CredentialsTemplate, true);
         cimi = (CimiCredentialsTemplate) converter.toCimi(this.context, service);
         Assert.assertEquals("password", cimi.getPassword());
         Assert.assertEquals("userName", cimi.getUserName());
@@ -627,7 +628,7 @@ public class ConverterTest {
         CimiCredentialsCreate cimi;
         CredentialsCreate service;
 
-        converter = this.context.getRootConverter(CimiEntityType.CredentialsCreate);
+        converter = this.context.getRootConverter(ResourceType.CredentialsCreate);
 
         // Empty Cimi -> Service
         service = (CredentialsCreate) converter.toService(this.context, new CimiCredentialsCreate());
@@ -647,7 +648,7 @@ public class ConverterTest {
         CimiJob cimi;
         Job service;
 
-        converter = this.context.getRootConverter(CimiEntityType.Job);
+        converter = this.context.getRootConverter(ResourceType.Job);
 
         // Empty Service -> Cimi
         cimi = (CimiJob) converter.toCimi(this.context, new Job());
@@ -683,13 +684,13 @@ public class ConverterTest {
         cimi = (CimiJob) converter.toCimi(this.context, service);
         Assert.assertEquals("action", cimi.getAction());
         Assert.assertEquals(Boolean.TRUE, cimi.getIsCancellable());
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.Job.getPathType().getPathname() + "/789", cimi
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.Job.getPathType().getPathname() + "/789", cimi
             .getParentJob().getHref());
         Assert.assertEquals(13, cimi.getProgress().intValue());
         Assert.assertEquals(11, cimi.getReturnCode().intValue());
         Assert.assertEquals(Job.Status.RUNNING.toString(), cimi.getStatus());
         Assert.assertEquals("statusMessage", cimi.getStatusMessage());
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.Machine.getPathType().getPathname() + "/321",
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.Machine.getPathType().getPathname() + "/321",
             cimi.getTargetEntity());
         Assert.assertEquals(timeOfStatusChange, cimi.getTimeOfStatusChange());
 
@@ -714,7 +715,7 @@ public class ConverterTest {
         Assert.assertNotNull(cimi.getNestedJobs());
         Assert.assertEquals(3, cimi.getNestedJobs().length);
         for (int i = 0; i < cimi.getNestedJobs().length; i++) {
-            Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.Job.getPathType().getPathname() + "/" + (i + 100),
+            Assert.assertEquals(this.request.getBaseUri() + ResourceType.Job.getPathType().getPathname() + "/" + (i + 100),
                 cimi.getNestedJobs()[i].getHref());
         }
     }
@@ -725,7 +726,7 @@ public class ConverterTest {
         CimiMachineConfiguration cimi;
         MachineConfiguration service;
 
-        converter = this.context.getRootConverter(CimiEntityType.MachineConfiguration);
+        converter = this.context.getRootConverter(ResourceType.MachineConfiguration);
 
         // Empty Cimi -> Service
         service = (MachineConfiguration) converter.toService(this.context, new CimiMachineConfiguration());
@@ -795,7 +796,7 @@ public class ConverterTest {
         CimiMachineImage cimi;
         MachineImage service;
 
-        converter = this.context.getRootConverter(CimiEntityType.MachineImage);
+        converter = this.context.getRootConverter(ResourceType.MachineImage);
 
         // Empty Cimi -> Service
         service = (MachineImage) converter.toService(this.context, new CimiMachineImage());
@@ -838,7 +839,7 @@ public class ConverterTest {
         CimiMachineImageCollection cimi;
         MachineImageCollection service;
 
-        converter = this.context.getRootConverter(CimiEntityType.MachineImageCollection);
+        converter = this.context.getRootConverter(ResourceType.MachineImageCollection);
 
         // Empty Cimi -> Service
         service = (MachineImageCollection) converter.toService(this.context, new CimiMachineImageCollection());
@@ -846,11 +847,11 @@ public class ConverterTest {
 
         // Empty Service -> Cimi
         cimi = (CimiMachineImageCollection) converter.toCimi(this.context, new MachineImageCollection());
-        Assert.assertNull(cimi.getMachineImages());
+        Assert.assertNull(cimi.getArray());
 
         // Full Cimi -> Service
         cimi = new CimiMachineImageCollection();
-        cimi.setMachineImages(new CimiMachineImage[] {new CimiMachineImage(), new CimiMachineImage()});
+        cimi.setArray(new CimiMachineImage[] {new CimiMachineImage(), new CimiMachineImage()});
 
         service = (MachineImageCollection) converter.toService(this.context, cimi);
         Assert.assertEquals(2, service.getImages().size());
@@ -870,31 +871,31 @@ public class ConverterTest {
         service.setImages(Arrays.asList(new MachineImage[] {machineImage1, machineImage2, machineImage3}));
 
         cimi = (CimiMachineImageCollection) converter.toCimi(this.context, service);
-        Assert.assertEquals(3, cimi.getMachineImages().length);
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/1",
-            cimi.getMachineImages()[0].getHref());
-        Assert.assertNull(cimi.getMachineImages()[0].getId());
-        Assert.assertNull(cimi.getMachineImages()[0].getName());
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/2",
-            cimi.getMachineImages()[1].getHref());
-        Assert.assertNull(cimi.getMachineImages()[1].getId());
-        Assert.assertNull(cimi.getMachineImages()[1].getName());
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/3",
-            cimi.getMachineImages()[2].getHref());
-        Assert.assertNull(cimi.getMachineImages()[2].getId());
-        Assert.assertNull(cimi.getMachineImages()[2].getName());
+        Assert.assertEquals(3, cimi.getArray().length);
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/1",
+            cimi.getArray()[0].getHref());
+        Assert.assertNull(cimi.getArray()[0].getId());
+        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/2",
+            cimi.getArray()[1].getHref());
+        Assert.assertNull(cimi.getArray()[1].getId());
+        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/3",
+            cimi.getArray()[2].getHref());
+        Assert.assertNull(cimi.getArray()[2].getId());
+        Assert.assertNull(cimi.getArray()[2].getName());
 
         cimi = (CimiMachineImageCollection) converter.toCimi(this.context,
             Arrays.asList(new MachineImage[] {machineImage3, machineImage1}));
-        Assert.assertEquals(2, cimi.getMachineImages().length);
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/3",
-            cimi.getMachineImages()[0].getHref());
-        Assert.assertNull(cimi.getMachineImages()[0].getId());
-        Assert.assertNull(cimi.getMachineImages()[0].getName());
-        Assert.assertEquals(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname() + "/1",
-            cimi.getMachineImages()[1].getHref());
-        Assert.assertNull(cimi.getMachineImages()[1].getId());
-        Assert.assertNull(cimi.getMachineImages()[1].getName());
+        Assert.assertEquals(2, cimi.getArray().length);
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/3",
+            cimi.getArray()[0].getHref());
+        Assert.assertNull(cimi.getArray()[0].getId());
+        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertEquals(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/1",
+            cimi.getArray()[1].getHref());
+        Assert.assertNull(cimi.getArray()[1].getId());
+        Assert.assertNull(cimi.getArray()[1].getName());
     }
 
     // TODO Volumes, Network, ...
@@ -904,7 +905,7 @@ public class ConverterTest {
         CimiMachine cimi;
         Machine service;
 
-        converter = this.context.getRootConverter(CimiEntityType.Machine);
+        converter = this.context.getRootConverter(ResourceType.Machine);
 
         // Empty Cimi -> Service
         service = (Machine) converter.toService(this.context, new CimiMachine());
@@ -986,7 +987,7 @@ public class ConverterTest {
         CimiMachineTemplate cimi;
         MachineTemplate service;
 
-        converter = this.context.getRootConverter(CimiEntityType.MachineTemplate);
+        converter = this.context.getRootConverter(ResourceType.MachineTemplate);
 
         // Empty Cimi -> Service
         service = (MachineTemplate) converter.toService(this.context, new CimiMachineTemplate());
@@ -1030,7 +1031,7 @@ public class ConverterTest {
         CimiMachineCreate cimi;
         MachineCreate service;
 
-        converter = this.context.getRootConverter(CimiEntityType.MachineCreate);
+        converter = this.context.getRootConverter(ResourceType.MachineCreate);
 
         // Empty Cimi -> Service
         service = (MachineCreate) converter.toService(this.context, new CimiMachineCreate());

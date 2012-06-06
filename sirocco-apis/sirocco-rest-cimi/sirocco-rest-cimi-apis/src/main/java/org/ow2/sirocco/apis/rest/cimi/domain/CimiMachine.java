@@ -41,7 +41,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
  */
 @XmlRootElement(name = "Machine")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachine extends CimiCommonId {
+public class CimiMachine extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -84,6 +84,22 @@ public class CimiMachine extends CimiCommonId {
     @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiNetworkInterface[] networkInterfaces;
+
+    /**
+     * Default constructor.
+     */
+    public CimiMachine() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiMachine(final String href) {
+        super(href);
+    }
 
     /**
      * Return the value of field "state".
@@ -198,7 +214,7 @@ public class CimiMachine extends CimiCommonId {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl#hasValues()
      */
     @Override
     public boolean hasValues() {

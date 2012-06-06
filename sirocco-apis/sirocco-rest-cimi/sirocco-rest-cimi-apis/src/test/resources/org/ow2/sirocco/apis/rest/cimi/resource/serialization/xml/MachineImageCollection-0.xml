@@ -1,8 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineImageCollection href="hrefValue_0">
+<Collection href="hrefValue_0">
 	<id>idValue_0</id>
-	<name>nameValue_0</name>
-	<description>descriptionValue_0</description>
-	<created>2000-01-01T00:00:00.000Z</created>
-	<updated>2000-01-01T00:00:00.000Z</updated>
-</MachineImageCollection>
+</Collection>

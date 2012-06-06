@@ -39,7 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
  */
 @XmlRootElement(name = "MachineTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineTemplate extends CimiCommonId {
+public class CimiMachineTemplate extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -212,7 +212,7 @@ public class CimiMachineTemplate extends CimiCommonId {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl#hasValues()
      */
     @Override
     public boolean hasValues() {

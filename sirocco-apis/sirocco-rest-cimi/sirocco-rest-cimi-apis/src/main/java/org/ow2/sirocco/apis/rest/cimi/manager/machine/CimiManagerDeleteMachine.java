@@ -26,11 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerDeleteAbstract;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -51,14 +50,12 @@ public class CimiManagerDeleteMachine extends CimiManagerDeleteAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
-        return this.manager.deleteMachine(request.getId());
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
+        return this.manager.deleteMachine(context.getRequest().getId());
     }
 
     /**
@@ -69,16 +66,15 @@ public class CimiManagerDeleteMachine extends CimiManagerDeleteAbstract {
      * @param dataService The output service data
      */
     @Override
-    protected void afterConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService) {
-        if (null == response.getCimiData()) {
+    protected void afterConvertToResponse(final CimiContext context, final Object dataService) {
+        if (null == context.getResponse().getCimiData()) {
             // Job
             if (dataService instanceof Job) {
-                CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
-                    .toCimi(request.getContext(), dataService);
-                response.setCimiData(cimi);
-                response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
-                response.putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
-                response.setStatus(Response.Status.ACCEPTED);
+                CimiJob cimi = (CimiJob) context.getRootConverter(ResourceType.Job).toCimi(context, dataService);
+                context.getResponse().setCimiData(cimi);
+                context.getResponse().putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
+                context.getResponse().putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
+                context.getResponse().setStatus(Response.Status.ACCEPTED);
             }
         }
     }

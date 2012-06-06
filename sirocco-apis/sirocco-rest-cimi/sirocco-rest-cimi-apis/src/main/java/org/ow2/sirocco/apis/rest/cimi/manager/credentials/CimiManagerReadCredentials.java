@@ -27,10 +27,9 @@ package org.ow2.sirocco.apis.rest.cimi.manager.credentials;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
@@ -51,21 +50,20 @@ public class CimiManagerReadCredentials extends CimiManagerReadAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Credentials out = null;
-        CimiSelect select = request.getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getCredentialsById(request.getId());
+            out = this.manager.getCredentialsById(context.getRequest().getId());
         } else {
             // FIXME
             throw new UnsupportedOperationException();
-            // out = this.manager.getCredentialsAttributes(request.getId(),
+            // out =
+            // this.manager.getCredentialsAttributes(context.getRequest().getId(),
             // select.getAttributes());
         }
         return out;
@@ -74,17 +72,15 @@ public class CimiManagerReadCredentials extends CimiManagerReadAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
-        CimiCredentials cimi = (CimiCredentials) request.getContext().getRootConverter(CimiEntityType.Credentials)
-            .toCimi(request.getContext(), dataService);
-        response.setCimiData(cimi);
-        response.setStatus(Response.Status.OK);
+    protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
+        CimiCredentials cimi = (CimiCredentials) context.getRootConverter(ResourceType.Credentials)
+            .toCimi(context, dataService);
+        context.getResponse().setCimiData(cimi);
+        context.getResponse().setStatus(Response.Status.OK);
     }
 
 }

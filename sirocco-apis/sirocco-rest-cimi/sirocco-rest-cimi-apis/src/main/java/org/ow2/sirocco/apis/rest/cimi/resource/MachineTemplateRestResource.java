@@ -37,9 +37,8 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.request.HelperRequest;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.apis.rest.cimi.request.HelperContext;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,7 +59,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path(ConstantsPath.MACHINE_TEMPLATE_PATH)
-public class CimiMachineTemplateResource extends CimiResourceAbstract {
+public class MachineTemplateRestResource extends RestResourceAbstract {
 
     @Autowired
     @Qualifier("CimiManagerReadMachineTemplate")
@@ -88,10 +87,9 @@ public class CimiMachineTemplateResource extends CimiResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
     public Response read(@PathParam("id") final String id) {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
-        CimiResponse response = new CimiResponse();
-        this.cimiManagerReadMachineTemplate.execute(request, response);
-        return HelperResponse.buildResponse(response);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
+        this.cimiManagerReadMachineTemplate.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
     }
 
     /**
@@ -104,10 +102,9 @@ public class CimiMachineTemplateResource extends CimiResourceAbstract {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
     public Response update(@PathParam("id") final String id, final CimiMachineTemplate cimiData) {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
-        CimiResponse response = new CimiResponse();
-        this.cimiManagerUpdateMachineTemplate.execute(request, response);
-        return HelperResponse.buildResponse(response);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, cimiData);
+        this.cimiManagerUpdateMachineTemplate.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
     }
 
     /**
@@ -118,10 +115,9 @@ public class CimiMachineTemplateResource extends CimiResourceAbstract {
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response create(final CimiMachineTemplate cimiData) {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cimiData);
-        CimiResponse response = new CimiResponse();
-        this.cimiManagerCreateMachineTemplate.execute(request, response);
-        return HelperResponse.buildResponse(response);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), cimiData);
+        this.cimiManagerCreateMachineTemplate.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
     }
 
     /**
@@ -133,10 +129,9 @@ public class CimiMachineTemplateResource extends CimiResourceAbstract {
     @DELETE
     @Path("{id}")
     public Response delete(@PathParam("id") final String id) {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
-        CimiResponse response = new CimiResponse();
-        this.cimiManagerDeleteMachineTemplate.execute(request, response);
-        return HelperResponse.buildResponse(response);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
+        this.cimiManagerDeleteMachineTemplate.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
     }
 
 }

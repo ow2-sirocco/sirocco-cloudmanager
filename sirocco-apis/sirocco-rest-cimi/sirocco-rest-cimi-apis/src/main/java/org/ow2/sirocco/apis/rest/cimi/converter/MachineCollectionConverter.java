@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -44,7 +45,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
  * </ul>
  * </p>
  */
-public class MachineCollectionConverter extends CommonIdConverter implements EntityConverter {
+public class MachineCollectionConverter extends CollectionConverter {
 
     /**
      * {@inheritDoc}
@@ -62,7 +63,7 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
@@ -94,7 +95,7 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -116,11 +117,12 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
         if (true == context.mustBeExpanded(dataCimi)) {
             if ((null != dataService.getMachines()) && (dataService.getMachines().size() > 0)) {
                 CimiConverter converter = context.getConverter(CimiMachine.class);
-                List<CimiMachine> cimiList = new ArrayList<CimiMachine>();
-                for (Machine machineImage : dataService.getMachines()) {
-                    cimiList.add((CimiMachine) converter.toCimi(context, machineImage));
+                CimiArray<CimiMachine> cimiList = dataCimi.newCollection();
+
+                for (Machine serviceItem : dataService.getMachines()) {
+                    cimiList.add((CimiMachine) converter.toCimi(context, serviceItem));
                 }
-                dataCimi.setMachines(cimiList.toArray(new CimiMachine[cimiList.size()]));
+                dataCimi.setCollection(cimiList);
             }
         }
     }
@@ -134,14 +136,15 @@ public class MachineCollectionConverter extends CommonIdConverter implements Ent
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineCollection dataCimi,
         final MachineCollection dataService) {
-        List<Machine> listServicesImages = new ArrayList<Machine>();
-        dataService.setMachines(listServicesImages);
+        CimiArray<CimiMachine> cimiList = dataCimi.getCollection();
+        if ((null != cimiList) && (cimiList.size() > 0)) {
+            List<Machine> serviceList = new ArrayList<Machine>();
+            dataService.setMachines(serviceList);
 
-        CimiConverter converter = context.getConverter(CimiMachine.class);
-        CimiMachine[] images = dataCimi.getMachines();
-        for (CimiMachine cimiImage : images) {
-            listServicesImages.add((Machine) converter.toService(context, cimiImage));
+            CimiConverter converter = context.getConverter(CimiMachine.class);
+            for (CimiMachine cimiItem : cimiList) {
+                serviceList.add((Machine) converter.toService(context, cimiItem));
+            }
         }
     }
-
 }

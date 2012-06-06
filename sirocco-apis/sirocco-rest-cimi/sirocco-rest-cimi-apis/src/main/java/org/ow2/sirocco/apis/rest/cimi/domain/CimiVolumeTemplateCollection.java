@@ -24,55 +24,67 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeTemplateCollection.
+ * Collection of VolumeTemplate.
  */
-@XmlRootElement(name = "volumeTemplateCollection")
+@XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeTemplateCollection extends CimiCommonId implements Serializable {
+public class CimiVolumeTemplateCollection extends CimiCollectionAbstract<CimiVolumeTemplate> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "volumeTemplates".
-     */
-    private CimiVolumeTemplate[] volumeTemplates;
-
-    /**
-     * Return the value of field "volumeTemplates".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
-    public CimiVolumeTemplate[] getVolumeTemplates() {
-        return this.volumeTemplates;
-    }
-
-    /**
-     * Set the value of field "volumeTemplates".
-     * 
-     * @param volumeTemplates The value
-     */
-    public void setVolumeTemplates(final CimiVolumeTemplate[] volumeTemplates) {
-        this.volumeTemplates = volumeTemplates;
+    @Override
+    @XmlElement(name = "VolumeTemplate")
+    @JsonProperty(value = "volumeTemplates")
+    public CimiVolumeTemplate[] getArray() {
+        return super.getArray();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+    @JsonProperty(value = "volumeTemplates")
+    public void setArray(final CimiVolumeTemplate[] items) {
+        super.setArray(items);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiVolumeTemplate> newCollection() {
+        return new CimiVolumeTemplateArray();
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiVolumeTemplateArray extends CimiArrayAbstract<CimiVolumeTemplate> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public CimiVolumeTemplate[] newEmptyArraySized() {
+            return new CimiVolumeTemplate[this.size()];
+        }
+    }
 }

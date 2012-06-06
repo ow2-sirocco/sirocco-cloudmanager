@@ -30,27 +30,34 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
-import org.ow2.sirocco.apis.rest.cimi.resource.CimiResourceAbstract;
+import org.ow2.sirocco.apis.rest.cimi.resource.RestResourceAbstract;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 
+/**
+ * Utility to build CIMI Request with the data of REST request.
+ * 
+ * @see CimiRequest
+ */
 public class HelperRequest {
 
-    public static CimiRequest buildRequest(final CimiResourceAbstract.JaxRsRequestInfos infos) {
-        return HelperRequest.buildRequest(infos, null, null);
-    }
+    // public static CimiRequest buildRequest(final
+    // CimiResourceAbstract.JaxRsRequestInfos infos) {
+    // return HelperRequest.buildRequest(infos, null, null);
+    // }
+    //
+    // public static CimiRequest buildRequest(final
+    // CimiResourceAbstract.JaxRsRequestInfos infos, final CimiData cimiData) {
+    // return HelperRequest.buildRequest(infos, null, cimiData);
+    // }
+    //
+    // public static CimiRequest buildRequest(final
+    // CimiResourceAbstract.JaxRsRequestInfos infos, final String id) {
+    // return HelperRequest.buildRequest(infos, id, null);
+    // }
 
-    public static CimiRequest buildRequest(final CimiResourceAbstract.JaxRsRequestInfos infos, final CimiData cimiData) {
-        return HelperRequest.buildRequest(infos, null, cimiData);
-    }
-
-    public static CimiRequest buildRequest(final CimiResourceAbstract.JaxRsRequestInfos infos, final String id) {
-        return HelperRequest.buildRequest(infos, id, null);
-    }
-
-    public static CimiRequest buildRequest(final CimiResourceAbstract.JaxRsRequestInfos infos, final String id,
+    public static CimiRequest buildRequest(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
         final CimiData cimiData) {
         CimiRequest request = new CimiRequest();
-        request.setContext(new CimiContextImpl(request));
         request.setHeader(HelperRequest.buildRequestHeader(infos));
         request.setId(id);
         request.setCimiData(cimiData);
@@ -60,7 +67,7 @@ public class HelperRequest {
         return request;
     }
 
-    private static RequestHeader buildRequestHeader(final CimiResourceAbstract.JaxRsRequestInfos infos) {
+    private static RequestHeader buildRequestHeader(final RestResourceAbstract.JaxRsRequestInfos infos) {
         RequestHeader requestHeader = new RequestHeader();
         List<String> versions = infos.getHeaders().getRequestHeader(Constants.HEADER_CIMI_VERSION);
         if ((null != versions) && (versions.size() > 0)) {

@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -44,7 +45,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
  * </ul>
  * </p>
  */
-public class MachineImageCollectionConverter extends CommonIdConverter implements EntityConverter {
+public class MachineImageCollectionConverter extends CollectionConverter {
 
     /**
      * {@inheritDoc}
@@ -62,7 +63,7 @@ public class MachineImageCollectionConverter extends CommonIdConverter implement
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
@@ -94,7 +95,7 @@ public class MachineImageCollectionConverter extends CommonIdConverter implement
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -116,11 +117,12 @@ public class MachineImageCollectionConverter extends CommonIdConverter implement
         if (true == context.mustBeExpanded(dataCimi)) {
             if ((null != dataService.getImages()) && (dataService.getImages().size() > 0)) {
                 CimiConverter converter = context.getConverter(CimiMachineImage.class);
-                List<CimiMachineImage> cimiList = new ArrayList<CimiMachineImage>();
-                for (MachineImage machineImage : dataService.getImages()) {
-                    cimiList.add((CimiMachineImage) converter.toCimi(context, machineImage));
+                CimiArray<CimiMachineImage> cimiList = dataCimi.newCollection();
+
+                for (MachineImage serviceItem : dataService.getImages()) {
+                    cimiList.add((CimiMachineImage) converter.toCimi(context, serviceItem));
                 }
-                dataCimi.setMachineImages(cimiList.toArray(new CimiMachineImage[cimiList.size()]));
+                dataCimi.setCollection(cimiList);
             }
         }
     }
@@ -134,17 +136,15 @@ public class MachineImageCollectionConverter extends CommonIdConverter implement
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineImageCollection dataCimi,
         final MachineImageCollection dataService) {
-        if ((null != dataCimi.getMachineImages()) && ((dataCimi.getMachineImages().length > 0))) {
-            List<MachineImage> listServicesImages = new ArrayList<MachineImage>();
-            dataService.setImages(listServicesImages);
-            CimiMachineImage[] images = dataCimi.getMachineImages();
-            if (null != images) {
-                CimiConverter converter = context.getConverter(CimiMachineImage.class);
-                for (CimiMachineImage cimiImage : images) {
-                    listServicesImages.add((MachineImage) converter.toService(context, cimiImage));
-                }
+        CimiArray<CimiMachineImage> cimiList = dataCimi.getCollection();
+        if ((null != cimiList) && (cimiList.size() > 0)) {
+            List<MachineImage> serviceList = new ArrayList<MachineImage>();
+            dataService.setImages(serviceList);
+
+            CimiConverter converter = context.getConverter(CimiMachineImage.class);
+            for (CimiMachineImage cimiItem : cimiList) {
+                serviceList.add((MachineImage) converter.toService(context, cimiItem));
             }
         }
     }
-
 }

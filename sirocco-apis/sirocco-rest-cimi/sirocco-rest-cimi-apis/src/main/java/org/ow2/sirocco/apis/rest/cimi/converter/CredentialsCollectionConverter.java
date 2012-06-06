@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -44,7 +45,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
  * </ul>
  * </p>
  */
-public class CredentialsCollectionConverter extends CommonIdConverter implements EntityConverter {
+public class CredentialsCollectionConverter extends CollectionConverter {
 
     /**
      * {@inheritDoc}
@@ -62,7 +63,7 @@ public class CredentialsCollectionConverter extends CommonIdConverter implements
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
@@ -94,7 +95,7 @@ public class CredentialsCollectionConverter extends CommonIdConverter implements
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -116,11 +117,12 @@ public class CredentialsCollectionConverter extends CommonIdConverter implements
         if (true == context.mustBeExpanded(dataCimi)) {
             if ((null != dataService.getCredentials()) && (dataService.getCredentials().size() > 0)) {
                 CimiConverter converter = context.getConverter(CimiCredentials.class);
-                List<CimiCredentials> cimiList = new ArrayList<CimiCredentials>();
-                for (Credentials machineImage : dataService.getCredentials()) {
-                    cimiList.add((CimiCredentials) converter.toCimi(context, machineImage));
+                CimiArray<CimiCredentials> cimiList = dataCimi.newCollection();
+
+                for (Credentials serviceItem : dataService.getCredentials()) {
+                    cimiList.add((CimiCredentials) converter.toCimi(context, serviceItem));
                 }
-                dataCimi.setCredentials(cimiList.toArray(new CimiCredentials[cimiList.size()]));
+                dataCimi.setCollection(cimiList);
             }
         }
     }
@@ -134,14 +136,15 @@ public class CredentialsCollectionConverter extends CommonIdConverter implements
      */
     protected void doCopyToService(final CimiContext context, final CimiCredentialsCollection dataCimi,
         final CredentialsCollection dataService) {
-        List<Credentials> listServicesImages = new ArrayList<Credentials>();
-        dataService.setCredentials(listServicesImages);
+        CimiArray<CimiCredentials> cimiList = dataCimi.getCollection();
+        if ((null != cimiList) && (cimiList.size() > 0)) {
+            List<Credentials> serviceList = new ArrayList<Credentials>();
+            dataService.setCredentials(serviceList);
 
-        CimiConverter converter = context.getConverter(CimiCredentials.class);
-        CimiCredentials[] images = dataCimi.getCredentials();
-        for (CimiCredentials cimiImage : images) {
-            listServicesImages.add((Credentials) converter.toService(context, cimiImage));
+            CimiConverter converter = context.getConverter(CimiCredentials.class);
+            for (CimiCredentials cimiItem : cimiList) {
+                serviceList.add((Credentials) converter.toService(context, cimiItem));
+            }
         }
     }
-
 }

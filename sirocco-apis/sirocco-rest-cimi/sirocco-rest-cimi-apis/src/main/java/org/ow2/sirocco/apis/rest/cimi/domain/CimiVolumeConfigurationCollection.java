@@ -24,57 +24,67 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeConfigurationCollection.
+ * Collection of VolumeConfiguration.
  */
-@XmlRootElement(name = "volumeConfigurationCollection")
+@XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeConfigurationCollection extends CimiCommonId implements Serializable {
+public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<CimiVolumeConfiguration> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "volumeConfigurations".
-     */
-    private CimiVolumeConfiguration[] volumeConfigurations;
-
-    /**
-     * Return the value of field "volumeConfigurations".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
-    public CimiVolumeConfiguration[] getVolumeConfigurations() {
-        return this.volumeConfigurations;
-    }
-
-    /**
-     * Set the value of field "volumeConfigurations".
-     * 
-     * @param volumeConfigurations The value
-     */
-    public void setVolumeConfigurations(final CimiVolumeConfiguration[] volumeConfigurations) {
-        this.volumeConfigurations = volumeConfigurations;
+    @Override
+    @XmlElement(name = "VolumeConfiguration")
+    @JsonProperty(value = "volumeConfigurations")
+    public CimiVolumeConfiguration[] getArray() {
+        return super.getArray();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+    @JsonProperty(value = "volumeConfigurations")
+    public void setArray(final CimiVolumeConfiguration[] items) {
+        super.setArray(items);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiVolumeConfiguration> newCollection() {
+        return new CimiVolumeConfigurationArray();
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiVolumeConfigurationArray extends CimiArrayAbstract<CimiVolumeConfiguration> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public CimiVolumeConfiguration[] newEmptyArraySized() {
+            return new CimiVolumeConfiguration[this.size()];
+        }
+    }
 }

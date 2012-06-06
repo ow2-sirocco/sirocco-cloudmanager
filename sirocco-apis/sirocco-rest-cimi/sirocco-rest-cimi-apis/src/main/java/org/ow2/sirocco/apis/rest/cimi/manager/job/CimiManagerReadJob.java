@@ -26,11 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.manager.job;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -51,19 +50,17 @@ public class CimiManagerReadJob extends CimiManagerReadAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Job out = null;
-        CimiSelect select = request.getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getJobById(request.getId());
+            out = this.manager.getJobById(context.getRequest().getId());
         } else {
-            out = this.manager.getJobAttributes(request.getId(), select.getAttributes());
+            out = this.manager.getJobAttributes(context.getRequest().getId(), select.getAttributes());
         }
         return out;
     }
@@ -71,18 +68,15 @@ public class CimiManagerReadJob extends CimiManagerReadAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
-        CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
-            .toCimi(request.getContext(), dataService);
+    protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
+        CimiJob cimi = (CimiJob) context.getRootConverter(ResourceType.Job).toCimi(context, dataService);
 
-        response.setCimiData(cimi);
-        response.setStatus(Response.Status.OK);
+        context.getResponse().setCimiData(cimi);
+        context.getResponse().setStatus(Response.Status.OK);
     }
 
 }

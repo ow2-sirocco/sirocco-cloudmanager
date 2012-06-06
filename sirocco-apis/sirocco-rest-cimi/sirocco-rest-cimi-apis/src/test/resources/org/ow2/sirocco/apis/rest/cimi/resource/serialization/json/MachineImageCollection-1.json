@@ -1,18 +1,6 @@
 {
 	"id":"idValue_1",
-	"name":"nameValue_1",
-	"description":"descriptionValue_1",
-	"created":"2001-02-02T01:01:01.001Z",
-	"updated":"2001-02-02T01:01:01.001Z",
-	"properties":{
-		"keyProp_1_0":"valueProp_1_0"
-	},
-	"machineImages":[
-		{
-			"href":"hrefValue_1_0"
-		}
-		
-	],
+	"href":"hrefValue_1",
 	"operations":[
 		{
 			"rel":"relValue_1_0",
@@ -20,5 +8,10 @@
 		}
 		
 	],
-	"href":"hrefValue_1"
+	"machineImages":[
+		{
+			"href":"hrefValue_1_0"
+		}
+		
+	]
 }

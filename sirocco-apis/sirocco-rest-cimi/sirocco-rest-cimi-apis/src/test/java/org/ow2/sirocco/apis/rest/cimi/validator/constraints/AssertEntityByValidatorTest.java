@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -39,13 +40,15 @@ public class AssertEntityByValidatorTest {
 
     private CimiResponse response;
 
+    private CimiContext context;
+
     @Before
     public void setUp() throws Exception {
 
         this.request = new CimiRequest();
-        this.request.setContext(new CimiContextImpl(this.request));
         this.request.setBaseUri("http://www.test.org/");
         this.response = new CimiResponse();
+        this.context = new CimiContextImpl(this.request, this.response);
     }
 
     @Test
@@ -55,19 +58,16 @@ public class AssertEntityByValidatorTest {
         // OK entity with ref (even if ref is bad)
         toTest = new CimiMachineImage();
         toTest.setHref("A");
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest,
-            GroupCreateByRefOrByValue.class));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupCreateByRefOrByValue.class));
 
         // OK entity with value (even if bad value)
         toTest = new CimiMachineImage();
         toTest.setName("foo");
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest,
-            GroupCreateByRefOrByValue.class));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupCreateByRefOrByValue.class));
 
         // KO entity empty
         toTest = new CimiMachineImage();
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.request, this.response, toTest,
-            GroupCreateByRefOrByValue.class));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupCreateByRefOrByValue.class));
     }
 
 }

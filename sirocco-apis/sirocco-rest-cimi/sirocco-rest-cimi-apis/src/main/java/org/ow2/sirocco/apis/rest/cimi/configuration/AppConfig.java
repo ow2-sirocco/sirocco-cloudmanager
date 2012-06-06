@@ -25,9 +25,9 @@
 package org.ow2.sirocco.apis.rest.cimi.configuration;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 
 public class AppConfig {
 
@@ -95,8 +95,8 @@ public class AppConfig {
         this.setConfig(factory.getConfig());
     }
 
-    public static CimiEntityType getType(final CimiData data) {
-        CimiEntityType type = null;
+    public static ResourceType getType(final CimiData data) {
+        ResourceType type = null;
         ItemConfig item = AppConfig.getInstance().getConfig().find(data.getClass());
         if (null != item) {
             type = item.getType();
@@ -104,8 +104,8 @@ public class AppConfig {
         return type;
     }
 
-    public static EntityConverter getEntityConverter(final Class<?> klass) {
-        return (EntityConverter) AppConfig.getConverter(klass);
+    public static ResourceConverter getEntityConverter(final Class<?> klass) {
+        return (ResourceConverter) AppConfig.getConverter(klass);
     }
 
     public static CimiConverter getConverter(final Class<?> klass) {
@@ -120,7 +120,7 @@ public class AppConfig {
         return converter;
     }
 
-    public static CimiConverter getConverter(final CimiEntityType type) {
+    public static CimiConverter getConverter(final ResourceType type) {
         ItemConfig item = AppConfig.getInstance().getConfig().find(type);
         if (null == item) {
             throw new ConfigurationException("ItemConfig not found in configuration for " + type);

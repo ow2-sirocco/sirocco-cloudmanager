@@ -26,8 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.manager;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
 
 /**
@@ -38,36 +37,32 @@ public abstract class CimiManagerDeleteAbstract extends CimiManagerAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#validate(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#validate(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected boolean validate(final CimiRequest request, final CimiResponse response) throws Exception {
-        return CimiValidatorHelper.getInstance().validate(request, response, request.getHeader());
+    protected boolean validate(final CimiContext context) throws Exception {
+        return CimiValidatorHelper.getInstance().validate(context, context.getRequest().getHeader());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+    protected Object convertToDataService(final CimiContext context) throws Exception {
         return null;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
-        response.setCimiData(null);
-        response.setStatus(Response.Status.OK);
+    protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
+        context.getResponse().setCimiData(null);
+        context.getResponse().setStatus(Response.Status.OK);
     }
 }

@@ -27,10 +27,9 @@ package org.ow2.sirocco.apis.rest.cimi.manager;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.InvalidConversionException;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -99,100 +98,93 @@ public abstract class CimiManagerAbstract implements CimiManager {
      * </table>
      * </p>
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManager#execute(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManager#execute(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    public void execute(final CimiRequest request, final CimiResponse response) {
+    public void execute(final CimiContext context) {
         try {
-            if (this.doValidate(request, response)) {
-                Object dataServiceIn = this.doConvertToDataService(request, response);
-                if (false == response.isCommitted()) {
-                    Object dataServiceOut = this.doCallService(request, response, dataServiceIn);
-                    if (false == response.isCommitted()) {
-                        this.doConvertToResponse(request, response, dataServiceOut);
+            if (this.doValidate(context)) {
+                Object dataServiceIn = this.doConvertToDataService(context);
+                if (false == context.getResponse().isCommitted()) {
+                    Object dataServiceOut = this.doCallService(context, dataServiceIn);
+                    if (false == context.getResponse().isCommitted()) {
+                        this.doConvertToResponse(context, dataServiceOut);
                     }
                 }
             }
         } catch (InvalidConversionException e) {
-            this.convertToResponse(request, response, e);
+            this.convertToResponse(context, e);
         } catch (ResourceNotFoundException e) {
-            this.convertToResponse(request, response, e);
+            this.convertToResponse(context, e);
         } catch (InvalidRequestException e) {
-            this.convertToResponse(request, response, e);
+            this.convertToResponse(context, e);
         } catch (ResourceConflictException e) {
-            this.convertToResponse(request, response, e);
+            this.convertToResponse(context, e);
         } catch (ServiceUnavailableException e) {
-            this.convertToResponse(request, response, e);
+            this.convertToResponse(context, e);
         } catch (SecurityException e) {
-            this.convertToResponse(request, response, e);
+            this.convertToResponse(context, e);
         } catch (UnsupportedOperationException e) {
-            this.convertToResponse(request, response, e);
+            this.convertToResponse(context, e);
         } catch (CloudProviderException e) {
-            this.convertToResponse(request, response, e);
+            this.convertToResponse(context, e);
         } catch (Exception e) {
-            this.convertToResponse(request, response, e);
+            this.convertToResponse(context, e);
         }
     }
 
     /**
      * Validate the request.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @return True if the request is valid
      * @throws Exception In case of validation error
      */
-    protected abstract boolean validate(CimiRequest request, CimiResponse response) throws Exception;
+    protected abstract boolean validate(CimiContext context) throws Exception;
 
     /**
      * Convert the CIMI data from request to a service data.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @return The input service data
      * @throws Exception In case of conversion error
      */
-    protected abstract Object convertToDataService(CimiRequest request, CimiResponse response) throws Exception;
+    protected abstract Object convertToDataService(CimiContext context) throws Exception;
 
     /**
      * Call the service.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param dataService The input service data
      * @return The output service data or null if none output
      * @throws Exception In case of error in service
      */
-    protected abstract Object callService(CimiRequest request, CimiResponse response, Object dataService) throws Exception;
+    protected abstract Object callService(CimiContext context, Object dataService) throws Exception;
 
     /**
      * Convert the service data to a CIMI data from request.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param dataService The output service data
      * @throws Exception In case of conversion error
      */
-    protected abstract void convertToResponse(CimiRequest request, CimiResponse response, Object dataService) throws Exception;
+    protected abstract void convertToResponse(CimiContext context, Object dataService) throws Exception;
 
     /**
      * Call after the conversion.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param dataService The output service data
      */
-    protected void afterConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService) {
-        if (null == response.getCimiData()) {
+    protected void afterConvertToResponse(final CimiContext context, final Object dataService) {
+        if (null == context.getResponse().getCimiData()) {
             // Job
             if (dataService instanceof Job) {
-                CimiJob cimi = (CimiJob) request.getContext().getRootConverter(CimiEntityType.Job)
-                    .toCimi(request.getContext(), dataService);
-                response.setCimiData(cimi);
-                response.putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
-                response.putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
-                response.setStatus(Response.Status.ACCEPTED);
+                CimiJob cimi = (CimiJob) context.getRootConverter(ResourceType.Job).toCimi(context, dataService);
+                context.getResponse().setCimiData(cimi);
+                context.getResponse().putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
+                context.getResponse().putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
+                context.getResponse().setStatus(Response.Status.ACCEPTED);
             }
         }
     }
@@ -200,27 +192,25 @@ public abstract class CimiManagerAbstract implements CimiManager {
     /**
      * Call before the conversion.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @throws Exception In case of error
      */
-    protected void beforeConvertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+    protected void beforeConvertToDataService(final CimiContext context) throws Exception {
         // Nothing to do
     }
 
     /**
      * Manage the request validation.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @return True if the request is valid
      * @throws Exception In case of validation error
      */
-    private boolean doValidate(final CimiRequest request, final CimiResponse response) throws Exception {
+    private boolean doValidate(final CimiContext context) throws Exception {
         boolean valid = false;
-        valid = this.validate(request, response);
+        valid = this.validate(context);
         if (!valid) {
-            response.setStatus(Response.Status.BAD_REQUEST);
+            context.getResponse().setStatus(Response.Status.BAD_REQUEST);
         }
         return valid;
     }
@@ -228,170 +218,149 @@ public abstract class CimiManagerAbstract implements CimiManager {
     /**
      * Manage the conversion of the CIMI data from request to a service data.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @return The input service data
      * @throws Exception In case of conversion error
      */
-    private Object doConvertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+    private Object doConvertToDataService(final CimiContext context) throws Exception {
         Object dataService = null;
-        this.beforeConvertToDataService(request, response);
-        dataService = this.convertToDataService(request, response);
+        this.beforeConvertToDataService(context);
+        dataService = this.convertToDataService(context);
         return dataService;
     }
 
     /**
      * Manage the call to the service.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param dataServiceIn The input service data
      * @return The output service data or null if none output
      * @throws Exception In case of service error
      */
-    private Object doCallService(final CimiRequest request, final CimiResponse response, final Object dataServiceIn)
-        throws Exception {
+    private Object doCallService(final CimiContext context, final Object dataServiceIn) throws Exception {
         Object dataServiceOut = null;
-        dataServiceOut = this.callService(request, response, dataServiceIn);
+        dataServiceOut = this.callService(context, dataServiceIn);
         return dataServiceOut;
     }
 
     /**
      * Manage the conversion of a service data to a CIMI data from request.
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param dataService The output service data
      * @throws Exception In case of conversion error
      */
-    private void doConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
-        this.convertToResponse(request, response, dataService);
-        this.afterConvertToResponse(request, response, dataService);
+    private void doConvertToResponse(final CimiContext context, final Object dataService) throws Exception {
+        this.convertToResponse(context, dataService);
+        this.afterConvertToResponse(context, dataService);
     }
 
     /**
      * Convert general exception to HTTP status "INTERNAL_SERVER_ERROR" (500).
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param exception The exception to convert
      */
-    private void convertToResponse(final CimiRequest request, final CimiResponse response, final Exception exception) {
+    private void convertToResponse(final CimiContext context, final Exception exception) {
         CimiManagerAbstract.LOGGER.error("Internal Server Error", exception);
-        response.setStatus(Response.Status.INTERNAL_SERVER_ERROR);
-        response.setErrorMessage(exception.getMessage());
+        context.getResponse().setStatus(Response.Status.INTERNAL_SERVER_ERROR);
+        context.getResponse().setErrorMessage(exception.getMessage());
     }
 
     /**
      * Convert exception to HTTP status "NOT FOUND" (404).
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param exception The exception to convert
      */
-    private void convertToResponse(final CimiRequest request, final CimiResponse response,
-        final ResourceNotFoundException exception) {
-        CimiManagerAbstract.LOGGER.debug("Resource not found : {}", request.getId());
-        response.setStatus(Response.Status.NOT_FOUND);
-        response.setErrorMessage(exception.getMessage());
+    private void convertToResponse(final CimiContext context, final ResourceNotFoundException exception) {
+        CimiManagerAbstract.LOGGER.debug("Resource not found : {}", context.getRequest().getId());
+        context.getResponse().setStatus(Response.Status.NOT_FOUND);
+        context.getResponse().setErrorMessage(exception.getMessage());
     }
 
     /**
      * Convert exception to HTTP status "BAD REQUEST" (400).
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param exception The exception to convert
      */
-    private void convertToResponse(final CimiRequest request, final CimiResponse response,
-        final InvalidRequestException exception) {
+    private void convertToResponse(final CimiContext context, final InvalidRequestException exception) {
         CimiManagerAbstract.LOGGER.debug(exception.getMessage(), exception);
-        response.setStatus(Response.Status.BAD_REQUEST);
-        response.setErrorMessage(exception.getMessage());
+        context.getResponse().setStatus(Response.Status.BAD_REQUEST);
+        context.getResponse().setErrorMessage(exception.getMessage());
     }
 
     /**
      * Convert exception to HTTP status "BAD REQUEST" (400).
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param exception The exception to convert
      */
-    private void convertToResponse(final CimiRequest request, final CimiResponse response,
-        final InvalidConversionException exception) {
+    private void convertToResponse(final CimiContext context, final InvalidConversionException exception) {
         CimiManagerAbstract.LOGGER.debug(exception.getMessage(), exception);
-        response.setStatus(Response.Status.BAD_REQUEST);
-        response.setErrorMessage(exception.getMessage());
+        context.getResponse().setStatus(Response.Status.BAD_REQUEST);
+        context.getResponse().setErrorMessage(exception.getMessage());
     }
 
     /**
      * Convert exception to HTTP status "CONFLICT" (409).
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param exception The exception to convert
      */
-    private void convertToResponse(final CimiRequest request, final CimiResponse response,
-        final ResourceConflictException exception) {
+    private void convertToResponse(final CimiContext context, final ResourceConflictException exception) {
         CimiManagerAbstract.LOGGER.debug(exception.getMessage(), exception);
-        response.setStatus(Response.Status.CONFLICT);
-        response.setErrorMessage(exception.getMessage());
+        context.getResponse().setStatus(Response.Status.CONFLICT);
+        context.getResponse().setErrorMessage(exception.getMessage());
     }
 
     /**
      * Convert exception to HTTP status "SERVICE UNAVAILABLE" (503).
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param exception The exception to convert
      */
-    private void convertToResponse(final CimiRequest request, final CimiResponse response,
-        final ServiceUnavailableException exception) {
+    private void convertToResponse(final CimiContext context, final ServiceUnavailableException exception) {
         CimiManagerAbstract.LOGGER.debug(exception.getMessage(), exception);
-        response.setStatus(Response.Status.SERVICE_UNAVAILABLE);
-        response.setErrorMessage(exception.getMessage());
+        context.getResponse().setStatus(Response.Status.SERVICE_UNAVAILABLE);
+        context.getResponse().setErrorMessage(exception.getMessage());
     }
 
     /**
      * Convert exception to HTTP status "FORBIDDEN" (403).
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param exception The exception to convert
      */
-    private void convertToResponse(final CimiRequest request, final CimiResponse response, final SecurityException exception) {
+    private void convertToResponse(final CimiContext context, final SecurityException exception) {
         CimiManagerAbstract.LOGGER.debug(exception.getMessage(), exception);
-        response.setStatus(Response.Status.FORBIDDEN);
-        response.setErrorMessage(exception.getMessage());
+        context.getResponse().setStatus(Response.Status.FORBIDDEN);
+        context.getResponse().setErrorMessage(exception.getMessage());
     }
 
     /**
      * Convert exception to HTTP status "NOT IMPLEMENTED" (501).
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param exception The exception to convert
      */
-    private void convertToResponse(final CimiRequest request, final CimiResponse response,
-        final UnsupportedOperationException exception) {
+    private void convertToResponse(final CimiContext context, final UnsupportedOperationException exception) {
         CimiManagerAbstract.LOGGER.debug(exception.getMessage(), exception);
-        response.setStatus(501);
-        response.setErrorMessage(exception.getMessage());
+        context.getResponse().setStatus(501);
+        context.getResponse().setErrorMessage(exception.getMessage());
     }
 
     /**
      * Convert exception to HTTP status "INTERNAL_SERVER_ERROR" (500).
      * 
-     * @param request The CIMI request
-     * @param response The CIMI response
+     * @param context The CIMI context
      * @param exception The exception to convert
      */
-    private void convertToResponse(final CimiRequest request, final CimiResponse response,
-        final CloudProviderException exception) {
+    private void convertToResponse(final CimiContext context, final CloudProviderException exception) {
         CimiManagerAbstract.LOGGER.error(exception.getMessage(), exception);
-        response.setStatus(Response.Status.INTERNAL_SERVER_ERROR);
-        response.setErrorMessage(exception.getMessage());
+        context.getResponse().setStatus(Response.Status.INTERNAL_SERVER_ERROR);
+        context.getResponse().setErrorMessage(exception.getMessage());
     }
 
 }

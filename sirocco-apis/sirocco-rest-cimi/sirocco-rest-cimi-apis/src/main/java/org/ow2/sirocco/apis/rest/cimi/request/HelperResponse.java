@@ -34,7 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utility to build REST response with datas of CIMI response.
+ * Utility to build REST response with the data of CIMI response.
  * 
  * @see CimiResponse
  */

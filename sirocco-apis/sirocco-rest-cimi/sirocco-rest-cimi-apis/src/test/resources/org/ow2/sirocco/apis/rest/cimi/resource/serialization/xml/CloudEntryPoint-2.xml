@@ -10,16 +10,10 @@
 	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 	<updated>2002-03-03T02:02:02.002Z</updated>
 	<credentials href="hrefValue_2">
-		<description>descriptionValue_2</description>
-		<name>nameValue_2</name>
-		<property key="keyProp_2_0">valueProp_2_0</property>
-		<property key="keyProp_2_1">valueProp_2_1</property>
-		<created>2002-03-03T02:02:02.002Z</created>
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<updated>2002-03-03T02:02:02.002Z</updated>
-		<credentials href="hrefValue_2_0">
+		<Credentials href="hrefValue_2_0">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -32,8 +26,8 @@
 			<key>AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUm</key>
 			<password>passwordValue_2_0</password>
 			<userName>userNameValue_2_0</userName>
-		</credentials>
-		<credentials href="hrefValue_2_1">
+		</Credentials>
+		<Credentials href="hrefValue_2_1">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -46,19 +40,13 @@
 			<key>AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUm</key>
 			<password>passwordValue_2_1</password>
 			<userName>userNameValue_2_1</userName>
-		</credentials>
+		</Credentials>
 	</credentials>
 	<credentialsTemplates href="hrefValue_2">
-		<description>descriptionValue_2</description>
-		<name>nameValue_2</name>
-		<property key="keyProp_2_0">valueProp_2_0</property>
-		<property key="keyProp_2_1">valueProp_2_1</property>
-		<created>2002-03-03T02:02:02.002Z</created>
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<updated>2002-03-03T02:02:02.002Z</updated>
-		<credentialsTemplate href="hrefValue_2_0">
+		<CredentialsTemplate href="hrefValue_2_0">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -71,8 +59,8 @@
 			<key>AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUm</key>
 			<password>passwordValue_2_0</password>
 			<userName>userNameValue_2_0</userName>
-		</credentialsTemplate>
-		<credentialsTemplate href="hrefValue_2_1">
+		</CredentialsTemplate>
+		<CredentialsTemplate href="hrefValue_2_1">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -85,20 +73,14 @@
 			<key>AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUm</key>
 			<password>passwordValue_2_1</password>
 			<userName>userNameValue_2_1</userName>
-		</credentialsTemplate>
+		</CredentialsTemplate>
 	</credentialsTemplates>
 	<jobTime>2</jobTime>
 	<machineConfigs href="hrefValue_2">
-		<description>descriptionValue_2</description>
-		<name>nameValue_2</name>
-		<property key="keyProp_2_0">valueProp_2_0</property>
-		<property key="keyProp_2_1">valueProp_2_1</property>
-		<created>2002-03-03T02:02:02.002Z</created>
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<updated>2002-03-03T02:02:02.002Z</updated>
-		<machineConfiguration href="hrefValue_2_0">
+		<MachineConfiguration href="hrefValue_2_0">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -120,8 +102,8 @@
 				<format>formatValue_2_1</format>
 			</disk>
 			<memory quantity="2" units="unitValue_2_0" />
-		</machineConfiguration>
-		<machineConfiguration href="hrefValue_2_1">
+		</MachineConfiguration>
+		<MachineConfiguration href="hrefValue_2_1">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -143,19 +125,13 @@
 				<format>formatValue_2_1</format>
 			</disk>
 			<memory quantity="2" units="unitValue_2_1" />
-		</machineConfiguration>
+		</MachineConfiguration>
 	</machineConfigs>
 	<machineImages href="hrefValue_2">
-		<description>descriptionValue_2</description>
-		<name>nameValue_2</name>
-		<property key="keyProp_2_0">valueProp_2_0</property>
-		<property key="keyProp_2_1">valueProp_2_1</property>
-		<created>2002-03-03T02:02:02.002Z</created>
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<updated>2002-03-03T02:02:02.002Z</updated>
-		<machineImage href="hrefValue_2_0">
+		<MachineImage href="hrefValue_2_0">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -168,8 +144,8 @@
 			<imageLocation href="hrefImageLocation_2_0" />
 			<state>stateValue_2_0</state>
 			<type>typeValue_2_0</type>
-		</machineImage>
-		<machineImage href="hrefValue_2_1">
+		</MachineImage>
+		<MachineImage href="hrefValue_2_1">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -182,19 +158,13 @@
 			<imageLocation href="hrefImageLocation_2_1" />
 			<state>stateValue_2_1</state>
 			<type>typeValue_2_1</type>
-		</machineImage>
+		</MachineImage>
 	</machineImages>
 	<machineTemplates href="hrefValue_2">
-		<description>descriptionValue_2</description>
-		<name>nameValue_2</name>
-		<property key="keyProp_2_0">valueProp_2_0</property>
-		<property key="keyProp_2_1">valueProp_2_1</property>
-		<created>2002-03-03T02:02:02.002Z</created>
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<updated>2002-03-03T02:02:02.002Z</updated>
-		<machineTemplate href="hrefValue_2_0">
+		<MachineTemplate href="hrefValue_2_0">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -255,8 +225,8 @@
 				<state>stateValue_2_0</state>
 				<type>typeValue_2_0</type>
 			</machineImage>
-		</machineTemplate>
-		<machineTemplate href="hrefValue_2_1">
+		</MachineTemplate>
+		<MachineTemplate href="hrefValue_2_1">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -317,19 +287,13 @@
 				<state>stateValue_2_1</state>
 				<type>typeValue_2_1</type>
 			</machineImage>
-		</machineTemplate>
+		</MachineTemplate>
 	</machineTemplates>
 	<machines href="hrefValue_2">
-		<description>descriptionValue_2</description>
-		<name>nameValue_2</name>
-		<property key="keyProp_2_0">valueProp_2_0</property>
-		<property key="keyProp_2_1">valueProp_2_1</property>
-		<created>2002-03-03T02:02:02.002Z</created>
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<updated>2002-03-03T02:02:02.002Z</updated>
-		<machine href="hrefValue_2_0">
+		<Machine href="hrefValue_2_0">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -348,8 +312,8 @@
 			</disk>
 			<memory quantity="2" units="unitValue_2_0" />
 			<state>stateValue_2_0</state>
-		</machine>
-		<machine href="hrefValue_2_1">
+		</Machine>
+		<Machine href="hrefValue_2_1">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -368,6 +332,6 @@
 			</disk>
 			<memory quantity="2" units="unitValue_2_1" />
 			<state>stateValue_2_1</state>
-		</machine>
+		</Machine>
 	</machines>
 </CloudEntryPoint>

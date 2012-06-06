@@ -27,8 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock;
 import javax.ws.rs.core.Response.Status;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 
 /**
  * Mock CimiManagerDeleteMachineImage.
@@ -45,17 +44,17 @@ public class MockCimiManagerDelete implements CimiManager {
      *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
      */
     @Override
-    public void execute(final CimiRequest request, final CimiResponse response) {
+    public void execute(final CimiContext context) {
         try {
             // Test ID
-            Integer.valueOf(request.getId());
+            Integer.valueOf(context.getRequest().getId());
 
             // Build response
-            response.setCimiData(null);
-            response.setStatus(Status.OK);
+            context.getResponse().setCimiData(null);
+            context.getResponse().setStatus(Status.OK);
         } catch (Exception e) {
-            response.setErrorMessage(e.getMessage());
-            response.setStatus(Status.SERVICE_UNAVAILABLE);
+            context.getResponse().setErrorMessage(e.getMessage());
+            context.getResponse().setStatus(Status.SERVICE_UNAVAILABLE);
         }
     }
 

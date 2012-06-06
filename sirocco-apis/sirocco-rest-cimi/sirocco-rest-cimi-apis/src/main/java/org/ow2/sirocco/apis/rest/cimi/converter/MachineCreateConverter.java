@@ -43,7 +43,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
  * </ul>
  * </p>
  */
-public class MachineCreateConverter implements EntityConverter {
+public class MachineCreateConverter implements ResourceConverter {
 
     /**
      * {@inheritDoc}
@@ -60,7 +60,7 @@ public class MachineCreateConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -84,7 +84,7 @@ public class MachineCreateConverter implements EntityConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */

@@ -42,12 +42,9 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.Identifier;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
- * Class Common.
- * <p>
- * Attributes common to all entities
- * </p>
+ * Class with the common attributes of multiple resources.
  */
-public class CimiCommon implements CimiData {
+public class CimiCommon implements CimiDataCommon {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -84,83 +81,105 @@ public class CimiCommon implements CimiData {
     private Map<String, String> properties;
 
     /**
-     * Return the value of field "name".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon#getName()
      */
+    @Override
     public String getName() {
         return this.name;
     }
 
     /**
-     * Set the value of field "name".
+     * {@inheritDoc}
      * 
-     * @param name The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon#setName(java.lang
+     *      .String)
      */
+    @Override
     public void setName(final String name) {
         this.name = name;
     }
 
     /**
-     * Return the value of field "description".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon#getDescription()
      */
+    @Override
     public String getDescription() {
         return this.description;
     }
 
     /**
-     * Set the value of field "description".
+     * {@inheritDoc}
      * 
-     * @param description The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon#setDescription(java
+     *      .lang.String)
      */
+    @Override
     public void setDescription(final String description) {
         this.description = description;
     }
 
     /**
-     * Return the value of field "properties".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon#getProperties()
      */
+    @Override
     @XmlTransient
     public Map<String, String> getProperties() {
         return this.properties;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon#setProperties(java
+     *      .util.Map)
+     */
+    @Override
+    public void setProperties(final Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+    /**
+     * Get all keys-values properties for JAXB.
+     * 
+     * @return An array with all the keys-values properties
+     */
     @JsonIgnore
     @XmlElement(name = "property")
-    public Property[] getPropertyArray() {
-        List<Property> list = new ArrayList<Property>();
+    public KeyValue[] getPropertyArray() {
+        List<KeyValue> list = new ArrayList<KeyValue>();
         if (null != this.properties) {
             for (Entry<String, String> entry : this.properties.entrySet()) {
-                Property mapEntry = new Property();
+                KeyValue mapEntry = new KeyValue();
                 mapEntry.key = entry.getKey();
                 mapEntry.value = entry.getValue();
                 list.add(mapEntry);
             }
         }
-        return list.toArray(new Property[list.size()]);
+        return list.toArray(new KeyValue[list.size()]);
     }
 
-    public void setPropertyArray(final Property[] props) {
+    /**
+     * Set all keys-values properties for JAXB.
+     * 
+     * @param props An array with all the keys-values properties
+     */
+    public void setPropertyArray(final KeyValue[] props) {
         this.properties = new HashMap<String, String>();
-        for (Property prop : props) {
+        for (KeyValue prop : props) {
             this.properties.put(prop.key, prop.value);
         }
     }
 
     /**
-     * Set the value of field "properties".
-     * 
-     * @param properties The value
+     * Key-value class for JAXB.
      */
-    public void setProperties(final Map<String, String> properties) {
-        this.properties = properties;
-    }
-
-    private static class Property {
+    private static class KeyValue {
 
         @XmlAttribute
         private String key;

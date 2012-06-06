@@ -28,22 +28,21 @@ import junit.framework.Assert;
 
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
@@ -84,35 +83,24 @@ public class MergeReferenceHelperTest {
 
     private CimiRequest request;
 
+    private CimiResponse response;
+
     private CimiContext context;
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
 
     /**
      * @throws java.lang.Exception
      */
     @Before
     public void setUp() throws Exception {
-        this.request = new CimiRequest();
-        this.context = new CimiContextImpl(this.request);
 
+        this.request = new CimiRequest();
         this.request.setBaseUri("/");
-        this.request.setContext(this.context);
         RequestHeader header = new RequestHeader();
         header.setCimiSelect(new CimiSelect());
         this.request.setHeader(header);
+
+        this.response = new CimiResponse();
+        this.context = new CimiContextImpl(this.request, this.response);
     }
 
     /**
@@ -149,7 +137,7 @@ public class MergeReferenceHelperTest {
         EasyMock.expect(this.serviceCredentials.getCredentialsById("456")).andReturn(reference);
         EasyMock.replay(this.serviceCredentials);
 
-        cimi = new CimiCredentials(this.request.getBaseUri() + CimiEntityType.Credentials.getPathType().getPathname() + "/456");
+        cimi = new CimiCredentials(this.request.getBaseUri() + ResourceType.Credentials.getPathType().getPathname() + "/456");
         this.helper.merge(this.context, cimi);
 
         Assert.assertEquals("refName", cimi.getName());
@@ -161,7 +149,7 @@ public class MergeReferenceHelperTest {
         EasyMock.expect(this.serviceCredentials.getCredentialsById("456")).andReturn(reference);
         EasyMock.replay(this.serviceCredentials);
 
-        cimi = new CimiCredentials(this.request.getBaseUri() + CimiEntityType.Credentials.getPathType().getPathname() + "/456");
+        cimi = new CimiCredentials(this.request.getBaseUri() + ResourceType.Credentials.getPathType().getPathname() + "/456");
         cimi.setName("name");
         this.helper.merge(this.context, cimi);
 
@@ -225,7 +213,7 @@ public class MergeReferenceHelperTest {
         EasyMock.replay(this.serviceCredentials);
 
         cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + CimiEntityType.CredentialsTemplate.getPathType().getPathname() + "/456");
+            + ResourceType.CredentialsTemplate.getPathType().getPathname() + "/456");
         this.helper.merge(this.context, cimi);
 
         Assert.assertEquals("refName", cimi.getName());
@@ -239,7 +227,7 @@ public class MergeReferenceHelperTest {
         EasyMock.replay(this.serviceCredentials);
 
         cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + CimiEntityType.CredentialsTemplate.getPathType().getPathname() + "/456");
+            + ResourceType.CredentialsTemplate.getPathType().getPathname() + "/456");
         cimi.setName("name");
         this.helper.merge(this.context, cimi);
 
@@ -274,8 +262,7 @@ public class MergeReferenceHelperTest {
         EasyMock.expect(this.serviceMachineImage.getMachineImageById("456")).andReturn(reference);
         EasyMock.replay(this.serviceMachineImage);
 
-        cimi = new CimiMachineImage(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname()
-            + "/456");
+        cimi = new CimiMachineImage(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/456");
         this.helper.merge(this.context, cimi);
 
         Assert.assertEquals("refName", cimi.getName());
@@ -287,8 +274,7 @@ public class MergeReferenceHelperTest {
         EasyMock.expect(this.serviceMachineImage.getMachineImageById("456")).andReturn(reference);
         EasyMock.replay(this.serviceMachineImage);
 
-        cimi = new CimiMachineImage(this.request.getBaseUri() + CimiEntityType.MachineImage.getPathType().getPathname()
-            + "/456");
+        cimi = new CimiMachineImage(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/456");
         cimi.setName("name");
         this.helper.merge(this.context, cimi);
 
@@ -323,7 +309,7 @@ public class MergeReferenceHelperTest {
         EasyMock.replay(this.serviceMachine);
 
         cimi = new CimiMachineConfiguration(this.request.getBaseUri()
-            + CimiEntityType.MachineConfiguration.getPathType().getPathname() + "/456");
+            + ResourceType.MachineConfiguration.getPathType().getPathname() + "/456");
         this.helper.merge(this.context, cimi);
 
         Assert.assertEquals("refName", cimi.getName());
@@ -336,7 +322,7 @@ public class MergeReferenceHelperTest {
         EasyMock.replay(this.serviceMachine);
 
         cimi = new CimiMachineConfiguration(this.request.getBaseUri()
-            + CimiEntityType.MachineConfiguration.getPathType().getPathname() + "/456");
+            + ResourceType.MachineConfiguration.getPathType().getPathname() + "/456");
         cimi.setName("name");
         this.helper.merge(this.context, cimi);
 
@@ -403,7 +389,7 @@ public class MergeReferenceHelperTest {
         EasyMock.replay(this.serviceMachine);
         EasyMock.replay(this.serviceMachineImage);
 
-        cimi = new CimiMachineTemplate(this.request.getBaseUri() + CimiEntityType.MachineTemplate.getPathType().getPathname()
+        cimi = new CimiMachineTemplate(this.request.getBaseUri() + ResourceType.MachineTemplate.getPathType().getPathname()
             + "/123");
         this.helper.merge(this.context, cimi);
 
@@ -423,7 +409,7 @@ public class MergeReferenceHelperTest {
         EasyMock.replay(this.serviceMachine);
         EasyMock.replay(this.serviceMachineImage);
 
-        cimi = new CimiMachineTemplate(this.request.getBaseUri() + CimiEntityType.MachineTemplate.getPathType().getPathname()
+        cimi = new CimiMachineTemplate(this.request.getBaseUri() + ResourceType.MachineTemplate.getPathType().getPathname()
             + "/123");
         cimi.setName("name");
         this.helper.merge(this.context, cimi);
@@ -481,11 +467,11 @@ public class MergeReferenceHelperTest {
 
         cimi = new CimiMachineTemplate();
         cimi.setCredentials(new CimiCredentials(this.request.getBaseUri()
-            + CimiEntityType.Credentials.getPathType().getPathname() + "/234"));
+            + ResourceType.Credentials.getPathType().getPathname() + "/234"));
         cimi.setMachineConfig(new CimiMachineConfiguration(this.request.getBaseUri()
-            + CimiEntityType.MachineConfiguration.getPathType().getPathname() + "/345"));
+            + ResourceType.MachineConfiguration.getPathType().getPathname() + "/345"));
         cimi.setMachineImage(new CimiMachineImage(this.request.getBaseUri()
-            + CimiEntityType.MachineImage.getPathType().getPathname() + "/456"));
+            + ResourceType.MachineImage.getPathType().getPathname() + "/456"));
         this.helper.merge(this.context, cimi);
 
         Assert.assertEquals("refNameCredentials", cimi.getCredentials().getName());
@@ -513,13 +499,13 @@ public class MergeReferenceHelperTest {
 
         cimi = new CimiMachineTemplate();
         cimi.setCredentials(new CimiCredentials(this.request.getBaseUri()
-            + CimiEntityType.Credentials.getPathType().getPathname() + "/234"));
+            + ResourceType.Credentials.getPathType().getPathname() + "/234"));
         cimi.getCredentials().setName("nameCredentials");
         cimi.setMachineConfig(new CimiMachineConfiguration(this.request.getBaseUri()
-            + CimiEntityType.MachineConfiguration.getPathType().getPathname() + "/345"));
+            + ResourceType.MachineConfiguration.getPathType().getPathname() + "/345"));
         cimi.getMachineConfig().setName("nameConfiguration");
         cimi.setMachineImage(new CimiMachineImage(this.request.getBaseUri()
-            + CimiEntityType.MachineImage.getPathType().getPathname() + "/456"));
+            + ResourceType.MachineImage.getPathType().getPathname() + "/456"));
         cimi.getMachineImage().setName("nameImage");
         this.helper.merge(this.context, cimi);
 

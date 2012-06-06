@@ -31,7 +31,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
@@ -40,6 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl;
 import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
 import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
@@ -52,19 +52,20 @@ public class MergeReferenceHelperImplTest {
 
     /**
      * Test method for
-     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#mergeCommon(org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId, org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId)}
+     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#mergeCommon(org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon, org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon)}
      * .
      */
     @Test
     public void testMergeCommon() {
+
         MergeReferenceHelperImpl merger = new MergeReferenceHelperImpl();
-        CimiCommonId cimi;
-        CimiCommonId cimiRef;
+        CimiObjectCommonImpl cimi;
+        CimiObjectCommonImpl cimiRef;
         Map<String, String> refProps;
 
         // Destination without value : ID, Name, Description
-        cimi = new CimiCommonId();
-        cimiRef = new CimiCommonId();
+        cimi = new CimiObjectCommonImpl();
+        cimiRef = new CimiObjectCommonImpl();
         cimiRef.setId("/456");
         cimiRef.setName("refName");
         cimiRef.setDescription("refDescription");
@@ -77,11 +78,11 @@ public class MergeReferenceHelperImplTest {
         Assert.assertNull(cimi.getProperties());
 
         // Destination with values : ID, Name, Description
-        cimi = new CimiCommonId();
+        cimi = new CimiObjectCommonImpl();
         cimi.setName("name");
         cimi.setDescription("description");
 
-        cimiRef = new CimiCommonId();
+        cimiRef = new CimiObjectCommonImpl();
         cimiRef.setId("/456");
         cimiRef.setName("refName");
         cimiRef.setDescription("refDescription");
@@ -95,8 +96,8 @@ public class MergeReferenceHelperImplTest {
 
         // Destination without value : Properties empty
         refProps = new HashMap<String, String>();
-        cimi = new CimiCommonId();
-        cimiRef = new CimiCommonId();
+        cimi = new CimiObjectCommonImpl();
+        cimiRef = new CimiObjectCommonImpl();
         cimiRef.setProperties(refProps);
 
         merger.mergeCommon(cimiRef, cimi);
@@ -109,8 +110,8 @@ public class MergeReferenceHelperImplTest {
         refProps.put("refKeyTwo", "refValueTwo");
         refProps.put("refKeyThree", "refValueThree");
 
-        cimi = new CimiCommonId();
-        cimiRef = new CimiCommonId();
+        cimi = new CimiObjectCommonImpl();
+        cimiRef = new CimiObjectCommonImpl();
         cimiRef.setProperties(refProps);
 
         merger.mergeCommon(cimiRef, cimi);
@@ -125,7 +126,7 @@ public class MergeReferenceHelperImplTest {
         props.put("keyOne", "valueOne");
         props.put("keyTwo", "valueTwo");
         props.put("refKeyThree", "valueThree");
-        cimi = new CimiCommonId();
+        cimi = new CimiObjectCommonImpl();
         cimi.setProperties(props);
 
         refProps = new HashMap<String, String>();
@@ -133,7 +134,7 @@ public class MergeReferenceHelperImplTest {
         refProps.put("refKeyTwo", "refValueTwo");
         refProps.put("refKeyThree", "refValueThree");
 
-        cimiRef = new CimiCommonId();
+        cimiRef = new CimiObjectCommonImpl();
         cimiRef.setId("/456");
         cimiRef.setProperties(refProps);
 

@@ -32,7 +32,7 @@ import javax.ws.rs.core.UriInfo;
 /**
  *
  */
-public class CimiResourceAbstract {
+public class RestResourceAbstract {
 
     @Context
     private UriInfo uriInfo;
@@ -48,7 +48,7 @@ public class CimiResourceAbstract {
     /**
      * 
      */
-    public CimiResourceAbstract() {
+    public RestResourceAbstract() {
         this.infos = new JaxRsRequestInfos();
     }
 
@@ -86,21 +86,21 @@ public class CimiResourceAbstract {
          * @return the uriInfo
          */
         public UriInfo getUriInfo() {
-            return CimiResourceAbstract.this.uriInfo;
+            return RestResourceAbstract.this.uriInfo;
         }
 
         /**
          * @return the headers
          */
         public HttpHeaders getHeaders() {
-            return CimiResourceAbstract.this.headers;
+            return RestResourceAbstract.this.headers;
         }
 
         /**
          * @return the request
          */
         public Request getRequest() {
-            return CimiResourceAbstract.this.request;
+            return RestResourceAbstract.this.request;
         }
 
     }

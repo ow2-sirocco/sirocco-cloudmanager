@@ -24,63 +24,67 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
- * Class JobCollection.
+ * Collection of Job.
  */
-@XmlRootElement(name = "JobCollection")
+@XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiJobCollection extends CimiCommonId {
+public class CimiJobCollection extends CimiCollectionAbstract<CimiJob> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "jobs".
-     */
-    @JsonProperty
-    @Null(groups = {GroupWrite.class})
-    private CimiJob[] jobs;
-
-    /**
-     * Return the value of field "jobs".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
-    @XmlElement(name = "job")
-    @JsonIgnore
-    public CimiJob[] getJobs() {
-        return this.jobs;
-    }
-
-    /**
-     * Set the value of field "jobs".
-     * 
-     * @param jobs The value
-     */
-    public void setJobs(final CimiJob[] jobs) {
-        this.jobs = jobs;
+    @Override
+    @XmlElement(name = "Job")
+    @JsonProperty(value = "jobs")
+    public CimiJob[] getArray() {
+        return super.getArray();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    public boolean hasValues() {
-        boolean has = super.hasValues();
-        has = has || (null != this.getJobs());
-        return has;
+    @JsonProperty(value = "jobs")
+    public void setArray(final CimiJob[] items) {
+        super.setArray(items);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiJob> newCollection() {
+        return new CimiJobArray();
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiJobArray extends CimiArrayAbstract<CimiJob> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public CimiJob[] newEmptyArraySized() {
+            return new CimiJob[this.size()];
+        }
+    }
 }

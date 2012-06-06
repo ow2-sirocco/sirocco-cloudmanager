@@ -29,8 +29,7 @@ import javax.validation.groups.Default;
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
@@ -51,17 +50,16 @@ public class CimiManagerActionMachine extends CimiManagerAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#validate(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#validate(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected boolean validate(final CimiRequest request, final CimiResponse response) throws Exception {
-        boolean valid = CimiValidatorHelper.getInstance().validate(request, response, request.getHeader());
+    protected boolean validate(final CimiContext context) throws Exception {
+        boolean valid = CimiValidatorHelper.getInstance().validate(context, context.getRequest().getHeader());
         if (valid) {
-            if (null == request.getCimiData()) {
+            if (null == context.getRequest().getCimiData()) {
                 valid = false;
             } else {
-                valid = CimiValidatorHelper.getInstance().validate(request, response, request.getCimiData(), Default.class,
+                valid = CimiValidatorHelper.getInstance().validate(context, context.getRequest().getCimiData(), Default.class,
                     GroupWrite.class);
             }
         }
@@ -71,11 +69,10 @@ public class CimiManagerActionMachine extends CimiManagerAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+    protected Object convertToDataService(final CimiContext context) throws Exception {
         // Nothing to do
         return null;
     }
@@ -83,22 +80,20 @@ public class CimiManagerActionMachine extends CimiManagerAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiAction cimiAction = (CimiAction) request.getCimiData();
+        CimiAction cimiAction = (CimiAction) context.getRequest().getCimiData();
         ActionType type = ActionType.findPath(cimiAction.getAction());
         switch (type) {
         case START:
-            out = this.manager.startMachine(request.getId());
+            out = this.manager.startMachine(context.getRequest().getId());
             break;
         case STOP:
-            out = this.manager.stopMachine(request.getId());
+            out = this.manager.stopMachine(context.getRequest().getId());
             break;
         default:
             throw new UnsupportedOperationException();
@@ -109,13 +104,11 @@ public class CimiManagerActionMachine extends CimiManagerAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
+    protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
         // Nothing to do
     }
 }

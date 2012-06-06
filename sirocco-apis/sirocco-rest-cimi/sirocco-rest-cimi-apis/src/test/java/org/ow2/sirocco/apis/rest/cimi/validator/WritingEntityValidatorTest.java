@@ -38,10 +38,9 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiHref;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
@@ -53,7 +52,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -64,20 +66,22 @@ public class WritingEntityValidatorTest {
 
     private CimiResponse response;
 
+    private CimiContext context;
+
     @Before
     public void setUp() throws Exception {
 
         this.request = new CimiRequest();
-        this.request.setContext(new CimiContextImpl(this.request));
         this.request.setBaseUri("http://www.test.org/");
         this.response = new CimiResponse();
+        this.context = new CimiContextImpl(this.request, this.response);
     }
 
     @Test
     public void testAllEntitiesWithHref() throws Exception {
-        CimiHref cimi = null;
+        CimiResource cimi = null;
 
-        for (CimiEntityType type : CimiEntityType.values()) {
+        for (ResourceType type : ResourceType.values()) {
             switch (type) {
             case CloudEntryPoint:
                 cimi = new CimiCloudEntryPoint();
@@ -138,19 +142,19 @@ public class WritingEntityValidatorTest {
                 break;
             }
             if (null != cimi) {
-                cimi.setHref(this.request.getContext().makeHref(cimi, 1));
-                Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+                cimi.setHref(this.context.makeHref(cimi, 1));
+                Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
-                cimi.setHref(this.request.getContext().makeHrefBase(cimi));
-                if (true == this.request.getContext().mustHaveIdInReference(cimi)) {
+                cimi.setHref(this.context.makeHrefBase(cimi));
+                if (true == this.context.mustHaveIdInReference(cimi)) {
 
-                    Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+                    Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
                 } else {
-                    Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+                    Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
                 }
 
                 cimi.setHref("foo");
-                Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+                Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
             }
         }
 
@@ -158,46 +162,46 @@ public class WritingEntityValidatorTest {
 
     @Test
     public void testCimiCommon() throws Exception {
-        CimiCommon cimi;
+        CimiDataCommon cimi;
         Map<String, String> props;
 
         // --------------- OK
 
         cimi = new CimiCommon();
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCommon();
         cimi.setName("A");
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCommon();
         cimi.setName("_");
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCommon();
         props = new HashMap<String, String>();
         props.put("A", "a");
         props.put("B", "b");
         cimi.setProperties(props);
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
         cimi = new CimiCommon();
         cimi.setName("0");
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCommon();
         props = new HashMap<String, String>();
         cimi.setProperties(props);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCommon();
         props = new HashMap<String, String>();
         props.put("A", "a");
         props.put("B", null);
         cimi.setProperties(props);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }
 
     @Test
@@ -212,21 +216,21 @@ public class WritingEntityValidatorTest {
         // --------------- OK
 
         cimi = new CimiCredentials();
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCredentials();
         cimi.setKey(filledKeySize3);
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCredentials();
         cimi.setKey(new byte[1]);
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
         cimi = new CimiCredentials();
         cimi.setKey(new byte[0]);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
     }
 
@@ -242,21 +246,21 @@ public class WritingEntityValidatorTest {
         // --------------- OK
 
         cimi = new CimiCredentialsTemplate();
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCredentialsTemplate();
         cimi.setKey(filledKeySize3);
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCredentialsTemplate();
         cimi.setKey(new byte[1]);
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
         cimi = new CimiCredentialsTemplate();
         cimi.setKey(new byte[0]);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }
 
     @Test
@@ -267,17 +271,17 @@ public class WritingEntityValidatorTest {
         // --------------- OK
 
         cimi = new CimiMachine();
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachine();
         cimi.setDisks(new CimiDisk[] {new CimiDisk(new CimiCapacity(1, "unit"))});
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
         cimi = new CimiMachine();
         cimi.setDisks(new CimiDisk[0]);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }
 
     @Test
@@ -287,25 +291,25 @@ public class WritingEntityValidatorTest {
         // --------------- OK
 
         cimi = new CimiMachineConfiguration();
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
         cimi.setCpu(new CimiCpu(1f, "unit", 1));
         cimi.setMemory(new CimiMemory(1, "unit"));
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
         cimi.setCpu(new CimiCpu(1f, "unit", 1));
         cimi.setMemory(new CimiMemory(1, "unit"));
         cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(new CimiCapacity(1, "unit"), "f", "ap")});
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
         cimi.setCpu(new CimiCpu(1f, "unit", 1));
         cimi.setMemory(new CimiMemory(1, "unit"));
         cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(new CimiCapacity(1, "unit"), "f", "ap"),
             new CimiDiskConfiguration(new CimiCapacity(2, "unit2"), "f2", "ap2")});
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
@@ -313,19 +317,19 @@ public class WritingEntityValidatorTest {
         cimi.setCpu(new CimiCpu(1f, "unit", 1));
         cimi.setMemory(new CimiMemory(1, "unit"));
         cimi.setDisks(new CimiDiskConfiguration[0]);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
         cimi.setCpu(new CimiCpu(1f, "unit", 1));
         cimi.setMemory(new CimiMemory(1, "unit"));
         cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration()});
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
         cimi.setCpu(new CimiCpu(1f, "unit", 1));
         cimi.setMemory(new CimiMemory(1, "unit"));
         cimi.setDisks(new CimiDiskConfiguration[] {null, null});
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }
 
     @Test
@@ -335,17 +339,17 @@ public class WritingEntityValidatorTest {
         // --------------- OK
 
         cimi = new CimiMachineImage();
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineImage();
         cimi.setImageLocation(new ImageLocation("foo"));
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
         cimi = new CimiMachineImage();
         cimi.setImageLocation(new ImageLocation());
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }
 
     @Test
@@ -355,13 +359,13 @@ public class WritingEntityValidatorTest {
         // --------------- OK
 
         cimi = new CimiMachineTemplate();
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineTemplate();
         cimi.setCredentials(new CimiCredentials());
         cimi.setMachineConfig(new CimiMachineConfiguration());
         cimi.setMachineImage(new CimiMachineImage());
-        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
@@ -369,6 +373,6 @@ public class WritingEntityValidatorTest {
         cimi.setCredentials(new CimiCredentials());
         cimi.setMachineConfig(new CimiMachineConfiguration());
         cimi.setMachineImage(new CimiMachineImage(new ImageLocation()));
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.request, this.response, cimi));
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }
 }

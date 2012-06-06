@@ -25,9 +25,9 @@
 package org.ow2.sirocco.apis.rest.cimi.request;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.EntityConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 
 /**
  *
@@ -35,12 +35,26 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 public interface CimiContext {
 
     /**
+     * Get the current request.
+     * 
+     * @return The current request
+     */
+    CimiRequest getRequest();
+
+    /**
+     * Get the current response.
+     * 
+     * @return The current response
+     */
+    CimiResponse getResponse();
+
+    /**
      * Get the entity type for a instance.
      * 
      * @param data The entity
      * @return The entity type
      */
-    CimiEntityType getType(CimiData data);
+    ResourceType getType(CimiData data);
 
     /**
      * Get the converter for the entity root to convert.
@@ -52,9 +66,9 @@ public interface CimiContext {
      * 
      * @param type The type of entity to convert
      * @return The converter
-     * @see #getRootConverter(CimiEntityType, boolean)
+     * @see #getRootConverter(ResourceType, boolean)
      */
-    CimiConverter getRootConverter(CimiEntityType type);
+    CimiConverter getRootConverter(ResourceType type);
 
     /**
      * Get the converter for the entity root to convert.
@@ -69,7 +83,7 @@ public interface CimiContext {
      * @see #isConvertedWriteOnly()
      * @see #setConvertedWriteOnly(boolean)
      */
-    CimiConverter getRootConverter(CimiEntityType type, boolean convertedWriteOnly);
+    CimiConverter getRootConverter(ResourceType type, boolean convertedWriteOnly);
 
     /**
      * Get the converter for a class.
@@ -85,22 +99,15 @@ public interface CimiContext {
      * @param klass The class to convert
      * @return The entity converter
      */
-    EntityConverter getEntityConverter(Class<?> klass);
+    ResourceConverter getEntityConverter(Class<?> klass);
 
     /**
      * Get the current root converting setted by
-     * {@link #getRootConverter(CimiEntityType)}.
+     * {@link #getRootConverter(ResourceType)}.
      * 
      * @return The current root type converting
      */
-    CimiEntityType getCurrentRootConverting();
-
-    /**
-     * Get the current request.
-     * 
-     * @return The current request
-     */
-    CimiRequest getRequest();
+    ResourceType getCurrentRootConverting();
 
     /**
      * Returns true if the given entity must be expanded.
@@ -134,7 +141,7 @@ public interface CimiContext {
      * @param type The type of a CIMI entity
      * @return True if must have a ID.
      */
-    boolean mustHaveIdInReference(final CimiEntityType type);
+    boolean mustHaveIdInReference(final ResourceType type);
 
     /**
      * Make the base HREF without ID.
@@ -169,7 +176,7 @@ public interface CimiContext {
      * @param id Service ID
      * @return The HREF made
      */
-    String makeHref(final CimiEntityType type, final Integer id);
+    String makeHref(final ResourceType type, final Integer id);
 
     /**
      * Returns true if the converters must process the write-only data when

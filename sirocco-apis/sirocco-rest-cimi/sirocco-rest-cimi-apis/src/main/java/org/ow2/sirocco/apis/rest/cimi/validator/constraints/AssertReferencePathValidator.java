@@ -26,7 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.validator.constraints;
 
 import javax.validation.ConstraintValidatorContext;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiHref;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiContextValidatorAbstract;
 
 /**
@@ -52,7 +52,7 @@ public class AssertReferencePathValidator extends CimiContextValidatorAbstract<A
     public boolean isValid(final Object value, final ConstraintValidatorContext ctx) {
         boolean valid = true;
         if (value != null) {
-            CimiHref cimiHref = (CimiHref) value;
+            CimiResource cimiHref = (CimiResource) value;
             String href = cimiHref.getHref();
             if (href != null) {
                 String hrefNoId = this.getCimiContext().makeHrefBase(cimiHref);

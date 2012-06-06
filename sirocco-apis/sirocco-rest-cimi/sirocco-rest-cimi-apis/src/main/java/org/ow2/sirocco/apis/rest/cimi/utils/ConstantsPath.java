@@ -26,6 +26,8 @@ package org.ow2.sirocco.apis.rest.cimi.utils;
 
 public abstract class ConstantsPath {
 
+    public static final String CIMI_XML_NAMESPACE = "http://schemas.dmtf.org/cimi/1";
+
     public static final String CLOUDENTRYPOINT = "";
 
     public static final String CLOUDENTRYPOINT_PATH = "/" + ConstantsPath.CLOUDENTRYPOINT;

@@ -17,18 +17,12 @@
 			"rel":"relValue_2_1",
 			"href":"hrefValue_2_1"
 		}
+		
 	],
 	"href":"hrefValue_2",
 	"machineTemplates":{
-		"name":"nameValue_2",
-		"description":"descriptionValue_2",
-		"properties":{
-			"keyProp_2_0":"valueProp_2_0",
-			"keyProp_2_1":"valueProp_2_1"
-		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002Z",
-		"updated":"2002-03-03T02:02:02.002Z",
+		"href":"hrefValue_2",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -38,8 +32,8 @@
 				"rel":"relValue_2_1",
 				"href":"hrefValue_2_1"
 			}
+			
 		],
-		"href":"hrefValue_2",
 		"machineTemplates":[
 			{
 				"name":"nameValue_2_0",
@@ -60,6 +54,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_0",
 				"machineConfig":{
@@ -81,6 +76,7 @@
 							"rel":"relValue_2_1",
 							"href":"hrefValue_2_1"
 						}
+						
 					],
 					"href":"hrefValue_2_0",
 					"cpu":{
@@ -109,7 +105,9 @@
 							"format":"formatValue_2_1",
 							"attachmentPoint":"attachmentPointValue_2_1"
 						}
+						
 					]
+					
 				},
 				"machineImage":{
 					"name":"nameValue_2_0",
@@ -130,6 +128,7 @@
 							"rel":"relValue_2_1",
 							"href":"hrefValue_2_1"
 						}
+						
 					],
 					"href":"hrefValue_2_0",
 					"state":"stateValue_2_0",
@@ -157,12 +156,14 @@
 							"rel":"relValue_2_1",
 							"href":"hrefValue_2_1"
 						}
+						
 					],
 					"href":"hrefValue_2_0",
 					"userName":"userNameValue_2_0",
 					"password":"passwordValue_2_0",
 					"key":"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUm"
 				}
+				
 			},
 			{
 				"name":"nameValue_2_1",
@@ -183,6 +184,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_1",
 				"machineConfig":{
@@ -204,6 +206,7 @@
 							"rel":"relValue_2_1",
 							"href":"hrefValue_2_1"
 						}
+						
 					],
 					"href":"hrefValue_2_1",
 					"cpu":{
@@ -232,7 +235,9 @@
 							"format":"formatValue_2_1",
 							"attachmentPoint":"attachmentPointValue_2_1"
 						}
+						
 					]
+					
 				},
 				"machineImage":{
 					"name":"nameValue_2_1",
@@ -253,6 +258,7 @@
 							"rel":"relValue_2_1",
 							"href":"hrefValue_2_1"
 						}
+						
 					],
 					"href":"hrefValue_2_1",
 					"state":"stateValue_2_1",
@@ -280,25 +286,22 @@
 							"rel":"relValue_2_1",
 							"href":"hrefValue_2_1"
 						}
+						
 					],
 					"href":"hrefValue_2_1",
 					"userName":"userNameValue_2_1",
 					"password":"passwordValue_2_1",
 					"key":"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUm"
 				}
+				
 			}
+			
 		]
+		
 	},
 	"machineConfigs":{
-		"name":"nameValue_2",
-		"description":"descriptionValue_2",
-		"properties":{
-			"keyProp_2_0":"valueProp_2_0",
-			"keyProp_2_1":"valueProp_2_1"
-		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002Z",
-		"updated":"2002-03-03T02:02:02.002Z",
+		"href":"hrefValue_2",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -308,8 +311,8 @@
 				"rel":"relValue_2_1",
 				"href":"hrefValue_2_1"
 			}
+			
 		],
-		"href":"hrefValue_2",
 		"machineConfigurations":[
 			{
 				"name":"nameValue_2_0",
@@ -330,6 +333,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_0",
 				"cpu":{
@@ -358,7 +362,9 @@
 						"format":"formatValue_2_1",
 						"attachmentPoint":"attachmentPointValue_2_1"
 					}
+					
 				]
+				
 			},
 			{
 				"name":"nameValue_2_1",
@@ -379,6 +385,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_1",
 				"cpu":{
@@ -407,20 +414,17 @@
 						"format":"formatValue_2_1",
 						"attachmentPoint":"attachmentPointValue_2_1"
 					}
+					
 				]
+				
 			}
+			
 		]
+		
 	},
 	"machineImages":{
-		"name":"nameValue_2",
-		"description":"descriptionValue_2",
-		"properties":{
-			"keyProp_2_0":"valueProp_2_0",
-			"keyProp_2_1":"valueProp_2_1"
-		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002Z",
-		"updated":"2002-03-03T02:02:02.002Z",
+		"href":"hrefValue_2",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -430,8 +434,8 @@
 				"rel":"relValue_2_1",
 				"href":"hrefValue_2_1"
 			}
+			
 		],
-		"href":"hrefValue_2",
 		"machineImages":[
 			{
 				"name":"nameValue_2_0",
@@ -452,6 +456,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_0",
 				"state":"stateValue_2_0",
@@ -479,6 +484,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_1",
 				"state":"stateValue_2_1",
@@ -487,18 +493,13 @@
 				},
 				"type":"typeValue_2_1"
 			}
+			
 		]
+		
 	},
 	"credentials":{
-		"name":"nameValue_2",
-		"description":"descriptionValue_2",
-		"properties":{
-			"keyProp_2_0":"valueProp_2_0",
-			"keyProp_2_1":"valueProp_2_1"
-		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002Z",
-		"updated":"2002-03-03T02:02:02.002Z",
+		"href":"hrefValue_2",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -508,8 +509,8 @@
 				"rel":"relValue_2_1",
 				"href":"hrefValue_2_1"
 			}
+			
 		],
-		"href":"hrefValue_2",
 		"credentials":[
 			{
 				"name":"nameValue_2_0",
@@ -530,6 +531,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_0",
 				"userName":"userNameValue_2_0",
@@ -555,24 +557,20 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_1",
 				"userName":"userNameValue_2_1",
 				"password":"passwordValue_2_1",
 				"key":"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUm"
 			}
+			
 		]
+		
 	},
 	"machines":{
-		"name":"nameValue_2",
-		"description":"descriptionValue_2",
-		"properties":{
-			"keyProp_2_0":"valueProp_2_0",
-			"keyProp_2_1":"valueProp_2_1"
-		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002Z",
-		"updated":"2002-03-03T02:02:02.002Z",
+		"href":"hrefValue_2",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -582,8 +580,8 @@
 				"rel":"relValue_2_1",
 				"href":"hrefValue_2_1"
 			}
+			
 		],
-		"href":"hrefValue_2",
 		"machines":[
 			{
 				"name":"nameValue_2_0",
@@ -604,6 +602,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_0",
 				"state":"stateValue_2_0",
@@ -622,14 +621,18 @@
 							"quantity":2,
 							"units":"unitValue_2_0"
 						}
+						
 					},
 					{
 						"capacity":{
 							"quantity":2,
 							"units":"unitValue_2_1"
 						}
+						
 					}
+					
 				]
+				
 			},
 			{
 				"name":"nameValue_2_1",
@@ -650,6 +653,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_1",
 				"state":"stateValue_2_1",
@@ -668,28 +672,27 @@
 							"quantity":2,
 							"units":"unitValue_2_0"
 						}
+						
 					},
 					{
 						"capacity":{
 							"quantity":2,
 							"units":"unitValue_2_1"
 						}
+						
 					}
+					
 				]
+				
 			}
+			
 		]
+		
 	},
 	"jobTime":2,
 	"credentialsTemplates":{
-		"name":"nameValue_2",
-		"description":"descriptionValue_2",
-		"properties":{
-			"keyProp_2_0":"valueProp_2_0",
-			"keyProp_2_1":"valueProp_2_1"
-		},
 		"id":"idValue_2",
-		"created":"2002-03-03T02:02:02.002Z",
-		"updated":"2002-03-03T02:02:02.002Z",
+		"href":"hrefValue_2",
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -699,8 +702,8 @@
 				"rel":"relValue_2_1",
 				"href":"hrefValue_2_1"
 			}
+			
 		],
-		"href":"hrefValue_2",
 		"credentialsTemplates":[
 			{
 				"name":"nameValue_2_0",
@@ -721,6 +724,7 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_0",
 				"userName":"userNameValue_2_0",
@@ -746,12 +750,15 @@
 						"rel":"relValue_2_1",
 						"href":"hrefValue_2_1"
 					}
+					
 				],
 				"href":"hrefValue_2_1",
 				"userName":"userNameValue_2_1",
 				"password":"passwordValue_2_1",
 				"key":"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUm"
 			}
+			
 		]
+		
 	}
 }

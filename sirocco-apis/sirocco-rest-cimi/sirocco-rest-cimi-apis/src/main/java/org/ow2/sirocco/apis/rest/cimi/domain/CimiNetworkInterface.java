@@ -35,7 +35,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "NetworkInterface")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiNetworkInterface extends CimiCommonId {
+public class CimiNetworkInterface extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -84,6 +84,22 @@ public class CimiNetworkInterface extends CimiCommonId {
      * Field "macTransmissionUnit".
      */
     private Integer macTransmissionUnit;
+
+    /**
+     * Default constructor.
+     */
+    public CimiNetworkInterface() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiNetworkInterface(final String href) {
+        super(href);
+    }
 
     /**
      * Return the value of field "hostname".
@@ -250,7 +266,7 @@ public class CimiNetworkInterface extends CimiCommonId {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl#hasValues()
      */
     @Override
     public boolean hasValues() {

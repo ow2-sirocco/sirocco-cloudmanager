@@ -26,11 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine.template;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
@@ -51,17 +50,15 @@ public class CimiManagerReadMachineTemplate extends CimiManagerReadAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#callService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected Object callService(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
+    protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         MachineTemplate out = null;
-        CimiSelect select = request.getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getMachineTemplateById(request.getId());
+            out = this.manager.getMachineTemplateById(context.getRequest().getId());
         } else {
             // FIXME
             throw new UnsupportedOperationException();
@@ -72,17 +69,15 @@ public class CimiManagerReadMachineTemplate extends CimiManagerReadAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected void convertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService)
-        throws Exception {
-        CimiMachineTemplate cimi = (CimiMachineTemplate) request.getContext().getRootConverter(CimiEntityType.MachineTemplate)
-            .toCimi(request.getContext(), dataService);
-        response.setCimiData(cimi);
-        response.setStatus(Response.Status.OK);
+    protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
+        CimiMachineTemplate cimi = (CimiMachineTemplate) context.getRootConverter(ResourceType.MachineTemplate).toCimi(context,
+            dataService);
+        context.getResponse().setCimiData(cimi);
+        context.getResponse().setStatus(Response.Status.OK);
     }
 
 }

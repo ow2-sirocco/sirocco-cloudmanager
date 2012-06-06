@@ -32,8 +32,7 @@ import junit.framework.ComparisonFailure;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.PathType;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.SerializationHelper;
 
 /**
@@ -51,24 +50,25 @@ public class MockCimiManagerUpdate extends MockCimiManager {
      *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
      */
     @Override
-    public void execute(final CimiRequest request, final CimiResponse response) {
+    public void execute(final CimiContext context) {
         try {
             // Build and compare
-            CimiData cimi = this.buildEntity(request);
+            CimiData cimi = this.buildEntity(context.getRequest());
             Assert.assertEquals(ToStringBuilder.reflectionToString(cimi, new SerializationHelper.RecursiveToStringStyle()),
-                ToStringBuilder.reflectionToString(request.getCimiData(), new SerializationHelper.RecursiveToStringStyle()));
+                ToStringBuilder.reflectionToString(context.getRequest().getCimiData(),
+                    new SerializationHelper.RecursiveToStringStyle()));
 
             // Build response
-            response.setCimiData(this.buildEntity(request, PathType.Job));
-            response.setStatus(Status.OK);
+            context.getResponse().setCimiData(this.buildEntity(context.getRequest(), PathType.Job));
+            context.getResponse().setStatus(Status.OK);
         } catch (ComparisonFailure e) {
             // Build assert error
-            response.setCimiData(null);
-            response.setErrorMessage(e.getMessage());
-            response.setStatus(Status.NOT_ACCEPTABLE);
+            context.getResponse().setCimiData(null);
+            context.getResponse().setErrorMessage(e.getMessage());
+            context.getResponse().setStatus(Status.NOT_ACCEPTABLE);
         } catch (Exception e) {
-            response.setErrorMessage(e.getMessage());
-            response.setStatus(Status.SERVICE_UNAVAILABLE);
+            context.getResponse().setErrorMessage(e.getMessage());
+            context.getResponse().setStatus(Status.SERVICE_UNAVAILABLE);
         }
     }
 

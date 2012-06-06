@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineImageCollection href="hrefValue_3">
-	<description>descriptionValue_3</description>
-	<name>nameValue_3</name>
-	<property key="keyProp_3_0">valueProp_3_0</property>
-	<property key="keyProp_3_2">valueProp_3_2</property>
-	<property key="keyProp_3_1">valueProp_3_1</property>
+<Collection href="hrefValue_3">
 	<id>idValue_3</id>
-	<created>2003-04-04T03:03:03.003Z</created>
 	<operation href="hrefValue_3_0" rel="relValue_3_0" />
 	<operation href="hrefValue_3_1" rel="relValue_3_1" />
 	<operation href="hrefValue_3_2" rel="relValue_3_2" />
-	<updated>2003-04-04T03:03:03.003Z</updated>
-	<machineImage href="hrefValue_3_0" />
-	<machineImage href="hrefValue_3_1" />
-	<machineImage href="hrefValue_3_2" />
-</MachineImageCollection>
+	<MachineImage href="hrefValue_3_0" />
+	<MachineImage href="hrefValue_3_1" />
+	<MachineImage href="hrefValue_3_2" />
+</Collection>

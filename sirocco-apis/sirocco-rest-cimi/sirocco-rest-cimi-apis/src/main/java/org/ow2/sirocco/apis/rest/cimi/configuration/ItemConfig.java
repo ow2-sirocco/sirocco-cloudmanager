@@ -27,11 +27,11 @@ package org.ow2.sirocco.apis.rest.cimi.configuration;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 
 public class ItemConfig {
 
-    private CimiEntityType type;
+    private ResourceType type;
 
     private Class<?> klass;
 
@@ -58,7 +58,7 @@ public class ItemConfig {
      * @param type
      * @param klass
      */
-    public ItemConfig(final CimiEntityType type, final Class<?> klass) {
+    public ItemConfig(final ResourceType type, final Class<?> klass) {
         this();
         this.setType(type);
         this.setKlass(klass);
@@ -67,14 +67,14 @@ public class ItemConfig {
     /**
      * @return the type
      */
-    public CimiEntityType getType() {
+    public ResourceType getType() {
         return this.type;
     }
 
     /**
      * @param type the type to set
      */
-    public void setType(final CimiEntityType type) {
+    public void setType(final ResourceType type) {
         this.type = type;
     }
 

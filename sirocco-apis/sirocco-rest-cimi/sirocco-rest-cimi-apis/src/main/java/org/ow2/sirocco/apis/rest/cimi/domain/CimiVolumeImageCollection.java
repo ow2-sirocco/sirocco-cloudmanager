@@ -24,55 +24,67 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class VolumeImageCollection.
+ * Collection of VolumeImage.
  */
-@XmlRootElement(name = "volumeImageCollection")
+@XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeImageCollection extends CimiCommonId implements Serializable {
+public class CimiVolumeImageCollection extends CimiCollectionAbstract<CimiVolumeImage> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "volumeImages".
-     */
-    private CimiVolumeImage[] volumeImages;
-
-    /**
-     * Return the value of field "volumeImages".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
-    public CimiVolumeImage[] getVolumeImages() {
-        return this.volumeImages;
-    }
-
-    /**
-     * Set the value of field "volumeImages".
-     * 
-     * @param volumeImages The value
-     */
-    public void setVolumeImages(final CimiVolumeImage[] volumeImages) {
-        this.volumeImages = volumeImages;
+    @Override
+    @XmlElement(name = "VolumeImage")
+    @JsonProperty(value = "volumeImages")
+    public CimiVolumeImage[] getArray() {
+        return super.getArray();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+    @JsonProperty(value = "volumeImages")
+    public void setArray(final CimiVolumeImage[] items) {
+        super.setArray(items);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiVolumeImage> newCollection() {
+        return new CimiVolumeImageArray();
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiVolumeImageArray extends CimiArrayAbstract<CimiVolumeImage> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public CimiVolumeImage[] newEmptyArraySized() {
+            return new CimiVolumeImage[this.size()];
+        }
+    }
 }

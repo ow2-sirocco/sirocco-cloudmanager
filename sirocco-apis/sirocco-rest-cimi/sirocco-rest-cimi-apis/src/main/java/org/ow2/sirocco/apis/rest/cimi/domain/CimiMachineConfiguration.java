@@ -42,7 +42,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
  */
 @XmlRootElement(name = "MachineConfiguration")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineConfiguration extends CimiCommonId {
+public class CimiMachineConfiguration extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -92,6 +92,7 @@ public class CimiMachineConfiguration extends CimiCommonId {
      * @param memory The memory
      */
     public CimiMachineConfiguration(final CimiCpu cpu, final CimiMemory memory) {
+        super();
         this.cpu = cpu;
         this.memory = memory;
     }
@@ -155,7 +156,7 @@ public class CimiMachineConfiguration extends CimiCommonId {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl#hasValues()
      */
     @Override
     public boolean hasValues() {

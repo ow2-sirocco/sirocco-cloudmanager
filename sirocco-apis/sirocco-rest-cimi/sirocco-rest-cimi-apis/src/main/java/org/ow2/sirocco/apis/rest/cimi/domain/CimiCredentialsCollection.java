@@ -24,61 +24,68 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.constraints.Null;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
- * Class CredentialsCollection.
+ * Collection of Credentials.
  */
-@XmlRootElement(name = "CredentialsCollection")
+@XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsCollection extends CimiCommonId {
+public class CimiCredentialsCollection extends CimiCollectionAbstract<CimiCredentials> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "credentials".
-     */
-    @JsonProperty
-    @Null(groups = {GroupWrite.class})
-    private CimiCredentials[] credentials;
-
-    /**
-     * Return the value of field "Credentials".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
-    @JsonIgnore
-    public CimiCredentials[] getCredentials() {
-        return this.credentials;
-    }
-
-    /**
-     * Set the value of field "Credentials".
-     * 
-     * @param Credentials The value
-     */
-    public void setCredentials(final CimiCredentials[] credentials) {
-        this.credentials = credentials;
+    @Override
+    @XmlElement(name = "Credentials")
+    @JsonProperty(value = "credentials")
+    public CimiCredentials[] getArray() {
+        return super.getArray();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    public boolean hasValues() {
-        boolean has = super.hasValues();
-        has = has || (null != this.getCredentials());
-        return has;
+    @JsonProperty(value = "credentials")
+    public void setArray(final CimiCredentials[] items) {
+        super.setArray(items);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiCredentials> newCollection() {
+        return new CimiCredentialsArray();
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiCredentialsArray extends CimiArrayAbstract<CimiCredentials> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public CimiCredentials[] newEmptyArraySized() {
+            return new CimiCredentials[this.size()];
+        }
     }
 
 }

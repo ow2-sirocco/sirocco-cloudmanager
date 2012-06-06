@@ -34,9 +34,8 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.request.HelperRequest;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.apis.rest.cimi.request.HelperContext;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,7 +54,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path(ConstantsPath.CLOUDENTRYPOINT_PATH)
-public class CimiCloudEntryPointResource extends CimiResourceAbstract {
+public class CloudEntryPointRestResource extends RestResourceAbstract {
 
     @Autowired
     @Qualifier("CimiManagerReadCloudEntryPoint")
@@ -73,10 +72,9 @@ public class CimiCloudEntryPointResource extends CimiResourceAbstract {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readCloudEntryPoint() {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos());
-        CimiResponse response = new CimiResponse();
-        this.cimiManagerReadCloudEntryPoint.execute(request, response);
-        return HelperResponse.buildResponse(response);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos());
+        this.cimiManagerReadCloudEntryPoint.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
     }
 
     /**
@@ -87,10 +85,9 @@ public class CimiCloudEntryPointResource extends CimiResourceAbstract {
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateCloudEntryPoint(final CimiCloudEntryPoint cloudEntryPoint) {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), cloudEntryPoint);
-        CimiResponse response = new CimiResponse();
-        this.cimiManagerUpdateCloudEntryPoint.execute(request, response);
-        return HelperResponse.buildResponse(response);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), cloudEntryPoint);
+        this.cimiManagerUpdateCloudEntryPoint.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
     }
 
 }

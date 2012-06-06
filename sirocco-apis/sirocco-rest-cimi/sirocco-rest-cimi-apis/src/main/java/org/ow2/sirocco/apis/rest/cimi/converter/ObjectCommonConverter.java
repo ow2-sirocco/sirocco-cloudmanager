@@ -24,9 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
@@ -34,12 +33,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiCommonId}</li>
- * <li>Service model: {@link CloudEntity}</li>
+ * <li>CIMI model: {@link CimiObjectCommon}</li>
+ * <li>Service model: {@link Resource}</li>
  * </ul>
  * </p>
  */
-public class CommonIdConverter extends CommonConverter {
+public class ObjectCommonConverter extends CommonConverter {
 
     /**
      * Fill the common data from a service object to a CIMI object.
@@ -48,7 +47,7 @@ public class CommonIdConverter extends CommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void fill(final CimiContext context, final Resource dataService, final CimiCommonId dataCimi) {
+    protected void fill(final CimiContext context, final Resource dataService, final CimiObjectCommon dataCimi) {
         if (true == context.mustBeExpanded(dataCimi)) {
             this.fill(dataService, dataCimi);
             dataCimi.setCreated(dataService.getCreated());
@@ -69,10 +68,10 @@ public class CommonIdConverter extends CommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination service object
      */
-    protected void fill(final CimiContext context, final CimiCommonId dataCimi, final Resource dataService) {
+    protected void fill(final CimiContext context, final CimiObjectCommon dataCimi, final Resource dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getId()) {
-            dataService.setId(CommonIdConverter.extractId(dataCimi.getId()));
+            dataService.setId(ObjectCommonConverter.extractId(dataCimi.getId()));
         }
     }
 
@@ -96,6 +95,6 @@ public class CommonIdConverter extends CommonConverter {
      * @return The ID service
      */
     public static Integer extractId(final String href) {
-        return Integer.valueOf(CommonIdConverter.extractIdString(href));
+        return Integer.valueOf(ObjectCommonConverter.extractIdString(href));
     }
 }

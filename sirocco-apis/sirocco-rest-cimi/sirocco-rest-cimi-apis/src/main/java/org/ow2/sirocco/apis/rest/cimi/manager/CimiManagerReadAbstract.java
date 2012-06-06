@@ -24,14 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
 
 /**
@@ -42,40 +38,34 @@ public abstract class CimiManagerReadAbstract extends CimiManagerAbstract {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#validate(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#validate(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected boolean validate(final CimiRequest request, final CimiResponse response) throws Exception {
-        return CimiValidatorHelper.getInstance().validate(request, response, request.getHeader());
+    protected boolean validate(final CimiContext context) throws Exception {
+        return CimiValidatorHelper.getInstance().validate(context, context.getRequest().getHeader());
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected Object convertToDataService(final CimiRequest request, final CimiResponse response) throws Exception {
+    protected Object convertToDataService(final CimiContext context) throws Exception {
         return null;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiRequest,
-     *      org.ow2.sirocco.apis.rest.cimi.request.CimiResponse,
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
-    protected void afterConvertToResponse(final CimiRequest request, final CimiResponse response, final Object dataService) {
-        super.afterConvertToResponse(request, response, dataService);
-
-        CimiCommonId common = (CimiCommonId) response.getCimiData();
-        List<CimiOperation> ops = new ArrayList<CimiOperation>();
-        ops.add(new CimiOperation(Operation.EDIT.getRel(), common.getId()));
-        ops.add(new CimiOperation(Operation.DELETE.getRel(), common.getId()));
-        common.setOperations(ops.toArray(new CimiOperation[ops.size()]));
+    protected void afterConvertToResponse(final CimiContext context, final Object dataService) {
+        super.afterConvertToResponse(context, dataService);
+        CimiResource resource = (CimiResource) context.getResponse().getCimiData();
+        resource.add(new CimiOperation(Operation.EDIT.getRel(), resource.getId()));
+        resource.add(new CimiOperation(Operation.DELETE.getRel(), resource.getId()));
     }
 }

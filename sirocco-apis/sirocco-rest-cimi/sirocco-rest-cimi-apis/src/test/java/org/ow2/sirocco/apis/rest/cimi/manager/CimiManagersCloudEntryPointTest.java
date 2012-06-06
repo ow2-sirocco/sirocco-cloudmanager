@@ -26,14 +26,13 @@ package org.ow2.sirocco.apis.rest.cimi.manager;
 
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -80,33 +79,22 @@ public class CimiManagersCloudEntryPointTest {
 
     private CimiResponse response;
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
+    private CimiContext context;
 
     /**
      * @throws java.lang.Exception
      */
     @Before
     public void setUp() throws Exception {
-        this.request = new CimiRequest();
-        this.response = new CimiResponse();
 
+        this.request = new CimiRequest();
         this.request.setBaseUri("/");
-        this.request.setContext(new CimiContextImpl(this.request));
         RequestHeader header = new RequestHeader();
         header.setCimiSelect(new CimiSelect());
         this.request.setHeader(header);
+
+        this.response = new CimiResponse();
+        this.context = new CimiContextImpl(this.request, this.response);
     }
 
     /**
@@ -153,7 +141,7 @@ public class CimiManagersCloudEntryPointTest {
         // EasyMock.replay(this.credentialsService);
 
         this.request.setId("1");
-        this.managerRead.execute(this.request, this.response);
+        this.managerRead.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         CimiCloudEntryPoint cimiCloud = (CimiCloudEntryPoint) this.response.getCimiData();

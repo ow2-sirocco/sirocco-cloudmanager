@@ -24,63 +24,67 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
- * Class MachineTemplateCollection.
+ * Collection of MachineTemplate.
  */
-@XmlRootElement(name = "MachineTemplateCollection")
+@XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineTemplateCollection extends CimiCommonId {
+public class CimiMachineTemplateCollection extends CimiCollectionAbstract<CimiMachineTemplate> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "machineTemplates".
-     */
-    @JsonProperty
-    @Null(groups = {GroupWrite.class})
-    private CimiMachineTemplate[] machineTemplates;
-
-    /**
-     * Return the value of field "machineTemplates".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
-    @XmlElement(name = "machineTemplate")
-    @JsonIgnore
-    public CimiMachineTemplate[] getMachineTemplates() {
-        return this.machineTemplates;
-    }
-
-    /**
-     * Set the value of field "machineTemplates".
-     * 
-     * @param machineTemplates The value
-     */
-    public void setMachineTemplates(final CimiMachineTemplate[] machineTemplates) {
-        this.machineTemplates = machineTemplates;
+    @Override
+    @XmlElement(name = "MachineTemplate")
+    @JsonProperty(value = "machineTemplates")
+    public CimiMachineTemplate[] getArray() {
+        return super.getArray();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    public boolean hasValues() {
-        boolean has = super.hasValues();
-        has = has || (null != this.getMachineTemplates());
-        return has;
+    @JsonProperty(value = "machineTemplates")
+    public void setArray(final CimiMachineTemplate[] items) {
+        super.setArray(items);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiMachineTemplate> newCollection() {
+        return new CimiMachineTemplateArray();
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiMachineTemplateArray extends CimiArrayAbstract<CimiMachineTemplate> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public CimiMachineTemplate[] newEmptyArraySized() {
+            return new CimiMachineTemplate[this.size()];
+        }
+    }
 }

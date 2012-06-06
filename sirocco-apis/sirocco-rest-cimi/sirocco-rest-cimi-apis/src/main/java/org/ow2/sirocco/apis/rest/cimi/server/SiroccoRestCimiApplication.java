@@ -54,14 +54,14 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
-import org.ow2.sirocco.apis.rest.cimi.resource.CimiCloudEntryPointResource;
-import org.ow2.sirocco.apis.rest.cimi.resource.CimiCredentialsResource;
-import org.ow2.sirocco.apis.rest.cimi.resource.CimiCredentialsTemplateResource;
-import org.ow2.sirocco.apis.rest.cimi.resource.CimiJobResource;
-import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineConfigurationResource;
-import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineImageResource;
-import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineResource;
-import org.ow2.sirocco.apis.rest.cimi.resource.CimiMachineTemplateResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CloudEntryPointRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CredentialsRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CredentialsTemplateRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.JobRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.MachineConfigurationRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.MachineImageRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.MachineRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.MachineTemplateRestResource;
 
 /**
  * Define the REST Application and the REST resources.
@@ -81,14 +81,14 @@ public class SiroccoRestCimiApplication extends Application {
         classes.add(JacksonConfigurator.class);
 
         // Resources
-        classes.add(CimiCloudEntryPointResource.class);
-        classes.add(CimiCredentialsResource.class);
-        classes.add(CimiCredentialsTemplateResource.class);
-        classes.add(CimiJobResource.class);
-        classes.add(CimiMachineResource.class);
-        classes.add(CimiMachineConfigurationResource.class);
-        classes.add(CimiMachineImageResource.class);
-        classes.add(CimiMachineTemplateResource.class);
+        classes.add(CloudEntryPointRestResource.class);
+        classes.add(CredentialsRestResource.class);
+        classes.add(CredentialsTemplateRestResource.class);
+        classes.add(JobRestResource.class);
+        classes.add(MachineRestResource.class);
+        classes.add(MachineConfigurationRestResource.class);
+        classes.add(MachineImageRestResource.class);
+        classes.add(MachineTemplateRestResource.class);
 
         return classes;
     }

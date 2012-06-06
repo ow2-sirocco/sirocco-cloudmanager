@@ -35,7 +35,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "CloudEntryPoint")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCloudEntryPoint extends CimiCommonId {
+public class CimiCloudEntryPoint extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -94,6 +94,22 @@ public class CimiCloudEntryPoint extends CimiCommonId {
      * Field "jobTime".
      */
     private Integer jobTime;
+
+    /**
+     * Default constructor.
+     */
+    public CimiCloudEntryPoint() {
+        super();
+    }
+
+    /**
+     * Parameterized constructor.
+     * 
+     * @param href The reference
+     */
+    public CimiCloudEntryPoint(final String href) {
+        super(href);
+    }
 
     /**
      * Return the value of field "machineTemplates".

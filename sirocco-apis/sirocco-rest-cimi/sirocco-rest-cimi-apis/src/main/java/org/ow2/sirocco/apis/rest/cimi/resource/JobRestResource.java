@@ -36,9 +36,8 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.apis.rest.cimi.request.HelperRequest;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.apis.rest.cimi.request.HelperContext;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,7 +57,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path(ConstantsPath.JOB_PATH)
-public class CimiJobResource extends CimiResourceAbstract {
+public class JobRestResource extends RestResourceAbstract {
 
     @Autowired
     @Qualifier("CimiManagerReadJob")
@@ -82,10 +81,9 @@ public class CimiJobResource extends CimiResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
     public Response read(@PathParam("id") final String id) {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
-        CimiResponse response = new CimiResponse();
-        this.cimiManagerReadJob.execute(request, response);
-        return HelperResponse.buildResponse(response);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
+        this.cimiManagerReadJob.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
     }
 
     /**
@@ -98,10 +96,9 @@ public class CimiJobResource extends CimiResourceAbstract {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("{id}")
     public Response update(@PathParam("id") final String id, final CimiJob cimiData) {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id, cimiData);
-        CimiResponse response = new CimiResponse();
-        this.cimiManagerUpdateJob.execute(request, response);
-        return HelperResponse.buildResponse(response);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, cimiData);
+        this.cimiManagerUpdateJob.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
     }
 
     /**
@@ -113,10 +110,9 @@ public class CimiJobResource extends CimiResourceAbstract {
     @DELETE
     @Path("{id}")
     public Response delete(@PathParam("id") final String id) {
-        CimiRequest request = HelperRequest.buildRequest(this.getJaxRsRequestInfos(), id);
-        CimiResponse response = new CimiResponse();
-        this.cimiManagerDeleteJob.execute(request, response);
-        return HelperResponse.buildResponse(response);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
+        this.cimiManagerDeleteJob.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
     }
 
 }

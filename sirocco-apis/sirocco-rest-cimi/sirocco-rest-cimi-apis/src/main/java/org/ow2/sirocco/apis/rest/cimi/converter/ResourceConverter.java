@@ -29,7 +29,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 /**
  * 
  */
-public interface EntityConverter extends CimiConverter {
+public interface ResourceConverter extends CimiConverter {
 
     /**
      * Copy data from a service object to a CIMI object.

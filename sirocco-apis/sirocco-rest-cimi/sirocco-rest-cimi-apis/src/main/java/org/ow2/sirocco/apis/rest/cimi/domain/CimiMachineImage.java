@@ -38,7 +38,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
  */
 @XmlRootElement(name = "MachineImage")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineImage extends CimiCommonId {
+public class CimiMachineImage extends CimiObjectCommonImpl {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -77,6 +77,7 @@ public class CimiMachineImage extends CimiCommonId {
      * @param imageLocation The image location
      */
     public CimiMachineImage(final ImageLocation imageLocation) {
+        super();
         this.imageLocation = imageLocation;
     }
 
@@ -138,7 +139,7 @@ public class CimiMachineImage extends CimiCommonId {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl#hasValues()
      */
     @Override
     public boolean hasValues() {

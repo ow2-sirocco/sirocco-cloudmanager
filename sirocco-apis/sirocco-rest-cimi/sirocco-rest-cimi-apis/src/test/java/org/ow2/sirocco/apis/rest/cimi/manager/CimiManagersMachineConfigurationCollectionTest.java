@@ -30,13 +30,12 @@ import java.util.List;
 
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -70,33 +69,22 @@ public class CimiManagersMachineConfigurationCollectionTest {
 
     private CimiResponse response;
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
+    private CimiContext context;
 
     /**
      * @throws java.lang.Exception
      */
     @Before
     public void setUp() throws Exception {
-        this.request = new CimiRequest();
-        this.response = new CimiResponse();
 
+        this.request = new CimiRequest();
         this.request.setBaseUri("/");
-        this.request.setContext(new CimiContextImpl(this.request));
         RequestHeader header = new RequestHeader();
         header.setCimiSelect(new CimiSelect());
         this.request.setHeader(header);
+
+        this.response = new CimiResponse();
+        this.context = new CimiContextImpl(this.request, this.response);
     }
 
     /**
@@ -122,17 +110,16 @@ public class CimiManagersMachineConfigurationCollectionTest {
         EasyMock.expect(this.service.getMachineConfigurationCollection()).andReturn(collect);
         EasyMock.replay(this.service);
 
-        this.managerReadCollection.execute(this.request, this.response);
+        this.managerReadCollection.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH,
             ((CimiMachineConfigurationCollection) this.response.getCimiData()).getId());
         CimiMachineConfigurationCollection cimiCollect = (CimiMachineConfigurationCollection) this.response.getCimiData();
-        Assert.assertNotNull(cimiCollect.getMachineConfigurations());
-        Assert.assertEquals(3, cimiCollect.getMachineConfigurations().length);
-        for (int i = 0; i < cimiCollect.getMachineConfigurations().length; i++) {
-            Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH + "/" + (i + 13),
-                cimiCollect.getMachineConfigurations()[i].getHref());
+        Assert.assertNotNull(cimiCollect.getArray());
+        Assert.assertEquals(3, cimiCollect.getArray().length);
+        for (int i = 0; i < cimiCollect.getArray().length; i++) {
+            Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
         }
         EasyMock.verify(this.service);
     }
@@ -147,7 +134,7 @@ public class CimiManagersMachineConfigurationCollectionTest {
         EasyMock.replay(this.service);
 
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"operations"});
-        this.managerReadCollection.execute(this.request, this.response);
+        this.managerReadCollection.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH,
@@ -172,17 +159,16 @@ public class CimiManagersMachineConfigurationCollectionTest {
         EasyMock.replay(this.service);
 
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"machineConfigurations[1-23]"});
-        this.managerReadCollection.execute(this.request, this.response);
+        this.managerReadCollection.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH,
             ((CimiMachineConfigurationCollection) this.response.getCimiData()).getId());
         CimiMachineConfigurationCollection cimiCollect = (CimiMachineConfigurationCollection) this.response.getCimiData();
-        Assert.assertNotNull(cimiCollect.getMachineConfigurations());
-        Assert.assertEquals(7, cimiCollect.getMachineConfigurations().length);
-        for (int i = 0; i < cimiCollect.getMachineConfigurations().length; i++) {
-            Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH + "/" + (i + 13),
-                cimiCollect.getMachineConfigurations()[i].getHref());
+        Assert.assertNotNull(cimiCollect.getArray());
+        Assert.assertEquals(7, cimiCollect.getArray().length);
+        for (int i = 0; i < cimiCollect.getArray().length; i++) {
+            Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
         }
         EasyMock.verify(this.service);
     }

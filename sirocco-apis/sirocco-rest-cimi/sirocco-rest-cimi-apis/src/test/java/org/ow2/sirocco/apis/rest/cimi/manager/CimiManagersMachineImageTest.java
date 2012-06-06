@@ -31,16 +31,15 @@ import java.util.Map;
 
 import org.easymock.EasyMock;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEntityType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
+import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
@@ -86,33 +85,22 @@ public class CimiManagersMachineImageTest {
 
     private CimiResponse response;
 
-    /**
-     * @throws java.lang.Exception
-     */
-    @BeforeClass
-    public static void setUpBeforeClass() throws Exception {
-    }
-
-    /**
-     * @throws java.lang.Exception
-     */
-    @AfterClass
-    public static void tearDownAfterClass() throws Exception {
-    }
+    private CimiContext context;
 
     /**
      * @throws java.lang.Exception
      */
     @Before
     public void setUp() throws Exception {
-        this.request = new CimiRequest();
-        this.response = new CimiResponse();
 
+        this.request = new CimiRequest();
         this.request.setBaseUri("/");
-        this.request.setContext(new CimiContextImpl(this.request));
         RequestHeader header = new RequestHeader();
         header.setCimiSelect(new CimiSelect());
         this.request.setHeader(header);
+
+        this.response = new CimiResponse();
+        this.context = new CimiContextImpl(this.request, this.response);
     }
 
     /**
@@ -137,7 +125,7 @@ public class CimiManagersMachineImageTest {
         CimiMachineImage cimi = new CimiMachineImage();
         cimi.setImageLocation(new ImageLocation("foo"));
         this.request.setCimiData(cimi);
-        this.managerCreate.execute(this.request, this.response);
+        this.managerCreate.execute(this.context);
 
         Assert.assertEquals(202, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
@@ -167,9 +155,9 @@ public class CimiManagersMachineImageTest {
         EasyMock.replay(this.service);
 
         CimiMachineImage cimi = new CimiMachineImage(this.request.getBaseUri()
-            + CimiEntityType.MachineImage.getPathType().getPathname() + "/13");
+            + ResourceType.MachineImage.getPathType().getPathname() + "/13");
         this.request.setCimiData(cimi);
-        this.managerCreate.execute(this.request, this.response);
+        this.managerCreate.execute(this.context);
 
         Assert.assertEquals(202, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.JOB_PATH + "/123", ((CimiJob) this.response.getCimiData()).getId());
@@ -188,7 +176,7 @@ public class CimiManagersMachineImageTest {
         EasyMock.replay(this.service);
 
         this.request.setId("1");
-        this.managerRead.execute(this.request, this.response);
+        this.managerRead.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH + "/1", ((CimiMachineImage) this.response.getCimiData()).getId());
@@ -206,7 +194,7 @@ public class CimiManagersMachineImageTest {
 
         this.request.setId("1");
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"name", "description"});
-        this.managerRead.execute(this.request, this.response);
+        this.managerRead.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH + "/1", ((CimiMachineImage) this.response.getCimiData()).getId());
@@ -220,7 +208,7 @@ public class CimiManagersMachineImageTest {
         EasyMock.replay(this.service);
 
         this.request.setId("1");
-        this.managerDelete.execute(this.request, this.response);
+        this.managerDelete.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         EasyMock.verify(this.service);
@@ -237,7 +225,7 @@ public class CimiManagersMachineImageTest {
         this.request.setId("1");
         this.request.setCimiData(cimi);
 
-        this.managerUpdate.execute(this.request, this.response);
+        this.managerUpdate.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         EasyMock.verify(this.service);
@@ -260,7 +248,7 @@ public class CimiManagersMachineImageTest {
         this.request.setCimiData(cimi);
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"name", "description"});
 
-        this.managerUpdate.execute(this.request, this.response);
+        this.managerUpdate.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         EasyMock.verify(this.service);

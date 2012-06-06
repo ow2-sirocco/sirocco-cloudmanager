@@ -24,62 +24,67 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
-import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
- * Class MachineCollection.
+ * Collection of Machine.
  */
-@XmlRootElement(name = "MachineCollection")
+@XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineCollection extends CimiCommonId {
+public class CimiMachineCollection extends CimiCollectionAbstract<CimiMachine> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "machines".
-     */
-    @JsonProperty
-    @Null(groups = {GroupWrite.class})
-    private CimiMachine[] machines;
-
-    /**
-     * Return the value of field "machines".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
-    @XmlElement(name = "machine")
-    @JsonIgnore
-    public CimiMachine[] getMachines() {
-        return this.machines;
-    }
-
-    /**
-     * Set the value of field "machines".
-     * 
-     * @param machines The value
-     */
-    public void setMachines(final CimiMachine[] machines) {
-        this.machines = machines;
+    @Override
+    @XmlElement(name = "Machine")
+    @JsonProperty(value = "machines")
+    public CimiMachine[] getArray() {
+        return super.getArray();
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCommonId#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    public boolean hasValues() {
-        boolean has = super.hasValues();
-        has = has || (null != this.getMachines());
-        return has;
+    @JsonProperty(value = "machines")
+    public void setArray(final CimiMachine[] items) {
+        super.setArray(items);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiMachine> newCollection() {
+        return new CimiMachineArray();
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiMachineArray extends CimiArrayAbstract<CimiMachine> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        @Override
+        public CimiMachine[] newEmptyArraySized() {
+            return new CimiMachine[this.size()];
+        }
     }
 }
