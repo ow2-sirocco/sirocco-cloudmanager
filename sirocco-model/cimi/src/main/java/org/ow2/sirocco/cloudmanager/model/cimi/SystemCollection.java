@@ -26,32 +26,46 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.Set;
-
+import java.util.ArrayList;
+import java.util.List;
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import javax.persistence.Transient;
 
 @Entity
-public class SystemCollection extends CloudEntity implements ICollection<System>,Serializable{
+public class SystemCollection extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    
-    private Set<System> items;
-
 
     public SystemCollection() {
     }
-    
-    @OneToMany(mappedBy = "systemColl")
-    public Set<System> getItems() {
-        return this.items;
-    }
-    
-    public void setItems(Set<System> items) {
-        this.items = items;
+
+    @Transient
+    protected List<String> operations = new ArrayList<String>() {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        {
+            add("add");
+        }
+    };
+
+    @Transient
+    List<System> systems;
+
+    @Transient
+    public List<System> getMachines() {
+        return this.systems;
     }
 
-    
+    @Transient
+    public void setSystems(List<System> systems) {
+        this.systems = systems;
+    }
+
+    @Transient
+    public List<String> getOperations() {
+        return operations;
+    }
+
 }

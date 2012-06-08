@@ -37,7 +37,7 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
     
     public static enum ComponentType {
-        SYSTEM,VOLUME,MACHINE,CREDENTIALS
+        SYSTEM,VOLUME,MACHINE,CREDENTIALS,NETWORK
     }
     
     private String componentName;

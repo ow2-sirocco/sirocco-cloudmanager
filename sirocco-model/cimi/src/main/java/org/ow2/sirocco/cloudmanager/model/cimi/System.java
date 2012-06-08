@@ -26,9 +26,12 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -37,60 +40,70 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 @Entity
 @Table(name = "SYSTEMINSTANCE")
 public class System extends CloudResource implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private CloudProviderLocation location;
 
     public static enum State {
-        CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, MIXED, DELETING, ERROR
+        CREATING, CREATED, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, MIXED, DELETING, ERROR
     }
 
-    private CredentialsCollection credentialColl;
+    private List<Credentials> credentials;
 
-    private MachineCollection machineColl;
+    private List<Machine> machines;
 
-    private SystemCollection systemColl;
+    private List<System> systems;
 
     private State state;
 
-    private VolumeCollection volumeColl;
+    private List<Volume> volumes;
+    
+    private List<Network> networks;
 
     private CloudProviderAccount cloudProviderAccount;
 
     public System() {
     }
-
-    public VolumeCollection getVolumeColl() {
-        return this.volumeColl;
+    
+    @OneToMany
+    @JoinColumn(name="system_id")
+    public List<Credentials> getCredentials() {
+        return credentials;
     }
 
-    public void setVolumeColl(final VolumeCollection volumeColl) {
-        this.volumeColl = volumeColl;
+    public void setCredentials(List<Credentials> credentials) {
+        this.credentials = credentials;
     }
 
-    public CredentialsCollection getCredentialColl() {
-        return this.credentialColl;
+    @OneToMany
+    @JoinColumn(name="system_id")
+    public List<Machine> getMachines() {
+        return machines;
     }
 
-    public void setCredentialColl(final CredentialsCollection credentialColl) {
-        this.credentialColl = credentialColl;
+    public void setMachines(List<Machine> machines) {
+        this.machines = machines;
     }
 
-    public MachineCollection getMachineColl() {
-        return this.machineColl;
+    @OneToMany
+    @JoinColumn(name="system_id")
+    public List<System> getSystems() {
+        return systems;
     }
 
-    public void setMachineColl(final MachineCollection machineColl) {
-        this.machineColl = machineColl;
+    public void setSystems(List<System> systems) {
+        this.systems = systems;
     }
 
-    @ManyToOne
-    public SystemCollection getSystemColl() {
-        return this.systemColl;
+    @OneToMany
+    @JoinColumn(name="system_id")
+    public List<Volume> getVolumes() {
+        return volumes;
     }
 
-    public void setSystemColl(final SystemCollection systemColl) {
-        this.systemColl = systemColl;
+    public void setVolumes(List<Volume> volumes) {
+        this.volumes = volumes;
     }
 
     public State getState() {
@@ -116,6 +129,16 @@ public class System extends CloudResource implements Serializable {
 
     public void setLocation(final CloudProviderLocation location) {
         this.location = location;
+    }
+    
+    @OneToMany
+    @JoinColumn(name="system_id")
+    public List<Network> getNetworks() {
+        return networks;
+    }
+
+    public void setNetworks(List<Network> networks) {
+        this.networks = networks;
     }
 
 }
