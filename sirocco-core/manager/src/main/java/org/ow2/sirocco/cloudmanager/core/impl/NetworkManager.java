@@ -50,7 +50,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
-@Stateless(name = INetworkManager.EJB_JNDI_NAME, mappedName = INetworkManager.EJB_JNDI_NAME)
+@Stateless
 @Remote(IRemoteNetworkManager.class)
 @Local(INetworkManager.class)
 public class NetworkManager implements INetworkManager {

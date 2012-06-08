@@ -54,7 +54,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
-@Stateless(name = IMachineImageManager.EJB_JNDI_NAME, mappedName = IMachineImageManager.EJB_JNDI_NAME)
+@Stateless
 @Remote(IRemoteMachineImageManager.class)
 @Local(IMachineImageManager.class)
 @SuppressWarnings("unused")

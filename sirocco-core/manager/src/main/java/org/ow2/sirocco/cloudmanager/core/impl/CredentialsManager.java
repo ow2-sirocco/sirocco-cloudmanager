@@ -57,7 +57,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
-@Stateless(name = ICredentialsManager.EJB_JNDI_NAME, mappedName = ICredentialsManager.EJB_JNDI_NAME)
+@Stateless
 @Remote(IRemoteCredentialsManager.class)
 @Local(ICredentialsManager.class)
 public class CredentialsManager implements ICredentialsManager {

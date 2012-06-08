@@ -56,7 +56,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
-@Stateless(name = IUserManager.EJB_JNDI_NAME, mappedName = IUserManager.EJB_JNDI_NAME)
+@Stateless
 @Remote(IRemoteUserManager.class)
 @Local(IUserManager.class)
 @SuppressWarnings("unused")
