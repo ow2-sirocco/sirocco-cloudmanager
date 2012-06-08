@@ -195,7 +195,7 @@ public class MachineManagerTest {
 
     private int credcounter = 1;
 
-    private CredentialsCreate initCredentials() {
+    public CredentialsCreate initCredentials() {
         CredentialsCreate credentialsCreate = new CredentialsCreate();
         CredentialsTemplate in = new CredentialsTemplate();
         credentialsCreate.setCredentialTemplate(in);
@@ -211,7 +211,7 @@ public class MachineManagerTest {
         return credentialsCreate;
     }
 
-    private Credentials createCredentials() throws Exception {
+    public Credentials createCredentials() throws Exception {
         Credentials out_c = this.credManager.createCredentials(this.initCredentials());
         Assert.assertNotNull("createCredentials returns no credentials", out_c);
         this.creds.add(out_c);
@@ -220,7 +220,7 @@ public class MachineManagerTest {
 
     private int ccounter = 1;
 
-    private MachineConfiguration initMachineConfiguration() {
+    public MachineConfiguration initMachineConfiguration() {
         MachineConfiguration in_c = new MachineConfiguration();
         in_c.setName("testConfig_" + UUID.randomUUID());
         this.ccounter += 1;
@@ -255,7 +255,7 @@ public class MachineManagerTest {
 
     private int imagecounter = 1;
 
-    private MachineImage initMachineImage() {
+    public MachineImage initMachineImage() {
         MachineImage mimage = new MachineImage();
         mimage.setName("image_" + this.imagecounter);
         mimage.setDescription("image description " + this.imagecounter);
@@ -264,7 +264,7 @@ public class MachineManagerTest {
         return mimage;
     }
 
-    private MachineImage createMachineImage() throws Exception {
+    public MachineImage createMachineImage() throws Exception {
         MachineImage in_i = this.initMachineImage();
         Job out_j = this.machineImageManager.createMachineImage(in_i);
         Assert.assertNotNull("machineImageCreate returns no machineimage", out_j);
@@ -300,7 +300,7 @@ public class MachineManagerTest {
         this.createMachineImage();
     }
 
-    private MachineConfiguration createMachineConfiguration() throws Exception {
+    public MachineConfiguration createMachineConfiguration() throws Exception {
         MachineConfiguration in_c = this.initMachineConfiguration();
 
         MachineConfiguration out_c = this.machineManager.createMachineConfiguration(in_c);
