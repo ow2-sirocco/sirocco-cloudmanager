@@ -49,7 +49,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 
 public interface INetworkManager {
-    static final String EJB_JNDI_NAME = "NetworkManager";
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.NetworkManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteNetworkManager@Remote";
 
     // Network operations
 

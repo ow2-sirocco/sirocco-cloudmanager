@@ -34,7 +34,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 public interface ICloudProviderManager {
 
-    static final String EJB_JNDI_NAME = "CloudProviderManager";
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.CloudProviderManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager@Remote";
 
     CloudProvider createCloudProvider(String type, String description)
             throws CloudProviderException;

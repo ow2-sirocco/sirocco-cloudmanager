@@ -42,7 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.System;
  */
 public interface ISystemManager extends IJobListener {
 
-    static final String EJB_JNDI_NAME = "SystemManager";
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.SystemManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager@Remote";
 
     //create
     Job createSystem(SystemCreate systemCreate) throws CloudProviderException;    

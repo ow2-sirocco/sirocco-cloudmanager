@@ -46,7 +46,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
  * Volume management operations
  */
 public interface IVolumeManager {
-    static final String EJB_JNDI_NAME = "VolumeManager";
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.VolumeManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager@Remote";
 
     /**
      * Creates a new Volume, this operation is asynchronous
@@ -446,6 +446,6 @@ public interface IVolumeManager {
 
     Job removeImageFromVolume(String volumeId, String imageId) throws ResourceNotFoundException, CloudProviderException;
 
-    boolean jobCompletionHandler(final Job job);
+    boolean jobCompletionHandler(final String job_id);
 
 }

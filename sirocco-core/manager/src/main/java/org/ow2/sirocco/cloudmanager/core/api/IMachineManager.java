@@ -51,7 +51,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplateCollection;
  */
 public interface IMachineManager {
 
-	static final String EJB_JNDI_NAME = "MachineManager";
+	static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.MachineManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager@Remote";
 
 	/**
 	 * Operations on CEP
@@ -176,6 +176,6 @@ public interface IMachineManager {
 
 	Job updateMachineVolume(String machineId, MachineVolume machineVolume) throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
 
-	boolean jobCompletionHandler(final Job job);
+	boolean jobCompletionHandler(final String job);
 
 }

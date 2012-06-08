@@ -42,7 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
  */
 public interface ICredentialsManager {
 
-    static final String EJB_JNDI_NAME = "CredentialsManager";
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.CredentialsManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager@Remote";
 
     Credentials createCredentials(CredentialsCreate credentialsCreate) throws CloudProviderException;
 
