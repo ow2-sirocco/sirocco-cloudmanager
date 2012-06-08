@@ -29,12 +29,16 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
@@ -45,6 +49,19 @@ public class Job extends CloudEntity implements Serializable {
     public static enum Status {
         RUNNING, SUCCESS, FAILED, CANCELLED
     };
+    
+    /**
+     * locked is used to prevent concurrent handling of events that are related to a same parent Job
+     */
+    private boolean locked;
+    /**
+     * lockedTime is used to know when a lock was set, and then to be able to unlock after some time (configurable) to prevent Job events to be blocked forever 
+     */
+    private Date lockedTime;
+    /**
+     * lockedID is used to be sure that only the locker thread has the right to unlock a Job
+     */
+    private String lockedID;
 
     private CloudProviderLocation location;
 
@@ -69,6 +86,19 @@ public class Job extends CloudEntity implements Serializable {
     private Integer progress;
 
     private List<CloudResource> affectedEntities;
+    
+    protected long versionNum;
+    
+    
+    @Version
+    @Column(name="OPTLOCK")    
+    protected long getVersionNum() {
+        return versionNum;
+    }
+
+    protected void setVersionNum(long versionNum) {
+        this.versionNum = versionNum;
+    }
 
     public Job() {
     }
@@ -173,6 +203,31 @@ public class Job extends CloudEntity implements Serializable {
 
     public void setAffectedEntities(final List<CloudResource> affectedEntities) {
         this.affectedEntities = affectedEntities;
+    }
+
+    public boolean getLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
+    }
+    
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getLockedTime() {
+        return lockedTime;
+    }
+
+    public void setLockedTime(Date lockedTime) {
+        this.lockedTime = lockedTime;
+    }
+
+    public String getLockedID() {
+        return lockedID;
+    }
+
+    public void setLockedID(String lockedID) {
+        this.lockedID = lockedID;
     }
 
 }
