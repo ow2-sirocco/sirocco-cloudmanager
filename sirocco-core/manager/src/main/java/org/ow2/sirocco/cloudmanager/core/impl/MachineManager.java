@@ -40,6 +40,8 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
@@ -99,10 +101,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
-@Stateless(name = IMachineManager.EJB_JNDI_NAME, mappedName = IMachineManager.EJB_JNDI_NAME)
+@Stateless
 @Remote(IRemoteMachineManager.class)
 @Local(IMachineManager.class)
-public class MachineManager implements IMachineManager, IRemoteMachineManager {
+public class MachineManager implements IMachineManager {
 
     static final String EJB_JNDI_NAME = "MachineManager";
 
@@ -1004,6 +1006,7 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
             mt.getVolumeTemplates().getItems().size();
         }
         mt.getNetworkInterfaces().size();
+        mt.getMachineConfiguration().getDiskTemplates().size();
 
         return mt;
     }
@@ -1280,6 +1283,8 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         mt.setCreated(new Date());
         this.em.persist(mt);
         this.em.flush();
+        mt.getMachineConfiguration().getDiskTemplates().size();
+        mt.getMachineConfiguration().getProperties().size();
         return mt;
     }
 
@@ -1653,15 +1658,16 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
         this.em.flush();
     }
 
-    private boolean completeMachineAddNotification(final Job notification, final Machine local, final Machine remote)
+    private boolean completeMachineAddNotification(Job notification, final Machine local, final Machine remote)
         throws CloudProviderException {
 
         /*
          * If notification.affectedResources is null then this is machine
          * creation otherwise an attachment of new resource to machine
          */
+        notification=jobManager.getJobById(notification.getId().toString());
         List<CloudResource> affected = notification.getAffectedEntities();
-        Job job = this.getPersistedJob(notification);
+        Job job = notification;
         MachineManager.logger.info(" completeMachineAddNotification ");
         if (affected == null || affected.size() == 0) {
 
@@ -1730,9 +1736,19 @@ public class MachineManager implements IMachineManager, IRemoteMachineManager {
     /**
      * Handler machine job completions
      */
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public boolean jobCompletionHandler(final String notification_id) {
 
-    public boolean jobCompletionHandler(final Job notification) {
-
+        Job notification;
+        try {
+            notification = jobManager.getJobById(notification_id);
+        } catch (ResourceNotFoundException e1) {
+            MachineManager.logger.info("Could not find job " + notification_id);
+            return false;
+        } catch (CloudProviderException e1) {
+            MachineManager.logger.info("unable to get job " + notification_id);
+            return false;
+        }
         /** providerAssignedMachineId */
         String pamid = notification.getTargetEntity().getProviderAssignedId();
 

@@ -10,6 +10,8 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
@@ -22,6 +24,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
+import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
@@ -45,7 +48,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
-@Stateless(name = IVolumeManager.EJB_JNDI_NAME, mappedName = IVolumeManager.EJB_JNDI_NAME)
+@Stateless
 @Remote(IRemoteVolumeManager.class)
 @Local(IVolumeManager.class)
 public class VolumeManager implements IVolumeManager {
@@ -62,6 +65,9 @@ public class VolumeManager implements IVolumeManager {
 
     @EJB
     private IUserManager userManager;
+    
+    @EJB
+    private IJobManager jobManager;
 
     private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount) {
         VolumeManager.logger.info("Getting connector for cloud provider type "
@@ -638,7 +644,19 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public boolean jobCompletionHandler(final Job job) {
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public boolean jobCompletionHandler(final String job_id) {
+        Job job;
+        try {
+            job = jobManager.getJobById(job_id);
+        } catch (ResourceNotFoundException e1) {
+            VolumeManager.logger.info("Could not find job " + job_id);
+            return false;
+        } catch (CloudProviderException e1) {
+            VolumeManager.logger.info("unable to get job " + job_id);
+            return false;
+        }
+        
         if (job.getTargetEntity() instanceof Volume) {
             return this.volumeCompletionHandler(job);
         } else if (job.getTargetEntity() instanceof VolumeImage) {

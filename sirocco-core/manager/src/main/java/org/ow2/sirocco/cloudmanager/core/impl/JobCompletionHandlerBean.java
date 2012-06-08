@@ -26,11 +26,13 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.io.Serializable;
-import java.util.Date;
-
+import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
+import javax.ejb.EJBContext;
 import javax.ejb.MessageDriven;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -42,106 +44,82 @@ import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
 import javax.naming.InitialContext;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-
 import org.apache.log4j.Logger;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
-import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
-import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 
 @MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
-    @ActivationConfigProperty(propertyName = "destination", propertyValue = "JobCompletion")})
+        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
+        @ActivationConfigProperty(propertyName = "destination", propertyValue = "JobCompletion") })
 public class JobCompletionHandlerBean implements MessageListener {
-    private static Logger logger = Logger.getLogger(JobCompletionHandlerBean.class.getName());
+    private static Logger logger = Logger
+            .getLogger(JobCompletionHandlerBean.class.getName());
 
     private static final String JMS_TOPIC_CONNECTION_FACTORY_NAME = "JTCF";
 
     private static final String JMS_TOPIC_NAME = "JobCompletion";
 
-    @EJB
-    private IVolumeManager volumeManager;
+    private static final long JMS_REDELIVERY_DELAY = 50 * 1000;
 
     @EJB
-    private IMachineManager machineManager;
+    private IJobManager jobManager;
 
-    @EJB
-    private INetworkManager networkManager;
+    @Resource
+    private EJBContext ctx;
 
-    @EJB
-    private ISystemManager systemManager;
-
-    @PersistenceContext
-    private EntityManager em;
-
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void onMessage(final Message msg) {
         if (msg instanceof ObjectMessage) {
             ObjectMessage objectMessage = (ObjectMessage) msg;
             Object payload;
             try {
                 payload = objectMessage.getObject();
-                JobCompletionHandlerBean.logger.info("On topic JobCompletion: received " + payload);
+                JobCompletionHandlerBean.logger
+                        .info("On topic JobCompletion: received " + payload);
             } catch (JMSException ex) {
-                JobCompletionHandlerBean.logger.error("Failed to extract from JMS message", ex);
+                JobCompletionHandlerBean.logger.error(
+                        "Failed to extract from JMS message", ex);
                 return;
             }
             Job providerJob = (Job) payload;
-            boolean done = false;
-            CloudResource targetEntity = providerJob.getTargetEntity();
-            if (targetEntity instanceof Machine) {
-                done = this.machineManager.jobCompletionHandler(providerJob);
-            } else if ((targetEntity instanceof Volume) || (targetEntity instanceof VolumeImage)) {
-                done = this.volumeManager.jobCompletionHandler(providerJob);
-            } else if ((targetEntity instanceof Network) || (targetEntity instanceof NetworkPort)
-                || (targetEntity instanceof ForwardingGroup)) {
-                done = this.networkManager.jobCompletionHandler(providerJob);
-            } else if (targetEntity instanceof MachineImage) {
-            } else if (providerJob.getAction().startsWith("system")) {
-                done = this.systemManager.completionHandler(providerJob);
-            }
-
-            // update Job entity
+            // we call jobManager to deal with events
             try {
-                Job job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
-                    .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
-                job.setStatus(providerJob.getStatus());
-                job.setStatusMessage(providerJob.getStatusMessage());
-                job.setReturnCode(providerJob.getReturnCode());
-                job.setTimeOfStatusChange(new Date());
-            } catch (NoResultException e) {
-                // should not happen
-                JobCompletionHandlerBean.logger.info("Cannot find job with providerAssignedId "
-                    + providerJob.getProviderAssignedId());
-            }
+                jobManager.handleWorkflowEvent(providerJob);
+            } catch (Exception e) {
+                ctx.setRollbackOnly();
+                JobCompletionHandlerBean.logger
+                        .error("JobCompletion message rollbacked");
 
+                try {
+                    // not possible to set a redelevery time in Joram/Jonas
+                    Thread.sleep(JMS_REDELIVERY_DELAY+(long)Math.floor(Math.random()*10000));
+                } catch (InterruptedException e1) {
+                    e1.printStackTrace();
+                }
+            }
         }
     }
 
+    @SuppressWarnings("unused")
     private void emitMessage(final Serializable payload) throws Exception {
         InitialContext ctx = new InitialContext();
         TopicConnectionFactory topicConnectionFactory = (TopicConnectionFactory) ctx
-            .lookup(JobCompletionHandlerBean.JMS_TOPIC_CONNECTION_FACTORY_NAME);
-        TopicConnection connection = topicConnectionFactory.createTopicConnection();
-        TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
-        Topic cloudAdminTopic = (Topic) ctx.lookup(JobCompletionHandlerBean.JMS_TOPIC_NAME);
-        TopicPublisher topicPublisher = session.createPublisher(cloudAdminTopic);
+                .lookup(JobCompletionHandlerBean.JMS_TOPIC_CONNECTION_FACTORY_NAME);
+        TopicConnection connection = topicConnectionFactory
+                .createTopicConnection();
+        TopicSession session = connection.createTopicSession(false,
+                Session.AUTO_ACKNOWLEDGE);
+        Topic cloudAdminTopic = (Topic) ctx
+                .lookup(JobCompletionHandlerBean.JMS_TOPIC_NAME);
+        TopicPublisher topicPublisher = session
+                .createPublisher(cloudAdminTopic);
         ObjectMessage message = session.createObjectMessage();
         message.setObject(payload);
         topicPublisher.publish(message);
-        JobCompletionHandlerBean.logger.info("EMITTED EVENT " + payload.toString() + " on "
-            + JobCompletionHandlerBean.JMS_TOPIC_NAME + " topic");
+        JobCompletionHandlerBean.logger.info("EMITTED EVENT "
+                + payload.toString() + " on "
+                + JobCompletionHandlerBean.JMS_TOPIC_NAME + " topic");
         topicPublisher.close();
         session.close();
         connection.close();

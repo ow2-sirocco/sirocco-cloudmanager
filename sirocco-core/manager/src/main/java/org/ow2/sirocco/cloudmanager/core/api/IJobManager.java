@@ -27,6 +27,8 @@ package org.ow2.sirocco.cloudmanager.core.api;
 import java.util.List;
 import java.util.Map;
 
+import javax.ejb.Timer;
+
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
@@ -40,7 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
  */
 public interface IJobManager {
 
-    static final String EJB_JNDI_NAME = "JobManager";
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.JobManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager@Remote";
 
     Job createJob(CloudResource targetEntity, String action, String parentJob) throws CloudProviderException;
 
@@ -62,7 +64,15 @@ public interface IJobManager {
     JobCollection updateJobCollection(JobCollection jobColl) throws CloudProviderException;
 
     void deleteJob(String id) throws CloudProviderException;
-
-    CloudEntity getCloudEntityById(String cloudEntityId);
-
+    
+    Job getTopmostJob(String jobId) throws CloudProviderException;
+    
+    String lock(String jobId) throws Exception;
+    
+    void unlock(String jobId,String lockedID) throws Exception;
+    
+    void handleWorkflowEvent(Job j) throws Exception;
+    
+    Job updateProviderJob(Job providerJob);
+    
 }

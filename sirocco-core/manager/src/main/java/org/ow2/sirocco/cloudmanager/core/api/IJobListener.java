@@ -24,13 +24,11 @@
  */
 package org.ow2.sirocco.cloudmanager.core.api;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-
 /**
  * Job event handling
  */
 public interface IJobListener {
 
-    boolean completionHandler(Job providerJob);
+    boolean jobCompletionHandler(final String job_id);
 
 }
