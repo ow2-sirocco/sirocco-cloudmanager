@@ -73,7 +73,7 @@ public class CimiPrimerScenarioTest {
 
     private static final String ACCOUNT_CREDENTIALS = "ignored";
 
-    private static final int ASYNC_OPERATION_WAIT_TIME_IN_SECONDS = 30;
+    private static final int ASYNC_OPERATION_WAIT_TIME_IN_SECONDS = 60;
 
     /**
      * Initial Context Factory.
@@ -148,7 +148,7 @@ public class CimiPrimerScenarioTest {
     @Before
     public void setUp() throws Exception {
     	System.out.println("CimiPrimerScenarioTest : setUp ");
-        //this.setUpDatabase();
+        this.setUpDatabase();
         this.connectToCloudManager();
         User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
         CloudProvider provider = this.cloudProviderManager.createCloudProvider(CimiPrimerScenarioTest.CLOUD_PROVIDER_TYPE,
@@ -174,6 +174,7 @@ public class CimiPrimerScenarioTest {
                 break;
             }
             Thread.sleep(1000);
+            
             if (counter-- == 0) {
                 throw new Exception("Machine operation time out");
             }
@@ -948,6 +949,8 @@ public class CimiPrimerScenarioTest {
             + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
             + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
             + machine.getNetworkInterfaces() + "]");
+        
+        System.out.println("Machine id=" + machine.getId() + " volumes " +machine.getVolumes());
 
         /**
          * Stop the Machine
