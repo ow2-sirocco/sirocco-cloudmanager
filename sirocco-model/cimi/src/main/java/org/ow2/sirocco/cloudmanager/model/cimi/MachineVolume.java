@@ -29,6 +29,8 @@ import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 import javax.persistence.Entity;
+import javax.persistence.Enumerated;
+import javax.persistence.EnumType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,6 +49,11 @@ public class MachineVolume implements Serializable {
 	private String			initialLocation;
 	private Volume			volume;
 
+	public static enum State {
+        PENDING, ATTACHING, ATTACHED, DETACHING, DETACHED, CANCELLED, ERROR
+    }
+	private State state;
+	
 	@ManyToOne
 	private MachineVolumeCollection 	machineVolumeCollection;
 
@@ -87,5 +94,13 @@ public class MachineVolume implements Serializable {
 
 	public void setMachineVolumeCollection(final MachineVolumeCollection machineVolumeColl) {
 		this.machineVolumeCollection = machineVolumeColl;
+	}
+	
+	@Enumerated(EnumType.STRING)
+	public MachineVolume.State getState() {
+		return state;
+	}
+	public void setState(MachineVolume.State state) {
+		this.state = state;
 	}
 }

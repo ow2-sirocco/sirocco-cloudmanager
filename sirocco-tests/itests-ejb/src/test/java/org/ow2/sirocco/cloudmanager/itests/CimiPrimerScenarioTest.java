@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 
 import javax.naming.Context;
@@ -146,7 +147,8 @@ public class CimiPrimerScenarioTest {
      */
     @Before
     public void setUp() throws Exception {
-        this.setUpDatabase();
+    	System.out.println("CimiPrimerScenarioTest : setUp ");
+        //this.setUpDatabase();
         this.connectToCloudManager();
         User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
         CloudProvider provider = this.cloudProviderManager.createCloudProvider(CimiPrimerScenarioTest.CLOUD_PROVIDER_TYPE,
@@ -427,11 +429,281 @@ public class CimiPrimerScenarioTest {
 
         Job job = this.machineManager.createMachine(machineCreate);
         String machineId = job.getTargetEntity().getId().toString();
-
+        System.out.println("createMachine wait for job completion " +machineId);
         this.waitForJobCompletion(job);
         return machineId;
     }
 
+    
+    String createMachineWithPreExistingVolumes() throws Exception {
+        /**
+         * Retrieve the list of Machine Images
+         */
+    	System.out.println("createMachineWithPreExistingVolumes ");
+
+        List<MachineImage> machineImages = this.machineImageManager.getMachineImageCollection().getImages();
+        for (MachineImage image : machineImages) {
+            System.out.println("MachineImage id=" + image.getId());
+        }
+
+        /**
+         * Choose a Machine Image (first one)
+         */
+
+        MachineImage image = this.machineImageManager.getMachineImageById(machineImages.get(0).getId().toString());
+        System.out.println("MachineImage [id=" + image.getId() + ", name=" + image.getName() + ", description="
+            + image.getDescription() + ", created=" + image.getCreated() + ", location=" + image.getImageLocation() + "]");
+
+        /**
+         * Retrieve the list of Machine Configurations
+         */
+
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurationCollection()
+            .getMachineConfigurations();
+        for (MachineConfiguration machineConfig : machineConfigs) {
+            System.out.println("MachineConfiguration id=" + machineConfig.getId());
+        }
+
+        /**
+         * Choose a Machine Configuration (first one)
+         */
+
+        MachineConfiguration machineConfig = this.machineManager.getMachineConfigurationById(machineConfigs.get(0).getId()
+            .toString());
+        System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
+            + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
+            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
+            + "]");
+
+        /**
+         * Create a new Credentials entity
+         */
+
+        CredentialsTemplate credentialsTemplate = new CredentialsTemplate();
+        credentialsTemplate.setUserName("JoeSmith");
+        credentialsTemplate.setPassword("letmein");
+        CredentialsCreate credentialsCreate = new CredentialsCreate();
+        credentialsCreate.setCredentialTemplate(credentialsTemplate);
+        credentialsCreate.setName("Default");
+        credentialsCreate.setDescription("Default User");
+        Credentials credentials = this.credManager.createCredentials(credentialsCreate);
+
+        System.out.println("New Credentials id=" + credentials.getId());
+
+        /**
+         * Create a new volume
+         */
+        Volume v = createVolume("testVolumeAttach");
+        System.out.println(" createMachineWithPreExistingVolumes created volume " +v.getId().toString());
+        /**
+         * Create a new Machine
+         */
+
+        MachineCreate machineCreate = new MachineCreate();
+        machineCreate.setName("myMachine1");
+        machineCreate.setDescription("My very first machine");
+
+        MachineTemplate machineTemplate = new MachineTemplate();
+
+        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineImage(image);
+        machineTemplate.setCredentials(credentials);
+
+        MachineVolumeCollection volColl = new MachineVolumeCollection();
+        
+        
+        
+        ArrayList<MachineVolume> vtItems = new ArrayList<MachineVolume>();
+        MachineVolume mv = new MachineVolume();
+        mv.setVolume(v);
+        mv.setInitialLocation("/dev/sda");
+        vtItems.add(mv);
+        volColl.setItems(vtItems);
+        machineTemplate.setVolumes(volColl);
+        
+        MachineVolumeTemplateCollection vtColl = new MachineVolumeTemplateCollection();
+        vtColl.setItems(Collections.<MachineVolumeTemplate> emptyList());
+        machineTemplate.setVolumeTemplates(vtColl);
+
+        machineTemplate.setNetworkInterfaces(Collections.<NetworkInterface> emptyList());
+        machineCreate.setMachineTemplate(machineTemplate);
+
+        System.out.println(" createMachineWithPreExistingVolumes : create machine now");
+        Job job = this.machineManager.createMachine(machineCreate);
+        String machineId = job.getTargetEntity().getId().toString();
+        System.out.println(" createMachineWithPreExistingVolumes : new machine id " +machineId +" with job " +job.getId());
+        this.waitForJobCompletion(job);
+        return machineId;
+    }
+    
+    
+    String createMachineWithNewVolumes() throws Exception {
+        /**
+         * Retrieve the list of Machine Images
+         */
+
+        List<MachineImage> machineImages = this.machineImageManager.getMachineImageCollection().getImages();
+        for (MachineImage image : machineImages) {
+            System.out.println("MachineImage id=" + image.getId());
+        }
+
+        /**
+         * Choose a Machine Image (first one)
+         */
+
+        MachineImage image = this.machineImageManager.getMachineImageById(machineImages.get(0).getId().toString());
+        System.out.println("MachineImage [id=" + image.getId() + ", name=" + image.getName() + ", description="
+            + image.getDescription() + ", created=" + image.getCreated() + ", location=" + image.getImageLocation() + "]");
+
+        /**
+         * Retrieve the list of Machine Configurations
+         */
+
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurationCollection()
+            .getMachineConfigurations();
+        for (MachineConfiguration machineConfig : machineConfigs) {
+            System.out.println("MachineConfiguration id=" + machineConfig.getId());
+        }
+
+        /**
+         * Choose a Machine Configuration (first one)
+         */
+
+        MachineConfiguration machineConfig = this.machineManager.getMachineConfigurationById(machineConfigs.get(0).getId()
+            .toString());
+        System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
+            + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
+            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
+            + "]");
+
+        /**
+         * Create a new Credentials entity
+         */
+
+        CredentialsTemplate credentialsTemplate = new CredentialsTemplate();
+        credentialsTemplate.setUserName("JoeSmith");
+        credentialsTemplate.setPassword("letmein");
+        CredentialsCreate credentialsCreate = new CredentialsCreate();
+        credentialsCreate.setCredentialTemplate(credentialsTemplate);
+        credentialsCreate.setName("Default");
+        credentialsCreate.setDescription("Default User");
+        Credentials credentials = this.credManager.createCredentials(credentialsCreate);
+
+        System.out.println("New Credentials id=" + credentials.getId());
+
+        
+        /**
+         * Create a new Machine
+         */
+
+        MachineCreate machineCreate = new MachineCreate();
+        machineCreate.setName("myMachine1");
+        machineCreate.setDescription("My very first machine");
+
+        MachineTemplate machineTemplate = new MachineTemplate();
+
+        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineImage(image);
+        machineTemplate.setCredentials(credentials);
+
+        MachineVolumeCollection volColl = new MachineVolumeCollection();
+        volColl.setItems(Collections.<MachineVolume> emptyList());
+        machineTemplate.setVolumes(volColl);
+        
+        ArrayList<MachineVolumeTemplate> vtItems = new ArrayList<MachineVolumeTemplate>();
+        MachineVolumeTemplate mvt = new MachineVolumeTemplate();
+        VolumeTemplate vt = createVolumeTemplate("dummy");
+        
+        mvt.setVolumeTemplate(vt);
+        mvt.setInitialLocation("/dev/sda");
+        vtItems.add(mvt);
+        
+        MachineVolumeTemplateCollection vtColl = new MachineVolumeTemplateCollection();
+        vtColl.setItems(vtItems);
+        machineTemplate.setVolumeTemplates(vtColl);
+
+        machineTemplate.setNetworkInterfaces(Collections.<NetworkInterface> emptyList());
+        machineCreate.setMachineTemplate(machineTemplate);
+
+        Job job = this.machineManager.createMachine(machineCreate);
+        String machineId = job.getTargetEntity().getId().toString();
+
+        this.waitForJobCompletion(job);
+        return machineId;
+    }
+    
+    private VolumeTemplate createVolumeTemplate(String name) throws Exception {
+    	/**
+         * Retrieve the list of Volume Configurations
+         */
+    	System.out.println("createVolumeTemplate " +name);
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurationCollection()
+            .getVolumeConfigurations();
+        for (VolumeConfiguration volumeConfig : volumeConfigs) {
+            System.out.println("VolumeConfiguration id=" + volumeConfig.getId());
+        }
+
+        /**
+         * Choose a VolumeConfiguration (first one)
+         */
+
+        VolumeConfiguration smallVolumeConfig = this.volumeManager.getVolumeConfigurationById(volumeConfigs.get(0).getId()
+            .toString());
+        System.out.println(smallVolumeConfig);
+
+        VolumeTemplate volumeTemplate = new VolumeTemplate();
+        volumeTemplate.setVolumeConfig(smallVolumeConfig);
+        System.out.println("CreateVolumeTemplate return");
+        
+    	return volumeTemplate;
+    }
+    
+    private Volume createVolume(String name) throws Exception {
+    	String volumeId;
+    	/**
+         * Retrieve the list of Volume Configurations
+         */
+
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurationCollection()
+            .getVolumeConfigurations();
+        for (VolumeConfiguration volumeConfig : volumeConfigs) {
+            System.out.println("VolumeConfiguration id=" + volumeConfig.getId());
+        }
+
+        /**
+         * Choose a VolumeConfiguration (first one)
+         */
+
+        VolumeConfiguration smallVolumeConfig = this.volumeManager.getVolumeConfigurationById(volumeConfigs.get(0).getId()
+            .toString());
+        System.out.println(smallVolumeConfig);
+
+        /**
+         * Create Volume
+         */
+
+        VolumeCreate volumeCreate = new VolumeCreate();
+        volumeCreate.setName(name);
+        volumeCreate.setDescription("My first new volume");
+        VolumeTemplate volumeTemplate = new VolumeTemplate();
+        volumeTemplate.setVolumeConfig(smallVolumeConfig);
+        volumeCreate.setVolumeTemplate(volumeTemplate);
+
+        Job job = this.volumeManager.createVolume(volumeCreate);
+
+        volumeId = job.getTargetEntity().getId().toString();
+        System.out.println(" testScenarioTwo: wait for volume creation completion ");
+        this.waitForJobCompletion(job);
+
+        /**
+         * Retrieve the Volume information
+         */
+
+        Volume volume = this.volumeManager.getVolumeById(volumeId);
+        System.out.println(volume);
+    	return volume;
+    }
+    
     @Test
     public void testScenarioOne() throws Exception {
         this.initDatabase();
@@ -444,7 +716,7 @@ public class CimiPrimerScenarioTest {
         this.testMachineTemplateCreate();
         System.out.println(" test machine create ");
         String machineId = this.createMachine();
-
+        System.out.println(" query newly created machine ");
         /**
          * Query the Machine
          */
@@ -494,6 +766,7 @@ public class CimiPrimerScenarioTest {
             + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
             + machine.getNetworkInterfaces() + "]");
 
+        System.out.println("testScenarioOne leave ");
     }
 
     @Test
@@ -502,7 +775,7 @@ public class CimiPrimerScenarioTest {
         /**
          * Retrieve the CEP
          */
-
+        System.out.println("testScenarioTwo ");
         CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
         System.out.println(" testScenarioTwo: create machine ");
         String machineId = this.createMachine();
@@ -567,6 +840,136 @@ public class CimiPrimerScenarioTest {
         for (MachineVolume machineVolume : machineVolumes) {
             System.out.println(machineVolume);
         }
+
+    }
+    
+    
+    @Test
+    public void testScenarioThree() throws Exception {
+        this.initDatabase();
+        /**
+         * Retrieve the CEP
+         */
+        System.out.println("testScenarioThree with volume attachment during machine create ");
+        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
+        System.out.println(" test machinetemplate create");
+        this.testMachineTemplateCreate();
+        System.out.println(" test machine create with volumes ");
+        String machineId = this.createMachineWithPreExistingVolumes();
+
+        /**
+         * Query the Machine
+         */
+
+        Machine machine = this.machineManager.getMachineById(machineId);
+        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
+            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
+            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
+            + machine.getNetworkInterfaces() + "]");
+
+        /**
+         * Start the Machine
+         */
+
+        Job job = this.machineManager.startMachine(machineId);
+        this.waitForJobCompletion(job);
+
+        /**
+         * Query the Machine to verify if it started
+         */
+
+        machine = this.machineManager.getMachineById(machineId);
+        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
+            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
+            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
+            + machine.getNetworkInterfaces() + "]");
+
+        /**
+         * Stop the Machine
+         */
+
+        job = this.machineManager.stopMachine(machineId);
+        this.waitForJobCompletion(job);
+
+        /**
+         * Update the Machine's name and description
+         */
+        Map<String, Object> attributeToUpdate = new HashMap<String, Object>();
+        attributeToUpdate.put("name", "Cool Demo #1");
+        attributeToUpdate.put("description", null);
+        job = this.machineManager.updateMachineAttributes(machineId, attributeToUpdate);
+        this.waitForJobCompletion(job);
+
+        machine = this.machineManager.getMachineById(machineId);
+        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
+            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
+            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
+            + machine.getNetworkInterfaces() + "]");
+
+    }
+    
+    
+    @Test
+    public void testScenarioFour() throws Exception {
+        this.initDatabase();
+        /**
+         * Retrieve the CEP
+         */
+        System.out.println("testScenarioFour with volume creation during machine create ");
+        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
+        System.out.println(" test machinetemplate create");
+        this.testMachineTemplateCreate();
+        System.out.println(" test machine create with volumes ");
+        String machineId = this.createMachineWithNewVolumes();
+
+        /**
+         * Query the Machine
+         */
+
+        Machine machine = this.machineManager.getMachineById(machineId);
+        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
+            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
+            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
+            + machine.getNetworkInterfaces() + "]");
+
+        /**
+         * Start the Machine
+         */
+
+        Job job = this.machineManager.startMachine(machineId);
+        this.waitForJobCompletion(job);
+
+        /**
+         * Query the Machine to verify if it started
+         */
+
+        machine = this.machineManager.getMachineById(machineId);
+        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
+            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
+            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
+            + machine.getNetworkInterfaces() + "]");
+
+        /**
+         * Stop the Machine
+         */
+
+        job = this.machineManager.stopMachine(machineId);
+        this.waitForJobCompletion(job);
+
+        /**
+         * Update the Machine's name and description
+         */
+        Map<String, Object> attributeToUpdate = new HashMap<String, Object>();
+        attributeToUpdate.put("name", "Cool Demo #1");
+        attributeToUpdate.put("description", null);
+        job = this.machineManager.updateMachineAttributes(machineId, attributeToUpdate);
+        this.waitForJobCompletion(job);
+
+        machine = this.machineManager.getMachineById(machineId);
+        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
+            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
+            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
+            + machine.getNetworkInterfaces() + "]");
 
     }
 }
