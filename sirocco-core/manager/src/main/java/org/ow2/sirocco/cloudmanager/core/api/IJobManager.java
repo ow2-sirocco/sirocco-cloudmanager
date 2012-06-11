@@ -65,7 +65,7 @@ public interface IJobManager {
 
     void deleteJob(String id) throws CloudProviderException;
     
-    Job getTopmostJob(String jobId) throws CloudProviderException;
+    String getTopmostJobId(String jobId) throws CloudProviderException;
     
     String lock(String jobId) throws Exception;
     
@@ -73,6 +73,6 @@ public interface IJobManager {
     
     void handleWorkflowEvent(Job j) throws Exception;
     
-    Job updateProviderJob(Job providerJob);
+    String getJobIdFromProvider(Job providerJob);
     
 }

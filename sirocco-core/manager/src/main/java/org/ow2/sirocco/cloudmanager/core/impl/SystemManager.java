@@ -834,7 +834,6 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public boolean jobCompletionHandler(final String notification_id) {
 
         Job job;

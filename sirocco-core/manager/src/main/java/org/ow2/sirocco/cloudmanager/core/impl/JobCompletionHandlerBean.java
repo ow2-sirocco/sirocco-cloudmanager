@@ -59,7 +59,7 @@ public class JobCompletionHandlerBean implements MessageListener {
 
     private static final String JMS_TOPIC_NAME = "JobCompletion";
 
-    private static final long JMS_REDELIVERY_DELAY = 50 * 1000;
+    private static final long JMS_REDELIVERY_DELAY = 30 * 1000;
 
     @EJB
     private IJobManager jobManager;
@@ -68,7 +68,7 @@ public class JobCompletionHandlerBean implements MessageListener {
     private EJBContext ctx;
 
     @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    //@dTransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void onMessage(final Message msg) {
         if (msg instanceof ObjectMessage) {
             ObjectMessage objectMessage = (ObjectMessage) msg;
@@ -89,11 +89,11 @@ public class JobCompletionHandlerBean implements MessageListener {
             } catch (Exception e) {
                 ctx.setRollbackOnly();
                 JobCompletionHandlerBean.logger
-                        .error("JobCompletion message rollbacked");
+                        .warn("JobCompletion message rollbacked - "+e.getMessage());
 
                 try {
                     // not possible to set a redelevery time in Joram/Jonas
-                    Thread.sleep(JMS_REDELIVERY_DELAY+(long)Math.floor(Math.random()*10000));
+                    Thread.sleep(JMS_REDELIVERY_DELAY+(long)Math.floor(Math.random()*JMS_REDELIVERY_DELAY));
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }

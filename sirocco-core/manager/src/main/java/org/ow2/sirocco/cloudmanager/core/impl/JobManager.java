@@ -96,8 +96,8 @@ public class JobManager implements IJobManager {
 
     @Resource
     private EJBContext ctx;
-    
-    @Resource 
+
+    @Resource
     private SessionContext sessionContext;
 
     public Job createJob(final CloudResource targetEntity, final String action,
@@ -207,26 +207,26 @@ public class JobManager implements IJobManager {
             CloudProviderException {
         // TODO Auto-generated method stub
     }
-    
+
     /**
      * to call internal methods by passing by the proxy.<br>
      * It is used to take care of transaction annotations on methods<br>
      * because if EJB method is called with <i>this</i>, it is not taken<br>
      * into account
+     * 
      * @return
      */
-    private IJobManager getThis(){
+    private IJobManager getThis() {
         return sessionContext.getBusinessObject(IJobManager.class);
     }
-    
+
     /**
      * update entity job with a pojo from provider layer
-     * works in its own transaction
+     * 
      * @param providerJob
      * @return
      */
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public Job updateProviderJob(Job providerJob){
+    private Job updateProviderJob(Job providerJob) {
         Job job = null;
         // update Job entity
         try {
@@ -249,64 +249,85 @@ public class JobManager implements IJobManager {
         return job;
     }
 
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public String getJobIdFromProvider(Job providerJob)
+            throws NoResultException {
+        Job job = null;
+        try {
+            job = (Job) this.em
+                    .createQuery(
+                            "SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
+                    .setParameter("providerAssignedId",
+                            providerJob.getProviderAssignedId())
+                    .getSingleResult();
+        } catch (NoResultException e) {
+            // should not happen
+            JobManager.logger.error("Cannot find job with providerAssignedId "
+                    + providerJob.getProviderAssignedId());
+            throw e;
+        }
+        return job.getId().toString();
+    }
+
     @Override
     public void handleWorkflowEvent(Job providerJob) throws Exception {
-        // TODO: persist the job and call handleWorkflowEvent(String jobId)
-
-        Job job = getThis().updateProviderJob(providerJob);
-
 
         // attemting to obtain a lock on the topmost job
-        Job topmost = this.getTopmostJob(job.getId().toString());
+        String topmostid = getThis().getTopmostJobId(getThis().getJobIdFromProvider(providerJob));
         String lockId = "";
 
         try {
-            lockId = getThis().lock(topmost.getId().toString());
-        } catch (Exception e) {
-            JobManager.logger.error("Unable to lock Job " + topmost.getId());
-            throw new CloudProviderException("Unable to lock Job " + topmost.getId());
+            lockId = getThis().lock(topmostid);
+        } catch (Throwable e) {
+            JobManager.logger.warn("Unable to lock Job " + topmostid
+                    + " - " + e.getMessage());
+            throw new CloudProviderException("Unable to lock Job "
+                    + topmostid);
         }
+
+        Job job = updateProviderJob(providerJob);
+        
+        Job topmost=this.getJobById(topmostid);
 
         // dispatch event to related managers and parent jobs
         while (job != null) {
             // find manager
             CloudResource target = job.getTargetEntity();
-            try {
 
-                if (target instanceof Machine) {
-                    JobManager.logger.info("calling  machineManager jobCompletionHandler with Job "+job.getId().toString());
-                    this.machineManager.jobCompletionHandler(job.getId().toString());
-                }
-                if (target instanceof MachineImage) {
-                    // this.machineImageManager.jobCompletionHandler(job);
-                }
-                if ((target instanceof Volume)
-                        || (target instanceof VolumeImage)) {
-                    this.volumeManager.jobCompletionHandler(job.getId().toString());
-                }
-                if (target instanceof System) {
-                    JobManager.logger.info("calling  systemManager jobCompletionHandler with Job "+job.getId().toString());
-                    this.systemManager.jobCompletionHandler(job.getId().toString());
-                }
-                if ((target instanceof Network)
-                        || (target instanceof NetworkPort)
-                        || (target instanceof ForwardingGroup)) {
-                    this.networkManager.jobCompletionHandler(job);
-                }
-            } catch (Exception e) {
-                JobManager.logger.error("Exception in handling event "
-                        + e.getMessage());
+            if (target instanceof Machine) {
+                JobManager.logger
+                        .info("calling  machineManager jobCompletionHandler with Job "
+                                + job.getId().toString());
+                this.machineManager
+                        .jobCompletionHandler(job.getId().toString());
             }
+            if (target instanceof MachineImage) {
+                // this.machineImageManager.jobCompletionHandler(job);
+            }
+            if ((target instanceof Volume) || (target instanceof VolumeImage)) {
+                this.volumeManager.jobCompletionHandler(job.getId().toString());
+            }
+            if (target instanceof System) {
+                JobManager.logger
+                        .info("calling  systemManager jobCompletionHandler with Job "
+                                + job.getId().toString());
+                this.systemManager.jobCompletionHandler(job.getId().toString());
+            }
+            if ((target instanceof Network) || (target instanceof NetworkPort)
+                    || (target instanceof ForwardingGroup)) {
+                this.networkManager.jobCompletionHandler(job);
+            }
+
             // find parent
             job = job.getParentJob();
         }
-        
-        //we unlock the topmost job after work
+
+        // we unlock the topmost job after work
         try {
-            getThis().unlock(topmost.getId().toString(),lockId);
-            
-        } catch (Exception e) {
-            JobManager.logger.error("Unable to unlock Job " + topmost.getId());
+            getThis().unlock(topmost.getId().toString(), lockId);
+
+        } catch (Throwable e) {
+            JobManager.logger.warn("Unable to unlock Job " + topmost.getId());
         }
 
     }
@@ -317,7 +338,7 @@ public class JobManager implements IJobManager {
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public String lock(String jobId) throws Exception {
-        JobManager.logger.info("locking job"+jobId);
+        JobManager.logger.info("locking job" + jobId);
         Job j = this.getJobById(jobId);
 
         // a lock expires after 1 hour
@@ -332,16 +353,30 @@ public class JobManager implements IJobManager {
             throw new CloudProviderException("unable to lock job " + jobId);
         }
         // not locked yet
-        this.em.lock(j, LockModeType.WRITE);
+
+        try {
+            this.em.lock(j, LockModeType.WRITE);
+        } catch (javax.persistence.OptimisticLockException e) {
+            //JobManager.logger.error("throwable");
+            throw new CloudProviderException("lock exception catched");
+        }
+
         j.setLocked(true);
         j.setLockedTime(new Date());
         String llockedID = UUID.randomUUID().toString();
         j.setLockedID(llockedID);
-        
+        try {
+            this.em.flush();
+        } catch (Throwable e) {
+            //JobManager.logger.error("throwable");
+            throw new CloudProviderException("lock exception catched2");
+        }
+
         Thread.sleep(lockWaitTimeInSeconds * 1000);// development environment
         // for now
-        
-        JobManager.logger.info("locked job"+jobId+" with lockedID "+llockedID);
+
+        JobManager.logger.info("locked job" + jobId + " with lockedID "
+                + llockedID);
         return llockedID;
     }
 
@@ -349,10 +384,10 @@ public class JobManager implements IJobManager {
      * used to unlock a Job works in its own transaction
      */
     @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public void unlock(String jobId, String lockedID) throws Exception {
 
-        JobManager.logger.info("unlocking job"+jobId+" with lockedID "+lockedID);
+        JobManager.logger.info("unlocking job" + jobId + " with lockedID "
+                + lockedID);
         Job j = this.getJobById(jobId);
         String jobLockedID = j.getLockedID();
         if (jobLockedID == null) {
@@ -378,10 +413,10 @@ public class JobManager implements IJobManager {
             throw new CloudProviderException("unable to unlock job " + jobId);
 
         }
-        
+
         Thread.sleep(lockWaitTimeInSeconds * 1000);// development environment
         // for now
-        JobManager.logger.info("unlocked job"+jobId);
+        JobManager.logger.info("unlocked job" + jobId);
 
     }
 
@@ -389,7 +424,8 @@ public class JobManager implements IJobManager {
      * find the root job in the job tree
      */
     @Override
-    public Job getTopmostJob(String jobId) throws CloudProviderException {
+    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
+    public String getTopmostJobId(String jobId) throws CloudProviderException {
 
         Job j = this.getJobById(jobId);
 
@@ -398,7 +434,7 @@ public class JobManager implements IJobManager {
             topmost = topmost.getParentJob();
         }
 
-        return topmost;
+        return topmost.getId().toString();
     }
 
     /*

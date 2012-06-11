@@ -644,7 +644,6 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public boolean jobCompletionHandler(final String job_id) {
         Job job;
         try {
