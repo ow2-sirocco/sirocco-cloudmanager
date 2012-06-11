@@ -63,6 +63,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
@@ -323,7 +324,15 @@ public class SystemManager implements ISystemManager {
     @Override
     public System getSystemById(final String systemId)
             throws CloudProviderException {
+        if (systemId == null) {
+            throw new InvalidRequestException(" null system id");
+        }
         System result = this.em.find(System.class, new Integer(systemId));
+        
+        if (result == null || result.getState() == System.State.DELETED) {
+            throw new ResourceNotFoundException(" Invalid system id "
+                    + systemId);
+        }
         return result;
     }
 
@@ -964,7 +973,8 @@ public class SystemManager implements ISystemManager {
             s.setState(State.STOPPED);
         }
         if (job.getAction().equals(SystemManager.DELETE_ACTION)) {
-            this.em.remove(s);
+            s.setState(System.State.DELETED);
+            //this.em.remove(s);
         }
 
 

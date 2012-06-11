@@ -59,7 +59,7 @@ public class JobCompletionHandlerBean implements MessageListener {
 
     private static final String JMS_TOPIC_NAME = "JobCompletion";
 
-    private static final long JMS_REDELIVERY_DELAY = 30 * 1000;
+    private static final long JMS_REDELIVERY_DELAY = 5 * 1000;
 
     @EJB
     private IJobManager jobManager;

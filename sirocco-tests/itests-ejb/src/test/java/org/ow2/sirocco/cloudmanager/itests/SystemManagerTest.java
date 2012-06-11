@@ -58,16 +58,8 @@ public class SystemManagerTest extends SiroccoTester{
         
         
         
-        HashSet<ComponentDescriptor> componentDescriptors=new HashSet<ComponentDescriptor>();
-        
-        ComponentDescriptor component=new ComponentDescriptor();
-        component.setComponentName("MaMachine");
-        component.setComponentQuantity(5);
-        component.setComponentType(ComponentType.MACHINE);
-        component.setComponentDescription("desc-comp");
-        HashMap<String,Object> map=new HashMap<String,Object>();
-        map.put("testProp", "testPropValue");
-        component.setComponentProperties(map);
+       
+
         
         //creating machine template
         MachineTemplate machineTemplate = new MachineTemplate();        
@@ -93,27 +85,124 @@ public class SystemManagerTest extends SiroccoTester{
         
         machineTemplate=machineManager.createMachineTemplate(machineTemplate);
         
-        component.setComponentTemplate(machineTemplate.getId().toString());
+        ComponentDescriptor component1=new ComponentDescriptor();
+        component1.setComponentName("MaMachine");
+        component1.setComponentQuantity(1);
+        component1.setComponentType(ComponentType.MACHINE);
+        component1.setComponentDescription("desc-comp");
+        HashMap<String,Object> map1=new HashMap<String,Object>();
+        map1.put("testProp", "testPropValue");
+        component1.setComponentProperties(map1);
+        component1.setComponentTemplate(machineTemplate.getId().toString());
         
-        componentDescriptors.add(component); 
+        ComponentDescriptor component2=new ComponentDescriptor();
+        component2.setComponentName("MaMachineBisque");
+        component2.setComponentQuantity(1);
+        component2.setComponentType(ComponentType.MACHINE);
+        component2.setComponentDescription("desc-comp2");
+        HashMap<String,Object> map2=new HashMap<String,Object>();
+        map2.put("testProp", "testPropValue2");
+        component2.setComponentProperties(map2);
+        component2.setComponentTemplate(machineTemplate.getId().toString());        
         
         
-        SystemTemplate systemTemplate=new SystemTemplate();
+        HashSet<ComponentDescriptor> componentDescriptors1=new HashSet<ComponentDescriptor>();
         
-        systemTemplate.setDescription("descr-st");
-        systemTemplate.setName("systemTemplateTest");
-        systemTemplate.setComponentDescriptors(componentDescriptors);
+        componentDescriptors1.add(component1); 
         
         
-        SystemCreate systemCreate=new SystemCreate();
+        HashSet<ComponentDescriptor> componentDescriptors2=new HashSet<ComponentDescriptor>();
+        componentDescriptors2.add(component2); 
         
-        systemCreate.setDescription("descr-sc");
-        systemCreate.setName("systemTest");
-        systemCreate.setSystemTemplate(systemTemplate);
         
-        Job j=systemManager.createSystem(systemCreate);
-
-      
+        SystemTemplate systemTemplate1=new SystemTemplate();
+        
+        systemTemplate1.setDescription("descr-st1");
+        systemTemplate1.setName("systemTemplateTest1");
+        systemTemplate1.setComponentDescriptors(componentDescriptors1);
+        
+        SystemTemplate systemTemplate2=new SystemTemplate();
+        
+        systemTemplate2.setDescription("descr-st2");
+        systemTemplate2.setName("systemTemplateTest2");
+        systemTemplate2.setComponentDescriptors(componentDescriptors2);
+        
+        
+        SystemCreate systemCreate1=new SystemCreate();
+        
+        systemCreate1.setDescription("descr-sc1");
+        systemCreate1.setName("systemTest1");
+        systemCreate1.setSystemTemplate(systemTemplate1);
+        
+        systemTemplate2=systemManager.createSystemTemplate(systemTemplate2);
+        
+        ComponentDescriptor component3=new ComponentDescriptor();
+        component3.setComponentName("MonSystemeBisque");
+        component3.setComponentQuantity(1);
+        component3.setComponentType(ComponentType.SYSTEM);
+        component3.setComponentDescription("desc-comp3");
+        HashMap<String,Object> map3=new HashMap<String,Object>();
+        map3.put("testProp", "testPropValue3");
+        component3.setComponentProperties(map3);
+        component3.setComponentTemplate(systemTemplate2.getId().toString());
+        //componentDescriptors1.add(component3);  
+        
+        Job j=systemManager.createSystem(systemCreate1);
+        String jobId=j.getId().toString();
+        String systemId=j.getTargetEntity().getId().toString();
+        int counter =130;
+        while (true) {
+            j = this.jobManager.getJobById(jobId);
+            if (j.getStatus() != Job.Status.RUNNING) {
+                break;
+            }
+            Thread.sleep(1000);
+            if (counter-- == 0) {
+                throw new Exception("system operation time out");
+            }
+        }
+        
+        j=systemManager.startSystem(systemId);
+        jobId=j.getId().toString();
+        counter =130;
+        while (true) {
+            j = this.jobManager.getJobById(jobId);
+            if (j.getStatus() != Job.Status.RUNNING) {
+                break;
+            }
+            Thread.sleep(1000);
+            if (counter-- == 0) {
+                throw new Exception("system operation time out");
+            }
+        }  
+        
+        j=systemManager.stopSystem(systemId);
+        jobId=j.getId().toString();
+        counter =130;
+        while (true) {
+            j = this.jobManager.getJobById(jobId);
+            if (j.getStatus() != Job.Status.RUNNING) {
+                break;
+            }
+            Thread.sleep(1000);
+            if (counter-- == 0) {
+                throw new Exception("system operation time out");
+            }
+        } 
+        
+        j=systemManager.deleteSystem(systemId);
+        jobId=j.getId().toString();
+        counter =130;
+        while (true) {
+            j = this.jobManager.getJobById(jobId);
+            if (j.getStatus() != Job.Status.RUNNING) {
+                break;
+            }
+            Thread.sleep(1000);
+            if (counter-- == 0) {
+                throw new Exception("system operation time out");
+            }
+        }       
         
         
     }
