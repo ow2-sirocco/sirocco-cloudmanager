@@ -37,7 +37,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
@@ -244,7 +244,7 @@ public class RestCimiPrimerScenarioTest {
             Assert.assertEquals(200, response.getStatus());
             jobRead = response.getEntity(CimiJob.class);
 
-            System.out.println("====== " + ResourceType.Job);
+            System.out.println("====== " + ExchangeType.Job);
             System.out.println("jobRead.getId:" + jobRead.getId());
             System.out.println("jobRead.getStatus:" + jobRead.getStatus());
             System.out.println("jobRead.getTargetEntity:" + jobRead.getTargetEntity());
@@ -379,7 +379,7 @@ public class RestCimiPrimerScenarioTest {
         CimiCloudEntryPoint cloudEntryPoint = response.getEntity(CimiCloudEntryPoint.class);
         Assert.assertEquals(200, response.getStatus());
 
-        System.out.println("====== " + ResourceType.CloudEntryPoint);
+        System.out.println("====== " + ExchangeType.CloudEntryPoint);
         System.out.println("ID: " + cloudEntryPoint.getId());
         if (null != cloudEntryPoint.getCredentials()) {
             System.out.println("getCredentials: " + cloudEntryPoint.getCredentials().getHref());
@@ -410,7 +410,7 @@ public class RestCimiPrimerScenarioTest {
         Assert.assertEquals(200, response.getStatus());
         CimiMachineImageCollection machineImagesCollection = response.getEntity(CimiMachineImageCollection.class);
 
-        System.out.println("====== " + ResourceType.MachineImageCollection);
+        System.out.println("====== " + ExchangeType.MachineImageCollection);
         System.out.println("ID: " + machineImagesCollection.getId());
         if (null != machineImagesCollection.getArray()) {
             for (CimiMachineImage mImage : machineImagesCollection.getArray()) {
@@ -428,7 +428,7 @@ public class RestCimiPrimerScenarioTest {
         Assert.assertEquals(200, response.getStatus());
         CimiMachineImage machineImage = response.getEntity(CimiMachineImage.class);
 
-        System.out.println("====== " + ResourceType.MachineImage);
+        System.out.println("====== " + ExchangeType.MachineImage);
         System.out.println("ID: " + machineImage.getId());
         System.out.println("name: " + machineImage.getName());
         System.out.println("imageLocation: " + machineImage.getImageLocation().getHref());
@@ -444,7 +444,7 @@ public class RestCimiPrimerScenarioTest {
         CimiMachineConfigurationCollection machineConfigsCollection = response
             .getEntity(CimiMachineConfigurationCollection.class);
 
-        System.out.println("====== " + ResourceType.MachineConfigurationCollection);
+        System.out.println("====== " + ExchangeType.MachineConfigurationCollection);
         System.out.println("ID: " + machineConfigsCollection.getId());
         if (null != machineConfigsCollection.getArray()) {
             for (CimiMachineConfiguration mConfig : machineConfigsCollection.getArray()) {
@@ -462,7 +462,7 @@ public class RestCimiPrimerScenarioTest {
         Assert.assertEquals(200, response.getStatus());
         CimiMachineConfiguration machineConfiguration = response.getEntity(CimiMachineConfiguration.class);
 
-        System.out.println("====== " + ResourceType.MachineConfiguration);
+        System.out.println("====== " + ExchangeType.MachineConfiguration);
         System.out.println("ID: " + machineConfiguration.getId());
         System.out.println("getName: " + machineConfiguration.getName());
         System.out.println("getDescription: " + machineConfiguration.getDescription());
@@ -504,7 +504,7 @@ public class RestCimiPrimerScenarioTest {
         Assert.assertEquals(201, response.getStatus());
         CimiCredentials credentials = response.getEntity(CimiCredentials.class);
 
-        System.out.println("====== " + ResourceType.Credentials + " : create");
+        System.out.println("====== " + ExchangeType.Credentials + " : create");
         System.out.println("Location: " + response.getLocation());
         System.out.println("Header: " + response.getHeaders());
         System.out.println("credentials.getId: " + credentials.getId());
@@ -551,7 +551,7 @@ public class RestCimiPrimerScenarioTest {
         Assert.assertEquals(202, response.getStatus());
         CimiJob jobMachineCreate = response.getEntity(CimiJob.class);
 
-        System.out.println("====== " + ResourceType.Job + " for machine creation");
+        System.out.println("====== " + ExchangeType.Job + " for machine creation");
         System.out.println("Location: " + response.getLocation());
         System.out.println("Header: " + response.getHeaders());
         System.out.println("jobMachineCreate.ID:" + jobMachineCreate.getId());
@@ -573,7 +573,7 @@ public class RestCimiPrimerScenarioTest {
         Assert.assertEquals(200, response.getStatus());
         CimiMachine machine = response.getEntity(CimiMachine.class);
 
-        System.out.println("====== " + ResourceType.Machine);
+        System.out.println("====== " + ExchangeType.Machine);
         System.out.println("ID: " + machine.getId());
         System.out.println("getName: " + machine.getName());
         System.out.println("getDescription: " + machine.getDescription());
@@ -623,7 +623,7 @@ public class RestCimiPrimerScenarioTest {
         machine = response.getEntity(CimiMachine.class);
         Assert.assertEquals("STARTED", machine.getState());
 
-        System.out.println("====== " + ResourceType.Machine);
+        System.out.println("====== " + ExchangeType.Machine);
         System.out.println("ID: " + machine.getId());
         System.out.println("getName: " + machine.getName());
         System.out.println("getDescription: " + machine.getDescription());
@@ -659,7 +659,7 @@ public class RestCimiPrimerScenarioTest {
         machine = response.getEntity(CimiMachine.class);
         Assert.assertEquals("STOPPED", machine.getState());
 
-        System.out.println("====== " + ResourceType.Machine);
+        System.out.println("====== " + ExchangeType.Machine);
         System.out.println("ID: " + machine.getId());
         System.out.println("getName: " + machine.getName());
         System.out.println("getDescription: " + machine.getDescription());
@@ -696,7 +696,7 @@ public class RestCimiPrimerScenarioTest {
         machine = response.getEntity(CimiMachine.class);
         Assert.assertEquals("myMachine1Updated", machine.getName());
 
-        System.out.println("====== " + ResourceType.Machine);
+        System.out.println("====== " + ExchangeType.Machine);
         System.out.println("ID: " + machine.getId());
         System.out.println("getName: " + machine.getName());
         System.out.println("getDescription: " + machine.getDescription());
