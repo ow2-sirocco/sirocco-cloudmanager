@@ -28,15 +28,15 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByRefOrByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
-import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertEntityBy;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertResourceBy;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertReferencePath;
 
 /**
  * Interface of an identified resource exchanged with the server.
  */
-@AssertEntityBy(groups = GroupCreateByRefOrByValue.class)
+@AssertResourceBy(groups = GroupCreateByRefOrByValue.class)
 @AssertReferencePath(groups = GroupWrite.class)
-public interface CimiResource extends CimiData {
+public interface CimiResource extends CimiData, CimiExchange {
 
     /**
      * Get the identifier of resource.

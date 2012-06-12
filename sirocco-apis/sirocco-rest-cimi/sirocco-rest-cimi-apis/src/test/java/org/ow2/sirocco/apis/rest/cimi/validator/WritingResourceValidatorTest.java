@@ -53,14 +53,14 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 
-public class WritingEntityValidatorTest {
+public class WritingResourceValidatorTest {
 
     private CimiRequest request;
 
@@ -78,10 +78,10 @@ public class WritingEntityValidatorTest {
     }
 
     @Test
-    public void testAllEntitiesWithHref() throws Exception {
+    public void testAllResourcesWithHref() throws Exception {
         CimiResource cimi = null;
 
-        for (ResourceType type : ResourceType.values()) {
+        for (ExchangeType type : ExchangeType.values()) {
             switch (type) {
             case CloudEntryPoint:
                 cimi = new CimiCloudEntryPoint();
@@ -142,11 +142,11 @@ public class WritingEntityValidatorTest {
                 break;
             }
             if (null != cimi) {
-                cimi.setHref(this.context.makeHref(cimi, 1));
+                cimi.setHref(this.context.makeHref(cimi, "1"));
                 Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
                 cimi.setHref(this.context.makeHrefBase(cimi));
-                if (true == this.context.mustHaveIdInReference(cimi)) {
+                if (true == this.context.mustHaveIdInReference(cimi.getClass())) {
 
                     Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
                 } else {
@@ -179,6 +179,14 @@ public class WritingEntityValidatorTest {
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCommon();
+        cimi.setName("0");
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
+
+        cimi = new CimiCommon();
+        cimi.setName("0 A");
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
+
+        cimi = new CimiCommon();
         props = new HashMap<String, String>();
         props.put("A", "a");
         props.put("B", "b");
@@ -186,10 +194,6 @@ public class WritingEntityValidatorTest {
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
-
-        cimi = new CimiCommon();
-        cimi.setName("0");
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiCommon();
         props = new HashMap<String, String>();

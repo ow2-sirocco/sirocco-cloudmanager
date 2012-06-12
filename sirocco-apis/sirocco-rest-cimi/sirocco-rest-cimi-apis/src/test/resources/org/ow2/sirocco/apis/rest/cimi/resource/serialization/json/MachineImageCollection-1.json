@@ -1,5 +1,7 @@
 {
 	"id":"idValue_1",
+	"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImageCollection",
+	"count":1,
 	"href":"hrefValue_1",
 	"operations":[
 		{

@@ -30,12 +30,12 @@ import javax.validation.ConstraintValidatorContext;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 
 /**
- * Implementation of {@link AssertEntityBy} validator.
+ * Implementation of {@link AssertResourceBy} validator.
  **/
-public class AssertEntityByValidator implements ConstraintValidator<AssertEntityBy, Object> {
+public class AssertResourceByValidator implements ConstraintValidator<AssertResourceBy, Object> {
 
     @Override
-    public void initialize(final AssertEntityBy annotation) {
+    public void initialize(final AssertResourceBy annotation) {
         // Nothing to do
     }
 

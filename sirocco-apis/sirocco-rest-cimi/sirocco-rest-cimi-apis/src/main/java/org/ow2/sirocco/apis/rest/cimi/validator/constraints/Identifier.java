@@ -45,6 +45,7 @@ import javax.validation.constraints.Pattern;
 @Retention(RUNTIME)
 @Constraint(validatedBy = {})
 @Documented
+// FIXME Not used
 public @interface Identifier {
     String message() default "{Identifier.message}";
 

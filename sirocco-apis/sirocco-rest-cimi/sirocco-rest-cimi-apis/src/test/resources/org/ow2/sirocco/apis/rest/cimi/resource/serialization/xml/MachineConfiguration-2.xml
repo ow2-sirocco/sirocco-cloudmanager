@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineConfiguration href="hrefValue_2">
+<MachineConfiguration href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 	<description>descriptionValue_2</description>
 	<name>nameValue_2</name>
 	<property key="keyProp_2_0">valueProp_2_0</property>

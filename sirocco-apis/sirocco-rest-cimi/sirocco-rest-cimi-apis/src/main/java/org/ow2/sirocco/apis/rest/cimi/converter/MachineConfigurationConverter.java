@@ -47,7 +47,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
  * </ul>
  * </p>
  */
-public class MachineConfigurationConverter extends ObjectCommonConverter implements ResourceConverter {
+public class MachineConfigurationConverter extends ObjectCommonConverter {
     /**
      * {@inheritDoc}
      * 
@@ -64,7 +64,7 @@ public class MachineConfigurationConverter extends ObjectCommonConverter impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -88,7 +88,7 @@ public class MachineConfigurationConverter extends ObjectCommonConverter impleme
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -109,17 +109,16 @@ public class MachineConfigurationConverter extends ObjectCommonConverter impleme
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
             if (null != dataService.getCpu()) {
-                dataCimi.setCpu((CimiCpu) context.getConverter(CimiCpu.class).toCimi(context, dataService.getCpu()));
+                dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
             }
             if (null != dataService.getMemory()) {
-                dataCimi
-                    .setMemory((CimiMemory) context.getConverter(CimiMemory.class).toCimi(context, dataService.getMemory()));
+                dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
             }
             if ((null != dataService.getDiskTemplates()) && (dataService.getDiskTemplates().size() > 0)) {
                 List<CimiDiskConfiguration> listCimis = new ArrayList<CimiDiskConfiguration>();
-                CimiConverter converter = context.getConverter(CimiDiskConfiguration.class);
-                for (DiskTemplate itemService : dataService.getDiskTemplates()) {
-                    listCimis.add((CimiDiskConfiguration) converter.toCimi(context, itemService));
+
+                for (DiskTemplate serviceItem : dataService.getDiskTemplates()) {
+                    listCimis.add((CimiDiskConfiguration) context.convertNextCimi(serviceItem, CimiDiskConfiguration.class));
                 }
                 dataCimi.setDisks(listCimis.toArray(new CimiDiskConfiguration[listCimis.size()]));
             }
@@ -137,16 +136,15 @@ public class MachineConfigurationConverter extends ObjectCommonConverter impleme
         final MachineConfiguration dataService) {
         this.fill(context, dataCimi, dataService);
         if (null != dataCimi.getCpu()) {
-            dataService.setCpu((Cpu) context.getConverter(CimiCpu.class).toService(context, dataCimi.getCpu()));
+            dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
         }
         if (null != dataCimi.getMemory()) {
-            dataService.setMemory((Memory) context.getConverter(CimiMemory.class).toService(context, dataCimi.getMemory()));
+            dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
         }
         if ((null != dataCimi.getDisks()) && (dataCimi.getDisks().length > 0)) {
             List<DiskTemplate> listServices = new ArrayList<DiskTemplate>();
-            CimiConverter converter = context.getConverter(CimiDiskConfiguration.class);
-            for (CimiDiskConfiguration itemCimi : dataCimi.getDisks()) {
-                listServices.add((DiskTemplate) converter.toService(context, itemCimi));
+            for (CimiDiskConfiguration cimiItem : dataCimi.getDisks()) {
+                listServices.add((DiskTemplate) context.convertNextService(cimiItem));
             }
             dataService.setDiskTemplates(listServices);
         }

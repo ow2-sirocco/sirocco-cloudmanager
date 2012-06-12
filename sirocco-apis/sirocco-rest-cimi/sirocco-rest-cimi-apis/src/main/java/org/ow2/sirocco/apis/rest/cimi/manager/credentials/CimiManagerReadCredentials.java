@@ -27,7 +27,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.credentials;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
@@ -77,8 +76,7 @@ public class CimiManagerReadCredentials extends CimiManagerReadAbstract {
      */
     @Override
     protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiCredentials cimi = (CimiCredentials) context.getRootConverter(ResourceType.Credentials)
-            .toCimi(context, dataService);
+        CimiCredentials cimi = (CimiCredentials) context.convertToCimi(dataService, CimiCredentials.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
     }

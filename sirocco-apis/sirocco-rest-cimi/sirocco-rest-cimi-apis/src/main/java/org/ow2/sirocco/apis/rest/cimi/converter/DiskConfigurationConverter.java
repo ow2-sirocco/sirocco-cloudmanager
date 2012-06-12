@@ -39,7 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
  * </ul>
  * </p>
  */
-public class DiskConfigurationConverter implements ResourceConverter {
+public class DiskConfigurationConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
@@ -56,7 +56,7 @@ public class DiskConfigurationConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -80,7 +80,7 @@ public class DiskConfigurationConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -98,7 +98,7 @@ public class DiskConfigurationConverter implements ResourceConverter {
      */
     protected void doCopyToCimi(final CimiContext context, final DiskTemplate dataService, final CimiDiskConfiguration dataCimi) {
         dataCimi.setAttachmentPoint(dataService.getAttachmentPoint());
-        dataCimi.setCapacity((CimiCapacity) context.getConverter(CimiCapacity.class).toCimi(context, dataService));
+        dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService, CimiCapacity.class));
         dataCimi.setFormat(dataService.getFormat());
     }
 
@@ -113,7 +113,7 @@ public class DiskConfigurationConverter implements ResourceConverter {
         final DiskTemplate dataService) {
         dataService.setAttachmentPoint(dataCimi.getAttachmentPoint());
         if (null != dataCimi.getCapacity()) {
-            context.getEntityConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
+            context.getConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
         }
         dataService.setFormat(dataCimi.getFormat());
     }

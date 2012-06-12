@@ -47,7 +47,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
@@ -237,7 +237,7 @@ public class CimiManagersMachineTest {
         EasyMock.replay(this.service);
 
         CimiMachineTemplate template = new CimiMachineTemplate(this.request.getBaseUri()
-            + ResourceType.MachineTemplate.getPathType().getPathname() + "/13");
+            + ExchangeType.MachineTemplate.getPathType().getPathname() + "/13");
         CimiMachineCreate cimi = new CimiMachineCreate();
         cimi.setMachineTemplate(template);
         this.request.setCimiData(cimi);
@@ -280,11 +280,11 @@ public class CimiManagersMachineTest {
 
         CimiMachineTemplate template = new CimiMachineTemplate();
         template.setMachineConfig(new CimiMachineConfiguration(this.request.getBaseUri()
-            + ResourceType.MachineConfiguration.getPathType().getPathname() + "/123"));
+            + ExchangeType.MachineConfiguration.getPathType().getPathname() + "/123"));
         template.setMachineImage(new CimiMachineImage(this.request.getBaseUri()
-            + ResourceType.MachineImage.getPathType().getPathname() + "/234"));
+            + ExchangeType.MachineImage.getPathType().getPathname() + "/234"));
         template.setCredentials(new CimiCredentials(this.request.getBaseUri()
-            + ResourceType.Credentials.getPathType().getPathname() + "/345"));
+            + ExchangeType.Credentials.getPathType().getPathname() + "/345"));
         CimiMachineCreate cimi = new CimiMachineCreate();
         cimi.setMachineTemplate(template);
         this.request.setCimiData(cimi);

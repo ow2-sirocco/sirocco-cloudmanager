@@ -39,7 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
  * </ul>
  * </p>
  */
-public class MemoryConverter implements ResourceConverter {
+public class MemoryConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
@@ -56,7 +56,7 @@ public class MemoryConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -80,7 +80,7 @@ public class MemoryConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -100,7 +100,7 @@ public class MemoryConverter implements ResourceConverter {
         if (null != dataService.getQuantity()) {
             dataCimi.setQuantity(dataService.getQuantity().intValue());
         }
-        dataCimi.setUnits((String) context.getConverter(MemoryUnit.class).toCimi(context, dataService.getUnit()));
+        dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnit(), MemoryUnit.class));
     }
 
     /**
@@ -114,7 +114,7 @@ public class MemoryConverter implements ResourceConverter {
         if (null != dataCimi.getQuantity()) {
             dataService.setQuantity(dataCimi.getQuantity().floatValue());
         }
-        dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit) context.getConverter(MemoryUnit.class)
-            .toService(context, dataCimi.getUnits()));
+        dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit) context.convertNextService(
+            dataCimi.getUnits(), MemoryUnit.class));
     }
 }

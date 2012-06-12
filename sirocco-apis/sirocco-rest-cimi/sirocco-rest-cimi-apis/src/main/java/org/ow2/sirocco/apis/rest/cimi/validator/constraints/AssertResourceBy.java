@@ -22,30 +22,31 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.converter;
+package org.ow2.sirocco.apis.rest.cimi.validator.constraints;
 
-import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
 
 /**
- * 
- */
-public interface ResourceConverter extends CimiConverter {
+ * Annotation to validate an entity is passed by reference or by value.
+ **/
+@Target({ElementType.TYPE})
+@Retention(RUNTIME)
+@Constraint(validatedBy = AssertResourceByValidator.class)
+@Documented
+public @interface AssertResourceBy {
 
-    /**
-     * Copy data from a service object to a CIMI object.
-     * 
-     * @param context The current context
-     * @param dataService Source service object
-     * @param dataCimi Destination CIMI object
-     */
-    void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi);
+    String message() default "{AssertResourceBy.message}";
 
-    /**
-     * Copy data from a CIMI object to a service object.
-     * 
-     * @param context The current context
-     * @param dataCimi Source CIMI object
-     * @param dataService Destination Service object
-     */
-    void copyToService(final CimiContext context, final Object dataCimi, final Object dataService);
+    Class<?>[] groups() default {};
+
+    Class<? extends Payload>[] payload() default {};
+
 }

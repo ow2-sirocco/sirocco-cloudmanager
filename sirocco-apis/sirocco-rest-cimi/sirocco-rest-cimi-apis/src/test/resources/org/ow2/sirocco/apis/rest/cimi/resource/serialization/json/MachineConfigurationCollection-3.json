@@ -1,6 +1,8 @@
 {
 	"id":"idValue_3",
 	"href":"hrefValue_3",
+	"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection",
+	"count":3,
 	"operations":[
 		{
 			"rel":"relValue_3_0",

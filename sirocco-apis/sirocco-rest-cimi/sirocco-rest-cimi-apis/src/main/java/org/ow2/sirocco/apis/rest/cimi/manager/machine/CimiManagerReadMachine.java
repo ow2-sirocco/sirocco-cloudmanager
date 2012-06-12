@@ -27,7 +27,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
@@ -73,7 +72,7 @@ public class CimiManagerReadMachine extends CimiManagerReadAbstract {
      */
     @Override
     protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiMachine cimi = (CimiMachine) context.getRootConverter(ResourceType.Machine).toCimi(context, dataService);
+        CimiMachine cimi = (CimiMachine) context.convertToCimi(dataService, CimiMachine.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
     }

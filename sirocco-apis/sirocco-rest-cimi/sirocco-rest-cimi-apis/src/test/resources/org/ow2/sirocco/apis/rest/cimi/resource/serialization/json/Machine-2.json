@@ -6,6 +6,7 @@
 		"keyProp_2_1":"valueProp_2_1"
 	},
 	"id":"idValue_2",
+	"resourceURI":"http://schemas.dmtf.org/cimi/1/Machine",
 	"created":"2002-03-03T02:02:02.002Z",
 	"updated":"2002-03-03T02:02:02.002Z",
 	"operations":[
@@ -17,6 +18,7 @@
 			"rel":"relValue_2_1",
 			"href":"hrefValue_2_1"
 		}
+		
 	],
 	"href":"hrefValue_2",
 	"state":"stateValue_2",
@@ -35,12 +37,15 @@
 				"quantity":2,
 				"units":"unitValue_2_0"
 			}
+			
 		},
 		{
 			"capacity":{
 				"quantity":2,
 				"units":"unitValue_2_1"
 			}
+			
 		}
+		
 	]
 }

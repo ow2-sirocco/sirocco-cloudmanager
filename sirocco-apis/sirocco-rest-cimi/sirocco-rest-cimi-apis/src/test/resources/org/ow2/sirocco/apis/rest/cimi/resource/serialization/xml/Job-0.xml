@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Job href="hrefValue_0">
+<Job href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/Job">
 	<created>2000-01-01T00:00:00.000Z</created>
 	<description>descriptionValue_0</description>
 	<id>idValue_0</id>

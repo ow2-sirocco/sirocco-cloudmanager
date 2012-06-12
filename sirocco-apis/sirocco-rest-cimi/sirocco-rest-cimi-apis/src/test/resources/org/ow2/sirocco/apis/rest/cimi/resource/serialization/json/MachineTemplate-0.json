@@ -2,6 +2,7 @@
 	"name":"nameValue_0",
 	"description":"descriptionValue_0",
 	"id":"idValue_0",
+	"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineTemplate",
 	"created":"2000-01-01T00:00:00.000Z",
 	"updated":"2000-01-01T00:00:00.000Z",
 	"href":"hrefValue_0",
@@ -9,6 +10,7 @@
 		"name":"nameValue_0",
 		"description":"descriptionValue_0",
 		"id":"idValue_0",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfiguration",
 		"created":"2000-01-01T00:00:00.000Z",
 		"updated":"2000-01-01T00:00:00.000Z",
 		"href":"hrefValue_0",
@@ -21,11 +23,13 @@
 			"quantity":0,
 			"units":"unitValue_0"
 		}
+		
 	},
 	"machineImage":{
 		"name":"nameValue_0",
 		"description":"descriptionValue_0",
 		"id":"idValue_0",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImage",
 		"created":"2000-01-01T00:00:00.000Z",
 		"updated":"2000-01-01T00:00:00.000Z",
 		"href":"hrefValue_0",
@@ -39,6 +43,7 @@
 		"name":"nameValue_0",
 		"description":"descriptionValue_0",
 		"id":"idValue_0",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/Credentials",
 		"created":"2000-01-01T00:00:00.000Z",
 		"updated":"2000-01-01T00:00:00.000Z",
 		"href":"hrefValue_0",

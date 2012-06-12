@@ -25,9 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.request;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 
 /**
  *
@@ -49,44 +47,7 @@ public interface CimiContext {
     CimiResponse getResponse();
 
     /**
-     * Get the entity type for a instance.
-     * 
-     * @param data The entity
-     * @return The entity type
-     */
-    ResourceType getType(CimiData data);
-
-    /**
-     * Get the converter for the entity root to convert.
-     * <p>
-     * The given type is saved in context and can be got with
-     * {@link #getCurrentRootConverting()}. In this case, the process don't
-     * convert the write-only data.
-     * </p>
-     * 
-     * @param type The type of entity to convert
-     * @return The converter
-     * @see #getRootConverter(ResourceType, boolean)
-     */
-    CimiConverter getRootConverter(ResourceType type);
-
-    /**
-     * Get the converter for the entity root to convert.
-     * <p>
-     * The given type is saved in context and can be got with
-     * {@link #getCurrentRootConverting()}.
-     * </p>
-     * 
-     * @param type The type of entity to convert
-     * @param convertedWriteOnly Sets the process the conversion of write-only
-     * @return The converter
-     * @see #isConvertedWriteOnly()
-     * @see #setConvertedWriteOnly(boolean)
-     */
-    CimiConverter getRootConverter(ResourceType type, boolean convertedWriteOnly);
-
-    /**
-     * Get the converter for a class.
+     * Get the converter for a CIMI class.
      * 
      * @param klass The class to convert
      * @return The converter
@@ -94,54 +55,78 @@ public interface CimiContext {
     CimiConverter getConverter(Class<?> klass);
 
     /**
-     * Get the entity converter for a class.
+     * Convert a service root object to a CIMI root object.
+     * <p>
+     * Initialize the conversion stack.
+     * </p>
      * 
-     * @param klass The class to convert
-     * @return The entity converter
+     * @param service The service instance to convert
+     * @param cimiAssociate The CIMI class associate to the service class
+     * @return A CIMI instance converted
      */
-    ResourceConverter getEntityConverter(Class<?> klass);
+    Object convertToCimi(Object service, Class<?> cimiAssociate);
 
     /**
-     * Get the current root converting setted by
-     * {@link #getRootConverter(ResourceType)}.
+     * Convert a service child object to a CIMI child object.
      * 
-     * @return The current root type converting
+     * @param service The service instance to convert
+     * @param cimiAssociate The CIMI class associate to the service class
+     * @return A CIMI instance converted
      */
-    ResourceType getCurrentRootConverting();
+    Object convertNextCimi(Object service, Class<?> cimiAssociate);
 
     /**
-     * Returns true if the given entity must be expanded.
+     * Convert a CIMI root object to a service root object.
+     * <p>
+     * Initialize the conversion stack.
+     * </p>
      * 
-     * @param entity The instance of a CIMI entity
+     * @param cimi The CIMI instance to convert
+     * @return A service instance converted
+     */
+    Object convertToService(Object cimi);
+
+    /**
+     * Convert a CIMI child object to a service child object.
+     * 
+     * @param cimi The CIMI instance to convert
+     * @return A service instance converted
+     */
+    Object convertNextService(Object cimi);
+
+    /**
+     * Convert a CIMI child object to a service child object.
+     * 
+     * @param cimi The CIMI instance to convert
+     * @param cimiToUse The CIMI class to use
+     * @return A service instance converted
+     */
+    Object convertNextService(Object cimi, Class<?> cimiToUse);
+
+    /**
+     * Returns true if the given resource must be expanded.
+     * 
+     * @param resource A instance of a CIMI resource
      * @return True if must be expanded.
      */
-    boolean mustBeExpanded(CimiData entity);
+    boolean mustBeExpanded(CimiResource resource);
 
     /**
-     * Returns true if the given entity must be referenced.
+     * Returns true if the given resource must be referenced.
      * 
-     * @param entity The instance of a CIMI entity
+     * @param resource A instance of a CIMI resource
      * @return True if must be referenced.
      */
-    boolean mustBeReferenced(CimiData data);
+    boolean mustBeReferenced(CimiResource resource);
 
     /**
-     * Returns true if the given entity must have an identifier in its
+     * Returns true if the given resource must have an identifier in its
      * reference.
      * 
-     * @param entity The instance of a CIMI entity
+     * @param resource A CIMI resource class
      * @return True if must have a ID.
      */
-    boolean mustHaveIdInReference(final CimiData entity);
-
-    /**
-     * Returns true if the given entity must have an identifier in its
-     * reference.
-     * 
-     * @param type The type of a CIMI entity
-     * @return True if must have a ID.
-     */
-    boolean mustHaveIdInReference(final ResourceType type);
+    boolean mustHaveIdInReference(Class<? extends CimiResource> classResource);
 
     /**
      * Make the base HREF without ID.
@@ -149,34 +134,25 @@ public interface CimiContext {
      * @param data
      * @return
      */
-    String makeHrefBase(final CimiData data);
+    String makeHrefBase(CimiResource data);
 
     /**
-     * Make a HREF.
+     * Make a HREF for a resource.
      * 
-     * @param entity The instance of entity
+     * @param resource The instance of the resource
      * @param id Service ID
      * @return The HREF made
      */
-    String makeHref(final CimiData entity, final String id);
+    String makeHref(CimiResource resource, String id);
 
     /**
-     * Make a HREF.
+     * Make a HREF for a resource.
      * 
-     * @param entity The instance of entity
+     * @param resource The class of the resource
      * @param id Service ID
      * @return The HREF made
      */
-    String makeHref(final CimiData entity, final Integer id);
-
-    /**
-     * Make a HREF.
-     * 
-     * @param type The type of entity
-     * @param id Service ID
-     * @return The HREF made
-     */
-    String makeHref(final ResourceType type, final Integer id);
+    public String makeHref(Class<? extends CimiResource> classToUse, String id);
 
     /**
      * Returns true if the converters must process the write-only data when
@@ -193,5 +169,13 @@ public interface CimiContext {
      * @param convertedWriteOnly True to convert the write-only data
      */
     void setConvertedWriteOnly(boolean convertedWriteOnly);
+
+    /**
+     * Find a CIMI class associate to a service class.
+     * 
+     * @param service The service class
+     * @return The CIMI class or null if not found
+     */
+    Class<? extends CimiResource> findAssociate(Class<?> service);
 
 }

@@ -25,14 +25,14 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -44,7 +44,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
  * </ul>
  * </p>
  */
-public class MachineConfigurationCollectionConverter extends CollectionConverter {
+public class MachineConfigurationCollectionConverter extends CollectionConverterAbstract {
 
     /**
      * {@inheritDoc}
@@ -62,7 +62,7 @@ public class MachineConfigurationCollectionConverter extends CollectionConverter
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
@@ -94,7 +94,7 @@ public class MachineConfigurationCollectionConverter extends CollectionConverter
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -105,46 +105,36 @@ public class MachineConfigurationCollectionConverter extends CollectionConverter
     }
 
     /**
-     * Copy data from a service object to a CIMI object.
+     * {@inheritDoc}
      * 
-     * @param context The current context
-     * @param dataService Source service object
-     * @param dataCimi Destination CIMI object
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#getChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
      */
-    protected void doCopyToCimi(final CimiContext context, final MachineConfigurationCollection dataService,
-        final CimiMachineConfigurationCollection dataCimi) {
-        this.fill(context, dataService, dataCimi);
-        if (true == context.mustBeExpanded(dataCimi)) {
-            if ((null != dataService.getMachineConfigurations()) && (dataService.getMachineConfigurations().size() > 0)) {
-                CimiConverter converter = context.getConverter(CimiMachineConfiguration.class);
-                CimiArray<CimiMachineConfiguration> cimiList = dataCimi.newCollection();
-
-                for (MachineConfiguration serviceItem : dataService.getMachineConfigurations()) {
-                    cimiList.add((CimiMachineConfiguration) converter.toCimi(context, serviceItem));
-                }
-                dataCimi.setCollection(cimiList);
-            }
-        }
+    @Override
+    protected Collection<?> getChildCollection(final Resource resourceCollection) {
+        MachineConfigurationCollection collect = (MachineConfigurationCollection) resourceCollection;
+        return collect.getMachineConfigurations();
     }
 
     /**
-     * Copy data from a CIMI object to a service object.
+     * {@inheritDoc}
      * 
-     * @param context The current context
-     * @param dataCimi Source CIMI object
-     * @param dataService Destination Service object
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#setNewChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
      */
-    protected void doCopyToService(final CimiContext context, final CimiMachineConfigurationCollection dataCimi,
-        final MachineConfigurationCollection dataService) {
-        CimiArray<CimiMachineConfiguration> cimiList = dataCimi.getCollection();
-        if ((null != cimiList) && (cimiList.size() > 0)) {
-            List<MachineConfiguration> serviceList = new ArrayList<MachineConfiguration>();
-            dataService.setMachineConfigurations(serviceList);
+    @Override
+    protected void setNewChildCollection(final Resource resourceCollection) {
+        MachineConfigurationCollection collect = (MachineConfigurationCollection) resourceCollection;
+        collect.setMachineConfigurations(new ArrayList<MachineConfiguration>());
+    }
 
-            CimiConverter converter = context.getConverter(CimiMachineConfiguration.class);
-            for (CimiMachineConfiguration cimiItem : cimiList) {
-                serviceList.add((MachineConfiguration) converter.toService(context, cimiItem));
-            }
-        }
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#addItemChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void addItemChildCollection(final Resource resourceCollection, final Object itemService) {
+        MachineConfigurationCollection collect = (MachineConfigurationCollection) resourceCollection;
+        collect.getMachineConfigurations().add((MachineConfiguration) itemService);
     }
 }

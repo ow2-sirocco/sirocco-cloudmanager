@@ -25,14 +25,14 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -45,7 +45,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
  * </ul>
  * </p>
  */
-public class CredentialsCollectionConverter extends CollectionConverter {
+public class CredentialsCollectionConverter extends CollectionConverterAbstract {
 
     /**
      * {@inheritDoc}
@@ -63,7 +63,7 @@ public class CredentialsCollectionConverter extends CollectionConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @SuppressWarnings("unchecked")
@@ -95,7 +95,7 @@ public class CredentialsCollectionConverter extends CollectionConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -105,46 +105,36 @@ public class CredentialsCollectionConverter extends CollectionConverter {
     }
 
     /**
-     * Copy data from a service object to a CIMI object.
+     * {@inheritDoc}
      * 
-     * @param context The current context
-     * @param dataService Source service object
-     * @param dataCimi Destination CIMI object
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#getChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
      */
-    protected void doCopyToCimi(final CimiContext context, final CredentialsCollection dataService,
-        final CimiCredentialsCollection dataCimi) {
-        this.fill(context, dataService, dataCimi);
-        if (true == context.mustBeExpanded(dataCimi)) {
-            if ((null != dataService.getCredentials()) && (dataService.getCredentials().size() > 0)) {
-                CimiConverter converter = context.getConverter(CimiCredentials.class);
-                CimiArray<CimiCredentials> cimiList = dataCimi.newCollection();
-
-                for (Credentials serviceItem : dataService.getCredentials()) {
-                    cimiList.add((CimiCredentials) converter.toCimi(context, serviceItem));
-                }
-                dataCimi.setCollection(cimiList);
-            }
-        }
+    @Override
+    protected Collection<?> getChildCollection(final Resource resourceCollection) {
+        CredentialsCollection collect = (CredentialsCollection) resourceCollection;
+        return collect.getCredentials();
     }
 
     /**
-     * Copy data from a CIMI object to a service object.
+     * {@inheritDoc}
      * 
-     * @param context The current context
-     * @param dataCimi Source CIMI object
-     * @param dataService Destination Service object
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#setNewChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
      */
-    protected void doCopyToService(final CimiContext context, final CimiCredentialsCollection dataCimi,
-        final CredentialsCollection dataService) {
-        CimiArray<CimiCredentials> cimiList = dataCimi.getCollection();
-        if ((null != cimiList) && (cimiList.size() > 0)) {
-            List<Credentials> serviceList = new ArrayList<Credentials>();
-            dataService.setCredentials(serviceList);
+    @Override
+    protected void setNewChildCollection(final Resource resourceCollection) {
+        CredentialsCollection collect = (CredentialsCollection) resourceCollection;
+        collect.setCredentials(new ArrayList<Credentials>());
+    }
 
-            CimiConverter converter = context.getConverter(CimiCredentials.class);
-            for (CimiCredentials cimiItem : cimiList) {
-                serviceList.add((Credentials) converter.toService(context, cimiItem));
-            }
-        }
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#addItemChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void addItemChildCollection(final Resource resourceCollection, final Object itemService) {
+        CredentialsCollection collect = (CredentialsCollection) resourceCollection;
+        collect.getCredentials().add((Credentials) itemService);
     }
 }

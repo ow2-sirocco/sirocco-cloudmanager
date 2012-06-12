@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -43,7 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
  * </ul>
  * </p>
  */
-public class CredentialsCreateConverter implements ResourceConverter {
+public class CredentialsCreateConverter implements CimiConverter {
 
     /**
      * {@inheritDoc}
@@ -60,7 +59,7 @@ public class CredentialsCreateConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -84,7 +83,7 @@ public class CredentialsCreateConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -120,8 +119,8 @@ public class CredentialsCreateConverter implements ResourceConverter {
         final CredentialsCreate dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getCredentialsTemplate()) {
-            dataService.setCredentialTemplate((CredentialsTemplate) context.getConverter(CimiCredentialsTemplate.class)
-                .toService(context, dataCimi.getCredentialsTemplate()));
+            dataService.setCredentialTemplate((CredentialsTemplate) context.convertNextService(dataCimi
+                .getCredentialsTemplate()));
         }
     }
 

@@ -45,7 +45,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
  * </ul>
  * </p>
  */
-public class CloudEntryPointConverter extends ObjectCommonConverter implements ResourceConverter {
+public class CloudEntryPointConverter extends ObjectCommonConverter {
     /**
      * {@inheritDoc}
      * 
@@ -62,7 +62,7 @@ public class CloudEntryPointConverter extends ObjectCommonConverter implements R
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -86,7 +86,7 @@ public class CloudEntryPointConverter extends ObjectCommonConverter implements R
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -107,28 +107,28 @@ public class CloudEntryPointConverter extends ObjectCommonConverter implements R
         this.fill(context, dataService, dataCimi);
         if ((true == context.mustBeExpanded(dataCimi)) || (true == context.mustBeReferenced(dataCimi))) {
             if (null != dataService.getCredentials()) {
-                dataCimi.setCredentials((CimiCredentialsCollection) context.getConverter(CimiCredentialsCollection.class)
-                    .toCimi(context, dataService.getCredentials()));
+                dataCimi.setCredentials((CimiCredentialsCollection) context.convertNextCimi(dataService.getCredentials(),
+                    CimiCredentialsCollection.class));
             }
             if (null != dataService.getCredentialsTemplates()) {
-                dataCimi.setCredentialsTemplates((CimiCredentialsTemplateCollection) context.getConverter(
-                    CimiCredentialsTemplateCollection.class).toCimi(context, dataService.getCredentialsTemplates()));
+                dataCimi.setCredentialsTemplates((CimiCredentialsTemplateCollection) context.convertNextCimi(
+                    dataService.getCredentialsTemplates(), CimiCredentialsTemplateCollection.class));
             }
             if (null != dataService.getMachineConfigs()) {
-                dataCimi.setMachineConfigs((CimiMachineConfigurationCollection) context.getConverter(
-                    CimiMachineConfigurationCollection.class).toCimi(context, dataService.getMachineConfigs()));
+                dataCimi.setMachineConfigs((CimiMachineConfigurationCollection) context.convertNextCimi(
+                    dataService.getMachineConfigs(), CimiMachineConfigurationCollection.class));
             }
             if (null != dataService.getMachineImages()) {
-                dataCimi.setMachineImages((CimiMachineImageCollection) context.getConverter(CimiMachineImageCollection.class)
-                    .toCimi(context, dataService.getMachineImages()));
+                dataCimi.setMachineImages((CimiMachineImageCollection) context.convertNextCimi(dataService.getMachineImages(),
+                    CimiMachineImageCollection.class));
             }
             if (null != dataService.getMachines()) {
-                dataCimi.setMachines((CimiMachineCollection) context.getConverter(CimiMachineCollection.class).toCimi(context,
-                    dataService.getMachines()));
+                dataCimi.setMachines((CimiMachineCollection) context.convertNextCimi(dataService.getMachines(),
+                    CimiMachineCollection.class));
             }
             if (null != dataService.getMachineTemplates()) {
-                dataCimi.setMachineTemplates((CimiMachineTemplateCollection) context.getConverter(
-                    CimiMachineTemplateCollection.class).toCimi(context, dataService.getMachineTemplates()));
+                dataCimi.setMachineTemplates((CimiMachineTemplateCollection) context.convertNextCimi(
+                    dataService.getMachineTemplates(), CimiMachineTemplateCollection.class));
             }
         }
     }

@@ -37,9 +37,9 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import org.ow2.sirocco.apis.rest.cimi.utils.CimiDateAdapter;
 
 /**
- * Abstract class of a CIMI resource object.
+ * Abstract class of a CIMI common object.
  */
-public class CimiObjectCommonImpl extends CimiCommon implements CimiObjectCommon {
+public abstract class CimiObjectCommonAbstract extends CimiCommon implements CimiObjectCommon {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -72,7 +72,7 @@ public class CimiObjectCommonImpl extends CimiCommon implements CimiObjectCommon
     /**
      * Default constructor.
      */
-    public CimiObjectCommonImpl() {
+    public CimiObjectCommonAbstract() {
         super();
         this.resource = new CimiResourceWrapped();
     }
@@ -82,7 +82,7 @@ public class CimiObjectCommonImpl extends CimiCommon implements CimiObjectCommon
      * 
      * @param href The reference
      */
-    public CimiObjectCommonImpl(final String href) {
+    public CimiObjectCommonAbstract(final String href) {
         this();
         this.setHref(href);
     }
@@ -157,6 +157,7 @@ public class CimiObjectCommonImpl extends CimiCommon implements CimiObjectCommon
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiResource#getResourceURI()
      */
     @Override
+    @XmlAttribute
     public String getResourceURI() {
         return this.resource.getResourceURI();
     }
@@ -289,6 +290,16 @@ public class CimiObjectCommonImpl extends CimiCommon implements CimiObjectCommon
         @Override
         public boolean hasValues() {
             return false;
+        }
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+         */
+        @Override
+        public ExchangeType getExchangeType() {
+            return null;
         }
 
     }

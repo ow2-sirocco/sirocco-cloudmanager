@@ -25,7 +25,9 @@
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
@@ -35,7 +37,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "CloudEntryPoint")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCloudEntryPoint extends CimiObjectCommonImpl {
+public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -56,12 +58,12 @@ public class CimiCloudEntryPoint extends CimiObjectCommonImpl {
     private CimiMachineImageCollection machineImages;
 
     /**
-     * Field "CredentialsTemplates".
+     * Field "credentialsTemplates".
      */
-    private CimiCredentialsTemplateCollection CredentialsTemplates;
+    private CimiCredentialsTemplateCollection credentialsTemplates;
 
     /**
-     * Field "Credentials".
+     * Field "credentials".
      */
     private CimiCredentialsCollection credentials;
 
@@ -166,12 +168,12 @@ public class CimiCloudEntryPoint extends CimiObjectCommonImpl {
     }
 
     /**
-     * Return the value of field "CredentialsTemplates".
+     * Return the value of field "credentialsTemplates".
      * 
      * @return The value
      */
     public CimiCredentialsTemplateCollection getCredentialsTemplates() {
-        return this.CredentialsTemplates;
+        return this.credentialsTemplates;
     }
 
     /**
@@ -179,8 +181,8 @@ public class CimiCloudEntryPoint extends CimiObjectCommonImpl {
      * 
      * @param CredentialsTemplates The value
      */
-    public void setCredentialsTemplates(final CimiCredentialsTemplateCollection CredentialsTemplates) {
-        this.CredentialsTemplates = CredentialsTemplates;
+    public void setCredentialsTemplates(final CimiCredentialsTemplateCollection credentialsTemplates) {
+        this.credentialsTemplates = credentialsTemplates;
     }
 
     /**
@@ -308,4 +310,17 @@ public class CimiCloudEntryPoint extends CimiObjectCommonImpl {
     public void setJobTime(final Integer jobTime) {
         this.jobTime = jobTime;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.CloudEntryPoint;
+    }
+
 }

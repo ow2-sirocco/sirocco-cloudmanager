@@ -36,13 +36,13 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 
-public class CreatingEntityValidatorTest {
+public class CreatingResourceValidatorTest {
 
     private CimiRequest request;
 
@@ -73,16 +73,16 @@ public class CreatingEntityValidatorTest {
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference
-        cimi = new CimiMachineImage(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/31");
+        cimi = new CimiMachineImage(this.request.getBaseUri() + ExchangeType.MachineImage.getPathType().getPathname() + "/31");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
-        cimi = new CimiMachineImage(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/31");
+        cimi = new CimiMachineImage(this.request.getBaseUri() + ExchangeType.MachineImage.getPathType().getPathname() + "/31");
         cimi.setImageLocation(new ImageLocation("foo"));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by reference and value
-        cimi = new CimiMachineImage(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/31");
+        cimi = new CimiMachineImage(this.request.getBaseUri() + ExchangeType.MachineImage.getPathType().getPathname() + "/31");
         cimi.setImageLocation(new ImageLocation());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
     }
@@ -103,19 +103,19 @@ public class CreatingEntityValidatorTest {
 
         // OK by reference
         cimi = new CimiMachineConfiguration(this.request.getBaseUri()
-            + ResourceType.MachineConfiguration.getPathType().getPathname() + "/17");
+            + ExchangeType.MachineConfiguration.getPathType().getPathname() + "/17");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
         cimi = new CimiMachineConfiguration(this.request.getBaseUri()
-            + ResourceType.MachineConfiguration.getPathType().getPathname() + "/17");
+            + ExchangeType.MachineConfiguration.getPathType().getPathname() + "/17");
         cimi.setCpu(new CimiCpu(1f, "unit", 1));
         cimi.setMemory(new CimiMemory(1, "unit"));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by reference and value : BAD CPU
         cimi = new CimiMachineConfiguration(this.request.getBaseUri()
-            + ResourceType.MachineConfiguration.getPathType().getPathname() + "/17");
+            + ExchangeType.MachineConfiguration.getPathType().getPathname() + "/17");
         cimi.setCpu(new CimiCpu(3f, null, null));
         cimi.setMemory(new CimiMemory(1, "unit"));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
@@ -138,14 +138,14 @@ public class CreatingEntityValidatorTest {
 
         // OK by reference
         template = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ResourceType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
         cimi = new CimiCredentialsCreate();
         cimi.setCredentialsTemplate(template);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
         template = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ResourceType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
         template.setUserName("user");
         template.setPassword("pass");
         cimi = new CimiCredentialsCreate();
@@ -154,7 +154,7 @@ public class CreatingEntityValidatorTest {
 
         // KO by reference and value
         template = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ResourceType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
         template.setKey(new byte[0]);
         cimi = new CimiCredentialsCreate();
         cimi.setCredentialsTemplate(template);
@@ -183,19 +183,19 @@ public class CreatingEntityValidatorTest {
 
         // OK by reference
         cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ResourceType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
         cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ResourceType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
         cimi.setUserName("user");
         cimi.setPassword("pass");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by reference and value
         cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ResourceType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
         cimi.setKey(new byte[0]);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
     }
@@ -220,11 +220,11 @@ public class CreatingEntityValidatorTest {
         // OK by reference
         cimi = new CimiMachineCreate();
         cimi.setMachineTemplate(new CimiMachineTemplate(this.request.getBaseUri()
-            + ResourceType.MachineTemplate.getPathType().getPathname() + "/7"));
+            + ExchangeType.MachineTemplate.getPathType().getPathname() + "/7"));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
-        template = new CimiMachineTemplate(this.request.getBaseUri() + ResourceType.MachineTemplate.getPathType().getPathname()
+        template = new CimiMachineTemplate(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathType().getPathname()
             + "/7");
         template.setMachineConfig(new CimiMachineConfiguration(new CimiCpu(1f, "unit", 1), new CimiMemory(1, "unit")));
         template.setMachineImage(new CimiMachineImage(new ImageLocation("foo")));
@@ -241,7 +241,7 @@ public class CreatingEntityValidatorTest {
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by reference and value
-        template = new CimiMachineTemplate(this.request.getBaseUri() + ResourceType.MachineTemplate.getPathType().getPathname()
+        template = new CimiMachineTemplate(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathType().getPathname()
             + "/7");
         template.setMachineConfig(new CimiMachineConfiguration(new CimiCpu(1f, null, 1), new CimiMemory(1, "unit")));
         cimi = new CimiMachineCreate();
@@ -264,19 +264,19 @@ public class CreatingEntityValidatorTest {
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference
-        cimi = new CimiMachineTemplate(this.request.getBaseUri() + ResourceType.MachineTemplate.getPathType().getPathname()
+        cimi = new CimiMachineTemplate(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathType().getPathname()
             + "/7");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
-        cimi = new CimiMachineTemplate(this.request.getBaseUri() + ResourceType.MachineTemplate.getPathType().getPathname()
+        cimi = new CimiMachineTemplate(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathType().getPathname()
             + "/7");
         cimi.setMachineConfig(new CimiMachineConfiguration(new CimiCpu(1f, "unit", 1), new CimiMemory(1, "unit")));
         cimi.setMachineImage(new CimiMachineImage(new ImageLocation("foo")));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by reference and value
-        cimi = new CimiMachineTemplate(this.request.getBaseUri() + ResourceType.MachineTemplate.getPathType().getPathname()
+        cimi = new CimiMachineTemplate(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathType().getPathname()
             + "/7");
         cimi.setMachineImage(new CimiMachineImage(new ImageLocation()));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));

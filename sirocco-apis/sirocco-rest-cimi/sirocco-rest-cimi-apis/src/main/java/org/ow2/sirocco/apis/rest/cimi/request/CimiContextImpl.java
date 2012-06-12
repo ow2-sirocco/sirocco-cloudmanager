@@ -24,24 +24,29 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.request;
 
+import java.util.LinkedList;
+
 import org.ow2.sirocco.apis.rest.cimi.configuration.AppConfig;
+import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigFactory;
+import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigurationException;
+import org.ow2.sirocco.apis.rest.cimi.configuration.ItemConfig;
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 
 /**
  * .
  */
 public class CimiContextImpl implements CimiContext {
 
-    private ResourceType currentRoot;
-
     private CimiRequest request;
 
     private CimiResponse response;
 
     private boolean convertedWriteOnly;
+
+    private LinkedList<Class<?>> stackConverted;
 
     /**
      * Set constructor.
@@ -53,26 +58,8 @@ public class CimiContextImpl implements CimiContext {
         super();
         this.request = request;
         this.response = response;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#getType(org.ow2.sirocco.apis.rest.cimi.domain.CimiData)
-     */
-    public ResourceType getType(final CimiData data) {
-        AppConfig.getInstance();
-        return AppConfig.getType(data);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#getCurrentRootConverting()
-     */
-    @Override
-    public ResourceType getCurrentRootConverting() {
-        return this.currentRoot;
+        this.stackConverted = new LinkedList<Class<?>>();
+        this.convertedWriteOnly = false;
     }
 
     /**
@@ -80,6 +67,7 @@ public class CimiContextImpl implements CimiContext {
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#getRequest()
      */
+    @Override
     public CimiRequest getRequest() {
         return this.request;
     }
@@ -89,30 +77,9 @@ public class CimiContextImpl implements CimiContext {
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#getResponse()
      */
+    @Override
     public CimiResponse getResponse() {
         return this.response;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#getRootConverter(ResourceType)
-     */
-    @Override
-    public CimiConverter getRootConverter(final ResourceType type) {
-        return this.getRootConverter(type, false);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#getRootConverter(ResourceType)
-     */
-    @Override
-    public CimiConverter getRootConverter(final ResourceType type, final boolean convertedWriteOnly) {
-        this.currentRoot = type;
-        this.convertedWriteOnly = convertedWriteOnly;
-        return AppConfig.getConverter(type);
     }
 
     /**
@@ -123,31 +90,86 @@ public class CimiContextImpl implements CimiContext {
      */
     @Override
     public CimiConverter getConverter(final Class<?> klass) {
-        return AppConfig.getConverter(klass);
+        CimiConverter converter;
+        try {
+            ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
+            converter = (CimiConverter) item.getData(ConfigFactory.CONVERTER);
+        } catch (Exception e) {
+            throw new ConfigurationException("CimiConverter not found in configuration for " + klass.getName());
+        }
+        return converter;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#getEntityConverter(java.lang.Class)
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertToCimi(java.lang.Object,
+     *      java.lang.Class)
      */
     @Override
-    public ResourceConverter getEntityConverter(final Class<?> klass) {
-        return AppConfig.getEntityConverter(klass);
+    public Object convertToCimi(final Object service, final Class<?> cimiAssociate) {
+        this.stackConverted.clear();
+        return this.convertNextCimi(service, cimiAssociate);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertNextCimi(java.lang.Object,
+     *      java.lang.Class)
+     */
+    @Override
+    public Object convertNextCimi(final Object service, final Class<?> cimiAssociate) {
+        Object converted = null;
+        this.stackConverted.push(cimiAssociate);
+        converted = this.getConverter(cimiAssociate).toCimi(this, service);
+        this.stackConverted.pop();
+        return converted;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertToService(java.lang.Object)
+     */
+    @Override
+    public Object convertToService(final Object cimi) {
+        this.stackConverted.clear();
+        return this.convertNextService(cimi);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertNextService(java.lang.Object)
+     */
+    @Override
+    public Object convertNextService(final Object cimi) {
+        return this.convertNextService(cimi, cimi.getClass());
+    }
+
+    @Override
+    public Object convertNextService(final Object cimi, final Class<?> cimiToUse) {
+        Object converted = null;
+        this.stackConverted.push(cimiToUse);
+        converted = this.getConverter(cimiToUse).toService(this, cimi);
+        this.stackConverted.pop();
+        return converted;
     }
 
     /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#mustBeExpanded(org
-     *      .ow2.sirocco.apis.rest.cimi.domain.CimiData)
+     *      .ow2.sirocco.apis.rest.cimi.domain.CimiResource)
      */
     @Override
-    public boolean mustBeExpanded(final CimiData data) {
+    public boolean mustBeExpanded(final CimiResource resource) {
         boolean expand = true;
-        ResourceType type = AppConfig.getType(data);
-        if (this.currentRoot != type) {
-            switch (this.currentRoot) {
+        ExchangeType typeCurrent = this.getType(resource);
+        ExchangeType typeRoot = this.getType(this.getRootConverting());
+        if (typeRoot != typeCurrent) {
+            switch (typeRoot) {
             case CloudEntryPoint:
             case CredentialsCollection:
             case CredentialsTemplateCollection:
@@ -169,14 +191,15 @@ public class CimiContextImpl implements CimiContext {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#mustBeReferenced(org
-     *      .ow2.CimiData)
+     *      .ow2.CimiResource)
      */
     @Override
-    public boolean mustBeReferenced(final CimiData data) {
+    public boolean mustBeReferenced(final CimiResource resource) {
         boolean reference = false;
-        ResourceType type = AppConfig.getType(data);
-        if (this.currentRoot != type) {
-            switch (this.currentRoot) {
+        ExchangeType typeCurrent = this.getType(resource);
+        ExchangeType typeRoot = this.getType(this.getRootConverting());
+        if (typeRoot != typeCurrent) {
+            switch (typeRoot) {
             case CloudEntryPoint:
             case CredentialsCollection:
             case CredentialsTemplateCollection:
@@ -200,19 +223,9 @@ public class CimiContextImpl implements CimiContext {
      * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#mustHaveIdInReference(org.ow2.sirocco.apis.rest.cimi.domain.CimiData)
      */
     @Override
-    public boolean mustHaveIdInReference(final CimiData data) {
-        return this.mustHaveIdInReference(AppConfig.getType(data));
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#mustHaveIdInReference(org.ow2.sirocco.apis.rest.cimi.domain.ResourceType)
-     */
-    @Override
-    public boolean mustHaveIdInReference(final ResourceType type) {
+    public boolean mustHaveIdInReference(final Class<? extends CimiResource> classResource) {
         boolean withId = true;
-        switch (type) {
+        switch (this.getType(classResource)) {
         case CloudEntryPoint:
         case CredentialsCollection:
         case CredentialsTemplateCollection:
@@ -232,56 +245,37 @@ public class CimiContextImpl implements CimiContext {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(org.ow2.sirocco
-     *      .apis.rest.cimi.domain.CimiData, java.lang.String)
+     * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(CimiResource,
+     *      java.lang.String)
      */
     @Override
-    public String makeHrefBase(final CimiData data) {
-        return this.makeHref(data, (Integer) null);
+    public String makeHrefBase(final CimiResource data) {
+        return this.makeHref(data, null);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(org.ow2.sirocco
-     *      .apis.rest.cimi.domain.CimiData, java.lang.String)
+     * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(CimiResource,
+     *      java.lang.String)
      */
     @Override
-    public String makeHref(final CimiData data, final String id) {
-        return this.makeHref(data, Integer.valueOf(id));
+    public String makeHref(final CimiResource data, final String id) {
+        return this.makeHref(data.getClass(), id);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(org.ow2.sirocco
-     *      .apis.rest.cimi.domain.CimiData, java.lang.Integer)
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#makeHref(java.lang.Class,
+     *      java.lang.String)
      */
     @Override
-    public String makeHref(final CimiData data, final Integer id) {
-        StringBuilder sb = new StringBuilder();
-        ResourceType type = AppConfig.getType(data);
-        sb.append(this.request.getBaseUri()).append(type.getPathType().getPathname());
-        if (true == this.mustHaveIdInReference(data)) {
-            sb.append('/');
-            if (null != id) {
-                sb.append(id);
-            }
-        }
-        return sb.toString();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#makeHref(org.ow2.sirocco.apis.rest.cimi.domain.ResourceType,
-     *      java.lang.Integer)
-     */
-    @Override
-    public String makeHref(final ResourceType type, final Integer id) {
+    public String makeHref(final Class<? extends CimiResource> classToUse, final String id) {
+        ExchangeType type = this.getType(classToUse);
         StringBuilder sb = new StringBuilder();
         sb.append(this.request.getBaseUri()).append(type.getPathType().getPathname());
-        if (true == this.mustHaveIdInReference(type)) {
+        if (true == this.mustHaveIdInReference(classToUse)) {
             sb.append('/');
             if (null != id) {
                 sb.append(id);
@@ -309,4 +303,61 @@ public class CimiContextImpl implements CimiContext {
     public void setConvertedWriteOnly(final boolean convertedWriteOnly) {
         this.convertedWriteOnly = convertedWriteOnly;
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#findAssociate(java.lang.Class)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<? extends CimiResource> findAssociate(final Class<?> klass) {
+        Class<? extends CimiResource> cimi = null;
+        try {
+            ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
+            cimi = (Class<? extends CimiResource>) item.getData(ConfigFactory.ASSOCIATE_TO);
+        } catch (Exception e) {
+            throw new ConfigurationException("Associate class not found in configuration for " + klass.getName());
+        }
+        return cimi;
+    }
+
+    /**
+     * Returns the root class being converted.
+     * 
+     * @return The current root converting
+     */
+    protected Class<?> getRootConverting() {
+        return this.stackConverted.getLast();
+    }
+
+    /**
+     * Get the exchange type for a CIMI instance.
+     * 
+     * @param exchange A CIMI Exchange instance
+     * @return The exchange type or null if the instance's class is unknown
+     */
+    protected ExchangeType getType(final CimiExchange exchange) {
+        ExchangeType type = null;
+        if (null != exchange) {
+            type = exchange.getExchangeType();
+        }
+        return type;
+    }
+
+    /**
+     * Get the exchange type for a instance.
+     * 
+     * @param klass A class
+     * @return The exchange type or null if the class is unknown
+     */
+    protected ExchangeType getType(final Class<?> klass) {
+        ExchangeType type = null;
+        ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
+        if (null != item) {
+            type = item.getType();
+        }
+        return type;
+    }
+
 }

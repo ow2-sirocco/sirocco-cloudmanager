@@ -40,7 +40,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
  * </ul>
  * </p>
  */
-public class CpuConverter implements ResourceConverter {
+public class CpuConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
@@ -57,7 +57,7 @@ public class CpuConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -81,7 +81,7 @@ public class CpuConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -100,7 +100,7 @@ public class CpuConverter implements ResourceConverter {
     protected void doCopyToCimi(final CimiContext context, final Cpu dataService, final CimiCpu dataCimi) {
         dataCimi.setFrequency(dataService.getQuantity());
         dataCimi.setNumberVirtualCpus(dataService.getNumberCpu());
-        dataCimi.setUnits((String) context.getConverter(FrequencyUnit.class).toCimi(context, dataService.getCpuSpeedUnit()));
+        dataCimi.setUnits((String) context.convertNextCimi(dataService.getCpuSpeedUnit(), FrequencyUnit.class));
     }
 
     /**
@@ -113,7 +113,6 @@ public class CpuConverter implements ResourceConverter {
     protected void doCopyToService(final CimiContext context, final CimiCpu dataCimi, final Cpu dataService) {
         dataService.setQuantity(dataCimi.getFrequency());
         dataService.setNumberCpu(dataCimi.getNumberVirtualCpus());
-        dataService.setCpuSpeedUnit((Frequency) context.getConverter(FrequencyUnit.class).toService(context,
-            dataCimi.getUnits()));
+        dataService.setCpuSpeedUnit((Frequency) context.convertNextService(dataCimi.getUnits(), FrequencyUnit.class));
     }
 }

@@ -27,9 +27,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 /**
- * Enumeration of all the entities used.
+ * Enumeration of all the resource exchanged between the customer and the
+ * producer.
  */
-public enum ResourceType {
+public enum ExchangeType {
     /** */
     CloudEntryPoint(PathType.CloudEntryPoint),
     /** */
@@ -52,16 +53,16 @@ public enum ResourceType {
     PathType pathType;
 
     /** Constructor. */
-    private ResourceType(final PathType pathType) {
+    private ExchangeType(final PathType pathType) {
         this.pathType = pathType;
     }
 
     /**
-     * Get the type URI of the resource.
+     * Get the URI of the resource.
      * 
-     * @return The type URI
+     * @return The URI
      */
-    public String getTypeURI() {
+    public String getResourceURI() {
         StringBuilder sb = new StringBuilder();
         sb.append(ConstantsPath.CIMI_XML_NAMESPACE).append('/').append(this.name());
         return sb.toString();

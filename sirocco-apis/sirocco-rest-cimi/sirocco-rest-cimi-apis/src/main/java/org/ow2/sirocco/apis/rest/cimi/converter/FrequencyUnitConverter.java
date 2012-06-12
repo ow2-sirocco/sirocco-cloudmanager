@@ -103,4 +103,25 @@ public class FrequencyUnitConverter implements CimiConverter {
         return service;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      java.lang.Object,java.lang.Object)
+     */
+    @Override
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      java.lang.Object,java.lang.Object)
+     */
+    @Override
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
+        throw new UnsupportedOperationException();
+    }
 }

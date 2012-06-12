@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Collection href="hrefValue_3">
+<Collection href="hrefValue_3" resourceURI="http://schemas.dmtf.org/cimi/1/MachineImageCollection">
 	<id>idValue_3</id>
 	<operation href="hrefValue_3_0" rel="relValue_3_0" />
 	<operation href="hrefValue_3_1" rel="relValue_3_1" />
 	<operation href="hrefValue_3_2" rel="relValue_3_2" />
+	<count>3</count>
 	<MachineImage href="hrefValue_3_0" />
 	<MachineImage href="hrefValue_3_1" />
 	<MachineImage href="hrefValue_3_2" />

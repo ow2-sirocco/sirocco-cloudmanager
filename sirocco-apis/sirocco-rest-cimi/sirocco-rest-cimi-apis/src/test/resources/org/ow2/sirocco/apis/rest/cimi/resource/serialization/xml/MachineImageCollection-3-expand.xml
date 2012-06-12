@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Collection href="hrefValue_3">
+<Collection href="hrefValue_3" resourceURI="http://schemas.dmtf.org/cimi/1/MachineImageCollection">
 	<id>idValue_3</id>
-	<MachineImage href="hrefValue_3_0">
+	<count>3</count>
+	<MachineImage href="hrefValue_3_0" resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
 		<id>idValue_3_0</id>
 		<name>nameValue_3_0</name>
 		<description>descriptionValue_3_0</description>
@@ -17,7 +18,7 @@
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
 	</MachineImage>
-	<MachineImage href="hrefValue_3_1">
+	<MachineImage href="hrefValue_3_1" resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
 		<id>idValue_3_1</id>
 		<name>nameValue_3_1</name>
 		<description>descriptionValue_3_1</description>
@@ -33,7 +34,7 @@
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
 	</MachineImage>
-	<MachineImage href="hrefValue_3_2">
+	<MachineImage href="hrefValue_3_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
 		<id>idValue_3_2</id>
 		<name>nameValue_3_2</name>
 		<description>descriptionValue_3_2</description>

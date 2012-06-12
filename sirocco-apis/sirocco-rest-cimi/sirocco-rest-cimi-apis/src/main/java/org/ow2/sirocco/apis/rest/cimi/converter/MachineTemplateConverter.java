@@ -44,7 +44,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
  * </ul>
  * </p>
  */
-public class MachineTemplateConverter extends ObjectCommonConverter implements ResourceConverter {
+public class MachineTemplateConverter extends ObjectCommonConverter {
 
     /**
      * {@inheritDoc}
@@ -62,7 +62,7 @@ public class MachineTemplateConverter extends ObjectCommonConverter implements R
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -86,7 +86,7 @@ public class MachineTemplateConverter extends ObjectCommonConverter implements R
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -106,16 +106,16 @@ public class MachineTemplateConverter extends ObjectCommonConverter implements R
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
             if (null != dataService.getCredentials()) {
-                dataCimi.setCredentials((CimiCredentials) context.getConverter(CimiCredentials.class).toCimi(context,
-                    dataService.getCredentials()));
+                dataCimi.setCredentials((CimiCredentials) context.convertNextCimi(dataService.getCredentials(),
+                    CimiCredentials.class));
             }
             if (null != dataService.getMachineConfiguration()) {
-                dataCimi.setMachineConfig((CimiMachineConfiguration) context.getConverter(CimiMachineConfiguration.class)
-                    .toCimi(context, dataService.getMachineConfiguration()));
+                dataCimi.setMachineConfig((CimiMachineConfiguration) context.convertNextCimi(
+                    dataService.getMachineConfiguration(), CimiMachineConfiguration.class));
             }
             if (null != dataService.getMachineImage()) {
-                dataCimi.setMachineImage((CimiMachineImage) context.getConverter(CimiMachineImage.class).toCimi(context,
-                    dataService.getMachineImage()));
+                dataCimi.setMachineImage((CimiMachineImage) context.convertNextCimi(dataService.getMachineImage(),
+                    CimiMachineImage.class));
             }
             // TODO NetworkInterfaces
             // if ((null != dataService.getNetworkInterfaces()) &&
@@ -177,16 +177,13 @@ public class MachineTemplateConverter extends ObjectCommonConverter implements R
         final MachineTemplate dataService) {
         this.fill(context, dataCimi, dataService);
         if (null != dataCimi.getCredentials()) {
-            dataService.setCredentials((Credentials) context.getConverter(CimiCredentials.class).toService(context,
-                dataCimi.getCredentials()));
+            dataService.setCredentials((Credentials) context.convertNextService(dataCimi.getCredentials()));
         }
         if (null != dataCimi.getMachineImage()) {
-            dataService.setMachineImage((MachineImage) context.getConverter(CimiMachineImage.class).toService(context,
-                dataCimi.getMachineImage()));
+            dataService.setMachineImage((MachineImage) context.convertNextService(dataCimi.getMachineImage()));
         }
         if (null != dataCimi.getMachineConfig()) {
-            dataService.setMachineConfiguration((MachineConfiguration) context.getConverter(CimiMachineConfiguration.class)
-                .toService(context, dataCimi.getMachineConfig()));
+            dataService.setMachineConfiguration((MachineConfiguration) context.convertNextService(dataCimi.getMachineConfig()));
         }
         // TODO NetworkInterfaces
         // dataService.setNetworkInterfaces(dataCimi.getUserName());

@@ -30,6 +30,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
 import org.ow2.sirocco.apis.rest.cimi.builder.CimiEntityBuilderHelper;
+import org.ow2.sirocco.apis.rest.cimi.converter.HrefHelper;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;

@@ -6,6 +6,7 @@
 		"keyProp_2_1":"valueProp_2_1"
 	},
 	"id":"idValue_2",
+	"resourceURI":"http://schemas.dmtf.org/cimi/1/CloudEntryPoint",
 	"created":"2002-03-03T02:02:02.002Z",
 	"updated":"2002-03-03T02:02:02.002Z",
 	"operations":[
@@ -22,6 +23,8 @@
 	"href":"hrefValue_2",
 	"machineTemplates":{
 		"id":"idValue_2",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineTemplateCollection",
+		"count":2,
 		"href":"hrefValue_2",
 		"operations":[
 			{
@@ -43,6 +46,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineTemplate",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -65,6 +69,7 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_0",
+					"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfiguration",
 					"created":"2002-03-03T02:02:02.002Z",
 					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
@@ -117,6 +122,7 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_0",
+					"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImage",
 					"created":"2002-03-03T02:02:02.002Z",
 					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
@@ -145,6 +151,7 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_0",
+					"resourceURI":"http://schemas.dmtf.org/cimi/1/Credentials",
 					"created":"2002-03-03T02:02:02.002Z",
 					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
@@ -173,6 +180,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineTemplate",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -195,6 +203,7 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_1",
+					"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfiguration",
 					"created":"2002-03-03T02:02:02.002Z",
 					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
@@ -247,6 +256,7 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_1",
+					"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImage",
 					"created":"2002-03-03T02:02:02.002Z",
 					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
@@ -275,6 +285,7 @@
 						"keyProp_2_1":"valueProp_2_1"
 					},
 					"id":"idValue_2_1",
+					"resourceURI":"http://schemas.dmtf.org/cimi/1/Credentials",
 					"created":"2002-03-03T02:02:02.002Z",
 					"updated":"2002-03-03T02:02:02.002Z",
 					"operations":[
@@ -302,6 +313,8 @@
 	"machineConfigs":{
 		"id":"idValue_2",
 		"href":"hrefValue_2",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection",
+		"count":2,
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -322,6 +335,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfiguration",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -374,6 +388,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfiguration",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -425,6 +440,8 @@
 	"machineImages":{
 		"id":"idValue_2",
 		"href":"hrefValue_2",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImageCollection",
+		"count":2,
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -445,6 +462,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImage",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -473,6 +491,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImage",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -500,6 +519,8 @@
 	"credentials":{
 		"id":"idValue_2",
 		"href":"hrefValue_2",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/CredentialsCollection",
+		"count":2,
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -520,6 +541,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/Credentials",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -546,6 +568,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/Credentials",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -571,6 +594,8 @@
 	"machines":{
 		"id":"idValue_2",
 		"href":"hrefValue_2",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineCollection",
+		"count":2,
 		"operations":[
 			{
 				"rel":"relValue_2_0",
@@ -591,6 +616,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/Machine",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -642,6 +668,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/Machine",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -692,6 +719,8 @@
 	"jobTime":2,
 	"credentialsTemplates":{
 		"id":"idValue_2",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/CredentialsTemplateCollection",
+		"count":2,
 		"href":"hrefValue_2",
 		"operations":[
 			{
@@ -713,6 +742,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_0",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/CredentialsTemplate",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[
@@ -739,6 +769,7 @@
 					"keyProp_2_1":"valueProp_2_1"
 				},
 				"id":"idValue_2_1",
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/CredentialsTemplate",
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
 				"operations":[

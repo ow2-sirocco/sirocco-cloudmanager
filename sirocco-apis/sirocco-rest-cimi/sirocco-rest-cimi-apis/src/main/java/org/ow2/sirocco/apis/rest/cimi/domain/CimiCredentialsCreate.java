@@ -26,7 +26,9 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
@@ -37,7 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
  */
 @XmlRootElement(name = "CredentialsCreate")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiCredentialsCreate extends CimiCommon {
+public class CimiCredentialsCreate extends CimiCommon implements CimiExchange {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -60,4 +62,15 @@ public class CimiCredentialsCreate extends CimiCommon {
         this.credentialsTemplate = credentialsTemplate;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.CredentialsCreate;
+    }
 }

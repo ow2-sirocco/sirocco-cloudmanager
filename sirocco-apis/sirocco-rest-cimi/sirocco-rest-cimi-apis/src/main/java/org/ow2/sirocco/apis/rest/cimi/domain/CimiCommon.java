@@ -38,7 +38,6 @@ import javax.xml.bind.annotation.XmlValue;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
-import org.ow2.sirocco.apis.rest.cimi.validator.constraints.Identifier;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
@@ -56,7 +55,6 @@ public class CimiCommon implements CimiDataCommon {
      * of the entity creation input.
      * </p>
      */
-    @Identifier(groups = {GroupWrite.class})
     private String name;
 
     /**

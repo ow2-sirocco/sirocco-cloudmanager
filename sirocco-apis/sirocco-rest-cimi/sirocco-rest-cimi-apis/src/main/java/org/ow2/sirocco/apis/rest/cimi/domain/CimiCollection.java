@@ -70,4 +70,11 @@ public interface CimiCollection<E> extends CimiResource {
      * @param items
      */
     void setArray(E[] items);
+
+    /**
+     * The class of item managed by the collection.
+     * 
+     * @return The class of item
+     */
+    Class<E> getItemClass();
 }

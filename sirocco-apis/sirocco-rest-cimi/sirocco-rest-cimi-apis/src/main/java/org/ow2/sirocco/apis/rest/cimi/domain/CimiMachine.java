@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -41,7 +42,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
  */
 @XmlRootElement(name = "Machine")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachine extends CimiObjectCommonImpl {
+public class CimiMachine extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -214,7 +215,7 @@ public class CimiMachine extends CimiObjectCommonImpl {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
      */
     @Override
     public boolean hasValues() {
@@ -225,6 +226,18 @@ public class CimiMachine extends CimiObjectCommonImpl {
         has = has || (null != this.getNetworkInterfaces());
         has = has || (null != this.getVolumes());
         return has;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.Machine;
     }
 
 }

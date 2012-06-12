@@ -25,7 +25,6 @@
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -57,16 +56,6 @@ public class CimiManagerCreateMachine extends CimiManagerCreateAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         return this.manager.createMachine((MachineCreate) dataService);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
-     */
-    @Override
-    protected Object convertToDataService(final CimiContext context) throws Exception {
-        return context.getRootConverter(ResourceType.MachineCreate).toService(context, context.getRequest().getCimiData());
     }
 
     /**

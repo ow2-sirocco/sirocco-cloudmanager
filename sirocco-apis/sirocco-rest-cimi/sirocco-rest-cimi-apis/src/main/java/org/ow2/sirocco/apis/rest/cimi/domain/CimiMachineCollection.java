@@ -26,7 +26,9 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
@@ -72,6 +74,30 @@ public class CimiMachineCollection extends CimiCollectionAbstract<CimiMachine> {
     @Override
     public CimiArray<CimiMachine> newCollection() {
         return new CimiMachineArray();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.MachineCollection;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#getItemClass()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public Class<CimiMachine> getItemClass() {
+        return CimiMachine.class;
     }
 
     /**

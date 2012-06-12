@@ -158,6 +158,7 @@ public class CimiEntityBuilderHelper {
             CimiEntityBuilderHelper.fillCimiCommon(common, id, index);
             common.setCreated(CimiEntityBuilderHelper.buildDate(id));
             common.setId("idValue" + postfix);
+            common.setResourceURI(common.getExchangeType().getResourceURI());
             common.setOperations(CimiEntityBuilderHelper.buildOperations(id));
             common.setUpdated(CimiEntityBuilderHelper.buildDate(id));
         }
@@ -169,6 +170,7 @@ public class CimiEntityBuilderHelper {
         String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
         if ((null != expand) && (true == expand)) {
             common.setId("idValue" + postfix);
+            common.setResourceURI(common.getExchangeType().getResourceURI());
             common.setOperations(CimiEntityBuilderHelper.buildOperations(id));
         }
         common.setHref("hrefValue" + postfix);

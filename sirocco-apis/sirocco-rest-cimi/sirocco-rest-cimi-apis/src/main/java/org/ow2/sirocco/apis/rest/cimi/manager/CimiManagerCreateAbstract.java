@@ -53,6 +53,16 @@ public abstract class CimiManagerCreateAbstract extends CimiManagerAbstract {
     /**
      * {@inheritDoc}
      * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
+     */
+    @Override
+    protected Object convertToDataService(final CimiContext context) throws Exception {
+        return context.convertToService(context.getRequest().getCimiData());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */

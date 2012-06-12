@@ -1,5 +1,6 @@
 {
 	"id":"idValue_0",
+	"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImage",
 	"name":"nameValue_0",
 	"description":"descriptionValue_0",
 	"created":"2000-01-01T00:00:00.000Z",

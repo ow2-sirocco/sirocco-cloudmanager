@@ -196,7 +196,7 @@ public abstract class CimiResourceAbstract implements CimiResource {
     /**
      * Concrete class of the collection.
      */
-    public static class CimiOperationArray extends CimiArrayAbstract<CimiOperation> {
+    public class CimiOperationArray extends CimiArrayAbstract<CimiOperation> {
 
         /** Serial number */
         private static final long serialVersionUID = 1L;

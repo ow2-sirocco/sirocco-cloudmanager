@@ -43,8 +43,6 @@ public class CimiRequest {
 
     private String method;
 
-    private CimiContext context;
-
     public RequestHeader getHeader() {
         return this.header;
     }

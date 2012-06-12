@@ -42,7 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
  * </ul>
  * </p>
  */
-public class CapacityConverter implements ResourceConverter {
+public class CapacityConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
@@ -62,7 +62,7 @@ public class CapacityConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -97,7 +97,7 @@ public class CapacityConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -128,7 +128,7 @@ public class CapacityConverter implements ResourceConverter {
             if (null != dataService.getQuantity()) {
                 dataCimi.setQuantity(dataService.getQuantity().intValue());
             }
-            dataCimi.setUnits((String) context.getConverter(StorageUnit.class).toCimi(context, dataService.getUnits()));
+            dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnits(), StorageUnit.class));
         }
     }
 
@@ -144,7 +144,7 @@ public class CapacityConverter implements ResourceConverter {
             if (null != dataService.getQuantity()) {
                 dataCimi.setQuantity(dataService.getQuantity().intValue());
             }
-            dataCimi.setUnits((String) context.getConverter(StorageUnit.class).toCimi(context, dataService.getUnit()));
+            dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnit(), StorageUnit.class));
         }
     }
 
@@ -158,8 +158,8 @@ public class CapacityConverter implements ResourceConverter {
     protected void doCopyToService(final CimiContext context, final CimiCapacity dataCimi, final Disk dataService) {
         if (null != dataCimi) {
             dataService.setQuantity(dataCimi.getQuantity().floatValue());
-            dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
-                .toService(context, dataCimi.getUnits()));
+            dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.convertNextService(
+                dataCimi.getUnits(), StorageUnit.class));
         }
     }
 
@@ -175,8 +175,8 @@ public class CapacityConverter implements ResourceConverter {
             if (null != dataCimi.getQuantity()) {
                 dataService.setQuantity(dataCimi.getQuantity().floatValue());
             }
-            dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.getConverter(StorageUnit.class)
-                .toService(context, dataCimi.getUnits()));
+            dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.convertNextService(
+                dataCimi.getUnits(), StorageUnit.class));
         }
     }
 }

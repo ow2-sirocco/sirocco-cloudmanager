@@ -39,7 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
  * </ul>
  * </p>
  */
-public class DiskConverter implements ResourceConverter {
+public class DiskConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
@@ -56,7 +56,7 @@ public class DiskConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -80,7 +80,7 @@ public class DiskConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -97,7 +97,7 @@ public class DiskConverter implements ResourceConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final Disk dataService, final CimiDisk dataCimi) {
-        dataCimi.setCapacity((CimiCapacity) context.getConverter(CimiCapacity.class).toCimi(context, dataService));
+        dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService, CimiCapacity.class));
     }
 
     /**
@@ -108,6 +108,6 @@ public class DiskConverter implements ResourceConverter {
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiDisk dataCimi, final Disk dataService) {
-        context.getEntityConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
+        context.getConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
     }
 }

@@ -36,7 +36,7 @@ import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
@@ -147,7 +147,7 @@ public class CimiManagersCredentialsTest {
         EasyMock.replay(this.service);
 
         CimiCredentialsTemplate template = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ResourceType.CredentialsTemplate.getPathType().getPathname() + "/13");
+            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/13");
         CimiCredentialsCreate cimi = new CimiCredentialsCreate();
         cimi.setCredentialsTemplate(template);
         this.request.setCimiData(cimi);

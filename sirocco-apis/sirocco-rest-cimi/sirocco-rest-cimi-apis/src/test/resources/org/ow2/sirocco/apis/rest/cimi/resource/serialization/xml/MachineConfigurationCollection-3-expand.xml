@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Collection href="hrefValue_3">
+<Collection href="hrefValue_3" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection">
 	<id>idValue_3</id>
-	<operation href="hrefValue_3_0" rel="relValue_3_0" />
-	<operation href="hrefValue_3_1" rel="relValue_3_1" />
-	<operation href="hrefValue_3_2" rel="relValue_3_2" />
-	<MachineConfiguration href="hrefValue_3_0">
+	<count>3</count>
+	<MachineConfiguration href="hrefValue_3_0" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 		<description>descriptionValue_3_0</description>
 		<name>nameValue_3_0</name>
 		<property key="keyProp_3_0">valueProp_3_0</property>
@@ -34,7 +32,7 @@
 		</disk>
 		<memory quantity="3" units="unitValue_3_0" />
 	</MachineConfiguration>
-	<MachineConfiguration href="hrefValue_3_1">
+	<MachineConfiguration href="hrefValue_3_1" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 		<description>descriptionValue_3_1</description>
 		<name>nameValue_3_1</name>
 		<property key="keyProp_3_0">valueProp_3_0</property>
@@ -64,7 +62,7 @@
 		</disk>
 		<memory quantity="3" units="unitValue_3_1" />
 	</MachineConfiguration>
-	<MachineConfiguration href="hrefValue_3_2">
+	<MachineConfiguration href="hrefValue_3_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 		<description>descriptionValue_3_2</description>
 		<name>nameValue_3_2</name>
 		<property key="keyProp_3_0">valueProp_3_0</property>
@@ -94,4 +92,7 @@
 		</disk>
 		<memory quantity="3" units="unitValue_3_2" />
 	</MachineConfiguration>
+	<operation href="hrefValue_3_0" rel="relValue_3_0" />
+	<operation href="hrefValue_3_1" rel="relValue_3_1" />
+	<operation href="hrefValue_3_2" rel="relValue_3_2" />
 </Collection>

@@ -38,7 +38,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * </ul>
  * </p>
  */
-public class ObjectCommonConverter extends CommonConverter {
+public abstract class ObjectCommonConverter extends CommonConverter implements CimiConverter {
 
     /**
      * Fill the common data from a service object to a CIMI object.
@@ -50,14 +50,15 @@ public class ObjectCommonConverter extends CommonConverter {
     protected void fill(final CimiContext context, final Resource dataService, final CimiObjectCommon dataCimi) {
         if (true == context.mustBeExpanded(dataCimi)) {
             this.fill(dataService, dataCimi);
+            dataCimi.setResourceURI(dataCimi.getExchangeType().getResourceURI());
             dataCimi.setCreated(dataService.getCreated());
             dataCimi.setUpdated(dataService.getUpdated());
-            // if (null != dataService.getId()) {
-            dataCimi.setId(context.makeHref(dataCimi, dataService.getId()));
-            // }
+            if (null != dataService.getId()) {
+                dataCimi.setId(context.makeHref(dataCimi, dataService.getId().toString()));
+            }
         }
         if (true == context.mustBeReferenced(dataCimi)) {
-            dataCimi.setHref(context.makeHref(dataCimi, dataService.getId()));
+            dataCimi.setHref(context.makeHref(dataCimi, dataService.getId().toString()));
         }
     }
 
@@ -71,30 +72,7 @@ public class ObjectCommonConverter extends CommonConverter {
     protected void fill(final CimiContext context, final CimiObjectCommon dataCimi, final Resource dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getId()) {
-            dataService.setId(ObjectCommonConverter.extractId(dataCimi.getId()));
+            dataService.setId(HrefHelper.extractId(dataCimi.getId()));
         }
-    }
-
-    /**
-     * Extract the ID service of the HREF.
-     * 
-     * @param href The HREF
-     * @return The ID service
-     */
-    public static String extractIdString(final String href) {
-        String id = null;
-        int posId = href.lastIndexOf('/');
-        id = href.substring(posId + 1);
-        return id;
-    }
-
-    /**
-     * Extract the ID service of the HREF.
-     * 
-     * @param href The HREF
-     * @return The ID service
-     */
-    public static Integer extractId(final String href) {
-        return Integer.valueOf(ObjectCommonConverter.extractIdString(href));
     }
 }

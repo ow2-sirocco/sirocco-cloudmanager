@@ -32,8 +32,8 @@ import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.configuration.AppConfig;
 import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigFactory;
 import org.ow2.sirocco.apis.rest.cimi.configuration.ItemConfig;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonImpl;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract;
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
@@ -54,26 +54,26 @@ public class AssertReferencePathValidatorTest {
         class MyConfigFactory extends ConfigFactory {
 
             @Override
-            protected ItemConfig buildEntityItem(final ResourceType type) {
+            protected ItemConfig buildExchangeItem(final ExchangeType type) {
                 ItemConfig item = null;
                 switch (type) {
                 case CloudEntryPoint:
-                    item = new ItemConfig(ResourceType.CloudEntryPoint, MyCloudEntryPoint.class);
+                    item = new ItemConfig(MyCloudEntryPoint.class, ExchangeType.CloudEntryPoint);
                     break;
                 case Credentials:
-                    item = new ItemConfig(ResourceType.Credentials, MyCredentials.class);
+                    item = new ItemConfig(MyCredentials.class, ExchangeType.Credentials);
                     break;
                 case MachineImage:
-                    item = new ItemConfig(ResourceType.MachineImage, MyImage.class);
+                    item = new ItemConfig(MyImage.class, ExchangeType.MachineImage);
                     break;
                 case MachineCollection:
-                    item = new ItemConfig(ResourceType.MachineCollection, MyCollectionMachine.class);
+                    item = new ItemConfig(MyCollectionMachine.class, ExchangeType.MachineCollection);
                     break;
                 case MachineConfigurationCollection:
-                    item = new ItemConfig(ResourceType.MachineConfigurationCollection, MyCollectionConfig.class);
+                    item = new ItemConfig(MyCollectionConfig.class, ExchangeType.MachineConfigurationCollection);
                     break;
                 default:
-                    item = super.buildEntityItem(type);
+                    item = super.buildExchangeItem(type);
                     break;
                 }
                 return item;
@@ -97,24 +97,49 @@ public class AssertReferencePathValidatorTest {
         this.context = new CimiContextImpl(this.request, this.response);
     }
 
-    private class MyCloudEntryPoint extends CimiObjectCommonImpl {
+    private class MyCloudEntryPoint extends CimiObjectCommonAbstract {
         private static final long serialVersionUID = 1L;
+
+        @Override
+        public ExchangeType getExchangeType() {
+            return ExchangeType.CloudEntryPoint;
+        }
     }
 
-    private class MyCredentials extends CimiObjectCommonImpl {
+    private class MyCredentials extends CimiObjectCommonAbstract {
         private static final long serialVersionUID = 1L;
+
+        @Override
+        public ExchangeType getExchangeType() {
+            return ExchangeType.Credentials;
+        }
     }
 
-    private class MyImage extends CimiObjectCommonImpl {
+    private class MyImage extends CimiObjectCommonAbstract {
         private static final long serialVersionUID = 1L;
+
+        @Override
+        public ExchangeType getExchangeType() {
+            return ExchangeType.MachineImage;
+        }
     }
 
-    private class MyCollectionMachine extends CimiObjectCommonImpl {
+    private class MyCollectionMachine extends CimiObjectCommonAbstract {
         private static final long serialVersionUID = 1L;
+
+        @Override
+        public ExchangeType getExchangeType() {
+            return ExchangeType.MachineCollection;
+        }
     }
 
-    private class MyCollectionConfig extends CimiObjectCommonImpl {
+    private class MyCollectionConfig extends CimiObjectCommonAbstract {
         private static final long serialVersionUID = 1L;
+
+        @Override
+        public ExchangeType getExchangeType() {
+            return ExchangeType.MachineConfigurationCollection;
+        }
     }
 
     @Test
@@ -123,7 +148,7 @@ public class AssertReferencePathValidatorTest {
         MyCloudEntryPoint toTest = new MyCloudEntryPoint();
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.CloudEntryPoint.getPathType().getPathname());
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.CloudEntryPoint.getPathType().getPathname());
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref("A");
@@ -135,13 +160,13 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri());
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.Credentials.getPathType().getPathname());
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(this.request.getBaseUri() + "foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.Credentials.getPathType().getPathname() + "/foo/1");
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname() + "/foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(this.context.makeHrefBase(toTest));
@@ -154,7 +179,7 @@ public class AssertReferencePathValidatorTest {
         MyCredentials toTest = new MyCredentials();
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.Credentials.getPathType().getPathname() + "/1");
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname() + "/1");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref("A");
@@ -166,13 +191,13 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.Credentials.getPathType().getPathname());
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(this.request.getBaseUri() + "foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.Credentials.getPathType().getPathname() + "/foo/1");
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname() + "/foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(this.context.makeHrefBase(toTest));
@@ -185,7 +210,7 @@ public class AssertReferencePathValidatorTest {
         MyImage toTest = new MyImage();
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname() + "/1");
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.MachineImage.getPathType().getPathname() + "/1");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref("A");
@@ -197,7 +222,7 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.MachineImage.getPathType().getPathname());
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.MachineImage.getPathType().getPathname());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(this.request.getBaseUri() + "toto/1");
@@ -213,7 +238,7 @@ public class AssertReferencePathValidatorTest {
         MyCollectionMachine toTest = new MyCollectionMachine();
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.MachineCollection.getPathType().getPathname());
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.MachineCollection.getPathType().getPathname());
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref("A");
@@ -225,7 +250,7 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.MachineCollection.getPathType().getPathname() + "/1");
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.MachineCollection.getPathType().getPathname() + "/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(this.request.getBaseUri() + "toto/1");
@@ -241,7 +266,7 @@ public class AssertReferencePathValidatorTest {
         MyCollectionConfig toTest = new MyCollectionConfig();
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.MachineConfigurationCollection.getPathType().getPathname());
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.MachineConfigurationCollection.getPathType().getPathname());
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref("A");
@@ -253,7 +278,7 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ResourceType.MachineConfigurationCollection.getPathType().getPathname()
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.MachineConfigurationCollection.getPathType().getPathname()
             + "/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 

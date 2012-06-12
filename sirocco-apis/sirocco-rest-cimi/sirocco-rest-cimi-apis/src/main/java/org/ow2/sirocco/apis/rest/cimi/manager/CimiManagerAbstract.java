@@ -28,7 +28,6 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.InvalidConversionException;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -180,7 +179,7 @@ public abstract class CimiManagerAbstract implements CimiManager {
         if (null == context.getResponse().getCimiData()) {
             // Job
             if (dataService instanceof Job) {
-                CimiJob cimi = (CimiJob) context.getRootConverter(ResourceType.Job).toCimi(context, dataService);
+                CimiJob cimi = (CimiJob) context.convertToCimi(dataService, CimiJob.class);
                 context.getResponse().setCimiData(cimi);
                 context.getResponse().putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
                 context.getResponse().putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());

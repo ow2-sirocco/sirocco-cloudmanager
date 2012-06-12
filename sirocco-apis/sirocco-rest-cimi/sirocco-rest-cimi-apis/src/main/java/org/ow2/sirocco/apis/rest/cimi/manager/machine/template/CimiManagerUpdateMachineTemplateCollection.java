@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.template;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
@@ -59,20 +58,6 @@ public class CimiManagerUpdateMachineTemplateCollection extends CimiManagerUpdat
         // this.manager.updateMachineTemplateCollection(select.dispatchAttributesValues(dataService));
         // }
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * <p>
-     * Copy only common attributes.
-     * </p>
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
-     */
-    @Override
-    protected Object convertToDataService(final CimiContext context) throws Exception {
-        return context.getRootConverter(ResourceType.MachineTemplateCollection).toService(context,
-            context.getRequest().getCimiData());
     }
 
 }

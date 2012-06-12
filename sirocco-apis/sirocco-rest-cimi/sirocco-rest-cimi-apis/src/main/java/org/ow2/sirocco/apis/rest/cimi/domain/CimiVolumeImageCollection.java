@@ -26,7 +26,9 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
@@ -75,6 +77,18 @@ public class CimiVolumeImageCollection extends CimiCollectionAbstract<CimiVolume
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#getItemClass()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public Class<CimiVolumeImage> getItemClass() {
+        return CimiVolumeImage.class;
+    }
+
+    /**
      * Concrete class of the collection.
      */
     public class CimiVolumeImageArray extends CimiArrayAbstract<CimiVolumeImage> {
@@ -87,4 +101,18 @@ public class CimiVolumeImageCollection extends CimiCollectionAbstract<CimiVolume
             return new CimiVolumeImage[this.size()];
         }
     }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

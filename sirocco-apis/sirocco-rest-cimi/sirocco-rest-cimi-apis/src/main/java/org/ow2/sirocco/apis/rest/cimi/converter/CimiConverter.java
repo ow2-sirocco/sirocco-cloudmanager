@@ -41,6 +41,15 @@ public interface CimiConverter {
     Object toCimi(final CimiContext context, final Object dataService);
 
     /**
+     * Copy data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi);
+
+    /**
      * Convert a CIMI object to a service object.
      * 
      * @param context The current context
@@ -48,4 +57,13 @@ public interface CimiConverter {
      * @return Converted service object
      */
     Object toService(final CimiContext context, final Object dataCimi);
+
+    /**
+     * Copy data from a CIMI object to a service object.
+     * 
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
+     */
+    void copyToService(final CimiContext context, final Object dataCimi, final Object dataService);
 }

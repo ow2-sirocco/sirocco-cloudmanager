@@ -24,10 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.configuration;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 
 public class AppConfig {
 
@@ -93,43 +89,6 @@ public class AppConfig {
     protected void buildDefaultConfig() {
         ConfigFactory factory = new ConfigFactory();
         this.setConfig(factory.getConfig());
-    }
-
-    public static ResourceType getType(final CimiData data) {
-        ResourceType type = null;
-        ItemConfig item = AppConfig.getInstance().getConfig().find(data.getClass());
-        if (null != item) {
-            type = item.getType();
-        }
-        return type;
-    }
-
-    public static ResourceConverter getEntityConverter(final Class<?> klass) {
-        return (ResourceConverter) AppConfig.getConverter(klass);
-    }
-
-    public static CimiConverter getConverter(final Class<?> klass) {
-        ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
-        if (null == item) {
-            throw new ConfigurationException("ItemConfig not found in configuration for " + klass.getName());
-        }
-        CimiConverter converter = (CimiConverter) item.getData(ConfigFactory.CONVERTER);
-        if (null == converter) {
-            throw new ConfigurationException("CimiConverter not found in configuration for " + klass.getName());
-        }
-        return converter;
-    }
-
-    public static CimiConverter getConverter(final ResourceType type) {
-        ItemConfig item = AppConfig.getInstance().getConfig().find(type);
-        if (null == item) {
-            throw new ConfigurationException("ItemConfig not found in configuration for " + type);
-        }
-        CimiConverter converter = (CimiConverter) item.getData(ConfigFactory.CONVERTER);
-        if (null == converter) {
-            throw new ConfigurationException("CimiConverter not found in configuration for " + type);
-        }
-        return converter;
     }
 
 }

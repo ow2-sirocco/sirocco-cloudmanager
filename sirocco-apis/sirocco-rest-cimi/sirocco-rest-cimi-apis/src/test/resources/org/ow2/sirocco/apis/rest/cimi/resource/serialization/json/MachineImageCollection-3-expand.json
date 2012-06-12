@@ -1,6 +1,8 @@
 {
 	"id":"idValue_3",
 	"href":"hrefValue_3",
+	"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImageCollection",
+	"count":3,
 	"operations":[
 		{
 			"rel":"relValue_3_0",
@@ -20,6 +22,7 @@
 		{
 			"href":"hrefValue_3_0",
 			"id":"idValue_3_0",
+			"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImage",
 			"name":"nameValue_3_0",
 			"description":"descriptionValue_3_0",
 			"created":"2003-04-04T03:03:03.003Z",
@@ -54,6 +57,7 @@
 		{
 			"href":"hrefValue_3_1",
 			"id":"idValue_3_1",
+			"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImage",
 			"name":"nameValue_3_1",
 			"description":"descriptionValue_3_1",
 			"created":"2003-04-04T03:03:03.003Z",
@@ -88,6 +92,7 @@
 		{
 			"href":"hrefValue_3_2",
 			"id":"idValue_3_2",
+			"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineImage",
 			"name":"nameValue_3_2",
 			"description":"descriptionValue_3_2",
 			"created":"2003-04-04T03:03:03.003Z",

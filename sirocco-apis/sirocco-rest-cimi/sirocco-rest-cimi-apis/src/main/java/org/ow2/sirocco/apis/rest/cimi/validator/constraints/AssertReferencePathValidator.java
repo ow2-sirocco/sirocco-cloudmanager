@@ -52,13 +52,13 @@ public class AssertReferencePathValidator extends CimiContextValidatorAbstract<A
     public boolean isValid(final Object value, final ConstraintValidatorContext ctx) {
         boolean valid = true;
         if (value != null) {
-            CimiResource cimiHref = (CimiResource) value;
-            String href = cimiHref.getHref();
+            CimiResource resource = (CimiResource) value;
+            String href = resource.getHref();
             if (href != null) {
-                String hrefNoId = this.getCimiContext().makeHrefBase(cimiHref);
+                String hrefNoId = this.getCimiContext().makeHrefBase(resource);
                 if (false == href.startsWith(hrefNoId)) {
                     valid = false;
-                } else if (false == this.getCimiContext().mustHaveIdInReference(cimiHref)) {
+                } else if (false == this.getCimiContext().mustHaveIdInReference(resource.getClass())) {
                     if (false == href.equals(hrefNoId)) {
                         valid = false;
                     }

@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Collection href="hrefValue_1">
+<Collection href="hrefValue_1"
+	resourceURI="http://schemas.dmtf.org/cimi/1/MachineImageCollection">
 	<id>idValue_1</id>
+	<count>1</count>
 	<MachineImage href="hrefValue_1_0" />
 	<operation href="hrefValue_1_0" rel="relValue_1_0" />
 </Collection>

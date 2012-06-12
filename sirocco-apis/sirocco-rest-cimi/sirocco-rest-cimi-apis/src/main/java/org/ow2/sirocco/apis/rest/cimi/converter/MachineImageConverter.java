@@ -39,7 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
  * </ul>
  * </p>
  */
-public class MachineImageConverter extends ObjectCommonConverter implements ResourceConverter {
+public class MachineImageConverter extends ObjectCommonConverter {
 
     /**
      * {@inheritDoc}
@@ -57,7 +57,7 @@ public class MachineImageConverter extends ObjectCommonConverter implements Reso
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -81,7 +81,7 @@ public class MachineImageConverter extends ObjectCommonConverter implements Reso
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */

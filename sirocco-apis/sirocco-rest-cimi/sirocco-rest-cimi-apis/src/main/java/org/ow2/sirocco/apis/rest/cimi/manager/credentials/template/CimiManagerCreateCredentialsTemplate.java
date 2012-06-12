@@ -27,7 +27,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.credentials.template;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -66,24 +65,13 @@ public class CimiManagerCreateCredentialsTemplate extends CimiManagerCreateAbstr
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
-     */
-    @Override
-    protected Object convertToDataService(final CimiContext context) throws Exception {
-        return context.getRootConverter(ResourceType.CredentialsTemplate)
-            .toService(context, context.getRequest().getCimiData());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      java.lang.Object)
      */
     @Override
     protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiCredentialsTemplate cimi = (CimiCredentialsTemplate) context.getRootConverter(ResourceType.CredentialsTemplate)
-            .toCimi(context, dataService);
+        CimiCredentialsTemplate cimi = (CimiCredentialsTemplate) context.convertToCimi(dataService,
+            CimiCredentialsTemplate.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().putHeader(Constants.HEADER_LOCATION, cimi.getId());
         context.getResponse().setStatus(Response.Status.CREATED);

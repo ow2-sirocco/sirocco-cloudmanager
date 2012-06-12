@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<CloudEntryPoint href="hrefValue_2">
+<CloudEntryPoint href="hrefValue_2"
+	resourceURI="http://schemas.dmtf.org/cimi/1/CloudEntryPoint">
 	<description>descriptionValue_2</description>
 	<name>nameValue_2</name>
 	<property key="keyProp_2_0">valueProp_2_0</property>
@@ -9,11 +10,14 @@
 	<operation href="hrefValue_2_0" rel="relValue_2_0" />
 	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 	<updated>2002-03-03T02:02:02.002Z</updated>
-	<credentials href="hrefValue_2">
+	<credentials href="hrefValue_2"
+		resourceURI="http://schemas.dmtf.org/cimi/1/CredentialsCollection">
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<Credentials href="hrefValue_2_0">
+		<count>2</count>
+		<Credentials href="hrefValue_2_0"
+			resourceURI="http://schemas.dmtf.org/cimi/1/Credentials">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -27,7 +31,8 @@
 			<password>passwordValue_2_0</password>
 			<userName>userNameValue_2_0</userName>
 		</Credentials>
-		<Credentials href="hrefValue_2_1">
+		<Credentials href="hrefValue_2_1"
+			resourceURI="http://schemas.dmtf.org/cimi/1/Credentials">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -42,11 +47,14 @@
 			<userName>userNameValue_2_1</userName>
 		</Credentials>
 	</credentials>
-	<credentialsTemplates href="hrefValue_2">
+	<credentialsTemplates href="hrefValue_2"
+		resourceURI="http://schemas.dmtf.org/cimi/1/CredentialsTemplateCollection">
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<CredentialsTemplate href="hrefValue_2_0">
+		<count>2</count>
+		<CredentialsTemplate href="hrefValue_2_0"
+			resourceURI="http://schemas.dmtf.org/cimi/1/CredentialsTemplate">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -60,7 +68,8 @@
 			<password>passwordValue_2_0</password>
 			<userName>userNameValue_2_0</userName>
 		</CredentialsTemplate>
-		<CredentialsTemplate href="hrefValue_2_1">
+		<CredentialsTemplate href="hrefValue_2_1"
+			resourceURI="http://schemas.dmtf.org/cimi/1/CredentialsTemplate">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -76,11 +85,14 @@
 		</CredentialsTemplate>
 	</credentialsTemplates>
 	<jobTime>2</jobTime>
-	<machineConfigs href="hrefValue_2">
+	<machineConfigs href="hrefValue_2"
+		resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection">
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<MachineConfiguration href="hrefValue_2_0">
+		<count>2</count>
+		<MachineConfiguration href="hrefValue_2_0"
+			resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -103,7 +115,8 @@
 			</disk>
 			<memory quantity="2" units="unitValue_2_0" />
 		</MachineConfiguration>
-		<MachineConfiguration href="hrefValue_2_1">
+		<MachineConfiguration href="hrefValue_2_1"
+			resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -127,11 +140,14 @@
 			<memory quantity="2" units="unitValue_2_1" />
 		</MachineConfiguration>
 	</machineConfigs>
-	<machineImages href="hrefValue_2">
+	<machineImages href="hrefValue_2"
+		resourceURI="http://schemas.dmtf.org/cimi/1/MachineImageCollection">
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<MachineImage href="hrefValue_2_0">
+		<count>2</count>
+		<MachineImage href="hrefValue_2_0"
+			resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -145,7 +161,8 @@
 			<state>stateValue_2_0</state>
 			<type>typeValue_2_0</type>
 		</MachineImage>
-		<MachineImage href="hrefValue_2_1">
+		<MachineImage href="hrefValue_2_1"
+			resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -160,11 +177,14 @@
 			<type>typeValue_2_1</type>
 		</MachineImage>
 	</machineImages>
-	<machineTemplates href="hrefValue_2">
+	<machineTemplates href="hrefValue_2"
+		resourceURI="http://schemas.dmtf.org/cimi/1/MachineTemplateCollection">
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<MachineTemplate href="hrefValue_2_0">
+		<count>2</count>
+		<MachineTemplate href="hrefValue_2_0"
+			resourceURI="http://schemas.dmtf.org/cimi/1/MachineTemplate">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -174,7 +194,8 @@
 			<operation href="hrefValue_2_0" rel="relValue_2_0" />
 			<operation href="hrefValue_2_1" rel="relValue_2_1" />
 			<updated>2002-03-03T02:02:02.002Z</updated>
-			<credentials href="hrefValue_2_0">
+			<credentials href="hrefValue_2_0"
+				resourceURI="http://schemas.dmtf.org/cimi/1/Credentials">
 				<description>descriptionValue_2_0</description>
 				<name>nameValue_2_0</name>
 				<property key="keyProp_2_0">valueProp_2_0</property>
@@ -188,7 +209,8 @@
 				<password>passwordValue_2_0</password>
 				<userName>userNameValue_2_0</userName>
 			</credentials>
-			<machineConfig href="hrefValue_2_0">
+			<machineConfig href="hrefValue_2_0"
+				resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 				<description>descriptionValue_2_0</description>
 				<name>nameValue_2_0</name>
 				<property key="keyProp_2_0">valueProp_2_0</property>
@@ -211,7 +233,8 @@
 				</disk>
 				<memory quantity="2" units="unitValue_2_0" />
 			</machineConfig>
-			<machineImage href="hrefValue_2_0">
+			<machineImage href="hrefValue_2_0"
+				resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
 				<description>descriptionValue_2_0</description>
 				<name>nameValue_2_0</name>
 				<property key="keyProp_2_0">valueProp_2_0</property>
@@ -226,7 +249,8 @@
 				<type>typeValue_2_0</type>
 			</machineImage>
 		</MachineTemplate>
-		<MachineTemplate href="hrefValue_2_1">
+		<MachineTemplate href="hrefValue_2_1"
+			resourceURI="http://schemas.dmtf.org/cimi/1/MachineTemplate">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -236,7 +260,8 @@
 			<operation href="hrefValue_2_0" rel="relValue_2_0" />
 			<operation href="hrefValue_2_1" rel="relValue_2_1" />
 			<updated>2002-03-03T02:02:02.002Z</updated>
-			<credentials href="hrefValue_2_1">
+			<credentials href="hrefValue_2_1"
+				resourceURI="http://schemas.dmtf.org/cimi/1/Credentials">
 				<description>descriptionValue_2_1</description>
 				<name>nameValue_2_1</name>
 				<property key="keyProp_2_0">valueProp_2_0</property>
@@ -250,7 +275,8 @@
 				<password>passwordValue_2_1</password>
 				<userName>userNameValue_2_1</userName>
 			</credentials>
-			<machineConfig href="hrefValue_2_1">
+			<machineConfig href="hrefValue_2_1"
+				resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 				<description>descriptionValue_2_1</description>
 				<name>nameValue_2_1</name>
 				<property key="keyProp_2_0">valueProp_2_0</property>
@@ -273,7 +299,8 @@
 				</disk>
 				<memory quantity="2" units="unitValue_2_1" />
 			</machineConfig>
-			<machineImage href="hrefValue_2_1">
+			<machineImage href="hrefValue_2_1"
+				resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
 				<description>descriptionValue_2_1</description>
 				<name>nameValue_2_1</name>
 				<property key="keyProp_2_0">valueProp_2_0</property>
@@ -289,11 +316,13 @@
 			</machineImage>
 		</MachineTemplate>
 	</machineTemplates>
-	<machines href="hrefValue_2">
+	<machines href="hrefValue_2"
+		resourceURI="http://schemas.dmtf.org/cimi/1/MachineCollection">
 		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<Machine href="hrefValue_2_0">
+		<count>2</count>
+		<Machine href="hrefValue_2_0" resourceURI="http://schemas.dmtf.org/cimi/1/Machine">
 			<description>descriptionValue_2_0</description>
 			<name>nameValue_2_0</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>
@@ -313,7 +342,7 @@
 			<memory quantity="2" units="unitValue_2_0" />
 			<state>stateValue_2_0</state>
 		</Machine>
-		<Machine href="hrefValue_2_1">
+		<Machine href="hrefValue_2_1" resourceURI="http://schemas.dmtf.org/cimi/1/Machine">
 			<description>descriptionValue_2_1</description>
 			<name>nameValue_2_1</name>
 			<property key="keyProp_2_0">valueProp_2_0</property>

@@ -32,7 +32,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
@@ -84,8 +83,8 @@ public class CimiManagerReadMachineImageCollection extends CimiManagerReadAbstra
      */
     @Override
     protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiMachineImageCollection cimi = (CimiMachineImageCollection) context.getRootConverter(
-            ResourceType.MachineImageCollection).toCimi(context, dataService);
+        CimiMachineImageCollection cimi = (CimiMachineImageCollection) context.convertToCimi(dataService,
+            CimiMachineImageCollection.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
     }

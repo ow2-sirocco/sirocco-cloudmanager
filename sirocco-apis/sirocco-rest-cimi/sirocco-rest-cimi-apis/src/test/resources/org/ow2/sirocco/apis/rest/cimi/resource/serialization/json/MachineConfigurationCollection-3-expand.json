@@ -1,6 +1,8 @@
 {
 	"id":"idValue_3",
 	"href":"hrefValue_3",
+	"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection",
+	"count":3,
 	"operations":[
 		{
 			"rel":"relValue_3_0",
@@ -26,6 +28,7 @@
 				"keyProp_3_1":"valueProp_3_1"
 			},
 			"id":"idValue_3_0",
+			"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfiguration",
 			"created":"2003-04-04T03:03:03.003Z",
 			"updated":"2003-04-04T03:03:03.003Z",
 			"operations":[
@@ -91,6 +94,7 @@
 				"keyProp_3_1":"valueProp_3_1"
 			},
 			"id":"idValue_3_1",
+			"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfiguration",
 			"created":"2003-04-04T03:03:03.003Z",
 			"updated":"2003-04-04T03:03:03.003Z",
 			"operations":[
@@ -156,6 +160,7 @@
 				"keyProp_3_1":"valueProp_3_1"
 			},
 			"id":"idValue_3_2",
+			"resourceURI":"http://schemas.dmtf.org/cimi/1/MachineConfiguration",
 			"created":"2003-04-04T03:03:03.003Z",
 			"updated":"2003-04-04T03:03:03.003Z",
 			"operations":[

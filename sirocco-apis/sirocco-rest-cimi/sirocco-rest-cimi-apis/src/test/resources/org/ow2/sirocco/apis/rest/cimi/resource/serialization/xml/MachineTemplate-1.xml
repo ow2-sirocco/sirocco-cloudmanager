@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineTemplate href="hrefValue_1">
+<MachineTemplate href="hrefValue_1" resourceURI="http://schemas.dmtf.org/cimi/1/MachineTemplate">
 	<description>descriptionValue_1</description>
 	<name>nameValue_1</name>
 	<property key="keyProp_1_0">valueProp_1_0</property>
@@ -7,7 +7,7 @@
 	<id>idValue_1</id>
 	<operation href="hrefValue_1_0" rel="relValue_1_0" />
 	<updated>2001-02-02T01:01:01.001Z</updated>
-	<credentials href="hrefValue_1">
+	<credentials href="hrefValue_1" resourceURI="http://schemas.dmtf.org/cimi/1/Credentials">
 		<description>descriptionValue_1</description>
 		<name>nameValue_1</name>
 		<property key="keyProp_1_0">valueProp_1_0</property>
@@ -19,7 +19,7 @@
 		<password>passwordValue_1</password>
 		<userName>userNameValue_1</userName>
 	</credentials>
-	<machineConfig href="hrefValue_1">
+	<machineConfig href="hrefValue_1" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 		<description>descriptionValue_1</description>
 		<name>nameValue_1</name>
 		<property key="keyProp_1_0">valueProp_1_0</property>
@@ -35,7 +35,7 @@
 		</disk>
 		<memory quantity="1" units="unitValue_1" />
 	</machineConfig>
-	<machineImage href="hrefValue_1">
+	<machineImage href="hrefValue_1" resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
 		<description>descriptionValue_1</description>
 		<name>nameValue_1</name>
 		<property key="keyProp_1_0">valueProp_1_0</property>

@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
@@ -43,7 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
  * </ul>
  * </p>
  */
-public class MachineCreateConverter implements ResourceConverter {
+public class MachineCreateConverter implements CimiConverter {
 
     /**
      * {@inheritDoc}
@@ -60,7 +59,7 @@ public class MachineCreateConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -84,7 +83,7 @@ public class MachineCreateConverter implements ResourceConverter {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -119,8 +118,7 @@ public class MachineCreateConverter implements ResourceConverter {
     protected void doCopyToService(final CimiContext context, final CimiMachineCreate dataCimi, final MachineCreate dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getMachineTemplate()) {
-            dataService.setMachineTemplate((MachineTemplate) context.getConverter(CimiMachineTemplate.class).toService(context,
-                dataCimi.getMachineTemplate()));
+            dataService.setMachineTemplate((MachineTemplate) context.convertNextService(dataCimi.getMachineTemplate()));
         }
     }
 

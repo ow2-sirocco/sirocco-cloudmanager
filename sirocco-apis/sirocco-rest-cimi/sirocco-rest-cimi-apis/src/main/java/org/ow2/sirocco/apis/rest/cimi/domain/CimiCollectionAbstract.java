@@ -25,9 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.validation.constraints.Null;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
@@ -43,6 +45,30 @@ public abstract class CimiCollectionAbstract<E> extends CimiResourceAbstract imp
      */
     @Null(groups = {GroupWrite.class})
     private CimiArray<E> items;
+
+    /**
+     * Returns the size of the collection.
+     * 
+     * @return The collection size
+     */
+    @XmlElement(name = "count")
+    @JsonProperty(value = "count")
+    public int getCount() {
+        int count = 0;
+        if (null != this.items) {
+            count = this.items.size();
+        }
+        return count;
+    }
+
+    /**
+     * Normally, set the size of the collection, but this method does nothing.
+     * It exists only for the JSON serializer.
+     * 
+     * @param count The collection size
+     */
+    public void setCount(final int count) {
+    }
 
     /**
      * {@inheritDoc}
@@ -122,5 +148,4 @@ public abstract class CimiCollectionAbstract<E> extends CimiResourceAbstract imp
         }
         return ret;
     }
-
 }

@@ -22,18 +22,12 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+package org.ow2.sirocco.apis.rest.cimi.converter;
 
 /**
- * Helper class of references: HREF.
+ * Utility class for references: HREF.
  */
 public class HrefHelper {
-
-    /** Logger */
-    private static final Logger LOGGER = LoggerFactory.getLogger(HrefHelper.class);
 
     /**
      * Make a HREF.
@@ -43,9 +37,8 @@ public class HrefHelper {
      * @return The HREF made
      */
     public static String makeHref(final String urlBase, final String urlConstant) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(urlBase).append(urlConstant);
-        return sb.toString();
+        return HrefHelper.makeHref(urlBase, urlConstant, (String) null);
+
     }
 
     /**
@@ -57,9 +50,13 @@ public class HrefHelper {
      * @return The HREF made
      */
     public static String makeHref(final String urlBase, final String urlConstant, final Integer id) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(urlBase).append(urlConstant).append('/').append(id);
-        return sb.toString();
+        String href;
+        if (null != id) {
+            href = HrefHelper.makeHref(urlBase, urlConstant, id.toString());
+        } else {
+            href = HrefHelper.makeHref(urlBase, urlConstant, (String) null);
+        }
+        return href;
     }
 
     /**
@@ -72,7 +69,10 @@ public class HrefHelper {
      */
     public static String makeHref(final String urlBase, final String urlConstant, final String id) {
         StringBuilder sb = new StringBuilder();
-        sb.append(urlBase).append(urlConstant).append('/').append(id);
+        sb.append(urlBase).append(urlConstant);
+        if (null != id) {
+            sb.append('/').append(id);
+        }
         return sb.toString();
     }
 
@@ -82,16 +82,21 @@ public class HrefHelper {
      * @param href The HREF
      * @return The ID service
      */
-    public static Integer extractId(final String href) throws Exception {
-        Integer id = null;
-        try {
-            int posId = href.lastIndexOf('/');
-            id = Integer.valueOf(href.substring(posId + 1));
-        } catch (Exception e) {
-            HrefHelper.LOGGER.error("Error ID conversion with HREF : {}", href, e);
-            throw e;
-        }
-
+    public static String extractIdString(final String href) {
+        String id = null;
+        int posId = href.lastIndexOf('/');
+        id = href.substring(posId + 1);
         return id;
     }
+
+    /**
+     * Extract the ID service of the HREF.
+     * 
+     * @param href The HREF
+     * @return The ID service
+     */
+    public static Integer extractId(final String href) {
+        return Integer.valueOf(HrefHelper.extractIdString(href));
+    }
+
 }

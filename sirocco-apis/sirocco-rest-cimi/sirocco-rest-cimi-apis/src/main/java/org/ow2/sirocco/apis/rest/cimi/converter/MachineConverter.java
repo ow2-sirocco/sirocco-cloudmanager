@@ -42,7 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
  * </ul>
  * </p>
  */
-public class MachineConverter extends ObjectCommonConverter implements ResourceConverter {
+public class MachineConverter extends ObjectCommonConverter {
 
     /**
      * {@inheritDoc}
@@ -60,7 +60,7 @@ public class MachineConverter extends ObjectCommonConverter implements ResourceC
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -84,7 +84,7 @@ public class MachineConverter extends ObjectCommonConverter implements ResourceC
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -104,11 +104,10 @@ public class MachineConverter extends ObjectCommonConverter implements ResourceC
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
             if (null != dataService.getCpu()) {
-                dataCimi.setCpu((CimiCpu) context.getConverter(CimiCpu.class).toCimi(context, dataService.getCpu()));
+                dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
             }
             if (null != dataService.getMemory()) {
-                dataCimi
-                    .setMemory((CimiMemory) context.getConverter(CimiMemory.class).toCimi(context, dataService.getMemory()));
+                dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
             }
             // FIXME Disk collection
             // if ((null != dataService.getDisks()) &&
@@ -140,10 +139,10 @@ public class MachineConverter extends ObjectCommonConverter implements ResourceC
     protected void doCopyToService(final CimiContext context, final CimiMachine dataCimi, final Machine dataService) {
         this.fill(context, dataCimi, dataService);
         if (null != dataCimi.getCpu()) {
-            dataService.setCpu((Cpu) context.getConverter(CimiCpu.class).toService(context, dataCimi.getCpu()));
+            dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
         }
         if (null != dataCimi.getMemory()) {
-            dataService.setMemory((Memory) context.getConverter(CimiMemory.class).toService(context, dataCimi.getMemory()));
+            dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
         }
         // FIXME Disk collection
         // if ((null != dataCimi.getDisks()) && (dataCimi.getDisks().length >

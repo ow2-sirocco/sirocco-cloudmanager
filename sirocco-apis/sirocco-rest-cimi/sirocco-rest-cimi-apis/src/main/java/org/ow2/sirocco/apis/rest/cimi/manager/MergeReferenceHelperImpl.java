@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.ObjectCommonConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.HrefHelper;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
@@ -43,7 +43,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
@@ -85,10 +84,8 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Override
     public void merge(final CimiContext context, final CimiMachineImage cimi) throws Exception {
         if (true == cimi.hasReference()) {
-            MachineImage dataService = this.managerMachineImage.getMachineImageById(ObjectCommonConverter.extractIdString(cimi
-                .getHref()));
-            CimiMachineImage cimiRef = (CimiMachineImage) context.getRootConverter(ResourceType.MachineImage).toCimi(context,
-                dataService);
+            MachineImage dataService = this.managerMachineImage.getMachineImageById(HrefHelper.extractIdString(cimi.getHref()));
+            CimiMachineImage cimiRef = (CimiMachineImage) context.convertToCimi(dataService, CimiMachineImage.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -102,10 +99,10 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Override
     public void merge(final CimiContext context, final CimiMachineConfiguration cimi) throws Exception {
         if (true == cimi.hasReference()) {
-            MachineConfiguration dataService = this.managerMachine.getMachineConfigurationById(ObjectCommonConverter
-                .extractIdString(cimi.getHref()));
-            CimiMachineConfiguration cimiRef = (CimiMachineConfiguration) context.getRootConverter(
-                ResourceType.MachineConfiguration).toCimi(context, dataService);
+            MachineConfiguration dataService = this.managerMachine.getMachineConfigurationById(HrefHelper.extractIdString(cimi
+                .getHref()));
+            CimiMachineConfiguration cimiRef = (CimiMachineConfiguration) context.convertToCimi(dataService,
+                CimiMachineConfiguration.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -130,10 +127,10 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Override
     public void merge(final CimiContext context, final CimiCredentialsTemplate cimi) throws Exception {
         if (true == cimi.hasReference()) {
-            CredentialsTemplate dataService = this.managerCredentials.getCredentialsTemplateById(ObjectCommonConverter
+            CredentialsTemplate dataService = this.managerCredentials.getCredentialsTemplateById(HrefHelper
                 .extractIdString(cimi.getHref()));
-            CimiCredentialsTemplate cimiRef = (CimiCredentialsTemplate) context.getRootConverter(
-                ResourceType.CredentialsTemplate).toCimi(context, dataService);
+            CimiCredentialsTemplate cimiRef = (CimiCredentialsTemplate) context.convertToCimi(dataService,
+                CimiCredentialsTemplate.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -147,10 +144,8 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Override
     public void merge(final CimiContext context, final CimiCredentials cimi) throws Exception {
         if (true == cimi.hasReference()) {
-            Credentials dataService = this.managerCredentials.getCredentialsById(ObjectCommonConverter.extractIdString(cimi
-                .getHref()));
-            CimiCredentials cimiRef = (CimiCredentials) context.getRootConverter(ResourceType.Credentials).toCimi(context,
-                dataService);
+            Credentials dataService = this.managerCredentials.getCredentialsById(HrefHelper.extractIdString(cimi.getHref()));
+            CimiCredentials cimiRef = (CimiCredentials) context.convertToCimi(dataService, CimiCredentials.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -176,10 +171,9 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Override
     public void merge(final CimiContext context, final CimiMachineTemplate cimi) throws Exception {
         if (true == cimi.hasReference()) {
-            MachineTemplate dataService = this.managerMachine.getMachineTemplateById(ObjectCommonConverter.extractIdString(cimi
-                .getHref()));
-            CimiMachineTemplate cimiRef = (CimiMachineTemplate) context.getRootConverter(ResourceType.MachineTemplate).toCimi(
-                context, dataService);
+            MachineTemplate dataService = this.managerMachine
+                .getMachineTemplateById(HrefHelper.extractIdString(cimi.getHref()));
+            CimiMachineTemplate cimiRef = (CimiMachineTemplate) context.convertToCimi(dataService, CimiMachineTemplate.class);
             this.merge(cimiRef, cimi);
         } else {
             if (null != cimi.getCredentials()) {

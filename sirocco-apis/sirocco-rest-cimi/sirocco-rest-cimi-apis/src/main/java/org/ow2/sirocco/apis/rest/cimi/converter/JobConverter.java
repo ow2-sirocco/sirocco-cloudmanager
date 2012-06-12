@@ -27,26 +27,14 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.ResourceType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.ParentJob;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -58,7 +46,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
  * </ul>
  * </p>
  */
-public class JobConverter extends ObjectCommonConverter implements ResourceConverter {
+public class JobConverter extends ObjectCommonConverter {
     /**
      * {@inheritDoc}
      * 
@@ -75,7 +63,7 @@ public class JobConverter extends ObjectCommonConverter implements ResourceConve
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
     @Override
@@ -99,7 +87,7 @@ public class JobConverter extends ObjectCommonConverter implements ResourceConve
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.ResourceConverter#copyToService
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToService
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
@@ -132,12 +120,12 @@ public class JobConverter extends ObjectCommonConverter implements ResourceConve
             dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
 
             if (null != dataService.getParentJob()) {
-                dataCimi.setParentJob(new ParentJob(context.makeHref(dataCimi, dataService.getParentJob().getId())));
+                dataCimi.setParentJob(new ParentJob(context.makeHref(dataCimi, dataService.getParentJob().getId().toString())));
             }
             if ((null != dataService.getNestedJobs()) && (dataService.getNestedJobs().size() > 0)) {
                 List<NestedJob> list = new ArrayList<NestedJob>();
                 for (Job job : dataService.getNestedJobs()) {
-                    list.add(new NestedJob(context.makeHref(dataCimi, job.getId())));
+                    list.add(new NestedJob(context.makeHref(dataCimi, job.getId().toString())));
                 }
                 dataCimi.setNestedJobs(list.toArray(new NestedJob[list.size()]));
             }
@@ -157,9 +145,8 @@ public class JobConverter extends ObjectCommonConverter implements ResourceConve
 
     protected String makeHrefTargetEntity(final CimiContext context, final Object targetDataService) {
         String href = null;
-        ResourceType targetType = this.findType(targetDataService);
-
-        href = context.makeHref(targetType, this.getTargetId(targetDataService));
+        Class<? extends CimiResource> targetType = context.findAssociate(targetDataService.getClass());
+        href = context.makeHref(targetType, this.getTargetId(targetDataService).toString());
         return href;
     }
 
@@ -171,41 +158,6 @@ public class JobConverter extends ObjectCommonConverter implements ResourceConve
             id = ((CloudEntity) targetDataService).getId();
         }
         return id;
-    }
-
-    protected ResourceType findType(final Object targetDataService) {
-        ResourceType type = null;
-        // TODO Complete with all service entities
-        if (targetDataService instanceof CloudEntryPoint) {
-            type = ResourceType.CloudEntryPoint;
-        } else if (targetDataService instanceof Credentials) {
-            type = ResourceType.Credentials;
-        } else if (targetDataService instanceof CredentialsTemplate) {
-            type = ResourceType.CredentialsTemplate;
-        } else if (targetDataService instanceof CredentialsCollection) {
-            type = ResourceType.CredentialsCollection;
-        } else if (targetDataService instanceof Job) {
-            type = ResourceType.Job;
-        } else if (targetDataService instanceof JobCollection) {
-            type = ResourceType.JobCollection;
-        } else if (targetDataService instanceof Machine) {
-            type = ResourceType.Machine;
-        } else if (targetDataService instanceof MachineTemplate) {
-            type = ResourceType.MachineTemplate;
-        } else if (targetDataService instanceof MachineCollection) {
-            type = ResourceType.MachineCollection;
-        } else if (targetDataService instanceof MachineConfiguration) {
-            type = ResourceType.MachineConfiguration;
-        } else if (targetDataService instanceof MachineConfigurationCollection) {
-            type = ResourceType.MachineConfigurationCollection;
-        } else if (targetDataService instanceof MachineImage) {
-            type = ResourceType.MachineImage;
-        } else if (targetDataService instanceof MachineImageCollection) {
-            type = ResourceType.MachineImageCollection;
-        } else {
-            throw new InvalidConversionException("Job conversion : target type not found");
-        }
-        return type;
     }
 
 }

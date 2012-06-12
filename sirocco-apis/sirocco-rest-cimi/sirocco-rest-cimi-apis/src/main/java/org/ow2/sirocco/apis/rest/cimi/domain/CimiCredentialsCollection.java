@@ -26,7 +26,9 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
@@ -75,6 +77,30 @@ public class CimiCredentialsCollection extends CimiCollectionAbstract<CimiCreden
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.CredentialsCollection;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#getItemClass()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public Class<CimiCredentials> getItemClass() {
+        return CimiCredentials.class;
+    }
+
+    /**
      * Concrete class of the collection.
      */
     public class CimiCredentialsArray extends CimiArrayAbstract<CimiCredentials> {
@@ -87,5 +113,4 @@ public class CimiCredentialsCollection extends CimiCollectionAbstract<CimiCreden
             return new CimiCredentials[this.size()];
         }
     }
-
 }
