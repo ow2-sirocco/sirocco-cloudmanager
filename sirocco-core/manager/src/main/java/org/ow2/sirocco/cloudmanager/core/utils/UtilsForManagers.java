@@ -4,16 +4,34 @@ import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+import javax.ejb.EJBContext;
+import javax.ejb.SessionContext;
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.Destination;
+import javax.jms.Message;
+import javax.jms.MessageProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.QueueConnection;
+import javax.jms.QueueConnectionFactory;
+import javax.jms.QueueSender;
+import javax.jms.QueueSession;
+import javax.jms.Session;
+import javax.naming.InitialContext;
+
 import org.hibernate.proxy.HibernateProxy;
+import org.ow2.sirocco.cloudmanager.core.impl.JobSendHandlerBean;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 public class UtilsForManagers {
-    
-    
-    public static Object fillObject(Object obj, Map<String, Object> updatedAttributes)
+
+    public static Object fillObject(Object obj,
+            Map<String, Object> updatedAttributes)
             throws InstantiationException, IllegalAccessException,
             IllegalArgumentException, IntrospectionException,
             NoSuchFieldException, InvocationTargetException {
@@ -26,8 +44,8 @@ public class UtilsForManagers {
 
     }
 
-    private static Object invokeSetter(Object targetObj,
-            String attrName, Object attrValue) throws IntrospectionException,
+    private static Object invokeSetter(Object targetObj, String attrName,
+            Object attrValue) throws IntrospectionException,
             NoSuchFieldException, IllegalArgumentException,
             IllegalAccessException, InvocationTargetException {
 
@@ -38,17 +56,38 @@ public class UtilsForManagers {
         throw new NoSuchFieldException(targetObj.getClass() + " has no field "
                 + attrName);
     }
-    
-    public static Object getEntityThroughProxy(Object o)
-    {
-        if (o instanceof HibernateProxy)
-        {
-            HibernateProxy oProxy=(HibernateProxy) o;
-            o=(Object) oProxy.getHibernateLazyInitializer().getImplementation();
+
+    public static Object getEntityThroughProxy(Object o) {
+        if (o instanceof HibernateProxy) {
+            HibernateProxy oProxy = (HibernateProxy) o;
+            o = (Object) oProxy.getHibernateLazyInitializer()
+                    .getImplementation();
         }
         return o;
-        
+
     }
 
+    public static void emitJobListenerMessage(final Serializable payload,
+            EJBContext ctx) throws Exception {
+        emitJMSMessage(payload, ctx, "JobEmission");
+    }
+
+    public static void emitJMSMessage(final Serializable payload,
+            EJBContext ctx, String queueName) throws Exception {
+        ConnectionFactory cf = (ConnectionFactory) ctx.lookup("QCF");
+        Queue queue = (Queue) ctx.lookup(queueName);
+        Connection conn = cf.createConnection();
+
+        Session sess = conn.createSession(true, Session.AUTO_ACKNOWLEDGE);
+
+        MessageProducer mp = sess.createProducer((Destination) queue);
+
+        ObjectMessage msg = sess.createObjectMessage();
+        msg.setObject(payload);
+        mp.send(msg);
+
+        sess.close();
+        conn.close();
+    }
 
 }

@@ -31,6 +31,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
@@ -160,8 +161,8 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             try {
-                connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-            } catch (ConnectorException e) {
+                UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+            } catch (Exception e) {
                 VolumeManager.logger.error(e.getMessage(), e);
             }
             return job;
@@ -512,8 +513,8 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             try {
-                connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-            } catch (ConnectorException e) {
+                UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+            } catch (Exception e) {
                 VolumeManager.logger.error("", e);
             }
             return job;
@@ -865,8 +866,8 @@ public class VolumeManager implements IVolumeManager {
         this.em.flush();
 
         try {
-            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-        } catch (ConnectorException e) {
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+        } catch (Exception e) {
             VolumeManager.logger.error(e.getMessage(), e);
         }
         return job;
@@ -966,8 +967,9 @@ public class VolumeManager implements IVolumeManager {
         this.em.flush();
 
         try {
-            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-        } catch (ConnectorException e) {
+            //connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+        } catch (Exception e) {
             VolumeManager.logger.error("", e);
         }
         return job;

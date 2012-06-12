@@ -31,6 +31,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.AddressCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
@@ -158,8 +159,8 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         try {
-            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-        } catch (ConnectorException e) {
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+        } catch (Exception e) {
             NetworkManager.logger.error(e.getMessage(), e);
         }
         return job;
@@ -292,8 +293,8 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         try {
-            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-        } catch (ConnectorException e) {
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+        } catch (Exception e) {
             NetworkManager.logger.error("", e);
         }
         return job;
@@ -553,8 +554,8 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         try {
-            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-        } catch (ConnectorException e) {
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+        } catch (Exception e) {
             NetworkManager.logger.error(e.getMessage(), e);
         }
         return job;
@@ -612,8 +613,8 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         try {
-            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-        } catch (ConnectorException e) {
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+        } catch (Exception e) {
             NetworkManager.logger.error("", e);
         }
         return job;
@@ -1029,8 +1030,8 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         try {
-            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-        } catch (ConnectorException e) {
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+        } catch (Exception e) {
             NetworkManager.logger.error(e.getMessage(), e);
         }
         return job;
@@ -1131,8 +1132,8 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         try {
-            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-        } catch (ConnectorException e) {
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+        } catch (Exception e) {
             NetworkManager.logger.error("", e);
         }
         return job;
@@ -1184,8 +1185,8 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         try {
-            connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-        } catch (ConnectorException e) {
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+        } catch (Exception e) {
             NetworkManager.logger.error("", e);
         }
         return job;

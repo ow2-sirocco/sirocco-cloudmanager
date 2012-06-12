@@ -77,7 +77,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static Log logger = LogFactory.getLog(MockCloudProviderConnector.class);
 
-    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS = 2000;
+    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS = 0;
 
     private final String cloudProviderId;
 
@@ -145,15 +145,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     @Override
     public INetworkService getNetworkService() throws ConnectorException {
         return this;
-    }
-
-    @Override
-    public void setNotificationOnJobCompletion(final String jobId) throws ConnectorException {
-        try {
-            this.mockCloudProviderConnectorFactory.getJobManager().setNotificationOnJobCompletion(jobId);
-        } catch (Exception e) {
-            throw new ConnectorException(e.getMessage());
-        }
     }
 
     @Override

@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,11 +39,8 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.Query;
@@ -66,6 +62,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
@@ -564,8 +561,8 @@ public class MachineManager implements IMachineManager {
         if (jobCreateMachine.getStatus() == Job.Status.RUNNING) {
             // Ask for connector to notify when job completes
             try {
-                connector.setNotificationOnJobCompletion(jobCreateMachine
-                        .getProviderAssignedId());
+                UtilsForManagers.emitJobListenerMessage(
+                        jobCreateMachine.getProviderAssignedId(), ctx);
             } catch (Exception e) {
                 throw new ServiceUnavailableException(e.getMessage());
             }
@@ -586,6 +583,7 @@ public class MachineManager implements IMachineManager {
         }
         MachineManager.logger.info("Return Job of new machine creation "
                 + j.getId().toString());
+
         return j;
     }
 
@@ -739,8 +737,8 @@ public class MachineManager implements IMachineManager {
 
         if (j.getStatus() == Job.Status.RUNNING) {
             try {
-                connector.setNotificationOnJobCompletion(job
-                        .getProviderAssignedId());
+                UtilsForManagers.emitJobListenerMessage(
+                        job.getProviderAssignedId(), ctx);
             } catch (Exception e) {
                 throw new ServiceUnavailableException(e.getMessage() + "  "
                         + action);
@@ -808,8 +806,8 @@ public class MachineManager implements IMachineManager {
 
         if (j.getStatus() == Job.Status.RUNNING) {
             try {
-                connector.setNotificationOnJobCompletion(job
-                        .getProviderAssignedId());
+                UtilsForManagers.emitJobListenerMessage(
+                        job.getProviderAssignedId(), ctx);
             } catch (Exception e) {
                 throw new ServiceUnavailableException(e.getMessage());
             }
@@ -2136,8 +2134,8 @@ public class MachineManager implements IMachineManager {
         }
         if (j.getStatus() == Job.Status.RUNNING) {
             try {
-                connector.setNotificationOnJobCompletion(j
-                        .getProviderAssignedId());
+                UtilsForManagers.emitJobListenerMessage(
+                        j.getProviderAssignedId(), ctx);
             } catch (Exception e) {
                 throw new ServiceUnavailableException(e.getMessage());
             }
@@ -2288,8 +2286,8 @@ public class MachineManager implements IMachineManager {
         }
         if (j.getStatus() == Job.Status.RUNNING) {
             try {
-                connector.setNotificationOnJobCompletion(j
-                        .getProviderAssignedId());
+                UtilsForManagers.emitJobListenerMessage(
+                        j.getProviderAssignedId(), ctx);
             } catch (Exception e) {
                 throw new ServiceUnavailableException(e.getMessage());
             }

@@ -78,7 +78,7 @@ public class JobManager implements IJobManager {
 
     public long jobLockTimeoutInSeconds = 600;
 
-    public long lockWaitTimeInSeconds = 1;
+    public long lockWaitTimeInSeconds = 0;
 
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
