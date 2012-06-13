@@ -136,6 +136,7 @@ public class MachineImageRestResource extends RestResourceAbstract {
      */
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Deprecated
     public Response update(final CimiMachineImageCollection cimiDataCollection) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), cimiDataCollection);
         this.cimiManagerUpdateMachineImageCollection.execute(context);

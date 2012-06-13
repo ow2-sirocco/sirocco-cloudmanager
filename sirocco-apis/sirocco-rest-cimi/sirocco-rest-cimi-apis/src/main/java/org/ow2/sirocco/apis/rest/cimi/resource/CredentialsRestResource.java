@@ -51,10 +51,11 @@ import org.springframework.stereotype.Component;
  * <p>
  * Operations supports :
  * <ul>
- * <li>Create a credential</li>
- * <li>Delete a credential</li>
- * <li>Read a credential</li>
- * <li>Update a credential</li>
+ * <li>Create a credentials</li>
+ * <li>Delete a credentials</li>
+ * <li>Read a credentials</li>
+ * <li>Read a collection of credentials</li>
+ * <li>Update a credentials</li>
  * </ul>
  * </p>
  */
@@ -65,6 +66,10 @@ public class CredentialsRestResource extends RestResourceAbstract {
     @Autowired
     @Qualifier("CimiManagerReadCredentials")
     private CimiManager cimiManagerReadCredentials;
+
+    @Autowired
+    @Qualifier("CimiManagerReadCredentialsCollection")
+    private CimiManager cimiManagerReadCredentialsCollection;
 
     @Autowired
     @Qualifier("CimiManagerDeleteCredentials")
@@ -79,9 +84,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     private CimiManager cimiManagerCreateCredentials;
 
     /**
-     * Get a credential.
+     * Get a credentials.
      * 
-     * @param id The ID of credential to get
+     * @param id The ID of credentials to get
      * @return The REST response
      */
     @GET
@@ -94,9 +99,22 @@ public class CredentialsRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Update a credential.
+     * Get a collection of credentials.
      * 
-     * @param id The ID of credential to update
+     * @return The REST response
+     */
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response read() {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos());
+        this.cimiManagerReadCredentialsCollection.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Update a credentials.
+     * 
+     * @param id The ID of credentials to update
      * @return The REST response
      */
     @PUT
@@ -109,7 +127,7 @@ public class CredentialsRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Create a credential.
+     * Create a credentials.
      * 
      * @return The REST response
      */
@@ -122,9 +140,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Delete a credential.
+     * Delete a credentials.
      * 
-     * @param id The ID of credential to delete
+     * @param id The ID of credentials to delete
      * @return The REST response
      */
     @DELETE

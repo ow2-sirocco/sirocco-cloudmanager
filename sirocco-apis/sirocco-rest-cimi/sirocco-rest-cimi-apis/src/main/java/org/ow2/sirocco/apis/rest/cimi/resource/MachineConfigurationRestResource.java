@@ -109,7 +109,7 @@ public class MachineConfigurationRestResource extends RestResourceAbstract {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response readMachineConfigurationCollection() {
+    public Response read() {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos());
         this.cimiManagerReadMachineConfigurationCollection.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
@@ -137,7 +137,8 @@ public class MachineConfigurationRestResource extends RestResourceAbstract {
      */
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response updateMachineConfigurationCollection(final CimiMachineConfigurationCollection cimiData) {
+    @Deprecated
+    public Response update(final CimiMachineConfigurationCollection cimiData) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), cimiData);
         this.cimiManagerUpdateMachineConfigurationCollection.execute(context);
         return HelperResponse.buildResponse(context.getResponse());

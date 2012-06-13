@@ -55,6 +55,7 @@ import org.springframework.stereotype.Component;
  * <li>Create a machine</li>
  * <li>Delete a machine</li>
  * <li>Read a machine</li>
+ * <li>Read a collection of machines</li>
  * <li>Update a machine</li>
  * </ul>
  * </p>
@@ -66,6 +67,10 @@ public class MachineRestResource extends RestResourceAbstract {
     @Autowired
     @Qualifier("CimiManagerReadMachine")
     private CimiManager cimiManagerReadMachine;
+
+    @Autowired
+    @Qualifier("CimiManagerReadMachineCollection")
+    private CimiManager cimiManagerReadMachineCollection;
 
     @Autowired
     @Qualifier("CimiManagerDeleteMachine")
@@ -95,6 +100,19 @@ public class MachineRestResource extends RestResourceAbstract {
     public Response read(@PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerReadMachine.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Get a collection of machines.
+     * 
+     * @return The REST response
+     */
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response read() {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos());
+        this.cimiManagerReadMachineCollection.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 

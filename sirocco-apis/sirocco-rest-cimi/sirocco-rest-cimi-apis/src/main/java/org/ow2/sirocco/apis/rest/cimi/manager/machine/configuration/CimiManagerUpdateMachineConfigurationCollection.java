@@ -36,6 +36,7 @@ import org.springframework.stereotype.Component;
  * Manage UPDATE request of Machine Configuration Collection.
  */
 @Component("CimiManagerUpdateMachineConfigurationCollection")
+@Deprecated
 public class CimiManagerUpdateMachineConfigurationCollection extends CimiManagerUpdateAbstract {
 
     @Autowired

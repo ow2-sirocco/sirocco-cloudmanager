@@ -37,6 +37,7 @@ import org.springframework.stereotype.Component;
  * Manage UPDATE request of Job Collection.
  */
 @Component("CimiManagerUpdateJobCollection")
+@Deprecated
 public class CimiManagerUpdateJobCollection extends CimiManagerUpdateAbstract {
 
     @Autowired

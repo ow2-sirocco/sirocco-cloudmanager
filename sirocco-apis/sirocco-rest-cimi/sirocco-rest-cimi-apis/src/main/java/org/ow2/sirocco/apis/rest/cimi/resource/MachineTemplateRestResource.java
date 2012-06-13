@@ -53,6 +53,7 @@ import org.springframework.stereotype.Component;
  * <li>Create a machine template</li>
  * <li>Delete a machine template</li>
  * <li>Read a machine template</li>
+ * <li>Read a collection of machines templates</li>
  * <li>Update a machine template</li>
  * </ul>
  * </p>
@@ -64,6 +65,10 @@ public class MachineTemplateRestResource extends RestResourceAbstract {
     @Autowired
     @Qualifier("CimiManagerReadMachineTemplate")
     private CimiManager cimiManagerReadMachineTemplate;
+
+    @Autowired
+    @Qualifier("CimiManagerReadMachineTemplateCollection")
+    private CimiManager cimiManagerReadMachineTemplateCollecion;
 
     @Autowired
     @Qualifier("CimiManagerDeleteMachineTemplate")
@@ -89,6 +94,19 @@ public class MachineTemplateRestResource extends RestResourceAbstract {
     public Response read(@PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerReadMachineTemplate.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Get a collection of machines templates.
+     * 
+     * @return The REST response
+     */
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response read() {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos());
+        this.cimiManagerReadMachineTemplateCollecion.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 

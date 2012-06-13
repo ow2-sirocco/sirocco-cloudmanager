@@ -34,7 +34,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
@@ -42,28 +42,28 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
+import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
- * Basic tests "end to end" for managers MachineImageCollection.
+ * Basic tests "end to end" for managers CredentialsCollection.
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = {"/context/managerContext.xml"})
-public class CimiManagersMachineImageCollectionTest {
+public class CimiManagersCredentialsCollectionTest {
 
     @Autowired
-    @Qualifier("IMachineImageManager")
-    private IMachineImageManager service;
+    @Qualifier("ICredentialsManager")
+    private ICredentialsManager service;
 
     @Autowired
-    @Qualifier("CimiManagerReadMachineImageCollection")
-    private CimiManager managerReadCollection;
+    @Qualifier("CimiManagerReadCredentialsCollection")
+    private CimiManager manager;
 
     private CimiRequest request;
 
@@ -97,29 +97,28 @@ public class CimiManagersMachineImageCollectionTest {
 
     @Test
     public void testRead() throws Exception {
-        MachineImage machine;
-        MachineImageCollection collect = new MachineImageCollection();
-        List<MachineImage> list = new ArrayList<MachineImage>();
-        collect.setImages(list);
+        Credentials item;
+        CredentialsCollection collect = new CredentialsCollection();
+        List<Credentials> list = new ArrayList<Credentials>();
+        collect.setCredentials(list);
         for (int i = 0; i < 3; i++) {
-            machine = new MachineImage();
-            machine.setId(i + 13);
-            list.add(machine);
+            item = new Credentials();
+            item.setId(i + 13);
+            list.add(item);
         }
 
-        EasyMock.expect(this.service.getMachineImageCollection()).andReturn(collect);
+        EasyMock.expect(this.service.getCredentialsCollection()).andReturn(collect);
         EasyMock.replay(this.service);
 
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
-        Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH,
-            ((CimiMachineImageCollection) this.response.getCimiData()).getId());
-        CimiMachineImageCollection cimiCollect = (CimiMachineImageCollection) this.response.getCimiData();
+        Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH, ((CimiCredentialsCollection) this.response.getCimiData()).getId());
+        CimiCredentialsCollection cimiCollect = (CimiCredentialsCollection) this.response.getCimiData();
         Assert.assertNotNull(cimiCollect.getArray());
         Assert.assertEquals(3, cimiCollect.getArray().length);
         for (int i = 0; i < cimiCollect.getArray().length; i++) {
-            Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
+            Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
         }
         EasyMock.verify(this.service);
     }
@@ -128,18 +127,17 @@ public class CimiManagersMachineImageCollectionTest {
     // FIXME Adapt to the last CIMI specification
     public void testReadWithCimiSelectAttributes() throws Exception {
 
-        List<MachineImage> list = new ArrayList<MachineImage>();
+        List<Credentials> list = new ArrayList<Credentials>();
         EasyMock.expect(
-            this.service.getMachineImages(EasyMock.eq(Arrays.asList(new String[] {"operations"})), EasyMock.eq((String) null)))
+            this.service.getCredentials(EasyMock.eq(Arrays.asList(new String[] {"operations"})), EasyMock.eq((String) null)))
             .andReturn(list);
         EasyMock.replay(this.service);
 
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"operations"});
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
-        Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH,
-            ((CimiMachineImageCollection) this.response.getCimiData()).getId());
+        Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH, ((CimiCredentialsCollection) this.response.getCimiData()).getId());
 
         EasyMock.verify(this.service);
     }
@@ -147,30 +145,29 @@ public class CimiManagersMachineImageCollectionTest {
     @Test
     // FIXME Adapt to the last CIMI specification
     public void testReadWithCimiSelectArrays() throws Exception {
-        MachineImage machine;
-        List<MachineImage> list = new ArrayList<MachineImage>();
+        Credentials item;
+        List<Credentials> list = new ArrayList<Credentials>();
         for (int i = 0; i < 23; i++) {
-            machine = new MachineImage();
-            machine.setId(i + 13);
-            list.add(machine);
+            item = new Credentials();
+            item.setId(i + 13);
+            list.add(item);
         }
 
         EasyMock.expect(
-            this.service.getMachineImages(EasyMock.eq(1), EasyMock.eq(23),
+            this.service.getCredentials(EasyMock.eq(1), EasyMock.eq(23),
                 EasyMock.eq(Arrays.asList(new String[] {"machineImages"})))).andReturn(list);
         EasyMock.replay(this.service);
 
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"machineImages[1-23]"});
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
-        Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH,
-            ((CimiMachineImageCollection) this.response.getCimiData()).getId());
-        CimiMachineImageCollection cimiCollect = (CimiMachineImageCollection) this.response.getCimiData();
+        Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH, ((CimiCredentialsCollection) this.response.getCimiData()).getId());
+        CimiCredentialsCollection cimiCollect = (CimiCredentialsCollection) this.response.getCimiData();
         Assert.assertNotNull(cimiCollect.getArray());
         Assert.assertEquals(23, cimiCollect.getArray().length);
         for (int i = 0; i < cimiCollect.getArray().length; i++) {
-            Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
+            Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
         }
         EasyMock.verify(this.service);
     }

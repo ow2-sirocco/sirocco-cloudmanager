@@ -51,6 +51,7 @@ import org.springframework.stereotype.Component;
  * <ul>
  * <li>Delete a job</li>
  * <li>Read a job</li>
+ * <li>Read a collection of jobs</li>
  * <li>Update a job</li>
  * </ul>
  * </p>
@@ -62,6 +63,10 @@ public class JobRestResource extends RestResourceAbstract {
     @Autowired
     @Qualifier("CimiManagerReadJob")
     private CimiManager cimiManagerReadJob;
+
+    @Autowired
+    @Qualifier("CimiManagerReadJobCollection")
+    private CimiManager cimiManagerReadJobCollection;
 
     @Autowired
     @Qualifier("CimiManagerDeleteJob")
@@ -83,6 +88,19 @@ public class JobRestResource extends RestResourceAbstract {
     public Response read(@PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerReadJob.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Get a collection of jobs.
+     * 
+     * @return The REST response
+     */
+    @GET
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response read() {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos());
+        this.cimiManagerReadJobCollection.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 

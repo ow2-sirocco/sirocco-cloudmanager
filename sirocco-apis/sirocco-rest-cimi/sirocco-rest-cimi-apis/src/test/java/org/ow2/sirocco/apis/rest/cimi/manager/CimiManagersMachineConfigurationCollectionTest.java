@@ -125,6 +125,7 @@ public class CimiManagersMachineConfigurationCollectionTest {
     }
 
     @Test
+    // FIXME Adapt to the last CIMI specification
     public void testReadWithCimiSelectAttributes() throws Exception {
 
         List<MachineConfiguration> list = new ArrayList<MachineConfiguration>();
@@ -144,6 +145,7 @@ public class CimiManagersMachineConfigurationCollectionTest {
     }
 
     @Test
+    // FIXME Adapt to the last CIMI specification
     public void testReadWithCimiSelectArrays() throws Exception {
         MachineConfiguration machine;
         List<MachineConfiguration> list = new ArrayList<MachineConfiguration>();
