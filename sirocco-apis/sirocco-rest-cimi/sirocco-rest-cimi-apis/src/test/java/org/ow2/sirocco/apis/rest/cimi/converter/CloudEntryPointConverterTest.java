@@ -92,11 +92,11 @@ public class CloudEntryPointConverterTest {
 
         cimi = (CimiCloudEntryPoint) this.context.convertToCimi(service, CimiCloudEntryPoint.class);
         Assert.assertEquals(this.request.getBaseUri(), cimi.getBaseURI());
-        Assert.assertNull(cimi.getCredentials());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.CredentialsCollection.getPathname(), cimi.getCredentials()
             .getHref());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.CredentialsTemplateCollection.getPathname(), cimi
             .getCredentialsTemplates().getHref());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.JobCollection.getPathname(), cimi.getJobs().getHref());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineConfigurationCollection.getPathname(), cimi
             .getMachineConfigs().getHref());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImageCollection.getPathname(), cimi
@@ -105,8 +105,6 @@ public class CloudEntryPointConverterTest {
             .getHref());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineTemplateCollection.getPathname(), cimi
             .getMachineTemplates().getHref());
-        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.JobCollection.getPathname(), cimi.getJobs().getHref());
-
     }
 
 }
