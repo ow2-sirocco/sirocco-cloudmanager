@@ -131,6 +131,7 @@ public class JobManager implements IJobManager {
             throw new ResourceNotFoundException("Invalid Job id " + id);
         }
         result.getNestedJobs().size();
+        result.getAffectedEntities().size();
         return result;
     }
 
