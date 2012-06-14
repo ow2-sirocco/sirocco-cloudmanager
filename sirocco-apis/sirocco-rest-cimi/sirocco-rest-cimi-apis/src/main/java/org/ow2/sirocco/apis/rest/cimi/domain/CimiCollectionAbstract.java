@@ -53,8 +53,8 @@ public abstract class CimiCollectionAbstract<E> extends CimiResourceAbstract imp
      */
     @XmlElement(name = "count")
     @JsonProperty(value = "count")
-    public int getCount() {
-        int count = 0;
+    public Integer getCount() {
+        Integer count = null;
         if (null != this.items) {
             count = this.items.size();
         }
@@ -67,7 +67,7 @@ public abstract class CimiCollectionAbstract<E> extends CimiResourceAbstract imp
      * 
      * @param count The collection size
      */
-    public void setCount(final int count) {
+    public void setCount(final Integer count) {
     }
 
     /**
