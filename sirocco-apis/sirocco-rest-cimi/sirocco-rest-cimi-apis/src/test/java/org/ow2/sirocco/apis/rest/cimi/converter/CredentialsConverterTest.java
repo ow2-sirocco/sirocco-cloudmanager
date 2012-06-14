@@ -118,7 +118,14 @@ public class CredentialsConverterTest {
         service = (CredentialsCollection) this.context.convertToService(new CimiCredentialsCollection());
         Assert.assertNull(service.getCredentials());
 
-        // Empty Service -> Cimi
+        // Empty Service -> Cimi : list null
+        cimi = (CimiCredentialsCollection) this.context.convertToCimi(new CredentialsCollection(),
+            CimiCredentialsCollection.class);
+        Assert.assertNull(cimi.getArray());
+
+        // Empty Service -> Cimi : list empty
+        service = new CredentialsCollection();
+        service.setCredentials(Arrays.asList(new Credentials[] {}));
         cimi = (CimiCredentialsCollection) this.context.convertToCimi(new CredentialsCollection(),
             CimiCredentialsCollection.class);
         Assert.assertNull(cimi.getArray());

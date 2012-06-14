@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
@@ -35,16 +36,31 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 /**
  * Aggregation of CloudEntryPoint to add all items necesary for CIMI.
  */
-
+// TODO Others resources : Volumes, ...
 public class CloudEntryPointAggregate extends CloudEntryPoint {
 
     /** Serial. */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "machineTemplates".
+     * Field "Credentials".
      */
-    private MachineTemplateCollection machineTemplates;
+    private CredentialsCollection credentials;
+
+    /**
+     * Field "CredentialsTemplates".
+     */
+    private CredentialsTemplateCollection credentialsTemplates;
+
+    /**
+     * Field "Jobs".
+     */
+    private JobCollection jobs;
+
+    /**
+     * Field "jobTime".
+     */
+    private Integer jobTime;
 
     /**
      * Field "machineConfigs".
@@ -55,16 +71,6 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * Field "machineImages".
      */
     private MachineImageCollection machineImages;
-
-    /**
-     * Field "CredentialsTemplates".
-     */
-    private CredentialsTemplateCollection CredentialsTemplates;
-
-    /**
-     * Field "Credentials".
-     */
-    private CredentialsCollection credentials;
 
     /**
      * Field "machines".
@@ -92,9 +98,9 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // private VolumeCollection volumes;
 
     /**
-     * Field "jobTime".
+     * Field "machineTemplates".
      */
-    private Integer jobTime;
+    private MachineTemplateCollection machineTemplates;
 
     /**
      * Parameterized constructor.
@@ -114,21 +120,75 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     }
 
     /**
-     * Return the value of field "machineTemplates".
+     * Return the value of field "credentials".
      * 
      * @return The value
      */
-    public MachineTemplateCollection getMachineTemplates() {
-        return this.machineTemplates;
+    public CredentialsCollection getCredentials() {
+        return this.credentials;
     }
 
     /**
-     * Set the value of field "machineTemplates".
+     * Set the value of field "credentials".
      * 
-     * @param machineTemplates The value
+     * @param Credentialss The value
      */
-    public void setMachineTemplates(final MachineTemplateCollection machineTemplates) {
-        this.machineTemplates = machineTemplates;
+    public void setCredentials(final CredentialsCollection credentials) {
+        this.credentials = credentials;
+    }
+
+    /**
+     * Return the value of field "CredentialsTemplates".
+     * 
+     * @return The value
+     */
+    public CredentialsTemplateCollection getCredentialsTemplates() {
+        return this.credentialsTemplates;
+    }
+
+    /**
+     * Set the value of field "CredentialsTemplates".
+     * 
+     * @param CredentialsTemplates The value
+     */
+    public void setCredentialsTemplates(final CredentialsTemplateCollection credentialsTemplates) {
+        this.credentialsTemplates = credentialsTemplates;
+    }
+
+    /**
+     * Return the value of field "jobs".
+     * 
+     * @return The value
+     */
+    public JobCollection getJobs() {
+        return this.jobs;
+    }
+
+    /**
+     * Set the value of field "jobs".
+     * 
+     * @param Jobs The value
+     */
+    public void setJobs(final JobCollection jobs) {
+        this.jobs = jobs;
+    }
+
+    /**
+     * Return the value of field "jobTime".
+     * 
+     * @return The value
+     */
+    public Integer getJobTime() {
+        return this.jobTime;
+    }
+
+    /**
+     * Set the value of field "jobTime".
+     * 
+     * @param jobTime The value
+     */
+    public void setJobTime(final Integer jobTime) {
+        this.jobTime = jobTime;
     }
 
     /**
@@ -165,42 +225,6 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      */
     public void setMachineImages(final MachineImageCollection machineImages) {
         this.machineImages = machineImages;
-    }
-
-    /**
-     * Return the value of field "CredentialsTemplates".
-     * 
-     * @return The value
-     */
-    public CredentialsTemplateCollection getCredentialsTemplates() {
-        return this.CredentialsTemplates;
-    }
-
-    /**
-     * Set the value of field "CredentialsTemplates".
-     * 
-     * @param CredentialsTemplates The value
-     */
-    public void setCredentialsTemplates(final CredentialsTemplateCollection CredentialsTemplates) {
-        this.CredentialsTemplates = CredentialsTemplates;
-    }
-
-    /**
-     * Return the value of field "credentials".
-     * 
-     * @return The value
-     */
-    public CredentialsCollection getCredentials() {
-        return this.credentials;
-    }
-
-    /**
-     * Set the value of field "credentials".
-     * 
-     * @param Credentialss The value
-     */
-    public void setCredentials(final CredentialsCollection credentials) {
-        this.credentials = credentials;
     }
 
     /**
@@ -296,20 +320,20 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // }
 
     /**
-     * Return the value of field "jobTime".
+     * Return the value of field "machineTemplates".
      * 
      * @return The value
      */
-    public Integer getJobTime() {
-        return this.jobTime;
+    public MachineTemplateCollection getMachineTemplates() {
+        return this.machineTemplates;
     }
 
     /**
-     * Set the value of field "jobTime".
+     * Set the value of field "machineTemplates".
      * 
-     * @param jobTime The value
+     * @param machineTemplates The value
      */
-    public void setJobTime(final Integer jobTime) {
-        this.jobTime = jobTime;
+    public void setMachineTemplates(final MachineTemplateCollection machineTemplates) {
+        this.machineTemplates = machineTemplates;
     }
 }

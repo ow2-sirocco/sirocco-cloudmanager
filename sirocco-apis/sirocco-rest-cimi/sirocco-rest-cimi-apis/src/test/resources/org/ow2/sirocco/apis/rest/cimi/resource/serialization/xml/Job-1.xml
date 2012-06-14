@@ -15,6 +15,7 @@
 	<returnCode>1</returnCode>
 	<status>statusValue_1</status>
 	<statusMessage>statusMessageValue_1</statusMessage>
-	<targetEntity>targetEntityValue_1</targetEntity>
+	<targetResource>targetResourceValue_1</targetResource>
+	<affectedResource>affectedResourcesValue_1_1_0</affectedResource>
 	<timeOfStatusChange>2001-02-02T01:01:01.001Z</timeOfStatusChange>
 </Job>

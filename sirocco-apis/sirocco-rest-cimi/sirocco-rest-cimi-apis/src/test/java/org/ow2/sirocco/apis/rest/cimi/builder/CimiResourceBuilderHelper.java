@@ -68,7 +68,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.ParentJob;
 /**
  * Helper to build Cimi Entities to test.
  */
-public class CimiEntityBuilderHelper {
+public class CimiResourceBuilderHelper {
 
     public static Date buildDate(final Integer id) {
         Date ret = null;
@@ -145,65 +145,67 @@ public class CimiEntityBuilderHelper {
     }
 
     public static void fillCimiCommon(final CimiDataCommon common, final Integer id, final Integer index) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         common.setDescription("descriptionValue" + postfix);
         common.setName("nameValue" + postfix);
-        common.setProperties(CimiEntityBuilderHelper.buildProperties(id));
+        common.setProperties(CimiResourceBuilderHelper.buildProperties(id));
     }
 
     public static void fillCimiObjectCommon(final CimiObjectCommon common, final Integer id, final Integer index,
         final Boolean expand) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         if ((null != expand) && (true == expand)) {
-            CimiEntityBuilderHelper.fillCimiCommon(common, id, index);
-            common.setCreated(CimiEntityBuilderHelper.buildDate(id));
+            CimiResourceBuilderHelper.fillCimiCommon(common, id, index);
+            common.setCreated(CimiResourceBuilderHelper.buildDate(id));
             common.setId("idValue" + postfix);
             common.setResourceURI(common.getExchangeType().getResourceURI());
-            common.setOperations(CimiEntityBuilderHelper.buildOperations(id));
-            common.setUpdated(CimiEntityBuilderHelper.buildDate(id));
+            common.setOperations(CimiResourceBuilderHelper.buildOperations(id));
+            common.setUpdated(CimiResourceBuilderHelper.buildDate(id));
         }
         common.setHref("hrefValue" + postfix);
     }
 
     public static void fillCimiCollection(final CimiCollection<?> common, final Integer id, final Integer index,
         final Boolean expand) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         if ((null != expand) && (true == expand)) {
             common.setId("idValue" + postfix);
             common.setResourceURI(common.getExchangeType().getResourceURI());
-            common.setOperations(CimiEntityBuilderHelper.buildOperations(id));
+            common.setOperations(CimiResourceBuilderHelper.buildOperations(id));
         }
         common.setHref("hrefValue" + postfix);
     }
 
     public static CimiCloudEntryPoint buildCimiCloudEntryPoint(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiCloudEntryPoint(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiCloudEntryPoint(id, null, true);
     }
 
     public static CimiCloudEntryPoint buildCimiCloudEntryPoint(final Integer id, final Integer index, final Boolean expand) {
         CimiCloudEntryPoint cimi = new CimiCloudEntryPoint();
-        CimiEntityBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
-        cimi.setCredentials(CimiEntityBuilderHelper.buildCimiCredentialsCollection(id, expand));
-        cimi.setCredentialsTemplates(CimiEntityBuilderHelper.buildCimiCredentialsTemplateCollection(id, expand));
+        CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
+        cimi.setBaseURI("baseUriValue" + CimiResourceBuilderHelper.buildPostfix(id, index));
+        cimi.setCredentials(CimiResourceBuilderHelper.buildCimiCredentialsCollection(id, expand));
+        cimi.setCredentialsTemplates(CimiResourceBuilderHelper.buildCimiCredentialsTemplateCollection(id, expand));
+        cimi.setJobs(CimiResourceBuilderHelper.buildCimiJobCollection(id, expand));
         cimi.setJobTime(id);
-        cimi.setMachines(CimiEntityBuilderHelper.buildCimiMachineCollection(id, expand));
-        cimi.setMachineConfigs(CimiEntityBuilderHelper.buildCimiMachineConfigurationCollection(id, expand));
-        cimi.setMachineImages(CimiEntityBuilderHelper.buildCimiMachineImageCollection(id, expand));
-        cimi.setMachineTemplates(CimiEntityBuilderHelper.buildCimiMachineTemplateCollection(id, expand));
+        cimi.setMachines(CimiResourceBuilderHelper.buildCimiMachineCollection(id, expand));
+        cimi.setMachineConfigs(CimiResourceBuilderHelper.buildCimiMachineConfigurationCollection(id, expand));
+        cimi.setMachineImages(CimiResourceBuilderHelper.buildCimiMachineImageCollection(id, expand));
+        cimi.setMachineTemplates(CimiResourceBuilderHelper.buildCimiMachineTemplateCollection(id, expand));
         // TODO Volume, NetworkInterface, ...
         return cimi;
     }
 
     public static CimiCredentials buildCimiCredentials(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiCredentials(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiCredentials(id, null, true);
     }
 
     public static CimiCredentials buildCimiCredentials(final Integer id, final Integer index, final Boolean expand) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiCredentials cimi = new CimiCredentials();
-        CimiEntityBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
+        CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
         if ((null != expand) && (true == expand)) {
-            cimi.setKey(CimiEntityBuilderHelper.buildBytes(id));
+            cimi.setKey(CimiResourceBuilderHelper.buildBytes(id));
             cimi.setPassword("passwordValue" + postfix);
             cimi.setUserName("userNameValue" + postfix);
         }
@@ -211,28 +213,28 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiCredentialsCreate buildCimiCredentialsCreate(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiCredentialsCreate(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiCredentialsCreate(id, null, true);
     }
 
     public static CimiCredentialsCreate buildCimiCredentialsCreate(final Integer id, final Integer index, final Boolean expand) {
         CimiCredentialsCreate cimi = new CimiCredentialsCreate();
-        CimiEntityBuilderHelper.fillCimiCommon(cimi, id, index);
-        cimi.setCredentialsTemplate(CimiEntityBuilderHelper.buildCimiCredentialsTemplate(id, index, expand));
+        CimiResourceBuilderHelper.fillCimiCommon(cimi, id, index);
+        cimi.setCredentialsTemplate(CimiResourceBuilderHelper.buildCimiCredentialsTemplate(id, index, expand));
         return cimi;
     }
 
     public static CimiCredentialsCollection buildCimiCredentialsCollection(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiCredentialsCollection(id, false);
+        return CimiResourceBuilderHelper.buildCimiCredentialsCollection(id, false);
     }
 
     public static CimiCredentialsCollection buildCimiCredentialsCollection(final Integer id, final Boolean expand) {
         CimiCredentialsCollection collec = new CimiCredentialsCollection();
-        CimiEntityBuilderHelper.fillCimiCollection(collec, id, null, true);
+        CimiResourceBuilderHelper.fillCimiCollection(collec, id, null, true);
 
         if ((null != id) && (id > 0)) {
             List<CimiCredentials> cimis = new ArrayList<CimiCredentials>();
             for (int i = 0; i < id; i++) {
-                cimis.add(CimiEntityBuilderHelper.buildCimiCredentials(id, i, expand));
+                cimis.add(CimiResourceBuilderHelper.buildCimiCredentials(id, i, expand));
             }
             collec.setArray(cimis.toArray(new CimiCredentials[cimis.size()]));
         }
@@ -240,16 +242,16 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiCredentialsTemplate buildCimiCredentialsTemplate(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiCredentialsTemplate(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiCredentialsTemplate(id, null, true);
     }
 
     public static CimiCredentialsTemplate buildCimiCredentialsTemplate(final Integer id, final Integer index,
         final Boolean expand) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiCredentialsTemplate cimi = new CimiCredentialsTemplate();
-        CimiEntityBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
+        CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
         if ((null != expand) && (true == expand)) {
-            cimi.setKey(CimiEntityBuilderHelper.buildBytes(id));
+            cimi.setKey(CimiResourceBuilderHelper.buildBytes(id));
             cimi.setPassword("passwordValue" + postfix);
             cimi.setUserName("userNameValue" + postfix);
         }
@@ -257,18 +259,18 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiCredentialsTemplateCollection buildCimiCredentialsTemplateCollection(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiCredentialsTemplateCollection(id, false);
+        return CimiResourceBuilderHelper.buildCimiCredentialsTemplateCollection(id, false);
     }
 
     public static CimiCredentialsTemplateCollection buildCimiCredentialsTemplateCollection(final Integer id,
         final Boolean expand) {
         CimiCredentialsTemplateCollection collec = new CimiCredentialsTemplateCollection();
-        CimiEntityBuilderHelper.fillCimiCollection(collec, id, null, true);
+        CimiResourceBuilderHelper.fillCimiCollection(collec, id, null, true);
 
         if ((null != id) && (id > 0)) {
             List<CimiCredentialsTemplate> cimis = new ArrayList<CimiCredentialsTemplate>();
             for (int i = 0; i < id; i++) {
-                cimis.add(CimiEntityBuilderHelper.buildCimiCredentialsTemplate(id, i, expand));
+                cimis.add(CimiResourceBuilderHelper.buildCimiCredentialsTemplate(id, i, expand));
             }
             collec.setArray(cimis.toArray(new CimiCredentialsTemplate[cimis.size()]));
         }
@@ -276,13 +278,13 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiMachineImage buildCimiMachineImage(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiMachineImage(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiMachineImage(id, null, true);
     }
 
     public static CimiMachineImage buildCimiMachineImage(final Integer id, final Integer index, final Boolean expand) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiMachineImage cimi = new CimiMachineImage();
-        CimiEntityBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
+        CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
         if ((null != expand) && (true == expand)) {
             cimi.setImageLocation(new ImageLocation("hrefImageLocation" + postfix));
             cimi.setState("stateValue" + postfix);
@@ -292,17 +294,17 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiMachineImageCollection buildCimiMachineImageCollection(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiMachineImageCollection(id, false);
+        return CimiResourceBuilderHelper.buildCimiMachineImageCollection(id, false);
     }
 
     public static CimiMachineImageCollection buildCimiMachineImageCollection(final Integer id, final Boolean expand) {
         CimiMachineImageCollection collec = new CimiMachineImageCollection();
-        CimiEntityBuilderHelper.fillCimiCollection(collec, id, null, true);
+        CimiResourceBuilderHelper.fillCimiCollection(collec, id, null, true);
 
         if ((null != id) && (id > 0)) {
             List<CimiMachineImage> cimis = new ArrayList<CimiMachineImage>();
             for (int i = 0; i < id; i++) {
-                cimis.add(CimiEntityBuilderHelper.buildCimiMachineImage(id, i, expand));
+                cimis.add(CimiResourceBuilderHelper.buildCimiMachineImage(id, i, expand));
             }
             collec.setArray(cimis.toArray(new CimiMachineImage[cimis.size()]));
         }
@@ -310,29 +312,35 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiJob buildCimiJob(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiJob(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiJob(id, null, true);
     }
 
     public static CimiJob buildCimiJob(final Integer id, final Integer index, final Boolean expand) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiJob cimi = new CimiJob();
 
-        CimiEntityBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
+        CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
         if ((null != expand) && (true == expand)) {
             cimi.setAction("actionValue" + postfix);
-            cimi.setIsCancellable(CimiEntityBuilderHelper.buildBoolean(id));
+            cimi.setIsCancellable(CimiResourceBuilderHelper.buildBoolean(id));
             cimi.setProgress(id);
             cimi.setReturnCode(id);
             cimi.setStatus("statusValue" + postfix);
             cimi.setStatusMessage("statusMessageValue" + postfix);
-            cimi.setTargetEntity("targetEntityValue" + postfix);
-            cimi.setTimeOfStatusChange(CimiEntityBuilderHelper.buildDate(id));
+            cimi.setTargetResource("targetResourceValue" + postfix);
+            cimi.setTimeOfStatusChange(CimiResourceBuilderHelper.buildDate(id));
 
             if ((null != id) && (id > 0)) {
+                List<String> affectedResources = new ArrayList<String>();
+                for (int i = 0; i < id; i++) {
+                    affectedResources.add(new String("affectedResourcesValue" + postfix
+                        + CimiResourceBuilderHelper.buildPostfix(id, i)));
+                }
+                cimi.setAffectedResources(affectedResources.toArray(new String[affectedResources.size()]));
                 cimi.setParentJob(new ParentJob("hrefParentValue" + postfix));
                 List<NestedJob> nesteds = new ArrayList<NestedJob>();
                 for (int i = 0; i < id; i++) {
-                    nesteds.add(new NestedJob("hrefNestedValue" + postfix + CimiEntityBuilderHelper.buildPostfix(id, i)));
+                    nesteds.add(new NestedJob("hrefNestedValue" + postfix + CimiResourceBuilderHelper.buildPostfix(id, i)));
                 }
                 cimi.setNestedJobs(nesteds.toArray(new NestedJob[nesteds.size()]));
             }
@@ -341,17 +349,17 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiJobCollection buildCimiJobCollection(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiJobCollection(id, false);
+        return CimiResourceBuilderHelper.buildCimiJobCollection(id, false);
     }
 
     public static CimiJobCollection buildCimiJobCollection(final Integer id, final Boolean expand) {
         CimiJobCollection collec = new CimiJobCollection();
-        CimiEntityBuilderHelper.fillCimiCollection(collec, id, null, true);
+        CimiResourceBuilderHelper.fillCimiCollection(collec, id, null, true);
 
         if ((null != id) && (id > 0)) {
             List<CimiJob> cimis = new ArrayList<CimiJob>();
             for (int i = 0; i < id; i++) {
-                cimis.add(CimiEntityBuilderHelper.buildCimiJob(id, i, expand));
+                cimis.add(CimiResourceBuilderHelper.buildCimiJob(id, i, expand));
             }
             collec.setArray(cimis.toArray(new CimiJob[cimis.size()]));
         }
@@ -359,7 +367,7 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiMemory buildCimiMemory(final Integer id, final Integer index) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiMemory cimi = new CimiMemory();
         cimi.setQuantity(id);
         cimi.setUnits("unitValue" + postfix);
@@ -367,7 +375,7 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiCapacity buildCimiCapacity(final Integer id, final Integer index) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiCapacity cimi = new CimiCapacity();
         cimi.setQuantity(id);
         cimi.setUnits("unitValue" + postfix);
@@ -375,7 +383,7 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiCpu buildCimiCpu(final Integer id, final Integer index) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiCpu cimi = new CimiCpu();
         cimi.setFrequency(new Float(id * 100.0));
         cimi.setNumberVirtualCpus(id);
@@ -385,45 +393,45 @@ public class CimiEntityBuilderHelper {
 
     public static CimiDisk buildCimiDisk(final Integer id, final Integer index) {
         CimiDisk cimi = new CimiDisk();
-        cimi.setCapacity(CimiEntityBuilderHelper.buildCimiCapacity(id, index));
+        cimi.setCapacity(CimiResourceBuilderHelper.buildCimiCapacity(id, index));
         return cimi;
     }
 
     public static CimiDiskConfiguration buildCimiDiskConfiguration(final Integer id, final Integer index) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiDiskConfiguration cimi = new CimiDiskConfiguration();
         cimi.setAttachmentPoint("attachmentPointValue" + postfix);
-        cimi.setCapacity(CimiEntityBuilderHelper.buildCimiCapacity(id, index));
+        cimi.setCapacity(CimiResourceBuilderHelper.buildCimiCapacity(id, index));
         cimi.setFormat("formatValue" + postfix);
         return cimi;
     }
 
     public static CimiAction buildCimiAction(final Integer id) {
         CimiAction cimi = new CimiAction();
-        CimiEntityBuilderHelper.fillCimiCommon(cimi, id, null);
+        CimiResourceBuilderHelper.fillCimiCommon(cimi, id, null);
         cimi.setAction(ActionType.START.getPath());
         return cimi;
     }
 
     public static CimiMachine buildCimiMachine(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiMachine(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiMachine(id, null, true);
     }
 
     public static CimiMachine buildCimiMachine(final Integer id, final Integer index, final Boolean expand) {
-        String postfix = CimiEntityBuilderHelper.buildPostfix(id, index);
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiMachine cimi = new CimiMachine();
-        CimiEntityBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
+        CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
 
         if ((null != expand) && (true == expand)) {
-            cimi.setCpu(CimiEntityBuilderHelper.buildCimiCpu(id, index));
+            cimi.setCpu(CimiResourceBuilderHelper.buildCimiCpu(id, index));
             if ((null != id) && (id > 0)) {
                 List<CimiDisk> cimis = new ArrayList<CimiDisk>();
                 for (int i = 0; i < id; i++) {
-                    cimis.add(CimiEntityBuilderHelper.buildCimiDisk(id, i));
+                    cimis.add(CimiResourceBuilderHelper.buildCimiDisk(id, i));
                 }
                 cimi.setDisks(cimis.toArray(new CimiDisk[cimis.size()]));
             }
-            cimi.setMemory(CimiEntityBuilderHelper.buildCimiMemory(id, index));
+            cimi.setMemory(CimiResourceBuilderHelper.buildCimiMemory(id, index));
             cimi.setState("stateValue" + postfix);
             // TODO Volume, NetworkInterface, ...
         }
@@ -431,17 +439,17 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiMachineCollection buildCimiMachineCollection(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiMachineCollection(id, false);
+        return CimiResourceBuilderHelper.buildCimiMachineCollection(id, false);
     }
 
     public static CimiMachineCollection buildCimiMachineCollection(final Integer id, final Boolean expand) {
         CimiMachineCollection collec = new CimiMachineCollection();
-        CimiEntityBuilderHelper.fillCimiCollection(collec, id, null, true);
+        CimiResourceBuilderHelper.fillCimiCollection(collec, id, null, true);
 
         if ((null != id) && (id > 0)) {
             List<CimiMachine> cimis = new ArrayList<CimiMachine>();
             for (int i = 0; i < id; i++) {
-                cimis.add(CimiEntityBuilderHelper.buildCimiMachine(id, i, expand));
+                cimis.add(CimiResourceBuilderHelper.buildCimiMachine(id, i, expand));
             }
             collec.setArray(cimis.toArray(new CimiMachine[cimis.size()]));
         }
@@ -449,21 +457,21 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiMachineConfiguration buildCimiMachineConfiguration(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiMachineConfiguration(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiMachineConfiguration(id, null, true);
     }
 
     public static CimiMachineConfiguration buildCimiMachineConfiguration(final Integer id, final Integer index,
         final Boolean expand) {
         CimiMachineConfiguration cimi = new CimiMachineConfiguration();
-        CimiEntityBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
+        CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
 
         if ((null != expand) && (true == expand)) {
-            cimi.setCpu(CimiEntityBuilderHelper.buildCimiCpu(id, index));
-            cimi.setMemory(CimiEntityBuilderHelper.buildCimiMemory(id, index));
+            cimi.setCpu(CimiResourceBuilderHelper.buildCimiCpu(id, index));
+            cimi.setMemory(CimiResourceBuilderHelper.buildCimiMemory(id, index));
             if ((null != id) && (id > 0)) {
                 List<CimiDiskConfiguration> cimis = new ArrayList<CimiDiskConfiguration>();
                 for (int i = 0; i < id; i++) {
-                    cimis.add(CimiEntityBuilderHelper.buildCimiDiskConfiguration(id, i));
+                    cimis.add(CimiResourceBuilderHelper.buildCimiDiskConfiguration(id, i));
                 }
                 cimi.setDisks(cimis.toArray(new CimiDiskConfiguration[cimis.size()]));
             }
@@ -472,18 +480,18 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiMachineConfigurationCollection buildCimiMachineConfigurationCollection(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiMachineConfigurationCollection(id, false);
+        return CimiResourceBuilderHelper.buildCimiMachineConfigurationCollection(id, false);
     }
 
     public static CimiMachineConfigurationCollection buildCimiMachineConfigurationCollection(final Integer id,
         final Boolean expand) {
         CimiMachineConfigurationCollection collec = new CimiMachineConfigurationCollection();
-        CimiEntityBuilderHelper.fillCimiCollection(collec, id, null, true);
+        CimiResourceBuilderHelper.fillCimiCollection(collec, id, null, true);
 
         if ((null != id) && (id > 0)) {
             List<CimiMachineConfiguration> cimis = new ArrayList<CimiMachineConfiguration>();
             for (int i = 0; i < id; i++) {
-                cimis.add(CimiEntityBuilderHelper.buildCimiMachineConfiguration(id, i, expand));
+                cimis.add(CimiResourceBuilderHelper.buildCimiMachineConfiguration(id, i, expand));
             }
             collec.setArray(cimis.toArray(new CimiMachineConfiguration[cimis.size()]));
         }
@@ -491,45 +499,45 @@ public class CimiEntityBuilderHelper {
     }
 
     public static CimiMachineCreate buildCimiMachineCreate(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiMachineCreate(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiMachineCreate(id, null, true);
     }
 
     public static CimiMachineCreate buildCimiMachineCreate(final Integer id, final Integer index, final Boolean expand) {
         CimiMachineCreate cimi = new CimiMachineCreate();
-        CimiEntityBuilderHelper.fillCimiCommon(cimi, id, index);
-        cimi.setMachineTemplate(CimiEntityBuilderHelper.buildCimiMachineTemplate(id, index, expand));
+        CimiResourceBuilderHelper.fillCimiCommon(cimi, id, index);
+        cimi.setMachineTemplate(CimiResourceBuilderHelper.buildCimiMachineTemplate(id, index, expand));
         return cimi;
     }
 
     public static CimiMachineTemplate buildCimiMachineTemplate(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiMachineTemplate(id, null, true);
+        return CimiResourceBuilderHelper.buildCimiMachineTemplate(id, null, true);
     }
 
     public static CimiMachineTemplate buildCimiMachineTemplate(final Integer id, final Integer index, final Boolean expand) {
         CimiMachineTemplate cimi = new CimiMachineTemplate();
-        CimiEntityBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
+        CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
 
         if ((null != expand) && (true == expand)) {
-            cimi.setCredentials(CimiEntityBuilderHelper.buildCimiCredentials(id, index, expand));
-            cimi.setMachineConfig(CimiEntityBuilderHelper.buildCimiMachineConfiguration(id, index, expand));
-            cimi.setMachineImage(CimiEntityBuilderHelper.buildCimiMachineImage(id, index, expand));
+            cimi.setCredentials(CimiResourceBuilderHelper.buildCimiCredentials(id, index, expand));
+            cimi.setMachineConfig(CimiResourceBuilderHelper.buildCimiMachineConfiguration(id, index, expand));
+            cimi.setMachineImage(CimiResourceBuilderHelper.buildCimiMachineImage(id, index, expand));
             // TODO Volume, NetworkInterface, ...
         }
         return cimi;
     }
 
     public static CimiMachineTemplateCollection buildCimiMachineTemplateCollection(final Integer id) {
-        return CimiEntityBuilderHelper.buildCimiMachineTemplateCollection(id, false);
+        return CimiResourceBuilderHelper.buildCimiMachineTemplateCollection(id, false);
     }
 
     public static CimiMachineTemplateCollection buildCimiMachineTemplateCollection(final Integer id, final Boolean expand) {
         CimiMachineTemplateCollection collec = new CimiMachineTemplateCollection();
-        CimiEntityBuilderHelper.fillCimiCollection(collec, id, null, true);
+        CimiResourceBuilderHelper.fillCimiCollection(collec, id, null, true);
 
         if ((null != id) && (id > 0)) {
             List<CimiMachineTemplate> cimis = new ArrayList<CimiMachineTemplate>();
             for (int i = 0; i < id; i++) {
-                cimis.add(CimiEntityBuilderHelper.buildCimiMachineTemplate(id, i, expand));
+                cimis.add(CimiResourceBuilderHelper.buildCimiMachineTemplate(id, i, expand));
             }
             collec.setArray(cimis.toArray(new CimiMachineTemplate[cimis.size()]));
         }

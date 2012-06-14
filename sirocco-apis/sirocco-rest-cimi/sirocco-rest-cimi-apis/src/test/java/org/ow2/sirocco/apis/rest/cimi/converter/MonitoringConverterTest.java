@@ -43,6 +43,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
 /**
  * Converters tests of monitoring resources.
@@ -65,10 +66,12 @@ public class MonitoringConverterTest {
     public void testCimiJob() throws Exception {
         CimiJob cimi;
         Job service;
+        CloudResource targetResource;
 
         // Empty Service -> Cimi
         cimi = (CimiJob) this.context.convertToCimi(new Job(), CimiJob.class);
         Assert.assertNull(cimi.getAction());
+        Assert.assertNull(cimi.getAffectedResources());
         Assert.assertNull(cimi.getIsCancellable());
         Assert.assertNull(cimi.getNestedJobs());
         Assert.assertNull(cimi.getParentJob());
@@ -76,11 +79,11 @@ public class MonitoringConverterTest {
         Assert.assertNull(cimi.getReturnCode());
         Assert.assertNull(cimi.getStatus());
         Assert.assertNull(cimi.getStatusMessage());
-        Assert.assertNull(cimi.getTargetEntity());
+        Assert.assertNull(cimi.getTargetResource());
         Assert.assertNull(cimi.getTimeOfStatusChange());
 
         // Full Service -> Cimi
-        CloudResource targetResource = new Machine();
+        targetResource = new Machine();
         targetResource.setId(321);
         Date timeOfStatusChange = new Date();
         Job parentJob = new Job();
@@ -105,17 +108,17 @@ public class MonitoringConverterTest {
         Assert.assertEquals(11, cimi.getReturnCode().intValue());
         Assert.assertEquals(Job.Status.RUNNING.toString(), cimi.getStatus());
         Assert.assertEquals("statusMessage", cimi.getStatusMessage());
-        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/321", cimi.getTargetEntity());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/321", cimi.getTargetResource());
         Assert.assertEquals(timeOfStatusChange, cimi.getTimeOfStatusChange());
 
-        // Full Service -> Cimi
+        // Full Service -> Cimi : NestedJobs empty
         service = new Job();
         service.setNestedJobs(new ArrayList<Job>());
 
         cimi = (CimiJob) this.context.convertToCimi(service, CimiJob.class);
         Assert.assertNull(cimi.getNestedJobs());
 
-        // Full Service -> Cimi
+        // Full Service -> Cimi : NestedJobs full
         List<Job> listJob = new ArrayList<Job>();
         for (int i = 0; i < 3; i++) {
             Job job = new Job();
@@ -132,6 +135,32 @@ public class MonitoringConverterTest {
             Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/" + (i + 100),
                 cimi.getNestedJobs()[i].getHref());
         }
+        // Full Service -> Cimi : AffectedResources empty
+        service = new Job();
+        service.setAffectedEntities(new ArrayList<CloudResource>());
+
+        cimi = (CimiJob) this.context.convertToCimi(service, CimiJob.class);
+        Assert.assertNull(cimi.getAffectedResources());
+
+        // Full Service -> Cimi : AffectedResources full
+        List<CloudResource> listResource = new ArrayList<CloudResource>();
+        targetResource = new Machine();
+        targetResource.setId(321);
+        listResource.add(targetResource);
+        targetResource = new MachineImage();
+        targetResource.setId(654);
+        listResource.add(targetResource);
+
+        service = new Job();
+        service.setAffectedEntities(listResource);
+
+        cimi = (CimiJob) this.context.convertToCimi(service, CimiJob.class);
+        Assert.assertNotNull(cimi.getAffectedResources());
+        Assert.assertEquals(2, cimi.getAffectedResources().length);
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/321",
+            cimi.getAffectedResources()[0]);
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/654",
+            cimi.getAffectedResources()[1]);
     }
 
     @Test

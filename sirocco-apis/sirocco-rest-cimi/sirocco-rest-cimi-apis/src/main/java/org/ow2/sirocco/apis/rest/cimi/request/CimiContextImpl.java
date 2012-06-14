@@ -121,9 +121,11 @@ public class CimiContextImpl implements CimiContext {
     @Override
     public Object convertNextCimi(final Object service, final Class<?> cimiAssociate) {
         Object converted = null;
-        this.stackConverted.push(cimiAssociate);
-        converted = this.getConverter(cimiAssociate).toCimi(this, service);
-        this.stackConverted.pop();
+        if (null != service) {
+            this.stackConverted.push(cimiAssociate);
+            converted = this.getConverter(cimiAssociate).toCimi(this, service);
+            this.stackConverted.pop();
+        }
         return converted;
     }
 

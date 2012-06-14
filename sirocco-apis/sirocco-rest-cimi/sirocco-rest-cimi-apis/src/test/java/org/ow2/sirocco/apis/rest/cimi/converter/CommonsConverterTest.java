@@ -526,7 +526,7 @@ public class CommonsConverterTest {
     }
 
     @Test
-    public void testAllIDandResourceURI() throws Exception {
+    public void testAllResourceUriAndId() throws Exception {
         CimiResource cimi = null;
         Resource service = null;
         Class<? extends CimiResource> cimiClass = null;

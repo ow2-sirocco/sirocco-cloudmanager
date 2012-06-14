@@ -43,9 +43,24 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "machineTemplates".
+     * Field "baseURI".
      */
-    private CimiMachineTemplateCollection machineTemplates;
+    private String baseURI;
+
+    /**
+     * Field "credentials".
+     */
+    private CimiCredentialsCollection credentials;
+
+    /**
+     * Field "credentialsTemplates".
+     */
+    private CimiCredentialsTemplateCollection credentialsTemplates;
+
+    /**
+     * Field "jobs".
+     */
+    private CimiJobCollection jobs;
 
     /**
      * Field "machineConfigs".
@@ -58,24 +73,14 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     private CimiMachineImageCollection machineImages;
 
     /**
-     * Field "credentialsTemplates".
-     */
-    private CimiCredentialsTemplateCollection credentialsTemplates;
-
-    /**
-     * Field "credentials".
-     */
-    private CimiCredentialsCollection credentials;
-
-    /**
      * Field "machines".
      */
     private CimiMachineCollection machines;
 
     /**
-     * Field "volumeTemplates".
+     * Field "machineTemplates".
      */
-    private CimiVolumeTemplateCollection volumeTemplates;
+    private CimiMachineTemplateCollection machineTemplates;
 
     /**
      * Field "volumeConfigurations".
@@ -91,6 +96,11 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * Field "volumes".
      */
     private CimiVolumeCollection volumes;
+
+    /**
+     * Field "volumeTemplates".
+     */
+    private CimiVolumeTemplateCollection volumeTemplates;
 
     /**
      * Field "jobTime".
@@ -114,21 +124,107 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "machineTemplates".
+     * Return the value of field "baseURI".
      * 
-     * @return The value
+     * @return the baseURI
      */
-    public CimiMachineTemplateCollection getMachineTemplates() {
-        return this.machineTemplates;
+    public String getBaseURI() {
+        return this.baseURI;
     }
 
     /**
-     * Set the value of field "machineTemplates".
+     * Set the value of field "baseURI".
      * 
-     * @param machineTemplates The value
+     * @param baseURI the baseURI to set
      */
-    public void setMachineTemplates(final CimiMachineTemplateCollection machineTemplates) {
-        this.machineTemplates = machineTemplates;
+    public void setBaseURI(final String baseURI) {
+        this.baseURI = baseURI;
+    }
+
+    /**
+     * Return the value of field "credentials".
+     * 
+     * @return The value
+     */
+    public CimiCredentialsCollection getCredentials() {
+        return this.credentials;
+    }
+
+    /**
+     * Set the value of field "credentials".
+     * 
+     * @param Credentialss The value
+     */
+    public void setCredentials(final CimiCredentialsCollection credentials) {
+        this.credentials = credentials;
+    }
+
+    /**
+     * Return the value of field "credentialsTemplates".
+     * 
+     * @return The value
+     */
+    public CimiCredentialsTemplateCollection getCredentialsTemplates() {
+        return this.credentialsTemplates;
+    }
+
+    /**
+     * Set the value of field "CredentialsTemplates".
+     * 
+     * @param CredentialsTemplates The value
+     */
+    public void setCredentialsTemplates(final CimiCredentialsTemplateCollection credentialsTemplates) {
+        this.credentialsTemplates = credentialsTemplates;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.CloudEntryPoint;
+    }
+
+    /**
+     * Return the value of field "jobs".
+     * 
+     * @return The value
+     */
+    public CimiJobCollection getJobs() {
+        return this.jobs;
+    }
+
+    /**
+     * Set the value of field "jobs".
+     * 
+     * @param jobs The value
+     */
+    public void setJobs(final CimiJobCollection jobs) {
+        this.jobs = jobs;
+    }
+
+    /**
+     * Return the value of field "jobTime".
+     * 
+     * @return The value
+     */
+    @Deprecated
+    public Integer getJobTime() {
+        return this.jobTime;
+    }
+
+    /**
+     * Set the value of field "jobTime".
+     * 
+     * @param jobTime The value
+     */
+    @Deprecated
+    public void setJobTime(final Integer jobTime) {
+        this.jobTime = jobTime;
     }
 
     /**
@@ -168,42 +264,6 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "credentialsTemplates".
-     * 
-     * @return The value
-     */
-    public CimiCredentialsTemplateCollection getCredentialsTemplates() {
-        return this.credentialsTemplates;
-    }
-
-    /**
-     * Set the value of field "CredentialsTemplates".
-     * 
-     * @param CredentialsTemplates The value
-     */
-    public void setCredentialsTemplates(final CimiCredentialsTemplateCollection credentialsTemplates) {
-        this.credentialsTemplates = credentialsTemplates;
-    }
-
-    /**
-     * Return the value of field "credentials".
-     * 
-     * @return The value
-     */
-    public CimiCredentialsCollection getCredentials() {
-        return this.credentials;
-    }
-
-    /**
-     * Set the value of field "credentials".
-     * 
-     * @param Credentialss The value
-     */
-    public void setCredentials(final CimiCredentialsCollection credentials) {
-        this.credentials = credentials;
-    }
-
-    /**
      * Return the value of field "machines".
      * 
      * @return The value
@@ -222,21 +282,21 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "volumeTemplates".
+     * Return the value of field "machineTemplates".
      * 
      * @return The value
      */
-    public CimiVolumeTemplateCollection getVolumeTemplates() {
-        return this.volumeTemplates;
+    public CimiMachineTemplateCollection getMachineTemplates() {
+        return this.machineTemplates;
     }
 
     /**
-     * Set the value of field "volumeTemplates".
+     * Set the value of field "machineTemplates".
      * 
-     * @param volumeTemplates The value
+     * @param machineTemplates The value
      */
-    public void setVolumeTemplates(final CimiVolumeTemplateCollection volumeTemplates) {
-        this.volumeTemplates = volumeTemplates;
+    public void setMachineTemplates(final CimiMachineTemplateCollection machineTemplates) {
+        this.machineTemplates = machineTemplates;
     }
 
     /**
@@ -294,33 +354,21 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "jobTime".
+     * Return the value of field "volumeTemplates".
      * 
      * @return The value
      */
-    public Integer getJobTime() {
-        return this.jobTime;
+    public CimiVolumeTemplateCollection getVolumeTemplates() {
+        return this.volumeTemplates;
     }
 
     /**
-     * Set the value of field "jobTime".
+     * Set the value of field "volumeTemplates".
      * 
-     * @param jobTime The value
+     * @param volumeTemplates The value
      */
-    public void setJobTime(final Integer jobTime) {
-        this.jobTime = jobTime;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
-     */
-    @Override
-    @XmlTransient
-    @JsonIgnore
-    public ExchangeType getExchangeType() {
-        return ExchangeType.CloudEntryPoint;
+    public void setVolumeTemplates(final CimiVolumeTemplateCollection volumeTemplates) {
+        this.volumeTemplates = volumeTemplates;
     }
 
 }

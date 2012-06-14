@@ -247,7 +247,7 @@ public class RestCimiPrimerScenarioTest {
             System.out.println("====== " + ExchangeType.Job);
             System.out.println("jobRead.getId:" + jobRead.getId());
             System.out.println("jobRead.getStatus:" + jobRead.getStatus());
-            System.out.println("jobRead.getTargetEntity:" + jobRead.getTargetEntity());
+            System.out.println("jobRead.getTargetResource:" + jobRead.getTargetResource());
             this.printTitleTest("Read Job", false);
 
             if (false == "RUNNING".equals(jobRead.getStatus())) {
@@ -556,7 +556,7 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("Header: " + response.getHeaders());
         System.out.println("jobMachineCreate.ID:" + jobMachineCreate.getId());
         System.out.println("jobMachineCreate.Status:" + jobMachineCreate.getStatus());
-        System.out.println("jobMachineCreate.TargetEntity:" + jobMachineCreate.getTargetEntity());
+        System.out.println("jobMachineCreate.TargetResource:" + jobMachineCreate.getTargetResource());
         this.printTitleTest("Create a new Machine", false);
 
         /*
@@ -568,7 +568,7 @@ public class RestCimiPrimerScenarioTest {
          * Query the Machine
          */
         this.printTitleTest("Query the Machine", true);
-        service = webResource.path(this.extractPath(jobMachineCreate.getTargetEntity()));
+        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         CimiMachine machine = response.getEntity(CimiMachine.class);
@@ -617,7 +617,7 @@ public class RestCimiPrimerScenarioTest {
          * Query the Machine to verify if it started
          */
         this.printTitleTest("Query the Machine to verify if it started", true);
-        service = webResource.path(this.extractPath(jobMachineCreate.getTargetEntity()));
+        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         machine = response.getEntity(CimiMachine.class);
@@ -653,7 +653,7 @@ public class RestCimiPrimerScenarioTest {
          * Query the Machine to verify if it stopped
          */
         this.printTitleTest("Query the Machine to verify if it stopped", true);
-        service = webResource.path(this.extractPath(jobMachineCreate.getTargetEntity()));
+        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         machine = response.getEntity(CimiMachine.class);
@@ -690,7 +690,7 @@ public class RestCimiPrimerScenarioTest {
          * Query the Machine to verify if it updated
          */
         this.printTitleTest("Query the Machine to verify if it updated", true);
-        service = webResource.path(this.extractPath(jobMachineCreate.getTargetEntity()));
+        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         machine = response.getEntity(CimiMachine.class);

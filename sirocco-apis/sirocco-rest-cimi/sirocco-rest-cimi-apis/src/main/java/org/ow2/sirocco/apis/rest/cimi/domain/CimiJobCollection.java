@@ -72,8 +72,6 @@ public class CimiJobCollection extends CimiCollectionAbstract<CimiJob> {
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
      */
     @Override
-    @XmlTransient
-    @JsonIgnore
     public CimiArray<CimiJob> newCollection() {
         return new CimiJobArray();
     }
@@ -96,6 +94,8 @@ public class CimiJobCollection extends CimiCollectionAbstract<CimiJob> {
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#getItemClass()
      */
     @Override
+    @XmlTransient
+    @JsonIgnore
     public Class<CimiJob> getItemClass() {
         return CimiJob.class;
     }

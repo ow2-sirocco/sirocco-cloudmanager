@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
@@ -106,30 +107,23 @@ public class CloudEntryPointConverter extends ObjectCommonConverter {
         final CimiCloudEntryPoint dataCimi) {
         this.fill(context, dataService, dataCimi);
         if ((true == context.mustBeExpanded(dataCimi)) || (true == context.mustBeReferenced(dataCimi))) {
-            if (null != dataService.getCredentials()) {
-                dataCimi.setCredentials((CimiCredentialsCollection) context.convertNextCimi(dataService.getCredentials(),
-                    CimiCredentialsCollection.class));
-            }
-            if (null != dataService.getCredentialsTemplates()) {
-                dataCimi.setCredentialsTemplates((CimiCredentialsTemplateCollection) context.convertNextCimi(
-                    dataService.getCredentialsTemplates(), CimiCredentialsTemplateCollection.class));
-            }
-            if (null != dataService.getMachineConfigs()) {
-                dataCimi.setMachineConfigs((CimiMachineConfigurationCollection) context.convertNextCimi(
-                    dataService.getMachineConfigs(), CimiMachineConfigurationCollection.class));
-            }
-            if (null != dataService.getMachineImages()) {
-                dataCimi.setMachineImages((CimiMachineImageCollection) context.convertNextCimi(dataService.getMachineImages(),
-                    CimiMachineImageCollection.class));
-            }
-            if (null != dataService.getMachines()) {
-                dataCimi.setMachines((CimiMachineCollection) context.convertNextCimi(dataService.getMachines(),
-                    CimiMachineCollection.class));
-            }
-            if (null != dataService.getMachineTemplates()) {
-                dataCimi.setMachineTemplates((CimiMachineTemplateCollection) context.convertNextCimi(
-                    dataService.getMachineTemplates(), CimiMachineTemplateCollection.class));
-            }
+            dataCimi.setBaseURI(context.getRequest().getBaseUri());
+
+            dataCimi.setCredentials((CimiCredentialsCollection) context.convertNextCimi(dataService.getCredentials(),
+                CimiCredentialsCollection.class));
+            dataCimi.setCredentialsTemplates((CimiCredentialsTemplateCollection) context.convertNextCimi(
+                dataService.getCredentialsTemplates(), CimiCredentialsTemplateCollection.class));
+
+            dataCimi.setJobs((CimiJobCollection) context.convertNextCimi(dataService.getJobs(), CimiJobCollection.class));
+
+            dataCimi.setMachineConfigs((CimiMachineConfigurationCollection) context.convertNextCimi(
+                dataService.getMachineConfigs(), CimiMachineConfigurationCollection.class));
+            dataCimi.setMachineImages((CimiMachineImageCollection) context.convertNextCimi(dataService.getMachineImages(),
+                CimiMachineImageCollection.class));
+            dataCimi.setMachines((CimiMachineCollection) context.convertNextCimi(dataService.getMachines(),
+                CimiMachineCollection.class));
+            dataCimi.setMachineTemplates((CimiMachineTemplateCollection) context.convertNextCimi(
+                dataService.getMachineTemplates(), CimiMachineTemplateCollection.class));
         }
     }
 

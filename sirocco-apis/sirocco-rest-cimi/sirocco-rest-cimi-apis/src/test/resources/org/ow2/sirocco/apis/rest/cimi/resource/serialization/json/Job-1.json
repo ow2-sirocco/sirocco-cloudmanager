@@ -16,7 +16,10 @@
 		}
 		
 	],
-	"targetEntity":"targetEntityValue_1",
+	"targetResource":"targetResourceValue_1",
+	"affectedResources":[
+		"affectedResourcesValue_1_1_0"
+	],
 	"action":"actionValue_1",
 	"status":"statusValue_1",
 	"returnCode":1,

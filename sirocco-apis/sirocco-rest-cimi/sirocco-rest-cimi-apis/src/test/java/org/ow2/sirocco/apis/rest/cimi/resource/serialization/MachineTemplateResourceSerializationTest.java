@@ -573,7 +573,7 @@ public class MachineTemplateResourceSerializationTest extends SerializationTestB
 
         Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_LOCATION));
         Assert.assertTrue(heardersResponse.get(Constants.HEADER_LOCATION).get(0)
-            .endsWith(ConstantsPath.MACHINE_TEMPLATE + "/" + "targetEntityValue_1"));
+            .endsWith(ConstantsPath.MACHINE_TEMPLATE + "/" + "targetResourceValue_1"));
 
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "Job-1.json"), new StringReader(
             entityResponse));
@@ -616,7 +616,7 @@ public class MachineTemplateResourceSerializationTest extends SerializationTestB
 
         Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_LOCATION));
         Assert.assertTrue(heardersResponse.get(Constants.HEADER_LOCATION).get(0)
-            .endsWith(ConstantsPath.MACHINE_TEMPLATE + "/" + "targetEntityValue_1"));
+            .endsWith(ConstantsPath.MACHINE_TEMPLATE + "/" + "targetResourceValue_1"));
 
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "Job-1.xml"), new StringReader(
             entityResponse));

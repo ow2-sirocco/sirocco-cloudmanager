@@ -29,7 +29,7 @@ import javax.ws.rs.core.Response.Status;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.junit.Assert;
 import org.junit.ComparisonFailure;
-import org.ow2.sirocco.apis.rest.cimi.builder.CimiEntityBuilderHelper;
+import org.ow2.sirocco.apis.rest.cimi.builder.CimiResourceBuilderHelper;
 import org.ow2.sirocco.apis.rest.cimi.converter.HrefHelper;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
@@ -62,13 +62,13 @@ public class MockCimiManagerAction extends MockCimiManager {
                     new SerializationHelper.RecursiveToStringStyle()));
 
             // Build response
-            CimiJob cimiJob = CimiEntityBuilderHelper.buildCimiJob(1);
+            CimiJob cimiJob = CimiResourceBuilderHelper.buildCimiJob(1);
             context.getResponse().setCimiData(cimiJob);
             context.getResponse().putHeader(Constants.HEADER_CIMI_JOB_URI, cimiJob.getId());
             context.getResponse().putHeader(
                 Constants.HEADER_LOCATION,
                 HrefHelper.makeHref(context.getRequest().getBaseUri(), this.extractPathname(context.getRequest().getPath()),
-                    cimiJob.getTargetEntity()));
+                    cimiJob.getTargetResource()));
             context.getResponse().setStatus(Status.ACCEPTED);
         } catch (ComparisonFailure e) {
             // Build assert error

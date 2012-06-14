@@ -48,9 +48,14 @@ public class CimiJob extends CimiObjectCommonAbstract {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "targetEntity".
+     * Field "targetResource".
      */
-    private String targetEntity;
+    private String targetResource;
+
+    /**
+     * Field "affectedResources".
+     */
+    private String[] affectedResources;
 
     /**
      * Field "action". URI
@@ -114,21 +119,41 @@ public class CimiJob extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "targetEntity".
+     * Return the value of field "targetResource".
      * 
      * @return The value
      */
-    public String getTargetEntity() {
-        return this.targetEntity;
+    public String getTargetResource() {
+        return this.targetResource;
     }
 
     /**
-     * Set the value of field "targetEntity".
+     * Set the value of field "targetResource".
      * 
-     * @param targetEntity The value
+     * @param targetResource The value
      */
-    public void setTargetEntity(final String targetEntity) {
-        this.targetEntity = targetEntity;
+    public void setTargetResource(final String targetResource) {
+        this.targetResource = targetResource;
+    }
+
+    /**
+     * Return the value of field "affectedResources".
+     * 
+     * @return The value
+     */
+    @XmlElement(name = "affectedResource")
+    @JsonProperty(value = "affectedResources")
+    public String[] getAffectedResources() {
+        return this.affectedResources;
+    }
+
+    /**
+     * Set the value of field "affectedResources".
+     * 
+     * @param affectedResources The value
+     */
+    public void setAffectedResources(final String[] affectedResources) {
+        this.affectedResources = affectedResources;
     }
 
     /**

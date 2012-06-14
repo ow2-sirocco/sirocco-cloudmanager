@@ -114,10 +114,18 @@ public class JobConverter extends ObjectCommonConverter {
                 dataCimi.setStatus(dataService.getStatus().toString());
             }
             dataCimi.setStatusMessage(dataService.getStatusMessage());
-            if (null != dataService.getTargetEntity()) {
-                dataCimi.setTargetEntity(this.makeHrefTargetEntity(context, dataService.getTargetEntity()));
-            }
             dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
+
+            if (null != dataService.getTargetEntity()) {
+                dataCimi.setTargetResource(this.makeHrefTargetResource(context, dataService.getTargetEntity()));
+            }
+            if ((null != dataService.getAffectedEntities()) && (dataService.getAffectedEntities().size() > 0)) {
+                List<String> list = new ArrayList<String>();
+                for (CloudResource resource : dataService.getAffectedEntities()) {
+                    list.add(this.makeHrefTargetResource(context, resource));
+                }
+                dataCimi.setAffectedResources(list.toArray(new String[list.size()]));
+            }
 
             if (null != dataService.getParentJob()) {
                 dataCimi.setParentJob(new ParentJob(context.makeHref(dataCimi, dataService.getParentJob().getId().toString())));
@@ -143,7 +151,7 @@ public class JobConverter extends ObjectCommonConverter {
         this.fill(context, dataCimi, dataService);
     }
 
-    protected String makeHrefTargetEntity(final CimiContext context, final Object targetDataService) {
+    protected String makeHrefTargetResource(final CimiContext context, final Object targetDataService) {
         String href = null;
         Class<? extends CimiResource> targetType = context.findAssociate(targetDataService.getClass());
         href = context.makeHref(targetType, this.getTargetId(targetDataService).toString());

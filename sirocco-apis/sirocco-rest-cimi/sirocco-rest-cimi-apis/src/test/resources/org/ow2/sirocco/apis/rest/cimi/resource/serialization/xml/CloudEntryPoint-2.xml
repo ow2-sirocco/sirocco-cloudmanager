@@ -9,6 +9,7 @@
 	<id>idValue_2</id>
 	<operation href="hrefValue_2_0" rel="relValue_2_0" />
 	<operation href="hrefValue_2_1" rel="relValue_2_1" />
+	<baseURI>baseUriValue_2</baseURI>
 	<updated>2002-03-03T02:02:02.002Z</updated>
 	<credentials href="hrefValue_2"
 		resourceURI="http://schemas.dmtf.org/cimi/1/CredentialsCollection">
@@ -85,6 +86,60 @@
 		</CredentialsTemplate>
 	</credentialsTemplates>
 	<jobTime>2</jobTime>
+	<jobs href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/JobCollection">
+		<id>idValue_2</id>
+		<operation href="hrefValue_2_0" rel="relValue_2_0" />
+		<operation href="hrefValue_2_1" rel="relValue_2_1" />
+		<count>2</count>
+		<Job href="hrefValue_2_0" resourceURI="http://schemas.dmtf.org/cimi/1/Job">
+			<description>descriptionValue_2_0</description>
+			<name>nameValue_2_0</name>
+			<property key="keyProp_2_0">valueProp_2_0</property>
+			<property key="keyProp_2_1">valueProp_2_1</property>
+			<created>2002-03-03T02:02:02.002Z</created>
+			<id>idValue_2_0</id>
+			<operation href="hrefValue_2_0" rel="relValue_2_0" />
+			<operation href="hrefValue_2_1" rel="relValue_2_1" />
+			<updated>2002-03-03T02:02:02.002Z</updated>
+			<action>actionValue_2_0</action>
+			<affectedResource>affectedResourcesValue_2_0_2_0</affectedResource>
+			<affectedResource>affectedResourcesValue_2_0_2_1</affectedResource>
+			<isCancellable>true</isCancellable>
+			<nestedJob href="hrefNestedValue_2_0_2_0" />
+			<nestedJob href="hrefNestedValue_2_0_2_1" />
+			<parentJob href="hrefParentValue_2_0" />
+			<progress>2</progress>
+			<returnCode>2</returnCode>
+			<status>statusValue_2_0</status>
+			<statusMessage>statusMessageValue_2_0</statusMessage>
+			<targetResource>targetResourceValue_2_0</targetResource>
+			<timeOfStatusChange>2002-03-03T02:02:02.002Z</timeOfStatusChange>
+		</Job>
+		<Job href="hrefValue_2_1" resourceURI="http://schemas.dmtf.org/cimi/1/Job">
+			<description>descriptionValue_2_1</description>
+			<name>nameValue_2_1</name>
+			<property key="keyProp_2_0">valueProp_2_0</property>
+			<property key="keyProp_2_1">valueProp_2_1</property>
+			<created>2002-03-03T02:02:02.002Z</created>
+			<id>idValue_2_1</id>
+			<operation href="hrefValue_2_0" rel="relValue_2_0" />
+			<operation href="hrefValue_2_1" rel="relValue_2_1" />
+			<updated>2002-03-03T02:02:02.002Z</updated>
+			<action>actionValue_2_1</action>
+			<affectedResource>affectedResourcesValue_2_1_2_0</affectedResource>
+			<affectedResource>affectedResourcesValue_2_1_2_1</affectedResource>
+			<isCancellable>true</isCancellable>
+			<nestedJob href="hrefNestedValue_2_1_2_0" />
+			<nestedJob href="hrefNestedValue_2_1_2_1" />
+			<parentJob href="hrefParentValue_2_1" />
+			<progress>2</progress>
+			<returnCode>2</returnCode>
+			<status>statusValue_2_1</status>
+			<statusMessage>statusMessageValue_2_1</statusMessage>
+			<targetResource>targetResourceValue_2_1</targetResource>
+			<timeOfStatusChange>2002-03-03T02:02:02.002Z</timeOfStatusChange>
+		</Job>
+	</jobs>
 	<machineConfigs href="hrefValue_2"
 		resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection">
 		<id>idValue_2</id>

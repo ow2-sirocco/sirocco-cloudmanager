@@ -182,7 +182,7 @@ public abstract class CimiManagerAbstract implements CimiManager {
                 CimiJob cimi = (CimiJob) context.convertToCimi(dataService, CimiJob.class);
                 context.getResponse().setCimiData(cimi);
                 context.getResponse().putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
-                context.getResponse().putHeader(Constants.HEADER_LOCATION, cimi.getTargetEntity());
+                context.getResponse().putHeader(Constants.HEADER_LOCATION, cimi.getTargetResource());
                 context.getResponse().setStatus(Response.Status.ACCEPTED);
             }
         }

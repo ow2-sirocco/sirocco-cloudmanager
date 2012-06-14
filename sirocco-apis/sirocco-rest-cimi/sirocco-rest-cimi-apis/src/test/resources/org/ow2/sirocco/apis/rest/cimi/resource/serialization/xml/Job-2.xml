@@ -18,6 +18,8 @@
 	<returnCode>2</returnCode>
 	<status>statusValue_2</status>
 	<statusMessage>statusMessageValue_2</statusMessage>
-	<targetEntity>targetEntityValue_2</targetEntity>
+	<targetResource>targetResourceValue_2</targetResource>
+	<affectedResource>affectedResourcesValue_2_2_0</affectedResource>
+	<affectedResource>affectedResourcesValue_2_2_1</affectedResource>
 	<timeOfStatusChange>2002-03-03T02:02:02.002Z</timeOfStatusChange>
 </Job>

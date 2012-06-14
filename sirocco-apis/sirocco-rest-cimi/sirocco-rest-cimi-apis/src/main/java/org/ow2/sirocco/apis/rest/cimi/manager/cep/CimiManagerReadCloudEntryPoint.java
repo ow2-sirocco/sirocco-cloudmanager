@@ -34,6 +34,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +59,10 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
     @Qualifier("IMachineImageManager")
     private IMachineImageManager machineImageManager;
 
+    @Autowired
+    @Qualifier("IJobManager")
+    private IJobManager jobManager;
+
     /**
      * {@inheritDoc}
      * 
@@ -67,16 +72,50 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         CloudEntryPointAggregate out = new CloudEntryPointAggregate(this.machineManager.getCloudEntryPoint());
+
+        out.setCredentials(this.credentialsManager.getCredentialsCollection());
+        out.setCredentialsTemplates(this.credentialsManager.getCredentialsTemplateCollection());
+
+        out.setJobs(this.jobManager.getJobCollection());
+
         out.setMachineConfigs(this.machineManager.getMachineConfigurationCollection());
+        out.setMachineImages(this.machineImageManager.getMachineImageCollection());
         out.setMachines(this.machineManager.getMachineCollection());
         out.setMachineTemplates(this.machineManager.getMachineTemplateCollection());
-        out.setMachineImages(this.machineImageManager.getMachineImageCollection());
-        // FIXME
-        // out.setCredentials(this.credentialsManager.getCredentialsCollection());
-        // FIXME
-        // out.setCredentialsTemplates(this.credentialsManager.getCredentialsTemplateCollection());
-        // TODO Volumes, ...
+
+        // TODO Others resources :
+        // resourceMetadata
+        // systems
+        // systemTemplates
+        // machines OK
+        // machineTemplates OK
+        // machineConfigs OK
+        // machineImages OK
+        // credentials OK
+        // credentialTemplates OK
+        // volumes
+        // volumeTemplates
+        // volumeConfigs
+        // volumeImages
+        // networks
+        // networkTemplates
+        // networkConfigs
+        // networkPorts
+        // networkPortTemplates
+        // networkPortConfigs
+        // addresses
+        // addressTemplates
+        // forwardingGroups
+        // forwardingGroupTemplates
+        // jobs OK
+        // meters
+        // meterTemplates
+        // meterConfigs
+        // eventLogs
+        // events
+
         // TODO CimiSelect
+
         return out;
     }
 
