@@ -294,7 +294,7 @@ public class SystemManagerTest extends SiroccoTester{
             
             String lockedID="";
             try {java.lang.System.out.println("start thread");
-                lockedID=jobManager.lock(jo.getId().toString());
+                //lockedID=jobManager.lock(jo.getId().toString());
                 java.lang.System.out.println("1-job "+jo.getId().toString()+" locked with ID "+lockedID+"!");
                 jo=jobManager.getJobById(jo.getId().toString());
                 java.lang.System.out.println("1-job date "+jo.getLockedTime());
@@ -326,7 +326,7 @@ public class SystemManagerTest extends SiroccoTester{
         new bob(j).start();
         Thread.sleep(12000);
         try {
-        jobManager.unlock(j.getId().toString(),"fsdfsdfds");
+        //jobManager.unlock(j.getId().toString(),"fsdfsdfds");
         } catch (Exception e) {
             
             java.lang.System.out.println("2-job "+j.getId().toString()+" not unlocked!");
@@ -335,7 +335,7 @@ public class SystemManagerTest extends SiroccoTester{
         String lockedID="";
         
         try {
-            lockedID=jobManager.lock(j.getId().toString());
+            //lockedID=jobManager.lock(j.getId().toString());
             j=jobManager.getJobById(j.getId().toString());
             java.lang.System.out.println("2-job "+j.getId().toString()+" locked with ID "+lockedID+"!and date "+j.getLockedTime());
         } catch (Exception e) {

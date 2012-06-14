@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.itests.util.SiroccoTester;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -162,13 +163,72 @@ public class CloudProviderManagerTest extends SiroccoTester{
         
     }
 
+    class bob extends Thread{
+        Job jo;
+        
+        bob(Job j)
+        {
+            jo=j;
+        }
+        
+        public void run()
+        {
+            
+            String lockedID="";
+            try {System.out.println("start thread");
+                //lockedID=jobManager.lock(jo.getId().toString());
+                System.out.println("1-job "+jo.getId().toString()+" locked with ID "+lockedID+"!");
+                jo=jobManager.getJobById(jo.getId().toString());
+                System.out.println("1-job date "+jo.getLockedTime());
+            } catch (Exception e) {
+                
+                System.out.println("1-job "+jo.getId().toString()+" not locked!");
+                System.out.println("1-Exception "+e.getClass().getName());
+            }
+            
+           /* try {
+                jobManager.unLock(jo.getId().toString(),"fdfd");
+                System.out.println("1-job "+jo.getId().toString()+" unlocked!");
+                } catch (Exception e) {
+                    
+                    System.out.println("1-job "+jo.getId().toString()+" not unlocked!");
+                    System.out.println("1-Exception "+e.getClass().getName());
+                }*/
+            
+        }
+        
+    }
+    //@Tefst
     public void testJob() throws Exception {
 
-        // IJobManager jm=(IJobManager)
-        // context.lookup(IRemoteJobManager.EJB_JNDI_NAME);
-        // ICloudProviderManager cpm=(ICloudProviderManager)
-        // context.lookup(ICloudProviderManager.EJB_JNDI_NAME);
-        // cpm.createCloudProvider("type1", "desc");
+        System.out.println("start");
+        
+        Job j=jobManager.createJob(null, "bob", null);
+        
+        new bob(j).start();
+        Thread.sleep(12000);
+        try {
+        //jobManager.unlock(j.getId().toString(),"fsdfsdfds");
+        } catch (Exception e) {
+            
+            System.out.println("2-job "+j.getId().toString()+" not unlocked!");
+            System.out.println("2-Exception "+e.getClass().getName());
+        }
+        String lockedID="";
+        
+        try {
+            //lockedID=jobManager.lock(j.getId().toString());
+            j=jobManager.getJobById(j.getId().toString());
+            System.out.println("2-job "+j.getId().toString()+" locked with ID "+lockedID+"!and date "+j.getLockedTime());
+        } catch (Exception e) {
+            
+            System.out.println("2-job "+j.getId().toString()+" not locked!");
+            System.out.println("2-Exception "+e.getClass().getName());
+        }
+        Thread.sleep(16000);
+        
+
+        //jobManager.sendJobNotification(j.getId().toString(),5000L);
 
         // Job parent=jm.createJob("pere", "http://",null);
         // parent.setTargetEntity(parent.getTargetEntity()+"-"+parent.getId().toString());
