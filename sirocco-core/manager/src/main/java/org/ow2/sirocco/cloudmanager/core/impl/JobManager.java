@@ -43,6 +43,7 @@ import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
+import org.ow2.sirocco.cloudmanager.core.api.ILockManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
@@ -93,6 +94,8 @@ public class JobManager implements IJobManager {
     private ISystemManager systemManager;
     @EJB
     private INetworkManager networkManager;
+    @EJB
+    private ILockManager lockManager;
 
     @Resource
     private EJBContext ctx;
@@ -278,146 +281,64 @@ public class JobManager implements IJobManager {
         String lockId = "";
 
         try {
-            lockId = getThis().lock(topmostid);
-        } catch (Throwable e) {
+            lockManager.lock(topmostid,Job.class.getCanonicalName());
+        } catch (CloudProviderException e) {
             JobManager.logger.warn("Unable to lock Job " + topmostid
                     + " - " + e.getMessage());
-            throw new CloudProviderException("Unable to lock Job "
-                    + topmostid);
+            throw e;
         }
-
-        Job job = updateProviderJob(providerJob);
         
-        Job topmost=this.getJobById(topmostid);
+        try{
+            Job job = updateProviderJob(providerJob);
+            
+            Job topmost=this.getJobById(topmostid);
 
-        // dispatch event to related managers and parent jobs
-        while (job != null) {
-            // find manager
-            CloudResource target = job.getTargetEntity();
+            // dispatch event to related managers and parent jobs
+            while (job != null) {
+                // find manager
+                CloudResource target = job.getTargetEntity();
 
-            if (target instanceof Machine) {
-                JobManager.logger
-                        .info("calling  machineManager jobCompletionHandler with Job "
-                                + job.getId().toString());
-                this.machineManager
-                        .jobCompletionHandler(job.getId().toString());
+                if (target instanceof Machine) {
+                    JobManager.logger
+                            .info("calling  machineManager jobCompletionHandler with Job "
+                                    + job.getId().toString());
+                    this.machineManager
+                            .jobCompletionHandler(job.getId().toString());
+                }
+                if (target instanceof MachineImage) {
+                    // this.machineImageManager.jobCompletionHandler(job);
+                }
+                if ((target instanceof Volume) || (target instanceof VolumeImage)) {
+                    this.volumeManager.jobCompletionHandler(job.getId().toString());
+                }
+                if (target instanceof System) {
+                    JobManager.logger
+                            .info("calling  systemManager jobCompletionHandler with Job "
+                                    + job.getId().toString());
+                    this.systemManager.jobCompletionHandler(job.getId().toString());
+                }
+                if ((target instanceof Network) || (target instanceof NetworkPort)
+                        || (target instanceof ForwardingGroup)) {
+                    this.networkManager.jobCompletionHandler(job);
+                }
+
+                // find parent
+                job = job.getParentJob();
             }
-            if (target instanceof MachineImage) {
-                // this.machineImageManager.jobCompletionHandler(job);
-            }
-            if ((target instanceof Volume) || (target instanceof VolumeImage)) {
-                this.volumeManager.jobCompletionHandler(job.getId().toString());
-            }
-            if (target instanceof System) {
-                JobManager.logger
-                        .info("calling  systemManager jobCompletionHandler with Job "
-                                + job.getId().toString());
-                this.systemManager.jobCompletionHandler(job.getId().toString());
-            }
-            if ((target instanceof Network) || (target instanceof NetworkPort)
-                    || (target instanceof ForwardingGroup)) {
-                this.networkManager.jobCompletionHandler(job);
-            }
 
-            // find parent
-            job = job.getParentJob();
+           
+        }
+        finally{
+            // we unlock the topmost job after work
+            try {
+                lockManager.unlock(topmostid, Job.class.getCanonicalName());
+
+            } catch (CloudProviderException e) {
+                JobManager.logger.warn("Unable to unlock Job " + topmostid+" - "+e.getMessage());
+            }             
         }
 
-        // we unlock the topmost job after work
-        try {
-            getThis().unlock(topmost.getId().toString(), lockId);
 
-        } catch (Throwable e) {
-            JobManager.logger.warn("Unable to unlock Job " + topmost.getId());
-        }
-
-    }
-
-    /**
-     * used to lock a Job works in its own transaction
-     */
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public String lock(String jobId) throws Exception {
-        JobManager.logger.info("locking job" + jobId);
-        Job j = this.getJobById(jobId);
-
-        // a lock expires after 1 hour
-        Date lockedDate = j.getLockedTime();
-        if (lockedDate == null) {
-            lockedDate = new Date();
-        }
-        long lockedTime = lockedDate.getTime() + jobLockTimeoutInSeconds * 1000;
-        long currentTime = new Date().getTime();
-
-        if ((j.getLocked()) && (currentTime < lockedTime)) {
-            throw new CloudProviderException("unable to lock job " + jobId);
-        }
-        // not locked yet
-
-        try {
-            this.em.lock(j, LockModeType.WRITE);
-        } catch (javax.persistence.OptimisticLockException e) {
-            //JobManager.logger.error("throwable");
-            throw new CloudProviderException("lock exception catched");
-        }
-
-        j.setLocked(true);
-        j.setLockedTime(new Date());
-        String llockedID = UUID.randomUUID().toString();
-        j.setLockedID(llockedID);
-        try {
-            this.em.flush();
-        } catch (Throwable e) {
-            //JobManager.logger.error("throwable");
-            throw new CloudProviderException("lock exception catched2");
-        }
-
-        Thread.sleep(lockWaitTimeInSeconds * 1000);// development environment
-        // for now
-
-        JobManager.logger.info("locked job" + jobId + " with lockedID "
-                + llockedID);
-        return llockedID;
-    }
-
-    /**
-     * used to unlock a Job works in its own transaction
-     */
-    @Override
-    public void unlock(String jobId, String lockedID) throws Exception {
-
-        JobManager.logger.info("unlocking job" + jobId + " with lockedID "
-                + lockedID);
-        Job j = this.getJobById(jobId);
-        String jobLockedID = j.getLockedID();
-        if (jobLockedID == null) {
-            jobLockedID = "";
-        }
-
-        // if the job is locked and the lockedID is correct
-        // we unlock it, else we throw an exception
-        if ((j.getLocked()) && (jobLockedID.equals(lockedID))) {
-            this.em.lock(j, LockModeType.WRITE);
-            j.setLocked(false);
-            j.setLockedID(null);
-            j.setLockedTime(null);
-        } else {
-            if (!j.getLocked()) {
-                throw new CloudProviderException("unable to unlock job "
-                        + jobId + " because it is not locked");
-            }
-            if (!jobLockedID.equals(lockedID)) {
-                throw new CloudProviderException("unable to unlock job "
-                        + jobId + " because its lockedID is bad");
-            }
-            throw new CloudProviderException("unable to unlock job " + jobId);
-
-        }
-
-        Thread.sleep(lockWaitTimeInSeconds * 1000);// development environment
-        // for now
-        JobManager.logger.info("unlocked job" + jobId);
 
     }
 
@@ -437,63 +358,5 @@ public class JobManager implements IJobManager {
 
         return topmost.getId().toString();
     }
-
-    /*
-     * @Override public void sendJobNotification(String jobId, long
-     * emissionDelayInMillis) throws CloudProviderException {
-     * 
-     * //get job Job job=this.getJobById(jobId);
-     * 
-     * asynchManager.sendJobNotification(jobId, emissionDelayInMillis); //queue
-     * = Queue.create(0, "schedulerQ", org.ob
-     * .joram.client.jms.Queue.SCHEDULER_QUEUE, null);
-     * 
-     * // org.ow2.sirocco.cloudmanager.connector.impl.
-     * .util.jobmanager.impl.JobManager
-     * .rawEmitDelayedQueueMessage((Serializable)
-     * job,emissionDelayInMillis,JobNotificationHandlerBean
-     * .JMS_QUEUE_CONNECTION_FACTORY_NAME
-     * ,JobNotificationHandlerBean.JMS_QUEUE_NAME);
-     * 
-     * 
-     * JobManager.logger.info("EMITTED sendJobNotification EVENT for Job " +
-     * job.getId());
-     * 
-     * //} catch (Exception e) { // throw new
-     * CloudProviderException("sendJobNotification JMS error");
-     * 
-     * //}
-     * 
-     * }
-     */
-
-    /*
-     * public void sendJobNotification(String jobId, long emissionDelayInMillis)
-     * throws CloudProviderException {
-     * 
-     * try { // get job Job job = this.getJobById(jobId);
-     * 
-     * Thread.sleep(emissionDelayInMillis);
-     * 
-     * QueueConnectionFactory qcf = (QueueConnectionFactory) ctx
-     * .lookup(JobNotificationHandlerBean.JMS_QUEUE_CONNECTION_FACTORY_NAME);
-     * QueueConnection queueCon = qcf.createQueueConnection(); QueueSession
-     * queueSession = queueCon.createQueueSession(false,
-     * Session.AUTO_ACKNOWLEDGE); Queue queue = (Queue) ctx
-     * .lookup(JobNotificationHandlerBean.JMS_QUEUE_NAME); QueueSender sender =
-     * queueSession.createSender(queue); Message msg =
-     * queueSession.createObjectMessage(job); //
-     * msg.setLongProperty("scheduleDate", System.currentTimeMillis() + //
-     * delayMilli);
-     * 
-     * sender.send(msg); JobManager.logger .info("EMITTED EVENT for payload " +
-     * job.toString());
-     * 
-     * } catch (JMSException e) { // TODO Auto-generated catch block
-     * e.printStackTrace(); } catch (InterruptedException e) { // TODO
-     * Auto-generated catch block e.printStackTrace(); }
-     * 
-     * }
-     */
 
 }

@@ -67,10 +67,6 @@ public interface IJobManager {
     
     String getTopmostJobId(String jobId) throws CloudProviderException;
     
-    String lock(String jobId) throws Exception;
-    
-    void unlock(String jobId,String lockedID) throws Exception;
-    
     void handleWorkflowEvent(Job j) throws Exception;
     
     String getJobIdFromProvider(Job providerJob);
