@@ -194,8 +194,7 @@ public class SystemManager implements ISystemManager {
                                 + new Integer(i).toString());
                     }
 
-                    MachineTemplate mt = machineManager
-                            .getMachineTemplateById(cd.getComponentTemplate());
+                    MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
                     mc.setMachineTemplate(mt);
                     mc.setDescription(cd.getComponentDescription());
                     mc.setProperties(cd.getProperties());
@@ -214,8 +213,7 @@ public class SystemManager implements ISystemManager {
                         vc.setName(cd.getComponentName()
                                 + new Integer(i).toString());
                     }
-                    VolumeTemplate vt = volumeManager.getVolumeTemplateById(cd
-                            .getComponentTemplate());
+                    VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
                     vc.setVolumeTemplate(vt);
                     vc.setDescription(cd.getComponentDescription());
                     vc.setProperties(cd.getProperties());
@@ -232,8 +230,7 @@ public class SystemManager implements ISystemManager {
                         sc.setName(cd.getComponentName()
                                 + new Integer(i).toString());
                     }
-                    SystemTemplate st = this.getSystemTemplateById(cd
-                            .getComponentTemplate());
+                    SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
                     sc.setSystemTemplate(st);
                     sc.setDescription(cd.getComponentDescription());
                     sc.setProperties(cd.getProperties());
@@ -250,8 +247,7 @@ public class SystemManager implements ISystemManager {
                         nc.setName(cd.getComponentName()
                                 + new Integer(i).toString());
                     }
-                    NetworkTemplate nt = networkManager
-                            .getNetworkTemplateById(cd.getComponentTemplate());
+                    NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
                     nc.setNetworkTemplate(nt);
                     nc.setDescription(cd.getComponentDescription());
                     nc.setProperties(cd.getProperties());
@@ -268,9 +264,7 @@ public class SystemManager implements ISystemManager {
                         cc.setName(cd.getComponentName()
                                 + new Integer(i).toString());
                     }
-                    CredentialsTemplate ct = credentialsManager
-                            .getCredentialsTemplateById(cd
-                                    .getComponentTemplate());
+                    CredentialsTemplate ct = (CredentialsTemplate) cd.getComponentTemplate();
                     cc.setCredentialTemplate(ct);
                     cc.setDescription(cd.getComponentDescription());
                     cc.setProperties(cd.getProperties());
@@ -333,6 +327,12 @@ public class SystemManager implements ISystemManager {
             throw new ResourceNotFoundException(" Invalid system id "
                     + systemId);
         }
+        result.getMachines().size();
+        result.getNetworks().size();
+        result.getSystems().size();
+        result.getVolumes().size();
+        result.getCredentials().size();
+        result.getProperties().size();
         return result;
     }
 

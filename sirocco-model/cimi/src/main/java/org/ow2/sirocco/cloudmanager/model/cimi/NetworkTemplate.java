@@ -31,7 +31,7 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
 @Entity
-public class NetworkTemplate extends CloudEntity implements Serializable {
+public class NetworkTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private NetworkConfiguration networkConfig;

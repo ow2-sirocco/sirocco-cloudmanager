@@ -19,51 +19,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id$
+ *  $Id: CloudResource.java 1258 2012-05-21 12:35:04Z dangtran $
  *
  */
+
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-
 import javax.persistence.Entity;
-import javax.persistence.Lob;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
 
 @Entity
-public class CredentialsTemplate extends CloudTemplate implements Serializable {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class CloudTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String userName;
-
-    private String password;
-
-    private byte[] publicKey;
-
-    public CredentialsTemplate() {
-    }
-
-    public String getUserName() {
-        return this.userName;
-    }
-
-    public void setUserName(final String userName) {
-        this.userName = userName;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public void setPassword(final String password) {
-        this.password = password;
-    }
-
-    @Lob
-    public byte[] getPublicKey() {
-        return this.publicKey;
-    }
-
-    public void setPublicKey(final byte[] key) {
-        this.publicKey = key;
-    }
 }

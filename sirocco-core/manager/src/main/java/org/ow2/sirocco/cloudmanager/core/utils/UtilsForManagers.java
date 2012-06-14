@@ -9,24 +9,14 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
 import javax.ejb.EJBContext;
-import javax.ejb.SessionContext;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
-import javax.jms.Message;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
 import javax.jms.Session;
-import javax.naming.InitialContext;
-
 import org.hibernate.proxy.HibernateProxy;
-import org.ow2.sirocco.cloudmanager.core.impl.JobSendHandlerBean;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 public class UtilsForManagers {
 

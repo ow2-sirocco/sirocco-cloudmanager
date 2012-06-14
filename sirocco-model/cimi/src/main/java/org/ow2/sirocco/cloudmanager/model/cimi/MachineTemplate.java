@@ -41,7 +41,7 @@ import javax.persistence.JoinColumn;
 
 
 @Entity
-public class MachineTemplate extends CloudEntity implements Serializable {
+public class MachineTemplate extends CloudTemplate implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private MachineConfiguration machineConfiguration;

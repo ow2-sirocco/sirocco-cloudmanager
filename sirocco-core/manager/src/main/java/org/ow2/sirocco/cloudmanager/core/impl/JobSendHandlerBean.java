@@ -25,7 +25,6 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.io.Serializable;
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJBContext;
@@ -33,18 +32,10 @@ import javax.ejb.MessageDriven;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.jms.Session;
-import javax.naming.InitialContext;
 import org.apache.log4j.Logger;
 import org.osgi.framework.*;
 import org.ow2.easybeans.osgi.annotation.OSGiResource;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl.JobManager;
 
 /**
  * This MDB is used to guarantee that we send messages to listen provider jobs
@@ -61,10 +52,6 @@ public class JobSendHandlerBean implements MessageListener {
     private static Logger logger = Logger.getLogger(JobSendHandlerBean.class
             .getName());
 
-    private static final String JMS_QUEUE_CONNECTION_FACTORY_NAME = "JQCF";
-
-    private static final String JMS_QUEUE_NAME = "JobEmission";
-
     private static final long JMS_REDELIVERY_DELAY = 5 * 1000;
 
     @Resource
@@ -80,16 +67,16 @@ public class JobSendHandlerBean implements MessageListener {
 
     @Override
     public void onMessage(final Message msg) {
-        if (msg instanceof ObjectMessage) {
-            ObjectMessage objectMessage = (ObjectMessage) msg;
+        if (msg instanceof ObjectMessage) {            
 
-            IJobManager jobM = getJobManager();
-            if (jobM == null) {
-                JobSendHandlerBean.logger
-                        .warn("JobManager is null - message rollback");
-                ctx.setRollbackOnly();
-            }
             try {
+                ObjectMessage objectMessage = (ObjectMessage) msg;
+                
+                IJobManager jobM = getJobManager();
+                if (jobM == null) {
+                    throw new Exception("JobManager is null");
+                }
+                
                 Object payload = objectMessage.getObject();
                 JobSendHandlerBean.logger.info("setting up Job completion listener");
                 jobM.setNotificationOnJobCompletion((String) payload);
@@ -97,27 +84,6 @@ public class JobSendHandlerBean implements MessageListener {
                 JobSendHandlerBean.logger
                 .warn("Exception "+e2.getMessage()+" - message rollback");
                 ctx.setRollbackOnly();
-            }
-
-            // try {
-            // payload = objectMessage.getObject();
-            // JobSendHandlerBean.logger
-            // .info("On topic JobCompletion: received " + payload);
-            // } catch (JMSException ex) {
-            // JobSendHandlerBean.logger.error(
-            // "Failed to extract from JMS message", ex);
-            // return;
-            // }
-            // Job providerJob = (Job) payload;
-            // we call jobManager to deal with events
-            try {
-                // jobManager.handleWorkflowEvent(providerJob);
-            } catch (Exception e) {
-                ctx.setRollbackOnly();
-                JobSendHandlerBean.logger
-                        .warn("JobCompletion message rollbacked - "
-                                + e.getMessage());
-
                 try {
                     // not possible to set a redelevery time in Joram/Jonas
                     Thread.sleep(JMS_REDELIVERY_DELAY
@@ -128,25 +94,6 @@ public class JobSendHandlerBean implements MessageListener {
                 }
             }
         }
-    }
-
-    @SuppressWarnings("unused")
-    private void emitMessage(final Serializable payload, InitialContext ctx)
-            throws Exception {
-
-        QueueConnectionFactory qcf = (QueueConnectionFactory) ctx
-                .lookup("JQCF");
-        QueueConnection queueCon = qcf.createQueueConnection();
-        QueueSession queueSession = queueCon.createQueueSession(false,
-                Session.AUTO_ACKNOWLEDGE);
-        Queue queue = (Queue) ctx.lookup("JobEmission");
-        QueueSender sender = queueSession.createSender(queue);
-        Message msg = queueSession.createObjectMessage(payload);
-        // msg.setLongProperty("scheduleDate",System.currentTimeMillis() +
-        // delayMilli);
-        sender.send(msg);
-        JobSendHandlerBean.logger.info("EMITTED SEND EVENT for payload "
-                + payload.toString());
     }
 
 }

@@ -26,11 +26,11 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.Map;
-
+import java.util.HashMap;
 import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 
 @Entity
 public class ComponentDescriptor extends CloudEntity implements Serializable {
@@ -42,7 +42,7 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
     
     private String componentName;
     private String componentDescription;
-    private Map<String,Object> componentProperties;
+    private HashMap<String,Object> componentProperties;
     /**
      * Type of component to be instanciated
      */
@@ -50,10 +50,9 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
     /**
      * Id of template entity to be used to instanciate the component
      */
-    private String componentTemplateId;
+    private CloudTemplate componentTemplate;
     private Integer componentQuantity;
     
-    private SystemTemplate systemTemplate;
     
     public String getComponentName() {
         return componentName;
@@ -68,10 +67,10 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
         this.componentDescription = description;
     }
     @Lob
-    public Map<String, Object> getComponentProperties() {
+    public HashMap<String, Object> getComponentProperties() {
         return componentProperties;
     }
-    public void setComponentProperties(Map<String, Object> properties) {
+    public void setComponentProperties(HashMap<String, Object> properties) {
         this.componentProperties = properties;
     }
     public ComponentType getComponentType() {
@@ -80,12 +79,6 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
     public void setComponentType(ComponentType type) {
         this.componentType = type;
     }
-    public String getComponentTemplate() {
-        return componentTemplateId;
-    }
-    public void setComponentTemplate(String componentTemplateId) {
-        this.componentTemplateId = componentTemplateId;
-    }
     public Integer getComponentQuantity() {
         return componentQuantity;
     }
@@ -93,12 +86,13 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
         this.componentQuantity = quantity;
     }
     
-    @ManyToOne
-    public SystemTemplate getSystemTemplate() {
-        return systemTemplate;
+    @OneToOne
+    @JoinColumn(name="comp_desc_id")
+    public CloudTemplate getComponentTemplate() {
+        return componentTemplate;
     }
-    public void setSystemTemplate(SystemTemplate systemTemplate) {
-        this.systemTemplate = systemTemplate;
+    public void setComponentTemplate(CloudTemplate componentTemplate) {
+        this.componentTemplate = componentTemplate;
     }
 
 }
