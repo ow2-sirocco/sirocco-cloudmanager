@@ -1,8 +1,10 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.io.Serializable;
+import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -76,9 +78,7 @@ public class LockManager implements ILockManager {
 
     private static Logger logger = Logger.getLogger(LockManager.class);
 
-    public long lockTimeoutInSeconds = 10;
-
-    public long lockWaitTimeInSeconds = 1;
+    public long lockTimeoutInSeconds = 600;
 
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
@@ -89,69 +89,66 @@ public class LockManager implements ILockManager {
     @Resource
     private SessionContext sessionContext;
 
-
-
     /**
      * used to lock an object, **works in its own transaction**
      */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void lock(String targetId, String targetType) throws CloudProviderException {
-        LockManager.logger.info("locking object " + targetId+" of type "+targetType);
-        
-        //is there already a lock, and if true, the lock is still valid?
-        
-        LockItem li=null;
+    public void lock(String targetId, String targetType)
+            throws CloudProviderException {
+        LockManager.logger.debug("locking object " + targetId + " of type "
+                + targetType);
+
+        // is there already a lock, and if true, the lock is still valid?
+        LockItem li = null;
         try {
             li = (LockItem) this.em
                     .createQuery(
                             "SELECT j FROM LockItem j WHERE j.lockedObjectId=:lockedObjectId and j.lockedObjectType=:lockedObjectType")
-                    .setParameter("lockedObjectId",targetId)
-                    .setParameter("lockedObjectType",targetType)
+                    .setParameter("lockedObjectId", targetId)
+                    .setParameter("lockedObjectType", targetType)
                     .getSingleResult();
         } catch (NoResultException e) {
-            //no lock, we can lock it!
+            // no lock, we can lock it!
         }
-        
-        if (li!=null){
-            //the object is locked, verifying that the lock is still valid
-            //should have been automatically deleted by a scheduled utility task
-            long lockedTime = li.getLockedTime().getTime() + lockTimeoutInSeconds * 1000;
+
+        if (li != null) {
+            // the object is locked, verifying that the lock is still valid
+            // should have been automatically deleted by a scheduled utility
+            // task
+            long lockedTime = li.getLockedTime().getTime()
+                    + lockTimeoutInSeconds * 1000;
             long currentTime = new Date().getTime();
             if (currentTime < lockedTime) {
-                throw new CloudProviderException("unable to lock object " + targetId +" of type "+targetType);
-            }else{
-                //the lock has expired
+                throw new CloudProviderException("unable to lock object "
+                        + targetId + " of type " + targetType+" because it is locked until "+DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL, Locale.getDefault()).format(new Date(lockedTime)));
+            } else {
+                // the lock has expired
                 this.em.remove(li);
             }
         }
-        
-        //no lock, we can set a lock
-        //if another locking attempt is happening on the same object at about the same time,
-        //this lock or the other will fail thanks to the database unicity constraint
-        
-        LockItem lock=new LockItem();
+
+        // no lock, we can set a lock
+        // if another locking attempt is happening on the same object at about
+        // the same time,
+        // this lock or the other will fail thanks to the database unicity
+        // constraint
+
+        LockItem lock = new LockItem();
         lock.setLockedObjectId(targetId);
         lock.setLockedObjectType(targetType);
         lock.setLockedTime(new Date());
-        
-        try{
-            this.em.persist(lock);
-        }catch(RuntimeException e){
-            throw new CloudProviderException("unable to lock object " + targetId +" of type "+targetType);
-        }
-        catch(Throwable e){
-            throw new CloudProviderException("2unable to lock object " + targetId +" of type "+targetType);
-        }
-        
+
         try {
-            Thread.sleep(lockWaitTimeInSeconds * 1000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }// development environment
-        LockManager.logger.info("locked object " + targetId+" of type "+targetType);
-        
+            this.em.persist(lock);
+        } catch (RuntimeException e) {
+            throw new CloudProviderException("unable to lock object "
+                    + targetId + " of type " + targetType+" because of exception "+e.getMessage());
+        }
+
+        LockManager.logger.info("locked object " + targetId + " of type "
+                + targetType);
+
     }
 
     /**
@@ -159,39 +156,46 @@ public class LockManager implements ILockManager {
      */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void unlock(String targetId, String targetType) throws CloudProviderException {
-        
-        //we only remove an existing lockItem with the key targetId+targetType
-        
-        LockManager.logger.info("unlocking object " + targetId+" of type "+targetType);
-        
-        //is there already a lock?
-        
-        LockItem li=null;
+    public void unlockUntransacted(String targetId, String targetType)
+            throws CloudProviderException {
+        _unlock(targetId,targetType,false);
+    }
+    
+    /**
+     * used to unlock an object, **works in the current transaction**
+     */
+    @Override
+    public void unlock(String targetId, String targetType) throws CloudProviderException{
+        _unlock(targetId,targetType,true);
+    }
+    
+    private void _unlock(String targetId, String targetType,boolean transacted) throws CloudProviderException{
+        // we only remove an existing lockItem with the key targetId+targetType
+        LockManager.logger.debug("unlocking object " + targetId + " of type "
+                + targetType+" - "+transacted);
+
+        // is there already a lock?
+        LockItem li = null;
         try {
             li = (LockItem) this.em
                     .createQuery(
                             "SELECT j FROM LockItem j WHERE j.lockedObjectId=:lockedObjectId and j.lockedObjectType=:lockedObjectType")
-                    .setParameter("lockedObjectId",targetId)
-                    .setParameter("lockedObjectType",targetType)
+                    .setParameter("lockedObjectId", targetId)
+                    .setParameter("lockedObjectType", targetType)
                     .getSingleResult();
         } catch (NoResultException e) {
-            //no lock!
-            throw new CloudProviderException("unable to unlock object " + targetId +" of type "+targetType+" because no lock exists!");
+            // no lock!
+            throw new CloudProviderException("unable to unlock object "
+                    + targetId + " of type " + targetType
+                    + " because no lock exists!");
         }
-        
-        if (li!=null){
+
+        if (li != null) {
             this.em.remove(li);
         }
-        
-        try {
-            Thread.sleep(lockWaitTimeInSeconds * 1000);
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }// development environment
-        LockManager.logger.info("unlocked object " + targetId+" of type "+targetType);
-        
+
+        LockManager.logger.info("unlocked object " + targetId + " of type "
+                + targetType+" - "+transacted);        
     }
 
 }

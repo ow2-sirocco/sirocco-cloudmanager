@@ -277,21 +277,22 @@ public class JobManager implements IJobManager {
     public void handleWorkflowEvent(Job providerJob) throws Exception {
 
         // attemting to obtain a lock on the topmost job
-        String topmostid = getThis().getTopmostJobId(getThis().getJobIdFromProvider(providerJob));
+        String topmostid = getThis().getTopmostJobId(
+                getThis().getJobIdFromProvider(providerJob));
         String lockId = "";
 
         try {
-            lockManager.lock(topmostid,Job.class.getCanonicalName());
+            lockManager.lock(topmostid, Job.class.getCanonicalName());
         } catch (CloudProviderException e) {
-            JobManager.logger.warn("Unable to lock Job " + topmostid
-                    + " - " + e.getMessage());
+            JobManager.logger.warn("Unable to lock Job " + topmostid + " - "
+                    + e.getMessage());
             throw e;
         }
-        
-        try{
+
+        try {
             Job job = updateProviderJob(providerJob);
-            
-            Job topmost=this.getJobById(topmostid);
+
+            Job topmost = this.getJobById(topmostid);
 
             // dispatch event to related managers and parent jobs
             while (job != null) {
@@ -302,22 +303,26 @@ public class JobManager implements IJobManager {
                     JobManager.logger
                             .info("calling  machineManager jobCompletionHandler with Job "
                                     + job.getId().toString());
-                    this.machineManager
-                            .jobCompletionHandler(job.getId().toString());
+                    this.machineManager.jobCompletionHandler(job.getId()
+                            .toString());
                 }
                 if (target instanceof MachineImage) {
                     // this.machineImageManager.jobCompletionHandler(job);
                 }
-                if ((target instanceof Volume) || (target instanceof VolumeImage)) {
-                    this.volumeManager.jobCompletionHandler(job.getId().toString());
+                if ((target instanceof Volume)
+                        || (target instanceof VolumeImage)) {
+                    this.volumeManager.jobCompletionHandler(job.getId()
+                            .toString());
                 }
                 if (target instanceof System) {
                     JobManager.logger
                             .info("calling  systemManager jobCompletionHandler with Job "
                                     + job.getId().toString());
-                    this.systemManager.jobCompletionHandler(job.getId().toString());
+                    this.systemManager.jobCompletionHandler(job.getId()
+                            .toString());
                 }
-                if ((target instanceof Network) || (target instanceof NetworkPort)
+                if ((target instanceof Network)
+                        || (target instanceof NetworkPort)
                         || (target instanceof ForwardingGroup)) {
                     this.networkManager.jobCompletionHandler(job);
                 }
@@ -326,19 +331,21 @@ public class JobManager implements IJobManager {
                 job = job.getParentJob();
             }
 
-           
+            // no exception: unlocking in current transaction
+            try{
+               lockManager.unlock(topmostid,
+                    Job.class.getCanonicalName()); 
+            }
+            catch(CloudProviderException e){
+                //if an exception occurs for unlocking, don't rollback!
+            }
+            
+        } catch (Exception e) {
+            // exception, will be rollbacked: unlocking in separate transaction
+            // to ensure unlocking is done
+            lockManager.unlockUntransacted(topmostid, Job.class.getCanonicalName());
+            throw e;
         }
-        finally{
-            // we unlock the topmost job after work
-            try {
-                lockManager.unlock(topmostid, Job.class.getCanonicalName());
-
-            } catch (CloudProviderException e) {
-                JobManager.logger.warn("Unable to unlock Job " + topmostid+" - "+e.getMessage());
-            }             
-        }
-
-
 
     }
 

@@ -255,6 +255,14 @@ public class SystemManagerTest extends SiroccoTester{
         Assert.assertEquals(s2.getMachines().get(1).getState(),Machine.State.STOPPED);
         Assert.assertEquals(s2.getMachines().get(2).getState(),Machine.State.STOPPED);
         
+        //some manipulations
+        systemManager.removeMachineFromSystem(sv1.getMachines().get(1).getId().toString(), systemId);
+        systemManager.removeSystemFromSystem(sv1.getSystems().get(0).getId().toString(), systemId);
+        sv1=systemManager.getSystemById(systemId);
+        
+        Assert.assertEquals(sv1.getMachines().size(),1);
+        Assert.assertEquals(sv1.getSystems().size(),1);
+        
         j=systemManager.deleteSystem(systemId);
         jobId=j.getId().toString();
         counter =130;

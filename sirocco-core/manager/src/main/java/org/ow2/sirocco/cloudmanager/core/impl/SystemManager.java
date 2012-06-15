@@ -376,6 +376,7 @@ public class SystemManager implements ISystemManager {
         for (Volume vol : vols) {
             if (vol.getId().equals(v.getId())) {
                 vols.remove(vol);
+                break;
             }
         }
 
@@ -412,6 +413,7 @@ public class SystemManager implements ISystemManager {
         for (System sys : syss) {
             if (sys.getId().equals(sRemove.getId())) {
                 syss.remove(sys);
+                break;
             }
         }
 
@@ -448,6 +450,7 @@ public class SystemManager implements ISystemManager {
         for (Machine mach : machines) {
             if (mach.getId().equals(m.getId())) {
                 machines.remove(mach);
+                break;
             }
         }
 
@@ -485,6 +488,7 @@ public class SystemManager implements ISystemManager {
         for (Credentials cred : credentials) {
             if (cred.getId().equals(c.getId())) {
                 credentials.remove(cred);
+                break;
             }
         }
 
@@ -524,6 +528,7 @@ public class SystemManager implements ISystemManager {
         for (ComponentDescriptor cdesc : descrs) {
             if (cdesc.getId().equals(cd.getId())) {
                 descrs.remove(cdesc);
+                break;
             }
         }
 

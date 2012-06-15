@@ -35,6 +35,8 @@ public interface ILockManager {
     
     void lock(String targetId,String targetType) throws CloudProviderException;
     
-    void unlock(String targetId,String targetType) throws CloudProviderException;
+    void unlockUntransacted(String targetId,String targetType) throws CloudProviderException;
+    
+    void unlock(String targetId, String targetType) throws CloudProviderException;
     
 }
