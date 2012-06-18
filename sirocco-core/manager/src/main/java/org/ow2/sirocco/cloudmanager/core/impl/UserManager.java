@@ -48,6 +48,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
@@ -118,6 +119,8 @@ public class UserManager implements IUserManager {
         creds.setUser(u);
         CredentialsTemplateCollection credsTemplates = new CredentialsTemplateCollection();
         credsTemplates.setUser(u);
+        JobCollection jobs = new JobCollection();
+        jobs.setUser(u);
         CloudEntryPoint cep = new CloudEntryPoint();
         cep.setUser(u);
 
@@ -132,6 +135,7 @@ public class UserManager implements IUserManager {
         this.em.persist(vic);
         this.em.persist(creds);
         this.em.persist(credsTemplates);
+        this.em.persist(jobs);
         this.em.persist(cep);
     }
 
