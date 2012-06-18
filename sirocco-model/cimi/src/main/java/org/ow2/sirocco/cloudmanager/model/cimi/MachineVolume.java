@@ -27,80 +27,81 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
-import javax.persistence.JoinColumn;
 
 @Entity
-public class MachineVolume implements Serializable {
+public class MachineVolume implements Serializable, Identifiable {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
-	private Integer 			id;
-	private String			initialLocation;
-	private Volume			volume;
+    private static final long serialVersionUID = 1L;
 
-	public static enum State {
+    private Integer id;
+
+    private String initialLocation;
+
+    private Volume volume;
+
+    public static enum State {
         PENDING, ATTACHING, ATTACHED, DETACHING, DETACHED, CANCELLED, ERROR
     }
-	private State state;
-	
-	@ManyToOne
-	private MachineVolumeCollection 	machineVolumeCollection;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Integer getId() {
-		return this.id;
-	}
+    private State state;
 
+    @ManyToOne
+    private MachineVolumeCollection machineVolumeCollection;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return this.id;
+    }
 
-	// unidirectional
-	@OneToOne
-	public Volume getVolume() {
-		return volume;
-	}
+    public void setId(final Integer id) {
+        this.id = id;
+    }
 
-	public void setVolume(Volume volume) {
-		this.volume = volume;
-	}
+    // unidirectional
+    @OneToOne
+    public Volume getVolume() {
+        return this.volume;
+    }
 
-	public String getInitialLocation() {
-		return initialLocation;
-	}
+    public void setVolume(final Volume volume) {
+        this.volume = volume;
+    }
 
-	public void setInitialLocation(String initialLocation) {
-		this.initialLocation = initialLocation;
-	}
+    public String getInitialLocation() {
+        return this.initialLocation;
+    }
 
+    public void setInitialLocation(final String initialLocation) {
+        this.initialLocation = initialLocation;
+    }
 
-	@ManyToOne
-	public MachineVolumeCollection getMachineVolumeCollection() {
-		return this.machineVolumeCollection;
-	}
+    @ManyToOne
+    public MachineVolumeCollection getMachineVolumeCollection() {
+        return this.machineVolumeCollection;
+    }
 
-	public void setMachineVolumeCollection(final MachineVolumeCollection machineVolumeColl) {
-		this.machineVolumeCollection = machineVolumeColl;
-	}
-	
-	@Enumerated(EnumType.STRING)
-	public MachineVolume.State getState() {
-		return state;
-	}
-	public void setState(MachineVolume.State state) {
-		this.state = state;
-	}
+    public void setMachineVolumeCollection(final MachineVolumeCollection machineVolumeColl) {
+        this.machineVolumeCollection = machineVolumeColl;
+    }
+
+    @Enumerated(EnumType.STRING)
+    public MachineVolume.State getState() {
+        return this.state;
+    }
+
+    public void setState(final MachineVolume.State state) {
+        this.state = state;
+    }
 }

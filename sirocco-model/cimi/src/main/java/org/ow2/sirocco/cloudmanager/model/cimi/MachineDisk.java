@@ -27,44 +27,63 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
-import javax.persistence.JoinColumn;
 
-@Embeddable
-public class MachineDisk implements Serializable {
+@Entity
+public class MachineDisk implements Serializable, Identifiable {
 
-	/**
+    /**
 	 * 
 	 */
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private String			initialLocation;
+    private Integer id;
 
-	private Disk			disk;
+    private String initialLocation;
 
+    private Disk disk;
 
+    private MachineDiskCollection machineDiskCollection;
 
-	@Embedded
-	public Disk getDisk() {
-		return disk;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return this.id;
+    }
 
-	public void setDisk(Disk disk) {
-		this.disk = disk;
-	}
+    public void setId(final Integer id) {
+        this.id = id;
+    }
 
-	public String getInitialLocation() {
-		return initialLocation;
-	}
+    @Embedded
+    public Disk getDisk() {
+        return this.disk;
+    }
 
-	public void setInitialLocation(String initialLocation) {
-		this.initialLocation = initialLocation;
-	}
+    public void setDisk(final Disk disk) {
+        this.disk = disk;
+    }
+
+    public String getInitialLocation() {
+        return this.initialLocation;
+    }
+
+    public void setInitialLocation(final String initialLocation) {
+        this.initialLocation = initialLocation;
+    }
+
+    @ManyToOne
+    public MachineDiskCollection getMachineDiskCollection() {
+        return this.machineDiskCollection;
+    }
+
+    public void setMachineDiskCollection(final MachineDiskCollection machineDiskCollection) {
+        this.machineDiskCollection = machineDiskCollection;
+    }
 
 }

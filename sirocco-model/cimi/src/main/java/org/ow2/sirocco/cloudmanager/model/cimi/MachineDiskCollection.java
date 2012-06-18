@@ -32,9 +32,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
-
-import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 public class MachineDiskCollection implements Serializable {
@@ -60,7 +59,7 @@ public class MachineDiskCollection implements Serializable {
         this.id = id;
     }
 
-    @CollectionOfElements
+    @OneToMany(mappedBy = "machineDiskCollection")
     public List<MachineDisk> getItems() {
         return this.items;
     }
@@ -77,4 +76,5 @@ public class MachineDiskCollection implements Serializable {
     public void setMachine(final Machine machine) {
         this.machine = machine;
     }
+
 }

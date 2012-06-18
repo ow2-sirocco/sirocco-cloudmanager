@@ -26,99 +26,95 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.List;
 
-import javax.persistence.OneToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Enumerated;
-import javax.persistence.EnumType;
-import javax.persistence.OneToOne;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
-
-import java.util.List;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class NetworkInterface implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
-	protected Integer id;
-	
+public abstract class NetworkInterface implements Serializable, Identifiable {
+    private static final long serialVersionUID = 1L;
+
+    protected Integer id;
+
     public static enum InterfaceState {
-		ACTIVE, STANDBY
+        ACTIVE, STANDBY
     }
-    
+
     @OneToMany
-    private List<Address>			addresses;
+    private List<Address> addresses;
 
     @ManyToOne
-    private Network					network;
+    private Network network;
 
     @OneToOne
-    private NetworkPort				networkPort;
-    
-    private InterfaceState			state;
-  
-	private Integer					mtu;
+    private NetworkPort networkPort;
 
-	
+    private InterfaceState state;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Integer getId() {
-		return this.id;
-	}
+    private Integer mtu;
 
-	public void setId(final Integer id) {
-		this.id = id;
-	}
-	
-	@Enumerated(EnumType.STRING)
-	public InterfaceState getState() {
-		return state;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return this.id;
+    }
 
-	public void setState(InterfaceState state) {
-		this.state = state;
-	}
+    public void setId(final Integer id) {
+        this.id = id;
+    }
 
-	public Integer getMtu() {
-		return mtu;
-	}
-	
-	public void setMtu(Integer mtu) {
-		this.mtu = mtu;
-	}
-	
-	public void setNetworkPort(NetworkPort networkPort) {
-		this.networkPort = networkPort;
-	}
-	
-	public NetworkPort getNetworkPort() {
-		return networkPort;
-	}
-	
-	@OneToMany
-	public List<Address> getAddresses() {
-		return addresses;
-	}
-	
-	public void setAddresses(List<Address> addresses) {
-		this.addresses = addresses;
-	}
-	
-	@ManyToOne
-	public Network getNetwork() {
-		return this.network;
-	}
-	
-	public void setNetwork(Network network) {
-		this.network = network;
-	}
-	
-	
+    @Enumerated(EnumType.STRING)
+    public InterfaceState getState() {
+        return this.state;
+    }
+
+    public void setState(final InterfaceState state) {
+        this.state = state;
+    }
+
+    public Integer getMtu() {
+        return this.mtu;
+    }
+
+    public void setMtu(final Integer mtu) {
+        this.mtu = mtu;
+    }
+
+    public void setNetworkPort(final NetworkPort networkPort) {
+        this.networkPort = networkPort;
+    }
+
+    public NetworkPort getNetworkPort() {
+        return this.networkPort;
+    }
+
+    @OneToMany
+    public List<Address> getAddresses() {
+        return this.addresses;
+    }
+
+    public void setAddresses(final List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    @ManyToOne
+    public Network getNetwork() {
+        return this.network;
+    }
+
+    public void setNetwork(final Network network) {
+        this.network = network;
+    }
+
 }
