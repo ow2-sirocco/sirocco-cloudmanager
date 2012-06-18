@@ -25,33 +25,8 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
-import java.util.Date;
-import java.util.Map;
+public interface Identifiable {
+    Integer getId();
 
-public interface Resource extends Identifiable {
-
-    String getDescription();
-
-    void setDescription(final String description);
-
-    Date getCreated();
-
-    String getName();
-
-    void setName(final String name);
-
-    void setCreated(final Date created);
-
-    void setProperties(final Map<String, String> properties);
-
-    Map<String, String> getProperties();
-
-    void setDeleted(final Date deleted);
-
-    Date getDeleted();
-
-    void setUpdated(final Date updated);
-
-    Date getUpdated();
-
+    void setId(Integer id);
 }
