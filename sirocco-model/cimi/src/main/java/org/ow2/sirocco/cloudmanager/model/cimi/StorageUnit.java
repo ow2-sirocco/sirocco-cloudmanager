@@ -27,19 +27,19 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-
 public enum StorageUnit implements Serializable {
-        BYTE, 
-        KILOBYTE, 
-        MEGABYTE, 
-        GIGABYTE, 
-        TERABYTE, 
-        PETABYTE, 
-        EXABYTE, 
-        ZETTABYTE, 
-        YOTTABYTE;
-    
+    BYTE(1), KILOBYTE(1000), MEGABYTE(1000 * 1000), GIGABYTE(1000 * 1000 * 1000), TERABYTE(1000 * 1000 * 1000), PETABYTE(
+        1000 * 1000 * 1000 * 1000), EXABYTE(1000 * 1000 * 1000 * 1000), ZETTABYTE(1000 * 1000 * 1000 * 1000 * 1000), YOTTABYTE(
+        1000 * 1000 * 1000 * 1000 * 1000 * 1000);
+
+    private final long valueInBytes;
+
+    StorageUnit(final long valueInBytes) {
+        this.valueInBytes = valueInBytes;
+    }
+
+    public long valueInBytes() {
+        return this.valueInBytes;
+    }
+
 }

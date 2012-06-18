@@ -37,7 +37,19 @@ public class Memory implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static enum MemoryUnit {
-        BYTE, KIBIBYTE, MEGIBYTE, GIGIBYTE, TEBIBYTE, PETIBYTE, EXBIBYTE, ZEBIBYTE, YOBIBYTE
+        BYTE(1L), KIBIBYTE(1024L), MEGIBYTE(1024L * 1024L), GIGIBYTE(1024L * 1024L * 1024L), TEBIBYTE(
+            1024L * 1024L * 1024L * 1024L), PETIBYTE(1024L * 1024L * 1024L * 1024L * 1024L), EXBIBYTE(1024L * 1024L * 1024L
+            * 1024L * 1024L), ZEBIBYTE(1024L * 1024L * 1024L * 1024L * 1024L * 1024L), YOBIBYTE(1024L * 1024L * 1024L * 1024L
+            * 1024L * 1024L * 1024L);
+        private final long valueInBytes;
+
+        MemoryUnit(final long valueInBytes) {
+            this.valueInBytes = valueInBytes;
+        }
+
+        public long valueInBytes() {
+            return this.valueInBytes;
+        }
     }
 
     private MemoryUnit unit;
