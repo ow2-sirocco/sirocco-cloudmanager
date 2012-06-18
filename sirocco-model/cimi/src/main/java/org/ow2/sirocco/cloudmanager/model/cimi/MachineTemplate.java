@@ -29,101 +29,106 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 import javax.persistence.JoinColumn;
-
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 @Entity
 public class MachineTemplate extends CloudTemplate implements Serializable {
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	private MachineConfiguration machineConfiguration;
+    private MachineConfiguration machineConfiguration;
 
-	private MachineImage machineImage;
+    private MachineImage machineImage;
 
-	private Credentials credentials;
+    private Credentials credentials;
 
-	@OneToOne
-	private MachineVolumeCollection volumes;
+    @OneToOne
+    private MachineVolumeCollection volumes;
 
-	@OneToOne
-	private MachineVolumeTemplateCollection volumeTemplates;
+    @OneToOne
+    private MachineVolumeTemplateCollection volumeTemplates;
 
-	@OneToMany
-    @JoinColumn(name = "machinetemplate_id", referencedColumnName="id")
-	private List<NetworkInterface> networkInterfaces;
+    @OneToMany
+    @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
+    private List<NetworkInterface> networkInterfaces;
 
-	public MachineTemplate() {
-		
-		this.networkInterfaces = new ArrayList<NetworkInterface>();
-	}
+    private String userData;
 
-	@ManyToOne
-	public MachineConfiguration getMachineConfiguration() {
-		return this.machineConfiguration;
-	}
+    public MachineTemplate() {
 
-	public void setMachineConfiguration(final MachineConfiguration machineConfiguration) {
-		this.machineConfiguration = machineConfiguration;
-	}
+        this.networkInterfaces = new ArrayList<NetworkInterface>();
+    }
 
-	@ManyToOne
-	public MachineImage getMachineImage() {
-		return this.machineImage;
-	}
+    @ManyToOne
+    public MachineConfiguration getMachineConfiguration() {
+        return this.machineConfiguration;
+    }
 
-	public void setMachineImage(final MachineImage machineImage) {
-		this.machineImage = machineImage;
-	}
+    public void setMachineConfiguration(final MachineConfiguration machineConfiguration) {
+        this.machineConfiguration = machineConfiguration;
+    }
 
-	@ManyToOne
-	public Credentials getCredentials() {
-		return this.credentials;
-	}
+    @ManyToOne
+    public MachineImage getMachineImage() {
+        return this.machineImage;
+    }
 
-	public void setCredentials(final Credentials credentials) {
-		this.credentials = credentials;
-	}
+    public void setMachineImage(final MachineImage machineImage) {
+        this.machineImage = machineImage;
+    }
 
-	@OneToOne
-	public MachineVolumeCollection getVolumes() {
-		return this.volumes;
-	}
+    @ManyToOne
+    public Credentials getCredentials() {
+        return this.credentials;
+    }
 
-	public void setVolumes(final MachineVolumeCollection volumes) {
-		this.volumes = volumes;
-	}
+    public void setCredentials(final Credentials credentials) {
+        this.credentials = credentials;
+    }
 
-	@OneToOne
-	public MachineVolumeTemplateCollection getVolumeTemplates() {
-		return this.volumeTemplates;
-	}
+    @OneToOne
+    public MachineVolumeCollection getVolumes() {
+        return this.volumes;
+    }
 
-	public void setVolumeTemplates(final MachineVolumeTemplateCollection volumeTemplates) {
-		this.volumeTemplates = volumeTemplates;
-	}    
+    public void setVolumes(final MachineVolumeCollection volumes) {
+        this.volumes = volumes;
+    }
 
+    @OneToOne
+    public MachineVolumeTemplateCollection getVolumeTemplates() {
+        return this.volumeTemplates;
+    }
 
-	@OneToMany
-    @JoinColumn(name = "machinetemplate_id", referencedColumnName="id")
-	public List<NetworkInterface> getNetworkInterfaces() {
-		return this.networkInterfaces;
-	}
+    public void setVolumeTemplates(final MachineVolumeTemplateCollection volumeTemplates) {
+        this.volumeTemplates = volumeTemplates;
+    }
 
-	public void addNetworkInterface(final NetworkInterface networkInterface) {
-		if (!getNetworkInterfaces().contains(networkInterface)) {
-			getNetworkInterfaces().add(networkInterface);
-		}
-	}
-	
-	public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
-		this.networkInterfaces = networkInterfaces;
-	}
+    @OneToMany
+    @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
+    public List<NetworkInterface> getNetworkInterfaces() {
+        return this.networkInterfaces;
+    }
+
+    public void addNetworkInterface(final NetworkInterface networkInterface) {
+        if (!this.getNetworkInterfaces().contains(networkInterface)) {
+            this.getNetworkInterfaces().add(networkInterface);
+        }
+    }
+
+    public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
+        this.networkInterfaces = networkInterfaces;
+    }
+
+    public String getUserData() {
+        return this.userData;
+    }
+
+    public void setUserData(final String userData) {
+        this.userData = userData;
+    }
+
 }
