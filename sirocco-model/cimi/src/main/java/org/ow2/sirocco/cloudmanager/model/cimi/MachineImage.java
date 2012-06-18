@@ -43,7 +43,7 @@ public class MachineImage extends CloudResource implements Serializable {
     private CloudProviderLocation location;
 
     public static enum State {
-        CREATING, AVAILABLE, DELETING, ERROR
+        CREATING, AVAILABLE, DELETING, ERROR, DELETED
     }
 
     public static enum Type {

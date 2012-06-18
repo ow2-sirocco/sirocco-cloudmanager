@@ -50,6 +50,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
@@ -86,6 +87,9 @@ public class MachineImageManager implements IMachineImageManager {
     public Job createMachineImage(final MachineImage mi) throws CloudProviderException {
         this.setUser();
         Job j = new Job();
+
+        // TODO : check whether imageLocation points to a Machine
+        mi.setType(MachineImage.Type.IMAGE);
 
         mi.setUser(this.user);
         mi.setCreated(new Date());
@@ -126,6 +130,9 @@ public class MachineImageManager implements IMachineImageManager {
         } catch (Exception e) {
             throw new CloudProviderException("MachineImage of identity " + imageId + " cannot be found ");
         }
+        if (image.getState() == State.DELETED) {
+            throw new ResourceNotFoundException();
+        }
         return image;
     }
 
@@ -153,15 +160,15 @@ public class MachineImageManager implements IMachineImageManager {
         List<MachineTemplate> templates = null;
         try {
             templates = this.em.createQuery("FROM MachineTemplate t WHERE t.machineImage.id=:mid")
-                .setParameter("id", Integer.valueOf(imageId)).getResultList();
+                .setParameter("mid", Integer.valueOf(imageId)).getResultList();
         } catch (Exception e) {
             throw new CloudProviderException("Internal query error" + e.getMessage());
         }
-        if (templates != null) {
+        if (templates != null && !templates.isEmpty()) {
             throw new CloudProviderException("Machine templates refer to this image " + imageId);
         }
-        
-        this.em.remove(image);
+
+        image.setState(MachineImage.State.DELETED);
         this.em.flush();
 
     }
@@ -178,7 +185,8 @@ public class MachineImageManager implements IMachineImageManager {
             throw new InvalidRequestException(" Illegal array index " + first + " " + last);
         }
 
-        Query query = this.em.createNamedQuery("FROM MachineImage i WHERE i.user.username=:userName ORDER BY i.id");
+        Query query = this.em
+            .createNamedQuery("FROM MachineImage i WHERE i.user.username=:userName AND i.state<>'DELETED' ORDER BY i.id");
         query.setParameter("userName", this.user.getUsername());
         query.setMaxResults(last - first + 1);
         query.setFirstResult(first);
@@ -191,7 +199,7 @@ public class MachineImageManager implements IMachineImageManager {
 
         this.setUser();
         Integer userid = this.user.getId();
-        Query query = this.em.createQuery("SELECT i FROM MachineImage i WHERE i.user.id=:userid");
+        Query query = this.em.createQuery("SELECT i FROM MachineImage i WHERE i.user.id=:userid AND i.state<>'DELETED'");
         List<MachineImage> images = query.setParameter("userid", userid).getResultList();
         MachineImageCollection collection = null;
         try {
