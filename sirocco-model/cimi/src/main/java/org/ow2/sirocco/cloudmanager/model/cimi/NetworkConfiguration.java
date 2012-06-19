@@ -33,17 +33,17 @@ import javax.persistence.Entity;
 public class NetworkConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String networkType;
+    private Network.Type networkType;
 
     private Integer mtu;
 
     private String classOfService;
 
-    public String getNetworkType() {
+    public Network.Type getNetworkType() {
         return this.networkType;
     }
 
-    public void setNetworkType(final String networkType) {
+    public void setNetworkType(final Network.Type networkType) {
         this.networkType = networkType;
     }
 
