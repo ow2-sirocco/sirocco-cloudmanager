@@ -46,7 +46,6 @@
 		<module>connector</module> 
 		<module>mock</module> 
 		<module>openstack</module> 
-		<module>amazon</module> 
 		<module>test</module> 
 	</modules>
 
