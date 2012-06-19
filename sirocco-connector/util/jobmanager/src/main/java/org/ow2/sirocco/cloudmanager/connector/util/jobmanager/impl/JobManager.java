@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: JobManager.java 1237 2012-05-15 13:43:17Z dangtran $
+ *  $Id$
  *
  */
 package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl;
@@ -48,6 +48,7 @@ import javax.jms.TopicConnectionFactory;
 import javax.jms.TopicPublisher;
 import javax.jms.TopicSession;
 import javax.naming.InitialContext;
+
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
@@ -77,10 +78,14 @@ public class JobManager implements IJobManager, ManagedService {
         JobEntry(final Job job, final ListenableFuture<?> result) {
             this.job = job;
             this.result = result;
+
         }
 
         Job job;
+
         ListenableFuture<?> result;
+
+        boolean sendNotif;
     };
 
     private long jobWatcherPeriodInSeconds = JobManager.DEFAULT_JOB_WATCHER_PERIOD_IN_SECONDS;
@@ -89,11 +94,9 @@ public class JobManager implements IJobManager, ManagedService {
 
     private final Map<String, JobEntry> jobs = new ConcurrentHashMap<String, JobEntry>();
 
-    private final ScheduledExecutorService scheduler = Executors
-            .newSingleThreadScheduledExecutor();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
 
-    private final ExecutorService jobCompletionExecutorService = Executors
-            .newSingleThreadExecutor();
+    private final ExecutorService jobCompletionExecutorService = Executors.newSingleThreadExecutor();
 
     private ScheduledFuture<?> jobWatcherHandle;
 
@@ -101,36 +104,28 @@ public class JobManager implements IJobManager, ManagedService {
     }
 
     @SuppressWarnings("rawtypes")
-    public void updated(final Dictionary properties)
-            throws ConfigurationException {
+    public void updated(final Dictionary properties) throws ConfigurationException {
         if (properties != null) {
-            String s = (String) properties
-                    .get(JobManager.JOB_WATCHER_PERIOD_PROP_NAME);
+            String s = (String) properties.get(JobManager.JOB_WATCHER_PERIOD_PROP_NAME);
             if (s != null) {
                 try {
                     this.jobWatcherPeriodInSeconds = Integer.parseInt(s);
                 } catch (NumberFormatException ex) {
-                    JobManager.logger
-                            .error("Illegal value for jobWatcherPeriodInSeconds property: "
-                                    + s);
+                    JobManager.logger.error("Illegal value for jobWatcherPeriodInSeconds property: " + s);
                 }
             }
-            s = (String) properties
-                    .get(JobManager.JOB_RETENTION_TIME_PROP_NAME);
+            s = (String) properties.get(JobManager.JOB_RETENTION_TIME_PROP_NAME);
             if (s != null) {
                 try {
                     this.jobRetentionPeriodInSeconds = Integer.parseInt(s);
                 } catch (NumberFormatException ex) {
-                    JobManager.logger
-                            .error("Illegal value for jobRetentionPeriodInSeconds property: "
-                                    + s);
+                    JobManager.logger.error("Illegal value for jobRetentionPeriodInSeconds property: " + s);
                 }
             }
 
         }
-        JobManager.logger.info("JobManager ready, watcher period: "
-                + this.jobWatcherPeriodInSeconds + "s, job retention time: "
-                + this.jobRetentionPeriodInSeconds + " s");
+        JobManager.logger.info("JobManager ready, watcher period: " + this.jobWatcherPeriodInSeconds
+            + "s, job retention time: " + this.jobRetentionPeriodInSeconds + " s");
     }
 
     public void start() {
@@ -142,19 +137,16 @@ public class JobManager implements IJobManager, ManagedService {
                 for (JobEntry jobEntry : JobManager.this.jobs.values()) {
                     Job job = jobEntry.job;
                     if (job.getStatus() != Job.Status.RUNNING) {
-                        if (TimeUnit.MILLISECONDS.toSeconds(now.getTime()
-                                - job.getTimeOfStatusChange().getTime()) > JobManager.this.jobRetentionPeriodInSeconds) {
-                            JobManager.logger.info("Reaping job "
-                                    + job.getProviderAssignedId());
-                            JobManager.this.jobs.remove(job
-                                    .getProviderAssignedId());
+                        if (TimeUnit.MILLISECONDS.toSeconds(now.getTime() - job.getTimeOfStatusChange().getTime()) > JobManager.this.jobRetentionPeriodInSeconds) {
+                            JobManager.logger.info("Reaping job " + job.getProviderAssignedId());
+                            JobManager.this.jobs.remove(job.getProviderAssignedId());
                         }
                     }
                 }
             }
         };
-        this.jobWatcherHandle = this.scheduler.scheduleAtFixedRate(jobWatcher,
-                0, this.jobWatcherPeriodInSeconds, TimeUnit.SECONDS);
+        this.jobWatcherHandle = this.scheduler.scheduleAtFixedRate(jobWatcher, 0, this.jobWatcherPeriodInSeconds,
+            TimeUnit.SECONDS);
     }
 
     public void shutdown() {
@@ -168,9 +160,8 @@ public class JobManager implements IJobManager, ManagedService {
         return jobManager;
     }
 
-    public Job newJob(final CloudResource targetEntity,
-            final CloudResource affectedEntity, final String action,
-            final ListenableFuture<?> result) {
+    public Job newJob(final CloudResource targetEntity, final CloudResource affectedEntity, final String action,
+        final ListenableFuture<?> result) {
         String jobId = UUID.randomUUID().toString();
         final Job job = new Job();
         job.setProviderAssignedId(jobId);
@@ -183,56 +174,77 @@ public class JobManager implements IJobManager, ManagedService {
         if (affectedEntity != null) {
             affectedEntities.add(affectedEntity);
         }
-        this.jobs.put(jobId, new JobEntry(job, result));
-        return job;
+        final JobEntry jobEntry = new JobEntry(job, result);
+        this.jobs.put(jobId, jobEntry);
+        jobEntry.result.addListener(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (jobEntry) {
+                    if (jobEntry.result.isCancelled()) {
+                        jobEntry.job.setStatus(Job.Status.CANCELLED);
+                        jobEntry.job.setStatusMessage("cancelled");
+                    } else {
+                        boolean interrupted = false;
+                        try {
+                            while (true) {
+                                try {
+                                    jobEntry.result.get();
+                                    jobEntry.job.setStatus(Job.Status.SUCCESS);
+                                    break;
+                                } catch (InterruptedException ex) {
+                                    interrupted = true;
+                                    // retry until not interrupted
+                                } catch (ExecutionException ex) {
+                                    jobEntry.job.setStatusMessage(ex.getCause().getMessage());
+                                    jobEntry.job.setStatus(Job.Status.FAILED);
+                                    break;
+                                } catch (CancellationException ex) {
+                                    jobEntry.job.setStatus(Job.Status.CANCELLED);
+                                    jobEntry.job.setStatusMessage("cancelled");
+                                    break;
+                                }
+                            }
+                        } finally {
+                            if (interrupted) {
+                                Thread.currentThread().interrupt();
+                            }
+                        }
+                    }
+                    jobEntry.job.setTimeOfStatusChange(new Date());
+                    if (jobEntry.sendNotif) {
+                        JobManager.this.emitJobCompletionEvent(jobEntry.job);
+                    }
+                }
+            }
+        }, this.jobCompletionExecutorService);
+        Job jobByValue = new Job();
+        synchronized (jobEntry) {
+            jobByValue.setAction(job.getAction());
+            jobByValue.setProviderAssignedId(job.getProviderAssignedId());
+            jobByValue.setTargetEntity(job.getTargetEntity());
+            jobByValue.setAction(job.getAction());
+            jobByValue.setIsCancellable(job.getIsCancellable());
+            jobByValue.setStatus(job.getStatus());
+            jobByValue.setStatusMessage(job.getStatusMessage());
+            jobByValue.setAffectedEntities(job.getAffectedEntities());
+        }
+
+        return jobByValue;
     }
 
     @Override
-    public void setNotificationOnJobCompletion(final String jobId)
-            throws Exception {
+    public void setNotificationOnJobCompletion(final String jobId) throws Exception {
         final JobEntry jobEntry = this.jobs.get(jobId);
         if (jobEntry == null) {
             throw new Exception("Invalid jobId: " + jobId);
         }
-        jobEntry.result.addListener(new Runnable() {
-            @Override
-            public void run() {
-                if (jobEntry.result.isCancelled()) {
-                    jobEntry.job.setStatus(Job.Status.CANCELLED);
-                    jobEntry.job.setStatusMessage("cancelled");
-                } else {
-                    boolean interrupted = false;
-                    try {
-                        while (true) {
-                            try {
-                                jobEntry.result.get();
-                                jobEntry.job.setStatus(Job.Status.SUCCESS);
-                                break;
-                            } catch (InterruptedException ex) {
-                                interrupted = true;
-                                // retry until not interrupted
-                            } catch (ExecutionException ex) {
-                                jobEntry.job.setStatusMessage(ex.getCause()
-                                        .getMessage());
-                                jobEntry.job.setStatus(Job.Status.FAILED);
-                                break;
-                            } catch (CancellationException ex) {
-                                jobEntry.job.setStatus(Job.Status.CANCELLED);
-                                jobEntry.job.setStatusMessage("cancelled");
-                                break;
-                            }
-                        }
-                    } finally {
-                        if (interrupted) {
-                            Thread.currentThread().interrupt();
-                        }
-                    }
-                }
-                jobEntry.job.setTimeOfStatusChange(new Date());
-                JobManager.this.emitJobCompletionEvent(jobEntry.job);
+        synchronized (jobEntry) {
+            if (jobEntry.job.getStatus() != Job.Status.RUNNING) {
+                this.emitJobCompletionEvent(jobEntry.job);
+            } else {
+                jobEntry.sendNotif = true;
             }
-        }, this.jobCompletionExecutorService);
-
+        }
     }
 
     public Job getJobById(final String id) {
@@ -253,6 +265,8 @@ public class JobManager implements IJobManager, ManagedService {
 
     private <T> void emitJobCompletionEvent(final Job job) {
         try {
+            JobManager.logger.info("SENDING EVENT JobCompletion action=" + job.getAction() + " target="
+                + job.getTargetEntity().getClass() + " id=" + job.getTargetEntity().getProviderAssignedId());
             this.emitMessage(job);
         } catch (Exception ex) {
             JobManager.logger.error("Failed to emit message", ex);
@@ -262,42 +276,35 @@ public class JobManager implements IJobManager, ManagedService {
     private void emitMessage(final Serializable payload) throws Exception {
         InitialContext ctx = new InitialContext();
         TopicConnectionFactory topicConnectionFactory = (TopicConnectionFactory) ctx
-                .lookup(JobManager.JMS_TOPIC_CONNECTION_FACTORY_NAME);
-        TopicConnection connection = topicConnectionFactory
-                .createTopicConnection();
-        TopicSession session = connection.createTopicSession(false,
-                Session.AUTO_ACKNOWLEDGE);
+            .lookup(JobManager.JMS_TOPIC_CONNECTION_FACTORY_NAME);
+        TopicConnection connection = topicConnectionFactory.createTopicConnection();
+        TopicSession session = connection.createTopicSession(false, Session.AUTO_ACKNOWLEDGE);
         Topic cloudAdminTopic = (Topic) ctx.lookup(JobManager.JMS_TOPIC_NAME);
-        TopicPublisher topicPublisher = session
-                .createPublisher(cloudAdminTopic);
+        TopicPublisher topicPublisher = session.createPublisher(cloudAdminTopic);
         ObjectMessage message = session.createObjectMessage();
         message.setObject(payload);
         topicPublisher.publish(message);
-        JobManager.logger.info("EMITTED EVENT " + payload.toString() + " on "
-                + JobManager.JMS_TOPIC_NAME + " topic");
         topicPublisher.close();
         session.close();
         connection.close();
     }
 
-    public static void rawEmitDelayedQueueMessage(final Serializable payload,
-            final long delayMilli, final String queueFactory,
-            final String queueName) throws Exception {
+    public static void rawEmitDelayedQueueMessage(final Serializable payload, final long delayMilli, final String queueFactory,
+        final String queueName) throws Exception {
 
         new Thread() {
+            @Override
             public void run() {
 
                 /*
-                 * Thread.sleep(delayMilli);
-                 * 
-                 * InitialContext ctx = new InitialContext();
-                 * 
-                 * QueueConnectionFactory qcf = (QueueConnectionFactory) ctx
-                 * .lookup(queueFactory); QueueConnection queueCon =
-                 * qcf.createQueueConnection(); QueueSession queueSession =
-                 * queueCon. createQueueSession( false, Session.AUTO_ACKNOWLEDGE
-                 * ); Queue queue = (Queue) ctx.lookup(queueName); QueueSender
-                 * sender = queueSession.createSender( queue ); Message msg =
+                 * Thread.sleep(delayMilli); InitialContext ctx = new
+                 * InitialContext(); QueueConnectionFactory qcf =
+                 * (QueueConnectionFactory) ctx .lookup(queueFactory);
+                 * QueueConnection queueCon = qcf.createQueueConnection();
+                 * QueueSession queueSession = queueCon. createQueueSession(
+                 * false, Session.AUTO_ACKNOWLEDGE ); Queue queue = (Queue)
+                 * ctx.lookup(queueName); QueueSender sender =
+                 * queueSession.createSender( queue ); Message msg =
                  * queueSession.createObjectMessage(payload);
                  * //msg.setLongProperty("scheduleDate",
                  * System.currentTimeMillis() + delayMilli); sender.send( msg );
