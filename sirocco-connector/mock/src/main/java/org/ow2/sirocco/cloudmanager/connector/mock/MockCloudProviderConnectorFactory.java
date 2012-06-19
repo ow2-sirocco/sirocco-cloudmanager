@@ -27,7 +27,6 @@ package org.ow2.sirocco.cloudmanager.connector.mock;
 
 import java.util.Collections;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
@@ -108,10 +107,10 @@ public class MockCloudProviderConnectorFactory implements ICloudProviderConnecto
     }
 
     @Override
-    public List<CloudProviderLocation> listCloudProviderLocations() {
+    public Set<CloudProviderLocation> listCloudProviderLocations() {
         CloudProviderLocation mockLocation = new CloudProviderLocation();
         mockLocation.setCountryName("France");
-        return Collections.singletonList(mockLocation);
+        return Collections.singleton(mockLocation);
     }
 
     IJobManager getJobManager() {

@@ -26,7 +26,6 @@
 package org.ow2.sirocco.cloudmanager.connector.mock;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -152,6 +151,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final String volumeProviderAssignedId = UUID.randomUUID().toString();
         final Volume volume = new Volume();
         volume.setProviderAssignedId(volumeProviderAssignedId);
+        Disk capacity = new Disk();
+        capacity.setQuantity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity().getQuantity());
+        capacity.setUnit(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity().getUnits());
+        volume.setCapacity(capacity);
         this.volumes.put(volumeProviderAssignedId, volume);
         volume.setState(Volume.State.CREATING);
 
@@ -198,9 +201,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     @Override
     public synchronized Volume getVolume(final String volumeId) throws ConnectorException {
         Volume volume = this.volumes.get(volumeId);
-        if (volume == null) {
-            throw new ConnectorException("Volume " + volumeId + " doesn't exist");
-        }
         return volume;
     }
 
@@ -240,6 +240,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
                 newNetIntf.setState(InterfaceState.STANDBY);
 
+                newNetIntf.setNetworkType(networkInterface.getNetworkType());
+
                 machine.addNetworkInterface(newNetIntf);
             }
         }
@@ -257,7 +259,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         };
         // TODO create and attach volumes
         MachineVolumeCollection volumeCollection = new MachineVolumeCollection();
-        volumeCollection.setItems(Collections.<MachineVolume> emptyList());
+        volumeCollection.setItems(new ArrayList<MachineVolume>());
         machine.setVolumes(volumeCollection);
         ListenableFuture<Machine> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
         return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, null, "add", result);
