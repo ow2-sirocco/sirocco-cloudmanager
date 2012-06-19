@@ -52,6 +52,8 @@ public class CloudProvider implements Serializable {
 
     private String description;
 
+    private String endPoint;
+
     private Set<CloudProviderAccount> cloudProviderAccounts;
 
     private Set<CloudProviderLocation> cloudProviderLocations;
@@ -86,23 +88,29 @@ public class CloudProvider implements Serializable {
         this.description = description;
     }
 
+    public String getEndPoint() {
+        return this.endPoint;
+    }
+
+    public void setEndPoint(final String endPoint) {
+        this.endPoint = endPoint;
+    }
+
     @OneToMany(mappedBy = "cloudProvider")
     public Set<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
     }
 
-    public void setCloudProviderAccounts(
-            final Set<CloudProviderAccount> cloudProviderAccounts) {
+    public void setCloudProviderAccounts(final Set<CloudProviderAccount> cloudProviderAccounts) {
         this.cloudProviderAccounts = cloudProviderAccounts;
     }
 
     @ManyToMany(mappedBy = "cloudProviders")
     public Set<CloudProviderLocation> getCloudProviderLocations() {
-        return cloudProviderLocations;
+        return this.cloudProviderLocations;
     }
 
-    public void setCloudProviderLocations(
-            Set<CloudProviderLocation> cloudProviderLocations) {
+    public void setCloudProviderLocations(final Set<CloudProviderLocation> cloudProviderLocations) {
         this.cloudProviderLocations = cloudProviderLocations;
     }
 
