@@ -58,7 +58,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
@@ -157,19 +156,6 @@ public class JobManager implements IJobManager {
      * updateAttribute(Job j,String Attribute,Object value) { if
      * (Attribute.equals("")) return j; }
      */
-
-    @Override
-    public JobCollection getJobCollection() throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public JobCollection updateJobCollection(final JobCollection jobColl)
-            throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public void deleteJob(final String id) throws CloudProviderException {

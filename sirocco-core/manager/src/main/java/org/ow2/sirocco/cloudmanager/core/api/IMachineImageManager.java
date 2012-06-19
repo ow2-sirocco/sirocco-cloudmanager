@@ -33,7 +33,6 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 
 /**
  * Machine Image management operations
@@ -64,9 +63,4 @@ public interface IMachineImageManager {
 
     List<MachineImage> getMachineImages(int first, int last, List<String> attributes) throws InvalidRequestException,
         CloudProviderException;
-
-    MachineImageCollection getMachineImageCollection() throws CloudProviderException;
-
-    void updateMachineImageCollection(Map<String, Object> attributes) throws CloudProviderException;
-
 }

@@ -51,7 +51,6 @@ import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
@@ -193,42 +192,6 @@ public class MachineImageManager implements IMachineImageManager {
         List<MachineImage> images = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
 
         return images;
-    }
-
-    public MachineImageCollection getMachineImageCollection() throws CloudProviderException {
-
-        this.setUser();
-        Integer userid = this.user.getId();
-        Query query = this.em.createQuery("SELECT i FROM MachineImage i WHERE i.user.id=:userid AND i.state<>'DELETED'");
-        List<MachineImage> images = query.setParameter("userid", userid).getResultList();
-        MachineImageCollection collection = null;
-        try {
-            collection = (MachineImageCollection) this.em.createQuery("FROM MachineImageCollection m WHERE m.user.id=:userid")
-                .setParameter("userid", userid).getSingleResult();
-        } catch (Exception e) {
-            throw new CloudProviderException(" Internal error " + e.getMessage());
-        }
-        collection.setImages(images);
-        return collection;
-    }
-
-    public void updateMachineImageCollection(final Map<String, Object> attributes) throws CloudProviderException {
-        this.setUser();
-        Integer userid = this.user.getId();
-        MachineImageCollection collection = null;
-        try {
-            collection = (MachineImageCollection) this.em.createQuery("FROM MachineImageCollection m WHERE m.user.id=:userid")
-                .setParameter("userid", userid).getSingleResult();
-        } catch (Exception e) {
-            throw new CloudProviderException(" Internal error " + e.getMessage());
-        }
-
-        try {
-            UtilsForManagers.fillObject(collection, attributes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CloudProviderException("Error updating machine image collection " + e.getMessage());
-        }
     }
 
     @Override

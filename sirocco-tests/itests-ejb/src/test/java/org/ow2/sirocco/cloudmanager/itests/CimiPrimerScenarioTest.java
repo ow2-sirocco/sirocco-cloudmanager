@@ -259,7 +259,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Machine Images
          */
 
-        List<MachineImage> machineImages = this.machineImageManager.getMachineImageCollection().getImages();
+        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
         for (MachineImage image : machineImages) {
             System.out.println("MachineImage id=" + image.getId());
         }
@@ -276,8 +276,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurationCollection()
-            .getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations(new ArrayList<String>(),"");
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
@@ -355,7 +354,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Machine Images
          */
 
-        List<MachineImage> machineImages = this.machineImageManager.getMachineImageCollection().getImages();
+        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
         for (MachineImage image : machineImages) {
             System.out.println("MachineImage id=" + image.getId());
         }
@@ -372,8 +371,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurationCollection()
-            .getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations(new ArrayList<String>(),"");
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
@@ -442,7 +440,7 @@ public class CimiPrimerScenarioTest {
          */
     	System.out.println("createMachineWithPreExistingVolumes ");
 
-        List<MachineImage> machineImages = this.machineImageManager.getMachineImageCollection().getImages();
+        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
         for (MachineImage image : machineImages) {
             System.out.println("MachineImage id=" + image.getId());
         }
@@ -459,8 +457,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurationCollection()
-            .getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations(new ArrayList<String>(),"");
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
@@ -543,7 +540,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Machine Images
          */
 
-        List<MachineImage> machineImages = this.machineImageManager.getMachineImageCollection().getImages();
+        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
         for (MachineImage image : machineImages) {
             System.out.println("MachineImage id=" + image.getId());
         }
@@ -560,8 +557,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurationCollection()
-            .getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations(new ArrayList<String>(),"");
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
@@ -638,8 +634,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Volume Configurations
          */
     	System.out.println("createVolumeTemplate " +name);
-        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurationCollection()
-            .getVolumeConfigurations();
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurations(new ArrayList<String>(), "");
         for (VolumeConfiguration volumeConfig : volumeConfigs) {
             System.out.println("VolumeConfiguration id=" + volumeConfig.getId());
         }
@@ -665,8 +660,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Volume Configurations
          */
 
-        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurationCollection()
-            .getVolumeConfigurations();
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurations(new ArrayList<String>(), "");
         for (VolumeConfiguration volumeConfig : volumeConfigs) {
             System.out.println("VolumeConfiguration id=" + volumeConfig.getId());
         }
@@ -785,8 +779,7 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Volume Configurations
          */
 
-        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurationCollection()
-            .getVolumeConfigurations();
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurations(new ArrayList<String>(), "");
         for (VolumeConfiguration volumeConfig : volumeConfigs) {
             System.out.println("VolumeConfiguration id=" + volumeConfig.getId());
         }

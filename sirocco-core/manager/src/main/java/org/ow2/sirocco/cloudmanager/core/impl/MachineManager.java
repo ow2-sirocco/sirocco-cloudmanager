@@ -72,15 +72,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
@@ -873,22 +870,6 @@ public class MachineManager implements IMachineManager {
     }
 
     /**
-     * Operations on MachineCollection
-     */
-    public MachineCollection getMachineCollection() throws CloudProviderException {
-        this.setUser();
-        Integer userid = this.user.getId();
-
-        MachineCollection collection = (MachineCollection) this.em
-            .createQuery("FROM MachineCollection m WHERE m.user.id=:userid").setParameter("userid", userid).getSingleResult();
-        List<Machine> machines = this.em
-            .createQuery("FROM Machine m WHERE m.user.username=:username AND m.state<>'DELETED' ORDER BY m.id")
-            .setParameter("username", this.user.getUsername()).getResultList();
-        collection.setMachines(machines);
-        return collection;
-    }
-
-    /**
      * Operations on MachineConfiguration
      */
     public MachineConfiguration getMachineConfigurationById(final String mcId) throws CloudProviderException {
@@ -959,35 +940,29 @@ public class MachineManager implements IMachineManager {
         this.em.flush();
     }
 
-    /**
-     * Operations on MachineConfigurationCollection
-     */
-    public MachineConfigurationCollection getMachineConfigurationCollection() throws CloudProviderException {
-        this.setUser();
-        Integer userid = this.user.getId();
-        // There should be only one collection
-        MachineConfigurationCollection collection = (MachineConfigurationCollection) this.em
-            .createQuery("FROM MachineConfigurationCollection m WHERE m.user.id=:userid").setParameter("userid", userid)
-            .getSingleResult();
-        List<MachineConfiguration> configs = this.em
-            .createQuery("FROM MachineConfiguration m WHERE m.user.username=:username ORDER BY m.id")
-            .setParameter("username", this.user.getUsername()).getResultList();
-        collection.setMachineConfigurations(configs);
-        return collection;
-    }
-
     @Override
     public List<MachineConfiguration> getMachineConfigurations(final int first, final int last, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        this.setUser();
+        User user = this.user;
+        Query query = this.em.createQuery("FROM MachineConfiguration v WHERE v.user.username=:username ORDER BY v.id");
+        query.setParameter("username", user.getUsername());
+        query.setMaxResults(last - first + 1);
+        query.setFirstResult(first);
+        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
     }
 
     @Override
     public List<MachineConfiguration> getMachineConfigurations(final List<String> attributes, final String queryExpression)
         throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        this.setUser();
+        if (queryExpression != null && !queryExpression.isEmpty()) {
+            // TODO
+            throw new UnsupportedOperationException();
+        }
+        User user = this.user;
+        return this.em.createQuery("FROM MachineConfiguration v WHERE v.user.username=:username ORDER BY v.id")
+            .setParameter("username", user.getUsername()).getResultList();
     }
 
     public MachineConfiguration createMachineConfiguration(final MachineConfiguration machineConfig)
@@ -1325,20 +1300,6 @@ public class MachineManager implements IMachineManager {
             mt.getMachineConfiguration().getProperties().size();
         }
         return mt;
-    }
-
-    public MachineTemplateCollection getMachineTemplateCollection() throws CloudProviderException {
-        this.setUser();
-        Integer userid = this.user.getId();
-
-        MachineTemplateCollection collection = (MachineTemplateCollection) this.em
-            .createQuery("FROM MachineTemplateCollection m WHERE m.user.id=:userid").setParameter("userid", userid)
-            .getSingleResult();
-        List<MachineTemplate> templates = this.em
-            .createQuery("FROM MachineTemplate m WHERE m.user.username=:username ORDER BY m.id")
-            .setParameter("username", this.user.getUsername()).getResultList();
-        collection.setMachineTemplates(templates);
-        return collection;
     }
 
     @Override

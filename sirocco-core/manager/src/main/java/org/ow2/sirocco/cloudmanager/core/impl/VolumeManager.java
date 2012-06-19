@@ -38,14 +38,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
@@ -557,81 +553,6 @@ public class VolumeManager implements IVolumeManager {
         this.em.remove(volumeTemplate);
     }
 
-    @Override
-    public VolumeCollection getVolumeCollection() throws CloudProviderException {
-        User user = this.getUser();
-        @SuppressWarnings("unchecked")
-        List<Volume> volumes = this.em
-            .createQuery("SELECT v FROM Volume v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
-        VolumeCollection collection = (VolumeCollection) this.em
-            .createQuery("FROM VolumeCollection m WHERE m.user.username=:username")
-            .setParameter("username", user.getUsername()).getSingleResult();
-        collection.setVolumes(volumes);
-        return collection;
-    }
-
-    @Override
-    public VolumeConfigurationCollection getVolumeConfigurationCollection() throws CloudProviderException {
-        User user = this.getUser();
-        @SuppressWarnings("unchecked")
-        List<VolumeConfiguration> volumeConfigs = this.em
-            .createQuery("SELECT v FROM VolumeConfiguration v WHERE v.user.username=:username")
-            .setParameter("username", user.getUsername()).getResultList();
-        VolumeConfigurationCollection collection = (VolumeConfigurationCollection) this.em
-            .createQuery("FROM VolumeConfigurationCollection v WHERE v.user.username=:username")
-            .setParameter("username", user.getUsername()).getSingleResult();
-        collection.setVolumeConfigurations(volumeConfigs);
-        return collection;
-    }
-
-    @Override
-    public VolumeTemplateCollection getVolumeTemplateCollection() throws CloudProviderException {
-        User user = this.getUser();
-        @SuppressWarnings("unchecked")
-        List<VolumeTemplate> volumeTemplates = this.em
-            .createQuery("SELECT v FROM VolumeTemplate v WHERE v.user.username=:username")
-            .setParameter("username", user.getUsername()).getResultList();
-        VolumeTemplateCollection collection = (VolumeTemplateCollection) this.em
-            .createQuery("FROM VolumeTemplateCollection v WHERE v.user.username=:username")
-            .setParameter("username", user.getUsername()).getSingleResult();
-        collection.setVolumeTemplates(volumeTemplates);
-        return collection;
-    }
-
-    @Override
-    public void updateVolumeCollection(final Map<String, Object> attributes) throws CloudProviderException {
-        User user = this.getUser();
-        VolumeCollection collection = (VolumeCollection) this.em
-            .createQuery("FROM VolumeCollection v WHERE v.user.username=:username")
-            .setParameter("username", user.getUsername()).getSingleResult();
-        if (this.updateCloudEntityAttributes(collection, attributes)) {
-            collection.setUpdated(new Date());
-        }
-    }
-
-    @Override
-    public void updateVolumeConfigurationCollection(final Map<String, Object> attributes) throws CloudProviderException {
-        User user = this.getUser();
-        VolumeConfigurationCollection collection = (VolumeConfigurationCollection) this.em
-            .createQuery("FROM VolumeConfigurationCollection v WHERE v.user.username=:username")
-            .setParameter("username", user.getUsername()).getSingleResult();
-        if (this.updateCloudEntityAttributes(collection, attributes)) {
-            collection.setUpdated(new Date());
-        }
-    }
-
-    @Override
-    public void updateVolumeTemplateCollection(final Map<String, Object> attributes) throws CloudProviderException {
-        User user = this.getUser();
-        VolumeTemplateCollection collection = (VolumeTemplateCollection) this.em
-            .createQuery("FROM VolumeTemplateCollection v WHERE v.user.username=:username")
-            .setParameter("username", user.getUsername()).getSingleResult();
-        if (this.updateCloudEntityAttributes(collection, attributes)) {
-            collection.setUpdated(new Date());
-        }
-    }
-
     private Volume getVolumeByProviderAssignedId(final String providerAssignedId) {
         Volume volume = (Volume) this.em.createNamedQuery(Volume.GET_VOLUME_BY_PROVIDER_ASSIGNED_ID)
             .setParameter("providerAssignedId", providerAssignedId).getSingleResult();
@@ -757,27 +678,6 @@ public class VolumeManager implements IVolumeManager {
         }
 
         return true;
-    }
-
-    @Override
-    public VolumeImageCollection getVolumeImageCollection() throws CloudProviderException {
-        User user = this.getUser();
-        @SuppressWarnings("unchecked")
-        List<VolumeImage> volumeImages = this.em
-            .createQuery("SELECT v FROM VolumeImage v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
-        VolumeImageCollection collection = (VolumeImageCollection) this.em
-            .createQuery("FROM VolumeImageCollection m WHERE m.user.username=:username")
-            .setParameter("username", user.getUsername()).getSingleResult();
-        collection.setVolumeImages(volumeImages);
-        return collection;
-    }
-
-    @Override
-    public List<VolumeImage> getVolumeImagesCollection(final String volumeId) throws ResourceNotFoundException,
-        CloudProviderException {
-        Volume volume = this.getVolumeById(volumeId);
-        return volume.getImages();
     }
 
     @Override

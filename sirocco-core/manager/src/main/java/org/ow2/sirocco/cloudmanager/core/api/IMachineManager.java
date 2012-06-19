@@ -35,13 +35,10 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
@@ -77,11 +74,6 @@ public interface IMachineManager {
     Job updateMachineAttributes(final String machineId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, CloudProviderException;
 
-    /**
-     * Operations on MachineCollection
-     */
-    MachineCollection getMachineCollection() throws CloudProviderException;
-
     Job createMachine(MachineCreate machineCreate) throws ResourceConflictException, InvalidRequestException,
         CloudProviderException;
 
@@ -105,11 +97,6 @@ public interface IMachineManager {
 
     void deleteMachineConfiguration(final String machineConfigurationId) throws ResourceNotFoundException,
         CloudProviderException;
-
-    /**
-     * Operations on MachineConfigurationCollection
-     */
-    MachineConfigurationCollection getMachineConfigurationCollection() throws CloudProviderException;
 
     MachineConfiguration createMachineConfiguration(MachineConfiguration machineConfig) throws InvalidRequestException,
         CloudProviderException;
@@ -138,8 +125,6 @@ public interface IMachineManager {
      */
     MachineTemplate createMachineTemplate(MachineTemplate machineTemplate) throws InvalidRequestException,
         CloudProviderException;
-
-    MachineTemplateCollection getMachineTemplateCollection() throws CloudProviderException;
 
     List<MachineTemplate> getMachineTemplates(int first, int last, List<String> attributes) throws InvalidRequestException,
         CloudProviderException;

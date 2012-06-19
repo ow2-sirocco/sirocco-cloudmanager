@@ -35,7 +35,6 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 
 /**
  * Job management operations
@@ -58,10 +57,6 @@ public interface IJobManager {
 
     void updateJobAttributes(String id, Map<String, Object> updatedAttributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
-
-    JobCollection getJobCollection() throws CloudProviderException;
-
-    JobCollection updateJobCollection(JobCollection jobColl) throws CloudProviderException;
 
     void deleteJob(String id) throws CloudProviderException;
     

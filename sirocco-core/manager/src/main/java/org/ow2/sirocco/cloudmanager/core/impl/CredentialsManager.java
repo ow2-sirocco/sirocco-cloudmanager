@@ -50,10 +50,8 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
@@ -238,43 +236,6 @@ public class CredentialsManager implements ICredentialsManager {
 
     }
 
-    public CredentialsCollection getCredentialsCollection() throws CloudProviderException {
-
-        this.setUser();
-        Integer userid = this.user.getId();
-        Query query = this.em.createQuery("SELECT c FROM Credentials c WHERE c.user.id=:userid");
-        List<Credentials> creds = query.setParameter("userid", userid).getResultList();
-        CredentialsCollection collection = null;
-        try {
-            collection = (CredentialsCollection) this.em.createQuery("FROM CredentialsCollection m WHERE m.user.id=:userid")
-                .setParameter("userid", userid).getSingleResult();
-        } catch (Exception e) {
-            throw new CloudProviderException(" Internal error " + e.getMessage());
-        }
-        collection.setCredentials(creds);
-        return collection;
-    }
-
-    public void updateCredentialsCollection(final Map<String, Object> attributes) throws CloudProviderException {
-
-        this.setUser();
-        Integer userid = this.user.getId();
-        CredentialsCollection collection = null;
-        try {
-            collection = (CredentialsCollection) this.em.createQuery("FROM CredentialsCollection m WHERE m.user.id=:userid")
-                .setParameter("userid", userid).getSingleResult();
-        } catch (Exception e) {
-            throw new CloudProviderException(" Internal error " + e.getMessage());
-        }
-
-        try {
-            UtilsForManagers.fillObject(collection, attributes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CloudProviderException("Error updating credentials collection " + e.getMessage());
-        }
-    }
-
     @Override
     public CredentialsTemplate createCredentialsTemplate(final CredentialsTemplate credentialsTemplate)
         throws CloudProviderException {
@@ -326,18 +287,6 @@ public class CredentialsManager implements ICredentialsManager {
         throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    public CredentialsTemplateCollection getCredentialsTemplateCollection() throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void updateCredentialsTemplateCollection(final Map<String, Object> attributes) throws CloudProviderException {
-        // TODO Auto-generated method stub
-
     }
 
 }

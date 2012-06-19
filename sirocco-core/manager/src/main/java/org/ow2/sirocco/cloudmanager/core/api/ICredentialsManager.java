@@ -32,10 +32,8 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 
 /**
  * Credentials management operations
@@ -62,10 +60,6 @@ public interface ICredentialsManager {
     List<Credentials> getCredentials(int first, int last, List<String> attributes) throws InvalidRequestException,
         CloudProviderException;
 
-    CredentialsCollection getCredentialsCollection() throws CloudProviderException;
-
-    void updateCredentialsCollection(Map<String, Object> attributes) throws CloudProviderException;
-
     CredentialsTemplate createCredentialsTemplate(CredentialsTemplate credentialsTemplate) throws CloudProviderException;
 
     void updateCredentialsTemplate(CredentialsTemplate credentialsTemplate) throws CloudProviderException;
@@ -83,9 +77,4 @@ public interface ICredentialsManager {
 
     List<CredentialsTemplate> getCredentialsTemplates(int first, int last, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
-
-    CredentialsTemplateCollection getCredentialsTemplateCollection() throws CloudProviderException;
-
-    void updateCredentialsTemplateCollection(Map<String, Object> attributes) throws CloudProviderException;
-
 }

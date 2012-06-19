@@ -95,7 +95,7 @@ public class MachineManagerTest {
 
     private static final String ACCOUNT_CREDENTIALS = "ignored";
 
-    private static final int MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS = 30;
+    private static final int MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS = 130;
 
     /**
      * Initial Context Factory.

@@ -46,17 +46,6 @@ import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImageCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Stateless
@@ -92,51 +81,8 @@ public class UserManager implements IUserManager {
         // if (!isUserValid(u)) {
         // throw new UserException("user validation failed");
         // }
-        this.createAllCollections(u);
         this.em.persist(u);
         return u;
-    }
-
-    private void createAllCollections(final User u) {
-        // create collection objects and attach them to the user
-        MachineImageCollection mic = new MachineImageCollection();
-        mic.setUser(u);
-        MachineCollection mc = new MachineCollection();
-        mc.setUser(u);
-        VolumeCollection vc = new VolumeCollection();
-        vc.setUser(u);
-        MachineTemplateCollection mtc = new MachineTemplateCollection();
-        mtc.setUser(u);
-        MachineConfigurationCollection mcc = new MachineConfigurationCollection();
-        mcc.setUser(u);
-        VolumeTemplateCollection vtc = new VolumeTemplateCollection();
-        vtc.setUser(u);
-        VolumeConfigurationCollection vcc = new VolumeConfigurationCollection();
-        vcc.setUser(u);
-        VolumeImageCollection vic = new VolumeImageCollection();
-        vic.setUser(u);
-        CredentialsCollection creds = new CredentialsCollection();
-        creds.setUser(u);
-        CredentialsTemplateCollection credsTemplates = new CredentialsTemplateCollection();
-        credsTemplates.setUser(u);
-        JobCollection jobs = new JobCollection();
-        jobs.setUser(u);
-        CloudEntryPoint cep = new CloudEntryPoint();
-        cep.setUser(u);
-
-        // persist them in the database
-        this.em.persist(mic);
-        this.em.persist(mc);
-        this.em.persist(vc);
-        this.em.persist(mtc);
-        this.em.persist(mcc);
-        this.em.persist(vtc);
-        this.em.persist(vcc);
-        this.em.persist(vic);
-        this.em.persist(creds);
-        this.em.persist(credsTemplates);
-        this.em.persist(jobs);
-        this.em.persist(cep);
     }
 
     private boolean isUserValid(final User u) {
@@ -228,27 +174,10 @@ public class UserManager implements IUserManager {
 
         User result = this.getUserById(userId);
 
-        this.removeCollection("MachineImageCollection", result);
-        this.removeCollection("MachineCollection", result);
-        this.removeCollection("VolumeCollection", result);
-        this.removeCollection("MachineTemplateCollection", result);
-        this.removeCollection("MachineConfigurationCollection", result);
-        this.removeCollection("VolumeTemplateCollection", result);
-        this.removeCollection("VolumeConfigurationCollection", result);
-
         if (result != null) {
             this.em.remove(result);
         }
 
-    }
-
-    @SuppressWarnings("unchecked")
-    private void removeCollection(final String Type, final User u) {
-        List<CloudEntity> l = this.em.createQuery("FROM " + Type + " t WHERE t.user=:usrid").setParameter("usrid", u)
-            .getResultList();
-        for (CloudEntity lmic : l) {
-            this.em.remove(lmic);
-        }
     }
 
 }

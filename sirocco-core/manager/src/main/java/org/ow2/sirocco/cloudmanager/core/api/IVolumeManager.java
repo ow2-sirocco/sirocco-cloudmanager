@@ -33,14 +33,10 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplateCollection;
 
 /**
  * Volume management operations
@@ -357,72 +353,6 @@ public interface IVolumeManager {
      *         occurs
      */
     void deleteVolumeConfiguration(String volumeConfigId) throws ResourceNotFoundException, CloudProviderException;
-
-    /**
-     * Returns the Volume Collection belonging to the caller
-     * 
-     * @return the Volume Collection belonging to the caller
-     * @throws CloudProviderException raised if the operation cannot be
-     *         completed
-     */
-    VolumeCollection getVolumeCollection() throws CloudProviderException;
-
-    /**
-     * Returns the VolumeConfiguration Collection belonging to the caller
-     * 
-     * @return the VolumeConfiguration Collection belonging to the caller
-     * @throws CloudProviderException raised if the operation cannot be
-     *         completed
-     */
-    VolumeConfigurationCollection getVolumeConfigurationCollection() throws CloudProviderException;
-
-    /**
-     * Returns the VolumeTemplate Collection belonging to the caller
-     * 
-     * @return the VolumeTemplate Collection belonging to the caller
-     * @throws CloudProviderException raised if the operation cannot be
-     *         completed
-     */
-    VolumeTemplateCollection getVolumeTemplateCollection() throws CloudProviderException;
-
-    /**
-     * Updates the attributes of the Volume Collection belonging to the caller
-     * 
-     * @param updatedAttributes each entry of this map contains the name of the
-     *        attribute to be update and the new value. Note that the only
-     *        allowed attributes are "name", "description" and "properties"
-     * @throws CloudProviderException raised if the operation cannot be
-     *         completed
-     */
-    void updateVolumeCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
-
-    /**
-     * Updates the attributes of the Volume Configuration Collection belonging
-     * to the caller
-     * 
-     * @param updatedAttributes each entry of this map contains the name of the
-     *        attribute to be update and the new value. Note that the only
-     *        allowed attributes are "name", "description" and "properties"
-     * @throws CloudProviderException raised if the operation cannot be
-     *         completed
-     */
-    void updateVolumeConfigurationCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
-
-    /**
-     * Updates the attributes of the Volume Template Collection belonging to the
-     * caller
-     * 
-     * @param updatedAttributes each entry of this map contains the name of the
-     *        attribute to be update and the new value. Note that the only
-     *        allowed attributes are "name", "description" and "properties"
-     * @throws CloudProviderException raised if the operation cannot be
-     *         completed
-     */
-    void updateVolumeTemplateCollection(Map<String, Object> updatedAttributes) throws CloudProviderException;
-
-    VolumeImageCollection getVolumeImageCollection() throws CloudProviderException;
-
-    List<VolumeImage> getVolumeImagesCollection(String volumeId) throws ResourceNotFoundException, CloudProviderException;
 
     Job createVolumeImage(VolumeImage volumeImage) throws InvalidRequestException, CloudProviderException;
 
