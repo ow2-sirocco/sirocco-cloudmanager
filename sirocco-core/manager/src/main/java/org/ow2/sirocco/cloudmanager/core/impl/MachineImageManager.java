@@ -48,6 +48,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
@@ -71,26 +72,23 @@ public class MachineImageManager implements IMachineImageManager {
     @Resource
     private SessionContext ctx;
 
-    private User user;
-
     @Resource
     public void setSessionContext(final SessionContext ctx) {
         this.ctx = ctx;
     }
-
-    private void setUser() throws CloudProviderException {
+    
+    private User getUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
-        this.user = this.userManager.getUserByUsername(username);
+        return this.userManager.getUserByUsername(username);
     }
 
     public Job createMachineImage(final MachineImage mi) throws CloudProviderException {
-        this.setUser();
         Job j = new Job();
 
         // TODO : check whether imageLocation points to a Machine
         mi.setType(MachineImage.Type.IMAGE);
 
-        mi.setUser(this.user);
+        mi.setUser(this.getUser());
         mi.setCreated(new Date());
         mi.setState(MachineImage.State.AVAILABLE);
         this.em.persist(mi);
@@ -102,22 +100,15 @@ public class MachineImageManager implements IMachineImageManager {
         j.setParentJob(null);
         j.setNestedJobs(null);
         j.setReturnCode(0);
-        j.setUser(this.user);
+        j.setUser(this.getUser());
         this.em.persist(j);
         this.em.flush();
         return j;
     }
-
-    public List<MachineImage> getMachineImages() throws CloudProviderException {
-        this.setUser();
-        List<MachineImage> images = null;
-        try {
-            images = this.em.createQuery("FROM MachineImage i WHERE i.state<>'DELETED' AND i.user=:user")
-                .setParameter("user", this.user).getResultList();
-        } catch (Exception e) {
-            throw new CloudProviderException("Internal query error");
-        }
-        return images;
+    
+    @Override
+    public List<MachineImage> getMachineImages() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("MachineImage",this.em,this.getUser().getUsername());
     }
 
     public MachineImage getMachineImageById(final String imageId) throws CloudProviderException {
@@ -142,7 +133,6 @@ public class MachineImageManager implements IMachineImageManager {
     }
 
     public void deleteMachineImage(final String imageId) throws CloudProviderException, ResourceNotFoundException {
-        this.setUser();
         MachineImage image = null;
         try {
             image = this.em.find(MachineImage.class, Integer.valueOf(imageId));
@@ -179,14 +169,13 @@ public class MachineImageManager implements IMachineImageManager {
 
     public List<MachineImage> getMachineImages(final int first, final int last, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
-        this.setUser();
         if ((first < 0) || (last < 0) || (last < first)) {
             throw new InvalidRequestException(" Illegal array index " + first + " " + last);
         }
 
         Query query = this.em
             .createNamedQuery("FROM MachineImage i WHERE i.user.username=:userName AND i.state<>'DELETED' ORDER BY i.id");
-        query.setParameter("userName", this.user.getUsername());
+        query.setParameter("userName", this.getUser().getUsername());
         query.setMaxResults(last - first + 1);
         query.setFirstResult(first);
         List<MachineImage> images = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
@@ -204,7 +193,6 @@ public class MachineImageManager implements IMachineImageManager {
     public void updateMachineImageAttributes(final String imageId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
 
-        this.setUser();
         MachineImage image = null;
         try {
             image = this.em.find(MachineImage.class, Integer.valueOf(imageId));

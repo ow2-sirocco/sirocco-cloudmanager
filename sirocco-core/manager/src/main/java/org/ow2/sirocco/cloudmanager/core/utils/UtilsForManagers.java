@@ -6,6 +6,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.List;
 import java.util.Map;
 
 import javax.ejb.EJBContext;
@@ -16,7 +17,10 @@ import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
+import javax.persistence.EntityManager;
+
 import org.hibernate.proxy.HibernateProxy;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 public class UtilsForManagers {
 
@@ -78,6 +82,14 @@ public class UtilsForManagers {
 
         sess.close();
         conn.close();
+    }
+    
+    @SuppressWarnings({"rawtypes" })
+    public static List getEntityList(String entityType,EntityManager em,String username)
+    {
+        return em.createQuery("FROM "+entityType+" v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id")
+                .setParameter("username", username).getResultList();
+        
     }
 
 }

@@ -49,19 +49,23 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
+import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
+import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
@@ -95,12 +99,19 @@ public class JobManager implements IJobManager {
     private INetworkManager networkManager;
     @EJB
     private ILockManager lockManager;
+    @EJB
+    private IUserManager userManager;
 
     @Resource
     private EJBContext ctx;
 
     @Resource
     private SessionContext sessionContext;
+    
+    private User getUser() throws CloudProviderException {
+        String username = this.ctx.getCallerPrincipal().getName();
+        return this.userManager.getUserByUsername(username);
+    }
 
     public Job createJob(final CloudResource targetEntity, final String action,
             final String parentJob) throws CloudProviderException {
@@ -174,6 +185,11 @@ public class JobManager implements IJobManager {
         return null;
     }
 
+    @Override
+    public List<Job> getJobs() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("Job",this.em,this.getUser().getUsername());
+    }
+    
     @Override
     public List<Job> getJobs(final int first, final int last,
             final List<String> attributes) throws InvalidRequestException,

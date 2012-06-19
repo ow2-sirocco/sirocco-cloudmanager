@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -86,5 +87,7 @@ public interface ISystemManager extends IJobListener {
     Job startSystem(String systemId) throws CloudProviderException;
     Job stopSystem(String systemId) throws CloudProviderException;
     Job deleteSystem(String systemId) throws CloudProviderException;
+    List<System> getSystems() throws CloudProviderException;
+    List<SystemTemplate> getSystemTemplates() throws CloudProviderException;
     
 }

@@ -52,6 +52,7 @@ import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
@@ -76,6 +77,11 @@ public class CredentialsManager implements ICredentialsManager {
     @Resource
     public void setSessionContext(final SessionContext ctx) {
         this.ctx = ctx;
+    }
+    
+    private User getUser() throws CloudProviderException {
+        String username = this.ctx.getCallerPrincipal().getName();
+        return this.userManager.getUserByUsername(username);
     }
 
     private void setUser() throws CloudProviderException {
@@ -218,6 +224,11 @@ public class CredentialsManager implements ICredentialsManager {
         throw new InvalidRequestException(" getCredentials with filter expression ");
     }
 
+    @Override
+    public List<Credentials> getCredentials() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("Credentials",this.em,this.getUser().getUsername());
+    }
+    
     public List<Credentials> getCredentials(final int first, final int last, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
 
@@ -280,6 +291,11 @@ public class CredentialsManager implements ICredentialsManager {
         throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    @Override
+    public List<CredentialsTemplate> getCredentialsTemplates() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("CredentialsTemplate",this.em,this.getUser().getUsername());
     }
 
     @Override

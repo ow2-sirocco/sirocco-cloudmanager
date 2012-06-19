@@ -123,19 +123,14 @@ public class MachineManager implements IMachineManager {
     @Resource
     private SessionContext ctx;
 
-    private User user;
-
     @Resource
     public void setSessionContext(final SessionContext ctx) {
         this.ctx = ctx;
     }
-
-    private void setUser() throws CloudProviderException {
+    
+    private User getUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
-        this.user = this.userManager.getUserByUsername(username);
-        if (this.user == null) {
-            throw new CloudProviderException("User " + username + " unknown");
-        }
+        return this.userManager.getUserByUsername(username);
     }
 
     private List<CloudProvider> selectCloudProviders(final MachineTemplate mt) {
@@ -162,8 +157,7 @@ public class MachineManager implements IMachineManager {
 
     @Override
     public CloudEntryPoint getCloudEntryPoint() throws CloudProviderException {
-        this.setUser();
-        Integer userid = this.user.getId();
+        Integer userid = this.getUser().getId();
         CloudEntryPoint cep = (CloudEntryPoint) this.em.createQuery("FROM CloudEntryPoint c WHERE c.user.id=:userid")
             .setParameter("userid", userid).getSingleResult();
         return cep;
@@ -319,14 +313,14 @@ public class MachineManager implements IMachineManager {
     }
 
     private Job createJob(final CloudResource targetResource, final List<CloudResource> affectedResources, final String action,
-        final Job.Status status, final Job parent) {
+        final Job.Status status, final Job parent) throws CloudProviderException {
 
         Job j = new Job();
         j.setTargetEntity(targetResource);
         j.setAffectedEntities(affectedResources);
         j.setAction(action);
         j.setStatus(status);
-        j.setUser(this.user);
+        j.setUser(this.getUser());
         j.setCreated(new Date());
         j.setProperties(new HashMap<String, String>());
         j.setParentJob(parent);
@@ -360,7 +354,6 @@ public class MachineManager implements IMachineManager {
             } catch (CloudProviderException e) {
                 // TODO clean up
                 MachineManager.logger.info(" Error in creating volume ");
-                this.em.flush();
                 return;
             }
             // TODO: doing this without lock on parent
@@ -377,7 +370,6 @@ public class MachineManager implements IMachineManager {
             this.em.persist(mv);
 
         }
-        this.em.flush();
     }
 
     /**
@@ -395,21 +387,19 @@ public class MachineManager implements IMachineManager {
             mv.setMachineVolumeCollection(volumeColl);
             this.em.persist(mv);
         }
-        this.em.flush();
     }
 
     public Job createMachine(final MachineCreate machineCreate) throws CloudProviderException {
 
-        this.setUser();
         MachineManager.logger.info("createMachine from machine template");
         MachineTemplate mt = machineCreate.getMachineTemplate();
 
-        this.validateCreationParameters(mt, this.user);
+        this.validateCreationParameters(mt, this.getUser());
 
         /**
          * TODO Check quota
          */
-        if (this.checkQuota(this.user, mt.getMachineConfiguration()) == false) {
+        if (this.checkQuota(this.getUser(), mt.getMachineConfiguration()) == false) {
             throw new CloudProviderException("User exceeded quota ");
         }
         MachineManager.logger.info(" selectCloudProviders ");
@@ -428,7 +418,7 @@ public class MachineManager implements IMachineManager {
             /**
              * Select provider account to use
              */
-            account = this.selectCloudProviderAccount(cp, this.user, mt);
+            account = this.selectCloudProviderAccount(cp, this.getUser(), mt);
             if (account != null) {
                 myprovider = cp;
                 break;
@@ -475,7 +465,7 @@ public class MachineManager implements IMachineManager {
         m.setProperties(machineCreate.getProperties());
 
         m.setState(Machine.State.CREATING);
-        m.setUser(this.user);
+        m.setUser(this.getUser());
         m.setCpu(mt.getMachineConfiguration().getCpu());
         m.setMemory(mt.getMachineConfiguration().getMemory());
 
@@ -484,14 +474,6 @@ public class MachineManager implements IMachineManager {
 
         m.setLocation(mylocation);
         m.setCreated(new Date());
-
-        if (jobCreateMachine.getStatus() == Job.Status.SUCCESS) {
-            try {
-                m.setState(computeService.getMachineState(jobCreateMachine.getTargetEntity().getProviderAssignedId()));
-            } catch (ConnectorException ce) {
-                throw new ServiceUnavailableException(ce.getMessage());
-            }
-        }
 
         this.initVolumeCollection(m);
         this.initDiskCollection(m);
@@ -518,13 +500,11 @@ public class MachineManager implements IMachineManager {
         child.setDescription("Machine creation ");
         this.updateJob(child);
 
-        if (jobCreateMachine.getStatus() == Job.Status.RUNNING) {
-            // Ask for connector to notify when job completes
-            try {
-                UtilsForManagers.emitJobListenerMessage(jobCreateMachine.getProviderAssignedId(), this.ctx);
-            } catch (Exception e) {
-                throw new ServiceUnavailableException(e.getMessage());
-            }
+        // Ask for connector to notify when job completes
+        try {
+            UtilsForManagers.emitJobListenerMessage(jobCreateMachine.getProviderAssignedId(), this.ctx);
+        } catch (Exception e) {
+            throw new ServiceUnavailableException(e.getMessage());
         }
         MachineManager.logger.info(" Machine create child job " + child.getId());
         /**
@@ -562,15 +542,13 @@ public class MachineManager implements IMachineManager {
     public List<Machine> getMachines(final int first, final int last, final List<String> attributes)
         throws CloudProviderException {
 
-        this.setUser();
-
         if ((first < 0) || (last < 0) || (last < first)) {
             throw new InvalidRequestException(" Illegal array index " + first + " " + last);
         }
 
         Query query = this.em
             .createNamedQuery("FROM Machine v WHERE v.user.username=:userName AND v.state<>'DELETED' ORDER BY v.id");
-        query.setParameter("userName", this.user.getUsername());
+        query.setParameter("userName", this.getUser().getUsername());
         query.setMaxResults(last - first + 1);
         query.setFirstResult(first);
         List<Machine> machines = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
@@ -581,10 +559,18 @@ public class MachineManager implements IMachineManager {
         return machines;
     }
 
+    @Override
+    public List<Machine> getMachines() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("Machine",this.em,this.getUser().getUsername());
+    }
+    
     // TODO
     public List<Machine> getMachines(final List<String> attributes, final String queryExpression) throws CloudProviderException {
         List<Machine> machines = new ArrayList<Machine>();
-
+        if (queryExpression != null && !queryExpression.isEmpty()) {
+            // TODO
+            throw new UnsupportedOperationException();
+        }
         return machines;
     }
 
@@ -655,20 +641,7 @@ public class MachineManager implements IMachineManager {
                 + m.getProviderAssignedId() + " " + m.getId());
         }
         MachineManager.logger.info("operation " + action + " for machine " + m.getId() + " job status " + j.getStatus());
-        if ((j.getStatus() == Job.Status.FAILED) || (j.getStatus() == Job.Status.CANCELLED)
-            || (j.getStatus() == Job.Status.SUCCESS)) {
-            /**
-             * what to do ? should we immediately obtain the machine status and
-             * update it without creating a job entity?
-             */
-            Machine.State s = m.getState();
-            try {
-                s = computeService.getMachineState(m.getProviderAssignedId());
-            } catch (ConnectorException e) {
-                /** what to do ? */
-            }
-            m.setState(s);
-        }
+
         Job job = this.createJob(m, null, action, j.getStatus(), null);
         job.setProviderAssignedId(j.getProviderAssignedId());
         this.updateJob(job);
@@ -839,7 +812,7 @@ public class MachineManager implements IMachineManager {
         j.setParentJob(null);
         j.setNestedJobs(null);
         j.setReturnCode(0);
-        j.setUser(this.user);
+        j.setUser(this.getUser());
         this.em.persist(j);
         this.em.flush();
         return j;
@@ -939,12 +912,16 @@ public class MachineManager implements IMachineManager {
         this.em.remove(config);
         this.em.flush();
     }
+    
+    @Override
+    public List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("MachineConfiguration",this.em,this.getUser().getUsername());
+    }
 
     @Override
     public List<MachineConfiguration> getMachineConfigurations(final int first, final int last, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
-        this.setUser();
-        User user = this.user;
+        User user = this.getUser();
         Query query = this.em.createQuery("FROM MachineConfiguration v WHERE v.user.username=:username ORDER BY v.id");
         query.setParameter("username", user.getUsername());
         query.setMaxResults(last - first + 1);
@@ -955,12 +932,11 @@ public class MachineManager implements IMachineManager {
     @Override
     public List<MachineConfiguration> getMachineConfigurations(final List<String> attributes, final String queryExpression)
         throws InvalidRequestException, CloudProviderException {
-        this.setUser();
         if (queryExpression != null && !queryExpression.isEmpty()) {
             // TODO
             throw new UnsupportedOperationException();
         }
-        User user = this.user;
+        User user = this.getUser();
         return this.em.createQuery("FROM MachineConfiguration v WHERE v.user.username=:username ORDER BY v.id")
             .setParameter("username", user.getUsername()).getResultList();
     }
@@ -968,8 +944,7 @@ public class MachineManager implements IMachineManager {
     public MachineConfiguration createMachineConfiguration(final MachineConfiguration machineConfig)
         throws CloudProviderException {
 
-        this.setUser();
-        Integer userid = this.user.getId();
+        Integer userid = this.getUser().getId();
         this.validateMachineConfiguration(machineConfig);
         boolean exists = true;
         try {
@@ -982,7 +957,7 @@ public class MachineManager implements IMachineManager {
         if (exists == true) {
             throw new CloudProviderException("MachineConfiguration by name already exists " + machineConfig.getName());
         }
-        machineConfig.setUser(this.user);
+        machineConfig.setUser(this.getUser());
         machineConfig.setCreated(new Date());
         this.em.persist(machineConfig);
         this.em.flush();
@@ -1124,13 +1099,12 @@ public class MachineManager implements IMachineManager {
     }
 
     public void deleteMachineTemplate(final String mtId) throws CloudProviderException {
-        this.setUser();
 
         MachineTemplate mt = this.em.find(MachineTemplate.class, Integer.valueOf(mtId));
         if (mt == null) {
             throw new ResourceNotFoundException("Cannot find machine template " + mtId);
         }
-        if (mt.getUser().equals(this.user) == false) {
+        if (mt.getUser().equals(this.getUser()) == false) {
             throw new CloudProviderException("Not owner, cannot delete machine template ");
         }
 
@@ -1250,8 +1224,7 @@ public class MachineManager implements IMachineManager {
      */
     public MachineTemplate createMachineTemplate(final MachineTemplate mt) throws CloudProviderException {
 
-        this.setUser();
-        Integer userid = this.user.getId();
+        Integer userid = this.getUser().getId();
         boolean exists = true;
         try {
             MachineTemplate mtemplate = (MachineTemplate) this.em
@@ -1289,7 +1262,7 @@ public class MachineManager implements IMachineManager {
         this.createVolumeTemplateCollectionForMt(mt);
         this.createNetworkInterfaces(mt);
 
-        mt.setUser(this.user);
+        mt.setUser(this.getUser());
         mt.setCreated(new Date());
         this.em.persist(mt);
         this.em.flush();
@@ -1307,6 +1280,11 @@ public class MachineManager implements IMachineManager {
         throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
+    }
+    
+    @Override
+    public List<MachineTemplate> getMachineTemplates() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("MachineTemplate",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -1579,8 +1557,9 @@ public class MachineManager implements IMachineManager {
     /**
      * Continue machine creation tasks in job completion handler. job : root
      * non-leaf job of machine creation
+     * @throws CloudProviderException 
      */
-    private boolean machineCreationContinuation(final Job job, final Machine m) {
+    private boolean machineCreationContinuation(final Job job, final Machine m) throws CloudProviderException {
 
         List<Job> children = job.getNestedJobs();
         MachineManager.logger.info("machineCreationContinuation child jobs " + children.size());
@@ -1743,7 +1722,7 @@ public class MachineManager implements IMachineManager {
         return true;
     }
 
-    public boolean jobCompletionHandler(final String notification_id) {
+    public boolean jobCompletionHandler(final String notification_id) throws CloudProviderException {
         Job notification;
 
         try {

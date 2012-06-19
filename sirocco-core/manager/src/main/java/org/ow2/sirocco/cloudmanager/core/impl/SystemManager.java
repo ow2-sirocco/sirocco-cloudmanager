@@ -66,6 +66,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor.ComponentType;
@@ -314,6 +315,11 @@ public class SystemManager implements ISystemManager {
         this.em.flush();
         return systemT;
     }
+    
+    @Override
+    public List<System> getSystems() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("System",this.em,this.getUser().getUsername());
+    }
 
     @Override
     public System getSystemById(final String systemId)
@@ -342,6 +348,11 @@ public class SystemManager implements ISystemManager {
         SystemTemplate result = this.em.find(SystemTemplate.class, new Integer(
                 systemTemplateId));
         return result;
+    }
+    
+    @Override
+    public List<SystemTemplate> getSystemTemplates() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("SystemTemplate",this.em,this.getUser().getUsername());
     }
 
     private ComponentDescriptor getComponentDescriptorById(

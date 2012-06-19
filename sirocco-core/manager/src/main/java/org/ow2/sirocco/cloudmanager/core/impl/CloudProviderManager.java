@@ -57,6 +57,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -75,14 +76,14 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     @Resource
     private EJBContext ctx;
-    private String user;
 
     @EJB
     private IUserManager userManager;
 
 
-    private void setUser() {
-        user = ctx.getCallerPrincipal().getName();
+    private User getUser() throws CloudProviderException {
+        String username = this.ctx.getCallerPrincipal().getName();
+        return this.userManager.getUserByUsername(username);
     }
 
     @Override
@@ -121,6 +122,11 @@ public class CloudProviderManager implements ICloudProviderManager {
                 cloudProviderId));
 
         return result;
+    }
+    
+    @Override
+    public List<CloudProvider> getCloudProviders() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("CloudProvider",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -262,6 +268,11 @@ public class CloudProviderManager implements ICloudProviderManager {
                 new Integer(cloudProviderAccountId));
         this.em.remove(result);
 
+    }
+    
+    @Override
+    public List<CloudProviderAccount> getCloudProviderAccounts() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("CloudProviderAccount",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -439,6 +450,12 @@ public class CloudProviderManager implements ICloudProviderManager {
         this.em.remove(result);
 
     }
+    
+    @Override
+    public List<CloudProviderLocation> getCloudProviderLocations() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("CloudProviderLocation",this.em,this.getUser().getUsername());
+    }
+    
     /**
      * Method to evaluate distance between 2 different locations
      * <br>** Only works if the points are close enough that you can omit 

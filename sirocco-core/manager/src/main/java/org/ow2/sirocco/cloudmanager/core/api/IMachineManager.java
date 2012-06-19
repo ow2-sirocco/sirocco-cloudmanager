@@ -46,7 +46,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
 /**
  * Machine management operations
  */
-public interface IMachineManager {
+public interface IMachineManager extends IJobListener{
 
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.MachineManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager@Remote";
 
@@ -192,6 +192,10 @@ public interface IMachineManager {
     Job removeNetworkInterfaceFromMachine(String machineId, String nicId) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException;
 
-    boolean jobCompletionHandler(final String job);
+    List<Machine> getMachines() throws CloudProviderException;
+
+    List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException;
+
+    List<MachineTemplate> getMachineTemplates() throws CloudProviderException;
 
 }

@@ -24,11 +24,13 @@
  */
 package org.ow2.sirocco.cloudmanager.core.api;
 
+import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+
 /**
  * Job event handling
  */
 public interface IJobListener {
 
-    boolean jobCompletionHandler(final String job_id);
+    boolean jobCompletionHandler(final String job_id) throws CloudProviderException;
 
 }

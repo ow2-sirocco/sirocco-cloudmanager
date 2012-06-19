@@ -37,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -277,6 +278,11 @@ public class VolumeManager implements IVolumeManager {
         }
         return result;
     }
+    
+    @Override
+    public List<Volume> getVolumes() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("Volume",this.em,this.getUser().getUsername());
+    }
 
     @Override
     public List<Volume> getVolumes(final List<String> attributes, final String filterExpression) throws CloudProviderException {
@@ -312,7 +318,12 @@ public class VolumeManager implements IVolumeManager {
         return this.em.createQuery("FROM VolumeConfiguration v WHERE v.user.username=:username ORDER BY v.id")
             .setParameter("username", user.getUsername()).getResultList();
     }
-
+    
+    @Override
+    public List<VolumeConfiguration> getVolumeConfigurations() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("VolumeConfiguration",this.em,this.getUser().getUsername());
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public List<VolumeConfiguration> getVolumeConfigurations(final int first, final int last, final List<String> attributes)
@@ -337,6 +348,11 @@ public class VolumeManager implements IVolumeManager {
             .setParameter("username", user.getUsername()).getResultList();
     }
 
+    @Override
+    public List<VolumeTemplate> getVolumeTemplates() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("VolumeTemplate",this.em,this.getUser().getUsername());
+    }
+    
     @SuppressWarnings("unchecked")
     @Override
     public List<VolumeTemplate> getVolumeTemplates(final int first, final int last, final List<String> attributes)
@@ -795,6 +811,11 @@ public class VolumeManager implements IVolumeManager {
         User user = this.getUser();
         return this.em.createQuery("FROM VolumeImage v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id ")
             .setParameter("username", user.getUsername()).getResultList();
+    }
+    
+    @Override
+    public List<VolumeImage> getVolumeImages() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("VolumeImage",this.em,this.getUser().getUsername());
     }
 
     @Override

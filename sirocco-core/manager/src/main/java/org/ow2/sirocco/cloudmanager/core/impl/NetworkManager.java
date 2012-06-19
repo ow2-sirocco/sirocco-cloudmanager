@@ -48,6 +48,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
@@ -190,13 +191,10 @@ public class NetworkManager implements INetworkManager {
         throws ResourceNotFoundException, CloudProviderException {
         return this.getNetworkById(networkId);
     }
-
-    @SuppressWarnings("unchecked")
+    
     @Override
-    public List<Network> getNetworks() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em.createQuery("SELECT v FROM Network v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<Network> getNetworks() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("Network",this.em,this.getUser().getUsername());
     }
 
     @SuppressWarnings("unchecked")
@@ -326,13 +324,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
         return networkConfig;
     }
-
+    
     @Override
-    public List<NetworkConfiguration> getNetworkConfigurations() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em
-            .createQuery("SELECT v FROM NetworkConfiguration v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<NetworkConfiguration> getNetworkConfigurations() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("NetworkConfiguration",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -416,12 +411,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
         return networkTemplate;
     }
-
+    
     @Override
-    public List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em.createQuery("SELECT v FROM NetworkTemplate v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("NetworkTemplate",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -629,12 +622,10 @@ public class NetworkManager implements INetworkManager {
     public Job stopNetworkPort(final String networkPortId) throws ResourceNotFoundException, CloudProviderException {
         return this.performActionOnNetworkPort(networkPortId, "stop");
     }
-
+   
     @Override
-    public List<NetworkPort> getNetworkPorts() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em.createQuery("SELECT v FROM NetworkPort v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<NetworkPort> getNetworkPorts() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("NetworkPort",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -712,13 +703,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
         return networkPortConfiguration;
     }
-
+    
     @Override
-    public List<NetworkPortConfiguration> getNetworkPortConfigurations() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em
-            .createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<NetworkPortConfiguration> getNetworkPortConfigurations() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("NetworkPortConfiguration",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -807,13 +795,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
         return networkPortTemplate;
     }
-
+    
     @Override
-    public List<NetworkPortTemplate> getNetworkPortTemplates() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em
-            .createQuery("SELECT v FROM NetworkPortTemplate v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<NetworkPortTemplate> getNetworkPortTemplates() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("NetworkPortTemplate",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -896,13 +881,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
         return forwardingGroupTemplate;
     }
-
+    
     @Override
-    public List<ForwardingGroupTemplate> getForwardingGroupTemplates() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em
-            .createQuery("SELECT v FROM ForwardingGroupTemplate v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<ForwardingGroupTemplate> getForwardingGroupTemplates() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("ForwardingGroupTemplate",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -1036,12 +1018,10 @@ public class NetworkManager implements INetworkManager {
         }
         return job;
     }
-
+    
     @Override
-    public List<ForwardingGroup> getForwardingGroups() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em.createQuery("SELECT v FROM ForwardingGroup v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<ForwardingGroup> getForwardingGroups() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("ForwardingGroup",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -1213,12 +1193,10 @@ public class NetworkManager implements INetworkManager {
         // TODO
         return null;
     }
-
+    
     @Override
-    public List<Address> getAddresses() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em.createQuery("SELECT v FROM Address v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<Address> getAddresses() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("Address",this.em,this.getUser().getUsername());
     }
 
     @Override
@@ -1295,12 +1273,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
         return addressTemplate;
     }
-
+    
     @Override
-    public List<AddressTemplate> getAddressTemplates() throws CloudProviderException {
-        User user = this.getUser();
-        return this.em.createQuery("SELECT v FROM AddressTemplate v WHERE v.user.username=:username AND v.state<>'DELETED'")
-            .setParameter("username", user.getUsername()).getResultList();
+    public List<AddressTemplate> getAddressTemplates() throws CloudProviderException{
+        return UtilsForManagers.getEntityList("AddressTemplate",this.em,this.getUser().getUsername());
     }
 
     @Override

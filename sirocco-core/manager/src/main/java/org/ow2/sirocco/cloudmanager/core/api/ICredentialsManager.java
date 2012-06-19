@@ -77,4 +77,9 @@ public interface ICredentialsManager {
 
     List<CredentialsTemplate> getCredentialsTemplates(int first, int last, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
+
+    List<Credentials> getCredentials() throws CloudProviderException;
+
+    List<CredentialsTemplate> getCredentialsTemplates()
+            throws CloudProviderException;
 }

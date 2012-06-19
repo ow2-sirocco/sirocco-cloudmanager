@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -109,5 +110,13 @@ public interface ICloudProviderManager {
 
     double locationDistance(CloudProviderLocation pointA,
             CloudProviderLocation pointB) throws CloudProviderException;
+
+    List<CloudProviderAccount> getCloudProviderAccounts()
+            throws CloudProviderException;
+
+    List<CloudProviderLocation> getCloudProviderLocations()
+            throws CloudProviderException;
+
+    List<CloudProvider> getCloudProviders() throws CloudProviderException;
 
 }
