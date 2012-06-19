@@ -50,13 +50,17 @@ public class Network extends CloudResource implements Serializable {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, DELETING, DELETED, ERROR
     }
 
+    public static enum Type {
+        PRIVATE, PUBLIC
+    }
+
     private CloudProviderAccount cloudProviderAccount;
 
     private CloudProviderLocation location;
 
     private State state;
 
-    private String networkType;
+    private Type networkType;
 
     private Integer mtu;
 
@@ -93,11 +97,12 @@ public class Network extends CloudResource implements Serializable {
         this.location = location;
     }
 
-    public String getNetworkType() {
+    @Enumerated(EnumType.STRING)
+    public Type getNetworkType() {
         return this.networkType;
     }
 
-    public void setNetworkType(final String networkType) {
+    public void setNetworkType(final Type networkType) {
         this.networkType = networkType;
     }
 

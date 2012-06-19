@@ -64,6 +64,8 @@ public abstract class NetworkInterface implements Serializable, Identifiable {
 
     private Integer mtu;
 
+    private Network.Type networkType;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
@@ -115,6 +117,15 @@ public abstract class NetworkInterface implements Serializable, Identifiable {
 
     public void setNetwork(final Network network) {
         this.network = network;
+    }
+
+    @Enumerated(EnumType.STRING)
+    public Network.Type getNetworkType() {
+        return this.networkType;
+    }
+
+    public void setNetworkType(final Network.Type networkType) {
+        this.networkType = networkType;
     }
 
 }
