@@ -40,8 +40,6 @@
 
 	<modules>
 		<module>sirocco-rest-cimi</module>
-		<module>sirocco-api-java-sdk</module>
-		<module>sirocco-command-line-tools</module>
 	</modules>
 
 </project>
