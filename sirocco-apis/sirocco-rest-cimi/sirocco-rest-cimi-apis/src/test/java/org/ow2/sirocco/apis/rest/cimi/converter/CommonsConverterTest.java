@@ -34,30 +34,15 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
-import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
@@ -66,27 +51,13 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
-import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
-import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * Converters tests of common data.
@@ -277,8 +248,8 @@ public class CommonsConverterTest {
         Assert.assertNull(((DiskTemplate) service).getQuantity());
         Assert.assertNull(((DiskTemplate) service).getUnit());
 
-        // Empty Cimi (CimiDisk) -> Service
-        service = this.context.convertToService(new CimiDisk());
+        // Empty Cimi (CimiCapacity) -> Service
+        service = this.context.convertToService(new CimiCapacity());
         Assert.assertEquals(Disk.class, service.getClass());
         Assert.assertNull(((Disk) service).getQuantity());
         Assert.assertNull(((Disk) service).getUnits());
@@ -300,10 +271,9 @@ public class CommonsConverterTest {
         Assert.assertEquals(5, ((DiskTemplate) service).getQuantity().longValue());
         Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.GIGABYTE, ((DiskTemplate) service).getUnit());
 
-        // Full Cimi (CimiDisk) -> Service
-        CimiDisk cimiDisk = new CimiDisk();
-        cimiDisk.setCapacity(new CimiCapacity(7, StorageUnit.EXABYTE.getLabel()));
-        service = this.context.convertToService(cimiDisk);
+        // Full Cimi (CimiCapacity) -> Service
+        cimi = new CimiCapacity(7, StorageUnit.EXABYTE.getLabel());
+        service = this.context.convertToService(cimi);
         Assert.assertEquals(7, ((Disk) service).getQuantity().longValue());
         Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.EXABYTE, ((Disk) service).getUnits());
 
@@ -334,14 +304,14 @@ public class CommonsConverterTest {
 
         // Empty Cimi -> Service
         service = (DiskTemplate) this.context.convertToService(new CimiDiskConfiguration());
-        Assert.assertNull(service.getAttachmentPoint());
+        Assert.assertNull(service.getInitialLocation());
         Assert.assertNull(service.getFormat());
         Assert.assertNull(service.getQuantity());
         Assert.assertNull(service.getUnit());
 
         // Empty Service -> Cimi
         cimi = (CimiDiskConfiguration) this.context.convertToCimi(new DiskTemplate(), CimiDiskConfiguration.class);
-        Assert.assertNull(cimi.getAttachmentPoint());
+        Assert.assertNull(cimi.getInitialLocation());
         Assert.assertNull(cimi.getFormat());
         Assert.assertNotNull(cimi.getCapacity());
         Assert.assertNull(cimi.getCapacity().getQuantity());
@@ -349,62 +319,68 @@ public class CommonsConverterTest {
 
         // Full Cimi -> Service
         cimi = new CimiDiskConfiguration();
-        cimi.setAttachmentPoint("attachmentPoint");
+        cimi.setInitialLocation("initialLocation");
         cimi.setFormat("format");
         cimi.setCapacity(new CimiCapacity(5, StorageUnit.PETABYTE.getLabel()));
 
         service = (DiskTemplate) this.context.convertToService(cimi);
-        Assert.assertEquals("attachmentPoint", service.getAttachmentPoint());
+        Assert.assertEquals("initialLocation", service.getInitialLocation());
         Assert.assertEquals("format", service.getFormat());
         Assert.assertEquals(5, service.getQuantity().longValue());
         Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.PETABYTE, service.getUnit());
 
         // Full Service -> Cimi
         service = new DiskTemplate();
-        service.setAttachmentPoint("attachmentPoint");
+        service.setInitialLocation("initialLocation");
         service.setFormat("format");
         service.setQuantity(7f);
         service.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.MEGABYTE);
 
         cimi = (CimiDiskConfiguration) this.context.convertToCimi(service, CimiDiskConfiguration.class);
-        Assert.assertEquals("attachmentPoint", cimi.getAttachmentPoint());
+        Assert.assertEquals("initialLocation", cimi.getInitialLocation());
         Assert.assertEquals("format", cimi.getFormat());
         Assert.assertEquals(7, cimi.getCapacity().getQuantity().intValue());
         Assert.assertEquals(StorageUnit.MEGABYTE.getLabel(), cimi.getCapacity().getUnits());
     }
 
     @Test
-    public void testCimiDisk() throws Exception {
-        CimiDisk cimi;
-        Disk service;
+    public void testCimiMachineDisk() throws Exception {
+        CimiMachineDisk cimi;
+        MachineDisk service;
 
         // Empty Cimi -> Service
-        service = (Disk) this.context.convertToService(new CimiDisk());
-        Assert.assertNull(service.getQuantity());
-        Assert.assertNull(service.getUnits());
+        service = (MachineDisk) this.context.convertToService(new CimiMachineDisk());
+        Assert.assertNull(service.getDisk());
+        Assert.assertNull(service.getInitialLocation());
 
         // Empty Service -> Cimi
-        cimi = (CimiDisk) this.context.convertToCimi(new Disk(), CimiDisk.class);
-        Assert.assertNotNull(cimi.getCapacity());
-        Assert.assertNull(cimi.getCapacity().getQuantity());
-        Assert.assertNull(cimi.getCapacity().getUnits());
+        cimi = (CimiMachineDisk) this.context.convertToCimi(new MachineDisk(), CimiMachineDisk.class);
+        Assert.assertNull(cimi.getCapacity());
+        Assert.assertNull(cimi.getInitialLocation());
 
         // Full Cimi -> Service
-        cimi = new CimiDisk();
+        cimi = new CimiMachineDisk();
         cimi.setCapacity(new CimiCapacity(5, StorageUnit.BYTE.getLabel()));
+        cimi.setInitialLocation("initialLocation");
 
-        service = (Disk) this.context.convertToService(cimi);
-        Assert.assertEquals(5, service.getQuantity().longValue());
-        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.BYTE, service.getUnits());
+        service = (MachineDisk) this.context.convertToService(cimi);
+        Assert.assertNotNull(service.getDisk());
+        Assert.assertEquals(5, service.getDisk().getQuantity().longValue());
+        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.BYTE, service.getDisk().getUnits());
+        Assert.assertEquals("initialLocation", service.getInitialLocation());
 
         // Full Service -> Cimi
-        service = new Disk();
-        service.setQuantity(7f);
-        service.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.MEGABYTE);
+        service = new MachineDisk();
+        Disk disk = new Disk();
+        disk.setQuantity(7f);
+        disk.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.MEGABYTE);
+        service.setDisk(disk);
+        service.setInitialLocation("initialLocation");
 
-        cimi = (CimiDisk) this.context.convertToCimi(service, CimiDisk.class);
+        cimi = (CimiMachineDisk) this.context.convertToCimi(service, CimiMachineDisk.class);
         Assert.assertEquals(7, cimi.getCapacity().getQuantity().intValue());
         Assert.assertEquals(StorageUnit.MEGABYTE.getLabel(), cimi.getCapacity().getUnits());
+        Assert.assertEquals("initialLocation", cimi.getInitialLocation());
     }
 
     @Test
@@ -506,11 +482,8 @@ public class CommonsConverterTest {
 
         // Full in collection
         CimiMachineImageCollection cimiCollection;
-        MachineImageCollection serviceCollection = new MachineImageCollection();
-        List<MachineImage> list = new ArrayList<MachineImage>();
-        list.add(service);
-        serviceCollection.setImages(list);
-        serviceCollection.setId(12);
+        List<MachineImage> serviceCollection = new ArrayList<MachineImage>();
+        serviceCollection.add(service);
 
         cimiCollection = (CimiMachineImageCollection) this.context.convertToCimi(serviceCollection,
             CimiMachineImageCollection.class);
@@ -523,110 +496,5 @@ public class CommonsConverterTest {
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/29", cimi.getHref());
         Assert.assertNull(cimi.getCreated());
         Assert.assertNull(cimi.getUpdated());
-    }
-
-    @Test
-    public void testAllResourceUriAndId() throws Exception {
-        CimiResource cimi = null;
-        Resource service = null;
-        Class<? extends CimiResource> cimiClass = null;
-
-        for (ExchangeType type : ExchangeType.values()) {
-            switch (type) {
-            case CloudEntryPoint:
-                service = new CloudEntryPointAggregate(new CloudEntryPoint());
-                service.setId(1);
-                cimiClass = CimiCloudEntryPoint.class;
-                break;
-            case Credentials:
-                service = new Credentials();
-                service.setId(1);
-                cimiClass = CimiCredentials.class;
-                break;
-            case CredentialsCollection:
-                service = new CredentialsCollection();
-                service.setId(1);
-                cimiClass = CimiCredentialsCollection.class;
-                break;
-            case CredentialsCreate:
-                service = null;
-                break;
-            case CredentialsTemplate:
-                service = new CredentialsTemplate();
-                service.setId(1);
-                cimiClass = CimiCredentialsTemplate.class;
-                break;
-            case CredentialsTemplateCollection:
-                service = new CredentialsTemplateCollection();
-                service.setId(1);
-                cimiClass = CimiCredentialsTemplateCollection.class;
-                break;
-            case Job:
-                service = new Job();
-                service.setId(1);
-                cimiClass = CimiJob.class;
-                break;
-            case JobCollection:
-                service = new JobCollection();
-                service.setId(1);
-                cimiClass = CimiJobCollection.class;
-                break;
-            case Machine:
-                service = new Machine();
-                service.setId(1);
-                cimiClass = CimiMachine.class;
-                break;
-            case MachineAction:
-                service = null;
-                break;
-            case MachineCollection:
-                service = new MachineCollection();
-                service.setId(1);
-                cimiClass = CimiMachineCollection.class;
-                break;
-            case MachineConfiguration:
-                service = new MachineConfiguration();
-                service.setId(1);
-                cimiClass = CimiMachineConfiguration.class;
-                break;
-            case MachineConfigurationCollection:
-                service = new MachineConfigurationCollection();
-                service.setId(1);
-                cimiClass = CimiMachineConfigurationCollection.class;
-                break;
-            case MachineCreate:
-                service = null;
-                break;
-            case MachineImage:
-                service = new MachineImage();
-                service.setId(1);
-                cimiClass = CimiMachineImage.class;
-                break;
-            case MachineImageCollection:
-                service = new MachineImageCollection();
-                service.setId(1);
-                cimiClass = CimiMachineImageCollection.class;
-                break;
-            case MachineTemplate:
-                service = new MachineTemplate();
-                service.setId(1);
-                cimiClass = CimiMachineTemplate.class;
-                break;
-            case MachineTemplateCollection:
-                service = new MachineTemplateCollection();
-                service.setId(1);
-                cimiClass = CimiMachineTemplateCollection.class;
-                break;
-            default:
-                Assert.fail(type.name());
-                break;
-            }
-            if (null != service) {
-                // System.out.println(service);
-                cimi = (CimiResource) this.context.convertToCimi(service, cimiClass);
-                Assert.assertEquals(this.context.makeHref(cimiClass, "1"), cimi.getId());
-                Assert.assertEquals(type.getResourceURI(), cimi.getResourceURI());
-            }
-        }
     }
 }

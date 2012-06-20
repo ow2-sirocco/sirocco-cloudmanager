@@ -24,7 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -40,10 +42,8 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 
 /**
  * Converters tests of credentials resources.
@@ -110,23 +110,19 @@ public class CredentialsConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCimiCredentialsCollection() throws Exception {
         CimiCredentialsCollection cimi;
-        CredentialsCollection service;
+        List<Credentials> service;
 
         // Empty Cimi -> Service
-        service = (CredentialsCollection) this.context.convertToService(new CimiCredentialsCollection());
-        Assert.assertNull(service.getCredentials());
+        service = (List<Credentials>) this.context.convertToService(new CimiCredentialsCollection());
+        Assert.assertNotNull(service);
+        Assert.assertEquals(0, service.size());
 
-        // Empty Service -> Cimi : list null
-        cimi = (CimiCredentialsCollection) this.context.convertToCimi(new CredentialsCollection(),
-            CimiCredentialsCollection.class);
-        Assert.assertNull(cimi.getArray());
-
-        // Empty Service -> Cimi : list empty
-        service = new CredentialsCollection();
-        service.setCredentials(Arrays.asList(new Credentials[] {}));
-        cimi = (CimiCredentialsCollection) this.context.convertToCimi(new CredentialsCollection(),
+        // Empty Service -> Cimi
+        service = new ArrayList<Credentials>();
+        cimi = (CimiCredentialsCollection) this.context.convertToCimi(new ArrayList<Credentials>(),
             CimiCredentialsCollection.class);
         Assert.assertNull(cimi.getArray());
 
@@ -134,8 +130,8 @@ public class CredentialsConverterTest {
         cimi = new CimiCredentialsCollection();
         cimi.setArray(new CimiCredentials[] {new CimiCredentials(), new CimiCredentials()});
 
-        service = (CredentialsCollection) this.context.convertToService(cimi);
-        Assert.assertEquals(2, service.getCredentials().size());
+        service = (List<Credentials>) this.context.convertToService(cimi);
+        Assert.assertEquals(2, service.size());
 
         // Full Service -> Cimi
         Credentials Credentials1 = new Credentials();
@@ -148,8 +144,8 @@ public class CredentialsConverterTest {
         Credentials3.setId(3);
         Credentials3.setName("nameThree");
 
-        service = new CredentialsCollection();
-        service.setCredentials(Arrays.asList(new Credentials[] {Credentials1, Credentials2, Credentials3}));
+        service = new ArrayList<Credentials>();
+        service.addAll(Arrays.asList(new Credentials[] {Credentials1, Credentials2, Credentials3}));
 
         cimi = (CimiCredentialsCollection) this.context.convertToCimi(service, CimiCredentialsCollection.class);
         Assert.assertEquals(3, cimi.getArray().length);
@@ -215,25 +211,29 @@ public class CredentialsConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCimiCredentialsTemplateCollection() throws Exception {
+
         CimiCredentialsTemplateCollection cimi;
-        CredentialsTemplateCollection service;
+        List<CredentialsTemplate> service;
 
         // Empty Cimi -> Service
-        service = (CredentialsTemplateCollection) this.context.convertToService(new CimiCredentialsTemplateCollection());
-        Assert.assertNull(service.getCredentialsTemplates());
+        service = (List<CredentialsTemplate>) this.context.convertToService(new CimiCredentialsTemplateCollection());
+        Assert.assertNotNull(service);
+        Assert.assertEquals(0, service.size());
 
         // Empty Service -> Cimi
-        cimi = (CimiCredentialsTemplateCollection) this.context.convertToCimi(new CredentialsTemplateCollection(),
+        cimi = (CimiCredentialsTemplateCollection) this.context.convertToCimi(new ArrayList<CredentialsTemplate>(),
             CimiCredentialsTemplateCollection.class);
         Assert.assertNull(cimi.getArray());
 
         // Full Cimi -> Service
         cimi = new CimiCredentialsTemplateCollection();
-        cimi.setArray(new CimiCredentialsTemplate[] {new CimiCredentialsTemplate(), new CimiCredentialsTemplate()});
+        cimi.add(new CimiCredentialsTemplate());
+        cimi.add(new CimiCredentialsTemplate());
 
-        service = (CredentialsTemplateCollection) this.context.convertToService(cimi);
-        Assert.assertEquals(2, service.getCredentialsTemplates().size());
+        service = (List<CredentialsTemplate>) this.context.convertToService(cimi);
+        Assert.assertEquals(2, service.size());
 
         // Full Service -> Cimi
         CredentialsTemplate CredentialsTemplate1 = new CredentialsTemplate();
@@ -246,9 +246,10 @@ public class CredentialsConverterTest {
         CredentialsTemplate3.setId(3);
         CredentialsTemplate3.setName("nameThree");
 
-        service = new CredentialsTemplateCollection();
-        service.setCredentialsTemplates(Arrays.asList(new CredentialsTemplate[] {CredentialsTemplate1, CredentialsTemplate2,
-            CredentialsTemplate3}));
+        service = new ArrayList<CredentialsTemplate>();
+        service.add(CredentialsTemplate1);
+        service.add(CredentialsTemplate2);
+        service.add(CredentialsTemplate3);
 
         cimi = (CimiCredentialsTemplateCollection) this.context.convertToCimi(service, CimiCredentialsTemplateCollection.class);
         Assert.assertEquals(3, cimi.getArray().length);

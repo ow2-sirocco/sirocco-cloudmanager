@@ -9,7 +9,7 @@
 	<updated>2001-02-02T01:01:01.001Z</updated>
 	<cpu frequency="100.0" numberVirtualCpus="1" units="unitValue_1" />
 	<disk>
-		<attachmentPoint>attachmentPointValue_1_0</attachmentPoint>
+		<initialLocation>initialLocationValue_1_0</initialLocation>
 		<capacity quantity="1" units="unitValue_1_0" />
 		<format>formatValue_1_0</format>
 	</disk>

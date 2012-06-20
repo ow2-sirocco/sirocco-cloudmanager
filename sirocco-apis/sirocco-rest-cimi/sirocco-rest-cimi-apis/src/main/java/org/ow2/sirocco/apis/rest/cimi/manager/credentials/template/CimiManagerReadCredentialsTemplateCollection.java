@@ -61,7 +61,7 @@ public class CimiManagerReadCredentialsTemplateCollection extends CimiManagerRea
         Object out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getCredentialsTemplateCollection();
+            out = this.manager.getCredentialsTemplates();
         } else {
             if (true == select.isNumericArrayPresent()) {
                 List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());

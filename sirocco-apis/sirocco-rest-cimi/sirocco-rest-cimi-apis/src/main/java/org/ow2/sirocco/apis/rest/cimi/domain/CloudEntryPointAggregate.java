@@ -24,14 +24,16 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import java.util.List;
+
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 
 /**
  * Aggregation of CloudEntryPoint to add all items necesary for CIMI.
@@ -45,17 +47,17 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     /**
      * Field "Credentials".
      */
-    private CredentialsCollection credentials;
+    private List<Credentials> credentials;
 
     /**
      * Field "CredentialsTemplates".
      */
-    private CredentialsTemplateCollection credentialsTemplates;
+    private List<CredentialsTemplate> credentialsTemplates;
 
     /**
      * Field "Jobs".
      */
-    private JobCollection jobs;
+    private List<Job> jobs;
 
     /**
      * Field "jobTime".
@@ -65,42 +67,42 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     /**
      * Field "machineConfigs".
      */
-    private MachineConfigurationCollection machineConfigs;
+    private List<MachineConfiguration> machineConfigs;
 
     /**
      * Field "machineImages".
      */
-    private MachineImageCollection machineImages;
+    private List<MachineImage> machineImages;
 
     /**
      * Field "machines".
      */
-    private MachineCollection machines;
-
-    // /**
-    // * Field "volumeTemplates".
-    // */
-    // private VolumeTemplateCollection volumeTemplates;
-    //
-    // /**
-    // * Field "volumeConfigurations".
-    // */
-    // private VolumeConfigurationCollection volumeConfigurations;
-    //
-    // /**
-    // * Field "volumeImages".
-    // */
-    // private VolumeImageCollection volumeImages;
-    //
-    // /**
-    // * Field "volumes".
-    // */
-    // private VolumeCollection volumes;
+    private List<Machine> machines;
 
     /**
      * Field "machineTemplates".
      */
-    private MachineTemplateCollection machineTemplates;
+    private List<MachineTemplate> machineTemplates;
+
+    // /**
+    // * Field "volumeTemplates".
+    // */
+    // private VolumeTemplate> volumeTemplates;
+    //
+    // /**
+    // * Field "volumeConfigurations".
+    // */
+    // private VolumeConfiguration> volumeConfigurations;
+    //
+    // /**
+    // * Field "volumeImages".
+    // */
+    // private VolumeImage> volumeImages;
+    //
+    // /**
+    // * Field "volumes".
+    // */
+    // private Volume> volumes;
 
     /**
      * Parameterized constructor.
@@ -124,7 +126,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @return The value
      */
-    public CredentialsCollection getCredentials() {
+    public List<Credentials> getCredentials() {
         return this.credentials;
     }
 
@@ -133,7 +135,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @param Credentialss The value
      */
-    public void setCredentials(final CredentialsCollection credentials) {
+    public void setCredentials(final List<Credentials> credentials) {
         this.credentials = credentials;
     }
 
@@ -142,7 +144,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @return The value
      */
-    public CredentialsTemplateCollection getCredentialsTemplates() {
+    public List<CredentialsTemplate> getCredentialsTemplates() {
         return this.credentialsTemplates;
     }
 
@@ -151,7 +153,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @param CredentialsTemplates The value
      */
-    public void setCredentialsTemplates(final CredentialsTemplateCollection credentialsTemplates) {
+    public void setCredentialsTemplates(final List<CredentialsTemplate> credentialsTemplates) {
         this.credentialsTemplates = credentialsTemplates;
     }
 
@@ -160,7 +162,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @return The value
      */
-    public JobCollection getJobs() {
+    public List<Job> getJobs() {
         return this.jobs;
     }
 
@@ -169,7 +171,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @param Jobs The value
      */
-    public void setJobs(final JobCollection jobs) {
+    public void setJobs(final List<Job> jobs) {
         this.jobs = jobs;
     }
 
@@ -196,7 +198,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @return The value
      */
-    public MachineConfigurationCollection getMachineConfigs() {
+    public List<MachineConfiguration> getMachineConfigs() {
         return this.machineConfigs;
     }
 
@@ -205,7 +207,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @param machineConfigs The value
      */
-    public void setMachineConfigs(final MachineConfigurationCollection machineConfigs) {
+    public void setMachineConfigs(final List<MachineConfiguration> machineConfigs) {
         this.machineConfigs = machineConfigs;
     }
 
@@ -214,7 +216,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @return The value
      */
-    public MachineImageCollection getMachineImages() {
+    public List<MachineImage> getMachineImages() {
         return this.machineImages;
     }
 
@@ -223,7 +225,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @param machineImages The value
      */
-    public void setMachineImages(final MachineImageCollection machineImages) {
+    public void setMachineImages(final List<MachineImage> machineImages) {
         this.machineImages = machineImages;
     }
 
@@ -232,7 +234,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @return The value
      */
-    public MachineCollection getMachines() {
+    public List<Machine> getMachines() {
         return this.machines;
     }
 
@@ -241,8 +243,26 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * 
      * @param machines The value
      */
-    public void setMachines(final MachineCollection machines) {
+    public void setMachines(final List<Machine> machines) {
         this.machines = machines;
+    }
+
+    /**
+     * Return the value of field "machineTemplates".
+     * 
+     * @return The value
+     */
+    public List<MachineTemplate> getMachineTemplates() {
+        return this.machineTemplates;
+    }
+
+    /**
+     * Set the value of field "machineTemplates".
+     * 
+     * @param machineTemplates The value
+     */
+    public void setMachineTemplates(final List<MachineTemplate> machineTemplates) {
+        this.machineTemplates = machineTemplates;
     }
 
     // /**
@@ -250,7 +270,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // *
     // * @return The value
     // */
-    // public VolumeTemplateCollection getVolumeTemplates() {
+    // public VolumeTemplate> getVolumeTemplates() {
     // return this.volumeTemplates;
     // }
     //
@@ -259,7 +279,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // *
     // * @param volumeTemplates The value
     // */
-    // public void setVolumeTemplates(final VolumeTemplateCollection
+    // public void setVolumeTemplates(final VolumeTemplate>
     // volumeTemplates) {
     // this.volumeTemplates = volumeTemplates;
     // }
@@ -269,7 +289,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // *
     // * @return The value
     // */
-    // public VolumeConfigurationCollection getVolumeConfigurations() {
+    // public VolumeConfiguration> getVolumeConfigurations() {
     // return this.volumeConfigurations;
     // }
     //
@@ -278,7 +298,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // *
     // * @param volumeConfigurations The value
     // */
-    // public void setVolumeConfigurations(final VolumeConfigurationCollection
+    // public void setVolumeConfigurations(final VolumeConfiguration>
     // volumeConfigurations) {
     // this.volumeConfigurations = volumeConfigurations;
     // }
@@ -288,7 +308,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // *
     // * @return The value
     // */
-    // public VolumeImageCollection getVolumeImages() {
+    // public VolumeImage> getVolumeImages() {
     // return this.volumeImages;
     // }
     //
@@ -297,7 +317,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // *
     // * @param volumeImages The value
     // */
-    // public void setVolumeImages(final VolumeImageCollection volumeImages) {
+    // public void setVolumeImages(final VolumeImage> volumeImages) {
     // this.volumeImages = volumeImages;
     // }
     //
@@ -306,7 +326,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // *
     // * @return The value
     // */
-    // public VolumeCollection getVolumes() {
+    // public Volume> getVolumes() {
     // return this.volumes;
     // }
     //
@@ -315,25 +335,8 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     // *
     // * @param volumes The value
     // */
-    // public void setVolumes(final VolumeCollection volumes) {
+    // public void setVolumes(final Volume> volumes) {
     // this.volumes = volumes;
     // }
 
-    /**
-     * Return the value of field "machineTemplates".
-     * 
-     * @return The value
-     */
-    public MachineTemplateCollection getMachineTemplates() {
-        return this.machineTemplates;
-    }
-
-    /**
-     * Set the value of field "machineTemplates".
-     * 
-     * @param machineTemplates The value
-     */
-    public void setMachineTemplates(final MachineTemplateCollection machineTemplates) {
-        this.machineTemplates = machineTemplates;
-    }
 }

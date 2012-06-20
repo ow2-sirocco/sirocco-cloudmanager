@@ -61,7 +61,7 @@ public class CimiManagerReadMachineConfigurationCollection extends CimiManagerRe
         Object out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getMachineConfigurationCollection();
+            out = this.manager.getMachineConfigurations();
         } else {
             if (true == select.isNumericArrayPresent()) {
                 List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());

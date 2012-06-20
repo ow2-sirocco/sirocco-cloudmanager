@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.validator.constraints;
 
+import java.util.regex.Pattern;
+
 import javax.validation.ConstraintValidatorContext;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
@@ -55,20 +57,9 @@ public class AssertReferencePathValidator extends CimiContextValidatorAbstract<A
             CimiResource resource = (CimiResource) value;
             String href = resource.getHref();
             if (href != null) {
-                String hrefNoId = this.getCimiContext().makeHrefBase(resource);
-                if (false == href.startsWith(hrefNoId)) {
-                    valid = false;
-                } else if (false == this.getCimiContext().mustHaveIdInReference(resource.getClass())) {
-                    if (false == href.equals(hrefNoId)) {
-                        valid = false;
-                    }
-                } else {
-                    int index = href.lastIndexOf('/');
-                    String sub = href.substring(0, index + 1);
-                    if ((false == sub.equals(hrefNoId)) || (href.length() == hrefNoId.length())) {
-                        valid = false;
-                    }
-                }
+                String regex = resource.getExchangeType().makeHrefPattern(this.getCimiContext().getRequest().getBaseUri());
+                Pattern pattern = Pattern.compile(regex);
+                valid = pattern.matcher(href).matches();
             }
         }
         return valid;

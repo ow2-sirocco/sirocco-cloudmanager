@@ -40,6 +40,10 @@ public abstract class ConstantsPath {
 
     public static final String CREDENTIALS_TEMPLATE_PATH = "/" + ConstantsPath.CREDENTIALS_TEMPLATE;
 
+    public static final String DISK = "disks";
+
+    public static final String DISK_PATH = "/" + ConstantsPath.DISK;
+
     public static final String JOB = "jobs";
 
     public static final String JOB_PATH = "/" + ConstantsPath.JOB;
@@ -60,4 +64,19 @@ public abstract class ConstantsPath {
 
     public static final String MACHINE_CONFIGURATION_PATH = "/" + ConstantsPath.MACHINE_CONFIGURATION;
 
+    public static final String VOLUME = "volumes";
+
+    public static final String VOLUME_PATH = "/" + ConstantsPath.VOLUME;
+
+    public static final String VOLUME_IMAGE = "volumeImages";
+
+    public static final String VOLUME_IMAGE_PATH = "/" + ConstantsPath.VOLUME_IMAGE;
+
+    public static final String VOLUME_CONFIGURATION = "machineConfigs";
+
+    public static final String VOLUME_CONFIGURATION_PATH = "/" + ConstantsPath.VOLUME_CONFIGURATION;
+
+    public static final String VOLUME_TEMPLATE = "machinesTemplates";
+
+    public static final String VOLUME_TEMPLATE_PATH = "/" + ConstantsPath.VOLUME_TEMPLATE;
 }

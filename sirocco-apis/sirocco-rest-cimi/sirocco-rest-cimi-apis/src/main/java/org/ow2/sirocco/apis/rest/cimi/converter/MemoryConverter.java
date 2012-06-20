@@ -97,9 +97,7 @@ public class MemoryConverter implements CimiConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final Memory dataService, final CimiMemory dataCimi) {
-        if (null != dataService.getQuantity()) {
-            dataCimi.setQuantity(dataService.getQuantity().intValue());
-        }
+        dataCimi.setQuantity(HelperConverter.toInteger(dataService.getQuantity()));
         dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnit(), MemoryUnit.class));
     }
 
@@ -111,9 +109,7 @@ public class MemoryConverter implements CimiConverter {
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiMemory dataCimi, final Memory dataService) {
-        if (null != dataCimi.getQuantity()) {
-            dataService.setQuantity(dataCimi.getQuantity().floatValue());
-        }
+        dataService.setQuantity(HelperConverter.toFloat(dataCimi.getQuantity()));
         dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit) context.convertNextService(
             dataCimi.getUnits(), MemoryUnit.class));
     }

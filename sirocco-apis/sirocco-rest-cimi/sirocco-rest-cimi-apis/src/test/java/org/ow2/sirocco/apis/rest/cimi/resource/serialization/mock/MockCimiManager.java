@@ -38,11 +38,11 @@ public abstract class MockCimiManager implements CimiManager {
 
     protected CimiData buildEntity(final CimiRequest request) {
         String pathname = this.extractPathname(request.getPath());
-        PathType type = PathType.valueOfPathname(pathname);
-        return this.buildEntity(request, type);
+        PathType type = PathType.valueOfPath(pathname);
+        return this.buildResource(request, type);
     }
 
-    protected CimiData buildEntity(final CimiRequest request, final PathType type) {
+    protected CimiData buildResource(final CimiRequest request, final PathType type) {
         CimiData cimi = null;
         switch (type) {
         case CloudEntryPoint:

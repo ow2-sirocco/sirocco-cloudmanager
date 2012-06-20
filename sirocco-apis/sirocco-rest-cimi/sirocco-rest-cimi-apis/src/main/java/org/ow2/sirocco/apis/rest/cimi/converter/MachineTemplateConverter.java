@@ -105,18 +105,13 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final MachineTemplate dataService, final CimiMachineTemplate dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            if (null != dataService.getCredentials()) {
-                dataCimi.setCredentials((CimiCredentials) context.convertNextCimi(dataService.getCredentials(),
-                    CimiCredentials.class));
-            }
-            if (null != dataService.getMachineConfiguration()) {
-                dataCimi.setMachineConfig((CimiMachineConfiguration) context.convertNextCimi(
-                    dataService.getMachineConfiguration(), CimiMachineConfiguration.class));
-            }
-            if (null != dataService.getMachineImage()) {
-                dataCimi.setMachineImage((CimiMachineImage) context.convertNextCimi(dataService.getMachineImage(),
-                    CimiMachineImage.class));
-            }
+            dataCimi.setCredentials((CimiCredentials) context.convertNextCimi(dataService.getCredentials(),
+                CimiCredentials.class));
+            dataCimi.setMachineConfig((CimiMachineConfiguration) context.convertNextCimi(dataService.getMachineConfiguration(),
+                CimiMachineConfiguration.class));
+            dataCimi.setMachineImage((CimiMachineImage) context.convertNextCimi(dataService.getMachineImage(),
+                CimiMachineImage.class));
+
             // TODO NetworkInterfaces
             // if ((null != dataService.getNetworkInterfaces()) &&
             // (dataService.getNetworkInterfaces().size() > 0)) {
@@ -176,15 +171,9 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiMachineTemplate dataCimi,
         final MachineTemplate dataService) {
         this.fill(context, dataCimi, dataService);
-        if (null != dataCimi.getCredentials()) {
-            dataService.setCredentials((Credentials) context.convertNextService(dataCimi.getCredentials()));
-        }
-        if (null != dataCimi.getMachineImage()) {
-            dataService.setMachineImage((MachineImage) context.convertNextService(dataCimi.getMachineImage()));
-        }
-        if (null != dataCimi.getMachineConfig()) {
-            dataService.setMachineConfiguration((MachineConfiguration) context.convertNextService(dataCimi.getMachineConfig()));
-        }
+        dataService.setCredentials((Credentials) context.convertNextService(dataCimi.getCredentials()));
+        dataService.setMachineImage((MachineImage) context.convertNextService(dataCimi.getMachineImage()));
+        dataService.setMachineConfiguration((MachineConfiguration) context.convertNextService(dataCimi.getMachineConfig()));
         // TODO NetworkInterfaces
         // dataService.setNetworkInterfaces(dataCimi.getUserName());
         // TODO MachineVolume

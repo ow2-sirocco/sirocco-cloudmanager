@@ -117,9 +117,8 @@ public class MachineCreateConverter implements CimiConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineCreate dataCimi, final MachineCreate dataService) {
         this.fill(dataCimi, dataService);
-        if (null != dataCimi.getMachineTemplate()) {
-            dataService.setMachineTemplate((MachineTemplate) context.convertNextService(dataCimi.getMachineTemplate()));
-        }
+        dataService.setMachineTemplate((MachineTemplate) context.convertNextService(dataCimi.getMachineTemplate()));
+
     }
 
 }

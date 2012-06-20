@@ -17,17 +17,17 @@
 		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_0" />
 		<disk>
 			<capacity quantity="3" units="unitValue_3_0" />
-			<attachmentPoint>attachmentPointValue_3_0</attachmentPoint>
+			<initialLocation>initialLocationValue_3_0</initialLocation>
 			<format>formatValue_3_0</format>
 		</disk>
 		<disk>
 			<capacity quantity="3" units="unitValue_3_1" />
-			<attachmentPoint>attachmentPointValue_3_1</attachmentPoint>
+			<initialLocation>initialLocationValue_3_1</initialLocation>
 			<format>formatValue_3_1</format>
 		</disk>
 		<disk>
 			<capacity quantity="3" units="unitValue_3_2" />
-			<attachmentPoint>attachmentPointValue_3_2</attachmentPoint>
+			<initialLocation>initialLocationValue_3_2</initialLocation>
 			<format>formatValue_3_2</format>
 		</disk>
 		<memory quantity="3" units="unitValue_3_0" />
@@ -47,17 +47,17 @@
 		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_1" />
 		<disk>
 			<capacity quantity="3" units="unitValue_3_0" />
-			<attachmentPoint>attachmentPointValue_3_0</attachmentPoint>
+			<initialLocation>initialLocationValue_3_0</initialLocation>
 			<format>formatValue_3_0</format>
 		</disk>
 		<disk>
 			<capacity quantity="3" units="unitValue_3_1" />
-			<attachmentPoint>attachmentPointValue_3_1</attachmentPoint>
+			<initialLocation>initialLocationValue_3_1</initialLocation>
 			<format>formatValue_3_1</format>
 		</disk>
 		<disk>
 			<capacity quantity="3" units="unitValue_3_2" />
-			<attachmentPoint>attachmentPointValue_3_2</attachmentPoint>
+			<initialLocation>initialLocationValue_3_2</initialLocation>
 			<format>formatValue_3_2</format>
 		</disk>
 		<memory quantity="3" units="unitValue_3_1" />
@@ -77,17 +77,17 @@
 		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_2" />
 		<disk>
 			<capacity quantity="3" units="unitValue_3_0" />
-			<attachmentPoint>attachmentPointValue_3_0</attachmentPoint>
+			<initialLocation>initialLocationValue_3_0</initialLocation>
 			<format>formatValue_3_0</format>
 		</disk>
 		<disk>
 			<capacity quantity="3" units="unitValue_3_1" />
-			<attachmentPoint>attachmentPointValue_3_1</attachmentPoint>
+			<initialLocation>initialLocationValue_3_1</initialLocation>
 			<format>formatValue_3_1</format>
 		</disk>
 		<disk>
 			<capacity quantity="3" units="unitValue_3_2" />
-			<attachmentPoint>attachmentPointValue_3_2</attachmentPoint>
+			<initialLocation>initialLocationValue_3_2</initialLocation>
 			<format>formatValue_3_2</format>
 		</disk>
 		<memory quantity="3" units="unitValue_3_2" />

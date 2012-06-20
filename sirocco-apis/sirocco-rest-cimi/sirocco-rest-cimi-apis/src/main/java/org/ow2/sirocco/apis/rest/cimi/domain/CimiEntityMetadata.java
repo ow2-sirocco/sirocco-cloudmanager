@@ -32,7 +32,10 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class Common. <p> Attributes common to all entities </p>
+ * Class Common.
+ * <p>
+ * Attributes common to all entities
+ * </p>
  */
 @XmlRootElement(name = "entityMetada")
 @JsonSerialize(include = Inclusion.NON_NULL)

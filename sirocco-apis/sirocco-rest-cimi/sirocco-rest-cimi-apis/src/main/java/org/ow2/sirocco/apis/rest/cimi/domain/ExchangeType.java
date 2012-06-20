@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import java.util.List;
+
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 /**
@@ -32,29 +34,53 @@ import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
  */
 public enum ExchangeType {
     /** */
-    CloudEntryPoint(PathType.CloudEntryPoint),
+    CloudEntryPoint(PathType.CloudEntryPoint, false),
     /** */
-    Credentials(PathType.Credentials), CredentialsCollection(PathType.Credentials), CredentialsCreate(PathType.Credentials),
+    Credentials(PathType.Credentials), CredentialsCollection(PathType.Credentials, false), CredentialsCreate(
+        PathType.Credentials),
     /** */
-    CredentialsTemplate(PathType.CredentialsTemplate), CredentialsTemplateCollection(PathType.CredentialsTemplate),
+    CredentialsTemplate(PathType.CredentialsTemplate), CredentialsTemplateCollection(PathType.CredentialsTemplate, false),
     /** */
-    Job(PathType.Job), JobCollection(PathType.Job),
+    Disk(PathType.MachineDisk), DiskCollection(PathType.MachineDisk, false),
     /** */
-    Machine(PathType.Machine), MachineCollection(PathType.Machine), MachineCreate(PathType.Machine), MachineAction(
+    Job(PathType.Job), JobCollection(PathType.Job, false),
+    /** */
+    Machine(PathType.Machine), MachineCollection(PathType.Machine, false), MachineCreate(PathType.Machine), MachineAction(
         PathType.Machine),
     /** */
-    MachineConfiguration(PathType.MachineConfiguration), MachineConfigurationCollection(PathType.MachineConfiguration),
+    MachineConfiguration(PathType.MachineConfiguration), MachineConfigurationCollection(PathType.MachineConfiguration, false),
     /** */
-    MachineImage(PathType.MachineImage), MachineImageCollection(PathType.MachineImage),
+    MachineImage(PathType.MachineImage), MachineImageCollection(PathType.MachineImage, false),
     /** */
-    MachineTemplate(PathType.MachineTemplate), MachineTemplateCollection(PathType.MachineTemplate);
+    MachineTemplate(PathType.MachineTemplate), MachineTemplateCollection(PathType.MachineTemplate, false);
+    // /** */
+    // Volume(PathType.Volume), VolumeCollection(PathType.Volume, false),
+    // /** */
+    // VolumeConfiguration(PathType.VolumeConfiguration),
+    // VolumeConfigurationCollection(PathType.VolumeConfiguration, false),
+    // /** */
+    // VolumeImage(PathType.VolumeImage),
+    // VolumeImageCollection(PathType.VolumeImage, false),
+    // /** */
+    // VolumeTemplate(PathType.VolumeTemplate),
+    // VolumeTemplateCollection(PathType.VolumeTemplate, false);
 
     /** The path type of the resource. */
     PathType pathType;
 
+    /** Flag ID in reference. */
+    boolean idInReference;
+
     /** Constructor. */
     private ExchangeType(final PathType pathType) {
         this.pathType = pathType;
+        this.idInReference = true;
+    }
+
+    /** Constructor. */
+    private ExchangeType(final PathType pathType, final boolean idInReference) {
+        this.pathType = pathType;
+        this.idInReference = idInReference;
     }
 
     /**
@@ -84,5 +110,75 @@ public enum ExchangeType {
      */
     public String getPathname() {
         return this.pathType.getPathname();
+    }
+
+    /**
+     * Get the flag "ID in reference".
+     * 
+     * @return True if the type must be a ID in reference
+     */
+    public boolean hasIdInReference() {
+        return this.idInReference;
+    }
+
+    /**
+     * Get the flag {@link PathType} Parent.
+     * 
+     * @return True if the current PathType has a parent
+     */
+    public boolean hasParent() {
+        return this.pathType.hasParent();
+    }
+
+    /**
+     * Make a HREF for the current type.
+     * 
+     * @param baseUri The base URI
+     * @param ids All ID necessary : the first is a ID parent, the last is
+     *        current ID
+     * @return
+     */
+    public String makeHref(final String baseUri, final String... ids) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(baseUri);
+        List<String> paths = this.getPathType().getPaths();
+        for (int i = 0; i < paths.size(); i++) {
+            if (i > 0) {
+                sb.append('/');
+            }
+            sb.append(paths.get(i));
+            if ((i < (paths.size() - 1)) || (true == this.hasIdInReference())) {
+                sb.append('/');
+                if (i < ids.length) {
+                    sb.append(ids[i]);
+                } else {
+                    sb.append('*');
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Make a HREF for the current type.
+     * 
+     * @param baseUri The base URI
+     * @return
+     */
+    public String makeHrefPattern(final String baseUri) {
+        StringBuilder sb = new StringBuilder();
+        sb.append('^').append(baseUri);
+        List<String> paths = this.getPathType().getPaths();
+        for (int i = 0; i < paths.size(); i++) {
+            if (i > 0) {
+                sb.append('/');
+            }
+            sb.append(paths.get(i));
+            if ((i < (paths.size() - 1)) || (true == this.hasIdInReference())) {
+                sb.append('/').append("([0-9]+){1}");
+            }
+        }
+        sb.append('$');
+        return sb.toString();
     }
 }

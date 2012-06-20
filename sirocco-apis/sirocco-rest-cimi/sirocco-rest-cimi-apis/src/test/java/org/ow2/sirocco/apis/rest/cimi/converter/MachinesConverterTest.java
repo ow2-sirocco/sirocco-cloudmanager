@@ -26,19 +26,21 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
@@ -54,16 +56,14 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.Type;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
@@ -152,16 +152,18 @@ public class MachinesConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCimiMachineConfigurationCollection() throws Exception {
         CimiMachineConfigurationCollection cimi;
-        MachineConfigurationCollection service;
+        List<MachineConfiguration> service;
 
         // Empty Cimi -> Service
-        service = (MachineConfigurationCollection) this.context.convertToService(new CimiMachineConfigurationCollection());
-        Assert.assertNull(service.getMachineConfigurations());
+        service = (List<MachineConfiguration>) this.context.convertToService(new CimiMachineConfigurationCollection());
+        Assert.assertNotNull(service);
+        Assert.assertEquals(0, service.size());
 
         // Empty Service -> Cimi
-        cimi = (CimiMachineConfigurationCollection) this.context.convertToCimi(new MachineConfigurationCollection(),
+        cimi = (CimiMachineConfigurationCollection) this.context.convertToCimi(new ArrayList<MachineConfiguration>(),
             CimiMachineConfigurationCollection.class);
         Assert.assertNull(cimi.getArray());
 
@@ -169,8 +171,8 @@ public class MachinesConverterTest {
         cimi = new CimiMachineConfigurationCollection();
         cimi.setArray(new CimiMachineConfiguration[] {new CimiMachineConfiguration(), new CimiMachineConfiguration()});
 
-        service = (MachineConfigurationCollection) this.context.convertToService(cimi);
-        Assert.assertEquals(2, service.getMachineConfigurations().size());
+        service = (List<MachineConfiguration>) this.context.convertToService(cimi);
+        Assert.assertEquals(2, service.size());
 
         // Full Service -> Cimi
         MachineConfiguration machineConfiguration1 = new MachineConfiguration();
@@ -183,9 +185,10 @@ public class MachinesConverterTest {
         machineConfiguration3.setId(3);
         machineConfiguration3.setName("nameThree");
 
-        service = new MachineConfigurationCollection();
-        service.setMachineConfigurations(Arrays.asList(new MachineConfiguration[] {machineConfiguration1,
-            machineConfiguration2, machineConfiguration3}));
+        service = new ArrayList<MachineConfiguration>();
+        service.add(machineConfiguration1);
+        service.add(machineConfiguration2);
+        service.add(machineConfiguration3);
 
         cimi = (CimiMachineConfigurationCollection) this.context.convertToCimi(service,
             CimiMachineConfigurationCollection.class);
@@ -258,16 +261,18 @@ public class MachinesConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCimiMachineImageCollection() throws Exception {
         CimiMachineImageCollection cimi;
-        MachineImageCollection service;
+        List<MachineImage> service;
 
         // Empty Cimi -> Service
-        service = (MachineImageCollection) this.context.convertToService(new CimiMachineImageCollection());
-        Assert.assertNull(service.getImages());
+        service = (List<MachineImage>) this.context.convertToService(new CimiMachineImageCollection());
+        Assert.assertNotNull(service);
+        Assert.assertEquals(0, service.size());
 
         // Empty Service -> Cimi
-        cimi = (CimiMachineImageCollection) this.context.convertToCimi(new MachineImageCollection(),
+        cimi = (CimiMachineImageCollection) this.context.convertToCimi(new ArrayList<MachineImage>(),
             CimiMachineImageCollection.class);
         Assert.assertNull(cimi.getArray());
 
@@ -275,8 +280,8 @@ public class MachinesConverterTest {
         cimi = new CimiMachineImageCollection();
         cimi.setArray(new CimiMachineImage[] {new CimiMachineImage(), new CimiMachineImage()});
 
-        service = (MachineImageCollection) this.context.convertToService(cimi);
-        Assert.assertEquals(2, service.getImages().size());
+        service = (List<MachineImage>) this.context.convertToService(cimi);
+        Assert.assertEquals(2, service.size());
 
         // Full Service -> Cimi
         MachineImage machineImage1 = new MachineImage();
@@ -289,8 +294,10 @@ public class MachinesConverterTest {
         machineImage3.setId(3);
         machineImage3.setName("nameThree");
 
-        service = new MachineImageCollection();
-        service.setImages(Arrays.asList(new MachineImage[] {machineImage1, machineImage2, machineImage3}));
+        service = new ArrayList<MachineImage>();
+        service.add(machineImage1);
+        service.add(machineImage2);
+        service.add(machineImage3);
 
         cimi = (CimiMachineImageCollection) this.context.convertToCimi(service, CimiMachineImageCollection.class);
         Assert.assertEquals(3, cimi.getArray().length);
@@ -321,6 +328,7 @@ public class MachinesConverterTest {
     }
 
     // TODO Volumes, Network, ...
+    // FIXME Disk collection
     @Test
     public void testCimiMachine() throws Exception {
         CimiMachine cimi;
@@ -331,8 +339,7 @@ public class MachinesConverterTest {
         Assert.assertNull(service.getCpu());
         Assert.assertNull(service.getMemory());
         Assert.assertNull(service.getState());
-        // FIXME Disk collection
-        // Assert.assertEquals(0, service.getDisks().size());
+        Assert.assertNull(service.getDisks());
 
         // Empty Service -> Cimi
         cimi = (CimiMachine) this.context.convertToCimi(new Machine(), CimiMachine.class);
@@ -341,7 +348,7 @@ public class MachinesConverterTest {
         Assert.assertNull(cimi.getMemory());
         Assert.assertNull(cimi.getState());
 
-        // Full Cimi -> Service
+        // Full Cimi -> Service : without collections
         cimi = new CimiMachine();
         cimi.setCpu(new CimiCpu());
         cimi.setMemory(new CimiMemory());
@@ -352,23 +359,25 @@ public class MachinesConverterTest {
         Assert.assertEquals(Memory.class, service.getMemory().getClass());
         Assert.assertNull(service.getState());
 
-        // Full Cimi -> Service
+        // Full Cimi -> Service : Empty MachineDisk Collection
         cimi = new CimiMachine();
-        cimi.setDisks(new CimiDisk[] {});
+        cimi.setDisks(new CimiMachineDiskCollection());
 
         service = (Machine) this.context.convertToService(cimi);
-        // FIXME Disk collection
-        // Assert.assertEquals(0, service.getDisks().size());
+        Assert.assertNotNull(service.getDisks());
+        Assert.assertNull(service.getDisks().getItems());
 
-        // Full Cimi -> Service
+        // Full Cimi -> Service : Full MachineDisk Collection
         cimi = new CimiMachine();
-        cimi.setDisks(new CimiDisk[] {new CimiDisk(), new CimiDisk()});
+        CimiMachineDiskCollection cimiMachineDisks = new CimiMachineDiskCollection();
+        cimiMachineDisks.add(new CimiMachineDisk());
+        cimiMachineDisks.add(new CimiMachineDisk());
+        cimi.setDisks(cimiMachineDisks);
 
         service = (Machine) this.context.convertToService(cimi);
-        // FIXME Disk collection
-        // Assert.assertEquals(2, service.getDisks().size());
+        Assert.assertEquals(2, service.getDisks().getItems().size());
 
-        // Full Service -> Cimi
+        // Full Service -> Cimi : without collections
         service = new Machine();
         service.setCpu(new Cpu());
         service.setMemory(new Memory());
@@ -380,44 +389,46 @@ public class MachinesConverterTest {
         Assert.assertEquals(Machine.State.CREATING.toString(), cimi.getState());
         Assert.assertNull(cimi.getDisks());
 
-        // Full Service -> Cimi
+        // Full Service -> Cimi : Empty MachineDisk Collection
         service = new Machine();
-        // FIXME Disk collection
-        // service.setDisks(new ArrayList<Disk>());
+        service.setDisks(new MachineDiskCollection());
 
         cimi = (CimiMachine) this.context.convertToCimi(service, CimiMachine.class);
-        Assert.assertNull(cimi.getDisks());
+        Assert.assertNotNull(cimi.getDisks());
+        Assert.assertNull(cimi.getDisks().getCollection());
 
         // Full Service -> Cimi
         service = new Machine();
-        // FIXME Disk collection
-        // service.setDisks(new ArrayList<Disk>(Arrays.asList(new Disk[] {new
-        // Disk(), new Disk(), new Disk()})));
+        MachineDiskCollection serviceMachineDisks = new MachineDiskCollection();
+        serviceMachineDisks.setItems(new ArrayList<MachineDisk>(Arrays.asList(new MachineDisk[] {new MachineDisk(),
+            new MachineDisk(), new MachineDisk()})));
+        service.setDisks(serviceMachineDisks);
 
         cimi = (CimiMachine) this.context.convertToCimi(service, CimiMachine.class);
-        // FIXME Disk collection
-        // Assert.assertEquals(3, cimi.getDisks().length);
+        Assert.assertEquals(3, cimi.getDisks().getCollection().size());
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCimiMachineCollection() throws Exception {
         CimiMachineCollection cimi;
-        MachineCollection service;
+        List<Machine> service;
 
         // Empty Cimi -> Service
-        service = (MachineCollection) this.context.convertToService(new CimiMachineCollection());
-        Assert.assertNull(service.getMachines());
+        service = (List<Machine>) this.context.convertToService(new CimiMachineCollection());
+        Assert.assertNotNull(service);
+        Assert.assertEquals(0, service.size());
 
         // Empty Service -> Cimi
-        cimi = (CimiMachineCollection) this.context.convertToCimi(new MachineCollection(), CimiMachineCollection.class);
+        cimi = (CimiMachineCollection) this.context.convertToCimi(new ArrayList<Machine>(), CimiMachineCollection.class);
         Assert.assertNull(cimi.getArray());
 
         // Full Cimi -> Service
         cimi = new CimiMachineCollection();
         cimi.setArray(new CimiMachine[] {new CimiMachine(), new CimiMachine()});
 
-        service = (MachineCollection) this.context.convertToService(cimi);
-        Assert.assertEquals(2, service.getMachines().size());
+        service = (List<Machine>) this.context.convertToService(cimi);
+        Assert.assertEquals(2, service.size());
 
         // Full Service -> Cimi
         Machine Machine1 = new Machine();
@@ -430,8 +441,10 @@ public class MachinesConverterTest {
         Machine3.setId(3);
         Machine3.setName("nameThree");
 
-        service = new MachineCollection();
-        service.setMachines(Arrays.asList(new Machine[] {Machine1, Machine2, Machine3}));
+        service = new ArrayList<Machine>();
+        service.add(Machine1);
+        service.add(Machine2);
+        service.add(Machine3);
 
         cimi = (CimiMachineCollection) this.context.convertToCimi(service, CimiMachineCollection.class);
         Assert.assertEquals(3, cimi.getArray().length);
@@ -503,16 +516,18 @@ public class MachinesConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCimiMachineTemplateCollection() throws Exception {
         CimiMachineTemplateCollection cimi;
-        MachineTemplateCollection service;
+        List<MachineTemplate> service;
 
         // Empty Cimi -> Service
-        service = (MachineTemplateCollection) this.context.convertToService(new CimiMachineTemplateCollection());
-        Assert.assertNull(service.getMachineTemplates());
+        service = (List<MachineTemplate>) this.context.convertToService(new CimiMachineTemplateCollection());
+        Assert.assertNotNull(service);
+        Assert.assertEquals(0, service.size());
 
         // Empty Service -> Cimi
-        cimi = (CimiMachineTemplateCollection) this.context.convertToCimi(new MachineTemplateCollection(),
+        cimi = (CimiMachineTemplateCollection) this.context.convertToCimi(new ArrayList<MachineTemplate>(),
             CimiMachineTemplateCollection.class);
         Assert.assertNull(cimi.getArray());
 
@@ -520,8 +535,8 @@ public class MachinesConverterTest {
         cimi = new CimiMachineTemplateCollection();
         cimi.setArray(new CimiMachineTemplate[] {new CimiMachineTemplate(), new CimiMachineTemplate()});
 
-        service = (MachineTemplateCollection) this.context.convertToService(cimi);
-        Assert.assertEquals(2, service.getMachineTemplates().size());
+        service = (List<MachineTemplate>) this.context.convertToService(cimi);
+        Assert.assertEquals(2, service.size());
 
         // Full Service -> Cimi
         MachineTemplate MachineTemplate1 = new MachineTemplate();
@@ -534,9 +549,10 @@ public class MachinesConverterTest {
         MachineTemplate3.setId(3);
         MachineTemplate3.setName("nameThree");
 
-        service = new MachineTemplateCollection();
-        service
-            .setMachineTemplates(Arrays.asList(new MachineTemplate[] {MachineTemplate1, MachineTemplate2, MachineTemplate3}));
+        service = new ArrayList<MachineTemplate>();
+        service.add(MachineTemplate1);
+        service.add(MachineTemplate2);
+        service.add(MachineTemplate3);
 
         cimi = (CimiMachineTemplateCollection) this.context.convertToCimi(service, CimiMachineTemplateCollection.class);
         Assert.assertEquals(3, cimi.getArray().length);

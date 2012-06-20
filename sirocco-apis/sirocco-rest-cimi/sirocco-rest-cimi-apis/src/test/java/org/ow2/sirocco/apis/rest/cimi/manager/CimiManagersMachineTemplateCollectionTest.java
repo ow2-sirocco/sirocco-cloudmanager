@@ -44,7 +44,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -98,16 +97,15 @@ public class CimiManagersMachineTemplateCollectionTest {
     @Test
     public void testRead() throws Exception {
         MachineTemplate item;
-        MachineTemplateCollection collect = new MachineTemplateCollection();
+
         List<MachineTemplate> list = new ArrayList<MachineTemplate>();
-        collect.setMachineTemplates(list);
         for (int i = 0; i < 3; i++) {
             item = new MachineTemplate();
             item.setId(i + 13);
             list.add(item);
         }
 
-        EasyMock.expect(this.service.getMachineTemplateCollection()).andReturn(collect);
+        EasyMock.expect(this.service.getMachineTemplates()).andReturn(list);
         EasyMock.replay(this.service);
 
         this.manager.execute(this.context);

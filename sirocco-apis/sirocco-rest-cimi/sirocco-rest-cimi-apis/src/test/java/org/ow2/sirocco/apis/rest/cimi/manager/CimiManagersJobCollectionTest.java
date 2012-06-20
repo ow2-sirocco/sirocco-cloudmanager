@@ -44,7 +44,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -98,16 +97,15 @@ public class CimiManagersJobCollectionTest {
     @Test
     public void testRead() throws Exception {
         Job item;
-        JobCollection collect = new JobCollection();
+
         List<Job> list = new ArrayList<Job>();
-        collect.setJobs(list);
         for (int i = 0; i < 3; i++) {
             item = new Job();
             item.setId(i + 13);
             list.add(item);
         }
 
-        EasyMock.expect(this.service.getJobCollection()).andReturn(collect);
+        EasyMock.expect(this.service.getJobs()).andReturn(list);
         EasyMock.replay(this.service);
 
         this.manager.execute(this.context);

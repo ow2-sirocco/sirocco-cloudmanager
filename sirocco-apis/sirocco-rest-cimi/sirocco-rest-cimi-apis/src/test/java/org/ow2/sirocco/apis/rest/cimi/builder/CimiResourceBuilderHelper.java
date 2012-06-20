@@ -45,7 +45,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
@@ -54,6 +53,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
@@ -397,16 +398,39 @@ public class CimiResourceBuilderHelper {
         return cimi;
     }
 
-    public static CimiDisk buildCimiDisk(final Integer id, final Integer index) {
-        CimiDisk cimi = new CimiDisk();
-        cimi.setCapacity(CimiResourceBuilderHelper.buildCimiCapacity(id, index));
+    public static CimiMachineDisk buildCimiMachineDisk(final Integer id, final Integer index, final Boolean expand) {
+        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
+        CimiMachineDisk cimi = new CimiMachineDisk();
+        CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
+        if ((null != expand) && (true == expand)) {
+            cimi.setCapacity(CimiResourceBuilderHelper.buildCimiCapacity(id, index));
+            cimi.setInitialLocation("initialLocation" + postfix);
+        }
         return cimi;
+    }
+
+    public static CimiMachineDiskCollection buildCimiMachineDiskCollection(final Integer id, final Boolean expand) {
+        return CimiResourceBuilderHelper.buildCimiMachineDiskCollection(id, expand, false);
+    }
+
+    public static CimiMachineDiskCollection buildCimiMachineDiskCollection(final Integer id, final Boolean expand,
+        final Boolean expandItems) {
+        CimiMachineDiskCollection collec = new CimiMachineDiskCollection();
+        CimiResourceBuilderHelper.fillCimiCollection(collec, id, null, expand);
+        if ((null != expand) && (true == expand)) {
+            if ((null != id) && (id > 0)) {
+                for (int i = 0; i < id; i++) {
+                    collec.add(CimiResourceBuilderHelper.buildCimiMachineDisk(id, i, expandItems));
+                }
+            }
+        }
+        return collec;
     }
 
     public static CimiDiskConfiguration buildCimiDiskConfiguration(final Integer id, final Integer index) {
         String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiDiskConfiguration cimi = new CimiDiskConfiguration();
-        cimi.setAttachmentPoint("attachmentPointValue" + postfix);
+        cimi.setInitialLocation("initialLocationValue" + postfix);
         cimi.setCapacity(CimiResourceBuilderHelper.buildCimiCapacity(id, index));
         cimi.setFormat("formatValue" + postfix);
         return cimi;
@@ -431,11 +455,7 @@ public class CimiResourceBuilderHelper {
         if ((null != expand) && (true == expand)) {
             cimi.setCpu(CimiResourceBuilderHelper.buildCimiCpu(id, index));
             if ((null != id) && (id > 0)) {
-                List<CimiDisk> cimis = new ArrayList<CimiDisk>();
-                for (int i = 0; i < id; i++) {
-                    cimis.add(CimiResourceBuilderHelper.buildCimiDisk(id, i));
-                }
-                cimi.setDisks(cimis.toArray(new CimiDisk[cimis.size()]));
+                cimi.setDisks(CimiResourceBuilderHelper.buildCimiMachineDiskCollection(id, expand, true));
             }
             cimi.setMemory(CimiResourceBuilderHelper.buildCimiMemory(id, index));
             cimi.setState("stateValue" + postfix);

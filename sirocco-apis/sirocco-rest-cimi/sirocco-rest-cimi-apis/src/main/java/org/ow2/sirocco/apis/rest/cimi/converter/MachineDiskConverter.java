@@ -24,26 +24,23 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 
 /**
- * Helper class to convert the data of the CIMI model and the service model in
- * both directions.
+ * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiCredentialsCollection}</li>
- * <li>Service model: {@link List<Credentials>}</li>
+ * <li>CIMI model: {@link CimiMachineDisk}</li>
+ * <li>Service model: {@link MachineDisk}</li>
  * </ul>
  * </p>
  */
-public class CredentialsCollectionConverter extends CollectionConverterAbstract {
-
+public class MachineDiskConverter extends ObjectCommonConverter {
     /**
      * {@inheritDoc}
      * 
@@ -52,7 +49,7 @@ public class CredentialsCollectionConverter extends CollectionConverterAbstract 
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiCredentialsCollection cimi = new CimiCredentialsCollection();
+        CimiMachineDisk cimi = new CimiMachineDisk();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -63,10 +60,9 @@ public class CredentialsCollectionConverter extends CollectionConverterAbstract 
      * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (List<Object>) dataService, (CimiCredentialsCollection) dataCimi);
+        this.doCopyToCimi(context, (MachineDisk) dataService, (CimiMachineDisk) dataCimi);
     }
 
     /**
@@ -77,7 +73,7 @@ public class CredentialsCollectionConverter extends CollectionConverterAbstract 
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        List<Credentials> service = new ArrayList<Credentials>();
+        MachineDisk service = new MachineDisk();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -89,10 +85,33 @@ public class CredentialsCollectionConverter extends CollectionConverterAbstract 
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
-    @SuppressWarnings("unchecked")
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiCredentialsCollection) dataCimi, (List<Object>) dataService);
+        this.doCopyToService(context, (CimiMachineDisk) dataCimi, (MachineDisk) dataService);
     }
 
+    /**
+     * Copy data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void doCopyToCimi(final CimiContext context, final MachineDisk dataService, final CimiMachineDisk dataCimi) {
+        // FIXME this.fill(context, dataService, dataCimi);
+        dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService.getDisk(), CimiCapacity.class));
+        dataCimi.setInitialLocation(dataService.getInitialLocation());
+    }
+
+    /**
+     * Copy data from a CIMI object to a service object.
+     * 
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination Service object
+     */
+    protected void doCopyToService(final CimiContext context, final CimiMachineDisk dataCimi, final MachineDisk dataService) {
+        dataService.setDisk((Disk) context.convertNextService(dataCimi.getCapacity()));
+        dataService.setInitialLocation(dataCimi.getInitialLocation());
+    }
 }

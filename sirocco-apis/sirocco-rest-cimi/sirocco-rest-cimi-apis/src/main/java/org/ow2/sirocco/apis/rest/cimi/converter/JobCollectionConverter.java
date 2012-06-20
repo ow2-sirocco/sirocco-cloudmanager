@@ -25,14 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -41,7 +38,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * Converted classes:
  * <ul>
  * <li>CIMI model: {@link CimiJobCollection}</li>
- * <li>Service model: {@link JobCollection}</li>
+ * <li>Service model: {@link List<Job>}</li>
  * </ul>
  * </p>
  */
@@ -69,14 +66,7 @@ public class JobCollectionConverter extends CollectionConverterAbstract {
     @SuppressWarnings("unchecked")
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        JobCollection use;
-        if (dataService instanceof List<?>) {
-            use = new JobCollection();
-            use.setJobs((List<Job>) dataService);
-        } else {
-            use = (JobCollection) dataService;
-        }
-        this.doCopyToCimi(context, use, (CimiJobCollection) dataCimi);
+        this.doCopyToCimi(context, (List<Object>) dataService, (CimiJobCollection) dataCimi);
     }
 
     /**
@@ -87,7 +77,7 @@ public class JobCollectionConverter extends CollectionConverterAbstract {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        JobCollection service = new JobCollection();
+        List<Job> service = new ArrayList<Job>();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -99,42 +89,10 @@ public class JobCollectionConverter extends CollectionConverterAbstract {
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiJobCollection) dataCimi, (JobCollection) dataService);
+        this.doCopyToService(context, (CimiJobCollection) dataCimi, (List<Object>) dataService);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#getChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected Collection<?> getChildCollection(final Resource resourceCollection) {
-        JobCollection collect = (JobCollection) resourceCollection;
-        return collect.getJobs();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#setNewChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected void setNewChildCollection(final Resource resourceCollection) {
-        JobCollection collect = (JobCollection) resourceCollection;
-        collect.setJobs(new ArrayList<Job>());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#addItemChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void addItemChildCollection(final Resource resourceCollection, final Object itemService) {
-        JobCollection collect = (JobCollection) resourceCollection;
-        collect.getJobs().add((Job) itemService);
-    }
 }

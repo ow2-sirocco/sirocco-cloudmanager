@@ -26,10 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -39,9 +35,9 @@ import org.springframework.stereotype.Component;
 @Deprecated
 public class CimiManagerUpdateMachineCollection extends CimiManagerUpdateAbstract {
 
-    @Autowired
-    @Qualifier("IMachineManager")
-    private IMachineManager manager;
+    // @Autowired
+    // @Qualifier("IMachineManager")
+    // private IMachineManager manager;
 
     /**
      * {@inheritDoc}
@@ -51,8 +47,8 @@ public class CimiManagerUpdateMachineCollection extends CimiManagerUpdateAbstrac
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         // FIXME Collection
+        // CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         // if (true == select.isEmpty()) {
         // throw new UnsupportedOperationException();
         // } else {

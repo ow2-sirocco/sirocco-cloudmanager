@@ -46,6 +46,7 @@ public class AssertVersionValidator implements ConstraintValidator<AssertVersion
      * <li>None Version is valid</li>
      * <li>Same version is valid</li>
      * </ul> {@inheritDoc}
+     * 
      * @see javax.validation.ConstraintValidator#isValid(java.lang.Object,
      *      javax.validation.ConstraintValidatorContext)
      */

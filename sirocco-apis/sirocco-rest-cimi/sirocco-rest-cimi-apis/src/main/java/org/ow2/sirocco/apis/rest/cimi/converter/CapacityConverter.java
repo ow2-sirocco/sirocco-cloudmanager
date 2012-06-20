@@ -25,8 +25,8 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
@@ -105,8 +105,8 @@ public class CapacityConverter implements CimiConverter {
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         if (dataCimi instanceof CimiDiskConfiguration) {
             this.doCopyToService(context, ((CimiDiskConfiguration) dataCimi).getCapacity(), (DiskTemplate) dataService);
-        } else if (dataCimi instanceof CimiDisk) {
-            this.doCopyToService(context, ((CimiDisk) dataCimi).getCapacity(), (Disk) dataService);
+        } else if (dataCimi instanceof CimiMachineDisk) {
+            this.doCopyToService(context, ((CimiMachineDisk) dataCimi).getCapacity(), (Disk) dataService);
         } else {
             if (dataService instanceof DiskTemplate) {
                 this.doCopyToService(context, (CimiCapacity) dataCimi, (DiskTemplate) dataService);
@@ -124,12 +124,8 @@ public class CapacityConverter implements CimiConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final Disk dataService, final CimiCapacity dataCimi) {
-        if (null != dataService) {
-            if (null != dataService.getQuantity()) {
-                dataCimi.setQuantity(dataService.getQuantity().intValue());
-            }
-            dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnits(), StorageUnit.class));
-        }
+        dataCimi.setQuantity(HelperConverter.toInteger(dataService.getQuantity()));
+        dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnits(), StorageUnit.class));
     }
 
     /**
@@ -140,12 +136,8 @@ public class CapacityConverter implements CimiConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final DiskTemplate dataService, final CimiCapacity dataCimi) {
-        if (null != dataService) {
-            if (null != dataService.getQuantity()) {
-                dataCimi.setQuantity(dataService.getQuantity().intValue());
-            }
-            dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnit(), StorageUnit.class));
-        }
+        dataCimi.setQuantity(HelperConverter.toInteger(dataService.getQuantity()));
+        dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnit(), StorageUnit.class));
     }
 
     /**
@@ -156,11 +148,9 @@ public class CapacityConverter implements CimiConverter {
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiCapacity dataCimi, final Disk dataService) {
-        if (null != dataCimi) {
-            dataService.setQuantity(dataCimi.getQuantity().floatValue());
-            dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.convertNextService(
-                dataCimi.getUnits(), StorageUnit.class));
-        }
+        dataService.setQuantity(HelperConverter.toFloat(dataCimi.getQuantity()));
+        dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.convertNextService(
+            dataCimi.getUnits(), StorageUnit.class));
     }
 
     /**
@@ -171,12 +161,8 @@ public class CapacityConverter implements CimiConverter {
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiCapacity dataCimi, final DiskTemplate dataService) {
-        if (null != dataCimi) {
-            if (null != dataCimi.getQuantity()) {
-                dataService.setQuantity(dataCimi.getQuantity().floatValue());
-            }
-            dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.convertNextService(
-                dataCimi.getUnits(), StorageUnit.class));
-        }
+        dataService.setQuantity(HelperConverter.toFloat(dataCimi.getQuantity()));
+        dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit) context.convertNextService(
+            dataCimi.getUnits(), StorageUnit.class));
     }
 }

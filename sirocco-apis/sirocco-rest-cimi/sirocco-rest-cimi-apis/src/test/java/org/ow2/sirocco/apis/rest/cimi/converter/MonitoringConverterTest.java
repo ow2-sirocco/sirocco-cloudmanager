@@ -41,7 +41,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
@@ -164,24 +163,26 @@ public class MonitoringConverterTest {
     }
 
     @Test
+    @SuppressWarnings("unchecked")
     public void testCimiJobCollection() throws Exception {
         CimiJobCollection cimi;
-        JobCollection service;
+        List<Job> service;
 
         // Empty Cimi -> Service
-        service = (JobCollection) this.context.convertToService(new CimiJobCollection());
-        Assert.assertNull(service.getJobs());
+        service = (List<Job>) this.context.convertToService(new CimiJobCollection());
+        Assert.assertNotNull(service);
+        Assert.assertEquals(0, service.size());
 
         // Empty Service -> Cimi
-        cimi = (CimiJobCollection) this.context.convertToCimi(new JobCollection(), CimiJobCollection.class);
+        cimi = (CimiJobCollection) this.context.convertToCimi(new ArrayList<Job>(), CimiJobCollection.class);
         Assert.assertNull(cimi.getArray());
 
         // Full Cimi -> Service
         cimi = new CimiJobCollection();
         cimi.setArray(new CimiJob[] {new CimiJob(), new CimiJob()});
 
-        service = (JobCollection) this.context.convertToService(cimi);
-        Assert.assertEquals(2, service.getJobs().size());
+        service = (List<Job>) this.context.convertToService(cimi);
+        Assert.assertEquals(2, service.size());
 
         // Full Service -> Cimi
         Job Job1 = new Job();
@@ -194,8 +195,10 @@ public class MonitoringConverterTest {
         Job3.setId(3);
         Job3.setName("nameThree");
 
-        service = new JobCollection();
-        service.setJobs(Arrays.asList(new Job[] {Job1, Job2, Job3}));
+        service = new ArrayList<Job>();
+        service.add(Job1);
+        service.add(Job2);
+        service.add(Job3);
 
         cimi = (CimiJobCollection) this.context.convertToCimi(service, CimiJobCollection.class);
         Assert.assertEquals(3, cimi.getArray().length);

@@ -160,7 +160,7 @@ public class SerializationHelper {
         @Override
         protected void appendDetail(final StringBuffer buffer, final String fieldName, final Object value) {
             if (value.getClass().getName().startsWith("java.lang.")
-                || (this.maxDepth != RecursiveToStringStyle.INFINITE_DEPTH && this.depth >= this.maxDepth)) {
+                || ((this.maxDepth != RecursiveToStringStyle.INFINITE_DEPTH) && (this.depth >= this.maxDepth))) {
                 buffer.append(value);
             } else {
                 this.depth++;

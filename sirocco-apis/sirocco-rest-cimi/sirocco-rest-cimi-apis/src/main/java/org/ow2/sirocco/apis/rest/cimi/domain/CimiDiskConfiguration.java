@@ -24,6 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import java.io.Serializable;
+
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -36,10 +39,17 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
  */
 @XmlRootElement(name = "Disk")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiDiskConfiguration extends CimiDisk {
+public class CimiDiskConfiguration implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Field "capacity".
+     */
+    @Valid
+    @NotNull(groups = {GroupWrite.class})
+    private CimiCapacity capacity;
 
     /**
      * Field "format".
@@ -48,10 +58,9 @@ public class CimiDiskConfiguration extends CimiDisk {
     private String format;
 
     /**
-     * Field "attachmentPoint".
+     * Field "initialLocation".
      */
-    @NotNull(groups = {GroupWrite.class})
-    private String attachmentPoint;
+    private String initialLocation;
 
     /**
      * Default constructor.
@@ -64,24 +73,26 @@ public class CimiDiskConfiguration extends CimiDisk {
      * Parameterized constructor.
      * 
      * @param format The format
-     * @param attachmentPoint The attachment point
+     * @param initialLocation The initial location
      */
-    public CimiDiskConfiguration(final String format, final String attachmentPoint) {
-        this.format = format;
-        this.attachmentPoint = attachmentPoint;
+    public CimiDiskConfiguration(final String format, final String initialLocation) {
+        super();
+        this.setFormat(format);
+        this.setInitialLocation(initialLocation);
     }
 
     /**
      * Parameterized constructor.
      * 
      * @param format The format
-     * @param attachmentPoint The attachment point
+     * @param initialLocation The initial location
      * @param capacity The capacity
      */
-    public CimiDiskConfiguration(final CimiCapacity capacity, final String format, final String attachmentPoint) {
-        super(capacity);
-        this.format = format;
-        this.attachmentPoint = attachmentPoint;
+    public CimiDiskConfiguration(final CimiCapacity capacity, final String format, final String initialLocation) {
+        super();
+        this.setCapacity(capacity);
+        this.setFormat(format);
+        this.setInitialLocation(initialLocation);
     }
 
     /**
@@ -103,21 +114,38 @@ public class CimiDiskConfiguration extends CimiDisk {
     }
 
     /**
-     * Return the value of field "attachmentPoint".
+     * Return the value of field "capacity".
      * 
      * @return The value
      */
-    public String getAttachmentPoint() {
-        return this.attachmentPoint;
+    public CimiCapacity getCapacity() {
+        return this.capacity;
     }
 
     /**
-     * Set the value of field "attachmentPoint".
+     * Set the value of field "capacity".
      * 
-     * @param attachmentPoint The value
+     * @param capacity The value
      */
-    public void setAttachmentPoint(final String attachmentPoint) {
-        this.attachmentPoint = attachmentPoint;
+    public void setCapacity(final CimiCapacity capacity) {
+        this.capacity = capacity;
     }
 
+    /**
+     * Return the value of field "initialLocation".
+     * 
+     * @return The value
+     */
+    public String getInitialLocation() {
+        return this.initialLocation;
+    }
+
+    /**
+     * Set the value of field "initialLocation".
+     * 
+     * @param initialLocation The value
+     */
+    public void setInitialLocation(final String initialLocation) {
+        this.initialLocation = initialLocation;
+    }
 }

@@ -61,7 +61,7 @@ public class CimiManagerReadCredentialsCollection extends CimiManagerReadAbstrac
         Object out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getCredentialsCollection();
+            out = this.manager.getCredentials();
         } else {
             if (true == select.isNumericArrayPresent()) {
                 List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());

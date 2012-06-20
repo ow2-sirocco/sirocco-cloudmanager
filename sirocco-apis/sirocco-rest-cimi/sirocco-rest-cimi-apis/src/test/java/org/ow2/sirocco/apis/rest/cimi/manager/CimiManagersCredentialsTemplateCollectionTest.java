@@ -44,7 +44,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -98,16 +97,15 @@ public class CimiManagersCredentialsTemplateCollectionTest {
     @Test
     public void testRead() throws Exception {
         CredentialsTemplate item;
-        CredentialsTemplateCollection collect = new CredentialsTemplateCollection();
+
         List<CredentialsTemplate> list = new ArrayList<CredentialsTemplate>();
-        collect.setCredentialsTemplates(list);
         for (int i = 0; i < 3; i++) {
             item = new CredentialsTemplate();
             item.setId(i + 13);
             list.add(item);
         }
 
-        EasyMock.expect(this.service.getCredentialsTemplateCollection()).andReturn(collect);
+        EasyMock.expect(this.service.getCredentialsTemplates()).andReturn(list);
         EasyMock.replay(this.service);
 
         this.manager.execute(this.context);

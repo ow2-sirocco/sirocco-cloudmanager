@@ -61,7 +61,7 @@ public class CimiManagerReadJobCollection extends CimiManagerReadAbstract {
         Object out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getJobCollection();
+            out = this.manager.getJobs();
         } else {
             if (true == select.isNumericArrayPresent()) {
                 List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());

@@ -36,12 +36,12 @@
 		<cpu frequency="200.0" numberVirtualCpus="2" units="unitValue_2" />
 		<disk>
 			<capacity quantity="2" units="unitValue_2_0" />
-			<attachmentPoint>attachmentPointValue_2_0</attachmentPoint>
+			<initialLocation>initialLocationValue_2_0</initialLocation>
 			<format>formatValue_2_0</format>
 		</disk>
 		<disk>
 			<capacity quantity="2" units="unitValue_2_1" />
-			<attachmentPoint>attachmentPointValue_2_1</attachmentPoint>
+			<initialLocation>initialLocationValue_2_1</initialLocation>
 			<format>formatValue_2_1</format>
 		</disk>
 		<memory quantity="2" units="unitValue_2" />

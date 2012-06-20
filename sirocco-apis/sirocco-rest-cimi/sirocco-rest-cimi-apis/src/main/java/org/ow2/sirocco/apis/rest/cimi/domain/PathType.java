@@ -24,6 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 /**
@@ -45,14 +48,36 @@ public enum PathType {
     /** */
     MachineImage(ConstantsPath.MACHINE_IMAGE),
     /** */
-    MachineTemplate(ConstantsPath.MACHINE_TEMPLATE);
+    MachineTemplate(ConstantsPath.MACHINE_TEMPLATE),
+    /** */
+    MachineDisk(ConstantsPath.DISK, Machine),
+    /** */
+    Volume(ConstantsPath.VOLUME),
+    /** */
+    VolumeConfiguration(ConstantsPath.VOLUME_CONFIGURATION),
+    /** */
+    VolumeImage(ConstantsPath.VOLUME_IMAGE),
+    /** */
+    VolumeDisk(ConstantsPath.DISK, VolumeConfiguration), CredentialsVolumeDisk(ConstantsPath.CREDENTIALS, VolumeDisk),
+    /** */
+    VolumeTemplate(ConstantsPath.VOLUME_TEMPLATE);
 
     /** The pathname. */
     String pathname;
 
+    /** The parent path. */
+    PathType parent;
+
     /** Constructor. */
     private PathType(final String pathname) {
         this.pathname = pathname;
+        this.parent = null;
+    }
+
+    /** Constructor. */
+    private PathType(final String pathname, final PathType parent) {
+        this.pathname = pathname;
+        this.parent = parent;
     }
 
     /**
@@ -65,24 +90,55 @@ public enum PathType {
     }
 
     /**
-     * Get the complete path.
+     * Get the pathname.
      * 
-     * @return The complete path
+     * @return The pathname
      */
-    public String getCompletePath() {
-        return "/" + this.pathname;
+    public String getPath() {
+        StringBuilder sb = new StringBuilder();
+        if (true == this.hasParent()) {
+            sb.append(this.parent.getPath());
+            sb.append("/*/");
+        }
+        sb.append(this.pathname);
+        return sb.toString();
     }
 
     /**
-     * Find the path type with a given pathname.
+     * Get the pathname.
+     * 
+     * @return The pathname
+     */
+    public List<String> getPaths() {
+        List<String> list = null;
+        if (true == this.hasParent()) {
+            list = this.parent.getPaths();
+        } else {
+            list = new ArrayList<String>();
+        }
+        list.add(this.pathname);
+        return list;
+    }
+
+    /**
+     * Indicates if the current PathType has a parent.
+     * 
+     * @return True if it has a parent
+     */
+    public boolean hasParent() {
+        return (null != this.parent);
+    }
+
+    /**
+     * Find the path type with a given path.
      * 
      * @param pathname The pathname
      * @return The path type or null if not found
      */
-    public static PathType valueOfPathname(final String pathname) {
+    public static PathType valueOfPath(final String path) {
         PathType type = null;
         for (PathType value : PathType.values()) {
-            if (pathname.equals(value.getPathname())) {
+            if (path.equals(value.getPathname())) {
                 type = value;
                 break;
             }

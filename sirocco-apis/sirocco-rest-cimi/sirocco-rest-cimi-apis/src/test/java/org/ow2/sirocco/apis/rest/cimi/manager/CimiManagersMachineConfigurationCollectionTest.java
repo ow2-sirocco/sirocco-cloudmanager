@@ -44,7 +44,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -98,16 +97,15 @@ public class CimiManagersMachineConfigurationCollectionTest {
     @Test
     public void testReadCollection() throws Exception {
         MachineConfiguration machine;
-        MachineConfigurationCollection collect = new MachineConfigurationCollection();
+
         List<MachineConfiguration> list = new ArrayList<MachineConfiguration>();
-        collect.setMachineConfigurations(list);
         for (int i = 0; i < 3; i++) {
             machine = new MachineConfiguration();
             machine.setId(i + 13);
             list.add(machine);
         }
 
-        EasyMock.expect(this.service.getMachineConfigurationCollection()).andReturn(collect);
+        EasyMock.expect(this.service.getMachineConfigurations()).andReturn(list);
         EasyMock.replay(this.service);
 
         this.managerReadCollection.execute(this.context);

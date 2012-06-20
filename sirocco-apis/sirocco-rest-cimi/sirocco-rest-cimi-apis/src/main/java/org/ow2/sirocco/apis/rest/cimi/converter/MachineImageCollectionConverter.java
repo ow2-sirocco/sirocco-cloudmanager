@@ -25,14 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -41,7 +38,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * Converted classes:
  * <ul>
  * <li>CIMI model: {@link CimiMachineImageCollection}</li>
- * <li>Service model: {@link MachineImageCollection}</li>
+ * <li>Service model: {@link List<MachineImage>}</li>
  * </ul>
  * </p>
  */
@@ -69,14 +66,7 @@ public class MachineImageCollectionConverter extends CollectionConverterAbstract
     @SuppressWarnings("unchecked")
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        MachineImageCollection use;
-        if (dataService instanceof List<?>) {
-            use = new MachineImageCollection();
-            use.setImages((List<MachineImage>) dataService);
-        } else {
-            use = (MachineImageCollection) dataService;
-        }
-        this.doCopyToCimi(context, use, (CimiMachineImageCollection) dataCimi);
+        this.doCopyToCimi(context, (List<Object>) dataService, (CimiMachineImageCollection) dataCimi);
     }
 
     /**
@@ -87,7 +77,7 @@ public class MachineImageCollectionConverter extends CollectionConverterAbstract
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        MachineImageCollection service = new MachineImageCollection();
+        List<MachineImage> service = new ArrayList<MachineImage>();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -99,42 +89,10 @@ public class MachineImageCollectionConverter extends CollectionConverterAbstract
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiMachineImageCollection) dataCimi, (MachineImageCollection) dataService);
+        this.doCopyToService(context, (CimiMachineImageCollection) dataCimi, (List<Object>) dataService);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#getChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected Collection<?> getChildCollection(final Resource resourceCollection) {
-        MachineImageCollection collect = (MachineImageCollection) resourceCollection;
-        return collect.getImages();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#setNewChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected void setNewChildCollection(final Resource resourceCollection) {
-        MachineImageCollection collect = (MachineImageCollection) resourceCollection;
-        collect.setImages(new ArrayList<MachineImage>());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#addItemChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void addItemChildCollection(final Resource resourceCollection, final Object itemService) {
-        MachineImageCollection collect = (MachineImageCollection) resourceCollection;
-        collect.getImages().add((MachineImage) itemService);
-    }
 }

@@ -147,15 +147,21 @@ public class CimiContextImpl implements CimiContext {
      */
     @Override
     public Object convertNextService(final Object cimi) {
-        return this.convertNextService(cimi, cimi.getClass());
+        Object converted = null;
+        if (null != cimi) {
+            converted = this.convertNextService(cimi, cimi.getClass());
+        }
+        return converted;
     }
 
     @Override
     public Object convertNextService(final Object cimi, final Class<?> cimiToUse) {
         Object converted = null;
-        this.stackConverted.push(cimiToUse);
-        converted = this.getConverter(cimiToUse).toService(this, cimi);
-        this.stackConverted.pop();
+        if (null != cimi) {
+            this.stackConverted.push(cimiToUse);
+            converted = this.getConverter(cimiToUse).toService(this, cimi);
+            this.stackConverted.pop();
+        }
         return converted;
     }
 
@@ -222,37 +228,12 @@ public class CimiContextImpl implements CimiContext {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#mustHaveIdInReference(org.ow2.sirocco.apis.rest.cimi.domain.CimiData)
-     */
-    @Override
-    public boolean mustHaveIdInReference(final Class<? extends CimiResource> classResource) {
-        boolean withId = true;
-        switch (this.getType(classResource)) {
-        case CloudEntryPoint:
-        case CredentialsCollection:
-        case CredentialsTemplateCollection:
-        case JobCollection:
-        case MachineCollection:
-        case MachineConfigurationCollection:
-        case MachineImageCollection:
-        case MachineTemplateCollection:
-            withId = false;
-            break;
-        default:
-            break;
-        }
-        return withId;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
      * @see org.ow2.sirocco.apis.rest.cimi.utils.CimiContext#makeHref(CimiResource,
      *      java.lang.String)
      */
     @Override
     public String makeHrefBase(final CimiResource data) {
-        return this.makeHref(data, null);
+        return this.makeHref(data, (String) null);
     }
 
     /**
@@ -262,8 +243,8 @@ public class CimiContextImpl implements CimiContext {
      *      java.lang.String)
      */
     @Override
-    public String makeHref(final CimiResource data, final String id) {
-        return this.makeHref(data.getClass(), id);
+    public String makeHref(final CimiResource data, final String... ids) {
+        return this.makeHref(data.getClass(), ids);
     }
 
     /**
@@ -273,17 +254,9 @@ public class CimiContextImpl implements CimiContext {
      *      java.lang.String)
      */
     @Override
-    public String makeHref(final Class<? extends CimiResource> classToUse, final String id) {
+    public String makeHref(final Class<? extends CimiResource> classToUse, final String... ids) {
         ExchangeType type = this.getType(classToUse);
-        StringBuilder sb = new StringBuilder();
-        sb.append(this.request.getBaseUri()).append(type.getPathType().getPathname());
-        if (true == this.mustHaveIdInReference(classToUse)) {
-            sb.append('/');
-            if (null != id) {
-                sb.append(id);
-            }
-        }
-        return sb.toString();
+        return type.makeHref(this.getRequest().getBaseUri(), ids);
     }
 
     /**

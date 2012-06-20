@@ -10,12 +10,38 @@
 	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 	<updated>2002-03-03T02:02:02.002Z</updated>
 	<cpu frequency="200.0" numberVirtualCpus="2" units="unitValue_2" />
-	<disk>
-		<capacity quantity="2" units="unitValue_2_0" />
-	</disk>
-	<disk>
-		<capacity quantity="2" units="unitValue_2_1" />
-	</disk>
+	<disks href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/DiskCollection">
+		<id>idValue_2</id>
+		<operation href="hrefValue_2_0" rel="relValue_2_0" />
+		<operation href="hrefValue_2_1" rel="relValue_2_1" />
+		<count>2</count>
+		<Disk href="hrefValue_2_0" resourceURI="http://schemas.dmtf.org/cimi/1/Disk">
+			<description>descriptionValue_2_0</description>
+			<name>nameValue_2_0</name>
+			<property key="keyProp_2_0">valueProp_2_0</property>
+			<property key="keyProp_2_1">valueProp_2_1</property>
+			<created>2002-03-03T02:02:02.002Z</created>
+			<id>idValue_2_0</id>
+			<operation href="hrefValue_2_0" rel="relValue_2_0" />
+			<operation href="hrefValue_2_1" rel="relValue_2_1" />
+			<updated>2002-03-03T02:02:02.002Z</updated>
+			<capacity quantity="2" units="unitValue_2_0" />
+			<initialLocation>initialLocation_2_0</initialLocation>
+		</Disk>
+		<Disk href="hrefValue_2_1" resourceURI="http://schemas.dmtf.org/cimi/1/Disk">
+			<description>descriptionValue_2_1</description>
+			<name>nameValue_2_1</name>
+			<property key="keyProp_2_0">valueProp_2_0</property>
+			<property key="keyProp_2_1">valueProp_2_1</property>
+			<created>2002-03-03T02:02:02.002Z</created>
+			<id>idValue_2_1</id>
+			<operation href="hrefValue_2_0" rel="relValue_2_0" />
+			<operation href="hrefValue_2_1" rel="relValue_2_1" />
+			<updated>2002-03-03T02:02:02.002Z</updated>
+			<capacity quantity="2" units="unitValue_2_1" />
+			<initialLocation>initialLocation_2_1</initialLocation>
+		</Disk>
+	</disks>
 	<memory quantity="2" units="unitValue_2" />
 	<state>stateValue_2</state>
 </Machine>

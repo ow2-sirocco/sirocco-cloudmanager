@@ -27,9 +27,9 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -37,12 +37,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiCredentialsCollection}</li>
- * <li>Service model: {@link List<Credentials>}</li>
+ * <li>CIMI model: {@link CimiMachineDiskCollection}</li>
+ * <li>Service model: {@link List<MachineDisk>}</li>
  * </ul>
  * </p>
  */
-public class CredentialsCollectionConverter extends CollectionConverterAbstract {
+public class MachineDiskCollectionConverter extends CollectionConverterAbstract {
 
     /**
      * {@inheritDoc}
@@ -52,7 +52,7 @@ public class CredentialsCollectionConverter extends CollectionConverterAbstract 
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiCredentialsCollection cimi = new CimiCredentialsCollection();
+        CimiMachineDiskCollection cimi = new CimiMachineDiskCollection();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -66,7 +66,7 @@ public class CredentialsCollectionConverter extends CollectionConverterAbstract 
     @SuppressWarnings("unchecked")
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (List<Object>) dataService, (CimiCredentialsCollection) dataCimi);
+        this.doCopyToCimi(context, (List<Object>) dataService, (CimiMachineDiskCollection) dataCimi);
     }
 
     /**
@@ -77,7 +77,7 @@ public class CredentialsCollectionConverter extends CollectionConverterAbstract 
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        List<Credentials> service = new ArrayList<Credentials>();
+        List<MachineDisk> service = new ArrayList<MachineDisk>();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -92,7 +92,7 @@ public class CredentialsCollectionConverter extends CollectionConverterAbstract 
     @SuppressWarnings("unchecked")
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiCredentialsCollection) dataCimi, (List<Object>) dataService);
+        this.doCopyToService(context, (CimiMachineDiskCollection) dataCimi, (List<Object>) dataService);
     }
 
 }

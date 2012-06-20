@@ -61,7 +61,7 @@ public class CimiManagerReadMachineTemplateCollection extends CimiManagerReadAbs
         Object out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getMachineTemplateCollection();
+            out = this.manager.getMachineTemplates();
         } else {
             if (true == select.isNumericArrayPresent()) {
                 List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());

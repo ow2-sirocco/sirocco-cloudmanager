@@ -24,6 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
@@ -44,13 +47,13 @@ import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -123,37 +126,37 @@ public class CimiManagersCloudEntryPointTest {
         cloud.setId(10);
 
         // Credentials
-        CredentialsCollection credentialsCollection = new CredentialsCollection();
-        credentialsCollection.setId(600);
-        CredentialsTemplateCollection credentialsTemplateCollection = new CredentialsTemplateCollection();
-        credentialsTemplateCollection.setId(700);
+        List<Credentials> credentialsCollection = new ArrayList<Credentials>();
+        // credentialsCollection.setId(600);
+        List<CredentialsTemplate> credentialsTemplateCollection = new ArrayList<CredentialsTemplate>();
+        // credentialsTemplateCollection.setId(700);
         // Jobs
-        JobCollection jobCollection = new JobCollection();
-        jobCollection.setId(800);
+        List<Job> jobCollection = new ArrayList<Job>();
+        // jobCollection.setId(800);
         // Machines
-        MachineCollection machineCollection = new MachineCollection();
-        machineCollection.setId(200);
-        MachineTemplateCollection machineTemplateCollection = new MachineTemplateCollection();
-        machineTemplateCollection.setId(300);
-        MachineConfigurationCollection machineConfigurationCollection = new MachineConfigurationCollection();
-        machineConfigurationCollection.setId(400);
-        MachineImageCollection machineImageCollection = new MachineImageCollection();
-        machineImageCollection.setId(500);
+        List<Machine> machineCollection = new ArrayList<Machine>();
+        // machineCollection.setId(200);
+        List<MachineTemplate> machineTemplateCollection = new ArrayList<MachineTemplate>();
+        // machineTemplateCollection.setId(300);
+        List<MachineConfiguration> machineConfigurationCollection = new ArrayList<MachineConfiguration>();
+        // machineConfigurationCollection.setId(400);
+        List<MachineImage> machineImageCollection = new ArrayList<MachineImage>();
+        // machineImageCollection.setId(500);
 
-        EasyMock.expect(this.serviceCredentials.getCredentialsCollection()).andReturn(credentialsCollection);
-        EasyMock.expect(this.serviceCredentials.getCredentialsTemplateCollection()).andReturn(credentialsTemplateCollection);
+        EasyMock.expect(this.serviceCredentials.getCredentials()).andReturn(credentialsCollection);
+        EasyMock.expect(this.serviceCredentials.getCredentialsTemplates()).andReturn(credentialsTemplateCollection);
         EasyMock.replay(this.serviceCredentials);
 
-        EasyMock.expect(this.serviceJob.getJobCollection()).andReturn(jobCollection);
+        EasyMock.expect(this.serviceJob.getJobs()).andReturn(jobCollection);
         EasyMock.replay(this.serviceJob);
 
         EasyMock.expect(this.serviceMachine.getCloudEntryPoint()).andReturn(cloud);
-        EasyMock.expect(this.serviceMachine.getMachineCollection()).andReturn(machineCollection);
-        EasyMock.expect(this.serviceMachine.getMachineTemplateCollection()).andReturn(machineTemplateCollection);
-        EasyMock.expect(this.serviceMachine.getMachineConfigurationCollection()).andReturn(machineConfigurationCollection);
+        EasyMock.expect(this.serviceMachine.getMachines()).andReturn(machineCollection);
+        EasyMock.expect(this.serviceMachine.getMachineTemplates()).andReturn(machineTemplateCollection);
+        EasyMock.expect(this.serviceMachine.getMachineConfigurations()).andReturn(machineConfigurationCollection);
         EasyMock.replay(this.serviceMachine);
 
-        EasyMock.expect(this.serviceMachineImage.getMachineImageCollection()).andReturn(machineImageCollection);
+        EasyMock.expect(this.serviceMachineImage.getMachineImages()).andReturn(machineImageCollection);
         EasyMock.replay(this.serviceMachineImage);
 
         // this.request.setId("1");

@@ -73,15 +73,15 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         CloudEntryPointAggregate out = new CloudEntryPointAggregate(this.machineManager.getCloudEntryPoint());
 
-        out.setCredentials(this.credentialsManager.getCredentialsCollection());
-        out.setCredentialsTemplates(this.credentialsManager.getCredentialsTemplateCollection());
+        out.setCredentials(this.credentialsManager.getCredentials());
+        out.setCredentialsTemplates(this.credentialsManager.getCredentialsTemplates());
 
-        out.setJobs(this.jobManager.getJobCollection());
+        out.setJobs(this.jobManager.getJobs());
 
-        out.setMachineConfigs(this.machineManager.getMachineConfigurationCollection());
-        out.setMachineImages(this.machineImageManager.getMachineImageCollection());
-        out.setMachines(this.machineManager.getMachineCollection());
-        out.setMachineTemplates(this.machineManager.getMachineTemplateCollection());
+        out.setMachineConfigs(this.machineManager.getMachineConfigurations());
+        out.setMachineImages(this.machineImageManager.getMachineImages());
+        out.setMachines(this.machineManager.getMachines());
+        out.setMachineTemplates(this.machineManager.getMachineTemplates());
 
         // TODO Others resources :
         // resourceMetadata

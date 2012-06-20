@@ -108,12 +108,9 @@ public class MachineConfigurationConverter extends ObjectCommonConverter {
         final CimiMachineConfiguration dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            if (null != dataService.getCpu()) {
-                dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
-            }
-            if (null != dataService.getMemory()) {
-                dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
-            }
+            dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
+            dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
+
             if ((null != dataService.getDiskTemplates()) && (dataService.getDiskTemplates().size() > 0)) {
                 List<CimiDiskConfiguration> listCimis = new ArrayList<CimiDiskConfiguration>();
 
@@ -135,12 +132,9 @@ public class MachineConfigurationConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiMachineConfiguration dataCimi,
         final MachineConfiguration dataService) {
         this.fill(context, dataCimi, dataService);
-        if (null != dataCimi.getCpu()) {
-            dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
-        }
-        if (null != dataCimi.getMemory()) {
-            dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
-        }
+        dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
+        dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
+
         if ((null != dataCimi.getDisks()) && (dataCimi.getDisks().length > 0)) {
             List<DiskTemplate> listServices = new ArrayList<DiskTemplate>();
             for (CimiDiskConfiguration cimiItem : dataCimi.getDisks()) {

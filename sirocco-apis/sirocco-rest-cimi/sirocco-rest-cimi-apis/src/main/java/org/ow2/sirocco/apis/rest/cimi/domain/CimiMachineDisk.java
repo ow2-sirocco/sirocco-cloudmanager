@@ -24,22 +24,20 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Class Disk.
  */
 @XmlRootElement(name = "Disk")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiDisk implements Serializable {
+public class CimiMachineDisk extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -48,13 +46,17 @@ public class CimiDisk implements Serializable {
      * Field "capacity".
      */
     @Valid
-    @NotNull(groups = {GroupWrite.class})
     private CimiCapacity capacity;
+
+    /**
+     * Field "initialLocation".
+     */
+    private String initialLocation;
 
     /**
      * Default constructor.
      */
-    public CimiDisk() {
+    public CimiMachineDisk() {
         super();
     }
 
@@ -63,9 +65,9 @@ public class CimiDisk implements Serializable {
      * 
      * @param capacity The capacity
      */
-    public CimiDisk(final CimiCapacity capacity) {
+    public CimiMachineDisk(final CimiCapacity capacity) {
         super();
-        this.capacity = capacity;
+        this.setCapacity(capacity);
     }
 
     /**
@@ -84,5 +86,47 @@ public class CimiDisk implements Serializable {
      */
     public void setCapacity(final CimiCapacity capacity) {
         this.capacity = capacity;
+    }
+
+    /**
+     * Return the value of field "initialLocation".
+     * 
+     * @return The value
+     */
+    public String getInitialLocation() {
+        return this.initialLocation;
+    }
+
+    /**
+     * Set the value of field "initialLocation".
+     * 
+     * @param initialLocation The value
+     */
+    public void setInitialLocation(final String initialLocation) {
+        this.initialLocation = initialLocation;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getCapacity());
+        return has;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.Disk;
     }
 }

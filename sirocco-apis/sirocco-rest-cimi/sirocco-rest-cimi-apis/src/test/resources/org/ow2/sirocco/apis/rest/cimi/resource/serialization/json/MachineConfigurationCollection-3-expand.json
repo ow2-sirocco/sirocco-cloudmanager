@@ -63,7 +63,7 @@
 						"units":"unitValue_3_0"
 					},
 					"format":"formatValue_3_0",
-					"attachmentPoint":"attachmentPointValue_3_0"
+					"initialLocation":"initialLocationValue_3_0"
 				},
 				{
 					"capacity":{
@@ -71,7 +71,7 @@
 						"units":"unitValue_3_1"
 					},
 					"format":"formatValue_3_1",
-					"attachmentPoint":"attachmentPointValue_3_1"
+					"initialLocation":"initialLocationValue_3_1"
 				},
 				{
 					"capacity":{
@@ -79,7 +79,7 @@
 						"units":"unitValue_3_2"
 					},
 					"format":"formatValue_3_2",
-					"attachmentPoint":"attachmentPointValue_3_2"
+					"initialLocation":"initialLocationValue_3_2"
 				}
 				
 			]
@@ -129,7 +129,7 @@
 						"units":"unitValue_3_0"
 					},
 					"format":"formatValue_3_0",
-					"attachmentPoint":"attachmentPointValue_3_0"
+					"initialLocation":"initialLocationValue_3_0"
 				},
 				{
 					"capacity":{
@@ -137,7 +137,7 @@
 						"units":"unitValue_3_1"
 					},
 					"format":"formatValue_3_1",
-					"attachmentPoint":"attachmentPointValue_3_1"
+					"initialLocation":"initialLocationValue_3_1"
 				},
 				{
 					"capacity":{
@@ -145,7 +145,7 @@
 						"units":"unitValue_3_2"
 					},
 					"format":"formatValue_3_2",
-					"attachmentPoint":"attachmentPointValue_3_2"
+					"initialLocation":"initialLocationValue_3_2"
 				}
 				
 			]
@@ -195,7 +195,7 @@
 						"units":"unitValue_3_0"
 					},
 					"format":"formatValue_3_0",
-					"attachmentPoint":"attachmentPointValue_3_0"
+					"initialLocation":"initialLocationValue_3_0"
 				},
 				{
 					"capacity":{
@@ -203,7 +203,7 @@
 						"units":"unitValue_3_1"
 					},
 					"format":"formatValue_3_1",
-					"attachmentPoint":"attachmentPointValue_3_1"
+					"initialLocation":"initialLocationValue_3_1"
 				},
 				{
 					"capacity":{
@@ -211,7 +211,7 @@
 						"units":"unitValue_3_2"
 					},
 					"format":"formatValue_3_2",
-					"attachmentPoint":"attachmentPointValue_3_2"
+					"initialLocation":"initialLocationValue_3_2"
 				}
 				
 			]

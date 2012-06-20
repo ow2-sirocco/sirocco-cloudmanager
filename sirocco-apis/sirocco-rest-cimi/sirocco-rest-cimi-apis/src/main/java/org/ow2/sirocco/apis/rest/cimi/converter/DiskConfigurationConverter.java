@@ -97,8 +97,8 @@ public class DiskConfigurationConverter implements CimiConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final DiskTemplate dataService, final CimiDiskConfiguration dataCimi) {
-        dataCimi.setAttachmentPoint(dataService.getAttachmentPoint());
         dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService, CimiCapacity.class));
+        dataCimi.setInitialLocation(dataService.getInitialLocation());
         dataCimi.setFormat(dataService.getFormat());
     }
 
@@ -111,7 +111,7 @@ public class DiskConfigurationConverter implements CimiConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiDiskConfiguration dataCimi,
         final DiskTemplate dataService) {
-        dataService.setAttachmentPoint(dataCimi.getAttachmentPoint());
+        dataService.setInitialLocation(dataCimi.getInitialLocation());
         if (null != dataCimi.getCapacity()) {
             context.getConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
         }

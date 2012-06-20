@@ -25,14 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -41,7 +38,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * Converted classes:
  * <ul>
  * <li>CIMI model: {@link CimiMachineTemplateCollection}</li>
- * <li>Service model: {@link MachineTemplateCollection}</li>
+ * <li>Service model: {@link List<MachineTemplate>}</li>
  * </ul>
  * </p>
  */
@@ -69,14 +66,7 @@ public class MachineTemplateCollectionConverter extends CollectionConverterAbstr
     @SuppressWarnings("unchecked")
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        MachineTemplateCollection use;
-        if (dataService instanceof List<?>) {
-            use = new MachineTemplateCollection();
-            use.setMachineTemplates((List<MachineTemplate>) dataService);
-        } else {
-            use = (MachineTemplateCollection) dataService;
-        }
-        this.doCopyToCimi(context, use, (CimiMachineTemplateCollection) dataCimi);
+        this.doCopyToCimi(context, (List<Object>) dataService, (CimiMachineTemplateCollection) dataCimi);
     }
 
     /**
@@ -87,7 +77,7 @@ public class MachineTemplateCollectionConverter extends CollectionConverterAbstr
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        MachineTemplateCollection service = new MachineTemplateCollection();
+        List<MachineTemplate> service = new ArrayList<MachineTemplate>();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -99,42 +89,10 @@ public class MachineTemplateCollectionConverter extends CollectionConverterAbstr
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiMachineTemplateCollection) dataCimi, (MachineTemplateCollection) dataService);
+        this.doCopyToService(context, (CimiMachineTemplateCollection) dataCimi, (List<Object>) dataService);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#getChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected Collection<?> getChildCollection(final Resource resourceCollection) {
-        MachineTemplateCollection collect = (MachineTemplateCollection) resourceCollection;
-        return collect.getMachineTemplates();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#setNewChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected void setNewChildCollection(final Resource resourceCollection) {
-        MachineTemplateCollection collect = (MachineTemplateCollection) resourceCollection;
-        collect.setMachineTemplates(new ArrayList<MachineTemplate>());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#addItemChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void addItemChildCollection(final Resource resourceCollection, final Object itemService) {
-        MachineTemplateCollection collect = (MachineTemplateCollection) resourceCollection;
-        collect.getMachineTemplates().add((MachineTemplate) itemService);
-    }
 }

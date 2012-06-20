@@ -26,10 +26,12 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
@@ -103,26 +105,11 @@ public class MachineConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final Machine dataService, final CimiMachine dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            if (null != dataService.getCpu()) {
-                dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
-            }
-            if (null != dataService.getMemory()) {
-                dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
-            }
-            // FIXME Disk collection
-            // if ((null != dataService.getDisks()) &&
-            // (dataService.getDisks().size() > 0)) {
-            // List<CimiDisk> listCimis = new ArrayList<CimiDisk>();
-            // CimiConverter converter = context.getConverter(CimiDisk.class);
-            // for (Disk itemService : dataService.getDisks()) {
-            // listCimis.add((CimiDisk) converter.toCimi(context, itemService));
-            // }
-            // dataCimi.setDisks(listCimis.toArray(new
-            // CimiDisk[listCimis.size()]));
-            // }
-            if (null != dataService.getState()) {
-                dataCimi.setState(dataService.getState().toString());
-            }
+            dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
+            dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
+            dataCimi.setDisks((CimiMachineDiskCollection) context.convertNextCimi(dataService.getDisks(),
+                CimiMachineDiskCollection.class));
+            dataCimi.setState(HelperConverter.toString(dataService.getState()));
 
             // TODO dataCimi.setNetworkInterfaces(???);
             // TODO dataCimi.setVolumes(???);
@@ -138,22 +125,9 @@ public class MachineConverter extends ObjectCommonConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiMachine dataCimi, final Machine dataService) {
         this.fill(context, dataCimi, dataService);
-        if (null != dataCimi.getCpu()) {
-            dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
-        }
-        if (null != dataCimi.getMemory()) {
-            dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
-        }
-        // FIXME Disk collection
-        // if ((null != dataCimi.getDisks()) && (dataCimi.getDisks().length >
-        // 0)) {
-        // List<Disk> listServices = new ArrayList<Disk>();
-        // dataService.setDisks(listServices);
-        // CimiConverter converter = context.getConverter(CimiDisk.class);
-        // for (CimiDisk itemCimi : dataCimi.getDisks()) {
-        // listServices.add((Disk) converter.toService(context, itemCimi));
-        // }
-        // }
+        dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
+        dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
+        dataService.setDisks((MachineDiskCollection) context.convertNextService(dataCimi.getDisks()));
         // TODO dataService.setNetworkInterfaces(???);
         // TODO dataService.setVolumes(???);
 

@@ -24,22 +24,28 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 
 /**
- * Convert the data of the CIMI model and the service model in both directions.
+ * Helper class to convert the data of the CIMI model and the service model in
+ * both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiDisk}</li>
- * <li>Service model: {@link Disk}</li>
+ * <li>CIMI model: {@link CimiMachineDiskCollection}</li>
+ * <li>Service model: {@link DiskCollection}</li>
  * </ul>
  * </p>
  */
-public class DiskConverter implements CimiConverter {
+public class MachineDiskCollectionOldConverter extends CollectionOldConverterAbstract {
+
     /**
      * {@inheritDoc}
      * 
@@ -48,7 +54,7 @@ public class DiskConverter implements CimiConverter {
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiDisk cimi = new CimiDisk();
+        CimiMachineDiskCollection cimi = new CimiMachineDiskCollection();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -59,9 +65,17 @@ public class DiskConverter implements CimiConverter {
      * @see org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter#copyToCimi(org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (Disk) dataService, (CimiDisk) dataCimi);
+        MachineDiskCollection use;
+        if (dataService instanceof List<?>) {
+            use = new MachineDiskCollection();
+            use.setItems((List<MachineDisk>) dataService);
+        } else {
+            use = (MachineDiskCollection) dataService;
+        }
+        this.doCopyToCimi(context, use, (CimiMachineDiskCollection) dataCimi);
     }
 
     /**
@@ -72,7 +86,7 @@ public class DiskConverter implements CimiConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Disk service = new Disk();
+        MachineDiskCollection service = new MachineDiskCollection();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -86,28 +100,40 @@ public class DiskConverter implements CimiConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiDisk) dataCimi, (Disk) dataService);
+        this.doCopyToService(context, (CimiMachineDiskCollection) dataCimi, (MachineDiskCollection) dataService);
     }
 
     /**
-     * Copy data from a service object to a CIMI object.
+     * {@inheritDoc}
      * 
-     * @param context The current context
-     * @param dataService Source service object
-     * @param dataCimi Destination CIMI object
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#getChildCollection(java.lang.Object)
      */
-    protected void doCopyToCimi(final CimiContext context, final Disk dataService, final CimiDisk dataCimi) {
-        dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService, CimiCapacity.class));
+    @Override
+    protected Collection<?> getChildCollection(final Object resourceCollection) {
+        MachineDiskCollection collect = (MachineDiskCollection) resourceCollection;
+        return collect.getItems();
     }
 
     /**
-     * Copy data from a CIMI object to a service object.
+     * {@inheritDoc}
      * 
-     * @param context The current context
-     * @param dataCimi Source CIMI object
-     * @param dataService Destination Service object
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#setNewChildCollection(java.lang.Object)
      */
-    protected void doCopyToService(final CimiContext context, final CimiDisk dataCimi, final Disk dataService) {
-        context.getConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
+    @Override
+    protected void setNewChildCollection(final Object resourceCollection) {
+        MachineDiskCollection collect = (MachineDiskCollection) resourceCollection;
+        collect.setItems(new ArrayList<MachineDisk>());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#addItemChildCollection(java.lang.Object,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void addItemChildCollection(final Object resourceCollection, final Object itemService) {
+        MachineDiskCollection collect = (MachineDiskCollection) resourceCollection;
+        collect.getItems().add((MachineDisk) itemService);
     }
 }

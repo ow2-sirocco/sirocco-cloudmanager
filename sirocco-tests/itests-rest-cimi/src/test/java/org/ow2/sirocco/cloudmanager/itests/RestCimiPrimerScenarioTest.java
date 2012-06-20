@@ -26,7 +26,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
@@ -277,7 +277,7 @@ public class RestCimiPrimerScenarioTest {
         disk.setUnit(StorageUnit.MEGABYTE);
         disk.setQuantity((float) diskSizeInGB);
         disk.setFormat("ext3");
-        disk.setAttachmentPoint("attachmentPoint");
+        disk.setInitialLocation("initialLocation");
 
         machineConfig.setCpu(cpu);
         machineConfig.setMemory(mem);
@@ -473,7 +473,7 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("getMemory().getQuantity: " + machineConfiguration.getMemory().getQuantity());
         System.out.println("getMemory().getUnit: " + machineConfiguration.getMemory().getUnits());
         for (CimiDiskConfiguration diskConfig : machineConfiguration.getDisks()) {
-            System.out.println("disk.getAttachmentPoint: " + diskConfig.getAttachmentPoint());
+            System.out.println("disk.getInitialLocation: " + diskConfig.getInitialLocation());
             System.out.println("disk.getCapacity.getQuantity: " + diskConfig.getCapacity().getQuantity());
             System.out.println("disk.getCapacity.getUnits: " + diskConfig.getCapacity().getUnits());
             System.out.println("disk.getFormat: " + diskConfig.getFormat());
@@ -585,8 +585,8 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("getCpu().getUnits: " + machine.getCpu().getUnits());
         System.out.println("getMemory().getQuantity: " + machine.getMemory().getQuantity());
         System.out.println("getMemory().getUnit: " + machine.getMemory().getUnits());
-        if (null != machine.getDisks()) {
-            for (CimiDisk disk : machine.getDisks()) {
+        if ((null != machine.getDisks()) && (null != machine.getDisks().getCollection())) {
+            for (CimiMachineDisk disk : machine.getDisks().getCollection()) {
                 System.out.println("disk.getCapacity.getQuantity: " + disk.getCapacity().getQuantity());
                 System.out.println("disk.getCapacity.getUnits: " + disk.getCapacity().getUnits());
             }

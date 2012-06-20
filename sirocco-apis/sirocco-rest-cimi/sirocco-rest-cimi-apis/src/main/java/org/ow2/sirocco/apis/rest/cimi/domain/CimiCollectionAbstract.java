@@ -24,13 +24,11 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.constraints.Null;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
 /**
  * Abstract class of a CIMI Collection.
@@ -43,7 +41,6 @@ public abstract class CimiCollectionAbstract<E> extends CimiResourceAbstract imp
     /**
      * The items of the collection
      */
-    @Null(groups = {GroupWrite.class})
     private CimiArray<E> items;
 
     /**

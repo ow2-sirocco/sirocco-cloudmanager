@@ -24,7 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import java.util.List;
+import java.util.Collection;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection;
@@ -43,7 +43,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * </ul>
  * </p>
  */
-public abstract class CollectionConverterAbstract implements CimiConverter {
+public abstract class CollectionOldConverterAbstract implements CimiConverter {
 
     /**
      * Fill the common data from a service collection to a CIMI collection.
@@ -90,6 +90,31 @@ public abstract class CollectionConverterAbstract implements CimiConverter {
     }
 
     /**
+     * Get the child collection of the resource collection of service.
+     * 
+     * @param resourceCollection The resource collection of service
+     * @return The child collection
+     */
+    protected abstract Collection<?> getChildCollection(final Object resourceCollection);
+
+    /**
+     * Create a new child collection and set it in the resource collection of
+     * service.
+     * 
+     * @param resourceCollection The resource collection of service
+     */
+    protected abstract void setNewChildCollection(final Object resourceCollection);
+
+    /**
+     * Add the item in the child collection of the resource collection of
+     * service.
+     * 
+     * @param resourceCollection The resource collection of service
+     * @param item The item to add
+     */
+    protected abstract void addItemChildCollection(final Object resourceCollection, final Object item);
+
+    /**
      * Copy data from a service collection to a CIMI collection.
      * 
      * @param context The current context
@@ -97,13 +122,14 @@ public abstract class CollectionConverterAbstract implements CimiConverter {
      * @param dataCimi Destination CIMI collection
      */
     @SuppressWarnings("unchecked")
-    protected <E extends CimiResource> void doCopyToCimi(final CimiContext context, final List<Object> collectionService,
+    protected <E extends CimiResource> void doCopyToCimi(final CimiContext context, final Object collectionService,
         final CimiCollection<E> collectionCimi) {
         this.fill(context, collectionService, collectionCimi);
         if (true == context.mustBeExpanded(collectionCimi)) {
-            if ((null != collectionService) && (collectionService.size() > 0)) {
+            Collection<?> serviceList = this.getChildCollection(collectionService);
+            if ((null != serviceList) && (serviceList.size() > 0)) {
                 CimiArray<E> cimiList = collectionCimi.newCollection();
-                for (Object serviceItem : collectionService) {
+                for (Object serviceItem : serviceList) {
                     cimiList.add((E) context.convertNextCimi(serviceItem, collectionCimi.getItemClass()));
                 }
                 collectionCimi.setCollection(cimiList);
@@ -119,11 +145,12 @@ public abstract class CollectionConverterAbstract implements CimiConverter {
      * @param dataService Destination Service collection
      */
     protected <E extends CimiResource> void doCopyToService(final CimiContext context, final CimiCollection<E> collectionCimi,
-        final List<Object> collectionService) {
+        final Object collectionService) {
         CimiArray<E> cimiList = collectionCimi.getCollection();
         if ((null != cimiList) && (cimiList.size() > 0)) {
+            this.setNewChildCollection(collectionService);
             for (E cimiItem : cimiList) {
-                collectionService.add(context.convertNextService(cimiItem));
+                this.addItemChildCollection(collectionService, context.convertNextService(cimiItem));
             }
         }
     }

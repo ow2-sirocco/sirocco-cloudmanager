@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.ArrayList;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,13 +37,13 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 
 /**
  * Converters tests of CloudEntryPoint resources.
@@ -80,15 +82,15 @@ public class CloudEntryPointConverterTest {
         Assert.assertNull(cimi.getMachineTemplates());
         Assert.assertNull(cimi.getMachineTemplates());
 
-        // // Full Service -> Cimi
+        // Full Service -> Cimi
         service = new CloudEntryPointAggregate(new CloudEntryPoint());
-        service.setCredentials(new CredentialsCollection());
-        service.setCredentialsTemplates(new CredentialsTemplateCollection());
-        service.setJobs(new JobCollection());
-        service.setMachineConfigs(new MachineConfigurationCollection());
-        service.setMachineImages(new MachineImageCollection());
-        service.setMachines(new MachineCollection());
-        service.setMachineTemplates(new MachineTemplateCollection());
+        service.setCredentials(new ArrayList<Credentials>());
+        service.setCredentialsTemplates(new ArrayList<CredentialsTemplate>());
+        service.setJobs(new ArrayList<Job>());
+        service.setMachineConfigs(new ArrayList<MachineConfiguration>());
+        service.setMachineImages(new ArrayList<MachineImage>());
+        service.setMachines(new ArrayList<Machine>());
+        service.setMachineTemplates(new ArrayList<MachineTemplate>());
 
         cimi = (CimiCloudEntryPoint) this.context.convertToCimi(service, CimiCloudEntryPoint.class);
         Assert.assertEquals(this.request.getBaseUri(), cimi.getBaseURI());

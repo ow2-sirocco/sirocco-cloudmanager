@@ -33,9 +33,9 @@ import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
@@ -251,7 +251,7 @@ public class MergeReferenceHelperImplTest {
 
         CimiCapacity refCapacity = new CimiCapacity();
         cimiRef = new CimiDiskConfiguration();
-        cimiRef.setAttachmentPoint("refAttachmentPoint");
+        cimiRef.setInitialLocation("refInitialLocation");
         cimiRef.setCapacity(refCapacity);
         cimiRef.setFormat("refFormat");
 
@@ -263,55 +263,59 @@ public class MergeReferenceHelperImplTest {
         cimi = new CimiDiskConfiguration();
         merger.merge(cimiRef, cimi);
 
-        Assert.assertEquals("refAttachmentPoint", cimi.getAttachmentPoint());
+        Assert.assertEquals("refInitialLocation", cimi.getInitialLocation());
         Assert.assertSame(refCapacity, cimi.getCapacity());
         Assert.assertEquals("refFormat", cimi.getFormat());
 
         // Destination with values
         CimiCapacity cimiCapacity = new CimiCapacity();
         cimi = new CimiDiskConfiguration();
-        cimi.setAttachmentPoint("attachmentPoint");
+        cimi.setInitialLocation("initialLocation");
         cimi.setCapacity(cimiCapacity);
         cimi.setFormat("format");
         merger.merge(cimiRef, cimi);
 
-        Assert.assertEquals("attachmentPoint", cimi.getAttachmentPoint());
+        Assert.assertEquals("initialLocation", cimi.getInitialLocation());
         Assert.assertSame(cimiCapacity, cimi.getCapacity());
         Assert.assertEquals("format", cimi.getFormat());
     }
 
     /**
      * Test method for
-     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk, org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk)}
+     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk, org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk)}
      * .
      */
     @Test
-    public void testMergeCimiDisk() {
+    public void testMergeCimiMachineDisk() {
         MergeReferenceHelperImpl merger = new MergeReferenceHelperImpl();
-        CimiDisk cimi;
-        CimiDisk cimiRef;
+        CimiMachineDisk cimi;
+        CimiMachineDisk cimiRef;
 
         CimiCapacity refCapacity = new CimiCapacity();
-        cimiRef = new CimiDisk();
+        cimiRef = new CimiMachineDisk();
         cimiRef.setCapacity(refCapacity);
+        cimiRef.setInitialLocation("refInitialLocation");
 
         // Source null
-        cimi = new CimiDisk();
+        cimi = new CimiMachineDisk();
         merger.merge(null, cimi);
 
         // Destination without value
-        cimi = new CimiDisk();
+        cimi = new CimiMachineDisk();
         merger.merge(cimiRef, cimi);
 
         Assert.assertSame(refCapacity, cimi.getCapacity());
+        Assert.assertEquals("refInitialLocation", cimi.getInitialLocation());
 
         // Destination with values
         CimiCapacity cimiCapacity = new CimiCapacity();
-        cimi = new CimiDisk();
+        cimi = new CimiMachineDisk();
         cimi.setCapacity(cimiCapacity);
+        cimi.setInitialLocation("initialLocation");
         merger.merge(cimiRef, cimi);
 
         Assert.assertSame(cimiCapacity, cimi.getCapacity());
+        Assert.assertEquals("initialLocation", cimi.getInitialLocation());
     }
 
     /**

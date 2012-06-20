@@ -28,8 +28,8 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByRefOrByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
-import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertResourceBy;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertReferencePath;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertResourceBy;
 
 /**
  * Interface of an identified resource exchanged with the server.

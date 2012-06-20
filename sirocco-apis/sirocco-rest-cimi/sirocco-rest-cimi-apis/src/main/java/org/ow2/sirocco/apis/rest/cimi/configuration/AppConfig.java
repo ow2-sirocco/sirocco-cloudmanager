@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.configuration;
 
-
 public class AppConfig {
 
     /** Singleton */

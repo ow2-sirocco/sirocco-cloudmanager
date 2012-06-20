@@ -26,11 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.job;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
-import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -38,11 +33,12 @@ import org.springframework.stereotype.Component;
  */
 @Component("CimiManagerUpdateJobCollection")
 @Deprecated
+// FIXME
 public class CimiManagerUpdateJobCollection extends CimiManagerUpdateAbstract {
 
-    @Autowired
-    @Qualifier("IJobManager")
-    private IJobManager manager;
+    // @Autowired
+    // @Qualifier("IJobManager")
+    // private IJobManager manager;
 
     /**
      * {@inheritDoc}
@@ -52,12 +48,12 @@ public class CimiManagerUpdateJobCollection extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
-        if (true == select.isEmpty()) {
-            this.manager.updateJobCollection((JobCollection) dataService);
-        } else {
-            throw new UnsupportedOperationException();
-        }
+        // CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        // if (true == select.isEmpty()) {
+        // this.manager.updateJobCollection((List<Job>) dataService);
+        // } else {
+        // throw new UnsupportedOperationException();
+        // }
         return null;
     }
 }

@@ -35,10 +35,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
@@ -366,12 +366,16 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiDiskConfiguration cimiRef, final CimiDiskConfiguration cimi) {
         if (null != cimiRef) {
-            this.merge((CimiDisk) cimiRef, (CimiDisk) cimi);
-            if (null == cimi.getAttachmentPoint()) {
-                cimi.setAttachmentPoint(cimiRef.getAttachmentPoint());
+            if (null == cimi.getCapacity()) {
+                cimi.setCapacity(cimiRef.getCapacity());
+            } else {
+                this.merge(cimiRef.getCapacity(), cimi.getCapacity());
             }
             if (null == cimi.getFormat()) {
                 cimi.setFormat(cimiRef.getFormat());
+            }
+            if (null == cimi.getInitialLocation()) {
+                cimi.setInitialLocation(cimiRef.getInitialLocation());
             }
         }
     }
@@ -382,12 +386,16 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      * @param cimiRef Source to merge
      * @param cimi Merged destination
      */
-    protected void merge(final CimiDisk cimiRef, final CimiDisk cimi) {
+    protected void merge(final CimiMachineDisk cimiRef, final CimiMachineDisk cimi) {
         if (null != cimiRef) {
+            this.mergeCommon(cimiRef, cimi);
             if (null == cimi.getCapacity()) {
                 cimi.setCapacity(cimiRef.getCapacity());
             } else {
                 this.merge(cimiRef.getCapacity(), cimi.getCapacity());
+            }
+            if (null == cimi.getInitialLocation()) {
+                cimi.setInitialLocation(cimiRef.getInitialLocation());
             }
         }
     }

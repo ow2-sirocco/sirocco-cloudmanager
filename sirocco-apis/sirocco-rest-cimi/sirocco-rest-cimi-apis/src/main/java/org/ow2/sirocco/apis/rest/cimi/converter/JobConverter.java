@@ -110,15 +110,11 @@ public class JobConverter extends ObjectCommonConverter {
             dataCimi.setIsCancellable(dataService.getIsCancellable());
             dataCimi.setProgress(dataService.getProgress());
             dataCimi.setReturnCode(dataService.getReturnCode());
-            if (null != dataService.getStatus()) {
-                dataCimi.setStatus(dataService.getStatus().toString());
-            }
+            dataCimi.setStatus(HelperConverter.toString(dataService.getStatus()));
             dataCimi.setStatusMessage(dataService.getStatusMessage());
             dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
+            dataCimi.setTargetResource(this.makeHrefTargetResource(context, dataService.getTargetEntity()));
 
-            if (null != dataService.getTargetEntity()) {
-                dataCimi.setTargetResource(this.makeHrefTargetResource(context, dataService.getTargetEntity()));
-            }
             if ((null != dataService.getAffectedEntities()) && (dataService.getAffectedEntities().size() > 0)) {
                 List<String> list = new ArrayList<String>();
                 for (CloudResource resource : dataService.getAffectedEntities()) {
@@ -153,8 +149,10 @@ public class JobConverter extends ObjectCommonConverter {
 
     protected String makeHrefTargetResource(final CimiContext context, final Object targetDataService) {
         String href = null;
-        Class<? extends CimiResource> targetType = context.findAssociate(targetDataService.getClass());
-        href = context.makeHref(targetType, this.getTargetId(targetDataService).toString());
+        if (null != targetDataService) {
+            Class<? extends CimiResource> targetType = context.findAssociate(targetDataService.getClass());
+            href = context.makeHref(targetType, this.getTargetId(targetDataService).toString());
+        }
         return href;
     }
 

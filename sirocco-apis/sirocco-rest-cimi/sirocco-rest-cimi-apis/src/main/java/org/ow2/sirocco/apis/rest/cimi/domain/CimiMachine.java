@@ -25,12 +25,10 @@
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.validation.Valid;
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
@@ -67,10 +65,9 @@ public class CimiMachine extends CimiObjectCommonAbstract {
     /**
      * Field "disks".
      */
-    @JsonProperty
-    @Valid
+    @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
-    private CimiDisk[] disks;
+    private CimiMachineDiskCollection disks;
 
     /**
      * Field "volumes".
@@ -161,9 +158,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    @XmlElement(name = "disk")
-    @JsonIgnore
-    public CimiDisk[] getDisks() {
+    public CimiMachineDiskCollection getDisks() {
         return this.disks;
     }
 
@@ -172,7 +167,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @param disks The value
      */
-    public void setDisks(final CimiDisk[] disks) {
+    public void setDisks(final CimiMachineDiskCollection disks) {
         this.disks = disks;
     }
 

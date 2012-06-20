@@ -31,21 +31,83 @@
 		"quantity":2,
 		"units":"unitValue_2"
 	},
-	"disks":[
-		{
-			"capacity":{
-				"quantity":2,
-				"units":"unitValue_2_0"
+	"disks":{
+		"id":"idValue_2",
+		"resourceURI":"http://schemas.dmtf.org/cimi/1/DiskCollection",
+		"href":"hrefValue_2",
+		"operations":[
+			{
+				"rel":"relValue_2_0",
+				"href":"hrefValue_2_0"
+			},
+			{
+				"rel":"relValue_2_1",
+				"href":"hrefValue_2_1"
 			}
 			
-		},
-		{
-			"capacity":{
-				"quantity":2,
-				"units":"unitValue_2_1"
+		],
+		"count":2,
+		"disks":[
+			{
+				"name":"nameValue_2_0",
+				"description":"descriptionValue_2_0",
+				"properties":{
+					"keyProp_2_0":"valueProp_2_0",
+					"keyProp_2_1":"valueProp_2_1"
+				},
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
+				"capacity":{
+					"quantity":2,
+					"units":"unitValue_2_0"
+				},
+				"initialLocation":"initialLocation_2_0",
+				"id":"idValue_2_0",
+				"href":"hrefValue_2_0",
+				"operations":[
+					{
+						"rel":"relValue_2_0",
+						"href":"hrefValue_2_0"
+					},
+					{
+						"rel":"relValue_2_1",
+						"href":"hrefValue_2_1"
+					}
+					
+				],
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/Disk"
+			},
+			{
+				"name":"nameValue_2_1",
+				"description":"descriptionValue_2_1",
+				"properties":{
+					"keyProp_2_0":"valueProp_2_0",
+					"keyProp_2_1":"valueProp_2_1"
+				},
+				"created":"2002-03-03T02:02:02.002Z",
+				"updated":"2002-03-03T02:02:02.002Z",
+				"capacity":{
+					"quantity":2,
+					"units":"unitValue_2_1"
+				},
+				"initialLocation":"initialLocation_2_1",
+				"id":"idValue_2_1",
+				"href":"hrefValue_2_1",
+				"operations":[
+					{
+						"rel":"relValue_2_0",
+						"href":"hrefValue_2_0"
+					},
+					{
+						"rel":"relValue_2_1",
+						"href":"hrefValue_2_1"
+					}
+					
+				],
+				"resourceURI":"http://schemas.dmtf.org/cimi/1/Disk"
 			}
 			
-		}
+		]
 		
-	]
+	}
 }

@@ -37,7 +37,7 @@
 			<cpu frequency="100.0" numberVirtualCpus="1" units="unitValue_1" />
 			<disk>
 				<capacity quantity="1" units="unitValue_1_0" />
-				<attachmentPoint>attachmentPointValue_1_0</attachmentPoint>
+				<initialLocation>initialLocationValue_1_0</initialLocation>
 				<format>formatValue_1_0</format>
 			</disk>
 			<memory quantity="1" units="unitValue_1" />

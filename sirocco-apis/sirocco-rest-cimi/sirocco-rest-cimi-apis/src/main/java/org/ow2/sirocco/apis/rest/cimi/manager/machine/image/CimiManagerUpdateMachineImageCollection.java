@@ -26,10 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
@@ -37,11 +33,12 @@ import org.springframework.stereotype.Component;
  */
 @Component("CimiManagerUpdateMachineImageCollection")
 @Deprecated
+// FIXME
 public class CimiManagerUpdateMachineImageCollection extends CimiManagerUpdateAbstract {
 
-    @Autowired
-    @Qualifier("IMachineImageManager")
-    private IMachineImageManager manager;
+    // @Autowired
+    // @Qualifier("IMachineImageManager")
+    // private IMachineImageManager manager;
 
     /**
      * {@inheritDoc}
@@ -51,12 +48,12 @@ public class CimiManagerUpdateMachineImageCollection extends CimiManagerUpdateAb
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
-        if (true == select.isEmpty()) {
-            throw new UnsupportedOperationException();
-        } else {
-            this.manager.updateMachineImageCollection(select.dispatchAttributesValues(dataService));
-        }
+        // CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        // if (true == select.isEmpty()) {
+        // throw new UnsupportedOperationException();
+        // } else {
+        // this.manager.updateMachineImages(select.dispatchAttributesValues(dataService));
+        // }
         return null;
     }
 }

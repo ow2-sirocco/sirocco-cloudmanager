@@ -32,9 +32,9 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 /**
  * Class TargetEntity.
  */
-@XmlRootElement(name = "TargetEntity")
+@XmlRootElement(name = "TargetResource")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class TargetEntity extends Reference {
+public class TargetResource extends Reference {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -42,14 +42,14 @@ public class TargetEntity extends Reference {
     /**
      * Default constructor.
      */
-    public TargetEntity() {
+    public TargetResource() {
         super();
     }
 
     /**
      * Parameter constructor.
      */
-    public TargetEntity(final String href) {
+    public TargetResource(final String href) {
         this.setHref(href);
     }
 }

@@ -44,7 +44,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -98,16 +97,14 @@ public class CimiManagersMachineImageCollectionTest {
     @Test
     public void testRead() throws Exception {
         MachineImage machine;
-        MachineImageCollection collect = new MachineImageCollection();
         List<MachineImage> list = new ArrayList<MachineImage>();
-        collect.setImages(list);
         for (int i = 0; i < 3; i++) {
             machine = new MachineImage();
             machine.setId(i + 13);
             list.add(machine);
         }
 
-        EasyMock.expect(this.service.getMachineImageCollection()).andReturn(collect);
+        EasyMock.expect(this.service.getMachineImages()).andReturn(list);
         EasyMock.replay(this.service);
 
         this.managerReadCollection.execute(this.context);

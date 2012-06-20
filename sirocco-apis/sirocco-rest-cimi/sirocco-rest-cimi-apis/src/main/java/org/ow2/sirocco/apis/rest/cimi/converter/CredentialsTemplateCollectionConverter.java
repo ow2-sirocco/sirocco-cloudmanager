@@ -25,14 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplateCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -40,8 +37,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiCredentialsTemplateCollection}</li>
- * <li>Service model: {@link CredentialsTemplateCollection}</li>
+ * <li>CIMI model: {@link CimiCredentialsTemplateTemplateCollection}</li>
+ * <li>Service model: {@link List<CredentialsTemplate>}</li>
  * </ul>
  * </p>
  */
@@ -69,14 +66,7 @@ public class CredentialsTemplateCollectionConverter extends CollectionConverterA
     @SuppressWarnings("unchecked")
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        CredentialsTemplateCollection use;
-        if (dataService instanceof List<?>) {
-            use = new CredentialsTemplateCollection();
-            use.setCredentialsTemplates((List<CredentialsTemplate>) dataService);
-        } else {
-            use = (CredentialsTemplateCollection) dataService;
-        }
-        this.doCopyToCimi(context, use, (CimiCredentialsTemplateCollection) dataCimi);
+        this.doCopyToCimi(context, (List<Object>) dataService, (CimiCredentialsTemplateCollection) dataCimi);
     }
 
     /**
@@ -87,7 +77,7 @@ public class CredentialsTemplateCollectionConverter extends CollectionConverterA
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        CredentialsTemplateCollection service = new CredentialsTemplateCollection();
+        List<CredentialsTemplate> service = new ArrayList<CredentialsTemplate>();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -99,42 +89,10 @@ public class CredentialsTemplateCollectionConverter extends CollectionConverterA
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiCredentialsTemplateCollection) dataCimi, (CredentialsTemplateCollection) dataService);
+        this.doCopyToService(context, (CimiCredentialsTemplateCollection) dataCimi, (List<Object>) dataService);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#getChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected Collection<?> getChildCollection(final Resource resourceCollection) {
-        CredentialsTemplateCollection collect = (CredentialsTemplateCollection) resourceCollection;
-        return collect.getCredentialsTemplates();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#setNewChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected void setNewChildCollection(final Resource resourceCollection) {
-        CredentialsTemplateCollection collect = (CredentialsTemplateCollection) resourceCollection;
-        collect.setCredentialsTemplates(new ArrayList<CredentialsTemplate>());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#addItemChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void addItemChildCollection(final Resource resourceCollection, final Object itemService) {
-        CredentialsTemplateCollection collect = (CredentialsTemplateCollection) resourceCollection;
-        collect.getCredentialsTemplates().add((CredentialsTemplate) itemService);
-    }
 }

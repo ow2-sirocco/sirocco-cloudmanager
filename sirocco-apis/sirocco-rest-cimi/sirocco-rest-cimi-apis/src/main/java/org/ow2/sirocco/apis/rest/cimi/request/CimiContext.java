@@ -120,15 +120,6 @@ public interface CimiContext {
     boolean mustBeReferenced(CimiResource resource);
 
     /**
-     * Returns true if the given resource must have an identifier in its
-     * reference.
-     * 
-     * @param resource A CIMI resource class
-     * @return True if must have a ID.
-     */
-    boolean mustHaveIdInReference(Class<? extends CimiResource> classResource);
-
-    /**
      * Make the base HREF without ID.
      * 
      * @param data
@@ -140,19 +131,21 @@ public interface CimiContext {
      * Make a HREF for a resource.
      * 
      * @param resource The instance of the resource
-     * @param id Service ID
+     * @param ids All ID necessary : the first is a ID parent, the last is
+     *        current ID
      * @return The HREF made
      */
-    String makeHref(CimiResource resource, String id);
+    String makeHref(CimiResource resource, String... ids);
 
     /**
      * Make a HREF for a resource.
      * 
      * @param resource The class of the resource
-     * @param id Service ID
+     * @param @param ids All ID necessary : the first is a ID parent, the last
+     *        is current ID
      * @return The HREF made
      */
-    public String makeHref(Class<? extends CimiResource> classToUse, String id);
+    public String makeHref(Class<? extends CimiResource> classToUse, String... ids);
 
     /**
      * Returns true if the converters must process the write-only data when

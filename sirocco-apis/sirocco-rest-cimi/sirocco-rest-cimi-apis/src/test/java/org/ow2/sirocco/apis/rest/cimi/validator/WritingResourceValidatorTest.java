@@ -39,7 +39,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
@@ -47,6 +46,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
@@ -72,7 +73,7 @@ public class WritingResourceValidatorTest {
     public void setUp() throws Exception {
 
         this.request = new CimiRequest();
-        this.request.setBaseUri("http://www.test.org/");
+        this.request.setBaseUri("http://www.sirocco.test.org/");
         this.response = new CimiResponse();
         this.context = new CimiContextImpl(this.request, this.response);
     }
@@ -82,72 +83,22 @@ public class WritingResourceValidatorTest {
         CimiResource cimi = null;
 
         for (ExchangeType type : ExchangeType.values()) {
-            switch (type) {
-            case CloudEntryPoint:
-                cimi = new CimiCloudEntryPoint();
-                break;
-            case Credentials:
-                cimi = new CimiCredentials();
-                break;
-            case CredentialsCollection:
-                cimi = new CimiCredentialsCollection();
-                break;
-            case CredentialsCreate:
-                cimi = null;
-                break;
-            case CredentialsTemplate:
-                cimi = new CimiCredentialsTemplate();
-                break;
-            case CredentialsTemplateCollection:
-                cimi = new CimiCredentialsTemplateCollection();
-                break;
-            case Job:
-                cimi = new CimiJob();
-                break;
-            case JobCollection:
-                cimi = new CimiJobCollection();
-                break;
-            case Machine:
-                cimi = new CimiMachine();
-                break;
-            case MachineAction:
-                cimi = null;
-                break;
-            case MachineCollection:
-                cimi = new CimiMachineCollection();
-                break;
-            case MachineConfiguration:
-                cimi = new CimiMachineConfiguration();
-                break;
-            case MachineConfigurationCollection:
-                cimi = new CimiMachineConfigurationCollection();
-                break;
-            case MachineCreate:
-                cimi = null;
-                break;
-            case MachineImage:
-                cimi = new CimiMachineImage();
-                break;
-            case MachineImageCollection:
-                cimi = new CimiMachineImageCollection();
-                break;
-            case MachineTemplate:
-                cimi = new CimiMachineTemplate();
-                break;
-            case MachineTemplateCollection:
-                cimi = new CimiMachineTemplateCollection();
-                break;
-            default:
-                Assert.fail(type.name());
-                break;
-            }
+
+            cimi = this.newResource(type);
+
             if (null != cimi) {
-                cimi.setHref(this.context.makeHref(cimi, "1"));
+                // System.out.println(type);
+                cimi.setHref(this.context.makeHref(cimi, "987", "123"));
+                // System.out.println(cimi.getHref());
                 Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
-                cimi.setHref(this.context.makeHrefBase(cimi));
-                if (true == this.context.mustHaveIdInReference(cimi.getClass())) {
-
+                if (true == type.hasParent()) {
+                    cimi.setHref(this.context.makeHref(cimi, "123"));
+                } else {
+                    cimi.setHref(this.context.makeHrefBase(cimi));
+                }
+                // System.out.println(cimi.getHref());
+                if (true == type.hasIdInReference()) {
                     Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
                 } else {
                     Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
@@ -155,9 +106,89 @@ public class WritingResourceValidatorTest {
 
                 cimi.setHref("foo");
                 Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
+
+                // Test with all other resource
+                for (ExchangeType otherType : ExchangeType.values()) {
+                    CimiResource cimiOther = this.newResource(otherType);
+                    if ((null != cimiOther) && (type != otherType)) {
+                        cimi.setHref(this.context.makeHref(cimiOther, "987", "123"));
+                        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
+                    }
+                }
             }
         }
 
+    }
+
+    private CimiResource newResource(final ExchangeType type) {
+        CimiResource cimi = null;
+        switch (type) {
+        case CloudEntryPoint:
+            cimi = new CimiCloudEntryPoint();
+            break;
+        case Credentials:
+            cimi = new CimiCredentials();
+            break;
+        case CredentialsCollection:
+            cimi = new CimiCredentialsCollection();
+            break;
+        case CredentialsCreate:
+            cimi = null;
+            break;
+        case CredentialsTemplate:
+            cimi = new CimiCredentialsTemplate();
+            break;
+        case CredentialsTemplateCollection:
+            cimi = new CimiCredentialsTemplateCollection();
+            break;
+        case Disk:
+            cimi = new CimiMachineDisk();
+            break;
+        case DiskCollection:
+            cimi = new CimiMachineDiskCollection();
+            break;
+        case Job:
+            cimi = new CimiJob();
+            break;
+        case JobCollection:
+            cimi = new CimiJobCollection();
+            break;
+        case Machine:
+            cimi = new CimiMachine();
+            break;
+        case MachineAction:
+            cimi = null;
+            break;
+        case MachineCollection:
+            cimi = new CimiMachineCollection();
+            break;
+        case MachineConfiguration:
+            cimi = new CimiMachineConfiguration();
+            break;
+        case MachineConfigurationCollection:
+            cimi = new CimiMachineConfigurationCollection();
+            break;
+        case MachineCreate:
+            cimi = null;
+            break;
+        case MachineImage:
+            cimi = new CimiMachineImage();
+            break;
+        case MachineImageCollection:
+            cimi = new CimiMachineImageCollection();
+            break;
+        case MachineTemplate:
+            cimi = new CimiMachineTemplate();
+            break;
+        case MachineTemplateCollection:
+            cimi = new CimiMachineTemplateCollection();
+            break;
+        default:
+            Assert.fail(type.name() + " not found");
+            break;
+        }
+
+        return cimi;
     }
 
     @Test
@@ -278,13 +309,18 @@ public class WritingResourceValidatorTest {
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachine();
-        cimi.setDisks(new CimiDisk[] {new CimiDisk(new CimiCapacity(1, "unit"))});
+        cimi.setCpu(new CimiCpu(1f, "unit", 1));
+        cimi.setMemory(new CimiMemory(1, "unit"));
+        cimi.setDisks(new CimiMachineDiskCollection());
+        cimi.getDisks().add(new CimiMachineDisk(new CimiCapacity(123, "unit")));
+        cimi.getDisks().add(new CimiMachineDisk(new CimiCapacity(456, "unit")));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
         cimi = new CimiMachine();
-        cimi.setDisks(new CimiDisk[0]);
+        cimi.setDisks(new CimiMachineDiskCollection());
+
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }
 

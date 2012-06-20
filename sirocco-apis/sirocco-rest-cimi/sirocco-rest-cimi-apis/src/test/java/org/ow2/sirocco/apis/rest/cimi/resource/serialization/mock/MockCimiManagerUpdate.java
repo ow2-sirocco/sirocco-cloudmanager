@@ -59,7 +59,7 @@ public class MockCimiManagerUpdate extends MockCimiManager {
                     new SerializationHelper.RecursiveToStringStyle()));
 
             // Build response
-            context.getResponse().setCimiData(this.buildEntity(context.getRequest(), PathType.Job));
+            context.getResponse().setCimiData(this.buildResource(context.getRequest(), PathType.Job));
             context.getResponse().setStatus(Status.OK);
         } catch (ComparisonFailure e) {
             // Build assert error

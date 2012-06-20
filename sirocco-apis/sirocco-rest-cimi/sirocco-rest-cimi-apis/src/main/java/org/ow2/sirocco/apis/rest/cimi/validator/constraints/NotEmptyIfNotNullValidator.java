@@ -32,6 +32,8 @@ import java.util.Map.Entry;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection;
+
 /**
  * Implementation of {@link NotEmptyIfNotNullValidator} validator.
  **/
@@ -51,6 +53,7 @@ public class NotEmptyIfNotNullValidator implements ConstraintValidator<NotEmptyI
      * <li>Array : value.length > 0 and all items not null</li>
      * <li>Collection : value.size() > 0 and all items not null</li>
      * <li>Map : value.size() > 0 and all items not null</li>
+     * <li>CimiCollection : value.size() > 0 and all items not null</li>
      * </ul>
      * <p>
      * {@inheritDoc}
@@ -97,6 +100,21 @@ public class NotEmptyIfNotNullValidator implements ConstraintValidator<NotEmptyI
                         allNotNull = allNotNull && (null != entry.getKey()) && (null != entry.getValue());
                     }
                     valid = allNotNull;
+                }
+            } else if (true == CimiCollection.class.isAssignableFrom(klass)) {
+                Collection<?> valueCollect = ((CimiCollection<?>) value).getCollection();
+                if (null == valueCollect) {
+                    valid = false;
+                } else {
+                    if (0 == valueCollect.size()) {
+                        valid = false;
+                    } else {
+                        boolean allNotNull = true;
+                        for (Object obj : valueCollect) {
+                            allNotNull = allNotNull && (null != obj);
+                        }
+                        valid = allNotNull;
+                    }
                 }
             }
         }

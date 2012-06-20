@@ -38,7 +38,6 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.DiskConfigurationConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.DiskConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.FrequencyUnitConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.JobCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.JobConverter;
@@ -47,6 +46,8 @@ import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationCollectionCo
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineCreateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineDiskCollectionOldConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineDiskConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateCollectionConverter;
@@ -63,7 +64,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
@@ -73,6 +73,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
@@ -84,16 +86,11 @@ import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
 import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.JobCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImageCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -205,6 +202,16 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new CredentialsTemplateCollectionConverter());
             break;
 
+        case Disk:
+            item = new ItemConfig(CimiMachineDisk.class, ExchangeType.Disk);
+            item.putData(ConfigFactory.CONVERTER, new MachineDiskConverter());
+            break;
+
+        case DiskCollection:
+            item = new ItemConfig(CimiMachineDiskCollection.class, ExchangeType.DiskCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineDiskCollectionOldConverter());
+            break;
+
         case Job:
             item = new ItemConfig(CimiJob.class, ExchangeType.Job);
             item.putData(ConfigFactory.CONVERTER, new JobConverter());
@@ -279,6 +286,19 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new MachineTemplateCollectionConverter());
             break;
 
+        // case Volume:
+        // case VolumeCollection:
+        // case VolumeConfiguration:
+        // case VolumeConfigurationCollection:
+        // case VolumeImage:
+        // case VolumeImageCollection:
+        // case VolumeTemplate:
+        // case VolumeTemplateCollection:
+        // // TODO Volume, VolumeCollection, VolumeConfiguration,
+        // // TODO VolumeConfigurationCollection, VolumeImage,
+        // // TODO VolumeImageCollection, VolumeTemplate,
+        // // TODO VolumeTemplateCollection
+        // break;
         default:
             ConfigFactory.LOGGER.error("Configuration not found : {}", type);
             throw new ConfigurationException("Configuration not found : " + type);
@@ -308,16 +328,8 @@ public class ConfigFactory {
         item.putData(ConfigFactory.ASSOCIATE_TO, CimiCredentialsTemplate.class);
         items.add(item);
 
-        item = new ItemConfig(CredentialsCollection.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiCredentialsCollection.class);
-        items.add(item);
-
         item = new ItemConfig(Job.class);
         item.putData(ConfigFactory.ASSOCIATE_TO, CimiJob.class);
-        items.add(item);
-
-        item = new ItemConfig(JobCollection.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiJobCollection.class);
         items.add(item);
 
         item = new ItemConfig(Machine.class);
@@ -328,24 +340,12 @@ public class ConfigFactory {
         item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachineTemplate.class);
         items.add(item);
 
-        item = new ItemConfig(MachineCollection.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachineCollection.class);
-        items.add(item);
-
         item = new ItemConfig(MachineConfiguration.class);
         item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachineConfiguration.class);
         items.add(item);
 
-        item = new ItemConfig(MachineConfigurationCollection.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachineConfigurationCollection.class);
-        items.add(item);
-
         item = new ItemConfig(MachineImage.class);
         item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachineImage.class);
-        items.add(item);
-
-        item = new ItemConfig(MachineImageCollection.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachineImageCollection.class);
         items.add(item);
 
         return items;
@@ -360,32 +360,28 @@ public class ConfigFactory {
         ItemConfig item;
         List<ItemConfig> items = new ArrayList<ItemConfig>();
 
+        item = new ItemConfig(CimiCapacity.class);
+        item.putData(ConfigFactory.CONVERTER, new CapacityConverter());
+        items.add(item);
+
         item = new ItemConfig(CimiCpu.class);
         item.putData(ConfigFactory.CONVERTER, new CpuConverter());
-        items.add(item);
-
-        item = new ItemConfig(FrequencyUnit.class);
-        item.putData(ConfigFactory.CONVERTER, new FrequencyUnitConverter());
-        items.add(item);
-
-        item = new ItemConfig(CimiMemory.class);
-        item.putData(ConfigFactory.CONVERTER, new MemoryConverter());
-        items.add(item);
-
-        item = new ItemConfig(MemoryUnit.class);
-        item.putData(ConfigFactory.CONVERTER, new MemoryUnitConverter());
-        items.add(item);
-
-        item = new ItemConfig(CimiDisk.class);
-        item.putData(ConfigFactory.CONVERTER, new DiskConverter());
         items.add(item);
 
         item = new ItemConfig(CimiDiskConfiguration.class);
         item.putData(ConfigFactory.CONVERTER, new DiskConfigurationConverter());
         items.add(item);
 
-        item = new ItemConfig(CimiCapacity.class);
-        item.putData(ConfigFactory.CONVERTER, new CapacityConverter());
+        item = new ItemConfig(CimiMemory.class);
+        item.putData(ConfigFactory.CONVERTER, new MemoryConverter());
+        items.add(item);
+
+        item = new ItemConfig(FrequencyUnit.class);
+        item.putData(ConfigFactory.CONVERTER, new FrequencyUnitConverter());
+        items.add(item);
+
+        item = new ItemConfig(MemoryUnit.class);
+        item.putData(ConfigFactory.CONVERTER, new MemoryUnitConverter());
         items.add(item);
 
         item = new ItemConfig(StorageUnit.class);

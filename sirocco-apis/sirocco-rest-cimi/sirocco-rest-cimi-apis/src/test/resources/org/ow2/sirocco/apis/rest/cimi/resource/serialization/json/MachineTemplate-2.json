@@ -60,7 +60,7 @@
 					"units":"unitValue_2_0"
 				},
 				"format":"formatValue_2_0",
-				"attachmentPoint":"attachmentPointValue_2_0"
+				"initialLocation":"initialLocationValue_2_0"
 			},
 			{
 				"capacity":{
@@ -68,7 +68,7 @@
 					"units":"unitValue_2_1"
 				},
 				"format":"formatValue_2_1",
-				"attachmentPoint":"attachmentPointValue_2_1"
+				"initialLocation":"initialLocationValue_2_1"
 			}
 			
 		]

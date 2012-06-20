@@ -25,14 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfigurationCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -40,7 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * Converted classes:
  * <ul>
  * <li>CIMI model: {@link CimiMachineConfigurationCollection}</li>
- * <li>Service model: List of {@link MachineConfiguration}</li>
+ * <li>Service model: {@link List<MachineConfiguration>}</li>
  * </ul>
  * </p>
  */
@@ -68,14 +65,7 @@ public class MachineConfigurationCollectionConverter extends CollectionConverter
     @SuppressWarnings("unchecked")
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        MachineConfigurationCollection use;
-        if (dataService instanceof List<?>) {
-            use = new MachineConfigurationCollection();
-            use.setMachineConfigurations((List<MachineConfiguration>) dataService);
-        } else {
-            use = (MachineConfigurationCollection) dataService;
-        }
-        this.doCopyToCimi(context, use, (CimiMachineConfigurationCollection) dataCimi);
+        this.doCopyToCimi(context, (List<Object>) dataService, (CimiMachineConfigurationCollection) dataCimi);
     }
 
     /**
@@ -86,7 +76,7 @@ public class MachineConfigurationCollectionConverter extends CollectionConverter
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        MachineConfigurationCollection service = new MachineConfigurationCollection();
+        List<MachineConfiguration> service = new ArrayList<MachineConfiguration>();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -98,43 +88,10 @@ public class MachineConfigurationCollectionConverter extends CollectionConverter
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiMachineConfigurationCollection) dataCimi,
-            (MachineConfigurationCollection) dataService);
+        this.doCopyToService(context, (CimiMachineConfigurationCollection) dataCimi, (List<Object>) dataService);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#getChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected Collection<?> getChildCollection(final Resource resourceCollection) {
-        MachineConfigurationCollection collect = (MachineConfigurationCollection) resourceCollection;
-        return collect.getMachineConfigurations();
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#setNewChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
-     */
-    @Override
-    protected void setNewChildCollection(final Resource resourceCollection) {
-        MachineConfigurationCollection collect = (MachineConfigurationCollection) resourceCollection;
-        collect.setMachineConfigurations(new ArrayList<MachineConfiguration>());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#addItemChildCollection(org.ow2.sirocco.cloudmanager.model.cimi.Resource,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void addItemChildCollection(final Resource resourceCollection, final Object itemService) {
-        MachineConfigurationCollection collect = (MachineConfigurationCollection) resourceCollection;
-        collect.getMachineConfigurations().add((MachineConfiguration) itemService);
-    }
 }
