@@ -221,7 +221,7 @@ public class NetworkManagerTest {
         Assert.assertEquals("dummy net config", netConfig.getDescription());
         Assert.assertEquals("blue", netConfig.getProperties().get("color"));
         Assert.assertEquals("silver", netConfig.getClassOfService());
-        Assert.assertEquals("PUBLIC", netConfig.getNetworkType());
+        Assert.assertEquals(Network.Type.PUBLIC, netConfig.getNetworkType());
 
         // attempt to create netconfig with same name
 
@@ -239,7 +239,7 @@ public class NetworkManagerTest {
         Assert.assertEquals("dummy net config", netConfig.getDescription());
         Assert.assertEquals("blue", netConfig.getProperties().get("color"));
         Assert.assertEquals("silver", netConfig.getClassOfService());
-        Assert.assertEquals("PUBLIC", netConfig.getNetworkType());
+        Assert.assertEquals(Network.Type.PUBLIC, netConfig.getNetworkType());
 
         // update
 

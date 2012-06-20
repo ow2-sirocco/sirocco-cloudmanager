@@ -215,6 +215,7 @@ public class CimiPrimerScenarioTest {
         Disk disk = new Disk();
         disk.setUnit(StorageUnit.MEGABYTE);
         disk.setQuantity((float) capacityInMBytes);
+        volumeConfig.setCapacity(disk);
         return volumeConfig;
     }
 
