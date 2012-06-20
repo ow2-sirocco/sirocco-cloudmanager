@@ -26,6 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
@@ -34,11 +35,43 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
  * Converted classes:
  * <ul>
  * <li>CIMI model: {@link CimiObjectCommon}</li>
- * <li>Service model: {@link Resource}</li>
+ * <li>Service model: {@link Resource} or {@link Identifiable}</li>
  * </ul>
  * </p>
  */
 public abstract class ObjectCommonConverter extends CommonConverter implements CimiConverter {
+
+    /**
+     * Fill the identity data from a service object to a CIMI object.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void fill(final CimiContext context, final Identifiable dataService, final CimiObjectCommon dataCimi) {
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi.setResourceURI(dataCimi.getExchangeType().getResourceURI());
+            if (null != dataService.getId()) {
+                dataCimi.setId(context.makeHref(dataCimi, dataService.getId().toString()));
+            }
+        }
+        if (true == context.mustBeReferenced(dataCimi)) {
+            dataCimi.setHref(context.makeHref(dataCimi, dataService.getId().toString()));
+        }
+    }
+
+    /**
+     * Fill the identity data from a CIMI object to a service object.
+     * 
+     * @param context The current context
+     * @param dataCimi Source CIMI object
+     * @param dataService Destination service object
+     */
+    protected void fill(final CimiContext context, final CimiObjectCommon dataCimi, final Identifiable dataService) {
+        if (null != dataCimi.getId()) {
+            dataService.setId(HrefHelper.extractId(dataCimi.getId()));
+        }
+    }
 
     /**
      * Fill the common data from a service object to a CIMI object.

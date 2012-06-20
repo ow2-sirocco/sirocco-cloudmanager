@@ -35,6 +35,8 @@ public class CimiRequest {
 
     private String id;
 
+    private String idParent;
+
     private CimiData cimiData;
 
     private String baseUri;
@@ -57,6 +59,14 @@ public class CimiRequest {
 
     public void setId(final String id) {
         this.id = id;
+    }
+
+    public String getIdParent() {
+        return this.idParent;
+    }
+
+    public void setIdParent(final String idParent) {
+        this.idParent = idParent;
     }
 
     public CimiData getCimiData() {

@@ -34,15 +34,31 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
@@ -51,12 +67,21 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
@@ -344,46 +369,6 @@ public class CommonsConverterTest {
     }
 
     @Test
-    public void testCimiMachineDisk() throws Exception {
-        CimiMachineDisk cimi;
-        MachineDisk service;
-
-        // Empty Cimi -> Service
-        service = (MachineDisk) this.context.convertToService(new CimiMachineDisk());
-        Assert.assertNull(service.getDisk());
-        Assert.assertNull(service.getInitialLocation());
-
-        // Empty Service -> Cimi
-        cimi = (CimiMachineDisk) this.context.convertToCimi(new MachineDisk(), CimiMachineDisk.class);
-        Assert.assertNull(cimi.getCapacity());
-        Assert.assertNull(cimi.getInitialLocation());
-
-        // Full Cimi -> Service
-        cimi = new CimiMachineDisk();
-        cimi.setCapacity(new CimiCapacity(5, StorageUnit.BYTE.getLabel()));
-        cimi.setInitialLocation("initialLocation");
-
-        service = (MachineDisk) this.context.convertToService(cimi);
-        Assert.assertNotNull(service.getDisk());
-        Assert.assertEquals(5, service.getDisk().getQuantity().longValue());
-        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.BYTE, service.getDisk().getUnits());
-        Assert.assertEquals("initialLocation", service.getInitialLocation());
-
-        // Full Service -> Cimi
-        service = new MachineDisk();
-        Disk disk = new Disk();
-        disk.setQuantity(7f);
-        disk.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.MEGABYTE);
-        service.setDisk(disk);
-        service.setInitialLocation("initialLocation");
-
-        cimi = (CimiMachineDisk) this.context.convertToCimi(service, CimiMachineDisk.class);
-        Assert.assertEquals(7, cimi.getCapacity().getQuantity().intValue());
-        Assert.assertEquals(StorageUnit.MEGABYTE.getLabel(), cimi.getCapacity().getUnits());
-        Assert.assertEquals("initialLocation", cimi.getInitialLocation());
-    }
-
-    @Test
     public void testCimiCommonFill() throws Exception {
         CimiDataCommon cimi;
         MachineImage service;
@@ -496,5 +481,156 @@ public class CommonsConverterTest {
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/29", cimi.getHref());
         Assert.assertNull(cimi.getCreated());
         Assert.assertNull(cimi.getUpdated());
+    }
+
+    @Test
+    public void testId() throws Exception {
+        CimiResource cimi = null;
+        Object service = null;
+        Class<? extends CimiResource> cimiClass = null;
+
+        for (ExchangeType type : ExchangeType.values()) {
+
+            // Removes idParent of request
+            this.request.setIdParent(null);
+
+            switch (type) {
+            case CloudEntryPoint:
+                service = new CloudEntryPointAggregate(new CloudEntryPoint());
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiCloudEntryPoint.class;
+                break;
+            case Credentials:
+                service = new Credentials();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiCredentials.class;
+                break;
+            case CredentialsCollection:
+                service = new ArrayList<Credentials>();
+                cimiClass = CimiCredentialsCollection.class;
+                break;
+            case CredentialsCreate:
+                service = null;
+                break;
+            case CredentialsTemplate:
+                service = new CredentialsTemplate();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiCredentialsTemplate.class;
+                break;
+            case CredentialsTemplateCollection:
+                service = new ArrayList<CredentialsTemplate>();
+                cimiClass = CimiCredentialsTemplateCollection.class;
+                break;
+            case Disk:
+                service = new MachineDisk();
+                ((MachineDisk) service).setId(111);
+                cimiClass = CimiMachineDisk.class;
+                // Add idParent of request
+                this.request.setIdParent("999");
+                break;
+            case DiskCollection:
+                service = new MachineDiskCollection();
+                cimiClass = CimiMachineDiskCollection.class;
+                break;
+            case Job:
+                service = new Job();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiJob.class;
+                break;
+            case JobCollection:
+                service = new ArrayList<Job>();
+                cimiClass = CimiJobCollection.class;
+                break;
+            case Machine:
+                service = new Machine();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiMachine.class;
+                break;
+            case MachineAction:
+                service = null;
+                break;
+            case MachineCollection:
+                service = new ArrayList<Machine>();
+                cimiClass = CimiMachineCollection.class;
+                break;
+            case MachineConfiguration:
+                service = new MachineConfiguration();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiMachineConfiguration.class;
+                break;
+            case MachineConfigurationCollection:
+                service = new ArrayList<MachineConfiguration>();
+                cimiClass = CimiMachineConfigurationCollection.class;
+                break;
+            case MachineCreate:
+                service = null;
+                break;
+            case MachineImage:
+                service = new MachineImage();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiMachineImage.class;
+                break;
+            case MachineImageCollection:
+                service = new ArrayList<MachineImage>();
+                cimiClass = CimiMachineImageCollection.class;
+                break;
+            case MachineTemplate:
+                service = new MachineTemplate();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiMachineTemplate.class;
+                break;
+            case MachineTemplateCollection:
+                service = new ArrayList<MachineTemplate>();
+                cimiClass = CimiMachineTemplateCollection.class;
+                break;
+            default:
+                Assert.fail(type.name());
+                break;
+            }
+            if (null != service) {
+                cimi = (CimiResource) this.context.convertToCimi(service, cimiClass);
+                if (true == type.hasIdInReference()) {
+                    if (true == type.hasParent()) {
+                        Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "999", "111"), cimi.getId());
+                    } else {
+                        Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "11"), cimi.getId());
+                    }
+                }
+                Assert.assertEquals("in " + type, type.getResourceURI(), cimi.getResourceURI());
+            }
+        }
+    }
+
+    @Test
+    public void testIdParentHierarchy() throws Exception {
+        CimiMachine cimi;
+
+        Machine sMachine = new Machine();
+        sMachine.setId(9999);
+        sMachine.setDisks(new MachineDiskCollection());
+        List<MachineDisk> sListDisks = new ArrayList<MachineDisk>();
+        MachineDisk sDiskOne = new MachineDisk();
+        sDiskOne.setId(111);
+        sListDisks.add(sDiskOne);
+        MachineDisk sDiskTwo = new MachineDisk();
+        sDiskTwo.setId(222);
+        sListDisks.add(sDiskTwo);
+        MachineDisk sDiskThree = new MachineDisk();
+        sDiskThree.setId(333);
+        sListDisks.add(sDiskThree);
+        sMachine.getDisks().setItems(sListDisks);
+
+        cimi = (CimiMachine) this.context.convertToCimi(sMachine, CimiMachine.class);
+
+        Assert.assertEquals("in " + cimi.getExchangeType(), ExchangeType.Machine.makeHref(this.request.getBaseUri(), "9999"),
+            cimi.getId());
+
+        Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "111"),
+            cimi.getDisks().getCollection().get(0).getId());
+        Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "222"),
+            cimi.getDisks().getCollection().get(1).getId());
+        Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "333"),
+            cimi.getDisks().getCollection().get(2).getId());
+
     }
 }

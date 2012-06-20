@@ -169,7 +169,7 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname() + "/foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.context.makeHrefBase(toTest));
+        toTest.setHref(toTest.getExchangeType().makeHref(this.request.getBaseUri(), (String) null));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
     }
 
@@ -200,7 +200,7 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname() + "/foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.context.makeHrefBase(toTest));
+        toTest.setHref(toTest.getExchangeType().makeHref(this.request.getBaseUri(), (String) null));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
     }
 
@@ -228,7 +228,7 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri() + "toto/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.context.makeHrefBase(toTest));
+        toTest.setHref(toTest.getExchangeType().makeHref(this.request.getBaseUri(), (String) null));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
     }
 
@@ -256,7 +256,7 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri() + "toto/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.context.makeHrefBase(toTest));
+        toTest.setHref(toTest.getExchangeType().makeHref(this.request.getBaseUri(), (String) null));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
     }
 
@@ -285,7 +285,7 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri() + "toto/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.context.makeHrefBase(toTest));
+        toTest.setHref(toTest.getExchangeType().makeHref(this.request.getBaseUri(), (String) null));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
     }
 }

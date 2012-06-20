@@ -34,6 +34,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 
 /**
  * .
@@ -46,7 +47,9 @@ public class CimiContextImpl implements CimiContext {
 
     private boolean convertedWriteOnly;
 
-    private LinkedList<Class<?>> stackConverted;
+    private LinkedList<Class<?>> stackConvertedCimiClass;
+
+    private LinkedList<Integer> stackConvertedIdService;
 
     /**
      * Set constructor.
@@ -58,7 +61,8 @@ public class CimiContextImpl implements CimiContext {
         super();
         this.request = request;
         this.response = response;
-        this.stackConverted = new LinkedList<Class<?>>();
+        this.stackConvertedCimiClass = new LinkedList<Class<?>>();
+        this.stackConvertedIdService = new LinkedList<Integer>();
         this.convertedWriteOnly = false;
     }
 
@@ -108,7 +112,8 @@ public class CimiContextImpl implements CimiContext {
      */
     @Override
     public Object convertToCimi(final Object service, final Class<?> cimiAssociate) {
-        this.stackConverted.clear();
+        this.stackConvertedCimiClass.clear();
+        this.stackConvertedIdService.clear();
         return this.convertNextCimi(service, cimiAssociate);
     }
 
@@ -121,11 +126,33 @@ public class CimiContextImpl implements CimiContext {
     @Override
     public Object convertNextCimi(final Object service, final Class<?> cimiAssociate) {
         Object converted = null;
+        // System.out.println(">>> convertNextCimi:" + service + ", " +
+        // cimiAssociate.getSimpleName());
+        // if (service instanceof Identifiable) {
+        // Identifiable idService = (Identifiable) service;
+        // System.out.println("=== convertNextCimi: ID=" + idService.getId());
+        // }
+        // System.out.println(">>> convertNextCimi:" + service + ", " +
+        // cimiAssociate.getSimpleName());
         if (null != service) {
-            this.stackConverted.push(cimiAssociate);
+            this.stackConvertedCimiClass.push(cimiAssociate);
+            if (service instanceof Identifiable) {
+                Identifiable idService = (Identifiable) service;
+                this.stackConvertedIdService.push(idService.getId());
+                // System.out.println("=== convertNextCimi: stackConvertedIdService="
+                // + this.stackConvertedIdService);
+                // System.out.println("=== convertNextCimi: findServiceIdParent="
+                // + this.findServiceIdParent());
+            } else {
+                this.stackConvertedIdService.push(null);
+            }
             converted = this.getConverter(cimiAssociate).toCimi(this, service);
-            this.stackConverted.pop();
+            this.stackConvertedCimiClass.pop();
+            this.stackConvertedIdService.pop();
         }
+        // System.out.println("<<< convertNextCimi:" + service + ", return=" +
+        // converted + ", stackConvertedIdService="
+        // + this.stackConvertedIdService);
         return converted;
     }
 
@@ -136,7 +163,7 @@ public class CimiContextImpl implements CimiContext {
      */
     @Override
     public Object convertToService(final Object cimi) {
-        this.stackConverted.clear();
+        this.stackConvertedCimiClass.clear();
         return this.convertNextService(cimi);
     }
 
@@ -158,9 +185,9 @@ public class CimiContextImpl implements CimiContext {
     public Object convertNextService(final Object cimi, final Class<?> cimiToUse) {
         Object converted = null;
         if (null != cimi) {
-            this.stackConverted.push(cimiToUse);
+            this.stackConvertedCimiClass.push(cimiToUse);
             converted = this.getConverter(cimiToUse).toService(this, cimi);
-            this.stackConverted.pop();
+            this.stackConvertedCimiClass.pop();
         }
         return converted;
     }
@@ -243,8 +270,8 @@ public class CimiContextImpl implements CimiContext {
      *      java.lang.String)
      */
     @Override
-    public String makeHref(final CimiResource data, final String... ids) {
-        return this.makeHref(data.getClass(), ids);
+    public String makeHref(final CimiResource data, final String id) {
+        return this.makeHref(data.getClass(), id);
     }
 
     /**
@@ -254,9 +281,25 @@ public class CimiContextImpl implements CimiContext {
      *      java.lang.String)
      */
     @Override
-    public String makeHref(final Class<? extends CimiResource> classToUse, final String... ids) {
+    public String makeHref(final Class<? extends CimiResource> classToUse, final String id) {
+        String href = null;
         ExchangeType type = this.getType(classToUse);
-        return type.makeHref(this.getRequest().getBaseUri(), ids);
+        // Detects if type has parent
+        if (true == type.hasParent()) {
+            // Adds id parent of the request if exists
+            if (null != this.getRequest().getIdParent()) {
+                href = type.makeHref(this.getRequest().getBaseUri(), this.getRequest().getIdParent(), id);
+            } else {
+                // Adds id parent of the service if exists
+                Integer idParentService = this.findServiceIdParent();
+                if (null != idParentService) {
+                    href = type.makeHref(this.getRequest().getBaseUri(), idParentService.toString(), id);
+                }
+            }
+        } else {
+            href = type.makeHref(this.getRequest().getBaseUri(), id);
+        }
+        return href;
     }
 
     /**
@@ -303,7 +346,21 @@ public class CimiContextImpl implements CimiContext {
      * @return The current root converting
      */
     protected Class<?> getRootConverting() {
-        return this.stackConverted.getLast();
+        return this.stackConvertedCimiClass.getLast();
+    }
+
+    /**
+     * Finds the "ID parent" stored in the stack "ID service" for the current
+     * object being converted.
+     * 
+     * @return The IdParent or null if not found
+     */
+    protected Integer findServiceIdParent() {
+        Integer idParent = null;
+        for (int i = 1; (i < this.stackConvertedIdService.size()) && (null == idParent); i++) {
+            idParent = this.stackConvertedIdService.get(i);
+        }
+        return idParent;
     }
 
     /**

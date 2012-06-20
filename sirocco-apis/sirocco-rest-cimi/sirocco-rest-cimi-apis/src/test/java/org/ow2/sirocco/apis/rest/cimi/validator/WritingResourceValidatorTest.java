@@ -88,14 +88,14 @@ public class WritingResourceValidatorTest {
 
             if (null != cimi) {
                 // System.out.println(type);
-                cimi.setHref(this.context.makeHref(cimi, "987", "123"));
+                cimi.setHref(type.makeHref(this.request.getBaseUri(), "987", "123"));
                 // System.out.println(cimi.getHref());
                 Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
                 if (true == type.hasParent()) {
-                    cimi.setHref(this.context.makeHref(cimi, "123"));
+                    cimi.setHref(type.makeHref(this.request.getBaseUri(), "123"));
                 } else {
-                    cimi.setHref(this.context.makeHrefBase(cimi));
+                    cimi.setHref(type.makeHref(this.request.getBaseUri(), (String) null));
                 }
                 // System.out.println(cimi.getHref());
                 if (true == type.hasIdInReference()) {
@@ -111,7 +111,7 @@ public class WritingResourceValidatorTest {
                 for (ExchangeType otherType : ExchangeType.values()) {
                     CimiResource cimiOther = this.newResource(otherType);
                     if ((null != cimiOther) && (type != otherType)) {
-                        cimi.setHref(this.context.makeHref(cimiOther, "987", "123"));
+                        cimi.setHref(otherType.makeHref(this.request.getBaseUri(), "987", "123"));
                         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
                     }
                 }

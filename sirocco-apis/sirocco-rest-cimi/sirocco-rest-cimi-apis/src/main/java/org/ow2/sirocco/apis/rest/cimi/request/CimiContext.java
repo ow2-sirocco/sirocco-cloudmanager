@@ -131,11 +131,10 @@ public interface CimiContext {
      * Make a HREF for a resource.
      * 
      * @param resource The instance of the resource
-     * @param ids All ID necessary : the first is a ID parent, the last is
-     *        current ID
+     * @param id The ID of the current service object
      * @return The HREF made
      */
-    String makeHref(CimiResource resource, String... ids);
+    String makeHref(CimiResource resource, String id);
 
     /**
      * Make a HREF for a resource.
@@ -145,7 +144,7 @@ public interface CimiContext {
      *        is current ID
      * @return The HREF made
      */
-    public String makeHref(Class<? extends CimiResource> classToUse, String... ids);
+    public String makeHref(Class<? extends CimiResource> classToUse, String id);
 
     /**
      * Returns true if the converters must process the write-only data when

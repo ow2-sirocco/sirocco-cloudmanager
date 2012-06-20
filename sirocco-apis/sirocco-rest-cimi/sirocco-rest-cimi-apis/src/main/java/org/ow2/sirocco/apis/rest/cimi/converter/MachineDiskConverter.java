@@ -98,7 +98,7 @@ public class MachineDiskConverter extends ObjectCommonConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final MachineDisk dataService, final CimiMachineDisk dataCimi) {
-        // FIXME this.fill(context, dataService, dataCimi);
+        this.fill(context, dataService, dataCimi);
         dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService.getDisk(), CimiCapacity.class));
         dataCimi.setInitialLocation(dataService.getInitialLocation());
     }
@@ -111,6 +111,7 @@ public class MachineDiskConverter extends ObjectCommonConverter {
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineDisk dataCimi, final MachineDisk dataService) {
+        this.fill(context, dataCimi, dataService);
         dataService.setDisk((Disk) context.convertNextService(dataCimi.getCapacity()));
         dataService.setInitialLocation(dataCimi.getInitialLocation());
     }

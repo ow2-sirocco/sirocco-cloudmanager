@@ -31,6 +31,7 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
@@ -48,12 +49,14 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
+import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -598,5 +601,45 @@ public class MachinesConverterTest {
 
         service = (MachineCreate) this.context.convertToService(cimi);
         Assert.assertEquals(MachineTemplate.class, service.getMachineTemplate().getClass());
+    }
+
+    @Test
+    public void testCimiMachineDisk() throws Exception {
+        CimiMachineDisk cimi;
+        MachineDisk service;
+    
+        // Empty Cimi -> Service
+        service = (MachineDisk) this.context.convertToService(new CimiMachineDisk());
+        Assert.assertNull(service.getDisk());
+        Assert.assertNull(service.getInitialLocation());
+    
+        // Empty Service -> Cimi
+        cimi = (CimiMachineDisk) this.context.convertToCimi(new MachineDisk(), CimiMachineDisk.class);
+        Assert.assertNull(cimi.getCapacity());
+        Assert.assertNull(cimi.getInitialLocation());
+    
+        // Full Cimi -> Service
+        cimi = new CimiMachineDisk();
+        cimi.setCapacity(new CimiCapacity(5, StorageUnit.BYTE.getLabel()));
+        cimi.setInitialLocation("initialLocation");
+    
+        service = (MachineDisk) this.context.convertToService(cimi);
+        Assert.assertNotNull(service.getDisk());
+        Assert.assertEquals(5, service.getDisk().getQuantity().longValue());
+        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.BYTE, service.getDisk().getUnits());
+        Assert.assertEquals("initialLocation", service.getInitialLocation());
+    
+        // Full Service -> Cimi
+        service = new MachineDisk();
+        Disk disk = new Disk();
+        disk.setQuantity(7f);
+        disk.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.MEGABYTE);
+        service.setDisk(disk);
+        service.setInitialLocation("initialLocation");
+    
+        cimi = (CimiMachineDisk) this.context.convertToCimi(service, CimiMachineDisk.class);
+        Assert.assertEquals(7, cimi.getCapacity().getQuantity().intValue());
+        Assert.assertEquals(StorageUnit.MEGABYTE.getLabel(), cimi.getCapacity().getUnits());
+        Assert.assertEquals("initialLocation", cimi.getInitialLocation());
     }
 }
