@@ -48,7 +48,7 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
             Disk disk = new Disk();
             disk.capacity = diskConfig.getCapacity().getQuantity();
             disk.format = diskConfig.getFormat();
-            disk.initialLocation = diskConfig.getAttachmentPoint();
+            disk.initialLocation = diskConfig.getInitialLocation();
             return disk;
         }
     }
@@ -112,9 +112,9 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
                 diskConfigs[i].setFormat("");
             }
             if (disks[i].initialLocation != null) {
-                diskConfigs[i].setAttachmentPoint(disks[i].initialLocation);
+                diskConfigs[i].setInitialLocation(disks[i].initialLocation);
             } else {
-                diskConfigs[i].setAttachmentPoint("");
+                diskConfigs[i].setInitialLocation("");
             }
         }
         this.cimiObject.setDisks(diskConfigs);
