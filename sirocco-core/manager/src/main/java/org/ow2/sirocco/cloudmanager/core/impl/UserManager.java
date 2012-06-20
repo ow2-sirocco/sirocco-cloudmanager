@@ -44,7 +44,6 @@ import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
@@ -81,7 +80,11 @@ public class UserManager implements IUserManager {
         // if (!isUserValid(u)) {
         // throw new UserException("user validation failed");
         // }
+        u.setRole("sirocco-user");
         this.em.persist(u);
+        CloudEntryPoint cep = new CloudEntryPoint();
+        cep.setUser(u);
+        this.em.persist(cep);
         return u;
     }
 
@@ -123,6 +126,11 @@ public class UserManager implements IUserManager {
         User result = this.em.find(User.class, new Integer(userId));
 
         return result;
+    }
+
+    @Override
+    public List<User> getUsers() throws CloudProviderException {
+        return this.em.createQuery("Select u From User u").getResultList();
     }
 
     @SuppressWarnings("unchecked")

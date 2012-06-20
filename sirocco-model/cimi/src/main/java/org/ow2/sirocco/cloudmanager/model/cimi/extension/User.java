@@ -35,11 +35,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 @Entity
 public class User implements Serializable {
@@ -62,6 +59,8 @@ public class User implements Serializable {
     private String username;
 
     private String password;
+
+    private String role;
 
     private Set<CloudProviderAccount> cloudProviderAccounts;
 
@@ -126,6 +125,14 @@ public class User implements Serializable {
 
     public void setUsername(final String username) {
         this.username = username;
+    }
+
+    public String getRole() {
+        return this.role;
+    }
+
+    public void setRole(final String role) {
+        this.role = role;
     }
 
     @ManyToMany(mappedBy = "users")

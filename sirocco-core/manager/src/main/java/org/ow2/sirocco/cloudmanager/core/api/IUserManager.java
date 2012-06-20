@@ -1,5 +1,6 @@
 package org.ow2.sirocco.cloudmanager.core.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -9,8 +10,8 @@ public interface IUserManager {
 
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.UserManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager@Remote";
 
-    User createUser(String firstName, String lastName, String email,
-            String username, String password) throws CloudProviderException;
+    User createUser(String firstName, String lastName, String email, String username, String password)
+        throws CloudProviderException;
 
     User createUser(User u) throws CloudProviderException;
 
@@ -18,10 +19,11 @@ public interface IUserManager {
 
     User getUserByUsername(String userName) throws CloudProviderException;
 
+    List<User> getUsers() throws CloudProviderException;
+
     User updateUser(User user) throws CloudProviderException;
 
-    User updateUser(String id, Map<String, Object> updatedAttributes)
-            throws CloudProviderException;
+    User updateUser(String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
 
     void deleteUser(String userId) throws CloudProviderException;
 }
