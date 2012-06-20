@@ -25,13 +25,6 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,23 +34,17 @@ import javax.ejb.EJB;
 import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.apache.commons.validator.routines.EmailValidator;
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -69,8 +56,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 @SuppressWarnings("unused")
 public class CloudProviderManager implements ICloudProviderManager {
 
-    private static Logger logger = Logger.getLogger(MachineImageManager.class
-            .getName());
+    private static Logger logger = Logger.getLogger(MachineImageManager.class.getName());
+
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
@@ -80,111 +67,113 @@ public class CloudProviderManager implements ICloudProviderManager {
     @EJB
     private IUserManager userManager;
 
-
     private User getUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
         return this.userManager.getUserByUsername(username);
     }
 
     @Override
-    public CloudProvider createCloudProvider(String type, String description)
-            throws CloudProviderException {
+    public CloudProvider createCloudProvider(final String type, final String description) throws CloudProviderException {
 
         CloudProvider cp = new CloudProvider();
         cp.setCloudProviderType(type);
         cp.setDescription(description);
-        
-        return createCloudProvider(cp);
+
+        return this.createCloudProvider(cp);
     }
-    
+
     @Override
-    public CloudProvider createCloudProvider(CloudProvider cp) throws CloudProviderException
-    {
-        //if (!isCloudProviderValid(cp)){throw new CloudProviderException("CloudProvider validation failed");};
+    public CloudProvider createCloudProvider(final CloudProvider cp) throws CloudProviderException {
+        // if (!isCloudProviderValid(cp)){throw new
+        // CloudProviderException("CloudProvider validation failed");};
 
         this.em.persist(cp);
         return cp;
     }
-    private String normalizeLabel(String label)
-    {
+
+    private String normalizeLabel(final String label) {
         return label.toUpperCase();
     }
-    private boolean isCloudProviderValid(CloudProvider cp)
-    {        
+
+    private boolean isCloudProviderValid(final CloudProvider cp) {
         return true;
-    }    
+    }
 
     @Override
-    public CloudProvider getCloudProviderById(String cloudProviderId)
-            throws CloudProviderException {
+    public CloudProvider getCloudProviderById(final String cloudProviderId) throws CloudProviderException {
 
-        CloudProvider result = this.em.find(CloudProvider.class, new Integer(
-                cloudProviderId));
+        CloudProvider result = this.em.find(CloudProvider.class, new Integer(cloudProviderId));
 
         return result;
     }
-    
+
     @Override
-    public List<CloudProvider> getCloudProviders() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("CloudProvider",this.em,this.getUser().getUsername());
+    public List<CloudProvider> getCloudProviders() throws CloudProviderException {
+        return this.em.createQuery("Select p From CloudProvider p").getResultList();
     }
 
     @Override
-    public void deleteCloudProvider(String cloudProviderId)
-            throws CloudProviderException {
-        CloudProvider result = this.em.find(CloudProvider.class, new Integer(
-                cloudProviderId));
+    public void deleteCloudProvider(final String cloudProviderId) throws CloudProviderException {
+        CloudProvider result = this.em.find(CloudProvider.class, new Integer(cloudProviderId));
         this.em.remove(result);
     }
 
     @Override
-    public CloudProviderAccount createCloudProviderAccount(
-            String cloudProviderId, String login, String password)
-            throws CloudProviderException {
+    public CloudProviderAccount createCloudProviderAccount(final String cloudProviderId, final String login,
+        final String password) throws CloudProviderException {
 
         CloudProviderAccount cpa = new CloudProviderAccount();
 
         cpa.setCloudProvider(this.getCloudProviderById(cloudProviderId));
         cpa.setLogin(login);
         cpa.setPassword(password);
-        
-        cpa=createCloudProviderAccount(cpa);
-        
-       return cpa;
+
+        cpa = this.createCloudProviderAccount(cpa);
+
+        return cpa;
     }
-    
+
     @Override
-    public CloudProviderAccount createCloudProviderAccount(CloudProviderAccount cpa) throws CloudProviderException
-    {
-        
-        //if (!isCloudProviderAccountValid(cpa)){throw new CloudProviderException("CloudProviderAccount validation failed");};
+    public CloudProviderAccount createCloudProviderAccount(final CloudProviderAccount cpa) throws CloudProviderException {
+
+        // if (!isCloudProviderAccountValid(cpa)){throw new
+        // CloudProviderException("CloudProviderAccount validation failed");};
 
         this.em.persist(cpa);
         return cpa;
-         
+
     }
-    
-    private boolean isCloudProviderAccountValid(CloudProviderAccount cpa)
-    {
-        
-        if (cpa.getLogin()==null){return false;}
-        if (cpa.getLogin().equals("")){return false;}
-        
-        if (cpa.getPassword()==null){return false;}
-        if (cpa.getPassword().equals("")){return false;}
-        
-        if (cpa.getCloudProvider()==null){return false;}
-        
+
+    private boolean isCloudProviderAccountValid(final CloudProviderAccount cpa) {
+
+        if (cpa.getLogin() == null) {
+            return false;
+        }
+        if (cpa.getLogin().equals("")) {
+            return false;
+        }
+
+        if (cpa.getPassword() == null) {
+            return false;
+        }
+        if (cpa.getPassword().equals("")) {
+            return false;
+        }
+
+        if (cpa.getCloudProvider() == null) {
+            return false;
+        }
+
         return true;
-    }    
+    }
 
     @Override
-    public CloudProviderAccount getCloudProviderAccountById(
-            String cloudProviderAccountId) throws CloudProviderException {
+    public CloudProviderAccount getCloudProviderAccountById(final String cloudProviderAccountId) throws CloudProviderException {
 
-        CloudProviderAccount result = this.em.find(CloudProviderAccount.class,
-                new Integer(cloudProviderAccountId));
-        if (result!=null){result.getUsers().size();}
+        CloudProviderAccount result = this.em.find(CloudProviderAccount.class, new Integer(cloudProviderAccountId));
+        if (result != null) {
+            result.getUsers().size();
+        }
         return result;
     }
 
@@ -195,12 +184,11 @@ public class CloudProviderManager implements ICloudProviderManager {
      *      java.lang.String)
      */
     @Override
-    public void addCloudProviderAccountToUser(String userId,
-            String cloudProviderAccountId) throws CloudProviderException {
+    public void addCloudProviderAccountToUser(final String userId, final String cloudProviderAccountId)
+        throws CloudProviderException {
 
-        CloudProviderAccount cpa = this
-                .getCloudProviderAccountById(cloudProviderAccountId);
-        User u = userManager.getUserById(userId);
+        CloudProviderAccount cpa = this.getCloudProviderAccountById(cloudProviderAccountId);
+        User u = this.userManager.getUserById(userId);
         Set<User> users = cpa.getUsers();
         users.add(u);
         cpa.setUsers(users);
@@ -216,12 +204,11 @@ public class CloudProviderManager implements ICloudProviderManager {
      *      java.lang.String)
      */
     @Override
-    public void addCloudProviderAccountToUserByName(String userName,
-            String cloudProviderAccountId) throws CloudProviderException {
+    public void addCloudProviderAccountToUserByName(final String userName, final String cloudProviderAccountId)
+        throws CloudProviderException {
 
-        this.addCloudProviderAccountToUser(
-                userManager.getUserByUsername(userName).getId().toString(),
-                cloudProviderAccountId);
+        this.addCloudProviderAccountToUser(this.userManager.getUserByUsername(userName).getId().toString(),
+            cloudProviderAccountId);
 
     }
 
@@ -232,12 +219,11 @@ public class CloudProviderManager implements ICloudProviderManager {
      *      java.lang.String)
      */
     @Override
-    public void removeCloudProviderAccountFromUser(String userId,
-            String cloudProviderAccountId) throws CloudProviderException {
+    public void removeCloudProviderAccountFromUser(final String userId, final String cloudProviderAccountId)
+        throws CloudProviderException {
 
-        CloudProviderAccount cpa = this
-                .getCloudProviderAccountById(cloudProviderAccountId);
-        User u = userManager.getUserById(userId);
+        CloudProviderAccount cpa = this.getCloudProviderAccountById(cloudProviderAccountId);
+        User u = this.userManager.getUserById(userId);
         Set<User> users = cpa.getUsers();
         users.remove(u);
         cpa.setUsers(users);
@@ -252,40 +238,36 @@ public class CloudProviderManager implements ICloudProviderManager {
      *      java.lang.String)
      */
     @Override
-    public void removeCloudProviderAccountFromUserByName(String userName,
-            String cloudProviderAccountId) throws CloudProviderException {
+    public void removeCloudProviderAccountFromUserByName(final String userName, final String cloudProviderAccountId)
+        throws CloudProviderException {
 
-        this.removeCloudProviderAccountFromUser(
-                userManager.getUserByUsername(userName).getId().toString(),
-                cloudProviderAccountId);
+        this.removeCloudProviderAccountFromUser(this.userManager.getUserByUsername(userName).getId().toString(),
+            cloudProviderAccountId);
 
     }
 
     @Override
-    public void deleteCloudProviderAccount(String cloudProviderAccountId)
-            throws CloudProviderException {
-        CloudProviderAccount result = this.em.find(CloudProviderAccount.class,
-                new Integer(cloudProviderAccountId));
+    public void deleteCloudProviderAccount(final String cloudProviderAccountId) throws CloudProviderException {
+        CloudProviderAccount result = this.em.find(CloudProviderAccount.class, new Integer(cloudProviderAccountId));
         this.em.remove(result);
 
     }
-    
+
     @Override
-    public List<CloudProviderAccount> getCloudProviderAccounts() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("CloudProviderAccount",this.em,this.getUser().getUsername());
+    public List<CloudProviderAccount> getCloudProviderAccounts() throws CloudProviderException {
+        return this.em.createQuery("Select p From CloudProviderAccount p").getResultList();
     }
 
     @Override
-    public CloudProvider updateCloudProvider(String id,
-            Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public CloudProvider updateCloudProvider(final String id, final Map<String, Object> updatedAttributes)
+        throws CloudProviderException {
 
         CloudProvider lCP = this.getCloudProviderById(id);
 
         try {
             UtilsForManagers.fillObject(lCP, updatedAttributes);
         } catch (Exception e) {
-            logger.info(e.getMessage());
+            CloudProviderManager.logger.info(e.getMessage());
             throw new CloudProviderException();
         }
 
@@ -293,10 +275,10 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProvider updateCloudProvider(CloudProvider CP)
-            throws CloudProviderException {
+    public CloudProvider updateCloudProvider(final CloudProvider CP) throws CloudProviderException {
 
-        //if (!isCloudProviderValid(CP)){throw new CloudProviderException("CloudProvider validation failed");}
+        // if (!isCloudProviderValid(CP)){throw new
+        // CloudProviderException("CloudProvider validation failed");}
         Integer CPId = CP.getId();
         this.em.merge(CP);
 
@@ -304,9 +286,8 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProviderAccount updateCloudProviderAccount(String id,
-            Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public CloudProviderAccount updateCloudProviderAccount(final String id, final Map<String, Object> updatedAttributes)
+        throws CloudProviderException {
 
         CloudProviderAccount lCPA = this.getCloudProviderAccountById(id);
 
@@ -321,11 +302,11 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProviderAccount updateCloudProviderAccount(
-            CloudProviderAccount CPA) throws CloudProviderException {
+    public CloudProviderAccount updateCloudProviderAccount(final CloudProviderAccount CPA) throws CloudProviderException {
 
         Integer CPAId = CPA.getId();
-        //if (!isCloudProviderAccountValid(CPA)){throw new CloudProviderException("CloudProviderAccount validation failed");};
+        // if (!isCloudProviderAccountValid(CPA)){throw new
+        // CloudProviderException("CloudProviderAccount validation failed");};
 
         this.em.merge(CPA);
 
@@ -333,9 +314,9 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProviderLocation createCloudProviderLocation(
-            String Iso3166_1_Code,String Iso3166_2_Code,String postalCode,Double altitude,Double latitude,Double longitude, String countryName, String stateName,String cityName)
-            throws CloudProviderException {
+    public CloudProviderLocation createCloudProviderLocation(final String Iso3166_1_Code, final String Iso3166_2_Code,
+        final String postalCode, final Double altitude, final Double latitude, final Double longitude,
+        final String countryName, final String stateName, final String cityName) throws CloudProviderException {
 
         CloudProviderLocation cpl = new CloudProviderLocation();
 
@@ -348,72 +329,90 @@ public class CloudProviderManager implements ICloudProviderManager {
         cpl.setCountryName(countryName);
         cpl.setStateName(stateName);
         cpl.setCityName(cityName);
-        
+
         return this.createCloudProviderLocation(cpl);
     }
-    
-    private CloudProviderLocation normalizeCloudProviderLocation(CloudProviderLocation cpl) throws CloudProviderException
-    {
-        cpl.setCityName(normalizeLabel(cpl.getCityName()));
-        cpl.setCountryName(normalizeLabel(cpl.getCountryName()));
-        cpl.setStateName(normalizeLabel(cpl.getStateName()));
-        cpl.setIso3166_1(normalizeLabel(cpl.getIso3166_1()));
-        cpl.setIso3166_2(normalizeLabel(cpl.getIso3166_2()));
-        cpl.setPostalCode(normalizeLabel(cpl.getPostalCode()));
-        return cpl;        
-    }
-    
-    @Override
-    public CloudProviderLocation createCloudProviderLocation(CloudProviderLocation cpl) throws CloudProviderException
-    {
-        normalizeCloudProviderLocation(cpl);
-        
-        //if (!isCloudProviderLocationValid(cpl)){throw new CloudProviderException("CloudProviderLocation validation failed");}
-      
-        this.em.persist(cpl);
-        
+
+    private CloudProviderLocation normalizeCloudProviderLocation(final CloudProviderLocation cpl) throws CloudProviderException {
+        cpl.setCityName(this.normalizeLabel(cpl.getCityName()));
+        cpl.setCountryName(this.normalizeLabel(cpl.getCountryName()));
+        cpl.setStateName(this.normalizeLabel(cpl.getStateName()));
+        cpl.setIso3166_1(this.normalizeLabel(cpl.getIso3166_1()));
+        cpl.setIso3166_2(this.normalizeLabel(cpl.getIso3166_2()));
+        cpl.setPostalCode(this.normalizeLabel(cpl.getPostalCode()));
         return cpl;
     }
 
-    private boolean isCloudProviderLocationValid(CloudProviderLocation cpl)
-    {        
-        if (cpl.getIso3166_1()==null){return false;}
-        if (cpl.getIso3166_1().equals("")){return false;}
-        
-        if (cpl.getIso3166_2()==null){return false;}
-        if (cpl.getIso3166_2().equals("")){return false;}
-        
-        if (cpl.getPostalCode()==null){return false;}
-        if (cpl.getPostalCode().equals("")){return false;}
-        
-        if (cpl.getGPS_Altitude()==null){return false;}
-        if (cpl.getGPS_Altitude().equals("")){return false;}
-        
-        if (cpl.getGPS_Latitude()==null){return false;}
-        if (cpl.getGPS_Latitude().equals("")){return false;}
-        
-        if (cpl.getGPS_Longitude()==null){return false;}
-        if (cpl.getGPS_Longitude().equals("")){return false;}
-
-        
-        return true;
-    } 
-    
     @Override
-    public CloudProviderLocation getCloudProviderLocationById(
-            String cloudProviderLocationId) throws CloudProviderException {
+    public CloudProviderLocation createCloudProviderLocation(final CloudProviderLocation cpl) throws CloudProviderException {
+        this.normalizeCloudProviderLocation(cpl);
 
-        CloudProviderLocation result = this.em.find(
-                CloudProviderLocation.class, new Integer(
-                        cloudProviderLocationId));
+        // if (!isCloudProviderLocationValid(cpl)){throw new
+        // CloudProviderException("CloudProviderLocation validation failed");}
+
+        this.em.persist(cpl);
+
+        return cpl;
+    }
+
+    private boolean isCloudProviderLocationValid(final CloudProviderLocation cpl) {
+        if (cpl.getIso3166_1() == null) {
+            return false;
+        }
+        if (cpl.getIso3166_1().equals("")) {
+            return false;
+        }
+
+        if (cpl.getIso3166_2() == null) {
+            return false;
+        }
+        if (cpl.getIso3166_2().equals("")) {
+            return false;
+        }
+
+        if (cpl.getPostalCode() == null) {
+            return false;
+        }
+        if (cpl.getPostalCode().equals("")) {
+            return false;
+        }
+
+        if (cpl.getGPS_Altitude() == null) {
+            return false;
+        }
+        if (cpl.getGPS_Altitude().equals("")) {
+            return false;
+        }
+
+        if (cpl.getGPS_Latitude() == null) {
+            return false;
+        }
+        if (cpl.getGPS_Latitude().equals("")) {
+            return false;
+        }
+
+        if (cpl.getGPS_Longitude() == null) {
+            return false;
+        }
+        if (cpl.getGPS_Longitude().equals("")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
+    public CloudProviderLocation getCloudProviderLocationById(final String cloudProviderLocationId)
+        throws CloudProviderException {
+
+        CloudProviderLocation result = this.em.find(CloudProviderLocation.class, new Integer(cloudProviderLocationId));
 
         return result;
     }
 
     @Override
-    public CloudProviderLocation updateCloudProviderLocation(String id,
-            Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public CloudProviderLocation updateCloudProviderLocation(final String id, final Map<String, Object> updatedAttributes)
+        throws CloudProviderException {
 
         CloudProviderLocation lCPL = this.getCloudProviderLocationById(id);
 
@@ -428,58 +427,58 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProviderLocation updateCloudProviderLocation(
-            CloudProviderLocation CPL) throws CloudProviderException {
+    public CloudProviderLocation updateCloudProviderLocation(final CloudProviderLocation CPL) throws CloudProviderException {
 
-        //if (!isCloudProviderLocationValid(CPL)){throw new CloudProviderException("CloudProviderLocation validation failed");}
-        
+        // if (!isCloudProviderLocationValid(CPL)){throw new
+        // CloudProviderException("CloudProviderLocation validation failed");}
+
         Integer CPLId = CPL.getId();
-        normalizeCloudProviderLocation(CPL);
+        this.normalizeCloudProviderLocation(CPL);
         this.em.merge(CPL);
 
         return this.getCloudProviderLocationById(CPLId.toString());
     }
 
     @Override
-    public void deleteCloudProviderLocation(String cloudProviderLocationId)
-            throws CloudProviderException {
+    public void deleteCloudProviderLocation(final String cloudProviderLocationId) throws CloudProviderException {
 
-        CloudProviderLocation result = this.em.find(
-                CloudProviderLocation.class, new Integer(
-                        cloudProviderLocationId));
+        CloudProviderLocation result = this.em.find(CloudProviderLocation.class, new Integer(cloudProviderLocationId));
         this.em.remove(result);
 
     }
-    
+
     @Override
-    public List<CloudProviderLocation> getCloudProviderLocations() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("CloudProviderLocation",this.em,this.getUser().getUsername());
+    public List<CloudProviderLocation> getCloudProviderLocations() throws CloudProviderException {
+        return UtilsForManagers.getEntityList("CloudProviderLocation", this.em, this.getUser().getUsername());
     }
-    
+
     /**
-     * Method to evaluate distance between 2 different locations
-     * <br>** Only works if the points are close enough that you can omit 
-     * that earth is not regular shape **
-     * <br><br><i>see http://androidsnippets.com/distance-between-two-gps-coordinates-in-meter</i>
+     * Method to evaluate distance between 2 different locations <br>
+     * ** Only works if the points are close enough that you can omit that earth
+     * is not regular shape ** <br>
+     * <br>
+     * <i>see
+     * http://androidsnippets.com/distance-between-two-gps-coordinates-in-
+     * meter</i>
+     * 
      * @return
      */
     @Override
-    public double locationDistance(CloudProviderLocation pointA,CloudProviderLocation pointB) {
-        
-        float pk = (float) (180/3.14159265);
+    public double locationDistance(final CloudProviderLocation pointA, final CloudProviderLocation pointB) {
+
+        float pk = (float) (180 / 3.14159265);
 
         double a1 = pointA.getGPS_Latitude() / pk;
         double a2 = pointA.getGPS_Longitude() / pk;
         double b1 = pointB.getGPS_Latitude() / pk;
         double b2 = pointB.getGPS_Longitude() / pk;
 
-        double t1 = Math.cos(a1)*Math.cos(a2)*Math.cos(b1)*Math.cos(b2);
-        double t2 = Math.cos(a1)*Math.sin(a2)*Math.cos(b1)*Math.sin(b2);
-        double t3 = Math.sin(a1)*Math.sin(b1);
+        double t1 = Math.cos(a1) * Math.cos(a2) * Math.cos(b1) * Math.cos(b2);
+        double t2 = Math.cos(a1) * Math.sin(a2) * Math.cos(b1) * Math.sin(b2);
+        double t3 = Math.sin(a1) * Math.sin(b1);
         double tt = Math.acos(t1 + t2 + t3);
 
-        return 6366000*tt;
+        return 6366000 * tt;
     }
-    
 
 }

@@ -1,10 +1,8 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -13,33 +11,12 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.ejb.Timeout;
-import javax.ejb.Timer;
-import javax.ejb.TimerService;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.jms.Session;
-import javax.jms.Topic;
-import javax.jms.TopicConnection;
-import javax.jms.TopicConnectionFactory;
-import javax.jms.TopicPublisher;
-import javax.jms.TopicSession;
-import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
-import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
-import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
@@ -54,21 +31,18 @@ import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
-import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
-import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Stateless
 @Remote(IRemoteJobManager.class)
@@ -89,16 +63,22 @@ public class JobManager implements IJobManager {
 
     @EJB
     private IVolumeManager volumeManager;
+
     @EJB
     private IMachineManager machineManager;
+
     @EJB
     private IMachineImageManager machineImageManager;
+
     @EJB
     private ISystemManager systemManager;
+
     @EJB
     private INetworkManager networkManager;
+
     @EJB
     private ILockManager lockManager;
+
     @EJB
     private IUserManager userManager;
 
@@ -107,14 +87,14 @@ public class JobManager implements IJobManager {
 
     @Resource
     private SessionContext sessionContext;
-    
+
     private User getUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
         return this.userManager.getUserByUsername(username);
     }
 
-    public Job createJob(final CloudResource targetEntity, final String action,
-            final String parentJob) throws CloudProviderException {
+    public Job createJob(final CloudResource targetEntity, final String action, final String parentJob)
+        throws CloudProviderException {
 
         Job j = new Job();
         j.setTargetEntity(targetEntity);
@@ -179,38 +159,35 @@ public class JobManager implements IJobManager {
     }
 
     @Override
-    public Job getJobAttributes(final String id, final List<String> attributes)
-            throws ResourceNotFoundException, CloudProviderException {
+    public Job getJobAttributes(final String id, final List<String> attributes) throws ResourceNotFoundException,
+        CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<Job> getJobs() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("Job",this.em,this.getUser().getUsername());
+    public List<Job> getJobs() throws CloudProviderException {
+        return this.em.createQuery("SELECT j FROM Job j WHERE j.user.id=:userid")
+            .setParameter("userid", this.getUser().getId()).getResultList();
     }
-    
+
     @Override
-    public List<Job> getJobs(final int first, final int last,
-            final List<String> attributes) throws InvalidRequestException,
-            CloudProviderException {
+    public List<Job> getJobs(final int first, final int last, final List<String> attributes) throws InvalidRequestException,
+        CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<Job> getJobs(final List<String> attributes,
-            final String filterExpression) throws InvalidRequestException,
-            CloudProviderException {
+    public List<Job> getJobs(final List<String> attributes, final String filterExpression) throws InvalidRequestException,
+        CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void updateJobAttributes(final String id,
-            final Map<String, Object> updatedAttributes)
-            throws ResourceNotFoundException, InvalidRequestException,
-            CloudProviderException {
+    public void updateJobAttributes(final String id, final Map<String, Object> updatedAttributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
     }
 
@@ -223,7 +200,7 @@ public class JobManager implements IJobManager {
      * @return
      */
     private IJobManager getThis() {
-        return sessionContext.getBusinessObject(IJobManager.class);
+        return this.sessionContext.getBusinessObject(IJobManager.class);
     }
 
     /**
@@ -232,67 +209,54 @@ public class JobManager implements IJobManager {
      * @param providerJob
      * @return
      */
-    private Job updateProviderJob(Job providerJob) {
+    private Job updateProviderJob(final Job providerJob) {
         Job job = null;
         // update Job entity
         try {
-            job = (Job) this.em
-                    .createQuery(
-                            "SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
-                    .setParameter("providerAssignedId",
-                            providerJob.getProviderAssignedId())
-                    .getSingleResult();
+            job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
+                .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
             job.setStatus(providerJob.getStatus());
             job.setStatusMessage(providerJob.getStatusMessage());
             job.setReturnCode(providerJob.getReturnCode());
             job.setTimeOfStatusChange(new Date());
         } catch (NoResultException e) {
             // should not happen
-            JobManager.logger.error("Cannot find job with providerAssignedId "
-                    + providerJob.getProviderAssignedId());
+            JobManager.logger.error("Cannot find job with providerAssignedId " + providerJob.getProviderAssignedId());
             throw e;
         }
         return job;
     }
 
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public String getJobIdFromProvider(Job providerJob)
-            throws NoResultException {
+    public String getJobIdFromProvider(final Job providerJob) throws NoResultException {
         Job job = null;
         try {
-            job = (Job) this.em
-                    .createQuery(
-                            "SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
-                    .setParameter("providerAssignedId",
-                            providerJob.getProviderAssignedId())
-                    .getSingleResult();
+            job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
+                .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
         } catch (NoResultException e) {
             // should not happen
-            JobManager.logger.error("Cannot find job with providerAssignedId "
-                    + providerJob.getProviderAssignedId());
+            JobManager.logger.error("Cannot find job with providerAssignedId " + providerJob.getProviderAssignedId());
             throw e;
         }
         return job.getId().toString();
     }
 
     @Override
-    public void handleWorkflowEvent(Job providerJob) throws Exception {
+    public void handleWorkflowEvent(final Job providerJob) throws Exception {
 
         // attemting to obtain a lock on the topmost job
-        String topmostid = getThis().getTopmostJobId(
-                getThis().getJobIdFromProvider(providerJob));
+        String topmostid = this.getThis().getTopmostJobId(this.getThis().getJobIdFromProvider(providerJob));
         String lockId = "";
 
         try {
-            lockManager.lock(topmostid, Job.class.getCanonicalName());
+            this.lockManager.lock(topmostid, Job.class.getCanonicalName());
         } catch (CloudProviderException e) {
-            JobManager.logger.warn("Unable to lock Job " + topmostid + " - "
-                    + e.getMessage());
+            JobManager.logger.warn("Unable to lock Job " + topmostid + " - " + e.getMessage());
             throw e;
         }
 
         try {
-            Job job = updateProviderJob(providerJob);
+            Job job = this.updateProviderJob(providerJob);
 
             Job topmost = this.getJobById(topmostid);
 
@@ -302,30 +266,20 @@ public class JobManager implements IJobManager {
                 CloudResource target = job.getTargetEntity();
 
                 if (target instanceof Machine) {
-                    JobManager.logger
-                            .info("calling  machineManager jobCompletionHandler with Job "
-                                    + job.getId().toString());
-                    this.machineManager.jobCompletionHandler(job.getId()
-                            .toString());
+                    JobManager.logger.info("calling  machineManager jobCompletionHandler with Job " + job.getId().toString());
+                    this.machineManager.jobCompletionHandler(job.getId().toString());
                 }
                 if (target instanceof MachineImage) {
                     // this.machineImageManager.jobCompletionHandler(job);
                 }
-                if ((target instanceof Volume)
-                        || (target instanceof VolumeImage)) {
-                    this.volumeManager.jobCompletionHandler(job.getId()
-                            .toString());
+                if ((target instanceof Volume) || (target instanceof VolumeImage)) {
+                    this.volumeManager.jobCompletionHandler(job.getId().toString());
                 }
                 if (target instanceof System) {
-                    JobManager.logger
-                            .info("calling  systemManager jobCompletionHandler with Job "
-                                    + job.getId().toString());
-                    this.systemManager.jobCompletionHandler(job.getId()
-                            .toString());
+                    JobManager.logger.info("calling  systemManager jobCompletionHandler with Job " + job.getId().toString());
+                    this.systemManager.jobCompletionHandler(job.getId().toString());
                 }
-                if ((target instanceof Network)
-                        || (target instanceof NetworkPort)
-                        || (target instanceof ForwardingGroup)) {
+                if ((target instanceof Network) || (target instanceof NetworkPort) || (target instanceof ForwardingGroup)) {
                     this.networkManager.jobCompletionHandler(job);
                 }
 
@@ -334,18 +288,16 @@ public class JobManager implements IJobManager {
             }
 
             // no exception: unlocking in current transaction
-            try{
-               lockManager.unlock(topmostid,
-                    Job.class.getCanonicalName()); 
+            try {
+                this.lockManager.unlock(topmostid, Job.class.getCanonicalName());
+            } catch (CloudProviderException e) {
+                // if an exception occurs for unlocking, don't rollback!
             }
-            catch(CloudProviderException e){
-                //if an exception occurs for unlocking, don't rollback!
-            }
-            
+
         } catch (Exception e) {
             // exception, will be rollbacked: unlocking in separate transaction
             // to ensure unlocking is done
-            lockManager.unlockUntransacted(topmostid, Job.class.getCanonicalName());
+            this.lockManager.unlockUntransacted(topmostid, Job.class.getCanonicalName());
             throw e;
         }
 
@@ -356,7 +308,7 @@ public class JobManager implements IJobManager {
      */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public String getTopmostJobId(String jobId) throws CloudProviderException {
+    public String getTopmostJobId(final String jobId) throws CloudProviderException {
 
         Job j = this.getJobById(jobId);
 

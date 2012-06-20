@@ -915,7 +915,8 @@ public class MachineManager implements IMachineManager {
 
     @Override
     public List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("MachineConfiguration", this.em, this.getUser().getUsername());
+        return this.em.createQuery("SELECT c FROM MachineConfiguration c WHERE c.user.id=:userid")
+            .setParameter("userid", this.getUser().getId()).getResultList();
     }
 
     @Override
@@ -1284,7 +1285,8 @@ public class MachineManager implements IMachineManager {
 
     @Override
     public List<MachineTemplate> getMachineTemplates() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("MachineTemplate", this.em, this.getUser().getUsername());
+        return this.em.createQuery("SELECT c FROM MachineTemplate c WHERE c.user.id=:userid")
+            .setParameter("userid", this.getUser().getId()).getResultList();
     }
 
     @Override
