@@ -127,7 +127,7 @@ public class MachineManager implements IMachineManager {
     public void setSessionContext(final SessionContext ctx) {
         this.ctx = ctx;
     }
-    
+
     private User getUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
         return this.userManager.getUserByUsername(username);
@@ -560,10 +560,10 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public List<Machine> getMachines() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("Machine",this.em,this.getUser().getUsername());
+    public List<Machine> getMachines() throws CloudProviderException {
+        return UtilsForManagers.getEntityList("Machine", this.em, this.getUser().getUsername());
     }
-    
+
     // TODO
     public List<Machine> getMachines(final List<String> attributes, final String queryExpression) throws CloudProviderException {
         List<Machine> machines = new ArrayList<Machine>();
@@ -583,10 +583,10 @@ public class MachineManager implements IMachineManager {
         if (machineId == null) {
             throw new InvalidRequestException("Null machine id ");
         }
-        try {
-            m = this.em.find(Machine.class, Integer.valueOf(machineId));
-        } catch (Exception e) {
-            throw new ResourceNotFoundException(e.getMessage());
+        m = this.em.find(Machine.class, Integer.valueOf(machineId));
+
+        if (m == null) {
+            throw new ResourceNotFoundException("Machine " + machineId + " not found");
         }
 
         m.initFSM();
@@ -912,10 +912,10 @@ public class MachineManager implements IMachineManager {
         this.em.remove(config);
         this.em.flush();
     }
-    
+
     @Override
-    public List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("MachineConfiguration",this.em,this.getUser().getUsername());
+    public List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException {
+        return UtilsForManagers.getEntityList("MachineConfiguration", this.em, this.getUser().getUsername());
     }
 
     @Override
@@ -1281,10 +1281,10 @@ public class MachineManager implements IMachineManager {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
     @Override
-    public List<MachineTemplate> getMachineTemplates() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("MachineTemplate",this.em,this.getUser().getUsername());
+    public List<MachineTemplate> getMachineTemplates() throws CloudProviderException {
+        return UtilsForManagers.getEntityList("MachineTemplate", this.em, this.getUser().getUsername());
     }
 
     @Override
@@ -1557,7 +1557,8 @@ public class MachineManager implements IMachineManager {
     /**
      * Continue machine creation tasks in job completion handler. job : root
      * non-leaf job of machine creation
-     * @throws CloudProviderException 
+     * 
+     * @throws CloudProviderException
      */
     private boolean machineCreationContinuation(final Job job, final Machine m) throws CloudProviderException {
 
