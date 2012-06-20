@@ -10,8 +10,6 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
@@ -37,7 +35,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -63,7 +60,7 @@ public class VolumeManager implements IVolumeManager {
 
     @EJB
     private IUserManager userManager;
-    
+
     @EJB
     private IJobManager jobManager;
 
@@ -158,7 +155,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             try {
-                UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+                UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
             } catch (Exception e) {
                 VolumeManager.logger.error(e.getMessage(), e);
             }
@@ -278,10 +275,10 @@ public class VolumeManager implements IVolumeManager {
         }
         return result;
     }
-    
+
     @Override
-    public List<Volume> getVolumes() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("Volume",this.em,this.getUser().getUsername());
+    public List<Volume> getVolumes() throws CloudProviderException {
+        return UtilsForManagers.getEntityList("Volume", this.em, this.getUser().getUsername());
     }
 
     @Override
@@ -318,12 +315,13 @@ public class VolumeManager implements IVolumeManager {
         return this.em.createQuery("FROM VolumeConfiguration v WHERE v.user.username=:username ORDER BY v.id")
             .setParameter("username", user.getUsername()).getResultList();
     }
-    
+
     @Override
-    public List<VolumeConfiguration> getVolumeConfigurations() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("VolumeConfiguration",this.em,this.getUser().getUsername());
+    public List<VolumeConfiguration> getVolumeConfigurations() throws CloudProviderException {
+        return this.em.createQuery("SELECT c FROM VolumeConfiguration c WHERE c.user.id=:userid")
+            .setParameter("userid", this.getUser().getId()).getResultList();
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public List<VolumeConfiguration> getVolumeConfigurations(final int first, final int last, final List<String> attributes)
@@ -349,10 +347,11 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public List<VolumeTemplate> getVolumeTemplates() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("VolumeTemplate",this.em,this.getUser().getUsername());
+    public List<VolumeTemplate> getVolumeTemplates() throws CloudProviderException {
+        return this.em.createQuery("SELECT c FROM VolumeTemplate c WHERE c.user.id=:userid")
+            .setParameter("userid", this.getUser().getId()).getResultList();
     }
-    
+
     @SuppressWarnings("unchecked")
     @Override
     public List<VolumeTemplate> getVolumeTemplates(final int first, final int last, final List<String> attributes)
@@ -525,7 +524,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             try {
-                UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+                UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
             } catch (Exception e) {
                 VolumeManager.logger.error("", e);
             }
@@ -585,7 +584,7 @@ public class VolumeManager implements IVolumeManager {
     public boolean jobCompletionHandler(final String job_id) {
         Job job;
         try {
-            job = jobManager.getJobById(job_id);
+            job = this.jobManager.getJobById(job_id);
         } catch (ResourceNotFoundException e1) {
             VolumeManager.logger.info("Could not find job " + job_id);
             return false;
@@ -593,7 +592,7 @@ public class VolumeManager implements IVolumeManager {
             VolumeManager.logger.info("unable to get job " + job_id);
             return false;
         }
-        
+
         if (job.getTargetEntity() instanceof Volume) {
             return this.volumeCompletionHandler(job);
         } else if (job.getTargetEntity() instanceof VolumeImage) {
@@ -782,7 +781,7 @@ public class VolumeManager implements IVolumeManager {
         this.em.flush();
 
         try {
-            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
         } catch (Exception e) {
             VolumeManager.logger.error(e.getMessage(), e);
         }
@@ -812,10 +811,10 @@ public class VolumeManager implements IVolumeManager {
         return this.em.createQuery("FROM VolumeImage v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id ")
             .setParameter("username", user.getUsername()).getResultList();
     }
-    
+
     @Override
-    public List<VolumeImage> getVolumeImages() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("VolumeImage",this.em,this.getUser().getUsername());
+    public List<VolumeImage> getVolumeImages() throws CloudProviderException {
+        return UtilsForManagers.getEntityList("VolumeImage", this.em, this.getUser().getUsername());
     }
 
     @Override
@@ -888,8 +887,8 @@ public class VolumeManager implements IVolumeManager {
         this.em.flush();
 
         try {
-            //connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
-            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(),context);
+            // connector.setNotificationOnJobCompletion(providerJob.getProviderAssignedId());
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
         } catch (Exception e) {
             VolumeManager.logger.error("", e);
         }
