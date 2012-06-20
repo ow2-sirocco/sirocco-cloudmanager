@@ -206,7 +206,7 @@ public class NetworkManagerTest {
         netConfig.setDescription("dummy net config");
         netConfig.setProperties(Collections.singletonMap("color", "blue"));
         netConfig.setClassOfService("silver");
-        netConfig.setNetworkType("PUBLIC");
+        netConfig.setNetworkType(Network.Type.PUBLIC);
         return netConfig;
     }
 
