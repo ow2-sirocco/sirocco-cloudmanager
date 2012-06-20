@@ -56,7 +56,18 @@
 			<artifactId>sirocco-text-table-formatter</artifactId>
 			<version>1.0</version>
 	 	</dependency>
-		
+	 	<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-core-manager</artifactId>
+			<version>${project.version}</version>
+			<type>ejb</type>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.jonas</groupId>
+			<artifactId>jonas-client</artifactId>
+			<version>${ow2.jonas.version}</version>
+			<type>jar</type>
+		</dependency>
 	</dependencies>
 
 	<build>

@@ -44,6 +44,10 @@
       <outputDirectory>bin</outputDirectory>
       <fileMode>755</fileMode>
     </fileSet>
+    <fileSet>
+      <directory>${basedir}/src/main/conf</directory>
+      <outputDirectory>conf</outputDirectory>
+    </fileSet>
   </fileSets>
   <dependencySets>
     <dependencySet>
