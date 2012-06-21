@@ -11,11 +11,15 @@ import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 
+import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "list cloud provider accounts")
 public class CloudProviderAccountListCommand implements Command {
     public static String COMMAND_NAME = "cloud-provider-account-list";
+
+    @Parameter(names = "-user", description = "user id", required = false)
+    private String userId;
 
     @Override
     public String getName() {
@@ -28,7 +32,13 @@ public class CloudProviderAccountListCommand implements Command {
         IRemoteCloudProviderManager cloudProviderManager = (IRemoteCloudProviderManager) context
             .lookup(ICloudProviderManager.EJB_JNDI_NAME);
 
-        List<CloudProviderAccount> accounts = cloudProviderManager.getCloudProviderAccounts();
+        List<CloudProviderAccount> accounts;
+
+        if (this.userId == null) {
+            accounts = cloudProviderManager.getCloudProviderAccounts();
+        } else {
+            accounts = cloudProviderManager.getCloudProviderAccountsByUser(this.userId);
+        }
 
         Table table = new Table(4);
         table.addCell("Cloud Provider Account ID");

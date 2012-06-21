@@ -37,7 +37,8 @@ public class AdminClient {
     private static String SIROCCO_RMI_ENDPOINT_URL_ENV_NAME = "SIROCCO_RMI_ENDPOINT_URL";
 
     private static Command commands[] = {new UserCreateCommand(), new UserListCommand(), new CloudProviderCreateCommand(),
-        new CloudProviderListCommand(), new CloudProviderAccountListCommand(), new CloudProviderAccountCreateCommand()};
+        new CloudProviderListCommand(), new CloudProviderAccountListCommand(), new CloudProviderAccountCreateCommand(),
+        new CloudProviderAccountAdd()};
 
     private AdminClient(final String[] args) {
         String login = System.getenv(AdminClient.SIROCCO_ADMIN_USERNAME_ENV_NAME);
