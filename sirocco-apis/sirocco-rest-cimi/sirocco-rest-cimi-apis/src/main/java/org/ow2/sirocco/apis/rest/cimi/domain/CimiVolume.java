@@ -24,26 +24,27 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class Volume.
- * <p>
  */
-@XmlRootElement(name = "volume")
+// FIXME images, meters, eventLog
+@XmlRootElement(name = "Volume")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiVolume extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
-
-    private String href;
 
     /**
      * Field "state".
@@ -51,8 +52,14 @@ public class CimiVolume extends CimiObjectCommonAbstract {
     private String state;
 
     /**
+     * Field "type".
+     */
+    private String type;
+
+    /**
      * Field "capacity".
      */
+    @Valid
     private CimiCapacity capacity;
 
     /**
@@ -61,34 +68,17 @@ public class CimiVolume extends CimiObjectCommonAbstract {
     private Boolean bootable;
 
     /**
-     * Field "supportsSnapshots".
+     * Field "images".
      */
-    private Boolean supportsSnapshots;
-
-    /**
-     * Field "snapShots".
-     */
-    private SnapShot[] snapShots;
-
-    /**
-     * Field "guestInterface".
-     */
-    private String guestInterface;
+    @ValidChild
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
+    private CimiVolumeVolumeImageCollection images;
 
     /**
      * Default constructor.
      */
     public CimiVolume() {
         super();
-    }
-
-    /**
-     * Parameterized constructor.
-     * 
-     * @param href The reference
-     */
-    public CimiVolume(final String href) {
-        super(href);
     }
 
     /**
@@ -107,6 +97,24 @@ public class CimiVolume extends CimiObjectCommonAbstract {
      */
     public void setState(final String state) {
         this.state = state;
+    }
+
+    /**
+     * Return the value of field "type".
+     * 
+     * @return The value
+     */
+    public String getType() {
+        return this.type;
+    }
+
+    /**
+     * Set the value of field "type".
+     * 
+     * @param type The value
+     */
+    public void setType(final String type) {
+        this.type = type;
     }
 
     /**
@@ -146,74 +154,21 @@ public class CimiVolume extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "supportsSnapshots".
+     * Return the value of field "images".
      * 
      * @return The value
      */
-    public Boolean getSupportsSnapshots() {
-        return this.supportsSnapshots;
+    public CimiVolumeVolumeImageCollection getImages() {
+        return this.images;
     }
 
     /**
-     * Set the value of field "supportsSnapshots".
+     * Set the value of field "images".
      * 
-     * @param supportsSnapshots The value
+     * @param images The value
      */
-    public void setSupportsSnapshots(final Boolean supportsSnapshots) {
-        this.supportsSnapshots = supportsSnapshots;
-    }
-
-    /**
-     * Return the value of field "snapShots".
-     * 
-     * @return The value
-     */
-    public SnapShot[] getSnapShots() {
-        return this.snapShots;
-    }
-
-    /**
-     * Set the value of field "snapShots".
-     * 
-     * @param snapShots The value
-     */
-    public void setSnapShots(final SnapShot[] snapShots) {
-        this.snapShots = snapShots;
-    }
-
-    /**
-     * Return the value of field "guestInterface".
-     * 
-     * @return The value
-     */
-    public String getGuestInterface() {
-        return this.guestInterface;
-    }
-
-    /**
-     * Set the value of field "guestInterface".
-     * 
-     * @param guestInterface The value
-     */
-    public void setGuestInterface(final String guestInterface) {
-        this.guestInterface = guestInterface;
-    }
-
-    /**
-     * @return the href
-     */
-    @Override
-    @XmlAttribute
-    public String getHref() {
-        return this.href;
-    }
-
-    /**
-     * @param href the href to set
-     */
-    @Override
-    public void setHref(final String href) {
-        this.href = href;
+    public void setImages(final CimiVolumeVolumeImageCollection images) {
+        this.images = images;
     }
 
     /**
@@ -223,8 +178,11 @@ public class CimiVolume extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getBootable());
+        has = has || (null != this.getCapacity());
+        has = has || (null != this.getImages());
+        return has;
     }
 
     /**
@@ -236,8 +194,7 @@ public class CimiVolume extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.Volume;
     }
 
 }

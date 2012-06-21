@@ -25,12 +25,11 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -38,13 +37,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiMachineDiskCollection}</li>
- * <li>Service model: {@link DiskCollection}</li>
+ * <li>CIMI model: {@link CimiVolumeVolumeImageCollection}</li>
+ * <li>Service model: {@link List<VolumeVolumeImage>}</li>
  * </ul>
  * </p>
  */
-public class MachineDiskCollectionOldConverter extends
-        CollectionOldConverterAbstract {
+public class VolumeVolumeImageCollectionConverter extends CollectionConverterAbstract {
 
     /**
      * {@inheritDoc}
@@ -54,7 +52,7 @@ public class MachineDiskCollectionOldConverter extends
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiMachineDiskCollection cimi = new CimiMachineDiskCollection();
+        CimiVolumeVolumeImageCollection cimi = new CimiVolumeVolumeImageCollection();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -67,10 +65,8 @@ public class MachineDiskCollectionOldConverter extends
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void copyToCimi(final CimiContext context, final Object dataService,
-            final Object dataCimi) {
-        this.doCopyToCimi(context, (List<Object>) dataService,
-                (CimiMachineDiskCollection) dataCimi);
+    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
+        this.doCopyToCimi(context, (List<Object>) dataService, (CimiVolumeVolumeImageCollection) dataCimi);
     }
 
     /**
@@ -81,7 +77,7 @@ public class MachineDiskCollectionOldConverter extends
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        List<MachineDisk> service = new ArrayList<MachineDisk>();
+        List<VolumeImage> service = new ArrayList<VolumeImage>();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -93,49 +89,10 @@ public class MachineDiskCollectionOldConverter extends
      *      (org.ow2.sirocco.apis.rest.cimi.utils.CimiContextImpl,
      *      java.lang.Object, java.lang.Object)
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public void copyToService(final CimiContext context, final Object dataCimi,
-            final Object dataService) {
-        this.doCopyToService(context, (CimiMachineDiskCollection) dataCimi,
-                (List<Object>) dataService);
+    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
+        this.doCopyToService(context, (CimiVolumeVolumeImageCollection) dataCimi, (List<Object>) dataService);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#getChildCollection(java.lang.Object)
-     */
-    @Override
-    protected Collection<?> getChildCollection(final Object resourceCollection) {
-        // MachineDiskCollection collect = (MachineDiskCollection)
-        // resourceCollection;
-        // return collect.getItems();
-        return (List<MachineDisk>) resourceCollection;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#setNewChildCollection(java.lang.Object)
-     */
-    @Override
-    protected void setNewChildCollection(final Object resourceCollection) {
-        // MachineDiskCollection collect = (MachineDiskCollection)
-        // resourceCollection;
-        // collect.setItems(new ArrayList<MachineDisk>());
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.converter.CollectionConverterAbstract#addItemChildCollection(java.lang.Object,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void addItemChildCollection(final Object resourceCollection,
-            final Object itemService) {
-        // MachineDiskCollection collect = (MachineDiskCollection)
-        // resourceCollection;
-        // collect.getItems().add((MachineDisk) itemService);
-    }
 }

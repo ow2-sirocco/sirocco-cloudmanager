@@ -34,11 +34,11 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Collection of VolumeConfiguration.
+ * Collection of MachineVolume.
  */
 @XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<CimiVolumeConfiguration> {
+public class CimiMachineVolumeCollection extends CimiCollectionAbstract<CimiMachineVolume> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -49,9 +49,9 @@ public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<Ci
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
     @Override
-    @XmlElement(name = "VolumeConfiguration")
-    @JsonProperty(value = "volumeConfigurations")
-    public CimiVolumeConfiguration[] getArray() {
+    @XmlElement(name = "MachineVolume")
+    @JsonProperty(value = "machineVolumes")
+    public CimiMachineVolume[] getArray() {
         return super.getArray();
     }
 
@@ -61,8 +61,8 @@ public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<Ci
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    @JsonProperty(value = "volumeConfigurations")
-    public void setArray(final CimiVolumeConfiguration[] items) {
+    @JsonProperty(value = "machineVolumes")
+    public void setArray(final CimiMachineVolume[] items) {
         super.setArray(items);
     }
 
@@ -72,8 +72,8 @@ public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<Ci
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
      */
     @Override
-    public CimiArray<CimiVolumeConfiguration> newCollection() {
-        return new CimiVolumeConfigurationArray();
+    public CimiArray<CimiMachineVolume> newCollection() {
+        return new CimiMachineVolumeArray();
     }
 
     /**
@@ -85,7 +85,7 @@ public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<Ci
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        return ExchangeType.VolumeConfigurationCollection;
+        return ExchangeType.MachineVolumeCollection;
     }
 
     /**
@@ -96,21 +96,21 @@ public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<Ci
     @Override
     @XmlTransient
     @JsonIgnore
-    public Class<CimiVolumeConfiguration> getItemClass() {
-        return CimiVolumeConfiguration.class;
+    public Class<CimiMachineVolume> getItemClass() {
+        return CimiMachineVolume.class;
     }
 
     /**
      * Concrete class of the collection.
      */
-    public class CimiVolumeConfigurationArray extends CimiArrayAbstract<CimiVolumeConfiguration> {
+    public class CimiMachineVolumeArray extends CimiArrayAbstract<CimiMachineVolume> {
 
         /** Serial number */
         private static final long serialVersionUID = 1L;
 
         @Override
-        public CimiVolumeConfiguration[] newEmptyArraySized() {
-            return new CimiVolumeConfiguration[this.size()];
+        public CimiMachineVolume[] newEmptyArraySized() {
+            return new CimiMachineVolume[this.size()];
         }
     }
 }

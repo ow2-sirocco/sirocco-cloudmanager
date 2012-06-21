@@ -45,25 +45,27 @@ public enum ExchangeType {
     /** */
     Job(PathType.Job), JobCollection(PathType.Job, false),
     /** */
-    Machine(PathType.Machine), MachineCollection(PathType.Machine, false), MachineCreate(PathType.Machine), MachineAction(
-        PathType.Machine),
+    Machine(PathType.Machine), MachineCollection(PathType.Machine, false),
+    /** */
+    MachineCreate(PathType.Machine), MachineAction(PathType.Machine),
     /** */
     MachineConfiguration(PathType.MachineConfiguration), MachineConfigurationCollection(PathType.MachineConfiguration, false),
     /** */
     MachineImage(PathType.MachineImage), MachineImageCollection(PathType.MachineImage, false),
     /** */
-    MachineTemplate(PathType.MachineTemplate), MachineTemplateCollection(PathType.MachineTemplate, false);
-    // /** */
-    // Volume(PathType.Volume), VolumeCollection(PathType.Volume, false),
-    // /** */
-    // VolumeConfiguration(PathType.VolumeConfiguration),
-    // VolumeConfigurationCollection(PathType.VolumeConfiguration, false),
-    // /** */
-    // VolumeImage(PathType.VolumeImage),
-    // VolumeImageCollection(PathType.VolumeImage, false),
-    // /** */
-    // VolumeTemplate(PathType.VolumeTemplate),
-    // VolumeTemplateCollection(PathType.VolumeTemplate, false);
+    MachineTemplate(PathType.MachineTemplate), MachineTemplateCollection(PathType.MachineTemplate, false),
+    /** */
+    MachineVolume(PathType.MachineVolume), MachineVolumeCollection(PathType.MachineVolume, false),
+    /** */
+    Volume(PathType.Volume), VolumeCollection(PathType.Volume, false),
+    /** */
+    VolumeVolumeImage(PathType.VolumeVolumeImage), VolumeVolumeImageCollection(PathType.VolumeVolumeImage, false),
+    /** */
+    VolumeConfiguration(PathType.VolumeConfiguration), VolumeConfigurationCollection(PathType.VolumeConfiguration, false),
+    /** */
+    VolumeImage(PathType.VolumeImage), VolumeImageCollection(PathType.VolumeImage, false),
+    /** */
+    VolumeTemplate(PathType.VolumeTemplate), VolumeTemplateCollection(PathType.VolumeTemplate, false);
 
     /** The path type of the resource. */
     PathType pathType;

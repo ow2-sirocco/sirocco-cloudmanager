@@ -34,11 +34,11 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Collection of VolumeConfiguration.
+ * Collection of VolumeVolumeImage.
  */
 @XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<CimiVolumeConfiguration> {
+public class CimiVolumeVolumeImageCollection extends CimiCollectionAbstract<CimiVolumeVolumeImage> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -49,9 +49,9 @@ public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<Ci
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
     @Override
-    @XmlElement(name = "VolumeConfiguration")
-    @JsonProperty(value = "volumeConfigurations")
-    public CimiVolumeConfiguration[] getArray() {
+    @XmlElement(name = "VolumeVolumeImage")
+    @JsonProperty(value = "volumeVolumeImages")
+    public CimiVolumeVolumeImage[] getArray() {
         return super.getArray();
     }
 
@@ -61,19 +61,9 @@ public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<Ci
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    @JsonProperty(value = "volumeConfigurations")
-    public void setArray(final CimiVolumeConfiguration[] items) {
+    @JsonProperty(value = "volumeVolumeImages")
+    public void setArray(final CimiVolumeVolumeImage[] items) {
         super.setArray(items);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
-     */
-    @Override
-    public CimiArray<CimiVolumeConfiguration> newCollection() {
-        return new CimiVolumeConfigurationArray();
     }
 
     /**
@@ -85,7 +75,17 @@ public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<Ci
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        return ExchangeType.VolumeConfigurationCollection;
+        return ExchangeType.VolumeVolumeImageCollection;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#newCollection()
+     */
+    @Override
+    public CimiArray<CimiVolumeVolumeImage> newCollection() {
+        return new CimiVolumeVolumeImageArray();
     }
 
     /**
@@ -96,21 +96,21 @@ public class CimiVolumeConfigurationCollection extends CimiCollectionAbstract<Ci
     @Override
     @XmlTransient
     @JsonIgnore
-    public Class<CimiVolumeConfiguration> getItemClass() {
-        return CimiVolumeConfiguration.class;
+    public Class<CimiVolumeVolumeImage> getItemClass() {
+        return CimiVolumeVolumeImage.class;
     }
 
     /**
      * Concrete class of the collection.
      */
-    public class CimiVolumeConfigurationArray extends CimiArrayAbstract<CimiVolumeConfiguration> {
+    public class CimiVolumeVolumeImageArray extends CimiArrayAbstract<CimiVolumeVolumeImage> {
 
         /** Serial number */
         private static final long serialVersionUID = 1L;
 
         @Override
-        public CimiVolumeConfiguration[] newEmptyArraySized() {
-            return new CimiVolumeConfiguration[this.size()];
+        public CimiVolumeVolumeImage[] newEmptyArraySized() {
+            return new CimiVolumeVolumeImage[this.size()];
         }
     }
 }

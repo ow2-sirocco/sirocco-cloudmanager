@@ -24,17 +24,20 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 
 /**
  * Class VolumeImage.
  */
-@XmlRootElement(name = "volumeImage")
+@XmlRootElement(name = "VolumeImage")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiVolumeImage extends CimiObjectCommonAbstract {
 
@@ -49,16 +52,14 @@ public class CimiVolumeImage extends CimiObjectCommonAbstract {
     /**
      * Field "imageLocation".
      */
+    @Valid
+    @NotNull(groups = {GroupCreateByValue.class})
     private ImageLocation imageLocation;
-
-    /**
-     * Field "imageData". Marshaling to verify
-     */
-    private byte[] imageData;
 
     /**
      * Field "bootable".
      */
+    @NotNull(groups = {GroupCreateByValue.class})
     private Boolean bootable;
 
     /**
@@ -66,15 +67,6 @@ public class CimiVolumeImage extends CimiObjectCommonAbstract {
      */
     public CimiVolumeImage() {
         super();
-    }
-
-    /**
-     * Parameterized constructor.
-     * 
-     * @param href The reference
-     */
-    public CimiVolumeImage(final String href) {
-        super(href);
     }
 
     /**
@@ -114,24 +106,6 @@ public class CimiVolumeImage extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "imageData".
-     * 
-     * @return The value
-     */
-    public byte[] getImageData() {
-        return this.imageData;
-    }
-
-    /**
-     * Set the value of field "imageData".
-     * 
-     * @param imageData The value
-     */
-    public void setImageData(final byte[] imageData) {
-        this.imageData = imageData;
-    }
-
-    /**
      * Return the value of field "bootable".
      * 
      * @return The value
@@ -156,8 +130,10 @@ public class CimiVolumeImage extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getBootable());
+        has = has || (null != this.getImageLocation());
+        return has;
     }
 
     /**
@@ -169,8 +145,6 @@ public class CimiVolumeImage extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.VolumeImage;
     }
-
 }

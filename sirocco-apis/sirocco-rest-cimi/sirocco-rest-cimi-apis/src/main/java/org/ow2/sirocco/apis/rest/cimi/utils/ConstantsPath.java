@@ -52,7 +52,7 @@ public abstract class ConstantsPath {
 
     public static final String MACHINE_PATH = "/" + ConstantsPath.MACHINE;
 
-    public static final String MACHINE_TEMPLATE = "machinesTemplates";
+    public static final String MACHINE_TEMPLATE = "machineTemplates";
 
     public static final String MACHINE_TEMPLATE_PATH = "/" + ConstantsPath.MACHINE_TEMPLATE;
 
@@ -72,11 +72,11 @@ public abstract class ConstantsPath {
 
     public static final String VOLUME_IMAGE_PATH = "/" + ConstantsPath.VOLUME_IMAGE;
 
-    public static final String VOLUME_CONFIGURATION = "machineConfigs";
+    public static final String VOLUME_CONFIGURATION = "volumeConfigs";
 
     public static final String VOLUME_CONFIGURATION_PATH = "/" + ConstantsPath.VOLUME_CONFIGURATION;
 
-    public static final String VOLUME_TEMPLATE = "machinesTemplates";
+    public static final String VOLUME_TEMPLATE = "volumeTemplates";
 
     public static final String VOLUME_TEMPLATE_PATH = "/" + ConstantsPath.VOLUME_TEMPLATE;
 }

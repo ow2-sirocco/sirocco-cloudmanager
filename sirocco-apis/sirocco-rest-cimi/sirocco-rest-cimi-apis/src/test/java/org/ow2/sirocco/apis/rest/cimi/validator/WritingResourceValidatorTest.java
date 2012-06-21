@@ -52,8 +52,20 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -90,7 +102,7 @@ public class WritingResourceValidatorTest {
                 // System.out.println(type);
                 cimi.setHref(type.makeHref(this.request.getBaseUri(), "987", "123"));
                 // System.out.println(cimi.getHref());
-                Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
+                Assert.assertTrue("Test " + type, CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
                 if (true == type.hasParent()) {
                     cimi.setHref(type.makeHref(this.request.getBaseUri(), "123"));
@@ -99,20 +111,21 @@ public class WritingResourceValidatorTest {
                 }
                 // System.out.println(cimi.getHref());
                 if (true == type.hasIdInReference()) {
-                    Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
+                    Assert.assertFalse("Test " + type, CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
                 } else {
-                    Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
+                    Assert.assertTrue("Test " + type, CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
                 }
 
                 cimi.setHref("foo");
-                Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
+                Assert.assertFalse("Test " + type, CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
                 // Test with all other resource
                 for (ExchangeType otherType : ExchangeType.values()) {
                     CimiResource cimiOther = this.newResource(otherType);
                     if ((null != cimiOther) && (type != otherType)) {
                         cimi.setHref(otherType.makeHref(this.request.getBaseUri(), "987", "123"));
-                        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
+                        Assert.assertFalse("Test " + type + " with " + otherType, CimiValidatorHelper.getInstance()
+                            .validateToWrite(this.context, cimi));
                     }
                 }
             }
@@ -183,8 +196,44 @@ public class WritingResourceValidatorTest {
         case MachineTemplateCollection:
             cimi = new CimiMachineTemplateCollection();
             break;
+        case MachineVolume:
+            cimi = new CimiMachineVolume();
+            break;
+        case MachineVolumeCollection:
+            cimi = new CimiMachineVolumeCollection();
+            break;
+        case Volume:
+            cimi = new CimiVolume();
+            break;
+        case VolumeCollection:
+            cimi = new CimiVolumeCollection();
+            break;
+        case VolumeConfiguration:
+            cimi = new CimiVolumeConfiguration();
+            break;
+        case VolumeConfigurationCollection:
+            cimi = new CimiVolumeConfigurationCollection();
+            break;
+        case VolumeImage:
+            cimi = new CimiVolumeImage();
+            break;
+        case VolumeImageCollection:
+            cimi = new CimiVolumeImageCollection();
+            break;
+        case VolumeTemplate:
+            cimi = new CimiVolumeTemplate();
+            break;
+        case VolumeTemplateCollection:
+            cimi = new CimiVolumeTemplateCollection();
+            break;
+        case VolumeVolumeImage:
+            cimi = new CimiVolumeVolumeImage();
+            break;
+        case VolumeVolumeImageCollection:
+            cimi = new CimiVolumeVolumeImageCollection();
+            break;
         default:
-            Assert.fail(type.name() + " not found");
+            Assert.fail("In test method \"newResource\" : " + type.name() + " not found");
             break;
         }
 

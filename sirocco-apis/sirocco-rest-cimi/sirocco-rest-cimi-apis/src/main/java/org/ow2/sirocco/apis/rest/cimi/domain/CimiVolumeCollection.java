@@ -79,6 +79,18 @@ public class CimiVolumeCollection extends CimiCollectionAbstract<CimiVolume> {
     /**
      * {@inheritDoc}
      * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.VolumeCollection;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection#getItemClass()
      */
     @Override
@@ -101,18 +113,4 @@ public class CimiVolumeCollection extends CimiCollectionAbstract<CimiVolume> {
             return new CimiVolume[this.size()];
         }
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
-     */
-    @Override
-    @XmlTransient
-    @JsonIgnore
-    public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

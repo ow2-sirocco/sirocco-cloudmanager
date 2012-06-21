@@ -74,7 +74,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      */
     @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
-    private CimiVolumeMachine[] volumes;
+    private CimiMachineVolumeCollection volumes;
 
     /**
      * Field "networkInterfaces".
@@ -176,7 +176,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiVolumeMachine[] getVolumes() {
+    public CimiMachineVolumeCollection getVolumes() {
         return this.volumes;
     }
 
@@ -185,7 +185,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @param volumes The value
      */
-    public void setVolumes(final CimiVolumeMachine[] volumes) {
+    public void setVolumes(final CimiMachineVolumeCollection volumes) {
         this.volumes = volumes;
     }
 

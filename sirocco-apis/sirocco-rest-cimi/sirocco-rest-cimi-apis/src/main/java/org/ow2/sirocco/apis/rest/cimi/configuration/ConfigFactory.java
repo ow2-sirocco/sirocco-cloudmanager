@@ -52,9 +52,21 @@ import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MemoryConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MemoryUnitConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.StorageUnitConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConfigurationCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConfigurationConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeImageCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeImageConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeVolumeImageCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeVolumeImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
@@ -79,7 +91,19 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
@@ -100,8 +124,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ConfigFactory {
     /** Logger */
-    private static final Logger LOGGER = LoggerFactory
-            .getLogger(ConfigFactory.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ConfigFactory.class);
 
     /** Associated names */
     public static final String NAMES = "names";
@@ -160,64 +183,47 @@ public class ConfigFactory {
         switch (type) {
 
         case CloudEntryPoint:
-            item = new ItemConfig(CimiCloudEntryPoint.class,
-                    ExchangeType.CloudEntryPoint);
+            item = new ItemConfig(CimiCloudEntryPoint.class, ExchangeType.CloudEntryPoint);
+            item.putData(ConfigFactory.CONVERTER, new CloudEntryPointConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
-            associatedNames.put("credentials",
-                    ExchangeType.CredentialsCollection);
-            associatedNames.put("credentialsTemplates",
-                    ExchangeType.CredentialsTemplateCollection);
+            associatedNames.put("credentials", ExchangeType.CredentialsCollection);
+            associatedNames.put("credentialsTemplates", ExchangeType.CredentialsTemplateCollection);
             associatedNames.put("machines", ExchangeType.MachineCollection);
-            associatedNames.put("machineTemplates",
-                    ExchangeType.MachineTemplateCollection);
-            associatedNames.put("machineConfigs",
-                    ExchangeType.MachineConfigurationCollection);
-            associatedNames.put("machineImages",
-                    ExchangeType.MachineImageCollection);
-            item.putData(ConfigFactory.CONVERTER,
-                    new CloudEntryPointConverter());
+            associatedNames.put("machineTemplates", ExchangeType.MachineTemplateCollection);
+            associatedNames.put("machineConfigs", ExchangeType.MachineConfigurationCollection);
+            associatedNames.put("machineImages", ExchangeType.MachineImageCollection);
             break;
 
         case Credentials:
-            item = new ItemConfig(CimiCredentials.class,
-                    ExchangeType.Credentials);
+            item = new ItemConfig(CimiCredentials.class, ExchangeType.Credentials);
             item.putData(ConfigFactory.CONVERTER, new CredentialsConverter());
             break;
 
         case CredentialsCollection:
-            item = new ItemConfig(CimiCredentialsCollection.class,
-                    ExchangeType.CredentialsCollection);
+            item = new ItemConfig(CimiCredentialsCollection.class, ExchangeType.CredentialsCollection);
+            item.putData(ConfigFactory.CONVERTER, new CredentialsCollectionConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
             associatedNames.put("credentials", ExchangeType.Credentials);
-            item.putData(ConfigFactory.CONVERTER,
-                    new CredentialsCollectionConverter());
             break;
 
         case CredentialsCreate:
-            item = new ItemConfig(CimiCredentialsCreate.class,
-                    ExchangeType.CredentialsCreate);
-            item.putData(ConfigFactory.CONVERTER,
-                    new CredentialsCreateConverter());
+            item = new ItemConfig(CimiCredentialsCreate.class, ExchangeType.CredentialsCreate);
+            item.putData(ConfigFactory.CONVERTER, new CredentialsCreateConverter());
             break;
 
         case CredentialsTemplate:
-            item = new ItemConfig(CimiCredentialsTemplate.class,
-                    ExchangeType.CredentialsTemplate);
-            item.putData(ConfigFactory.CONVERTER,
-                    new CredentialsTemplateConverter());
+            item = new ItemConfig(CimiCredentialsTemplate.class, ExchangeType.CredentialsTemplate);
+            item.putData(ConfigFactory.CONVERTER, new CredentialsTemplateConverter());
             break;
 
         case CredentialsTemplateCollection:
-            item = new ItemConfig(CimiCredentialsTemplateCollection.class,
-                    ExchangeType.CredentialsTemplateCollection);
+            item = new ItemConfig(CimiCredentialsTemplateCollection.class, ExchangeType.CredentialsTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new CredentialsTemplateCollectionConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
-            associatedNames.put("credentialsTemplates",
-                    ExchangeType.CredentialsTemplate);
-            item.putData(ConfigFactory.CONVERTER,
-                    new CredentialsTemplateCollectionConverter());
+            associatedNames.put("credentialsTemplates", ExchangeType.CredentialsTemplate);
             break;
 
         case Disk:
@@ -226,10 +232,8 @@ public class ConfigFactory {
             break;
 
         case DiskCollection:
-            item = new ItemConfig(CimiMachineDiskCollection.class,
-                    ExchangeType.DiskCollection);
-            item.putData(ConfigFactory.CONVERTER,
-                    new MachineDiskCollectionConverter());
+            item = new ItemConfig(CimiMachineDiskCollection.class, ExchangeType.DiskCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineDiskCollectionConverter());
             break;
 
         case Job:
@@ -238,12 +242,11 @@ public class ConfigFactory {
             break;
 
         case JobCollection:
-            item = new ItemConfig(CimiJobCollection.class,
-                    ExchangeType.JobCollection);
+            item = new ItemConfig(CimiJobCollection.class, ExchangeType.JobCollection);
+            item.putData(ConfigFactory.CONVERTER, new JobCollectionConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
             associatedNames.put("jobs", ExchangeType.Job);
-            item.putData(ConfigFactory.CONVERTER, new JobCollectionConverter());
             break;
 
         case Machine:
@@ -256,90 +259,119 @@ public class ConfigFactory {
             break;
 
         case MachineCollection:
-            item = new ItemConfig(CimiMachineCollection.class,
-                    ExchangeType.MachineCollection);
+            item = new ItemConfig(CimiMachineCollection.class, ExchangeType.MachineCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineCollectionConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
             associatedNames.put("machines", ExchangeType.Machine);
-            item.putData(ConfigFactory.CONVERTER,
-                    new MachineCollectionConverter());
             break;
 
         case MachineConfiguration:
-            item = new ItemConfig(CimiMachineConfiguration.class,
-                    ExchangeType.MachineConfiguration);
-            item.putData(ConfigFactory.CONVERTER,
-                    new MachineConfigurationConverter());
+            item = new ItemConfig(CimiMachineConfiguration.class, ExchangeType.MachineConfiguration);
+            item.putData(ConfigFactory.CONVERTER, new MachineConfigurationConverter());
             break;
 
         case MachineConfigurationCollection:
-            item = new ItemConfig(CimiMachineConfigurationCollection.class,
-                    ExchangeType.MachineConfigurationCollection);
+            item = new ItemConfig(CimiMachineConfigurationCollection.class, ExchangeType.MachineConfigurationCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineConfigurationCollectionConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
-            associatedNames.put("machineConfigurations",
-                    ExchangeType.MachineConfiguration);
-            item.putData(ConfigFactory.CONVERTER,
-                    new MachineConfigurationCollectionConverter());
+            associatedNames.put("machineConfigurations", ExchangeType.MachineConfiguration);
             break;
 
         case MachineCreate:
-            item = new ItemConfig(CimiMachineCreate.class,
-                    ExchangeType.MachineCreate);
+            item = new ItemConfig(CimiMachineCreate.class, ExchangeType.MachineCreate);
             item.putData(ConfigFactory.CONVERTER, new MachineCreateConverter());
             break;
 
         case MachineImage:
-            item = new ItemConfig(CimiMachineImage.class,
-                    ExchangeType.MachineImage);
+            item = new ItemConfig(CimiMachineImage.class, ExchangeType.MachineImage);
             item.putData(ConfigFactory.CONVERTER, new MachineImageConverter());
             break;
 
         case MachineImageCollection:
-            item = new ItemConfig(CimiMachineImageCollection.class,
-                    ExchangeType.MachineImageCollection);
+            item = new ItemConfig(CimiMachineImageCollection.class, ExchangeType.MachineImageCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineImageCollectionConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
             associatedNames.put("machineImages", ExchangeType.MachineImage);
-            item.putData(ConfigFactory.CONVERTER,
-                    new MachineImageCollectionConverter());
             break;
 
         case MachineTemplate:
-            item = new ItemConfig(CimiMachineTemplate.class,
-                    ExchangeType.MachineTemplate);
-            item.putData(ConfigFactory.CONVERTER,
-                    new MachineTemplateConverter());
+            item = new ItemConfig(CimiMachineTemplate.class, ExchangeType.MachineTemplate);
+            item.putData(ConfigFactory.CONVERTER, new MachineTemplateConverter());
             break;
 
         case MachineTemplateCollection:
-            item = new ItemConfig(CimiMachineTemplateCollection.class,
-                    ExchangeType.MachineTemplateCollection);
+            item = new ItemConfig(CimiMachineTemplateCollection.class, ExchangeType.MachineTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineTemplateCollectionConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
-            associatedNames.put("machineTemplates",
-                    ExchangeType.MachineTemplate);
-            item.putData(ConfigFactory.CONVERTER,
-                    new MachineTemplateCollectionConverter());
+            associatedNames.put("machineTemplates", ExchangeType.MachineTemplate);
             break;
 
-        // case Volume:
-        // case VolumeCollection:
-        // case VolumeConfiguration:
-        // case VolumeConfigurationCollection:
-        // case VolumeImage:
-        // case VolumeImageCollection:
-        // case VolumeTemplate:
-        // case VolumeTemplateCollection:
-        // // TODO Volume, VolumeCollection, VolumeConfiguration,
-        // // TODO VolumeConfigurationCollection, VolumeImage,
-        // // TODO VolumeImageCollection, VolumeTemplate,
-        // // TODO VolumeTemplateCollection
-        // break;
+        case MachineVolume:
+            item = new ItemConfig(CimiMachineVolume.class, ExchangeType.MachineVolume);
+            item.putData(ConfigFactory.CONVERTER, new MachineVolumeConverter());
+            break;
+
+        case MachineVolumeCollection:
+            item = new ItemConfig(CimiMachineVolumeCollection.class, ExchangeType.MachineVolumeCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineVolumeCollectionConverter());
+            break;
+
+        case Volume:
+            item = new ItemConfig(CimiVolume.class, ExchangeType.Volume);
+            item.putData(ConfigFactory.CONVERTER, new VolumeConverter());
+            break;
+
+        case VolumeCollection:
+            item = new ItemConfig(CimiVolumeCollection.class, ExchangeType.VolumeCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeCollectionConverter());
+            break;
+
+        case VolumeConfiguration:
+            item = new ItemConfig(CimiVolumeConfiguration.class, ExchangeType.VolumeConfiguration);
+            item.putData(ConfigFactory.CONVERTER, new VolumeConfigurationConverter());
+            break;
+
+        case VolumeConfigurationCollection:
+            item = new ItemConfig(CimiVolumeConfigurationCollection.class, ExchangeType.VolumeConfigurationCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeConfigurationCollectionConverter());
+            break;
+
+        case VolumeImage:
+            item = new ItemConfig(CimiVolumeImage.class, ExchangeType.VolumeImage);
+            item.putData(ConfigFactory.CONVERTER, new VolumeImageConverter());
+            break;
+
+        case VolumeImageCollection:
+            item = new ItemConfig(CimiVolumeImageCollection.class, ExchangeType.VolumeImageCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeImageCollectionConverter());
+            break;
+
+        case VolumeTemplate:
+            item = new ItemConfig(CimiVolumeTemplate.class, ExchangeType.VolumeTemplate);
+            item.putData(ConfigFactory.CONVERTER, new VolumeTemplateConverter());
+            break;
+
+        case VolumeTemplateCollection:
+            item = new ItemConfig(CimiVolumeTemplateCollection.class, ExchangeType.VolumeTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeTemplateCollectionConverter());
+            break;
+        case VolumeVolumeImage:
+            item = new ItemConfig(CimiVolumeVolumeImage.class, ExchangeType.VolumeVolumeImage);
+            item.putData(ConfigFactory.CONVERTER, new VolumeVolumeImageConverter());
+            break;
+
+        case VolumeVolumeImageCollection:
+            item = new ItemConfig(CimiVolumeVolumeImageCollection.class, ExchangeType.VolumeVolumeImageCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeVolumeImageCollectionConverter());
+            break;
+
         default:
             ConfigFactory.LOGGER.error("Configuration not found : {}", type);
-            throw new ConfigurationException("Configuration not found : "
-                    + type);
+            throw new ConfigurationException("Configuration not found : " + type);
         }
         return item;
     }

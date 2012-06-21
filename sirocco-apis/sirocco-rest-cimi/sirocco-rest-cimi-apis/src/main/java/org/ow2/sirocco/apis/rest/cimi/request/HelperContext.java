@@ -33,20 +33,30 @@ import org.ow2.sirocco.apis.rest.cimi.resource.RestResourceAbstract;
 public class HelperContext {
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos) {
-        return HelperContext.buildContext(infos, null, null);
+        return HelperContext.buildContext(infos, null, null, null);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final CimiData cimiData) {
-        return HelperContext.buildContext(infos, null, cimiData);
+        return HelperContext.buildContext(infos, null, null, cimiData);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id) {
-        return HelperContext.buildContext(infos, id, null);
+        return HelperContext.buildContext(infos, id, null, null);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
         final CimiData cimiData) {
-        CimiRequest request = HelperRequest.buildRequest(infos, id, cimiData);
+        return HelperContext.buildContext(infos, id, null, cimiData);
+    }
+
+    public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
+        final String idParent) {
+        return HelperContext.buildContext(infos, id, idParent, null);
+    }
+
+    public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
+        final String idParent, final CimiData cimiData) {
+        CimiRequest request = HelperRequest.buildRequest(infos, id, idParent, cimiData);
         CimiResponse response = new CimiResponse();
         return new CimiContextImpl(request, response);
     }

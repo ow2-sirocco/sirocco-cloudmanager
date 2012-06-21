@@ -27,6 +27,8 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 
 /**
  * 
@@ -74,6 +76,22 @@ public class HelperConverter {
     }
 
     public static String toString(final MachineImage.Type value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
+        }
+        return converted;
+    }
+
+    public static String toString(final Volume.State value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
+        }
+        return converted;
+    }
+
+    public static String toString(final VolumeImage.State value) {
         String converted = null;
         if (null != value) {
             converted = value.toString();

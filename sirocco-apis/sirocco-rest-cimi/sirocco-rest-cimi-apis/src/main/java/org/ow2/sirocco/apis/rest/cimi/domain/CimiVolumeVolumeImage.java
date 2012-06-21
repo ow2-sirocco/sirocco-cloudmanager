@@ -24,67 +24,77 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 
 /**
- * Class VolumeMachineTemplate.
+ * Class VolumeVolumeImage.
  */
-@XmlRootElement(name = "volumeMachineTemplate")
+@XmlRootElement(name = "VolumeVolumeImage")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeMachineTemplate implements Serializable {
+public class CimiVolumeVolumeImage extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "attachmentPoint".
+     * Field "volumeImage".
      */
-    private String attachmentPoint;
+    @ValidChild
+    private CimiVolumeImage volumeImage;
 
     /**
-     * Field "volumeTemplate".
+     * Default constructor.
      */
-    private CimiVolumeTemplate volumeTemplate;
+    public CimiVolumeVolumeImage() {
+        super();
+    }
 
     /**
-     * Return the value of field "attachmentPoint".
+     * Return the value of field "volumeImage".
      * 
      * @return The value
      */
-    public String getAttachmentPoint() {
-        return this.attachmentPoint;
+    public CimiVolumeImage getVolumeImage() {
+        return this.volumeImage;
     }
 
     /**
-     * Set the value of field "attachmentPoint".
+     * Set the value of field "volumeImage".
      * 
-     * @param attachmentPoint The value
+     * @param volumeImage The value
      */
-    public void setAttachmentPoint(final String attachmentPoint) {
-        this.attachmentPoint = attachmentPoint;
+    public void setVolumeImage(final CimiVolumeImage volumeImage) {
+        this.volumeImage = volumeImage;
     }
 
     /**
-     * Return the value of field "volumeTemplate".
+     * {@inheritDoc}
      * 
-     * @return The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
      */
-    public CimiVolumeTemplate getVolumeTemplate() {
-        return this.volumeTemplate;
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getVolumeImage());
+        return has;
     }
 
     /**
-     * Set the value of field "volumeTemplate".
+     * {@inheritDoc}
      * 
-     * @param volumeTemplate The value
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
      */
-    public void setVolumeTemplate(final CimiVolumeTemplate volumeTemplate) {
-        this.volumeTemplate = volumeTemplate;
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.VolumeVolumeImage;
     }
 
 }

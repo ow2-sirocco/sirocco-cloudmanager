@@ -91,7 +91,7 @@ public class CredentialsRestResource extends RestResourceAbstract {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("{id}")
+    @Path("/{id}")
     public Response read(@PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerReadCredentials.execute(context);
@@ -119,7 +119,7 @@ public class CredentialsRestResource extends RestResourceAbstract {
      */
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("{id}")
+    @Path("/{id}")
     public Response update(@PathParam("id") final String id, final CimiCredentials cimiData) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, cimiData);
         this.cimiManagerUpdateCredentials.execute(context);
@@ -146,7 +146,7 @@ public class CredentialsRestResource extends RestResourceAbstract {
      * @return The REST response
      */
     @DELETE
-    @Path("{id}")
+    @Path("/{id}")
     public Response delete(@PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerDeleteCredentials.execute(context);

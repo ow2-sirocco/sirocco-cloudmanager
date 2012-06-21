@@ -90,7 +90,7 @@ public class MachineTemplateRestResource extends RestResourceAbstract {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("{id}")
+    @Path("/{id}")
     public Response read(@PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerReadMachineTemplate.execute(context);
@@ -118,7 +118,7 @@ public class MachineTemplateRestResource extends RestResourceAbstract {
      */
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("{id}")
+    @Path("/{id}")
     public Response update(@PathParam("id") final String id, final CimiMachineTemplate cimiData) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, cimiData);
         this.cimiManagerUpdateMachineTemplate.execute(context);
@@ -145,7 +145,7 @@ public class MachineTemplateRestResource extends RestResourceAbstract {
      * @return The REST response
      */
     @DELETE
-    @Path("{id}")
+    @Path("/{id}")
     public Response delete(@PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerDeleteMachineTemplate.execute(context);

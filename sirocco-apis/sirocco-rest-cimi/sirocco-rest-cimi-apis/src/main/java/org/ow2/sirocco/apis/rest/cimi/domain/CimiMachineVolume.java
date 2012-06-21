@@ -24,58 +24,58 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
-
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 
 /**
- * Class VolumeMachine.
+ * Class MachineVolume.
  */
-@XmlRootElement(name = "volumeMachine")
+@XmlRootElement(name = "MachineVolume")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeMachine implements Serializable {
+public class CimiMachineVolume extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    // ---------------------------------------- Fields
-
     /**
-     * Field "attachmentPoint".
+     * Field "initialLocation".
      */
-    private String attachmentPoint;
+    private String initialLocation;
 
     /**
      * Field "volume".
      */
+    @ValidChild
     private CimiVolume volume;
 
     /**
      * Default constructor.
      */
-    public CimiVolumeMachine() {
+    public CimiMachineVolume() {
         super();
     }
 
     /**
-     * Return the value of field "attachmentPoint".
+     * Return the value of field "initialLocation".
      * 
      * @return The value
      */
-    public String getAttachmentPoint() {
-        return this.attachmentPoint;
+    public String getInitialLocation() {
+        return this.initialLocation;
     }
 
     /**
-     * Set the value of field "attachmentPoint".
+     * Set the value of field "initialLocation".
      * 
-     * @param attachmentPoint The value
+     * @param initialLocation The value
      */
-    public void setAttachmentPoint(final String attachmentPoint) {
-        this.attachmentPoint = attachmentPoint;
+    public void setInitialLocation(final String initialLocation) {
+        this.initialLocation = initialLocation;
     }
 
     /**
@@ -94,6 +94,30 @@ public class CimiVolumeMachine implements Serializable {
      */
     public void setVolume(final CimiVolume volume) {
         this.volume = volume;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
+     */
+    @Override
+    public boolean hasValues() {
+        boolean has = super.hasValues();
+        has = has || (null != this.getVolume());
+        return has;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.MachineVolume;
     }
 
 }

@@ -40,26 +40,12 @@ import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
  */
 public class HelperRequest {
 
-    // public static CimiRequest buildRequest(final
-    // CimiResourceAbstract.JaxRsRequestInfos infos) {
-    // return HelperRequest.buildRequest(infos, null, null);
-    // }
-    //
-    // public static CimiRequest buildRequest(final
-    // CimiResourceAbstract.JaxRsRequestInfos infos, final CimiData cimiData) {
-    // return HelperRequest.buildRequest(infos, null, cimiData);
-    // }
-    //
-    // public static CimiRequest buildRequest(final
-    // CimiResourceAbstract.JaxRsRequestInfos infos, final String id) {
-    // return HelperRequest.buildRequest(infos, id, null);
-    // }
-
     public static CimiRequest buildRequest(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
-        final CimiData cimiData) {
+        final String idParent, final CimiData cimiData) {
         CimiRequest request = new CimiRequest();
         request.setHeader(HelperRequest.buildRequestHeader(infos));
         request.setId(id);
+        request.setIdParent(idParent);
         request.setCimiData(cimiData);
         request.setBaseUri(infos.getUriInfo().getBaseUri().toString());
         request.setPath(infos.getUriInfo().getPath());

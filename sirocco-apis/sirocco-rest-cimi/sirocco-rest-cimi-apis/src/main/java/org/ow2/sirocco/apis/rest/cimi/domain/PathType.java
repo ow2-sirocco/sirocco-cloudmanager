@@ -52,13 +52,15 @@ public enum PathType {
     /** */
     MachineDisk(ConstantsPath.DISK, Machine),
     /** */
+    MachineVolume(ConstantsPath.VOLUME, Machine),
+    /** */
     Volume(ConstantsPath.VOLUME),
+    /** */
+    VolumeVolumeImage(ConstantsPath.VOLUME_IMAGE, Volume),
     /** */
     VolumeConfiguration(ConstantsPath.VOLUME_CONFIGURATION),
     /** */
     VolumeImage(ConstantsPath.VOLUME_IMAGE),
-    /** */
-    VolumeDisk(ConstantsPath.DISK, VolumeConfiguration), CredentialsVolumeDisk(ConstantsPath.CREDENTIALS, VolumeDisk),
     /** */
     VolumeTemplate(ConstantsPath.VOLUME_TEMPLATE);
 

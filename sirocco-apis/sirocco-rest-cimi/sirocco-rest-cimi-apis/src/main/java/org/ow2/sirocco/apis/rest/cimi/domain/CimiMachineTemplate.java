@@ -71,14 +71,14 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      */
     @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
-    private CimiVolumeMachine[] volumes;
+    private CimiMachineVolume[] volumes;
 
     /**
      * Field "volumeTemplates".
      */
     @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
-    private CimiVolumeMachineTemplate[] volumeTemplates;
+    private CimiMachineTemplateVolumeTemplate[] volumeTemplates;
 
     /**
      * Field "networkInterfaces".
@@ -162,7 +162,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiVolumeMachine[] getVolumes() {
+    public CimiMachineVolume[] getVolumes() {
         return this.volumes;
     }
 
@@ -171,7 +171,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @param volumes The value
      */
-    public void setVolumes(final CimiVolumeMachine[] volumes) {
+    public void setVolumes(final CimiMachineVolume[] volumes) {
         this.volumes = volumes;
     }
 
@@ -180,7 +180,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiVolumeMachineTemplate[] getVolumeTemplates() {
+    public CimiMachineTemplateVolumeTemplate[] getVolumeTemplates() {
         return this.volumeTemplates;
     }
 
@@ -189,7 +189,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @param volumeTemplates The value
      */
-    public void setVolumeTemplates(final CimiVolumeMachineTemplate[] volumeTemplates) {
+    public void setVolumeTemplates(final CimiMachineTemplateVolumeTemplate[] volumeTemplates) {
         this.volumeTemplates = volumeTemplates;
     }
 

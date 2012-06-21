@@ -24,45 +24,45 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class VolumeTemplate.
  */
-@XmlRootElement(name = "volumeTemplate")
+@XmlRootElement(name = "VolumeTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiVolumeTemplate extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    private String href;
-
     /**
      * Field "volumeConfig".
      */
+    @ValidChild
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiVolumeConfiguration volumeConfig;
+
+    /**
+     * Field "volumeImage".
+     */
+    @ValidChild
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
+    private CimiVolumeImage volumeImage;
 
     /**
      * Default constructor.
      */
     public CimiVolumeTemplate() {
         super();
-    }
-
-    /**
-     * Parameterized constructor.
-     * 
-     * @param href The reference
-     */
-    public CimiVolumeTemplate(final String href) {
-        super(href);
     }
 
     /**
@@ -84,20 +84,21 @@ public class CimiVolumeTemplate extends CimiObjectCommonAbstract {
     }
 
     /**
-     * @return the href
+     * Return the value of field "volumeImage".
+     * 
+     * @return The value
      */
-    @Override
-    @XmlAttribute
-    public String getHref() {
-        return this.href;
+    public CimiVolumeImage getVolumeImage() {
+        return this.volumeImage;
     }
 
     /**
-     * @param href the href to set
+     * Set the value of field "volumeImage".
+     * 
+     * @param volumeImage The value
      */
-    @Override
-    public void setHref(final String href) {
-        this.href = href;
+    public void setVolumeImage(final CimiVolumeImage volumeImage) {
+        this.volumeImage = volumeImage;
     }
 
     /**
@@ -107,8 +108,10 @@ public class CimiVolumeTemplate extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getVolumeConfig());
+        has = has || (null != this.getVolumeImage());
+        return has;
     }
 
     /**
@@ -120,8 +123,7 @@ public class CimiVolumeTemplate extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.VolumeTemplate;
     }
 
 }

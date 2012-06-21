@@ -24,22 +24,31 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 
 /**
  * Class VolumeConfiguration.
  */
-@XmlRootElement(name = "volumeConfiguration")
+@XmlRootElement(name = "VolumeConfiguration")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiVolumeConfiguration extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Field "type".
+     */
+    @NotNull(groups = {GroupCreateByValue.class})
+    private String type;
 
     /**
      * Field "format".
@@ -49,32 +58,15 @@ public class CimiVolumeConfiguration extends CimiObjectCommonAbstract {
     /**
      * Field "capacity".
      */
+    @Valid
+    @NotNull(groups = {GroupCreateByValue.class})
     private CimiCapacity capacity;
-
-    /**
-     * Field "supportsSnapshots".
-     */
-    private Boolean supportsSnapshots;
-
-    /**
-     * Field "guestInterface".
-     */
-    private String guestInterface;
 
     /**
      * Default constructor.
      */
     public CimiVolumeConfiguration() {
         super();
-    }
-
-    /**
-     * Parameterized constructor.
-     * 
-     * @param href The reference
-     */
-    public CimiVolumeConfiguration(final String href) {
-        super(href);
     }
 
     /**
@@ -114,39 +106,21 @@ public class CimiVolumeConfiguration extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "supportsSnapshots".
+     * Return the value of field "type".
      * 
      * @return The value
      */
-    public Boolean getSupportsSnapshots() {
-        return this.supportsSnapshots;
+    public String getType() {
+        return this.type;
     }
 
     /**
-     * Set the value of field "supportsSnapshots".
+     * Set the value of field "type".
      * 
-     * @param supportsSnapshots The value
+     * @param type The value
      */
-    public void setSupportsSnapshots(final Boolean supportsSnapshots) {
-        this.supportsSnapshots = supportsSnapshots;
-    }
-
-    /**
-     * Return the value of field "guestInterface".
-     * 
-     * @return The value
-     */
-    public String getGuestInterface() {
-        return this.guestInterface;
-    }
-
-    /**
-     * Set the value of field "guestInterface".
-     * 
-     * @param guestInterface The value
-     */
-    public void setGuestInterface(final String guestInterface) {
-        this.guestInterface = guestInterface;
+    public void setType(final String type) {
+        this.type = type;
     }
 
     /**
@@ -156,8 +130,11 @@ public class CimiVolumeConfiguration extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getCapacity());
+        has = has || (null != this.getFormat());
+        has = has || (null != this.getType());
+        return has;
     }
 
     /**
@@ -169,8 +146,7 @@ public class CimiVolumeConfiguration extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.VolumeConfiguration;
     }
 
 }
