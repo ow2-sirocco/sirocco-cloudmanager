@@ -34,6 +34,7 @@ import java.util.Properties;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
@@ -47,7 +48,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
@@ -76,11 +76,17 @@ public class CloudProviderConnectorTest {
 
     private static final String MACHINE_IMAGE_ID_PROP = "machineimage.id";
 
+    private static final String MACHINE_STOP_PROP = "machine.stop";
+
+    private static final String VOLUME_ATTACH_PROP = "volume.attach";
+
     private static final String VOLUME_CONFIG_SIZE_PROP = "volumeconfig.size";
 
     private static final String VOLUME_DEVICE_PROP = "volume.device";
 
     private static final String PUBLIC_KEY_PROP = "credentials.publickey";
+
+    private static final String LOCATION_COUNTRY_PROP = "location.country";
 
     private static final int ASYNC_OPERATION_WAIT_TIME_IN_SECONDS = 240;
 
@@ -132,8 +138,8 @@ public class CloudProviderConnectorTest {
 
         this.key = prop.getProperty(CloudProviderConnectorTest.PUBLIC_KEY_PROP);
 
-        this.testStopMachine = Boolean.valueOf(System.getProperty("machine.stop"));
-        this.testVolumeAttach = Boolean.valueOf(System.getProperty("volume.attach"));
+        this.testStopMachine = Boolean.valueOf(prop.getProperty(CloudProviderConnectorTest.MACHINE_STOP_PROP));
+        this.testVolumeAttach = Boolean.valueOf(prop.getProperty(CloudProviderConnectorTest.VOLUME_ATTACH_PROP));
 
         this.jobManager = JobManager.newJobManager();
         String className = "org.ow2.sirocco.cloudmanager.connector." + providerName.toLowerCase() + "." + providerName
@@ -144,7 +150,21 @@ public class CloudProviderConnectorTest {
 
         ICloudProviderConnectorFactory factory = (ICloudProviderConnectorFactory) ctor.newInstance(this.jobManager);
 
-        CloudProviderLocation location = factory.listCloudProviderLocations().iterator().next();
+        CloudProviderLocation location = null;
+        String country = prop.getProperty(CloudProviderConnectorTest.LOCATION_COUNTRY_PROP);
+        if (country == null) {
+            location = factory.listCloudProviderLocations().iterator().next();
+        } else {
+            for (CloudProviderLocation loc : factory.listCloudProviderLocations()) {
+                if (loc.getCountryName().equals(country)) {
+                    location = loc;
+                    break;
+                }
+            }
+        }
+        if (location == null) {
+            throw new Exception("Cannot find suitable provider location for country " + country);
+        }
         CloudProviderAccount cloudProviderAccount = new CloudProviderAccount();
         cloudProviderAccount.setLogin(login);
         cloudProviderAccount.setPassword(password);
@@ -195,14 +215,11 @@ public class CloudProviderConnectorTest {
             disk.setUnit(StorageUnit.GIGABYTE);
             disks.add(disk);
         }
-
         machineConfiguration.setDiskTemplates(disks);
         machineTemplate.setMachineConfiguration(machineConfiguration);
-
         MachineImage machineImage = new MachineImage();
         machineImage.setProviderAssignedId(this.imageId);
         machineTemplate.setMachineImage(machineImage);
-
         List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
         NetworkInterfaceMT nic = new NetworkInterfaceMT();
         nic.setNetworkType(Network.Type.PRIVATE);
@@ -210,22 +227,20 @@ public class CloudProviderConnectorTest {
         nic = new NetworkInterfaceMT();
         nic.setNetworkType(Network.Type.PUBLIC);
         nics.add(nic);
-
         machineTemplate.setNetworkInterfaces(nics);
-
         if (this.key != null) {
             Credentials credentials = new Credentials();
             credentials.setPublicKey(this.key.getBytes());
             machineTemplate.setCredentials(credentials);
         }
-
         machineCreate.setMachineTemplate(machineTemplate);
         machineCreate.setName("test");
 
+        System.out.println("Creating machine...");
         Job job = computeService.createMachine(machineCreate);
         this.waitForJobCompletion(job);
-        String machineId = job.getTargetEntity().getProviderAssignedId();
 
+        String machineId = job.getTargetEntity().getProviderAssignedId();
         Machine machine = computeService.getMachine(machineId);
         System.out.println("Machine id=" + machine.getProviderAssignedId() + " state=" + machine.getState());
         for (NetworkInterface netInterface : machine.getNetworkInterfaces()) {
@@ -237,18 +252,20 @@ public class CloudProviderConnectorTest {
             }
             System.out.println();
         }
-
         if (this.testStopMachine) {
-            if (machine.getState() == State.STOPPED) {
+            if (machine.getState() == Machine.State.STOPPED) {
+                System.out.println("Starting machine " + machineId);
                 job = computeService.startMachine(machineId);
                 this.waitForJobCompletion(job);
                 machine = computeService.getMachine(machineId);
                 Assert.assertEquals(Machine.State.STARTED, machine.getState());
             } else {
+                System.out.println("Stopping machine " + machineId);
                 job = computeService.stopMachine(machineId);
                 this.waitForJobCompletion(job);
                 machine = computeService.getMachine(machineId);
                 Assert.assertEquals(Machine.State.STOPPED, machine.getState());
+                System.out.println("Starting machine " + machineId);
                 job = computeService.startMachine(machineId);
                 this.waitForJobCompletion(job);
                 machine = computeService.getMachine(machineId);
@@ -268,6 +285,7 @@ public class CloudProviderConnectorTest {
         volumeCreate.setName("test");
         volumeCreate.setDescription("a test volume");
 
+        System.out.println("Creating Volume size=" + this.volumeConfigSizeGB + "GB");
         job = volumeService.createVolume(volumeCreate);
         this.waitForJobCompletion(job);
         String volumeId = job.getTargetEntity().getProviderAssignedId();
@@ -279,23 +297,39 @@ public class CloudProviderConnectorTest {
             MachineVolume machineVolume = new MachineVolume();
             machineVolume.setVolume(volume);
             machineVolume.setInitialLocation(this.volumeDevice);
-
+            System.out.println("Attaching volume " + volume.getProviderAssignedId() + " to machine " + machineId);
             job = computeService.addVolumeToMachine(machineId, machineVolume);
             this.waitForJobCompletion(job);
-
+            System.out.println("Detaching volume " + volume.getProviderAssignedId() + " from machine " + machineId);
             job = computeService.removeVolumeFromMachine(machineId, machineVolume);
             this.waitForJobCompletion(job);
         }
 
+        System.out.println("Deleting volume " + volumeId);
         job = volumeService.deleteVolume(volumeId);
         this.waitForJobCompletion(job);
 
-        Assert.assertNull(volumeService.getVolume(volumeId));
+        try {
+            volume = volumeService.getVolume(volumeId);
+            if (volume.getState() != Volume.State.DELETED) {
+                throw new Exception("Volume still exists after deletion");
+            }
+        } catch (ConnectorException ex) {
+            // OK
+        }
 
+        System.out.println("Deleting machine " + machineId);
         job = computeService.deleteMachine(machineId);
         this.waitForJobCompletion(job);
 
-        Assert.assertNull(computeService.getMachine(machineId));
+        try {
+            machine = computeService.getMachine(machineId);
+            if (machine.getState() != Machine.State.DELETED) {
+                throw new Exception("Machine still exists after deletion");
+            }
+        } catch (ConnectorException ex) {
+            // OK
+        }
 
     }
 }
