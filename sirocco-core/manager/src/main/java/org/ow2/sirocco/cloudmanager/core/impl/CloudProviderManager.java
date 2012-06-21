@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -256,6 +257,12 @@ public class CloudProviderManager implements ICloudProviderManager {
     @Override
     public List<CloudProviderAccount> getCloudProviderAccounts() throws CloudProviderException {
         return this.em.createQuery("Select p From CloudProviderAccount p").getResultList();
+    }
+
+    @Override
+    public List<CloudProviderAccount> getCloudProviderAccountsByUser(final String userId) throws CloudProviderException {
+        User user = this.userManager.getUserById(userId);
+        return new ArrayList<CloudProviderAccount>(user.getCloudProviderAccounts());
     }
 
     @Override
