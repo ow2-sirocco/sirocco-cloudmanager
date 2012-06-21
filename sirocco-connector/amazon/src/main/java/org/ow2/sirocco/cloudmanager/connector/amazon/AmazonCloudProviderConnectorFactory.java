@@ -49,7 +49,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit;
@@ -388,7 +387,6 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
             Memory memory = new Memory();
             memory.setQuantity((float) hardware.getRam());
             memory.setUnit(MemoryUnit.MEGIBYTE);
-            MachineDiskCollection disks = new MachineDiskCollection();
             List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
             if (hardware.getVolumes().size() == 0) {
                 MachineDisk machineDisk = new MachineDisk();
@@ -409,8 +407,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
                     machineDisks.add(machineDisk);
                 }
             }
-            disks.setItems(machineDisks);
-            machine.setDisks(disks);
+            machine.setDisks(machineDisks);
         }
 
         private KeyPair findOrInstallKeyPair(final String publicKey) {
