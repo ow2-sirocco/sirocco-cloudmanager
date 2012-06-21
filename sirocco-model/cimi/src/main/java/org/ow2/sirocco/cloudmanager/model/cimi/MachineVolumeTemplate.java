@@ -34,56 +34,40 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 @Entity
-public class MachineVolumeTemplate implements Serializable {
+public class MachineVolumeTemplate implements Serializable, Identifiable {
 
-	private static final long serialVersionUID = 1L;
-	private Integer 			id;
-	private String				initialLocation;
+    private static final long serialVersionUID = 1L;
+    private Integer id;
+    private String initialLocation;
 
-	private VolumeTemplate		volumeTemplate;
+    private VolumeTemplate volumeTemplate;
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return this.id;
+    }
 
-	@ManyToOne
-	private MachineVolumeTemplateCollection 	machineVolumeTemplateCollection;
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	public Integer getId() {
-		return this.id;
-	}
+    // TODO unidirectional
+    @OneToOne
+    public VolumeTemplate getVolumeTemplate() {
+        return volumeTemplate;
+    }
 
+    public void setVolumeTemplate(VolumeTemplate volumeTemplate) {
+        this.volumeTemplate = volumeTemplate;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public String getInitialLocation() {
+        return initialLocation;
+    }
 
-	// TODO unidirectional
-	@OneToOne
-	public VolumeTemplate getVolumeTemplate() {
-		return volumeTemplate;
-	}
+    public void setInitialLocation(String initialLocation) {
+        this.initialLocation = initialLocation;
+    }
 
-	public void setVolumeTemplate(VolumeTemplate volumeTemplate) {
-		this.volumeTemplate = volumeTemplate;
-	}
-
-	public String getInitialLocation() {
-		return initialLocation;
-	}
-
-	public void setInitialLocation(String initialLocation) {
-		this.initialLocation = initialLocation;
-	}
-
-
-	@ManyToOne
-	public MachineVolumeTemplateCollection getMachineVolumeTemplateCollection() {
-		return this.machineVolumeTemplateCollection;
-	}
-
-	public void setMachineVolumeTemplateCollection(final MachineVolumeTemplateCollection machineVolumeTemplateColl) {
-		this.machineVolumeTemplateCollection = machineVolumeTemplateColl;
-	}
 }
-
-

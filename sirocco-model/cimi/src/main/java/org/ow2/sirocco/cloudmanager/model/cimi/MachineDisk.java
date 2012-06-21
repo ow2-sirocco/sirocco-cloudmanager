@@ -48,8 +48,6 @@ public class MachineDisk implements Serializable, Identifiable {
 
     private Disk disk;
 
-    private MachineDiskCollection machineDiskCollection;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
@@ -75,15 +73,6 @@ public class MachineDisk implements Serializable, Identifiable {
 
     public void setInitialLocation(final String initialLocation) {
         this.initialLocation = initialLocation;
-    }
-
-    @ManyToOne
-    public MachineDiskCollection getMachineDiskCollection() {
-        return this.machineDiskCollection;
-    }
-
-    public void setMachineDiskCollection(final MachineDiskCollection machineDiskCollection) {
-        this.machineDiskCollection = machineDiskCollection;
     }
 
 }

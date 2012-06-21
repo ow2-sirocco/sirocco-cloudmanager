@@ -56,8 +56,6 @@ public class MachineVolume implements Serializable, Identifiable {
 
     private State state;
 
-    @ManyToOne
-    private MachineVolumeCollection machineVolumeCollection;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -85,15 +83,6 @@ public class MachineVolume implements Serializable, Identifiable {
 
     public void setInitialLocation(final String initialLocation) {
         this.initialLocation = initialLocation;
-    }
-
-    @ManyToOne
-    public MachineVolumeCollection getMachineVolumeCollection() {
-        return this.machineVolumeCollection;
-    }
-
-    public void setMachineVolumeCollection(final MachineVolumeCollection machineVolumeColl) {
-        this.machineVolumeCollection = machineVolumeColl;
     }
 
     @Enumerated(EnumType.STRING)

@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.List;
+
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
@@ -31,7 +33,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
@@ -66,8 +68,10 @@ public class MachineConverter extends ObjectCommonConverter {
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (Machine) dataService, (CimiMachine) dataCimi);
+    public void copyToCimi(final CimiContext context, final Object dataService,
+            final Object dataCimi) {
+        this.doCopyToCimi(context, (Machine) dataService,
+                (CimiMachine) dataCimi);
     }
 
     /**
@@ -91,24 +95,33 @@ public class MachineConverter extends ObjectCommonConverter {
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiMachine) dataCimi, (Machine) dataService);
+    public void copyToService(final CimiContext context, final Object dataCimi,
+            final Object dataService) {
+        this.doCopyToService(context, (CimiMachine) dataCimi,
+                (Machine) dataService);
     }
 
     /**
      * Copy data from a service object to a CIMI object.
      * 
-     * @param context The current context
-     * @param dataService Source service object
-     * @param dataCimi Destination CIMI object
+     * @param context
+     *            The current context
+     * @param dataService
+     *            Source service object
+     * @param dataCimi
+     *            Destination CIMI object
      */
-    protected void doCopyToCimi(final CimiContext context, final Machine dataService, final CimiMachine dataCimi) {
+    protected void doCopyToCimi(final CimiContext context,
+            final Machine dataService, final CimiMachine dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
-            dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
-            dataCimi.setDisks((CimiMachineDiskCollection) context.convertNextCimi(dataService.getDisks(),
-                CimiMachineDiskCollection.class));
+            dataCimi.setCpu((CimiCpu) context.convertNextCimi(
+                    dataService.getCpu(), CimiCpu.class));
+            dataCimi.setMemory((CimiMemory) context.convertNextCimi(
+                    dataService.getMemory(), CimiMemory.class));
+            dataCimi.setDisks((CimiMachineDiskCollection) context
+                    .convertNextCimi(dataService.getDisks(),
+                            CimiMachineDiskCollection.class));
             dataCimi.setState(HelperConverter.toString(dataService.getState()));
 
             // TODO dataCimi.setNetworkInterfaces(???);
@@ -119,15 +132,21 @@ public class MachineConverter extends ObjectCommonConverter {
     /**
      * Copy data from a CIMI object to a service object.
      * 
-     * @param context The current context
-     * @param dataCimi Source CIMI object
-     * @param dataService Destination Service object
+     * @param context
+     *            The current context
+     * @param dataCimi
+     *            Source CIMI object
+     * @param dataService
+     *            Destination Service object
      */
-    protected void doCopyToService(final CimiContext context, final CimiMachine dataCimi, final Machine dataService) {
+    protected void doCopyToService(final CimiContext context,
+            final CimiMachine dataCimi, final Machine dataService) {
         this.fill(context, dataCimi, dataService);
         dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
-        dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
-        dataService.setDisks((MachineDiskCollection) context.convertNextService(dataCimi.getDisks()));
+        dataService.setMemory((Memory) context.convertNextService(dataCimi
+                .getMemory()));
+        dataService.setDisks((List<MachineDisk>) context
+                .convertNextService(dataCimi.getDisks()));
         // TODO dataService.setNetworkInterfaces(???);
         // TODO dataService.setVolumes(???);
 

@@ -21,8 +21,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplateCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
@@ -83,8 +83,8 @@ public class SystemManagerTest extends SiroccoTester{
         Credentials out_cr = this.credManager.createCredentials(machineTest.initCredentials());
         
         machineTemplate.setCredentials(out_cr);
-        machineTemplate.setVolumes(new MachineVolumeCollection());
-        machineTemplate.setVolumeTemplates(new MachineVolumeTemplateCollection());
+        machineTemplate.setVolumes(new ArrayList<MachineVolume>());
+        machineTemplate.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
         machineTemplate.setNetworkInterfaces(new ArrayList<NetworkInterface>());
         
         //machineTemplate=machineManager.createMachineTemplate(machineTemplate);

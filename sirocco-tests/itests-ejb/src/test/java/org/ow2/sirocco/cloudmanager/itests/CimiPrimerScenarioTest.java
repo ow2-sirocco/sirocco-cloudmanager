@@ -1,3 +1,27 @@
+/**
+ *
+ * SIROCCO
+ * Copyright (C) 2011 France Telecom
+ * Contact: sirocco@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ *  $Id$
+ *
+ */
 package org.ow2.sirocco.cloudmanager.itests;
 
 import java.io.File;
@@ -49,9 +73,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplateCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMT;
@@ -105,20 +127,29 @@ public class CimiPrimerScenarioTest {
         int carolPort = Integer.parseInt(carolPortString);
 
         Hashtable<String, Object> env = new Hashtable<String, Object>();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, CimiPrimerScenarioTest.INITIAL_CONTEXT_FACTORY);
+        env.put(Context.INITIAL_CONTEXT_FACTORY,
+                CimiPrimerScenarioTest.INITIAL_CONTEXT_FACTORY);
         env.put(Context.PROVIDER_URL, "rmi://localhost:" + carolPort);
-        final long timeout = System.currentTimeMillis() + CimiPrimerScenarioTest.INITIALIZE_TIMEOUT * 1000;
+        final long timeout = System.currentTimeMillis()
+                + CimiPrimerScenarioTest.INITIALIZE_TIMEOUT * 1000;
         while (true) {
             try {
                 Context context = new InitialContext(env);
-                this.machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
-                this.volumeManager = (IRemoteVolumeManager) context.lookup(IVolumeManager.EJB_JNDI_NAME);
-                this.cloudProviderManager = (IRemoteCloudProviderManager) context.lookup(ICloudProviderManager.EJB_JNDI_NAME);
-                this.userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
-                this.credManager = (IRemoteCredentialsManager) context.lookup(ICredentialsManager.EJB_JNDI_NAME);
-                this.machineImageManager = (IRemoteMachineImageManager) context.lookup(IMachineImageManager.EJB_JNDI_NAME);
+                this.machineManager = (IRemoteMachineManager) context
+                        .lookup(IMachineManager.EJB_JNDI_NAME);
+                this.volumeManager = (IRemoteVolumeManager) context
+                        .lookup(IVolumeManager.EJB_JNDI_NAME);
+                this.cloudProviderManager = (IRemoteCloudProviderManager) context
+                        .lookup(ICloudProviderManager.EJB_JNDI_NAME);
+                this.userManager = (IRemoteUserManager) context
+                        .lookup(IUserManager.EJB_JNDI_NAME);
+                this.credManager = (IRemoteCredentialsManager) context
+                        .lookup(ICredentialsManager.EJB_JNDI_NAME);
+                this.machineImageManager = (IRemoteMachineImageManager) context
+                        .lookup(IMachineImageManager.EJB_JNDI_NAME);
 
-                this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+                this.jobManager = (IRemoteJobManager) context
+                        .lookup(IJobManager.EJB_JNDI_NAME);
                 break;
             } catch (NamingException e) {
                 if (System.currentTimeMillis() > timeout) {
@@ -132,13 +163,16 @@ public class CimiPrimerScenarioTest {
 
     private void setUpDatabase() throws Exception {
         PropertiesBasedJdbcDatabaseTester databaseTest;
-        Reader reader = new FileReader(new File(System.getProperty("dbunit.dataset")));
+        Reader reader = new FileReader(new File(
+                System.getProperty("dbunit.dataset")));
         XmlDataSet dataSet = new XmlDataSet(reader);
         databaseTest = new PropertiesBasedJdbcDatabaseTester();
         databaseTest.setDataSet(dataSet);
-        Assert.assertNotNull("database.type not set!", System.getProperty("database.type"));
+        Assert.assertNotNull("database.type not set!",
+                System.getProperty("database.type"));
         // databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
-        databaseTest.setSetUpOperation(new CustomDBUnitDeleteAllOperation(System.getProperty("database.type")));
+        databaseTest.setSetUpOperation(new CustomDBUnitDeleteAllOperation(
+                System.getProperty("database.type")));
         databaseTest.onSetup();
     }
 
@@ -147,15 +181,19 @@ public class CimiPrimerScenarioTest {
      */
     @Before
     public void setUp() throws Exception {
-    	System.out.println("CimiPrimerScenarioTest : setUp ");
+        System.out.println("CimiPrimerScenarioTest : setUp ");
         this.setUpDatabase();
         this.connectToCloudManager();
-        User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
-        CloudProvider provider = this.cloudProviderManager.createCloudProvider(CimiPrimerScenarioTest.CLOUD_PROVIDER_TYPE,
-            "mock");
-        CloudProviderAccount account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(),
-            CimiPrimerScenarioTest.ACCOUNT_LOGIN, CimiPrimerScenarioTest.ACCOUNT_CREDENTIALS);
-        this.cloudProviderManager.addCloudProviderAccountToUser(user.getId().toString(), account.getId().toString());
+        User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com",
+                CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
+        CloudProvider provider = this.cloudProviderManager.createCloudProvider(
+                CimiPrimerScenarioTest.CLOUD_PROVIDER_TYPE, "mock");
+        CloudProviderAccount account = this.cloudProviderManager
+                .createCloudProviderAccount(provider.getId().toString(),
+                        CimiPrimerScenarioTest.ACCOUNT_LOGIN,
+                        CimiPrimerScenarioTest.ACCOUNT_CREDENTIALS);
+        this.cloudProviderManager.addCloudProviderAccountToUser(user.getId()
+                .toString(), account.getId().toString());
     }
 
     /**
@@ -174,15 +212,16 @@ public class CimiPrimerScenarioTest {
                 break;
             }
             Thread.sleep(1000);
-            
+
             if (counter-- == 0) {
                 throw new Exception("Machine operation time out");
             }
         }
     }
 
-    private MachineConfiguration buildMachineConfiguration(final String name, final String description, final int numCpus,
-        final int ramSizeInMB, final int diskSizeInGB) {
+    private MachineConfiguration buildMachineConfiguration(final String name,
+            final String description, final int numCpus, final int ramSizeInMB,
+            final int diskSizeInGB) {
         MachineConfiguration machineConfig = new MachineConfiguration();
         machineConfig.setName(name);
         machineConfig.setDescription(description);
@@ -205,8 +244,9 @@ public class CimiPrimerScenarioTest {
         return machineConfig;
     }
 
-    private VolumeConfiguration buildVolumeConfiguration(final String name, final String description, final String format,
-        final int capacityInMBytes) {
+    private VolumeConfiguration buildVolumeConfiguration(final String name,
+            final String description, final String format,
+            final int capacityInMBytes) {
         VolumeConfiguration volumeConfig = new VolumeConfiguration();
         volumeConfig.setName(name);
         volumeConfig.setDescription(description);
@@ -239,19 +279,24 @@ public class CimiPrimerScenarioTest {
         job = this.machineImageManager.createMachineImage(image);
         this.waitForJobCompletion(job);
 
-        MachineConfiguration machineConfig = this.buildMachineConfiguration("small",
-            "small: 1 CPU 3.5Ghz, 512MB RAM, 1GB disk", 1, 512, 1);
+        MachineConfiguration machineConfig = this.buildMachineConfiguration(
+                "small", "small: 1 CPU 3.5Ghz, 512MB RAM, 1GB disk", 1, 512, 1);
         this.machineManager.createMachineConfiguration(machineConfig);
-        machineConfig = this.buildMachineConfiguration("medium", "medium: 2 CPU 3.5Ghz, 2GB RAM, 10GB disk", 2, 1024 * 2, 10);
+        machineConfig = this.buildMachineConfiguration("medium",
+                "medium: 2 CPU 3.5Ghz, 2GB RAM, 10GB disk", 2, 1024 * 2, 10);
         this.machineManager.createMachineConfiguration(machineConfig);
-        machineConfig = this.buildMachineConfiguration("large", "large: 4 CPU 3.5Ghz, 8GB RAM, 50GB disk", 4, 8 * 1024, 50);
+        machineConfig = this.buildMachineConfiguration("large",
+                "large: 4 CPU 3.5Ghz, 8GB RAM, 50GB disk", 4, 8 * 1024, 50);
         this.machineManager.createMachineConfiguration(machineConfig);
 
-        VolumeConfiguration volumeConfig = this.buildVolumeConfiguration("small", "Small Ext3 Volume", "ext3", 60);
+        VolumeConfiguration volumeConfig = this.buildVolumeConfiguration(
+                "small", "Small Ext3 Volume", "ext3", 60);
         this.volumeManager.createVolumeConfiguration(volumeConfig);
-        volumeConfig = this.buildVolumeConfiguration("medium", "Medium Ext3 Volume", "ext3", 120);
+        volumeConfig = this.buildVolumeConfiguration("medium",
+                "Medium Ext3 Volume", "ext3", 120);
         this.volumeManager.createVolumeConfiguration(volumeConfig);
-        volumeConfig = this.buildVolumeConfiguration("large", "Large Ext3 Volume", "ext3", 240);
+        volumeConfig = this.buildVolumeConfiguration("large",
+                "Large Ext3 Volume", "ext3", 240);
         this.volumeManager.createVolumeConfiguration(volumeConfig);
     }
 
@@ -260,7 +305,8 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Machine Images
          */
 
-        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
+        List<MachineImage> machineImages = this.machineImageManager
+                .getMachineImages();
         for (MachineImage image : machineImages) {
             System.out.println("MachineImage id=" + image.getId());
         }
@@ -269,29 +315,38 @@ public class CimiPrimerScenarioTest {
          * Choose a Machine Image (first one)
          */
 
-        MachineImage image = this.machineImageManager.getMachineImageById(machineImages.get(0).getId().toString());
-        System.out.println("MachineImage [id=" + image.getId() + ", name=" + image.getName() + ", description="
-            + image.getDescription() + ", created=" + image.getCreated() + ", location=" + image.getImageLocation() + "]");
+        MachineImage image = this.machineImageManager
+                .getMachineImageById(machineImages.get(0).getId().toString());
+        System.out.println("MachineImage [id=" + image.getId() + ", name="
+                + image.getName() + ", description=" + image.getDescription()
+                + ", created=" + image.getCreated() + ", location="
+                + image.getImageLocation() + "]");
 
         /**
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager
+                .getMachineConfigurations(new ArrayList<String>(), "");
         for (MachineConfiguration machineConfig : machineConfigs) {
-            System.out.println("MachineConfiguration id=" + machineConfig.getId());
+            System.out.println("MachineConfiguration id="
+                    + machineConfig.getId());
         }
 
         /**
          * Choose a Machine Configuration (first one)
          */
 
-        MachineConfiguration machineConfig = this.machineManager.getMachineConfigurationById(machineConfigs.get(0).getId()
-            .toString());
-        System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
-            + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
-            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
-            + "]");
+        MachineConfiguration machineConfig = this.machineManager
+                .getMachineConfigurationById(machineConfigs.get(0).getId()
+                        .toString());
+        System.out.println("MachineConfiguration [id=" + machineConfig.getId()
+                + ", name=" + machineConfig.getName() + ", description="
+                + machineConfig.getDescription() + ", created="
+                + machineConfig.getCreated() + ", cpu="
+                + machineConfig.getCpu() + ", memory="
+                + machineConfig.getMemory() + ", disks="
+                + machineConfig.getDiskTemplates() + "]");
 
         /**
          * Create a new Credentials entity
@@ -304,7 +359,8 @@ public class CimiPrimerScenarioTest {
         credentialsCreate.setCredentialTemplate(credentialsTemplate);
         credentialsCreate.setName("Default");
         credentialsCreate.setDescription("Default User");
-        Credentials credentials = this.credManager.createCredentials(credentialsCreate);
+        Credentials credentials = this.credManager
+                .createCredentials(credentialsCreate);
 
         System.out.println("New Credentials id=" + credentials.getId());
         MachineTemplate machineTemplate = new MachineTemplate();
@@ -313,11 +369,11 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setMachineImage(image);
         machineTemplate.setCredentials(credentials);
 
-        MachineVolumeCollection volColl = new MachineVolumeCollection();
-        volColl.setItems(Collections.<MachineVolume> emptyList());
+        List<MachineVolume> volColl = new ArrayList<MachineVolume>();
+
         machineTemplate.setVolumes(volColl);
-        MachineVolumeTemplateCollection vtColl = new MachineVolumeTemplateCollection();
-        vtColl.setItems(Collections.<MachineVolumeTemplate> emptyList());
+        List<MachineVolumeTemplate> vtColl = new ArrayList<MachineVolumeTemplate>();
+
         machineTemplate.setVolumeTemplates(vtColl);
 
         // create network interfaces
@@ -331,22 +387,26 @@ public class CimiPrimerScenarioTest {
         try {
             mt = this.machineManager.createMachineTemplate(machineTemplate);
         } catch (Exception e) {
-            System.out.println("testMachineTemplateCreate failed " + e.getMessage());
+            System.out.println("testMachineTemplateCreate failed "
+                    + e.getMessage());
             throw new Exception("machine template create failed ");
         }
         System.out.println("testMachineTemplateCreate returned " + mt.getId());
 
         try {
-            MachineTemplate mtt = this.machineManager.getMachineTemplateById(mt.getId().toString());
+            MachineTemplate mtt = this.machineManager.getMachineTemplateById(mt
+                    .getId().toString());
             List<NetworkInterface> items = mtt.getNetworkInterfaces();
             if (items.size() == 0) {
                 System.out.println(" Strange no network interface?");
             }
             for (NetworkInterface intf : items) {
-                System.out.println("testMachineTemplateCreate " + intf.getId() + " " + intf.getState());
+                System.out.println("testMachineTemplateCreate " + intf.getId()
+                        + " " + intf.getState());
             }
         } catch (Exception e) {
-            throw new Exception("read of newly created machine template create failed ");
+            throw new Exception(
+                    "read of newly created machine template create failed ");
         }
     }
 
@@ -355,7 +415,8 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Machine Images
          */
 
-        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
+        List<MachineImage> machineImages = this.machineImageManager
+                .getMachineImages();
         for (MachineImage image : machineImages) {
             System.out.println("MachineImage id=" + image.getId());
         }
@@ -364,29 +425,38 @@ public class CimiPrimerScenarioTest {
          * Choose a Machine Image (first one)
          */
 
-        MachineImage image = this.machineImageManager.getMachineImageById(machineImages.get(0).getId().toString());
-        System.out.println("MachineImage [id=" + image.getId() + ", name=" + image.getName() + ", description="
-            + image.getDescription() + ", created=" + image.getCreated() + ", location=" + image.getImageLocation() + "]");
+        MachineImage image = this.machineImageManager
+                .getMachineImageById(machineImages.get(0).getId().toString());
+        System.out.println("MachineImage [id=" + image.getId() + ", name="
+                + image.getName() + ", description=" + image.getDescription()
+                + ", created=" + image.getCreated() + ", location="
+                + image.getImageLocation() + "]");
 
         /**
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager
+                .getMachineConfigurations(new ArrayList<String>(), "");
         for (MachineConfiguration machineConfig : machineConfigs) {
-            System.out.println("MachineConfiguration id=" + machineConfig.getId());
+            System.out.println("MachineConfiguration id="
+                    + machineConfig.getId());
         }
 
         /**
          * Choose a Machine Configuration (first one)
          */
 
-        MachineConfiguration machineConfig = this.machineManager.getMachineConfigurationById(machineConfigs.get(0).getId()
-            .toString());
-        System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
-            + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
-            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
-            + "]");
+        MachineConfiguration machineConfig = this.machineManager
+                .getMachineConfigurationById(machineConfigs.get(0).getId()
+                        .toString());
+        System.out.println("MachineConfiguration [id=" + machineConfig.getId()
+                + ", name=" + machineConfig.getName() + ", description="
+                + machineConfig.getDescription() + ", created="
+                + machineConfig.getCreated() + ", cpu="
+                + machineConfig.getCpu() + ", memory="
+                + machineConfig.getMemory() + ", disks="
+                + machineConfig.getDiskTemplates() + "]");
 
         /**
          * Create a new Credentials entity
@@ -399,7 +469,8 @@ public class CimiPrimerScenarioTest {
         credentialsCreate.setCredentialTemplate(credentialsTemplate);
         credentialsCreate.setName("Default");
         credentialsCreate.setDescription("Default User");
-        Credentials credentials = this.credManager.createCredentials(credentialsCreate);
+        Credentials credentials = this.credManager
+                .createCredentials(credentialsCreate);
 
         System.out.println("New Credentials id=" + credentials.getId());
 
@@ -417,31 +488,33 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setMachineImage(image);
         machineTemplate.setCredentials(credentials);
 
-        MachineVolumeCollection volColl = new MachineVolumeCollection();
-        volColl.setItems(Collections.<MachineVolume> emptyList());
+        List<MachineVolume> volColl = new ArrayList<MachineVolume>();
+
         machineTemplate.setVolumes(volColl);
-        MachineVolumeTemplateCollection vtColl = new MachineVolumeTemplateCollection();
-        vtColl.setItems(Collections.<MachineVolumeTemplate> emptyList());
+        List<MachineVolumeTemplate> vtColl = new ArrayList<MachineVolumeTemplate>();
+
         machineTemplate.setVolumeTemplates(vtColl);
 
-        machineTemplate.setNetworkInterfaces(Collections.<NetworkInterface> emptyList());
+        machineTemplate.setNetworkInterfaces(Collections
+                .<NetworkInterface> emptyList());
         machineCreate.setMachineTemplate(machineTemplate);
 
         Job job = this.machineManager.createMachine(machineCreate);
         String machineId = job.getTargetEntity().getId().toString();
-        System.out.println("createMachine wait for job completion " +machineId);
+        System.out
+                .println("createMachine wait for job completion " + machineId);
         this.waitForJobCompletion(job);
         return machineId;
     }
 
-    
     String createMachineWithPreExistingVolumes() throws Exception {
         /**
          * Retrieve the list of Machine Images
          */
-    	System.out.println("createMachineWithPreExistingVolumes ");
+        System.out.println("createMachineWithPreExistingVolumes ");
 
-        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
+        List<MachineImage> machineImages = this.machineImageManager
+                .getMachineImages();
         for (MachineImage image : machineImages) {
             System.out.println("MachineImage id=" + image.getId());
         }
@@ -450,29 +523,38 @@ public class CimiPrimerScenarioTest {
          * Choose a Machine Image (first one)
          */
 
-        MachineImage image = this.machineImageManager.getMachineImageById(machineImages.get(0).getId().toString());
-        System.out.println("MachineImage [id=" + image.getId() + ", name=" + image.getName() + ", description="
-            + image.getDescription() + ", created=" + image.getCreated() + ", location=" + image.getImageLocation() + "]");
+        MachineImage image = this.machineImageManager
+                .getMachineImageById(machineImages.get(0).getId().toString());
+        System.out.println("MachineImage [id=" + image.getId() + ", name="
+                + image.getName() + ", description=" + image.getDescription()
+                + ", created=" + image.getCreated() + ", location="
+                + image.getImageLocation() + "]");
 
         /**
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager
+                .getMachineConfigurations(new ArrayList<String>(), "");
         for (MachineConfiguration machineConfig : machineConfigs) {
-            System.out.println("MachineConfiguration id=" + machineConfig.getId());
+            System.out.println("MachineConfiguration id="
+                    + machineConfig.getId());
         }
 
         /**
          * Choose a Machine Configuration (first one)
          */
 
-        MachineConfiguration machineConfig = this.machineManager.getMachineConfigurationById(machineConfigs.get(0).getId()
-            .toString());
-        System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
-            + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
-            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
-            + "]");
+        MachineConfiguration machineConfig = this.machineManager
+                .getMachineConfigurationById(machineConfigs.get(0).getId()
+                        .toString());
+        System.out.println("MachineConfiguration [id=" + machineConfig.getId()
+                + ", name=" + machineConfig.getName() + ", description="
+                + machineConfig.getDescription() + ", created="
+                + machineConfig.getCreated() + ", cpu="
+                + machineConfig.getCpu() + ", memory="
+                + machineConfig.getMemory() + ", disks="
+                + machineConfig.getDiskTemplates() + "]");
 
         /**
          * Create a new Credentials entity
@@ -485,7 +567,8 @@ public class CimiPrimerScenarioTest {
         credentialsCreate.setCredentialTemplate(credentialsTemplate);
         credentialsCreate.setName("Default");
         credentialsCreate.setDescription("Default User");
-        Credentials credentials = this.credManager.createCredentials(credentialsCreate);
+        Credentials credentials = this.credManager
+                .createCredentials(credentialsCreate);
 
         System.out.println("New Credentials id=" + credentials.getId());
 
@@ -493,7 +576,9 @@ public class CimiPrimerScenarioTest {
          * Create a new volume
          */
         Volume v = createVolume("testVolumeAttach");
-        System.out.println(" createMachineWithPreExistingVolumes created volume " +v.getId().toString());
+        System.out
+                .println(" createMachineWithPreExistingVolumes created volume "
+                        + v.getId().toString());
         /**
          * Create a new Machine
          */
@@ -508,40 +593,38 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setMachineImage(image);
         machineTemplate.setCredentials(credentials);
 
-        MachineVolumeCollection volColl = new MachineVolumeCollection();
-        
-        
-        
         ArrayList<MachineVolume> vtItems = new ArrayList<MachineVolume>();
         MachineVolume mv = new MachineVolume();
         mv.setVolume(v);
         mv.setInitialLocation("/dev/sda");
         vtItems.add(mv);
-        volColl.setItems(vtItems);
-        machineTemplate.setVolumes(volColl);
-        
-        MachineVolumeTemplateCollection vtColl = new MachineVolumeTemplateCollection();
-        vtColl.setItems(Collections.<MachineVolumeTemplate> emptyList());
+        machineTemplate.setVolumes(vtItems);
+
+        List<MachineVolumeTemplate> vtColl = new ArrayList<MachineVolumeTemplate>();
         machineTemplate.setVolumeTemplates(vtColl);
 
-        machineTemplate.setNetworkInterfaces(Collections.<NetworkInterface> emptyList());
+        machineTemplate.setNetworkInterfaces(Collections
+                .<NetworkInterface> emptyList());
         machineCreate.setMachineTemplate(machineTemplate);
 
-        System.out.println(" createMachineWithPreExistingVolumes : create machine now");
+        System.out
+                .println(" createMachineWithPreExistingVolumes : create machine now");
         Job job = this.machineManager.createMachine(machineCreate);
         String machineId = job.getTargetEntity().getId().toString();
-        System.out.println(" createMachineWithPreExistingVolumes : new machine id " +machineId +" with job " +job.getId());
+        System.out
+                .println(" createMachineWithPreExistingVolumes : new machine id "
+                        + machineId + " with job " + job.getId());
         this.waitForJobCompletion(job);
         return machineId;
     }
-    
-    
+
     String createMachineWithNewVolumes() throws Exception {
         /**
          * Retrieve the list of Machine Images
          */
 
-        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
+        List<MachineImage> machineImages = this.machineImageManager
+                .getMachineImages();
         for (MachineImage image : machineImages) {
             System.out.println("MachineImage id=" + image.getId());
         }
@@ -550,29 +633,38 @@ public class CimiPrimerScenarioTest {
          * Choose a Machine Image (first one)
          */
 
-        MachineImage image = this.machineImageManager.getMachineImageById(machineImages.get(0).getId().toString());
-        System.out.println("MachineImage [id=" + image.getId() + ", name=" + image.getName() + ", description="
-            + image.getDescription() + ", created=" + image.getCreated() + ", location=" + image.getImageLocation() + "]");
+        MachineImage image = this.machineImageManager
+                .getMachineImageById(machineImages.get(0).getId().toString());
+        System.out.println("MachineImage [id=" + image.getId() + ", name="
+                + image.getName() + ", description=" + image.getDescription()
+                + ", created=" + image.getCreated() + ", location="
+                + image.getImageLocation() + "]");
 
         /**
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager
+                .getMachineConfigurations(new ArrayList<String>(), "");
         for (MachineConfiguration machineConfig : machineConfigs) {
-            System.out.println("MachineConfiguration id=" + machineConfig.getId());
+            System.out.println("MachineConfiguration id="
+                    + machineConfig.getId());
         }
 
         /**
          * Choose a Machine Configuration (first one)
          */
 
-        MachineConfiguration machineConfig = this.machineManager.getMachineConfigurationById(machineConfigs.get(0).getId()
-            .toString());
-        System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
-            + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
-            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
-            + "]");
+        MachineConfiguration machineConfig = this.machineManager
+                .getMachineConfigurationById(machineConfigs.get(0).getId()
+                        .toString());
+        System.out.println("MachineConfiguration [id=" + machineConfig.getId()
+                + ", name=" + machineConfig.getName() + ", description="
+                + machineConfig.getDescription() + ", created="
+                + machineConfig.getCreated() + ", cpu="
+                + machineConfig.getCpu() + ", memory="
+                + machineConfig.getMemory() + ", disks="
+                + machineConfig.getDiskTemplates() + "]");
 
         /**
          * Create a new Credentials entity
@@ -585,11 +677,11 @@ public class CimiPrimerScenarioTest {
         credentialsCreate.setCredentialTemplate(credentialsTemplate);
         credentialsCreate.setName("Default");
         credentialsCreate.setDescription("Default User");
-        Credentials credentials = this.credManager.createCredentials(credentialsCreate);
+        Credentials credentials = this.credManager
+                .createCredentials(credentialsCreate);
 
         System.out.println("New Credentials id=" + credentials.getId());
 
-        
         /**
          * Create a new Machine
          */
@@ -604,74 +696,80 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setMachineImage(image);
         machineTemplate.setCredentials(credentials);
 
-        MachineVolumeCollection volColl = new MachineVolumeCollection();
-        volColl.setItems(Collections.<MachineVolume> emptyList());
+        List<MachineVolume> volColl = new ArrayList<MachineVolume>();
+
         machineTemplate.setVolumes(volColl);
-        
+
         ArrayList<MachineVolumeTemplate> vtItems = new ArrayList<MachineVolumeTemplate>();
         MachineVolumeTemplate mvt = new MachineVolumeTemplate();
         VolumeTemplate vt = createVolumeTemplate("dummy");
-        
+
         mvt.setVolumeTemplate(vt);
         mvt.setInitialLocation("/dev/sda");
         vtItems.add(mvt);
-        
-        MachineVolumeTemplateCollection vtColl = new MachineVolumeTemplateCollection();
-        vtColl.setItems(vtItems);
-        machineTemplate.setVolumeTemplates(vtColl);
 
-        machineTemplate.setNetworkInterfaces(Collections.<NetworkInterface> emptyList());
+        machineTemplate.setVolumeTemplates(vtItems);
+
+        machineTemplate.setNetworkInterfaces(Collections
+                .<NetworkInterface> emptyList());
         machineCreate.setMachineTemplate(machineTemplate);
-
+        System.out.println("createMachineWithNewVolumes create machine ");
         Job job = this.machineManager.createMachine(machineCreate);
         String machineId = job.getTargetEntity().getId().toString();
-
+        System.out
+                .println("createMachineWithNewVolumes wait for job completion ");
         this.waitForJobCompletion(job);
         return machineId;
     }
-    
+
     private VolumeTemplate createVolumeTemplate(String name) throws Exception {
-    	/**
+        /**
          * Retrieve the list of Volume Configurations
          */
-    	System.out.println("createVolumeTemplate " +name);
-        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurations();
+        System.out.println("createVolumeTemplate " + name);
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager
+                .getVolumeConfigurations(new ArrayList<String>(), "");
         for (VolumeConfiguration volumeConfig : volumeConfigs) {
-            System.out.println("VolumeConfiguration id=" + volumeConfig.getId());
+            System.out
+                    .println("VolumeConfiguration id=" + volumeConfig.getId());
         }
 
         /**
          * Choose a VolumeConfiguration (first one)
          */
 
-        VolumeConfiguration smallVolumeConfig = this.volumeManager.getVolumeConfigurationById(volumeConfigs.get(0).getId()
-            .toString());
+        VolumeConfiguration smallVolumeConfig = this.volumeManager
+                .getVolumeConfigurationById(volumeConfigs.get(0).getId()
+                        .toString());
         System.out.println(smallVolumeConfig);
 
         VolumeTemplate volumeTemplate = new VolumeTemplate();
         volumeTemplate.setVolumeConfig(smallVolumeConfig);
         System.out.println("CreateVolumeTemplate return");
-        
-    	return volumeTemplate;
+
+        return volumeTemplate;
     }
-    
+
     private Volume createVolume(String name) throws Exception {
-    	String volumeId;
-    	/**
+        String volumeId;
+        /**
          * Retrieve the list of Volume Configurations
          */
 
-        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurations();
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager
+                .getVolumeConfigurations(new ArrayList<String>(), "");
         for (VolumeConfiguration volumeConfig : volumeConfigs) {
-            System.out.println("VolumeConfiguration id=" + volumeConfig.getId());
+            System.out
+                    .println("VolumeConfiguration id=" + volumeConfig.getId());
         }
 
         /**
          * Choose a VolumeConfiguration (first one)
          */
 
-        VolumeConfiguration smallVolumeConfig = this.volumeManager.getVolumeConfigurationById(volumeConfigs.get(0).getId()
-            .toString());
+        VolumeConfiguration smallVolumeConfig = this.volumeManager
+                .getVolumeConfigurationById(volumeConfigs.get(0).getId()
+                        .toString());
         System.out.println(smallVolumeConfig);
 
         /**
@@ -688,7 +786,8 @@ public class CimiPrimerScenarioTest {
         Job job = this.volumeManager.createVolume(volumeCreate);
 
         volumeId = job.getTargetEntity().getId().toString();
-        System.out.println(" testScenarioTwo: wait for volume creation completion ");
+        System.out
+                .println(" testScenarioTwo: wait for volume creation completion ");
         this.waitForJobCompletion(job);
 
         /**
@@ -697,9 +796,9 @@ public class CimiPrimerScenarioTest {
 
         Volume volume = this.volumeManager.getVolumeById(volumeId);
         System.out.println(volume);
-    	return volume;
+        return volume;
     }
-    
+
     @Test
     public void testScenarioOne() throws Exception {
         this.initDatabase();
@@ -718,10 +817,13 @@ public class CimiPrimerScenarioTest {
          */
 
         Machine machine = this.machineManager.getMachineById(machineId);
-        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
-            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
-            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
+        System.out.println("Machine [id=" + machine.getId() + ", name="
+                + machine.getName() + ", description="
+                + machine.getDescription() + ", " + machine.getCreated()
+                + ", state=" + machine.getState() + ", " + machine.getCpu()
+                + ", memory=" + machine.getMemory() + ", disks="
+                + machine.getDisks() + ", networkInterfaces="
+                + machine.getNetworkInterfaces() + "]");
 
         /**
          * Start the Machine
@@ -735,10 +837,13 @@ public class CimiPrimerScenarioTest {
          */
 
         machine = this.machineManager.getMachineById(machineId);
-        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
-            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
-            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
+        System.out.println("Machine [id=" + machine.getId() + ", name="
+                + machine.getName() + ", description="
+                + machine.getDescription() + ", " + machine.getCreated()
+                + ", state=" + machine.getState() + ", " + machine.getCpu()
+                + ", memory=" + machine.getMemory() + ", disks="
+                + machine.getDisks() + ", networkInterfaces="
+                + machine.getNetworkInterfaces() + "]");
 
         /**
          * Stop the Machine
@@ -753,14 +858,18 @@ public class CimiPrimerScenarioTest {
         Map<String, Object> attributeToUpdate = new HashMap<String, Object>();
         attributeToUpdate.put("name", "Cool Demo #1");
         attributeToUpdate.put("description", null);
-        job = this.machineManager.updateMachineAttributes(machineId, attributeToUpdate);
+        job = this.machineManager.updateMachineAttributes(machineId,
+                attributeToUpdate);
         this.waitForJobCompletion(job);
 
         machine = this.machineManager.getMachineById(machineId);
-        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
-            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
-            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
+        System.out.println("Machine [id=" + machine.getId() + ", name="
+                + machine.getName() + ", description="
+                + machine.getDescription() + ", " + machine.getCreated()
+                + ", state=" + machine.getState() + ", " + machine.getCpu()
+                + ", memory=" + machine.getMemory() + ", disks="
+                + machine.getDisks() + ", networkInterfaces="
+                + machine.getNetworkInterfaces() + "]");
 
         System.out.println("testScenarioOne leave ");
     }
@@ -780,17 +889,20 @@ public class CimiPrimerScenarioTest {
          * Retrieve the list of Volume Configurations
          */
 
-        List<VolumeConfiguration> volumeConfigs = this.volumeManager.getVolumeConfigurations();
+        List<VolumeConfiguration> volumeConfigs = this.volumeManager
+                .getVolumeConfigurations(new ArrayList<String>(), "");
         for (VolumeConfiguration volumeConfig : volumeConfigs) {
-            System.out.println("VolumeConfiguration id=" + volumeConfig.getId());
+            System.out
+                    .println("VolumeConfiguration id=" + volumeConfig.getId());
         }
 
         /**
          * Choose a VolumeConfiguration (first one)
          */
 
-        VolumeConfiguration smallVolumeConfig = this.volumeManager.getVolumeConfigurationById(volumeConfigs.get(0).getId()
-            .toString());
+        VolumeConfiguration smallVolumeConfig = this.volumeManager
+                .getVolumeConfigurationById(volumeConfigs.get(0).getId()
+                        .toString());
         System.out.println(smallVolumeConfig);
 
         /**
@@ -807,7 +919,8 @@ public class CimiPrimerScenarioTest {
         Job job = this.volumeManager.createVolume(volumeCreate);
 
         String volumeId = job.getTargetEntity().getId().toString();
-        System.out.println(" testScenarioTwo: wait for volume creation completion ");
+        System.out
+                .println(" testScenarioTwo: wait for volume creation completion ");
         this.waitForJobCompletion(job);
 
         /**
@@ -821,31 +934,45 @@ public class CimiPrimerScenarioTest {
          * Connect the new Volume to the Machine
          */
         System.out.println(" testScenarioTwo: add volume to machine ");
-        job = this.machineManager.addVolumeToMachine(machineId, volumeId, "/dev/sdb");
-        System.out.println(" testScenarioTwo: add volume to machine wait for job completion " + job.getId() + " "
-            + job.getStatus());
+        job = this.machineManager.addVolumeToMachine(machineId, volumeId,
+                "/dev/sdb");
+        System.out
+                .println(" testScenarioTwo: add volume to machine wait for job completion "
+                        + job.getId() + " " + job.getStatus());
         this.waitForJobCompletion(job);
 
         /**
          * Query the Machine's volume collection to verify the update
          */
         System.out.println(" testScenarioTwo: get machine volumes ");
-        List<MachineVolume> machineVolumes = this.machineManager.getMachineVolumes(machineId);
-        System.out.println(" testScenarioTwo: found " + machineVolumes.size() + " machine volumes ");
+        List<MachineVolume> machineVolumes = this.machineManager
+                .getMachineVolumes(machineId);
+        System.out.println(" testScenarioTwo: found " + machineVolumes.size()
+                + " machine volumes ");
         for (MachineVolume machineVolume : machineVolumes) {
             System.out.println(machineVolume);
         }
 
+        /**
+         * Detach the volume now
+         */
+        System.out.println(" testScenarioTwo: detach machine volumes ");
+        machineVolumes = this.machineManager.getMachineVolumes(machineId);
+        for (MachineVolume mv : machineVolumes) {
+            System.out.println("testScenarioTwo removing " + mv);
+            this.machineManager.removeVolumeFromMachine(machineId, mv.getId()
+                    .toString());
+        }
     }
-    
-    
+
     @Test
     public void testScenarioThree() throws Exception {
         this.initDatabase();
         /**
          * Retrieve the CEP
          */
-        System.out.println("testScenarioThree with volume attachment during machine create ");
+        System.out
+                .println("testScenarioThree with volume attachment during machine create ");
         CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
         System.out.println(" test machinetemplate create");
         this.testMachineTemplateCreate();
@@ -857,10 +984,13 @@ public class CimiPrimerScenarioTest {
          */
 
         Machine machine = this.machineManager.getMachineById(machineId);
-        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
-            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
-            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
+        System.out.println("Machine [id=" + machine.getId() + ", name="
+                + machine.getName() + ", description="
+                + machine.getDescription() + ", " + machine.getCreated()
+                + ", state=" + machine.getState() + ", " + machine.getCpu()
+                + ", memory=" + machine.getMemory() + ", disks="
+                + machine.getDisks() + ", networkInterfaces="
+                + machine.getNetworkInterfaces() + "]");
 
         /**
          * Start the Machine
@@ -874,10 +1004,13 @@ public class CimiPrimerScenarioTest {
          */
 
         machine = this.machineManager.getMachineById(machineId);
-        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
-            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
-            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
+        System.out.println("Machine [id=" + machine.getId() + ", name="
+                + machine.getName() + ", description="
+                + machine.getDescription() + ", " + machine.getCreated()
+                + ", state=" + machine.getState() + ", " + machine.getCpu()
+                + ", memory=" + machine.getMemory() + ", disks="
+                + machine.getDisks() + ", networkInterfaces="
+                + machine.getNetworkInterfaces() + "]");
 
         /**
          * Stop the Machine
@@ -892,25 +1025,29 @@ public class CimiPrimerScenarioTest {
         Map<String, Object> attributeToUpdate = new HashMap<String, Object>();
         attributeToUpdate.put("name", "Cool Demo #1");
         attributeToUpdate.put("description", null);
-        job = this.machineManager.updateMachineAttributes(machineId, attributeToUpdate);
+        job = this.machineManager.updateMachineAttributes(machineId,
+                attributeToUpdate);
         this.waitForJobCompletion(job);
 
         machine = this.machineManager.getMachineById(machineId);
-        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
-            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
-            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
+        System.out.println("Machine [id=" + machine.getId() + ", name="
+                + machine.getName() + ", description="
+                + machine.getDescription() + ", " + machine.getCreated()
+                + ", state=" + machine.getState() + ", " + machine.getCpu()
+                + ", memory=" + machine.getMemory() + ", disks="
+                + machine.getDisks() + ", networkInterfaces="
+                + machine.getNetworkInterfaces() + "]");
 
     }
-    
-    
+
     @Test
     public void testScenarioFour() throws Exception {
         this.initDatabase();
         /**
          * Retrieve the CEP
          */
-        System.out.println("testScenarioFour with volume creation during machine create ");
+        System.out
+                .println("testScenarioFour with volume creation during machine create ");
         CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
         System.out.println(" test machinetemplate create");
         this.testMachineTemplateCreate();
@@ -922,10 +1059,13 @@ public class CimiPrimerScenarioTest {
          */
 
         Machine machine = this.machineManager.getMachineById(machineId);
-        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
-            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
-            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
+        System.out.println("Machine [id=" + machine.getId() + ", name="
+                + machine.getName() + ", description="
+                + machine.getDescription() + ", " + machine.getCreated()
+                + ", state=" + machine.getState() + ", " + machine.getCpu()
+                + ", memory=" + machine.getMemory() + ", disks="
+                + machine.getDisks() + ", networkInterfaces="
+                + machine.getNetworkInterfaces() + "]");
 
         /**
          * Start the Machine
@@ -939,12 +1079,16 @@ public class CimiPrimerScenarioTest {
          */
 
         machine = this.machineManager.getMachineById(machineId);
-        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
-            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
-            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
-        
-        System.out.println("Machine id=" + machine.getId() + " volumes " +machine.getVolumes());
+        System.out.println("Machine [id=" + machine.getId() + ", name="
+                + machine.getName() + ", description="
+                + machine.getDescription() + ", " + machine.getCreated()
+                + ", state=" + machine.getState() + ", " + machine.getCpu()
+                + ", memory=" + machine.getMemory() + ", disks="
+                + machine.getDisks() + ", networkInterfaces="
+                + machine.getNetworkInterfaces() + "]");
+
+        System.out.println("Machine id=" + machine.getId() + " volumes "
+                + machine.getVolumes());
 
         /**
          * Stop the Machine
@@ -959,14 +1103,18 @@ public class CimiPrimerScenarioTest {
         Map<String, Object> attributeToUpdate = new HashMap<String, Object>();
         attributeToUpdate.put("name", "Cool Demo #1");
         attributeToUpdate.put("description", null);
-        job = this.machineManager.updateMachineAttributes(machineId, attributeToUpdate);
+        job = this.machineManager.updateMachineAttributes(machineId,
+                attributeToUpdate);
         this.waitForJobCompletion(job);
 
         machine = this.machineManager.getMachineById(machineId);
-        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
-            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
-            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
+        System.out.println("Machine [id=" + machine.getId() + ", name="
+                + machine.getName() + ", description="
+                + machine.getDescription() + ", " + machine.getCreated()
+                + ", state=" + machine.getState() + ", " + machine.getCpu()
+                + ", memory=" + machine.getMemory() + ", disks="
+                + machine.getDisks() + ", networkInterfaces="
+                + machine.getNetworkInterfaces() + "]");
 
     }
 }

@@ -79,7 +79,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
@@ -104,10 +103,12 @@ public class CommonsConverterTest {
     @Test
     public void testFrequencyUnit() throws Exception {
         // Null Cimi -> Service
-        Assert.assertNull(this.context.getConverter(FrequencyUnit.class).toService(this.context, null));
+        Assert.assertNull(this.context.getConverter(FrequencyUnit.class)
+                .toService(this.context, null));
         // Empty Cimi -> Service
         try {
-            this.context.getConverter(FrequencyUnit.class).toService(this.context, new String());
+            this.context.getConverter(FrequencyUnit.class).toService(
+                    this.context, new String());
             // KO
             Assert.fail();
         } catch (InvalidConversionException e) {
@@ -115,7 +116,8 @@ public class CommonsConverterTest {
         // Full Cimi -> Service
         for (FrequencyUnit cimi : FrequencyUnit.values()) {
             try {
-                this.context.getConverter(FrequencyUnit.class).toService(this.context, cimi.getLabel().toString());
+                this.context.getConverter(FrequencyUnit.class).toService(
+                        this.context, cimi.getLabel().toString());
                 switch (cimi) {
                 case HERTZ:
                 case MEGAHERTZ:
@@ -132,59 +134,71 @@ public class CommonsConverterTest {
         }
 
         // Null Service -> Cimi
-        Assert.assertNull(this.context.getConverter(FrequencyUnit.class).toCimi(this.context, null));
+        Assert.assertNull(this.context.getConverter(FrequencyUnit.class)
+                .toCimi(this.context, null));
         // Full Service -> Cimi
         for (Frequency service : Frequency.values()) {
-            this.context.getConverter(FrequencyUnit.class).toCimi(this.context, service);
+            this.context.getConverter(FrequencyUnit.class).toCimi(this.context,
+                    service);
         }
     }
 
     @Test
     public void testMemoryUnit() throws Exception {
         // Null Cimi -> Service
-        Assert.assertNull(this.context.getConverter(MemoryUnit.class).toService(this.context, null));
+        Assert.assertNull(this.context.getConverter(MemoryUnit.class)
+                .toService(this.context, null));
         // Empty Cimi -> Service
         try {
-            this.context.getConverter(MemoryUnit.class).toService(this.context, new String());
+            this.context.getConverter(MemoryUnit.class).toService(this.context,
+                    new String());
             // KO
             Assert.fail();
         } catch (InvalidConversionException e) {
         }
         // Full Cimi -> Service
         for (MemoryUnit cimi : MemoryUnit.values()) {
-            this.context.getConverter(MemoryUnit.class).toService(this.context, cimi.getLabel().toString());
+            this.context.getConverter(MemoryUnit.class).toService(this.context,
+                    cimi.getLabel().toString());
         }
 
         // Null Service -> Cimi
-        Assert.assertNull(this.context.getConverter(MemoryUnit.class).toCimi(this.context, null));
+        Assert.assertNull(this.context.getConverter(MemoryUnit.class).toCimi(
+                this.context, null));
         // Full Service -> Cimi
         for (Memory.MemoryUnit service : Memory.MemoryUnit.values()) {
-            this.context.getConverter(MemoryUnit.class).toCimi(this.context, service);
+            this.context.getConverter(MemoryUnit.class).toCimi(this.context,
+                    service);
         }
     }
 
     @Test
     public void testStorageUnit() throws Exception {
         // Null Cimi -> Service
-        Assert.assertNull(this.context.getConverter(StorageUnit.class).toService(this.context, null));
+        Assert.assertNull(this.context.getConverter(StorageUnit.class)
+                .toService(this.context, null));
         // Empty Cimi -> Service
         try {
-            this.context.getConverter(StorageUnit.class).toService(this.context, new String());
+            this.context.getConverter(StorageUnit.class).toService(
+                    this.context, new String());
             // KO
             Assert.fail();
         } catch (InvalidConversionException e) {
         }
         // Full Cimi -> Service
         for (StorageUnit cimi : StorageUnit.values()) {
-            this.context.getConverter(StorageUnit.class).toService(this.context, cimi.getLabel().toString());
+            this.context.getConverter(StorageUnit.class).toService(
+                    this.context, cimi.getLabel().toString());
         }
 
         // Null Service -> Cimi
-        Assert.assertNull(this.context.getConverter(StorageUnit.class).toCimi(this.context, null));
+        Assert.assertNull(this.context.getConverter(StorageUnit.class).toCimi(
+                this.context, null));
         // Full Service -> Cimi
         for (org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit service : org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit
-            .values()) {
-            this.context.getConverter(StorageUnit.class).toCimi(this.context, service);
+                .values()) {
+            this.context.getConverter(StorageUnit.class).toCimi(this.context,
+                    service);
         }
     }
 
@@ -239,7 +253,8 @@ public class CommonsConverterTest {
         Assert.assertNull(service.getUnit());
 
         // Empty Service -> Cimi
-        cimi = (CimiMemory) this.context.convertToCimi(new Memory(), CimiMemory.class);
+        cimi = (CimiMemory) this.context.convertToCimi(new Memory(),
+                CimiMemory.class);
         Assert.assertNull(cimi.getQuantity());
         Assert.assertNull(cimi.getUnits());
 
@@ -257,7 +272,8 @@ public class CommonsConverterTest {
         service.setQuantity(4f);
         service.setUnit(Memory.MemoryUnit.MEGIBYTE);
 
-        cimi = (CimiMemory) this.context.convertToCimi(service, CimiMemory.class);
+        cimi = (CimiMemory) this.context.convertToCimi(service,
+                CimiMemory.class);
         Assert.assertEquals(4, cimi.getQuantity().longValue());
         Assert.assertEquals(MemoryUnit.MebiBYTE.getLabel(), cimi.getUnits());
     }
@@ -280,43 +296,55 @@ public class CommonsConverterTest {
         Assert.assertNull(((Disk) service).getUnits());
 
         // Empty Service (DiskTemplate) -> Cimi
-        cimi = (CimiCapacity) this.context.convertToCimi(new DiskTemplate(), CimiCapacity.class);
+        cimi = (CimiCapacity) this.context.convertToCimi(new DiskTemplate(),
+                CimiCapacity.class);
         Assert.assertNull(cimi.getQuantity());
         Assert.assertNull(cimi.getUnits());
 
         // Empty Service (Disk) -> Cimi
-        cimi = (CimiCapacity) this.context.convertToCimi(new Disk(), CimiCapacity.class);
+        cimi = (CimiCapacity) this.context.convertToCimi(new Disk(),
+                CimiCapacity.class);
         Assert.assertNull(cimi.getQuantity());
         Assert.assertNull(cimi.getUnits());
 
         // Full Cimi (CimiDiskConfiguration) -> Service
         CimiDiskConfiguration cimiDiskConf = new CimiDiskConfiguration();
-        cimiDiskConf.setCapacity(new CimiCapacity(5, StorageUnit.GIGABYTE.getLabel()));
+        cimiDiskConf.setCapacity(new CimiCapacity(5, StorageUnit.GIGABYTE
+                .getLabel()));
         service = this.context.convertToService(cimiDiskConf);
-        Assert.assertEquals(5, ((DiskTemplate) service).getQuantity().longValue());
-        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.GIGABYTE, ((DiskTemplate) service).getUnit());
+        Assert.assertEquals(5, ((DiskTemplate) service).getQuantity()
+                .longValue());
+        Assert.assertEquals(
+                org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.GIGABYTE,
+                ((DiskTemplate) service).getUnit());
 
         // Full Cimi (CimiCapacity) -> Service
         cimi = new CimiCapacity(7, StorageUnit.EXABYTE.getLabel());
         service = this.context.convertToService(cimi);
         Assert.assertEquals(7, ((Disk) service).getQuantity().longValue());
-        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.EXABYTE, ((Disk) service).getUnits());
+        Assert.assertEquals(
+                org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.EXABYTE,
+                ((Disk) service).getUnits());
 
         // Full Service (DiskTemplate) -> Cimi
         DiskTemplate serviceDiskTemplate = new DiskTemplate();
         serviceDiskTemplate.setQuantity(44f);
-        serviceDiskTemplate.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.KILOBYTE);
+        serviceDiskTemplate
+                .setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.KILOBYTE);
 
-        cimi = (CimiCapacity) this.context.convertToCimi(serviceDiskTemplate, CimiCapacity.class);
+        cimi = (CimiCapacity) this.context.convertToCimi(serviceDiskTemplate,
+                CimiCapacity.class);
         Assert.assertEquals(44, cimi.getQuantity().longValue());
         Assert.assertEquals(StorageUnit.KILOBYTE.getLabel(), cimi.getUnits());
 
         // Full Service (Disk) -> Cimi
         Disk serviceDisk = new Disk();
         serviceDisk.setQuantity(17f);
-        serviceDisk.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.TERABYTE);
+        serviceDisk
+                .setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.TERABYTE);
 
-        cimi = (CimiCapacity) this.context.convertToCimi(serviceDisk, CimiCapacity.class);
+        cimi = (CimiCapacity) this.context.convertToCimi(serviceDisk,
+                CimiCapacity.class);
         Assert.assertEquals(17, cimi.getQuantity().longValue());
         Assert.assertEquals(StorageUnit.TERABYTE.getLabel(), cimi.getUnits());
 
@@ -328,14 +356,16 @@ public class CommonsConverterTest {
         DiskTemplate service;
 
         // Empty Cimi -> Service
-        service = (DiskTemplate) this.context.convertToService(new CimiDiskConfiguration());
+        service = (DiskTemplate) this.context
+                .convertToService(new CimiDiskConfiguration());
         Assert.assertNull(service.getInitialLocation());
         Assert.assertNull(service.getFormat());
         Assert.assertNull(service.getQuantity());
         Assert.assertNull(service.getUnit());
 
         // Empty Service -> Cimi
-        cimi = (CimiDiskConfiguration) this.context.convertToCimi(new DiskTemplate(), CimiDiskConfiguration.class);
+        cimi = (CimiDiskConfiguration) this.context.convertToCimi(
+                new DiskTemplate(), CimiDiskConfiguration.class);
         Assert.assertNull(cimi.getInitialLocation());
         Assert.assertNull(cimi.getFormat());
         Assert.assertNotNull(cimi.getCapacity());
@@ -352,7 +382,9 @@ public class CommonsConverterTest {
         Assert.assertEquals("initialLocation", service.getInitialLocation());
         Assert.assertEquals("format", service.getFormat());
         Assert.assertEquals(5, service.getQuantity().longValue());
-        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.PETABYTE, service.getUnit());
+        Assert.assertEquals(
+                org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.PETABYTE,
+                service.getUnit());
 
         // Full Service -> Cimi
         service = new DiskTemplate();
@@ -361,11 +393,13 @@ public class CommonsConverterTest {
         service.setQuantity(7f);
         service.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.MEGABYTE);
 
-        cimi = (CimiDiskConfiguration) this.context.convertToCimi(service, CimiDiskConfiguration.class);
+        cimi = (CimiDiskConfiguration) this.context.convertToCimi(service,
+                CimiDiskConfiguration.class);
         Assert.assertEquals("initialLocation", cimi.getInitialLocation());
         Assert.assertEquals("format", cimi.getFormat());
         Assert.assertEquals(7, cimi.getCapacity().getQuantity().intValue());
-        Assert.assertEquals(StorageUnit.MEGABYTE.getLabel(), cimi.getCapacity().getUnits());
+        Assert.assertEquals(StorageUnit.MEGABYTE.getLabel(), cimi.getCapacity()
+                .getUnits());
     }
 
     @Test
@@ -406,7 +440,8 @@ public class CommonsConverterTest {
         Assert.assertEquals(3, service.getProperties().size());
         Assert.assertEquals("valueOne", service.getProperties().get("keyOne"));
         Assert.assertEquals("valueTwo", service.getProperties().get("keyTwo"));
-        Assert.assertEquals("valueThree", service.getProperties().get("keyThree"));
+        Assert.assertEquals("valueThree",
+                service.getProperties().get("keyThree"));
 
         cimi = new CimiCommon();
         converter.fill(service, cimi);
@@ -426,12 +461,14 @@ public class CommonsConverterTest {
         MachineImage service;
 
         // Empty
-        service = (MachineImage) this.context.convertToService(new CimiMachineImage());
+        service = (MachineImage) this.context
+                .convertToService(new CimiMachineImage());
         Assert.assertNull(service.getId());
         Assert.assertNull(service.getCreated());
         Assert.assertNull(service.getUpdated());
 
-        cimi = (CimiMachineImage) this.context.convertToCimi(new MachineImage(), CimiMachineImage.class);
+        cimi = (CimiMachineImage) this.context.convertToCimi(
+                new MachineImage(), CimiMachineImage.class);
         Assert.assertNull(cimi.getId());
         Assert.assertNull(cimi.getHref());
         Assert.assertNull(cimi.getCreated());
@@ -439,11 +476,14 @@ public class CommonsConverterTest {
 
         // Full
         cimi = new CimiMachineImage();
-        cimi.setId(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/13");
-        cimi.setHref(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/13");
+        cimi.setId(this.request.getBaseUri()
+                + ExchangeType.MachineImage.getPathname() + "/13");
+        cimi.setHref(this.request.getBaseUri()
+                + ExchangeType.MachineImage.getPathname() + "/13");
         cimi.setCreated(new Date());
         cimi.setUpdated(new Date());
-        cimi.setOperations(new CimiOperation[] {new CimiOperation("rel", "href")});
+        cimi.setOperations(new CimiOperation[] { new CimiOperation("rel",
+                "href") });
         service = new MachineImage();
 
         service = (MachineImage) this.context.convertToService(cimi);
@@ -459,8 +499,10 @@ public class CommonsConverterTest {
         Date updated = new Date();
         service.setUpdated(updated);
 
-        cimi = (CimiMachineImage) this.context.convertToCimi(service, CimiMachineImage.class);
-        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/29", cimi.getId());
+        cimi = (CimiMachineImage) this.context.convertToCimi(service,
+                CimiMachineImage.class);
+        Assert.assertEquals(this.request.getBaseUri()
+                + ExchangeType.MachineImage.getPathname() + "/29", cimi.getId());
         Assert.assertNull(cimi.getHref());
         Assert.assertEquals(created, cimi.getCreated());
         Assert.assertEquals(updated, cimi.getUpdated());
@@ -470,15 +512,19 @@ public class CommonsConverterTest {
         List<MachineImage> serviceCollection = new ArrayList<MachineImage>();
         serviceCollection.add(service);
 
-        cimiCollection = (CimiMachineImageCollection) this.context.convertToCimi(serviceCollection,
-            CimiMachineImageCollection.class);
-        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImageCollection.getPathname(),
-            cimiCollection.getId());
+        cimiCollection = (CimiMachineImageCollection) this.context
+                .convertToCimi(serviceCollection,
+                        CimiMachineImageCollection.class);
+        Assert.assertEquals(this.request.getBaseUri()
+                + ExchangeType.MachineImageCollection.getPathname(),
+                cimiCollection.getId());
         Assert.assertNull(cimiCollection.getHref());
 
         cimi = cimiCollection.getCollection().get(0);
         Assert.assertNull(cimi.getId());
-        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/29", cimi.getHref());
+        Assert.assertEquals(this.request.getBaseUri()
+                + ExchangeType.MachineImage.getPathname() + "/29",
+                cimi.getHref());
         Assert.assertNull(cimi.getCreated());
         Assert.assertNull(cimi.getUpdated());
     }
@@ -529,7 +575,7 @@ public class CommonsConverterTest {
                 this.request.setIdParent("999");
                 break;
             case DiskCollection:
-                service = new MachineDiskCollection();
+                service = new ArrayList<MachineDisk>();
                 cimiClass = CimiMachineDiskCollection.class;
                 break;
             case Job:
@@ -588,15 +634,21 @@ public class CommonsConverterTest {
                 break;
             }
             if (null != service) {
-                cimi = (CimiResource) this.context.convertToCimi(service, cimiClass);
+                cimi = (CimiResource) this.context.convertToCimi(service,
+                        cimiClass);
                 if (true == type.hasIdInReference()) {
                     if (true == type.hasParent()) {
-                        Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "999", "111"), cimi.getId());
+                        Assert.assertEquals("in " + type, type.makeHref(
+                                this.request.getBaseUri(), "999", "111"), cimi
+                                .getId());
                     } else {
-                        Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "11"), cimi.getId());
+                        Assert.assertEquals("in " + type,
+                                type.makeHref(this.request.getBaseUri(), "11"),
+                                cimi.getId());
                     }
                 }
-                Assert.assertEquals("in " + type, type.getResourceURI(), cimi.getResourceURI());
+                Assert.assertEquals("in " + type, type.getResourceURI(),
+                        cimi.getResourceURI());
             }
         }
     }
@@ -607,7 +659,7 @@ public class CommonsConverterTest {
 
         Machine sMachine = new Machine();
         sMachine.setId(9999);
-        sMachine.setDisks(new MachineDiskCollection());
+
         List<MachineDisk> sListDisks = new ArrayList<MachineDisk>();
         MachineDisk sDiskOne = new MachineDisk();
         sDiskOne.setId(111);
@@ -618,19 +670,25 @@ public class CommonsConverterTest {
         MachineDisk sDiskThree = new MachineDisk();
         sDiskThree.setId(333);
         sListDisks.add(sDiskThree);
-        sMachine.getDisks().setItems(sListDisks);
+        sMachine.setDisks(sListDisks);
 
-        cimi = (CimiMachine) this.context.convertToCimi(sMachine, CimiMachine.class);
+        cimi = (CimiMachine) this.context.convertToCimi(sMachine,
+                CimiMachine.class);
 
-        Assert.assertEquals("in " + cimi.getExchangeType(), ExchangeType.Machine.makeHref(this.request.getBaseUri(), "9999"),
-            cimi.getId());
+        Assert.assertEquals(
+                "in " + cimi.getExchangeType(),
+                ExchangeType.Machine.makeHref(this.request.getBaseUri(), "9999"),
+                cimi.getId());
 
-        Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "111"),
-            cimi.getDisks().getCollection().get(0).getId());
-        Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "222"),
-            cimi.getDisks().getCollection().get(1).getId());
-        Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "333"),
-            cimi.getDisks().getCollection().get(2).getId());
+        Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk
+                .makeHref(this.request.getBaseUri(), "9999", "111"), cimi
+                .getDisks().getCollection().get(0).getId());
+        Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk
+                .makeHref(this.request.getBaseUri(), "9999", "222"), cimi
+                .getDisks().getCollection().get(1).getId());
+        Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk
+                .makeHref(this.request.getBaseUri(), "9999", "333"), cimi
+                .getDisks().getCollection().get(2).getId());
 
     }
 }

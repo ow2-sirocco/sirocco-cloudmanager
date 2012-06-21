@@ -45,11 +45,11 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     private Credentials credentials;
 
-    @OneToOne
-    private MachineVolumeCollection volumes;
+    @OneToMany
+    private List<MachineVolume> volumes;
 
-    @OneToOne
-    private MachineVolumeTemplateCollection volumeTemplates;
+    @OneToMany
+    private List<MachineVolumeTemplate> volumeTemplates;
 
     @OneToMany
     @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
@@ -67,7 +67,8 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
         return this.machineConfiguration;
     }
 
-    public void setMachineConfiguration(final MachineConfiguration machineConfiguration) {
+    public void setMachineConfiguration(
+            final MachineConfiguration machineConfiguration) {
         this.machineConfiguration = machineConfiguration;
     }
 
@@ -89,21 +90,46 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
         this.credentials = credentials;
     }
 
-    @OneToOne
-    public MachineVolumeCollection getVolumes() {
+    @OneToMany
+    public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
 
-    public void setVolumes(final MachineVolumeCollection volumes) {
+    public void addMachineVolume(final MachineVolume mv) {
+        if (!getVolumes().contains(mv)) {
+            getVolumes().add(mv);
+        }
+    }
+
+    public void removeMachineVolume(final MachineVolume mv) {
+        if (getVolumes().contains(mv)) {
+            getVolumes().remove(mv);
+        }
+    }
+
+    public void setVolumes(final List<MachineVolume> volumes) {
         this.volumes = volumes;
     }
 
-    @OneToOne
-    public MachineVolumeTemplateCollection getVolumeTemplates() {
+    @OneToMany
+    public List<MachineVolumeTemplate> getVolumeTemplates() {
         return this.volumeTemplates;
     }
 
-    public void setVolumeTemplates(final MachineVolumeTemplateCollection volumeTemplates) {
+    public void addMachineVolumeTemplate(final MachineVolumeTemplate mvt) {
+        if (!getVolumeTemplates().contains(mvt)) {
+            getVolumeTemplates().add(mvt);
+        }
+    }
+
+    public void removeMachineVolumeTemplate(final MachineVolumeTemplate mvt) {
+        if (getVolumeTemplates().contains(mvt)) {
+            getVolumeTemplates().remove(mvt);
+        }
+    }
+
+    public void setVolumeTemplates(
+            final List<MachineVolumeTemplate> volumeTemplates) {
         this.volumeTemplates = volumeTemplates;
     }
 
@@ -119,7 +145,8 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
         }
     }
 
-    public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
+    public void setNetworkInterfaces(
+            final List<NetworkInterface> networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 

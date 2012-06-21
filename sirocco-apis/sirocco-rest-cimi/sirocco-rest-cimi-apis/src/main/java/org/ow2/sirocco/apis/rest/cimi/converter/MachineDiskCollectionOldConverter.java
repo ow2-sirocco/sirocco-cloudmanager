@@ -31,7 +31,6 @@ import java.util.List;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -44,7 +43,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineDiskCollection;
  * </ul>
  * </p>
  */
-public class MachineDiskCollectionOldConverter extends CollectionOldConverterAbstract {
+public class MachineDiskCollectionOldConverter extends
+        CollectionOldConverterAbstract {
 
     /**
      * {@inheritDoc}
@@ -67,15 +67,10 @@ public class MachineDiskCollectionOldConverter extends CollectionOldConverterAbs
      */
     @SuppressWarnings("unchecked")
     @Override
-    public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        MachineDiskCollection use;
-        if (dataService instanceof List<?>) {
-            use = new MachineDiskCollection();
-            use.setItems((List<MachineDisk>) dataService);
-        } else {
-            use = (MachineDiskCollection) dataService;
-        }
-        this.doCopyToCimi(context, use, (CimiMachineDiskCollection) dataCimi);
+    public void copyToCimi(final CimiContext context, final Object dataService,
+            final Object dataCimi) {
+        this.doCopyToCimi(context, (List<Object>) dataService,
+                (CimiMachineDiskCollection) dataCimi);
     }
 
     /**
@@ -86,7 +81,7 @@ public class MachineDiskCollectionOldConverter extends CollectionOldConverterAbs
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        MachineDiskCollection service = new MachineDiskCollection();
+        List<MachineDisk> service = new ArrayList<MachineDisk>();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -99,8 +94,10 @@ public class MachineDiskCollectionOldConverter extends CollectionOldConverterAbs
      *      java.lang.Object, java.lang.Object)
      */
     @Override
-    public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiMachineDiskCollection) dataCimi, (MachineDiskCollection) dataService);
+    public void copyToService(final CimiContext context, final Object dataCimi,
+            final Object dataService) {
+        this.doCopyToService(context, (CimiMachineDiskCollection) dataCimi,
+                (List<Object>) dataService);
     }
 
     /**
@@ -110,8 +107,10 @@ public class MachineDiskCollectionOldConverter extends CollectionOldConverterAbs
      */
     @Override
     protected Collection<?> getChildCollection(final Object resourceCollection) {
-        MachineDiskCollection collect = (MachineDiskCollection) resourceCollection;
-        return collect.getItems();
+        // MachineDiskCollection collect = (MachineDiskCollection)
+        // resourceCollection;
+        // return collect.getItems();
+        return (List<MachineDisk>) resourceCollection;
     }
 
     /**
@@ -121,8 +120,9 @@ public class MachineDiskCollectionOldConverter extends CollectionOldConverterAbs
      */
     @Override
     protected void setNewChildCollection(final Object resourceCollection) {
-        MachineDiskCollection collect = (MachineDiskCollection) resourceCollection;
-        collect.setItems(new ArrayList<MachineDisk>());
+        // MachineDiskCollection collect = (MachineDiskCollection)
+        // resourceCollection;
+        // collect.setItems(new ArrayList<MachineDisk>());
     }
 
     /**
@@ -132,8 +132,10 @@ public class MachineDiskCollectionOldConverter extends CollectionOldConverterAbs
      *      java.lang.Object)
      */
     @Override
-    protected void addItemChildCollection(final Object resourceCollection, final Object itemService) {
-        MachineDiskCollection collect = (MachineDiskCollection) resourceCollection;
-        collect.getItems().add((MachineDisk) itemService);
+    protected void addItemChildCollection(final Object resourceCollection,
+            final Object itemService) {
+        // MachineDiskCollection collect = (MachineDiskCollection)
+        // resourceCollection;
+        // collect.getItems().add((MachineDisk) itemService);
     }
 }

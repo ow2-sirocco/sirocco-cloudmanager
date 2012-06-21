@@ -48,7 +48,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
-@NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
+@NamedQueries({ @NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state") })
 public class Machine extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -65,18 +65,16 @@ public class Machine extends CloudResource implements Serializable {
     private Cpu cpu;
 
     private Memory memory;
-    
-    
-    @OneToOne
-    private MachineVolumeCollection volumes;
-
-    @OneToOne
-    private MachineDiskCollection disks;
 
     @OneToMany
-    @JoinColumn(name = "machine_id", referencedColumnName="id")
+    private List<MachineVolume> volumes;
+
+    @OneToMany
+    private List<MachineDisk> disks;
+
+    @OneToMany
+    @JoinColumn(name = "machine_id", referencedColumnName = "id")
     private List<NetworkInterface> networkInterfaces;
-    
 
     private CloudProviderAccount cloudProviderAccount;
 
@@ -85,6 +83,8 @@ public class Machine extends CloudResource implements Serializable {
 
     public Machine() {
         this.networkInterfaces = new ArrayList<NetworkInterface>();
+        this.disks = new ArrayList<MachineDisk>();
+        this.volumes = new ArrayList<MachineVolume>();
     }
 
     @Enumerated(EnumType.STRING)
@@ -114,37 +114,56 @@ public class Machine extends CloudResource implements Serializable {
         this.memory = memory;
     }
 
-    @OneToOne
-    public MachineDiskCollection getDisks() {
+    @OneToMany
+    public List<MachineDisk> getDisks() {
         return this.disks;
     }
 
-    public void setDisks(final MachineDiskCollection disks) {
+    public void setDisks(final List<MachineDisk> disks) {
         this.disks = disks;
     }
 
-    @OneToOne
-    public MachineVolumeCollection getVolumes() {
+    public void addMachineDisk(final MachineDisk disk) {
+        if (!getDisks().contains(disk)) {
+            getDisks().add(disk);
+        }
+    }
+
+    @OneToMany
+    public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
 
-    public void setVolumes(final MachineVolumeCollection volumes) {
+    public void addMachineVolume(final MachineVolume mv) {
+        if (!getVolumes().contains(mv)) {
+            getVolumes().add(mv);
+        }
+    }
+
+    public void removeMachineVolume(final MachineVolume mv) {
+        if (getVolumes().contains(mv)) {
+            getVolumes().remove(mv);
+        }
+    }
+
+    public void setVolumes(final List<MachineVolume> volumes) {
         this.volumes = volumes;
     }
 
     @OneToMany
-    @JoinColumn(name = "machine_id", referencedColumnName="id")
+    @JoinColumn(name = "machine_id", referencedColumnName = "id")
     public List<NetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
     public void addNetworkInterface(final NetworkInterface networkInterface) {
-    	if (!getNetworkInterfaces().contains(networkInterface)) {
-    		getNetworkInterfaces().add(networkInterface);
-    	}
+        if (!getNetworkInterfaces().contains(networkInterface)) {
+            getNetworkInterfaces().add(networkInterface);
+        }
     }
-    
-    public void setNetworkInterfaces(final List<NetworkInterface> networkInterfaces) {
+
+    public void setNetworkInterfaces(
+            final List<NetworkInterface> networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 
@@ -153,7 +172,8 @@ public class Machine extends CloudResource implements Serializable {
         return this.cloudProviderAccount;
     }
 
-    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
+    public void setCloudProviderAccount(
+            final CloudProviderAccount cloudProviderAccount) {
         this.cloudProviderAccount = cloudProviderAccount;
     }
 

@@ -78,20 +78,11 @@ public class DiskTemplate implements Serializable {
         this.initialLocation = initialLocation;
     }
 
-    // To remove
-    public String getAttachmentPoint() {
-        return this.getInitialLocation();
-    }
-
-    // To remove
-    public void setAttachmentPoint(final String attachmentPoint) {
-        this.setInitialLocation(attachmentPoint);
-    }
-
     @Override
     public String toString() {
-        return "DiskTemplate [unit=" + this.unit + ", quantity=" + this.quantity + ", format=" + this.format
-            + ", initialLocation=" + this.initialLocation + "]";
+        return "DiskTemplate [unit=" + this.unit + ", quantity="
+                + this.quantity + ", format=" + this.format
+                + ", initialLocation=" + this.initialLocation + "]";
     }
 
 }

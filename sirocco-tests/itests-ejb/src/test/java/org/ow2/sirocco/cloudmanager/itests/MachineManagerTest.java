@@ -68,8 +68,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeCollection;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplateCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
@@ -244,7 +244,7 @@ public class MachineManagerTest {
             dt.setUnit(StorageUnit.MEGABYTE);
             dt.setQuantity((float) 4.5);
             dt.setFormat("ext3");
-            dt.setAttachmentPoint("/dev/sd" + i);
+            dt.setInitialLocation("/dev/sd" + i);
             dTemplates.add(dt);
         }
         in_c.setCpu(cpu);
@@ -333,8 +333,8 @@ public class MachineManagerTest {
         machineTemplate.setMachineImage(this.createMachineImage());
 
         machineTemplate.setCredentials(this.createCredentials());
-        machineTemplate.setVolumes(new MachineVolumeCollection());
-        machineTemplate.setVolumeTemplates(new MachineVolumeTemplateCollection());
+        machineTemplate.setVolumes(new ArrayList<MachineVolume>());
+        machineTemplate.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
         machineTemplate.setNetworkInterfaces(new ArrayList<NetworkInterface>());
         machineCreate.setMachineTemplate(machineTemplate);
 
