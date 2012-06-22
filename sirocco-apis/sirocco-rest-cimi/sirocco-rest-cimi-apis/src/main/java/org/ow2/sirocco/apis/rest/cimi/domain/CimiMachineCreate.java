@@ -80,6 +80,6 @@ public class CimiMachineCreate extends CimiCommon implements CimiExchange {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        return ExchangeType.CredentialsCreate;
+        return ExchangeType.MachineCreate;
     }
 }
