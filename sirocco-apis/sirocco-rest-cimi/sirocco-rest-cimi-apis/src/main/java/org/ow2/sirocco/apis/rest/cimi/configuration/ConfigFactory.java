@@ -61,6 +61,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.VolumeCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConfigurationCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.VolumeCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeTemplateCollectionConverter;
@@ -98,6 +99,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
@@ -339,6 +341,10 @@ public class ConfigFactory {
             item = new ItemConfig(CimiVolumeConfigurationCollection.class, ExchangeType.VolumeConfigurationCollection);
             item.putData(ConfigFactory.CONVERTER, new VolumeConfigurationCollectionConverter());
             break;
+
+        case VolumeCreate:
+            item = new ItemConfig(CimiVolumeCreate.class, ExchangeType.VolumeCreate);
+            item.putData(ConfigFactory.CONVERTER, new VolumeCreateConverter());
 
         case VolumeImage:
             item = new ItemConfig(CimiVolumeImage.class, ExchangeType.VolumeImage);

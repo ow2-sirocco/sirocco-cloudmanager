@@ -214,6 +214,9 @@ public class WritingResourceValidatorTest {
         case VolumeConfigurationCollection:
             cimi = new CimiVolumeConfigurationCollection();
             break;
+        case VolumeCreate:
+            cimi = null;
+            break;
         case VolumeImage:
             cimi = new CimiVolumeImage();
             break;

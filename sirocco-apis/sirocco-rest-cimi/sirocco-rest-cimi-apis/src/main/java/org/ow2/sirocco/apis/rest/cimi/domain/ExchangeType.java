@@ -59,6 +59,8 @@ public enum ExchangeType {
     /** */
     Volume(PathType.Volume), VolumeCollection(PathType.Volume, false),
     /** */
+    VolumeCreate(PathType.Volume),
+    /** */
     VolumeVolumeImage(PathType.VolumeVolumeImage), VolumeVolumeImageCollection(PathType.VolumeVolumeImage, false),
     /** */
     VolumeConfiguration(PathType.VolumeConfiguration), VolumeConfigurationCollection(PathType.VolumeConfiguration, false),

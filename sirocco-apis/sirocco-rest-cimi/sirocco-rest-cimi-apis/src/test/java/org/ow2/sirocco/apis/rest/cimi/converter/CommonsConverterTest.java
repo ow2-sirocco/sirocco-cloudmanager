@@ -640,6 +640,9 @@ public class CommonsConverterTest {
                 service = new ArrayList<VolumeConfiguration>();
                 cimiClass = CimiVolumeConfigurationCollection.class;
                 break;
+            case VolumeCreate:
+                service = null;
+                break;
             case VolumeImage:
                 service = new VolumeImage();
                 ((Identifiable) service).setId(11);
