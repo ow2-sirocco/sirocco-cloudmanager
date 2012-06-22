@@ -37,6 +37,7 @@ import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
@@ -80,6 +81,7 @@ public class CimiManagersMachineCollectionTest {
         this.request.setBaseUri("/");
         RequestHeader header = new RequestHeader();
         header.setCimiSelect(new CimiSelect());
+        header.setCimiExpand(new CimiExpand());
         this.request.setHeader(header);
 
         this.response = new CimiResponse();

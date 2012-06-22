@@ -24,7 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.request;
 
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -32,21 +34,32 @@ import java.util.Set;
 /**
  * Utility class to manage CimiExpand expression.
  */
-public class CimiExpand {
+public class CimiExpand implements Serializable {
 
-    // /** Logger */
-    // private static final Logger LOGGER =
-    // LoggerFactory.getLogger(CimiExpand.class);
+    private static final long serialVersionUID = 1L;
+
+    public static String EXPAND_ALL = "*";
 
     private List<String> expands;
 
     private List<String> attributes;
+
+    private boolean containsExpandAll;
 
     /**
      * Default constructor.
      */
     public CimiExpand() {
         super();
+    }
+
+    /**
+     * Set constructor.
+     * 
+     * @param expand The expand expression
+     */
+    public CimiExpand(final String expand) {
+        this.setExpands(new ArrayList<String>(Arrays.asList(new String[] {expand})));
     }
 
     /**
@@ -71,6 +84,33 @@ public class CimiExpand {
             }
         }
         return empty;
+    }
+
+    /**
+     * Returns true if the CimiExpand contain '*'.
+     * 
+     * @return True if contain '*'
+     */
+    public boolean hasExpandAll() {
+        return this.containsExpandAll;
+    }
+
+    /**
+     * Returns true if the CimiExpand contain '*'.
+     * 
+     * @return True if contain '*'
+     */
+    protected boolean containsExpandAll() {
+        boolean all = false;
+        if (null != this.attributes) {
+            for (String item : this.attributes) {
+                if (true == CimiExpand.EXPAND_ALL.equals(item)) {
+                    all = true;
+                    break;
+                }
+            }
+        }
+        return all;
     }
 
     /**
@@ -122,6 +162,8 @@ public class CimiExpand {
                 }
             }
         }
+
+        this.containsExpandAll = this.containsExpandAll();
     }
 
     /**
@@ -129,7 +171,6 @@ public class CimiExpand {
      * 
      * @see java.lang.Object#toString()
      */
-
     @Override
     public String toString() {
         return "CimiExpand [expands=" + this.expands + ", attributes=" + this.attributes + "]";

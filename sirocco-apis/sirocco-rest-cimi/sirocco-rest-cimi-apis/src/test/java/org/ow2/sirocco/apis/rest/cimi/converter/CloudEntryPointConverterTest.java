@@ -34,8 +34,11 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -59,6 +62,11 @@ public class CloudEntryPointConverterTest {
 
         this.request = new CimiRequest();
         this.request.setBaseUri("http://www.test.org/");
+        RequestHeader header = new RequestHeader();
+        header.setCimiSelect(new CimiSelect());
+        header.setCimiExpand(new CimiExpand());
+        this.request.setHeader(header);
+
         this.context = new CimiContextImpl(this.request, new CimiResponse());
     }
 

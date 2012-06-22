@@ -103,7 +103,7 @@ public abstract class MockCimiManager implements CimiManager {
         case PUT:
             if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiCredentialsCollection(request.getHeader()
-                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getBooleanSiroccoInfoTestExpand());
+                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
                 cimi = CimiResourceBuilderHelper.buildCimiCredentials(Integer.valueOf(request.getId()));
             }
@@ -128,7 +128,7 @@ public abstract class MockCimiManager implements CimiManager {
         case PUT:
             if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiCredentialsTemplateCollection(request.getHeader()
-                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getBooleanSiroccoInfoTestExpand());
+                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
                 cimi = CimiResourceBuilderHelper.buildCimiCredentialsTemplate(Integer.valueOf(request.getId()));
             }
@@ -157,7 +157,7 @@ public abstract class MockCimiManager implements CimiManager {
         case PUT:
             if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineCollection(request.getHeader().getIntegerSiroccoInfoTestId(),
-                    true, request.getHeader().getBooleanSiroccoInfoTestExpand());
+                    true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
                 cimi = CimiResourceBuilderHelper.buildCimiMachine(Integer.valueOf(request.getId()));
             }
@@ -182,7 +182,7 @@ public abstract class MockCimiManager implements CimiManager {
         case PUT:
             if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineConfigurationCollection(request.getHeader()
-                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getBooleanSiroccoInfoTestExpand());
+                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineConfiguration(Integer.valueOf(request.getId()));
             }
@@ -207,7 +207,7 @@ public abstract class MockCimiManager implements CimiManager {
         case PUT:
             if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineImageCollection(request.getHeader()
-                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getBooleanSiroccoInfoTestExpand());
+                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineImage(Integer.valueOf(request.getId()));
             }
@@ -232,7 +232,7 @@ public abstract class MockCimiManager implements CimiManager {
         case PUT:
             if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineTemplateCollection(request.getHeader()
-                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getBooleanSiroccoInfoTestExpand());
+                    .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineTemplate(Integer.valueOf(request.getId()));
             }
@@ -257,7 +257,7 @@ public abstract class MockCimiManager implements CimiManager {
         case PUT:
             if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiJobCollection(request.getHeader().getIntegerSiroccoInfoTestId(),
-                    true, request.getHeader().getBooleanSiroccoInfoTestExpand());
+                    true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
                 cimi = CimiResourceBuilderHelper.buildCimiJob(Integer.valueOf(request.getId()));
             }

@@ -29,17 +29,17 @@ public abstract class Constants {
     /** Number Version CIMI. */
     public static final String VERSION_DMTF_CIMI = "1.0";
 
-    /** Parameter name in Query String : CimiSelect. */
-    public static final String PARAM_CIMI_SELECT = "CIMISelect";
+    /** Parameter name in Query String : select. */
+    public static final String PARAM_CIMI_SELECT = "select";
+
+    /** Parameter name in Query String : expand. */
+    public static final String PARAM_CIMI_EXPAND = "expand";
 
     /** Parameter name in Header : CIMI-Specification-Version. */
     public static final String HEADER_CIMI_VERSION = "CIMI-Specification-Version";
 
     /** Parameter name in Header : SIROCCO-INFO-TEST-ID. */
     public static final String HEADER_SIROCCO_INFO_TEST_ID = "SIROCCO-INFO-TEST-ID";
-
-    /** Parameter name in Header : SIROCCO-INFO-TEST-EXPAND. */
-    public static final String HEADER_SIROCCO_INFO_TEST_EXPAND = "SIROCCO-INFO-TEST-EXPAND";
 
     /** Parameter name in Header : CIMI-Job-URI. */
     public static final String HEADER_CIMI_JOB_URI = "CIMI-Job-URI";

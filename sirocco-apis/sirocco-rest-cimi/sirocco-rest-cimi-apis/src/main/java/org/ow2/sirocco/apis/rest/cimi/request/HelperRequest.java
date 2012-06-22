@@ -60,24 +60,24 @@ public class HelperRequest {
             requestHeader.setVersion(versions.get(0));
         }
 
-        requestHeader.setCimiSelect(new CimiSelect(HelperRequest.transformQueryParamToList(infos.getUriInfo()
-            .getQueryParameters())));
+        requestHeader.setCimiSelect(new CimiSelect(HelperRequest.transformQueryParamToList(Constants.PARAM_CIMI_SELECT, infos
+            .getUriInfo().getQueryParameters())));
+
+        requestHeader.setCimiExpand(new CimiExpand(HelperRequest.transformQueryParamToList(Constants.PARAM_CIMI_EXPAND, infos
+            .getUriInfo().getQueryParameters())));
 
         List<String> siroccoInfoTestsId = infos.getHeaders().getRequestHeader(Constants.HEADER_SIROCCO_INFO_TEST_ID);
         if ((null != siroccoInfoTestsId) && (siroccoInfoTestsId.size() > 0)) {
             requestHeader.setSiroccoInfoTestId(siroccoInfoTestsId.get(0));
         }
-        List<String> siroccoInfoTestExpand = infos.getHeaders().getRequestHeader(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND);
-        if ((null != siroccoInfoTestExpand) && (siroccoInfoTestExpand.size() > 0)) {
-            requestHeader.setSiroccoInfoTestExpand(siroccoInfoTestExpand.get(0));
-        }
 
         return requestHeader;
     }
 
-    private static List<String> transformQueryParamToList(final MultivaluedMap<String, String> queryParameters) {
+    private static List<String> transformQueryParamToList(final String paramName,
+        final MultivaluedMap<String, String> queryParameters) {
         List<String> listSelect = new ArrayList<String>();
-        listSelect = queryParameters.get(Constants.PARAM_CIMI_SELECT);
+        listSelect = queryParameters.get(paramName);
         return listSelect;
     }
 

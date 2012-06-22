@@ -30,12 +30,12 @@ public class RequestHeader {
 
     private CimiSelect cimiSelect;
 
+    private CimiExpand cimiExpand;
+
     @AssertVersion
     private String version;
 
     private String siroccoInfoTestId;
-
-    private String siroccoInfoTestExpand;
 
     /**
      * @return the cimiSelect
@@ -49,6 +49,20 @@ public class RequestHeader {
      */
     public void setCimiSelect(final CimiSelect cimiSelect) {
         this.cimiSelect = cimiSelect;
+    }
+
+    /**
+     * @return the cimiExpand
+     */
+    public CimiExpand getCimiExpand() {
+        return this.cimiExpand;
+    }
+
+    /**
+     * @param cimiExpand the cimiExpand to set
+     */
+    public void setCimiExpand(final CimiExpand cimiExpand) {
+        this.cimiExpand = cimiExpand;
     }
 
     public void setVersion(final String version) {
@@ -90,40 +104,5 @@ public class RequestHeader {
      */
     public void setSiroccoInfoTestId(final String siroccoInfoTest) {
         this.siroccoInfoTestId = siroccoInfoTest;
-    }
-
-    /**
-     * Expand used in test.
-     * 
-     * @return the siroccoInfoTestExpand
-     */
-    public String getSiroccoInfoTestExpand() {
-        return this.siroccoInfoTestExpand;
-    }
-
-    /**
-     * Expand used in test.
-     * 
-     * @param siroccoInfoTestExpand the siroccoInfoTestExpand to set
-     */
-    public void setSiroccoInfoTestExpand(final String siroccoInfoTestExpand) {
-        this.siroccoInfoTestExpand = siroccoInfoTestExpand;
-    }
-
-    /**
-     * Expand used in test.
-     * 
-     * @return the siroccoInfoTestExpand
-     */
-    public Boolean getBooleanSiroccoInfoTestExpand() {
-        Boolean ret = null;
-        if (null != this.siroccoInfoTestExpand) {
-            try {
-                ret = Boolean.valueOf(this.siroccoInfoTestExpand);
-            } catch (Exception e) {
-                // Nothing to do
-            }
-        }
-        return ret;
     }
 }

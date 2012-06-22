@@ -52,8 +52,11 @@ import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
 import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
@@ -82,6 +85,11 @@ public class MachinesConverterTest {
 
         this.request = new CimiRequest();
         this.request.setBaseUri("http://www.test.org/");
+        RequestHeader header = new RequestHeader();
+        header.setCimiSelect(new CimiSelect());
+        header.setCimiExpand(new CimiExpand());
+        this.request.setHeader(header);
+
         this.context = new CimiContextImpl(this.request, new CimiResponse());
     }
 
@@ -220,6 +228,56 @@ public class MachinesConverterTest {
             cimi.getArray()[1].getHref());
         Assert.assertNull(cimi.getArray()[1].getId());
         Assert.assertNull(cimi.getArray()[1].getName());
+    }
+
+    @Test
+    public void testCimiMachineConfigurationCollectionWithExpandAll() throws Exception {
+        CimiMachineConfigurationCollection cimi;
+        List<MachineConfiguration> service;
+
+        // Prepare Service
+        MachineConfiguration machineConfiguration1 = new MachineConfiguration();
+        machineConfiguration1.setId(1);
+        machineConfiguration1.setName("nameOne");
+        MachineConfiguration machineConfiguration2 = new MachineConfiguration();
+        machineConfiguration2.setId(2);
+        machineConfiguration2.setName("nameTwo");
+        MachineConfiguration machineConfiguration3 = new MachineConfiguration();
+        machineConfiguration3.setId(3);
+        machineConfiguration3.setName("nameThree");
+
+        service = new ArrayList<MachineConfiguration>();
+        service.add(machineConfiguration1);
+        service.add(machineConfiguration2);
+        service.add(machineConfiguration3);
+
+        // Prepare request
+        this.request.getHeader().setCimiExpand(new CimiExpand(CimiExpand.EXPAND_ALL));
+
+        // Convert
+        cimi = (CimiMachineConfigurationCollection) this.context.convertToCimi(service,
+            CimiMachineConfigurationCollection.class);
+
+        // Verify
+        Assert.assertEquals(3, cimi.getArray().length);
+
+        Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "1"),
+            cimi.getArray()[0].getHref());
+        Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "1"),
+            cimi.getArray()[0].getId());
+        Assert.assertEquals("nameOne", cimi.getArray()[0].getName());
+
+        Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "2"),
+            cimi.getArray()[1].getHref());
+        Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "2"),
+            cimi.getArray()[1].getId());
+        Assert.assertEquals("nameTwo", cimi.getArray()[1].getName());
+
+        Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "3"),
+            cimi.getArray()[2].getHref());
+        Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "3"),
+            cimi.getArray()[2].getId());
+        Assert.assertEquals("nameThree", cimi.getArray()[2].getName());
     }
 
     @Test

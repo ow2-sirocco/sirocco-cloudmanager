@@ -213,7 +213,7 @@ public class CimiContextImpl implements CimiContext {
             case MachineConfigurationCollection:
             case MachineImageCollection:
             case MachineTemplateCollection:
-                expand = false;
+                expand = this.getRequest().getHeader().getCimiExpand().hasExpandAll();
                 break;
             default:
                 break;

@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.request;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -39,7 +40,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Utility class to manage CimiSelect expression.
  */
-public class CimiSelect {
+public class CimiSelect implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     /** Logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(CimiSelect.class);
