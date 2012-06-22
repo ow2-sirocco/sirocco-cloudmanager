@@ -104,6 +104,55 @@
 	<bean id="CimiManagerUpdateMachineConfigurationCollection"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
+	<!-- Volume -->
+	<bean id="CimiManagerCreateVolume"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
+	<bean id="CimiManagerDeleteVolume"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
+	<bean id="CimiManagerReadVolume"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerUpdateVolume"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
+	<bean id="CimiManagerReadVolumeCollection"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+
+	<!-- Volume Template -->
+	<bean id="CimiManagerCreateVolumeTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
+	<bean id="CimiManagerDeleteVolumeTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
+	<bean id="CimiManagerReadVolumeTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerUpdateVolumeTemplate"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
+	<bean id="CimiManagerReadVolumeTemplateCollection"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+
+	<!-- VolumeImage -->
+	<bean id="CimiManagerCreateVolumeImage"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
+	<bean id="CimiManagerDeleteVolumeImage"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
+	<bean id="CimiManagerReadVolumeImage"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerReadVolumeImageCollection"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerUpdateVolumeImage"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
+
+	<!-- VolumeConfiguration -->
+	<bean id="CimiManagerCreateVolumeConfiguration"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
+	<bean id="CimiManagerDeleteVolumeConfiguration"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
+	<bean id="CimiManagerReadVolumeConfiguration"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerReadVolumeConfigurationCollection"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
+	<bean id="CimiManagerUpdateVolumeConfiguration"
+		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
+	
+
 	<!-- Services -->
 	<bean id="IJobManager" class="org.easymock.EasyMock"
 		factory-method="createMock">
@@ -125,7 +174,11 @@
 		<constructor-arg index="0"
 			value="org.ow2.sirocco.cloudmanager.core.api.IMachineManager" />
 	</bean>
-
+	<bean id="IVolumeManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.IVolumeManager" />
+	</bean>
 
 	<context:annotation-config />
 	<context:component-scan base-package="org.ow2.sirocco.apis.rest.cimi" />

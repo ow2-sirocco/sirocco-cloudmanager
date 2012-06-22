@@ -28,6 +28,11 @@
 		<constructor-arg index="0"
 			value="org.ow2.sirocco.cloudmanager.core.api.IMachineManager" />
 	</bean>
+	<bean id="IVolumeManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.IVolumeManager" />
+	</bean>
 
 
 	<context:annotation-config />

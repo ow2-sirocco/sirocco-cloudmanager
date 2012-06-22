@@ -43,6 +43,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
@@ -187,6 +191,54 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             }
             // TODO Volumes, Network, ...
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiVolumeCreate cimi) throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiVolumeConfiguration cimi) throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiVolumeImage cimi) throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiVolumeTemplate cimi) throws Exception {
+        // TODO Auto-generated method stub
+
     }
 
     /**
@@ -416,4 +468,5 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             }
         }
     }
+
 }

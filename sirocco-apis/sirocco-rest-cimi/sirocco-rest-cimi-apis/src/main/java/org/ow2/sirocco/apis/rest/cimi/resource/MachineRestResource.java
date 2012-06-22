@@ -38,6 +38,8 @@ import javax.ws.rs.core.Response;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.HelperContext;
@@ -87,6 +89,10 @@ public class MachineRestResource extends RestResourceAbstract {
     @Autowired
     @Qualifier("CimiManagerActionMachine")
     private CimiManager cimiManagerActionMachine;
+
+    @Autowired
+    @Qualifier("CimiManagerOperationNotImplemented")
+    private CimiManager cimiOperationNotImplemented;
 
     /**
      * Get a machine.
@@ -173,8 +179,9 @@ public class MachineRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Get a collection of disks of a machine.
+     * Read a collection of disks of a machine.
      * 
+     * @param idParent ID machine
      * @return The REST response
      */
     @GET
@@ -182,49 +189,149 @@ public class MachineRestResource extends RestResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readDisks(@PathParam("idParent") final String idParent) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), (String) null, idParent);
-        // FIXME this.cimiManagerReadMachineCollection.execute(context);
+        this.cimiOperationNotImplemented.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
     /**
-     * Get a disk of a machine.
+     * Read a disk of a machine.
      * 
+     * @param idParent ID machine
+     * @param id ID disk to read
      * @return The REST response
      */
     @GET
     @Path("/{idParent}" + ConstantsPath.DISK_PATH + "/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readDisk(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), (String) null, idParent);
-        // FIXME this.cimiManagerReadMachineCollection.execute(context);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent);
+        this.cimiOperationNotImplemented.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
     /**
-     * Get a collection of volumes of a machine.
+     * Update a disk of a machine.
      * 
+     * @param idParent ID machine
+     * @param id ID disk to update
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.DISK_PATH + "/{id}")
+    public Response updateDisk(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
+        final CimiMachineDisk cimiData) {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent, cimiData);
+        this.cimiOperationNotImplemented.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Create a disk of a machine.
+     * 
+     * @param idParent ID machine
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.DISK_PATH)
+    public Response createDisk(@PathParam("idParent") final String idParent, final CimiMachineDisk cimiData) {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), null, idParent, cimiData);
+        this.cimiOperationNotImplemented.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Delete a disk of a machine.
+     * 
+     * @param idParent ID machine
+     * @param id ID disk to delete
+     * @return The REST response
+     */
+    @DELETE
+    @Path("/{idParent}" + ConstantsPath.DISK_PATH + "/{id}")
+    public Response deleteDisk(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent);
+        this.cimiOperationNotImplemented.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a collection of volumes of a machine.
+     * 
+     * @param idParent ID machine
      * @return The REST response
      */
     @GET
-    @Path("/{idParent}" + ConstantsPath.VOLUME_PATH)
+    @Path("{idParent}" + ConstantsPath.VOLUME_PATH)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readVolumes(@PathParam("idParent") final String idParent) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), (String) null, idParent);
-        // TODO this.cimiManagerReadMachineCollection.execute(context);
+        this.cimiOperationNotImplemented.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
     /**
-     * Get a volume of a machine.
+     * Read a volume of a machine.
      * 
+     * @param idParent ID machine
+     * @param id ID volume to read
      * @return The REST response
      */
     @GET
     @Path("/{idParent}" + ConstantsPath.VOLUME_PATH + "/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readVolume(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), (String) null, idParent);
-        // FIXME this.cimiManagerReadMachineCollection.execute(context);
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent);
+        this.cimiOperationNotImplemented.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
+
+    /**
+     * Update a volume of a machine.
+     * 
+     * @param idParent ID machine
+     * @param id ID volume to update
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.VOLUME_PATH + "/{id}")
+    public Response updateVolume(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
+        final CimiMachineVolume cimiData) {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent, cimiData);
+        this.cimiOperationNotImplemented.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Create a volume of a machine.
+     * 
+     * @param idParent ID machine
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.VOLUME_PATH)
+    public Response createVolume(@PathParam("idParent") final String idParent, final CimiMachineVolume cimiData) {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), null, idParent, cimiData);
+        this.cimiOperationNotImplemented.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Delete a volume of a machine.
+     * 
+     * @param idParent ID machine
+     * @param id ID volume to delete
+     * @return The REST response
+     */
+    @DELETE
+    @Path("/{idParent}" + ConstantsPath.VOLUME_PATH + "/{id}")
+    public Response deleteVolume(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent);
+        this.cimiOperationNotImplemented.execute(context);
+        return HelperResponse.buildResponse(context.getResponse());
+    }
+
 }
