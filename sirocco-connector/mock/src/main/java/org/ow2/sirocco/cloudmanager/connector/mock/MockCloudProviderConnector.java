@@ -81,6 +81,7 @@ import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 
 public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, IVolumeService,
@@ -415,7 +416,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             throw new ConnectorException("Machine " + machineId + " doesn't exist");
         }
         machine.setState(Machine.State.DELETING);
-        
+
         final Callable<Void> deleteTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
@@ -467,9 +468,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         system.setState(System.State.CREATING);
         MockCloudProviderConnector.logger.info("Creating system with providerAssignedId " + systemProviderAssignedId);
 
-        // pseudo-persisting
-        this.systems.put(systemProviderAssignedId, system);
-
         // attributes
         system.setCloudProviderAccount(this.cloudProviderAccount);
         system.setLocation(this.cloudProviderLocation);
@@ -502,6 +500,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     mc.setDescription(cd.getComponentDescription());
                     mc.setProperties(cd.getProperties());
                     Job j = this.createMachine(mc);
+                    while (j.getStatus().equals(Job.Status.RUNNING)) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                        }
+                    }
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         system.getMachines().add((Machine) j.getTargetEntity());
                     }
@@ -527,6 +531,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     vc.setProperties(cd.getProperties());
 
                     Job j = this.createVolume(vc);
+                    while (j.getStatus().equals(Job.Status.RUNNING)) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                        }
+                    }
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         system.getVolumes().add((Volume) j.getTargetEntity());
                     }
@@ -552,6 +562,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     sc.setProperties(cd.getProperties());
 
                     Job j = this.createSystem(sc);
+                    while (j.getStatus().equals(Job.Status.RUNNING)) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                        }
+                    }
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         system.getSystems().add((System) j.getTargetEntity());
                     }
@@ -577,6 +593,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     nc.setProperties(cd.getProperties());
 
                     Job j = this.createNetwork(nc);
+                    while (j.getStatus().equals(Job.Status.RUNNING)) {
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                        }
+                    }
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         system.getNetworks().add((Network) j.getTargetEntity());
                     }
@@ -590,17 +612,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             }
         }
 
-        system.setState(System.State.CREATED);
-
-        if (failed) {
+        if (failed||cancelled) {
             // one or more jobs are failed, so all is failed
             system.setState(System.State.ERROR);
         }
-        if (cancelled) {
-            system.setState(System.State.ERROR);
-        }
 
-        return simulateProviderTask(system, "add");
+        return simulateProviderTask(system, SystemAction.CREATE,failed|cancelled);
     }
 
     // private utility methods for System services (start,stop,etc)
@@ -609,6 +626,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         boolean failedCancelled = false;
         for (CloudResource m : l) {
             Job j = callSystemService(m, action, m.getProviderAssignedId().toString());
+            while (j.getStatus().equals(Job.Status.RUNNING)) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+            }
             if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
                 failedCancelled = true;
             }
@@ -651,32 +674,63 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 return this.startNetwork(providerId);
             case STOP:
                 return this.stopNetwork(providerId);
-            //case SUSPEND:
-            //    return this.suspendNetwork(providerId);
-            //case PAUSE:
-            //    return this.pauseNetwork(providerId);
-            //case RESTART:
-            //    return this.restartNetwork(providerId);
+                // case SUSPEND:
+                // return this.suspendNetwork(providerId);
+                // case PAUSE:
+                // return this.pauseNetwork(providerId);
+                // case RESTART:
+                // return this.restartNetwork(providerId);
             }
         }
         throw new ConnectorException("Illegal Operation");
     }
 
-    private Job simulateProviderTask(final CloudResource ce, final String action) {
+    private Job simulateProviderTask(final System ce, final SystemAction action, final boolean failedOrCancelled) {
         // simulating task
         final Callable<CloudResource> createTask = new Callable<CloudResource>() {
             @Override
             public CloudResource call() throws Exception {
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                switch (action) {
+                case START:
+                    ce.setState(System.State.STARTED);
+                    break;
+                case PAUSE:
+                    ce.setState(System.State.PAUSED);
+                    break;
+                case STOP:
+                    ce.setState(System.State.STOPPED);
+                    break;
+                case RESTART:
+                    ce.setState(System.State.STARTED);
+                    break;
+                case SUSPEND:
+                    ce.setState(System.State.SUSPENDED);
+                    break;
+                case CREATE:
+                    ce.setState(System.State.STOPPED);
+                    MockCloudProviderConnector.this.systems.put(ce.getProviderAssignedId(), ce);
+                    break;
+                case DELETE:
+                    ce.setState(System.State.DELETED);
+                    MockCloudProviderConnector.this.systems.remove(ce.getProviderAssignedId());
+                    break;
+                default:
+                    throw new Exception("action not implemented");
+                }
+                if (failedOrCancelled) {
+                    ce.setState(System.State.ERROR);
+                }
                 return ce;
+
             }
         };
         ListenableFuture<CloudResource> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(ce, null, action, result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(ce, null, action.name(), result);
     }
 
     private static enum SystemAction {
-        START, STOP, PAUSE, SUSPEND, RESTART
+        START, STOP, PAUSE, SUSPEND, RESTART, CREATE, DELETE
     }
 
     private static final List<System.State> forbiddenSystemStartActions = ImmutableList.of(System.State.CREATING,
@@ -696,9 +750,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static final List<System.State> forbiddenSystemRestartActions = ImmutableList.of();
 
-    
     private Job doSystemService(final String systemId, final System.State temporaryState, final SystemAction action,
-        final String jobAction, final List<System.State> forbiddenStates) throws ConnectorException {
+        final List<System.State> forbiddenStates) throws ConnectorException {
         MockCloudProviderConnector.logger.info(action + " system with providerAssignedId " + systemId);
         final System system = this.systems.get(systemId);
         if (system == null) {
@@ -720,32 +773,95 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             // one or more jobs are failed or cancelled, so all is in error
             system.setState(System.State.ERROR);
         }
-        return simulateProviderTask(system, jobAction);
+        return simulateProviderTask(system, action,failedCancelled);
     }
 
     @Override
     public Job startSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.STARTING, SystemAction.START, "start", forbiddenSystemStartActions);
+        return doSystemService(systemId, System.State.STARTING, SystemAction.START, forbiddenSystemStartActions);
     }
 
     @Override
     public Job stopSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.STOPPING, SystemAction.STOP, "stop", forbiddenSystemStopActions);
+        return doSystemService(systemId, System.State.STOPPING, SystemAction.STOP, forbiddenSystemStopActions);
     }
 
     @Override
     public Job restartSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.STARTING, SystemAction.RESTART, "restart", forbiddenSystemRestartActions);
+        return doSystemService(systemId, System.State.STARTING, SystemAction.RESTART, forbiddenSystemRestartActions);
     }
 
     @Override
     public Job pauseSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.PAUSING, SystemAction.PAUSE, "pause", forbiddenSystemPauseActions);
+        return doSystemService(systemId, System.State.PAUSING, SystemAction.PAUSE, forbiddenSystemPauseActions);
     }
 
     @Override
     public Job suspendSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.SUSPENDING, SystemAction.SUSPEND, "suspend", forbiddenSystemSuspendActions);
+        return doSystemService(systemId, System.State.SUSPENDING, SystemAction.SUSPEND, forbiddenSystemSuspendActions);
+    }
+
+    @Override
+    public Job deleteSystem(String systemId) throws ConnectorException {
+        MockCloudProviderConnector.logger.info("deleting system with providerAssignedId " + systemId);
+        final System system = this.systems.get(systemId);
+        if (system == null) {
+            throw new ConnectorException("System " + systemId + " doesn't exist");
+        }
+
+        boolean failedCancelled = false;
+
+        for (Machine m : system.getMachines()) {
+            Job j = this.deleteMachine(m.getId().toString());
+            while (j.getStatus().equals(Job.Status.RUNNING)) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+            }
+            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
+                failedCancelled = true;
+            }
+        }
+        for (System m : system.getSystems()) {
+            Job j = this.deleteSystem(m.getId().toString());
+            while (j.getStatus().equals(Job.Status.RUNNING)) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+            }
+            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
+                failedCancelled = true;
+            }
+        }
+        for (Volume m : system.getVolumes()) {
+            Job j = this.deleteVolume(m.getId().toString());
+            while (j.getStatus().equals(Job.Status.RUNNING)) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+            }
+            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
+                failedCancelled = true;
+            }
+        }
+        for (Network m : system.getNetworks()) {
+            Job j = this.deleteNetwork(m.getId().toString());
+            while (j.getStatus().equals(Job.Status.RUNNING)) {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                }
+            }
+            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
+                failedCancelled = true;
+            }
+        }
+        system.setState(System.State.DELETING);
+
+        return simulateProviderTask(system, SystemAction.DELETE,failedCancelled);
     }
 
     @Override
