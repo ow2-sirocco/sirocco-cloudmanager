@@ -26,8 +26,11 @@
 package org.ow2.sirocco.cloudmanager.connector.mock;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
@@ -39,6 +42,8 @@ import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
@@ -46,14 +51,22 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor.ComponentType;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
+import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface.InterfaceState;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
@@ -67,6 +80,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
 
 public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, IVolumeService,
@@ -89,6 +103,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     private Map<String, VolumeImage> volumeImages = new ConcurrentHashMap<String, VolumeImage>();
 
     private Map<String, Machine> machines = new ConcurrentHashMap<String, Machine>();
+
+    private Map<String, System> systems = new ConcurrentHashMap<String, System>();
 
     private Map<String, Network> networks = new ConcurrentHashMap<String, Network>();
 
@@ -399,6 +415,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             throw new ConnectorException("Machine " + machineId + " doesn't exist");
         }
         machine.setState(Machine.State.DELETING);
+        
         final Callable<Void> deleteTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
@@ -440,33 +457,295 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
-    public Job createSystem(final SystemCreate systemCreate) {
-        throw new UnsupportedOperationException();
+    public Job createSystem(final SystemCreate systemCreate) throws ConnectorException {
+
+        // assign a random provider id
+        final String systemProviderAssignedId = UUID.randomUUID().toString();
+        final System system = new System();
+        system.setProviderAssignedId(systemProviderAssignedId);
+
+        system.setState(System.State.CREATING);
+        MockCloudProviderConnector.logger.info("Creating system with providerAssignedId " + systemProviderAssignedId);
+
+        // pseudo-persisting
+        this.systems.put(systemProviderAssignedId, system);
+
+        // attributes
+        system.setCloudProviderAccount(this.cloudProviderAccount);
+        system.setLocation(this.cloudProviderLocation);
+        system.setDescription(systemCreate.getSystemTemplate().getDescription());
+        system.setName(systemCreate.getSystemTemplate().getName());
+        // systemCreate.getSystemTemplate().getComponentDescriptors().
+
+        Set<ComponentDescriptor> componentDescriptors = systemCreate.getSystemTemplate().getComponentDescriptors();
+
+        // iterating through descriptors
+        // fusion of manager algorithm create+handleJob :)
+
+        boolean failed = false;
+        boolean cancelled = false;
+
+        Iterator<ComponentDescriptor> iter = componentDescriptors.iterator();
+        while (iter.hasNext()) {
+            ComponentDescriptor cd = iter.next();
+
+            if (cd.getComponentType() == ComponentType.MACHINE) {
+                // creating new machines
+                for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                    MachineCreate mc = new MachineCreate();
+                    if (cd.getComponentQuantity() > 1) {
+                        mc.setName(cd.getComponentName() + new Integer(i).toString());
+                    }
+
+                    MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
+                    mc.setMachineTemplate(mt);
+                    mc.setDescription(cd.getComponentDescription());
+                    mc.setProperties(cd.getProperties());
+                    Job j = this.createMachine(mc);
+                    if (j.getStatus().equals(Status.SUCCESS)) {
+                        system.getMachines().add((Machine) j.getTargetEntity());
+                    }
+                    if (j.getStatus().equals(Status.FAILED)) {
+                        failed = true;
+                    }
+                    if (j.getStatus().equals(Status.CANCELLED)) {
+                        cancelled = true;
+                    }
+                }
+            }
+
+            if (cd.getComponentType() == ComponentType.VOLUME) {
+                // creating new volumes
+                for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                    VolumeCreate vc = new VolumeCreate();
+                    if (cd.getComponentQuantity() > 1) {
+                        vc.setName(cd.getComponentName() + new Integer(i).toString());
+                    }
+                    VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
+                    vc.setVolumeTemplate(vt);
+                    vc.setDescription(cd.getComponentDescription());
+                    vc.setProperties(cd.getProperties());
+
+                    Job j = this.createVolume(vc);
+                    if (j.getStatus().equals(Status.SUCCESS)) {
+                        system.getVolumes().add((Volume) j.getTargetEntity());
+                    }
+                    if (j.getStatus().equals(Status.FAILED)) {
+                        failed = true;
+                    }
+                    if (j.getStatus().equals(Status.CANCELLED)) {
+                        cancelled = true;
+                    }
+                }
+            }
+
+            if (cd.getComponentType() == ComponentType.SYSTEM) {
+                // creating new systems
+                for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                    SystemCreate sc = new SystemCreate();
+                    if (cd.getComponentQuantity() > 1) {
+                        sc.setName(cd.getComponentName() + new Integer(i).toString());
+                    }
+                    SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
+                    sc.setSystemTemplate(st);
+                    sc.setDescription(cd.getComponentDescription());
+                    sc.setProperties(cd.getProperties());
+
+                    Job j = this.createSystem(sc);
+                    if (j.getStatus().equals(Status.SUCCESS)) {
+                        system.getSystems().add((System) j.getTargetEntity());
+                    }
+                    if (j.getStatus().equals(Status.FAILED)) {
+                        failed = true;
+                    }
+                    if (j.getStatus().equals(Status.CANCELLED)) {
+                        cancelled = true;
+                    }
+                }
+            }
+
+            if (cd.getComponentType() == ComponentType.NETWORK) {
+                // creating new networks
+                for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                    NetworkCreate nc = new NetworkCreate();
+                    if (cd.getComponentQuantity() > 1) {
+                        nc.setName(cd.getComponentName() + new Integer(i).toString());
+                    }
+                    NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
+                    nc.setNetworkTemplate(nt);
+                    nc.setDescription(cd.getComponentDescription());
+                    nc.setProperties(cd.getProperties());
+
+                    Job j = this.createNetwork(nc);
+                    if (j.getStatus().equals(Status.SUCCESS)) {
+                        system.getNetworks().add((Network) j.getTargetEntity());
+                    }
+                    if (j.getStatus().equals(Status.FAILED)) {
+                        failed = true;
+                    }
+                    if (j.getStatus().equals(Status.CANCELLED)) {
+                        cancelled = true;
+                    }
+                }
+            }
+        }
+
+        system.setState(System.State.CREATED);
+
+        if (failed) {
+            // one or more jobs are failed, so all is failed
+            system.setState(System.State.ERROR);
+        }
+        if (cancelled) {
+            system.setState(System.State.ERROR);
+        }
+
+        return simulateProviderTask(system, "add");
+    }
+
+    // private utility methods for System services (start,stop,etc)
+
+    private boolean serviceSystem(List<? extends CloudResource> l, SystemAction action) throws ConnectorException {
+        boolean failedCancelled = false;
+        for (CloudResource m : l) {
+            Job j = callSystemService(m, action, m.getProviderAssignedId().toString());
+            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
+                failedCancelled = true;
+            }
+        }
+        return failedCancelled;
+    }
+
+    private Job callSystemService(CloudResource ce, SystemAction action, String providerId) throws ConnectorException {
+        if (ce.getClass().equals(Machine.class)) {
+            switch (action) {
+            case START:
+                return this.startMachine(providerId);
+            case STOP:
+                return this.stopMachine(providerId);
+            case SUSPEND:
+                return this.suspendMachine(providerId);
+            case PAUSE:
+                return this.pauseMachine(providerId);
+            case RESTART:
+                return this.restartMachine(providerId);
+            }
+        }
+        if (ce.getClass().equals(System.class)) {
+            switch (action) {
+            case START:
+                return this.startSystem(providerId);
+            case STOP:
+                return this.stopSystem(providerId);
+            case SUSPEND:
+                return this.suspendSystem(providerId);
+            case PAUSE:
+                return this.pauseSystem(providerId);
+            case RESTART:
+                return this.restartSystem(providerId);
+            }
+        }
+        if (ce.getClass().equals(Network.class)) {
+            switch (action) {
+            case START:
+                return this.startNetwork(providerId);
+            case STOP:
+                return this.stopNetwork(providerId);
+            //case SUSPEND:
+            //    return this.suspendNetwork(providerId);
+            //case PAUSE:
+            //    return this.pauseNetwork(providerId);
+            //case RESTART:
+            //    return this.restartNetwork(providerId);
+            }
+        }
+        throw new ConnectorException("Illegal Operation");
+    }
+
+    private Job simulateProviderTask(final CloudResource ce, final String action) {
+        // simulating task
+        final Callable<CloudResource> createTask = new Callable<CloudResource>() {
+            @Override
+            public CloudResource call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                return ce;
+            }
+        };
+        ListenableFuture<CloudResource> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(ce, null, action, result);
+    }
+
+    private static enum SystemAction {
+        START, STOP, PAUSE, SUSPEND, RESTART
+    }
+
+    private static final List<System.State> forbiddenSystemStartActions = ImmutableList.of(System.State.CREATING,
+        System.State.STARTED, System.State.DELETING);
+
+    private static final List<System.State> forbiddenSystemStopActions = ImmutableList.of(System.State.CREATING,
+        System.State.STOPPED, System.State.PAUSING, System.State.PAUSED, System.State.SUSPENDING, System.State.SUSPENDED,
+        System.State.DELETING);
+
+    private static final List<System.State> forbiddenSystemPauseActions = ImmutableList.of(System.State.CREATING,
+        System.State.STARTING, System.State.STOPPING, System.State.STOPPED, System.State.PAUSING, System.State.PAUSED,
+        System.State.SUSPENDING, System.State.SUSPENDED, System.State.DELETING);
+
+    private static final List<System.State> forbiddenSystemSuspendActions = ImmutableList.of(System.State.CREATING,
+        System.State.STARTING, System.State.STOPPING, System.State.STOPPED, System.State.PAUSING, System.State.PAUSED,
+        System.State.SUSPENDING, System.State.SUSPENDED, System.State.DELETING);
+
+    private static final List<System.State> forbiddenSystemRestartActions = ImmutableList.of();
+
+    
+    private Job doSystemService(final String systemId, final System.State temporaryState, final SystemAction action,
+        final String jobAction, final List<System.State> forbiddenStates) throws ConnectorException {
+        MockCloudProviderConnector.logger.info(action + " system with providerAssignedId " + systemId);
+        final System system = this.systems.get(systemId);
+        if (system == null) {
+            throw new ConnectorException("System " + systemId + " doesn't exist");
+        }
+        if (forbiddenStates.contains(system.getState())) {
+            throw new ConnectorException("Illegal operation");
+        }
+
+        system.setState(temporaryState);
+
+        boolean failedCancelled = false;
+
+        failedCancelled |= serviceSystem(system.getMachines(), action);
+        failedCancelled |= serviceSystem(system.getSystems(), action);
+        failedCancelled |= serviceSystem(system.getNetworks(), action);
+
+        if (failedCancelled) {
+            // one or more jobs are failed or cancelled, so all is in error
+            system.setState(System.State.ERROR);
+        }
+        return simulateProviderTask(system, jobAction);
     }
 
     @Override
     public Job startSystem(final String systemId) throws ConnectorException {
-        throw new UnsupportedOperationException();
+        return doSystemService(systemId, System.State.STARTING, SystemAction.START, "start", forbiddenSystemStartActions);
     }
 
     @Override
     public Job stopSystem(final String systemId) throws ConnectorException {
-        throw new UnsupportedOperationException();
+        return doSystemService(systemId, System.State.STOPPING, SystemAction.STOP, "stop", forbiddenSystemStopActions);
     }
 
     @Override
     public Job restartSystem(final String systemId) throws ConnectorException {
-        throw new UnsupportedOperationException();
+        return doSystemService(systemId, System.State.STARTING, SystemAction.RESTART, "restart", forbiddenSystemRestartActions);
     }
 
     @Override
     public Job pauseSystem(final String systemId) throws ConnectorException {
-        throw new UnsupportedOperationException();
+        return doSystemService(systemId, System.State.PAUSING, SystemAction.PAUSE, "pause", forbiddenSystemPauseActions);
     }
 
     @Override
     public Job suspendSystem(final String systemId) throws ConnectorException {
-        throw new UnsupportedOperationException();
+        return doSystemService(systemId, System.State.SUSPENDING, SystemAction.SUSPEND, "suspend", forbiddenSystemSuspendActions);
     }
 
     @Override
