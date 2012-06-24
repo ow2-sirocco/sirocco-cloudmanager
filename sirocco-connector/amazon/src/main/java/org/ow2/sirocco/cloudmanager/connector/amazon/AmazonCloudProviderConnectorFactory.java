@@ -53,8 +53,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume.State;
@@ -342,7 +342,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
             machine.setProviderAssignedId(runningInstance.getId());
             machine.setState(this.fromInstanceStateToMachineState(runningInstance.getInstanceState()));
 
-            List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
+            List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
             machine.setNetworkInterfaces(nics);
 
             if (runningInstance.getPrivateIpAddress() != null) {
@@ -357,7 +357,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
 
                 List<org.ow2.sirocco.cloudmanager.model.cimi.Address> cimiAddresses = new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.Address>();
                 cimiAddresses.add(cimiAddress);
-                NetworkInterfaceMachine privateNic = new NetworkInterfaceMachine();
+                MachineNetworkInterface privateNic = new MachineNetworkInterface();
                 privateNic.setAddresses(cimiAddresses);
                 privateNic.setNetworkType(Network.Type.PRIVATE);
                 nics.add(privateNic);
@@ -374,7 +374,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
 
                 List<org.ow2.sirocco.cloudmanager.model.cimi.Address> cimiAddresses = new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.Address>();
                 cimiAddresses.add(cimiAddress);
-                NetworkInterfaceMachine publicNic = new NetworkInterfaceMachine();
+                MachineNetworkInterface publicNic = new MachineNetworkInterface();
                 publicNic.setAddresses(cimiAddresses);
                 publicNic.setNetworkType(Network.Type.PUBLIC);
                 nics.add(publicNic);

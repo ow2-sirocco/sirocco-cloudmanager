@@ -37,12 +37,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
@@ -74,15 +72,15 @@ public class Machine extends CloudResource implements Serializable {
 
     @OneToMany
     @JoinColumn(name = "machine_id", referencedColumnName = "id")
-    private List<NetworkInterface> networkInterfaces;
+    private List<MachineNetworkInterface> networkInterfaces;
 
     private CloudProviderAccount cloudProviderAccount;
 
     @Transient
-    private FSM fsm;
+    private FSM<Machine.State, String> fsm;
 
     public Machine() {
-        this.networkInterfaces = new ArrayList<NetworkInterface>();
+        this.networkInterfaces = new ArrayList<MachineNetworkInterface>();
         this.disks = new ArrayList<MachineDisk>();
         this.volumes = new ArrayList<MachineVolume>();
     }
@@ -152,18 +150,18 @@ public class Machine extends CloudResource implements Serializable {
 
     @OneToMany
     @JoinColumn(name = "machine_id", referencedColumnName = "id")
-    public List<NetworkInterface> getNetworkInterfaces() {
+    public List<MachineNetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
-    public void addNetworkInterface(final NetworkInterface networkInterface) {
+    public void addNetworkInterface(final MachineNetworkInterface networkInterface) {
         if (!getNetworkInterfaces().contains(networkInterface)) {
             getNetworkInterfaces().add(networkInterface);
         }
     }
 
     public void setNetworkInterfaces(
-            final List<NetworkInterface> networkInterfaces) {
+            final List<MachineNetworkInterface> networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 
@@ -182,7 +180,7 @@ public class Machine extends CloudResource implements Serializable {
      * should then refer appropriate FSM.
      */
     public void initFSM() {
-        this.fsm = new FSM(State.CREATING.toString());
+        this.fsm = new FSM<Machine.State, String>(State.CREATING);
         this.fsm.addAction(State.CREATING, "delete", State.DELETING);
         this.fsm.addAction(State.CREATING, "delete", State.ERROR);
         this.fsm.addAction(State.CREATING, "internal", State.STOPPED);

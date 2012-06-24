@@ -37,7 +37,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
-public class MachineVolume implements Serializable, Identifiable {
+public class MachineVolume extends CloudResource implements Serializable, Identifiable {
 
     /**
 	 * 
@@ -55,17 +55,6 @@ public class MachineVolume implements Serializable, Identifiable {
     }
 
     private State state;
-
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Integer getId() {
-        return this.id;
-    }
-
-    public void setId(final Integer id) {
-        this.id = id;
-    }
 
     // unidirectional
     @OneToOne

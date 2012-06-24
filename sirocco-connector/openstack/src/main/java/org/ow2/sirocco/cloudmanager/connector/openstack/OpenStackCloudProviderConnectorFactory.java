@@ -79,8 +79,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume.State;
@@ -323,12 +323,12 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
         private void fromServerToMachine(final Server server, final Machine machine) {
             machine.setProviderAssignedId(server.getId());
             machine.setState(OpenStackCloudProviderConnector.this.fromServerStatusToMachineState(server.getStatus()));
-            List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
+            List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
             machine.setNetworkInterfaces(nics);
-            NetworkInterfaceMachine privateNic = new NetworkInterfaceMachine();
+            MachineNetworkInterface privateNic = new MachineNetworkInterface();
             privateNic.setAddresses(new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.Address>());
             privateNic.setNetworkType(Network.Type.PRIVATE);
-            NetworkInterfaceMachine publicNic = new NetworkInterfaceMachine();
+            MachineNetworkInterface publicNic = new MachineNetworkInterface();
             publicNic.setAddresses(new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.Address>());
             publicNic.setNetworkType(Network.Type.PUBLIC);
 
@@ -503,7 +503,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                     // assigned to the machine
                     boolean allocateFloatingIp = false;
                     if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
-                        for (NetworkInterface nic : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
+                        for (MachineTemplateNetworkInterface nic : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
                             if (nic.getNetworkType() == Network.Type.PUBLIC) {
                                 allocateFloatingIp = true;
                                 break;

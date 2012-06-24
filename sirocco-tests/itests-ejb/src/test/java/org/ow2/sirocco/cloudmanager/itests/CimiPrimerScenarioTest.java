@@ -73,10 +73,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMT;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
@@ -182,7 +183,7 @@ public class CimiPrimerScenarioTest {
     @Before
     public void setUp() throws Exception {
         System.out.println("CimiPrimerScenarioTest : setUp ");
-        this.setUpDatabase();
+        //this.setUpDatabase();
         this.connectToCloudManager();
         User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com",
                 CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
@@ -221,7 +222,7 @@ public class CimiPrimerScenarioTest {
 
     private MachineConfiguration buildMachineConfiguration(final String name,
             final String description, final int numCpus, final int ramSizeInMB,
-            final int diskSizeInGB) {
+            final int diskSizeInGB, final String location) {
         MachineConfiguration machineConfig = new MachineConfiguration();
         machineConfig.setName(name);
         machineConfig.setDescription(description);
@@ -236,6 +237,7 @@ public class CimiPrimerScenarioTest {
         DiskTemplate disk = new DiskTemplate();
         disk.setUnit(StorageUnit.MEGABYTE);
         disk.setQuantity((float) diskSizeInGB);
+        disk.setInitialLocation(location);
         disk.setFormat("ext3");
 
         machineConfig.setCpu(cpu);
@@ -280,13 +282,13 @@ public class CimiPrimerScenarioTest {
         this.waitForJobCompletion(job);
 
         MachineConfiguration machineConfig = this.buildMachineConfiguration(
-                "small", "small: 1 CPU 3.5Ghz, 512MB RAM, 1GB disk", 1, 512, 1);
+                "small", "small: 1 CPU 3.5Ghz, 512MB RAM, 1GB disk", 1, 512, 1, "/dev/sda");
         this.machineManager.createMachineConfiguration(machineConfig);
         machineConfig = this.buildMachineConfiguration("medium",
-                "medium: 2 CPU 3.5Ghz, 2GB RAM, 10GB disk", 2, 1024 * 2, 10);
+                "medium: 2 CPU 3.5Ghz, 2GB RAM, 10GB disk", 2, 1024 * 2, 10, "/dev/sdb");
         this.machineManager.createMachineConfiguration(machineConfig);
         machineConfig = this.buildMachineConfiguration("large",
-                "large: 4 CPU 3.5Ghz, 8GB RAM, 50GB disk", 4, 8 * 1024, 50);
+                "large: 4 CPU 3.5Ghz, 8GB RAM, 50GB disk", 4, 8 * 1024, 50, "/dev/sdc");
         this.machineManager.createMachineConfiguration(machineConfig);
 
         VolumeConfiguration volumeConfig = this.buildVolumeConfiguration(
@@ -377,10 +379,10 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setVolumeTemplates(vtColl);
 
         // create network interfaces
-        NetworkInterfaceMT mtnic = null;
+        MachineTemplateNetworkInterface mtnic = null;
         for (int i = 0; i < 2; i++) {
-            mtnic = new NetworkInterfaceMT();
-            mtnic.setState(NetworkInterface.InterfaceState.STANDBY);
+            mtnic = new MachineTemplateNetworkInterface();
+            mtnic.setState(MachineTemplateNetworkInterface.InterfaceState.STANDBY);
             machineTemplate.addNetworkInterface(mtnic);
         }
         MachineTemplate mt = null;
@@ -396,11 +398,11 @@ public class CimiPrimerScenarioTest {
         try {
             MachineTemplate mtt = this.machineManager.getMachineTemplateById(mt
                     .getId().toString());
-            List<NetworkInterface> items = mtt.getNetworkInterfaces();
+            List<MachineTemplateNetworkInterface> items = mtt.getNetworkInterfaces();
             if (items.size() == 0) {
                 System.out.println(" Strange no network interface?");
             }
-            for (NetworkInterface intf : items) {
+            for (MachineTemplateNetworkInterface intf : items) {
                 System.out.println("testMachineTemplateCreate " + intf.getId()
                         + " " + intf.getState());
             }
@@ -496,7 +498,7 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setVolumeTemplates(vtColl);
 
         machineTemplate.setNetworkInterfaces(Collections
-                .<NetworkInterface> emptyList());
+                .<MachineTemplateNetworkInterface> emptyList());
         machineCreate.setMachineTemplate(machineTemplate);
 
         Job job = this.machineManager.createMachine(machineCreate);
@@ -604,7 +606,7 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setVolumeTemplates(vtColl);
 
         machineTemplate.setNetworkInterfaces(Collections
-                .<NetworkInterface> emptyList());
+                .<MachineTemplateNetworkInterface> emptyList());
         machineCreate.setMachineTemplate(machineTemplate);
 
         System.out
@@ -711,7 +713,7 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setVolumeTemplates(vtItems);
 
         machineTemplate.setNetworkInterfaces(Collections
-                .<NetworkInterface> emptyList());
+                .<MachineTemplateNetworkInterface> emptyList());
         machineCreate.setMachineTemplate(machineTemplate);
         System.out.println("createMachineWithNewVolumes create machine ");
         Job job = this.machineManager.createMachine(machineCreate);
@@ -1037,6 +1039,18 @@ public class CimiPrimerScenarioTest {
                 + ", memory=" + machine.getMemory() + ", disks="
                 + machine.getDisks() + ", networkInterfaces="
                 + machine.getNetworkInterfaces() + "]");
+        
+        List<MachineDisk> disks = machine.getDisks();
+        for (MachineDisk d : disks) {
+            System.out.println("testScenarioThree: " +machineId +" " +d.getId());
+            MachineDisk read = this.machineManager.getDiskFromMachine(machineId, d.getId().toString() );
+            Assert.assertNotNull(read);
+            Assert.assertEquals(read.getId(), d.getId());
+            if (read.getInitialLocation() != null) {
+                System.out.println(" testScenarioThree " +read.getId() +" " +read.getInitialLocation());
+            }
+            
+        }
 
     }
 

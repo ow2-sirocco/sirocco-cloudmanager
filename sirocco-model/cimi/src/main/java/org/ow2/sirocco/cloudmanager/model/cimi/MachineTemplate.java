@@ -53,13 +53,13 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     @OneToMany
     @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
-    private List<NetworkInterface> networkInterfaces;
+    private List<MachineTemplateNetworkInterface> networkInterfaces;
 
     private String userData;
 
     public MachineTemplate() {
 
-        this.networkInterfaces = new ArrayList<NetworkInterface>();
+        this.networkInterfaces = new ArrayList<MachineTemplateNetworkInterface>();
     }
 
     @ManyToOne
@@ -135,18 +135,18 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     @OneToMany
     @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
-    public List<NetworkInterface> getNetworkInterfaces() {
+    public List<MachineTemplateNetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
-    public void addNetworkInterface(final NetworkInterface networkInterface) {
+    public void addNetworkInterface(final MachineTemplateNetworkInterface networkInterface) {
         if (!this.getNetworkInterfaces().contains(networkInterface)) {
             this.getNetworkInterfaces().add(networkInterface);
         }
     }
 
     public void setNetworkInterfaces(
-            final List<NetworkInterface> networkInterfaces) {
+            final List<MachineTemplateNetworkInterface> networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 

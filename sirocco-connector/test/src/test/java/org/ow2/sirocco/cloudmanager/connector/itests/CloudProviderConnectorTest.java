@@ -56,8 +56,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMT;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
@@ -220,11 +220,11 @@ public class CloudProviderConnectorTest {
         MachineImage machineImage = new MachineImage();
         machineImage.setProviderAssignedId(this.imageId);
         machineTemplate.setMachineImage(machineImage);
-        List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
-        NetworkInterfaceMT nic = new NetworkInterfaceMT();
+        List<MachineTemplateNetworkInterface> nics = new ArrayList<MachineTemplateNetworkInterface>();
+        MachineTemplateNetworkInterface nic = new MachineTemplateNetworkInterface();
         nic.setNetworkType(Network.Type.PRIVATE);
         nics.add(nic);
-        nic = new NetworkInterfaceMT();
+        nic = new MachineTemplateNetworkInterface();
         nic.setNetworkType(Network.Type.PUBLIC);
         nics.add(nic);
         machineTemplate.setNetworkInterfaces(nics);
@@ -243,7 +243,7 @@ public class CloudProviderConnectorTest {
         String machineId = job.getTargetEntity().getProviderAssignedId();
         Machine machine = computeService.getMachine(machineId);
         System.out.println("Machine id=" + machine.getProviderAssignedId() + " state=" + machine.getState());
-        for (NetworkInterface netInterface : machine.getNetworkInterfaces()) {
+        for (MachineNetworkInterface netInterface : machine.getNetworkInterfaces()) {
             System.out.print("\t Network " + netInterface.getNetworkType() + " addresses=");
             if (netInterface.getAddresses() != null) {
                 for (Address addr : netInterface.getAddresses()) {

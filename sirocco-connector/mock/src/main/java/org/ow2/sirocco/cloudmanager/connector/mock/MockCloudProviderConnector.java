@@ -64,11 +64,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface.InterfaceState;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterfaceMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface.InterfaceState;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
@@ -248,8 +248,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         machine.setDisks(disks);
 
         if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
-            for (NetworkInterface networkInterface : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
-                NetworkInterfaceMachine newNetIntf = new NetworkInterfaceMachine();
+            for (MachineTemplateNetworkInterface networkInterface : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
+                MachineNetworkInterface newNetIntf = new MachineNetworkInterface();
                 // TODO
                 newNetIntf.setAddresses(networkInterface.getAddresses());
 
@@ -267,7 +267,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             @Override
             public Machine call() throws Exception {
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
-                for (NetworkInterface networkInterface : machine.getNetworkInterfaces()) {
+                for (MachineNetworkInterface networkInterface : machine.getNetworkInterfaces()) {
                     networkInterface.setState(InterfaceState.ACTIVE);
                 }
                 machine.setState(Machine.State.STOPPED);

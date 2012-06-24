@@ -71,7 +71,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -335,7 +335,7 @@ public class MachineManagerTest {
         machineTemplate.setCredentials(this.createCredentials());
         machineTemplate.setVolumes(new ArrayList<MachineVolume>());
         machineTemplate.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
-        machineTemplate.setNetworkInterfaces(new ArrayList<NetworkInterface>());
+        machineTemplate.setNetworkInterfaces(new ArrayList<MachineTemplateNetworkInterface>());
         machineCreate.setMachineTemplate(machineTemplate);
 
         Job job = this.machineManager.createMachine(machineCreate);
