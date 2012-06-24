@@ -65,6 +65,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
+import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
@@ -264,6 +265,10 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             return null;
         }
 
+        @Override
+        public IProviderCapability getProviderCapability() throws ConnectorException {
+            return null;
+        }
         //
         // Compute Service
         //

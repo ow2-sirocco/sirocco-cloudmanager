@@ -43,4 +43,6 @@ public interface ICloudProviderConnector {
     INetworkService getNetworkService() throws ConnectorException;
 
     ISystemService getSystemService() throws ConnectorException;
+    
+    IProviderCapability getProviderCapability() throws ConnectorException;
 }

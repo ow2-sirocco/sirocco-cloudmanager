@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2012 France Telecom
+ * Copyright (C) 2011 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -19,22 +19,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id$
+ *  $Id: $
  *
  */
+package org.ow2.sirocco.cloudmanager.connector.api;
 
-package org.ow2.sirocco.cloudmanager.model.cimi;
-
-import java.io.Serializable;
-
-import javax.persistence.Entity;
-import javax.persistence.Enumerated;
-import javax.persistence.EnumType;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderCapability;
 
 
-@Entity
-public class NetworkInterfaceMT extends NetworkInterface implements Serializable {
-	private static final long serialVersionUID = 1L;
-	
+public interface IProviderCapability {
     
+    boolean hasCapability(CloudProviderCapability capability);
+    
+    void addCapability(CloudProviderCapability capability);
+    
+    void removeCapability(CloudProviderCapability capability);
 }

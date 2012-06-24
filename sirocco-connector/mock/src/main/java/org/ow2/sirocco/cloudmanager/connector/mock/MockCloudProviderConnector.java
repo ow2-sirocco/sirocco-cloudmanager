@@ -42,7 +42,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
@@ -77,6 +77,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderCapability;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
@@ -113,6 +114,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private Map<String, ForwardingGroup> forwardingGroups = new ConcurrentHashMap<String, ForwardingGroup>();
 
+    private IProviderCapability capabilities = new MockCloudProviderCapability();
+    
     public MockCloudProviderConnector(final MockCloudProviderConnectorFactory mockCloudProviderConnectorFactory,
         final CloudProviderAccount cloudProviderAccount, final CloudProviderLocation cloudProviderLocation) {
         this.mockCloudProviderConnectorFactory = mockCloudProviderConnectorFactory;
@@ -161,6 +164,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return this;
     }
 
+    @Override
+    public IProviderCapability getProviderCapability() throws ConnectorException {
+        return capabilities;
+    }
     @Override
     public synchronized Job createVolume(final VolumeCreate volumeCreate) throws ConnectorException {
         final String volumeProviderAssignedId = UUID.randomUUID().toString();
