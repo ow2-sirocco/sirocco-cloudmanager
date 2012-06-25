@@ -820,7 +820,10 @@ public class CimiPrimerScenarioTest {
          * Connect the new Volume to the Machine
          */
         System.out.println(" testScenarioTwo: add volume to machine ");
-        job = this.machineManager.addVolumeToMachine(machineId, volumeId, "/dev/sdb");
+        MachineVolume machineVolume = new MachineVolume();
+        machineVolume.setVolume(volume);
+        machineVolume.setInitialLocation("/dev/sdb");
+        job = this.machineManager.addVolumeToMachine(machineId, machineVolume);
         System.out.println(" testScenarioTwo: add volume to machine wait for job completion " + job.getId() + " "
             + job.getStatus());
         this.waitForJobCompletion(job);
@@ -831,8 +834,8 @@ public class CimiPrimerScenarioTest {
         System.out.println(" testScenarioTwo: get machine volumes ");
         List<MachineVolume> machineVolumes = this.machineManager.getMachineVolumes(machineId);
         System.out.println(" testScenarioTwo: found " + machineVolumes.size() + " machine volumes ");
-        for (MachineVolume machineVolume : machineVolumes) {
-            System.out.println(machineVolume);
+        for (MachineVolume mv : machineVolumes) {
+            System.out.println(mv);
         }
 
         /**
