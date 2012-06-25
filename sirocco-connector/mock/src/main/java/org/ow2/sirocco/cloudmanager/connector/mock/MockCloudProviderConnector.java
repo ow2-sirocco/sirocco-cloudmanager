@@ -26,7 +26,6 @@
 package org.ow2.sirocco.cloudmanager.connector.mock;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -40,49 +39,47 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
+import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
-import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
+import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface.InterfaceState;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface.InterfaceState;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderCapability;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ListenableFuture;
 
 public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, IVolumeService,
@@ -115,7 +112,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     private Map<String, ForwardingGroup> forwardingGroups = new ConcurrentHashMap<String, ForwardingGroup>();
 
     private IProviderCapability capabilities = new MockCloudProviderCapability();
-    
+
     public MockCloudProviderConnector(final MockCloudProviderConnectorFactory mockCloudProviderConnectorFactory,
         final CloudProviderAccount cloudProviderAccount, final CloudProviderLocation cloudProviderLocation) {
         this.mockCloudProviderConnectorFactory = mockCloudProviderConnectorFactory;
@@ -166,17 +163,15 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public IProviderCapability getProviderCapability() throws ConnectorException {
-        return capabilities;
+        return this.capabilities;
     }
+
     @Override
     public synchronized Job createVolume(final VolumeCreate volumeCreate) throws ConnectorException {
         final String volumeProviderAssignedId = UUID.randomUUID().toString();
         final Volume volume = new Volume();
         volume.setProviderAssignedId(volumeProviderAssignedId);
-        Disk capacity = new Disk();
-        capacity.setQuantity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity().getQuantity());
-        capacity.setUnit(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity().getUnits());
-        volume.setCapacity(capacity);
+        volume.setCapacity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity());
         this.volumes.put(volumeProviderAssignedId, volume);
         volume.setState(Volume.State.CREATING);
 
@@ -619,20 +614,20 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             }
         }
 
-        if (failed||cancelled) {
+        if (failed || cancelled) {
             // one or more jobs are failed, so all is failed
             system.setState(System.State.ERROR);
         }
 
-        return simulateProviderTask(system, SystemAction.CREATE,failed|cancelled);
+        return this.simulateProviderTask(system, SystemAction.CREATE, failed | cancelled);
     }
 
     // private utility methods for System services (start,stop,etc)
 
-    private boolean serviceSystem(List<? extends CloudResource> l, SystemAction action) throws ConnectorException {
+    private boolean serviceSystem(final List<? extends CloudResource> l, final SystemAction action) throws ConnectorException {
         boolean failedCancelled = false;
         for (CloudResource m : l) {
-            Job j = callSystemService(m, action, m.getProviderAssignedId().toString());
+            Job j = this.callSystemService(m, action, m.getProviderAssignedId().toString());
             while (j.getStatus().equals(Job.Status.RUNNING)) {
                 try {
                     Thread.sleep(500);
@@ -646,7 +641,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return failedCancelled;
     }
 
-    private Job callSystemService(CloudResource ce, SystemAction action, String providerId) throws ConnectorException {
+    private Job callSystemService(final CloudResource ce, final SystemAction action, final String providerId)
+        throws ConnectorException {
         if (ce.getClass().equals(Machine.class)) {
             switch (action) {
             case START:
@@ -772,44 +768,49 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         boolean failedCancelled = false;
 
-        failedCancelled |= serviceSystem(system.getMachines(), action);
-        failedCancelled |= serviceSystem(system.getSystems(), action);
-        failedCancelled |= serviceSystem(system.getNetworks(), action);
+        failedCancelled |= this.serviceSystem(system.getMachines(), action);
+        failedCancelled |= this.serviceSystem(system.getSystems(), action);
+        failedCancelled |= this.serviceSystem(system.getNetworks(), action);
 
         if (failedCancelled) {
             // one or more jobs are failed or cancelled, so all is in error
             system.setState(System.State.ERROR);
         }
-        return simulateProviderTask(system, action,failedCancelled);
+        return this.simulateProviderTask(system, action, failedCancelled);
     }
 
     @Override
     public Job startSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.STARTING, SystemAction.START, forbiddenSystemStartActions);
+        return this.doSystemService(systemId, System.State.STARTING, SystemAction.START,
+            MockCloudProviderConnector.forbiddenSystemStartActions);
     }
 
     @Override
     public Job stopSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.STOPPING, SystemAction.STOP, forbiddenSystemStopActions);
+        return this.doSystemService(systemId, System.State.STOPPING, SystemAction.STOP,
+            MockCloudProviderConnector.forbiddenSystemStopActions);
     }
 
     @Override
     public Job restartSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.STARTING, SystemAction.RESTART, forbiddenSystemRestartActions);
+        return this.doSystemService(systemId, System.State.STARTING, SystemAction.RESTART,
+            MockCloudProviderConnector.forbiddenSystemRestartActions);
     }
 
     @Override
     public Job pauseSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.PAUSING, SystemAction.PAUSE, forbiddenSystemPauseActions);
+        return this.doSystemService(systemId, System.State.PAUSING, SystemAction.PAUSE,
+            MockCloudProviderConnector.forbiddenSystemPauseActions);
     }
 
     @Override
     public Job suspendSystem(final String systemId) throws ConnectorException {
-        return doSystemService(systemId, System.State.SUSPENDING, SystemAction.SUSPEND, forbiddenSystemSuspendActions);
+        return this.doSystemService(systemId, System.State.SUSPENDING, SystemAction.SUSPEND,
+            MockCloudProviderConnector.forbiddenSystemSuspendActions);
     }
 
     @Override
-    public Job deleteSystem(String systemId) throws ConnectorException {
+    public Job deleteSystem(final String systemId) throws ConnectorException {
         MockCloudProviderConnector.logger.info("deleting system with providerAssignedId " + systemId);
         final System system = this.systems.get(systemId);
         if (system == null) {
@@ -868,7 +869,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         }
         system.setState(System.State.DELETING);
 
-        return simulateProviderTask(system, SystemAction.DELETE,failedCancelled);
+        return this.simulateProviderTask(system, SystemAction.DELETE, failedCancelled);
     }
 
     @Override

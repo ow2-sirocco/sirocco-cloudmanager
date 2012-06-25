@@ -37,7 +37,7 @@ public class VolumeConfiguration extends CloudEntity implements Serializable {
 
     private String format;
 
-    private Disk capacity;
+    private Integer capacity;
 
     public String getType() {
         return this.type;
@@ -47,11 +47,11 @@ public class VolumeConfiguration extends CloudEntity implements Serializable {
         this.type = type;
     }
 
-    public Disk getCapacity() {
+    public Integer getCapacity() {
         return this.capacity;
     }
 
-    public void setCapacity(final Disk capacity) {
+    public void setCapacity(final Integer capacity) {
         this.capacity = capacity;
     }
 

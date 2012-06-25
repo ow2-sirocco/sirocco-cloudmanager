@@ -44,20 +44,19 @@ import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl.JobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
@@ -276,10 +275,7 @@ public class CloudProviderConnectorTest {
         VolumeCreate volumeCreate = new VolumeCreate();
         VolumeTemplate volumeTemplate = new VolumeTemplate();
         VolumeConfiguration volumeConfig = new VolumeConfiguration();
-        Disk diskCapacity = new Disk();
-        diskCapacity.setUnit(StorageUnit.GIGABYTE);
-        diskCapacity.setQuantity((float) this.volumeConfigSizeGB);
-        volumeConfig.setCapacity(diskCapacity);
+        volumeConfig.setCapacity(this.volumeConfigSizeGB * 1000 * 1000);
         volumeTemplate.setVolumeConfig(volumeConfig);
         volumeCreate.setVolumeTemplate(volumeTemplate);
         volumeCreate.setName("test");
@@ -291,7 +287,7 @@ public class CloudProviderConnectorTest {
         String volumeId = job.getTargetEntity().getProviderAssignedId();
 
         Volume volume = volumeService.getVolume(volumeId);
-        System.out.println("Volume id=" + volume.getProviderAssignedId() + " size=" + volume.getCapacity().getQuantity());
+        System.out.println("Volume id=" + volume.getProviderAssignedId() + " size=" + volume.getCapacity() + " KB");
 
         if (this.testVolumeAttach) {
             MachineVolume machineVolume = new MachineVolume();

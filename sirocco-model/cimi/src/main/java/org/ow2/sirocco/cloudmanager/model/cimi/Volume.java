@@ -30,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -60,7 +59,7 @@ public class Volume extends CloudResource implements Serializable {
 
     private String type;
 
-    private Disk capacity;
+    private Integer capacity;
 
     private Boolean bootable;
 
@@ -83,12 +82,11 @@ public class Volume extends CloudResource implements Serializable {
         this.state = state;
     }
 
-    @Embedded
-    public Disk getCapacity() {
+    public Integer getCapacity() {
         return this.capacity;
     }
 
-    public void setCapacity(final Disk capacity) {
+    public void setCapacity(final Integer capacity) {
         this.capacity = capacity;
     }
 

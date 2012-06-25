@@ -27,7 +27,6 @@ package org.ow2.sirocco.cloudmanager.itests;
 import java.io.File;
 import java.io.FileReader;
 import java.io.Reader;
-import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -54,9 +53,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -190,10 +187,7 @@ public class VolumeManagerTest {
         volumeCreate.setProperties(properties);
         VolumeTemplate volumeTemplate = new VolumeTemplate();
         VolumeConfiguration volumeConfig = new VolumeConfiguration();
-        Disk capacity = new Disk();
-        capacity.setQuantity((float) 512);
-        capacity.setUnit(StorageUnit.MEGABYTE);
-        volumeConfig.setCapacity(capacity);
+        volumeConfig.setCapacity(500 * 1000);
         volumeConfig.setType("http://schemas.dmtf.org/cimi/1/mapped");
         volumeTemplate.setVolumeConfig(volumeConfig);
         volumeCreate.setVolumeTemplate(volumeTemplate);
@@ -225,8 +219,7 @@ public class VolumeManagerTest {
         Assert.assertNotNull(volume.getProperties());
         Assert.assertTrue(volume.getProperties().get("department").equals("MAPS"));
         Assert.assertNotNull(volume.getCapacity());
-        Assert.assertEquals(volume.getCapacity().getQuantity().intValue(), 512);
-        Assert.assertEquals(volume.getCapacity().getUnits(), StorageUnit.MEGABYTE);
+        Assert.assertEquals(volume.getCapacity().intValue(), 500 * 1000);
 
         // TODO update volume
 
@@ -251,10 +244,7 @@ public class VolumeManagerTest {
 
     VolumeConfiguration createVolumeConfiguration() throws Exception {
         VolumeConfiguration inVolumeConfig = new VolumeConfiguration();
-        Disk capacity = new Disk();
-        capacity.setQuantity((float) 512);
-        capacity.setUnit(StorageUnit.MEGABYTE);
-        inVolumeConfig.setCapacity(capacity);
+        inVolumeConfig.setCapacity(500 * 1000);
         inVolumeConfig.setType("http://schemas.dmtf.org/cimi/1/mapped");
         inVolumeConfig.setName("myVolumeConfig" + this.counterVolumeConfig++);
         inVolumeConfig.setDescription("a volume config");
@@ -384,7 +374,7 @@ public class VolumeManagerTest {
         Assert.assertEquals(volumeImage.getOwner().getName(), "myVolume0");
 
         volume = this.volumeManager.getVolumeById(volumeId);
-        List<VolumeImage> snapshots = this.volumeManager.getVolumeImages(new ArrayList<String>(),"");
+        List<VolumeImage> snapshots = this.volumeManager.getVolumeImages(new ArrayList<String>(), "");
         Assert.assertTrue(snapshots.contains(volumeImage));
 
         // UPDATE
@@ -398,7 +388,7 @@ public class VolumeManagerTest {
 
         // Remove from Volume
 
-        job = this.volumeManager.removeImageFromVolume(volumeId, volumeImageId);
+        job = this.volumeManager.removeVolumeImageFromVolume(volumeId, volumeImageId);
         volumeImage = this.volumeManager.getVolumeImageById(volumeImageId);
         volume = this.volumeManager.getVolumeById(volumeId);
         Assert.assertNull(volumeImage.getOwner());
@@ -420,7 +410,7 @@ public class VolumeManagerTest {
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-         volumes = this.volumeManager.getVolumes(0, 9, attributes);
+        volumes = this.volumeManager.getVolumes(0, 9, attributes);
         Assert.assertEquals(10, volumes.size());
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals("myVolume" + i, volumes.get(i).getName());
@@ -450,7 +440,7 @@ public class VolumeManagerTest {
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-         volumeConfigs = this.volumeManager.getVolumeConfigurations(0, 9, attributes);
+        volumeConfigs = this.volumeManager.getVolumeConfigurations(0, 9, attributes);
         Assert.assertEquals(10, volumeConfigs.size());
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals("myVolumeConfig" + i, volumeConfigs.get(i).getName());
@@ -480,7 +470,7 @@ public class VolumeManagerTest {
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-       volumeTemplates = this.volumeManager.getVolumeTemplates(0, 9, attributes);
+        volumeTemplates = this.volumeManager.getVolumeTemplates(0, 9, attributes);
         Assert.assertEquals(10, volumeTemplates.size());
         for (int i = 0; i < 10; i++) {
             Assert.assertEquals("myVolumeTemplate" + i, volumeTemplates.get(i).getName());

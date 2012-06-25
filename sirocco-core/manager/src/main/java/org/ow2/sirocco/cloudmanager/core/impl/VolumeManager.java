@@ -32,7 +32,6 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
@@ -446,7 +445,7 @@ public class VolumeManager implements IVolumeManager {
             updated = true;
         }
         if (attributes.containsKey("capacity")) {
-            volumeConfig.setCapacity((Disk) attributes.get("capacity"));
+            volumeConfig.setCapacity((Integer) attributes.get("capacity"));
             updated = true;
         }
         if (attributes.containsKey("type")) {

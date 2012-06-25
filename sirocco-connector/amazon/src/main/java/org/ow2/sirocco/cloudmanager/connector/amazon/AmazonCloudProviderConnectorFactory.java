@@ -39,9 +39,9 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
+import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
-import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
@@ -50,12 +50,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume.State;
@@ -284,6 +283,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
         public IProviderCapability getProviderCapability() throws ConnectorException {
             return null;
         }
+
         //
         // Compute Service
         //
@@ -773,17 +773,14 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
         private void fromEbsVolumetToCimiVolume(final org.jclouds.ec2.domain.Volume ebsVolume, final Volume cimiVolume) {
             cimiVolume.setProviderAssignedId(ebsVolume.getId());
             Disk disk = new Disk();
-            disk.setUnit(StorageUnit.GIGABYTE);
-            disk.setQuantity((float) ebsVolume.getSize());
-            cimiVolume.setCapacity(disk);
+            cimiVolume.setCapacity(ebsVolume.getSize() * 1000 * 1000);
             cimiVolume.setState(this.fromEbsVolumeStatusToCimiVolumeState(ebsVolume.getStatus()));
         }
 
         @Override
         public Job createVolume(final VolumeCreate volumeCreate) throws ConnectorException {
             VolumeConfiguration volumeConfig = volumeCreate.getVolumeTemplate().getVolumeConfig();
-            int sizeInGB = (int) (volumeConfig.getCapacity().getQuantity()
-                * volumeConfig.getCapacity().getUnits().valueInBytes() / (1000 * 1000 * 1000));
+            int sizeInGB = volumeConfig.getCapacity() / (1000 * 1000);
 
             try {
                 final ElasticBlockStoreClient ebsClient = this.syncClient.getElasticBlockStoreServices();

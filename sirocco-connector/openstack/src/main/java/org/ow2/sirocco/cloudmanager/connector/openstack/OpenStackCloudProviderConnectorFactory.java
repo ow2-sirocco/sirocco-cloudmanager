@@ -76,12 +76,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume.State;
@@ -269,6 +269,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
         public IProviderCapability getProviderCapability() throws ConnectorException {
             return null;
         }
+
         //
         // Compute Service
         //
@@ -689,10 +690,8 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
         private void fromNovaVolumeToCimiVolume(final org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume,
             final Volume cimiVolume) {
             cimiVolume.setProviderAssignedId(novaVolume.getId());
-            Disk capacity = new Disk();
-            capacity.setUnit(StorageUnit.GIGABYTE);
-            capacity.setQuantity((float) novaVolume.getSize());
-            cimiVolume.setCapacity(capacity);
+            // GB to KB
+            cimiVolume.setCapacity(novaVolume.getSize() * 1000 * 1000);
             cimiVolume.setState(this.fromNovaVolumeStatusToCimiVolumeState(novaVolume.getStatus()));
         }
 
@@ -702,8 +701,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             CreateVolumeOptions options = CreateVolumeOptions.Builder.name(volumeCreate.getName()).description(
                 volumeCreate.getDescription());
             VolumeConfiguration volumeConfig = volumeCreate.getVolumeTemplate().getVolumeConfig();
-            int sizeInGB = (int) (volumeConfig.getCapacity().getQuantity()
-                * volumeConfig.getCapacity().getUnits().valueInBytes() / (1000 * 1000 * 1000));
+            int sizeInGB = volumeConfig.getCapacity() / (1000 * 1000);
             org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.createVolume(sizeInGB, options);
             final String novaVolumeId = novaVolume.getId();
             final Volume cimiVolume = new Volume();
