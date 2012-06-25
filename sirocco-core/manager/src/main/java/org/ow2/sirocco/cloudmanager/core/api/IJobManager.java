@@ -27,12 +27,9 @@ package org.ow2.sirocco.cloudmanager.core.api;
 import java.util.List;
 import java.util.Map;
 
-import javax.ejb.Timer;
-
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 

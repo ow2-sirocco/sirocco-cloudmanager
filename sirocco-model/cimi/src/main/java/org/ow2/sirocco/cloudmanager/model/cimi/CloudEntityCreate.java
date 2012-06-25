@@ -19,20 +19,45 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: CloudResource.java 1258 2012-05-21 12:35:04Z ycas7461S $
+ *  $Id: CloudResource.java 1258 2012-05-21 12:35:04Z ycas7461 $
  *
  */
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import javax.persistence.Entity;
-import javax.persistence.Inheritance;
-import javax.persistence.InheritanceType;
+import java.util.Map;
 
-@Entity
-@Inheritance(strategy = InheritanceType.JOINED)
-public abstract class CloudTemplate extends CloudEntity implements Serializable {
-    private static final long serialVersionUID = 1L;
+public abstract class CloudEntityCreate implements Serializable {
+    private static final long serialVersionUID = -1L;
 
+    private String name;
+
+    private String description;
+
+    private Map<String, String> properties;
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
+    }
+
+    public Map<String, String> getProperties() {
+        return this.properties;
+    }
+
+    public void setProperties(final Map<String, String> properties) {
+        this.properties = properties;
+    }
 }

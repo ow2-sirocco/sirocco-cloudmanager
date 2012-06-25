@@ -29,7 +29,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
-import javax.persistence.Column;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -38,8 +37,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Version;
-
 import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 

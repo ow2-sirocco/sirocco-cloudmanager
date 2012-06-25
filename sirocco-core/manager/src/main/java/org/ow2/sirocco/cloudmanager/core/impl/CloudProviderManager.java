@@ -108,6 +108,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<CloudProvider> getCloudProviders() throws CloudProviderException {
         return this.em.createQuery("Select p From CloudProvider p").getResultList();
@@ -254,6 +255,7 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<CloudProviderAccount> getCloudProviderAccounts() throws CloudProviderException {
         return this.em.createQuery("Select p From CloudProviderAccount p").getResultList();
@@ -454,6 +456,7 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<CloudProviderLocation> getCloudProviderLocations() throws CloudProviderException {
         return UtilsForManagers.getEntityList("CloudProviderLocation", this.em, this.getUser().getUsername());

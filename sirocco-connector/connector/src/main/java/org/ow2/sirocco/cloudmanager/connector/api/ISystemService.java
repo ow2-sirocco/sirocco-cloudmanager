@@ -29,7 +29,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
 
 public interface ISystemService {
-    Job createSystem(SystemCreate systemCreate) throws ConnectorException, InterruptedException;
+    Job createSystem(SystemCreate systemCreate) throws ConnectorException;
     
     Job deleteSystem(String systemId) throws ConnectorException;
 

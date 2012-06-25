@@ -374,7 +374,7 @@ public class VolumeManagerTest {
         Assert.assertEquals(volumeImage.getOwner().getName(), "myVolume0");
 
         volume = this.volumeManager.getVolumeById(volumeId);
-        List<VolumeImage> snapshots = this.volumeManager.getVolumeImages(new ArrayList<String>(), "");
+        List<VolumeImage> snapshots = this.volumeManager.getVolumeImages();
         Assert.assertTrue(snapshots.contains(volumeImage));
 
         // UPDATE

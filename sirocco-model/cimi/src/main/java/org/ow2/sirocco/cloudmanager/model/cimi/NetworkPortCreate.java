@@ -25,35 +25,10 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
-import java.io.Serializable;
-import java.util.Map;
-
-public class NetworkPortCreate implements Serializable {
+public class NetworkPortCreate extends CloudEntityCreate {
     private static final long serialVersionUID = 1L;
 
-    private String name;
-
-    private String description;
-
-    private Map<String, String> properties;
-
     private NetworkPortTemplate networkPortTemplate;
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
 
     public NetworkPortTemplate getNetworkPortTemplate() {
         return this.networkPortTemplate;
@@ -61,14 +36,6 @@ public class NetworkPortCreate implements Serializable {
 
     public void setNetworkPortTemplate(final NetworkPortTemplate networkPortTemplate) {
         this.networkPortTemplate = networkPortTemplate;
-    }
-
-    public Map<String, String> getProperties() {
-        return this.properties;
-    }
-
-    public void setProperties(final Map<String, String> properties) {
-        this.properties = properties;
     }
 
 }

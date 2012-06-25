@@ -20,10 +20,23 @@ import javax.jms.Session;
 import javax.persistence.EntityManager;
 
 import org.hibernate.proxy.HibernateProxy;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 public class UtilsForManagers {
 
+    /**
+     * This generic method fills a bean with a map of attribute names and attribute values
+     * @param obj
+     * The bean to update
+     * @param updatedAttributes
+     * The map owning attribute names and their respective values
+     * @return
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IllegalArgumentException
+     * @throws IntrospectionException
+     * @throws NoSuchFieldException
+     * @throws InvocationTargetException
+     */
     public static Object fillObject(Object obj,
             Map<String, Object> updatedAttributes)
             throws InstantiationException, IllegalAccessException,
@@ -38,6 +51,22 @@ public class UtilsForManagers {
 
     }
 
+    /**
+     * This generic method calls a bean setter, given a bean and an attribute name.
+     * <br>It highly relies on reflection
+     * @param targetObj
+     * the bean to update
+     * @param attrName
+     * the name of the attribute to be updated
+     * @param attrValue
+     * the value used to update the attribute
+     * @return
+     * @throws IntrospectionException
+     * @throws NoSuchFieldException
+     * @throws IllegalArgumentException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
     private static Object invokeSetter(Object targetObj, String attrName,
             Object attrValue) throws IntrospectionException,
             NoSuchFieldException, IllegalArgumentException,
@@ -61,11 +90,31 @@ public class UtilsForManagers {
 
     }
 
+    /**
+     * Emits a message to set a listener on the connector task tied to the given Job <br>
+     * The main goal is to ensure that the job listener is triggered after
+     * commit, or never triggered if the transaction is rollbacked
+     * 
+     * @param payload
+     *            the related Job
+     * @param ctx
+     * @throws Exception
+     */
     public static void emitJobListenerMessage(final Serializable payload,
             EJBContext ctx) throws Exception {
         emitJMSMessage(payload, ctx, "JobEmission");
     }
 
+    /**
+     * emits an JMS message to a queue, <b>inside a JTA transaction</b>
+     * 
+     * @param payload
+     *            the message body
+     * @param ctx
+     *            to send the message inside the ctx transaction
+     * @param queueName
+     * @throws Exception
+     */
     public static void emitJMSMessage(final Serializable payload,
             EJBContext ctx, String queueName) throws Exception {
         ConnectionFactory cf = (ConnectionFactory) ctx.lookup("QCF");
@@ -83,13 +132,53 @@ public class UtilsForManagers {
         sess.close();
         conn.close();
     }
-    
-    @SuppressWarnings({"rawtypes" })
-    public static List getEntityList(String entityType,EntityManager em,String username)
-    {
-        return em.createQuery("FROM "+entityType+" v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id")
+
+    /**
+     * code factoring for getXXX (getMachines, getVolumes,etc)
+     * 
+     * @param entityType
+     * @param em
+     * @param username
+     *            optionnal, filter request to given user
+     * @param verifyDeletedState
+     *            if the query should ignore deleted entities.<br>
+     *            Must be set to false if an entity doesn't have a state field
+     * @return
+     */
+    @SuppressWarnings({ "rawtypes" })
+    public static List getEntityList(String entityType, EntityManager em,
+            String username, boolean verifyDeletedState) {
+        String userQuery = "", stateQuery = "";
+
+        if (!(("".equals(username) || username == null))) {
+            userQuery = " v.user.username=:username ";
+        }
+        if (verifyDeletedState) {
+            stateQuery = " v.state<>'DELETED' ";
+        }
+        return em
+                .createQuery(
+                        "FROM " + entityType + " v WHERE " + userQuery
+                                + (userQuery.equals("") ? "" : " AND ")
+                                + stateQuery + " ORDER BY v.id")
                 .setParameter("username", username).getResultList();
-        
+
+    }
+
+    /**
+     * same as full getEntityList, but automatically sets verifyDeletedState to
+     * true
+     * 
+     * @param entityType
+     * @param em
+     * @param username
+     * @return
+     */
+    @SuppressWarnings({ "rawtypes" })
+    public static List getEntityList(String entityType, EntityManager em,
+            String username) {
+        return getEntityList(entityType, em, username, true);
+
     }
 
 }

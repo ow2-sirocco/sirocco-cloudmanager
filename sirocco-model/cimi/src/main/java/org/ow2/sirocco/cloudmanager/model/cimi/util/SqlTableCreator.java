@@ -45,6 +45,7 @@ public class SqlTableCreator {
      */
     private final Dialect dialect = new org.hibernate.dialect.MySQL5InnoDBDialect();
 
+    @SuppressWarnings("rawtypes")
     public SqlTableCreator(final Collection<Class> entities) {
 
         final Ejb3Configuration ejb3Configuration = new Ejb3Configuration();
@@ -90,6 +91,7 @@ public class SqlTableCreator {
     /**
      * @param args
      */
+    @SuppressWarnings("rawtypes")
     public static void main(final String[] args) {
         // TODO Auto-generated method stub
 

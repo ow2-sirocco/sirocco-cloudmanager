@@ -99,20 +99,30 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 @SuppressWarnings("unused")
 public class SystemManager implements ISystemManager {
 
-    private static Logger logger = Logger.getLogger(SystemManager.class
-            .getName());
+    private static Logger logger = Logger.getLogger(SystemManager.class.getName());
 
     private static String CREATE_ACTION = "system creation";
+
     private static String ADD_VOLUME_ACTION = "addVolumeToSystem";
+
     private static String START_ACTION = "system start";
+
     private static String STOP_ACTION = "system stop";
+
     private static String DELETE_ACTION = "system delete";
+
     private static String REMOVE_MACHINE_ACTION = "removeMachineFromSystem";
+
     private static String ADD_CREDENTIAL_ACTION = "addCredentialToSystem";
+
     private static String REMOVE_CREDENTIAL_ACTION = "removeCredentialFromSystem";
+
     private static String ADD_MACHINE_ACTION = "addMachineToSystem";
+
     private static String REMOVE_SYSTEM_ACTION = "removeSystemFromSystem";
+
     private static String ADD_SYSTEM_ACTION = "addSystemToSystem";
+
     private static String REMOVE_VOLUME_ACTION = "removeVolumeFromSystem";
 
     private static String HANDLED_JOB = "handled";
@@ -140,7 +150,7 @@ public class SystemManager implements ISystemManager {
 
     @EJB
     private INetworkManager networkManager;
-    
+
     @EJB
     private IJobManager jobManager;
 
@@ -150,15 +160,9 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job createSystem(final SystemCreate systemCreate)
-            throws CloudProviderException {
+    public Job createSystem(final SystemCreate systemCreate) throws CloudProviderException {
 
         // this.checkQuota(userManager.getUserByUsername(this.user), system);
-
-        ICloudProviderConnector connector = this.getCloudProviderConnector();
-        if (connector == null) {
-            throw new CloudProviderException("no connector found");
-        }
 
         // creation of entities in the base
         System system = new System();
@@ -177,161 +181,192 @@ public class SystemManager implements ISystemManager {
         this.em.persist(parentJob);
         this.em.flush();
 
-        // implementation when System is not supported by underlying connector
-        Set<ComponentDescriptor> componentDescriptors = systemCreate
-                .getSystemTemplate().getComponentDescriptors();
+        if (0 == 0) {
 
-        // iterating through descriptors
-        Iterator<ComponentDescriptor> iter = componentDescriptors.iterator();
-        while (iter.hasNext()) {
-            ComponentDescriptor cd = iter.next();
-
-            if (cd.getComponentType() == ComponentType.MACHINE) {
-                // creating new machines
-                for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                    MachineCreate mc = new MachineCreate();
-                    if (cd.getComponentQuantity() > 1) {
-                        mc.setName(cd.getComponentName()
-                                + new Integer(i).toString());
-                    }
-
-                    MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
-                    mc.setMachineTemplate(mt);
-                    mc.setDescription(cd.getComponentDescription());
-                    mc.setProperties(cd.getProperties());
-
-                    Job j = machineManager.createMachine(mc);
-                    j.setParentJob(parentJob);
-                }
-
+            ICloudProviderConnector connector = this.getCloudProviderConnector();
+            if (connector == null) {
+                throw new CloudProviderException("no connector found");
             }
 
-            if (cd.getComponentType() == ComponentType.VOLUME) {
-                // creating new volumes
-                for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                    VolumeCreate vc = new VolumeCreate();
-                    if (cd.getComponentQuantity() > 1) {
-                        vc.setName(cd.getComponentName()
-                                + new Integer(i).toString());
+            // creating credentials if necessary
+            // iterating through descriptors
+            Set<ComponentDescriptor> componentDescriptors = systemCreate.getSystemTemplate().getComponentDescriptors();
+
+            Iterator<ComponentDescriptor> iter = componentDescriptors.iterator();
+            while (iter.hasNext()) {
+                ComponentDescriptor cd = iter.next();
+                if (cd.getComponentType() == ComponentType.CREDENTIALS) {
+                    // creating new credentials
+                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                        CredentialsCreate cc = new CredentialsCreate();
+                        if (cd.getComponentQuantity() > 1) {
+                            cc.setName(cd.getComponentName() + new Integer(i).toString());
+                        }
+                        CredentialsTemplate ct = (CredentialsTemplate) cd.getComponentTemplate();
+                        cc.setCredentialTemplate(ct);
+                        cc.setDescription(cd.getComponentDescription());
+                        cc.setProperties(cd.getProperties());
+
+                        // no job for credentials!
+                        Credentials c = credentialsManager.createCredentials(cc);
+                        system.getCredentials().add(c);
                     }
-                    VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
-                    vc.setVolumeTemplate(vt);
-                    vc.setDescription(cd.getComponentDescription());
-                    vc.setProperties(cd.getProperties());
-
-                    Job j = volumeManager.createVolume(vc);
-                    j.setParentJob(parentJob);
-                }
-            }
-            if (cd.getComponentType() == ComponentType.SYSTEM) {
-                // creating new systems
-                for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                    SystemCreate sc = new SystemCreate();
-                    if (cd.getComponentQuantity() > 1) {
-                        sc.setName(cd.getComponentName()
-                                + new Integer(i).toString());
-                    }
-                    SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
-                    sc.setSystemTemplate(st);
-                    sc.setDescription(cd.getComponentDescription());
-                    sc.setProperties(cd.getProperties());
-
-                    Job j = this.createSystem(sc);
-                    j.setParentJob(parentJob);
-                }
-            }
-            if (cd.getComponentType() == ComponentType.NETWORK) {
-                // creating new networks
-                for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                    NetworkCreate nc = new NetworkCreate();
-                    if (cd.getComponentQuantity() > 1) {
-                        nc.setName(cd.getComponentName()
-                                + new Integer(i).toString());
-                    }
-                    NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
-                    nc.setNetworkTemplate(nt);
-                    nc.setDescription(cd.getComponentDescription());
-                    nc.setProperties(cd.getProperties());
-
-                    Job j = networkManager.createNetwork(nc);
-                    j.setParentJob(parentJob);
-                }
-            }
-            if (cd.getComponentType() == ComponentType.CREDENTIALS) {
-                // creating new credentials
-                for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                    CredentialsCreate cc = new CredentialsCreate();
-                    if (cd.getComponentQuantity() > 1) {
-                        cc.setName(cd.getComponentName()
-                                + new Integer(i).toString());
-                    }
-                    CredentialsTemplate ct = (CredentialsTemplate) cd.getComponentTemplate();
-                    cc.setCredentialTemplate(ct);
-                    cc.setDescription(cd.getComponentDescription());
-                    cc.setProperties(cd.getProperties());
-
-                    // no job for credentials!
-                    Credentials c = credentialsManager.createCredentials(cc);
-                    system.getCredentials().add(c);
-
                 }
             }
 
+            // sending command to selected connector
+            Job job = null;
+            try {
+                job = connector.getSystemService().createSystem(systemCreate);
+            } catch (ConnectorException e) {
+                throw new CloudProviderException("system creation failed");
+            }
+            // job returned by connector is a copy of the real connector job
+            // so we can directly persist it
+            this.em.persist(job);
+            job.setTargetEntity(system);
+            job.setParentJob(parentJob);
+
+            // Ask for connector to notify when job completes
+            try {
+                UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
+            } catch (Exception e) {
+                throw new ServiceUnavailableException(e.getMessage());
+            }
+            this.relConnector(system, connector);
+
+        } else {
+            // implementation when System is not supported by underlying
+            // connector
+            Set<ComponentDescriptor> componentDescriptors = systemCreate.getSystemTemplate().getComponentDescriptors();
+
+            // iterating through descriptors
+            Iterator<ComponentDescriptor> iter = componentDescriptors.iterator();
+            while (iter.hasNext()) {
+                ComponentDescriptor cd = iter.next();
+
+                if (cd.getComponentType() == ComponentType.MACHINE) {
+                    // creating new machines
+                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                        MachineCreate mc = new MachineCreate();
+                        if (cd.getComponentQuantity() > 1) {
+                            mc.setName(cd.getComponentName() + new Integer(i).toString());
+                        }
+                        MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
+                        mc.setMachineTemplate(mt);
+                        mc.setDescription(cd.getComponentDescription());
+                        mc.setProperties(cd.getProperties());
+
+                        Job j = machineManager.createMachine(mc);
+                        j.setParentJob(parentJob);
+                    }
+                }
+                if (cd.getComponentType() == ComponentType.VOLUME) {
+                    // creating new volumes
+                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                        VolumeCreate vc = new VolumeCreate();
+                        if (cd.getComponentQuantity() > 1) {
+                            vc.setName(cd.getComponentName() + new Integer(i).toString());
+                        }
+                        VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
+                        vc.setVolumeTemplate(vt);
+                        vc.setDescription(cd.getComponentDescription());
+                        vc.setProperties(cd.getProperties());
+
+                        Job j = volumeManager.createVolume(vc);
+                        j.setParentJob(parentJob);
+                    }
+                }
+                if (cd.getComponentType() == ComponentType.SYSTEM) {
+                    // creating new systems
+                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                        SystemCreate sc = new SystemCreate();
+                        if (cd.getComponentQuantity() > 1) {
+                            sc.setName(cd.getComponentName() + new Integer(i).toString());
+                        }
+                        SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
+                        sc.setSystemTemplate(st);
+                        sc.setDescription(cd.getComponentDescription());
+                        sc.setProperties(cd.getProperties());
+
+                        Job j = this.createSystem(sc);
+                        j.setParentJob(parentJob);
+                    }
+                }
+                if (cd.getComponentType() == ComponentType.NETWORK) {
+                    // creating new networks
+                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                        NetworkCreate nc = new NetworkCreate();
+                        if (cd.getComponentQuantity() > 1) {
+                            nc.setName(cd.getComponentName() + new Integer(i).toString());
+                        }
+                        NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
+                        nc.setNetworkTemplate(nt);
+                        nc.setDescription(cd.getComponentDescription());
+                        nc.setProperties(cd.getProperties());
+
+                        Job j = networkManager.createNetwork(nc);
+                        j.setParentJob(parentJob);
+                    }
+                }
+                if (cd.getComponentType() == ComponentType.CREDENTIALS) {
+                    // creating new credentials
+                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                        CredentialsCreate cc = new CredentialsCreate();
+                        if (cd.getComponentQuantity() > 1) {
+                            cc.setName(cd.getComponentName() + new Integer(i).toString());
+                        }
+                        CredentialsTemplate ct = (CredentialsTemplate) cd.getComponentTemplate();
+                        cc.setCredentialTemplate(ct);
+                        cc.setDescription(cd.getComponentDescription());
+                        cc.setProperties(cd.getProperties());
+
+                        // no job for credentials!
+                        Credentials c = credentialsManager.createCredentials(cc);
+                        system.getCredentials().add(c);
+                    }
+                }
+            }
         }
-
-        /*
-         * // sending command to selected connector Job job = null; try { job =
-         * connector.getSystemService().createSystem(systemCreate); } catch
-         * (ConnectorException e) { throw new
-         * CloudProviderException("system creation failed"); }
-         * 
-         * 
-         * 
-         * // persist this.em.persist(system); this.em.flush();// useless?
-         * job.setTargetEntity(system);
-         * 
-         * // Ask for connector to notify when job completes try {
-         * connector.setNotificationOnJobCompletion
-         * (job.getProviderAssignedId()); } catch (Exception e) { throw new
-         * ServiceUnavailableException(e.getMessage()); }
-         * 
-         * this.relConnector(system, connector);
-         * 
-         * return job;
-         */
 
         return parentJob;
 
     }
 
     @Override
-    public SystemTemplate createSystemTemplate(final SystemTemplate systemT)
-            throws CloudProviderException {
+    public SystemTemplate createSystemTemplate(final SystemTemplate systemT) throws CloudProviderException {
 
         systemT.setUser(this.getUser());
         systemT.setCreated(new Date());
+
+        for (ComponentDescriptor cd : systemT.getComponentDescriptors()) {
+            if ("".equals(cd.getId()) || cd.getId() == null) {
+                // no id, will be persisted as jpa entity
+                cd.setUser(this.getUser());
+                cd.setCreated(new Date());
+            }
+        }
 
         this.em.persist(systemT);
         this.em.flush();
         return systemT;
     }
-    
+
+    @SuppressWarnings("unchecked")
     @Override
-    public List<System> getSystems() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("System",this.em,this.getUser().getUsername());
+    public List<System> getSystems() throws CloudProviderException {
+        return UtilsForManagers.getEntityList("System", this.em, this.getUser().getUsername());
     }
 
     @Override
-    public System getSystemById(final String systemId)
-            throws CloudProviderException {
+    public System getSystemById(final String systemId) throws CloudProviderException {
         if (systemId == null) {
             throw new InvalidRequestException(" null system id");
         }
         System result = this.em.find(System.class, new Integer(systemId));
-        
+
         if (result == null || result.getState() == System.State.DELETED) {
-            throw new ResourceNotFoundException(" Invalid system id "
-                    + systemId);
+            throw new ResourceNotFoundException(" Invalid system id " + systemId);
         }
         result.getMachines().size();
         result.getNetworks().size();
@@ -343,28 +378,24 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public SystemTemplate getSystemTemplateById(final String systemTemplateId)
-            throws CloudProviderException {
-        SystemTemplate result = this.em.find(SystemTemplate.class, new Integer(
-                systemTemplateId));
+    public SystemTemplate getSystemTemplateById(final String systemTemplateId) throws CloudProviderException {
+        SystemTemplate result = this.em.find(SystemTemplate.class, new Integer(systemTemplateId));
         return result;
     }
-    
+
+    @SuppressWarnings("unchecked")
     @Override
-    public List<SystemTemplate> getSystemTemplates() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("SystemTemplate",this.em,this.getUser().getUsername());
+    public List<SystemTemplate> getSystemTemplates() throws CloudProviderException {
+        return UtilsForManagers.getEntityList("SystemTemplate", this.em, this.getUser().getUsername());
     }
 
-    private ComponentDescriptor getComponentDescriptorById(
-            final String componentDescriptorId) throws CloudProviderException {
-        ComponentDescriptor result = this.em.find(ComponentDescriptor.class,
-                new Integer(componentDescriptorId));
+    private ComponentDescriptor getComponentDescriptorById(final String componentDescriptorId) throws CloudProviderException {
+        ComponentDescriptor result = this.em.find(ComponentDescriptor.class, new Integer(componentDescriptorId));
         return result;
     }
 
     @Override
-    public Job addVolumeToSystem(final Volume volume, final String systemId)
-            throws CloudProviderException {
+    public Job addVolumeToSystem(final Volume volume, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Volume> vols = s.getVolumes();
         vols.add(volume);
@@ -378,8 +409,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job removeVolumeFromSystem(final String volumeId,
-            final String systemId) throws CloudProviderException {
+    public Job removeVolumeFromSystem(final String volumeId, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Volume> vols = s.getVolumes();
         Volume v = this.volumeManager.getVolumeById(volumeId);
@@ -400,8 +430,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job addSystemToSystem(final System system, final String systemId)
-            throws CloudProviderException {
+    public Job addSystemToSystem(final System system, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<System> syss = s.getSystems();
         syss.add(system);
@@ -415,8 +444,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job removeSystemFromSystem(final String systemToRemoveId,
-            final String systemId) throws CloudProviderException {
+    public Job removeSystemFromSystem(final String systemToRemoveId, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<System> syss = s.getSystems();
         System sRemove = this.getSystemById(systemToRemoveId);
@@ -437,8 +465,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job addMachineToSystem(final Machine machine, final String systemId)
-            throws CloudProviderException {
+    public Job addMachineToSystem(final Machine machine, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Machine> machines = s.getMachines();
         machines.add(machine);
@@ -452,8 +479,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job removeMachineFromSystem(final String machineId,
-            final String systemId) throws CloudProviderException {
+    public Job removeMachineFromSystem(final String machineId, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Machine> machines = s.getMachines();
         Machine m = this.machineManager.getMachineById(machineId);
@@ -474,8 +500,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job addCredentialToSystem(final Credentials credential,
-            final String systemId) throws CloudProviderException {
+    public Job addCredentialToSystem(final Credentials credential, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Credentials> credentials = s.getCredentials();
         credentials.add(credential);
@@ -489,12 +514,10 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job removeCredentialFromSystem(final String credentialId,
-            final String systemId) throws CloudProviderException {
+    public Job removeCredentialFromSystem(final String credentialId, final String systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
         List<Credentials> credentials = s.getCredentials();
-        Credentials c = this.credentialsManager
-                .getCredentialsById(credentialId);
+        Credentials c = this.credentialsManager.getCredentialsById(credentialId);
 
         for (Credentials cred : credentials) {
             if (cred.getId().equals(c.getId())) {
@@ -512,9 +535,8 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public boolean addComponentDescriptorToSystemTemplate(
-            final ComponentDescriptor componentDescriptor,
-            final String systemTemplateId) throws CloudProviderException {
+    public boolean addComponentDescriptorToSystemTemplate(final ComponentDescriptor componentDescriptor,
+        final String systemTemplateId) throws CloudProviderException {
         SystemTemplate s = this.getSystemTemplateById(systemTemplateId);
         Set<ComponentDescriptor> descrs = s.getComponentDescriptors();
 
@@ -528,13 +550,11 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public boolean removeComponentDescriptorFromSystemTemplate(
-            final String componentDescriptorId, final String systemTemplateId)
-            throws CloudProviderException {
+    public boolean removeComponentDescriptorFromSystemTemplate(final String componentDescriptorId, final String systemTemplateId)
+        throws CloudProviderException {
         SystemTemplate s = this.getSystemTemplateById(systemTemplateId);
         Set<ComponentDescriptor> descrs = s.getComponentDescriptors();
-        ComponentDescriptor cd = this
-                .getComponentDescriptorById(componentDescriptorId);
+        ComponentDescriptor cd = this.getComponentDescriptorById(componentDescriptorId);
 
         for (ComponentDescriptor cdesc : descrs) {
             if (cdesc.getId().equals(cd.getId())) {
@@ -551,140 +571,143 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public System updateComponentDescriptor(final String id,
-            final Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public System updateComponentDescriptor(final String id, final Map<String, Object> updatedAttributes)
+        throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public System updateSystem(final String id,
-            final Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public System updateSystem(final String id, final Map<String, Object> updatedAttributes) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public SystemTemplate updateSystemTemplate(final String id,
-            final Map<String, Object> updatedAttributes)
-            throws CloudProviderException {
+    public SystemTemplate updateSystemTemplate(final String id, final Map<String, Object> updatedAttributes)
+        throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
     public Job startSystem(final String systemId) throws CloudProviderException {
-        // Job j = this.doService(systemId, "start");
 
-        // implementation for system not supported by underlying connector
-        System s = this.getSystemById(systemId);
-        s.setState(State.STARTING);
-        // creation of main system job
-        Job parentJob = this.createJob(START_ACTION, s);
-        this.em.persist(parentJob);
-        this.em.flush();
+        Job parentJob = null;
+        if (0 == 0) {
+            parentJob = this.doService(systemId, START_ACTION);
+        } else {
+            // implementation for system not supported by underlying connector
+            System s = this.getSystemById(systemId);
+            s.setState(State.STARTING);
+            // creation of main system job
+            parentJob = this.createJob(START_ACTION, s);
+            this.em.persist(parentJob);
+            this.em.flush();
 
-        for (Machine m : s.getMachines()) {
-            Job j = machineManager.startMachine(m.getId().toString());
-            j.setParentJob(parentJob);
+            for (Machine m : s.getMachines()) {
+                Job j = machineManager.startMachine(m.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (Volume v : s.getVolumes()) {
+                // Job j=volumeManager..startVolume(v.getId().toString());
+                // j.setParentJob(parentJob);
+            }
+            for (System sy : s.getSystems()) {
+                Job j = this.startSystem(sy.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (Network n : s.getNetworks()) {
+                Job j = networkManager.startNetwork(n.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (Credentials c : s.getCredentials()) {
+                // Job j=volumeManager..startVolume(v.getId().toString());
+                // j.setParentJob(parentJob);
+            }
         }
-        for (Volume v : s.getVolumes()) {
-            // Job j=volumeManager..startVolume(v.getId().toString());
-            // j.setParentJob(parentJob);
-        }
-        for (System sy : s.getSystems()) {
-            Job j = this.startSystem(sy.getId().toString());
-            j.setParentJob(parentJob);
-        }
-        for (Network n : s.getNetworks()) {
-            Job j = networkManager.startNetwork(n.getId().toString());
-            j.setParentJob(parentJob);
-        }
-        for (Credentials c : s.getCredentials()) {
-            // Job j=volumeManager..startVolume(v.getId().toString());
-            // j.setParentJob(parentJob);
-        }
-
         return parentJob;
     }
 
     @Override
     public Job stopSystem(final String systemId) throws CloudProviderException {
-        // Job j = this.doService(systemId, "stop");
+        Job parentJob = null;
+        if (0 == 0) {
+            parentJob = this.doService(systemId, STOP_ACTION);
+        } else {
+            // implementation for system not supported by underlying connector
+            System s = this.getSystemById(systemId);
+            s.setState(State.STOPPING);
+            // creation of main system job
+            parentJob = this.createJob(STOP_ACTION, s);
+            this.em.persist(parentJob);
+            this.em.flush();
 
-        // implementation for system not supported by underlying connector
-        System s = this.getSystemById(systemId);
-        s.setState(State.STOPPING);
-        // creation of main system job
-        Job parentJob = this.createJob(STOP_ACTION, s);
-        this.em.persist(parentJob);
-        this.em.flush();
-
-        for (Machine m : s.getMachines()) {
-            Job j = machineManager.stopMachine(m.getId().toString());
-            j.setParentJob(parentJob);
+            for (Machine m : s.getMachines()) {
+                Job j = machineManager.stopMachine(m.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (Volume v : s.getVolumes()) {
+                // Job j=volumeManager..startVolume(v.getId().toString());
+                // j.setParentJob(parentJob);
+            }
+            for (System sy : s.getSystems()) {
+                Job j = this.stopSystem(sy.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (Network n : s.getNetworks()) {
+                Job j = networkManager.stopNetwork(n.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (Credentials c : s.getCredentials()) {
+                // Job j=volumeManager..startVolume(v.getId().toString());
+                // j.setParentJob(parentJob);
+            }
         }
-        for (Volume v : s.getVolumes()) {
-            // Job j=volumeManager..startVolume(v.getId().toString());
-            // j.setParentJob(parentJob);
-        }
-        for (System sy : s.getSystems()) {
-            Job j = this.stopSystem(sy.getId().toString());
-            j.setParentJob(parentJob);
-        }
-        for (Network n : s.getNetworks()) {
-            Job j = networkManager.stopNetwork(n.getId().toString());
-            j.setParentJob(parentJob);
-        }
-        for (Credentials c : s.getCredentials()) {
-            // Job j=volumeManager..startVolume(v.getId().toString());
-            // j.setParentJob(parentJob);
-        }
-
         return parentJob;
     }
 
     @Override
-    public Job deleteSystem(final String systemId)
-            throws CloudProviderException {
-        // implementation for system not supported by underlying connector
-        System s = this.getSystemById(systemId);
-        s.setState(State.DELETING);
-        // creation of main system job
-        Job parentJob = this.createJob(DELETE_ACTION, s);
-        this.em.persist(parentJob);
-        this.em.flush();
+    public Job deleteSystem(final String systemId) throws CloudProviderException {
+        Job parentJob = null;
+        if (0 == 0) {
+            parentJob = this.doService(systemId, DELETE_ACTION);
+        } else {
+            // implementation for system not supported by underlying connector
+            System s = this.getSystemById(systemId);
+            s.setState(State.DELETING);
+            // creation of main system job
+            parentJob = this.createJob(DELETE_ACTION, s);
+            this.em.persist(parentJob);
+            this.em.flush();
 
-        for (Machine m : s.getMachines()) {
-            Job j = machineManager.deleteMachine(m.getId().toString());
-            j.setParentJob(parentJob);
+            for (Machine m : s.getMachines()) {
+                Job j = machineManager.deleteMachine(m.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (Volume v : s.getVolumes()) {
+                Job j = volumeManager.deleteVolume(v.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (System sy : s.getSystems()) {
+                Job j = this.deleteSystem(sy.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (Network n : s.getNetworks()) {
+                Job j = networkManager.deleteNetwork(n.getId().toString());
+                j.setParentJob(parentJob);
+            }
+            for (Credentials c : s.getCredentials()) {
+                credentialsManager.deleteCredentials(c.getId().toString());
+                // j.setParentJob(parentJob);
+            }
         }
-        for (Volume v : s.getVolumes()) {
-            Job j = volumeManager.deleteVolume(v.getId().toString());
-            j.setParentJob(parentJob);
-        }
-        for (System sy : s.getSystems()) {
-            Job j = this.deleteSystem(sy.getId().toString());
-            j.setParentJob(parentJob);
-        }
-        for (Network n : s.getNetworks()) {
-            Job j = networkManager.deleteNetwork(n.getId().toString());
-            j.setParentJob(parentJob);
-        }
-        for (Credentials c : s.getCredentials()) {
-            credentialsManager.deleteCredentials(c.getId().toString());
-            // j.setParentJob(parentJob);
-        }
-
         return parentJob;
     }
 
     // private methods
 
-    private Job doService(final String systemId, final String action)
-            throws CloudProviderException {
+    private Job doService(final String systemId, final String action) throws CloudProviderException {
 
         System s = this.getSystemById(systemId);
 
@@ -693,9 +716,8 @@ public class SystemManager implements ISystemManager {
         /*
          * ICloudProviderConnector connector = this.getConnector(s); if
          * (connector == null) { throw new
-         * CloudProviderException("no connector found"); } Job j;
-         * 
-         * try { if (action.equals("start")) { j =
+         * CloudProviderException("no connector found"); } Job j; try { if
+         * (action.equals("start")) { j =
          * connector.getSystemService().startSystem( s.getProviderAssignedId());
          * s.setState(System.State.STARTING); } else if (action.equals("stop"))
          * { j = connector.getSystemService().stopSystem(
@@ -705,26 +727,17 @@ public class SystemManager implements ISystemManager {
          * s.getProviderAssignedId() + " " + s.getId()); } } catch
          * (ConnectorException e) { throw new
          * ServiceUnavailableException(e.getMessage() + " action " + action +
-         * " system id " + s.getProviderAssignedId() + " " + s.getId());
-         * 
-         * }
-         * 
-         * j.setTargetEntity(s); j.setUser(this.getUser());
-         * 
-         * this.em.persist(j); this.em.flush();
-         * 
-         * if (j.getStatus() == Job.Status.RUNNING) { try {
+         * " system id " + s.getProviderAssignedId() + " " + s.getId()); }
+         * j.setTargetEntity(s); j.setUser(this.getUser()); this.em.persist(j);
+         * this.em.flush(); if (j.getStatus() == Job.Status.RUNNING) { try {
          * connector.setNotificationOnJobCompletion(j .getProviderAssignedId());
          * } catch (Exception e) { throw new
          * ServiceUnavailableException(e.getMessage() + "  system " + action); }
-         * }
-         * 
-         * // Ask for connector to notify when job completes try {
+         * } // Ask for connector to notify when job completes try {
          * connector.setNotificationOnJobCompletion(j.getProviderAssignedId());
          * } catch (Exception e) { throw new
-         * ServiceUnavailableException(e.getMessage()); }
-         * 
-         * this.relConnector(s, connector);
+         * ServiceUnavailableException(e.getMessage()); } this.relConnector(s,
+         * connector);
          */
 
         return null;
@@ -738,15 +751,11 @@ public class SystemManager implements ISystemManager {
         return true;
     }
 
-    private void relConnector(final System ce,
-            final ICloudProviderConnector connector)
-            throws CloudProviderException {
-        String cpType = ce.getCloudProviderAccount().getCloudProvider()
-                .getCloudProviderType();
+    private void relConnector(final System ce, final ICloudProviderConnector connector) throws CloudProviderException {
+        String cpType = ce.getCloudProviderAccount().getCloudProvider().getCloudProviderType();
         ICloudProviderConnectorFactory cFactory = null;
         try {
-            cFactory = this.cloudProviderConnectorFactoryFinder
-                    .getCloudProviderConnectorFactory(cpType);
+            cFactory = this.cloudProviderConnectorFactoryFinder.getCloudProviderConnectorFactory(cpType);
             String connectorId = connector.getCloudProviderId();
             cFactory.disposeCloudProviderConnector(connectorId);
         } catch (ConnectorException e) {
@@ -755,8 +764,7 @@ public class SystemManager implements ISystemManager {
     }
 
     private CloudProvider selectCloudProvider() {
-        Query q = this.em
-                .createQuery("FROM CloudProvider c WHERE c.cloudProviderType=:type");
+        Query q = this.em.createQuery("FROM CloudProvider c WHERE c.cloudProviderType=:type");
         q.setParameter("type", "mock");
 
         q.setMaxResults(1);
@@ -770,18 +778,15 @@ public class SystemManager implements ISystemManager {
         return null;
     }
 
-    private CloudProviderAccount selectCloudProviderAccount(
-            final CloudProvider provider) {
-        Set<CloudProviderAccount> accounts = provider
-                .getCloudProviderAccounts();
+    private CloudProviderAccount selectCloudProviderAccount(final CloudProvider provider) {
+        Set<CloudProviderAccount> accounts = provider.getCloudProviderAccounts();
         if (accounts.isEmpty() == false) {
             return accounts.iterator().next();
         }
         return null;
     }
 
-    private ICloudProviderConnector getConnector(final System s)
-            throws CloudProviderException {
+    private ICloudProviderConnector getConnector(final System s) throws CloudProviderException {
 
         ICloudProviderConnector connector = null;
 
@@ -789,15 +794,13 @@ public class SystemManager implements ISystemManager {
         return connector;
     }
 
-    private ICloudProviderConnector getCloudProviderConnector()
-            throws CloudProviderException {
+    private ICloudProviderConnector getCloudProviderConnector() throws CloudProviderException {
 
         CloudProvider cloudProvider = this.selectCloudProvider();
         if (cloudProvider == null) {
             throw new CloudProviderException("no provider found");
         }
-        CloudProviderAccount cloudProviderAccount = this
-                .selectCloudProviderAccount(cloudProvider);
+        CloudProviderAccount cloudProviderAccount = this.selectCloudProviderAccount(cloudProvider);
         if (cloudProviderAccount == null) {
             throw new CloudProviderException("no provider account found");
         }
@@ -806,22 +809,18 @@ public class SystemManager implements ISystemManager {
             throw new CloudProviderException("Cloud provider account ");
         }
         ICloudProviderConnectorFactory connectorFactory = this.cloudProviderConnectorFactoryFinder
-                .getCloudProviderConnectorFactory(cloudProviderAccount
-                        .getCloudProvider().getCloudProviderType());
+            .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
         if (connectorFactory == null) {
-            throw new CloudProviderException(
-                    " Internal error in connector factory ");
+            throw new CloudProviderException(" Internal error in connector factory ");
         }
 
         CloudProviderLocation location = null;
 
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount,
-                location);
+        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
     }
 
-    private ICloudProviderConnector getCloudProviderConnector(
-            final CloudProviderAccount cloudProviderAccount)
-            throws CloudProviderException {
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
+        throws CloudProviderException {
 
         CloudProvider cloudProvider = cloudProviderAccount.getCloudProvider();
 
@@ -829,21 +828,17 @@ public class SystemManager implements ISystemManager {
             throw new CloudProviderException("Cloud provider account ");
         }
         ICloudProviderConnectorFactory connectorFactory = this.cloudProviderConnectorFactoryFinder
-                .getCloudProviderConnectorFactory(cloudProviderAccount
-                        .getCloudProvider().getCloudProviderType());
+            .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
         if (connectorFactory == null) {
-            throw new CloudProviderException(
-                    " Internal error in connector factory ");
+            throw new CloudProviderException(" Internal error in connector factory ");
         }
 
         CloudProviderLocation location = null;
 
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount,
-                location);
+        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
     }
 
-    private Job createJob(final String action, final CloudResource targetEntity)
-            throws CloudProviderException {
+    private Job createJob(final String action, final CloudResource targetEntity) throws CloudProviderException {
 
         Job job = new Job();
         job.setAction(action);
@@ -871,7 +866,7 @@ public class SystemManager implements ISystemManager {
             SystemManager.logger.info("unable to get job " + notification_id);
             return false;
         }
-        
+
         SystemManager.logger.info(" System Notification for job " + job.getId());
 
         Status state = Status.SUCCESS;
@@ -881,7 +876,7 @@ public class SystemManager implements ISystemManager {
         boolean running = false;
 
         try {
-            job=jobManager.getJobById(job.getId().toString());
+            job = jobManager.getJobById(job.getId().toString());
         } catch (ResourceNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -889,7 +884,7 @@ public class SystemManager implements ISystemManager {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        
+
         for (Job j : job.getNestedJobs()) {
             if (j.getStatus().equals(Status.FAILED)) {
                 failed = true;
@@ -903,7 +898,8 @@ public class SystemManager implements ISystemManager {
             if (j.getStatus().equals(Status.SUCCESS)) {
                 // update System in database if not already done
                 if (!job.getProperties().containsKey(j.getId().toString())) {
-                    SystemManager.logger.info(" SystemHandler updating successful job " + job.getId()+" for main job "+job.getId().toString());
+                    SystemManager.logger.info(" SystemHandler updating successful job " + job.getId() + " for main job "
+                        + job.getId().toString());
                     System s = (System) job.getTargetEntity();
 
                     if (j.getTargetEntity() instanceof Machine) {
@@ -912,35 +908,31 @@ public class SystemManager implements ISystemManager {
                             s.getMachines().add((Machine) j.getTargetEntity());
                         }
 
-                        job.getProperties().put(j.getId().toString(),
-                                HANDLED_JOB);
+                        job.getProperties().put(j.getId().toString(), HANDLED_JOB);
                     }
                     if (j.getTargetEntity() instanceof Volume) {
-                        
+
                         if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
                             s.getVolumes().add((Volume) j.getTargetEntity());
                         }
-                        
-                        job.getProperties().put(j.getId().toString(),
-                                HANDLED_JOB);
+
+                        job.getProperties().put(j.getId().toString(), HANDLED_JOB);
                     }
                     if (j.getTargetEntity() instanceof System) {
-                        
+
                         if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
                             s.getSystems().add((System) j.getTargetEntity());
                         }
-                        
-                        job.getProperties().put(j.getId().toString(),
-                                HANDLED_JOB);
+
+                        job.getProperties().put(j.getId().toString(), HANDLED_JOB);
                     }
                     if (j.getTargetEntity() instanceof Network) {
-                        
+
                         if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
                             s.getNetworks().add((Network) j.getTargetEntity());
                         }
-                        
-                        job.getProperties().put(j.getId().toString(),
-                                HANDLED_JOB);
+
+                        job.getProperties().put(j.getId().toString(), HANDLED_JOB);
                     }
                     /*
                      * if (j.getTargetEntity() instanceof Credentials) {
@@ -956,7 +948,7 @@ public class SystemManager implements ISystemManager {
             job.setStatus(Status.FAILED);
             System s = (System) job.getTargetEntity();
             s.setState(State.ERROR);
-            SystemManager.logger.info(" SystemHandler one or more jobs are failed "+job.getId().toString());
+            SystemManager.logger.info(" SystemHandler one or more jobs are failed " + job.getId().toString());
             return true;
         }
         if (cancelled) {
@@ -964,21 +956,21 @@ public class SystemManager implements ISystemManager {
             job.setStatus(Status.CANCELLED);
             System s = (System) job.getTargetEntity();
             s.setState(State.ERROR);
-            SystemManager.logger.info(" SystemHandler one or more jobs are cancelled "+job.getId().toString());
+            SystemManager.logger.info(" SystemHandler one or more jobs are cancelled " + job.getId().toString());
             return true;
         }
         if (running) {
             // one or more jobs are running, so all is running
             job.setStatus(Status.RUNNING);
-            SystemManager.logger.info(" SystemHandler one or more jobs are running "+job.getId().toString());
+            SystemManager.logger.info(" SystemHandler one or more jobs are running " + job.getId().toString());
             return true;
         }
 
         // job success
         job.setStatus(Status.SUCCESS);
         System s = (System) job.getTargetEntity();
-        SystemManager.logger.info(" SystemHandler all jobs are successful "+job.getId().toString());
-        
+        SystemManager.logger.info(" SystemHandler all jobs are successful " + job.getId().toString());
+
         if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
             s.setState(State.CREATED);
         }
@@ -990,17 +982,15 @@ public class SystemManager implements ISystemManager {
         }
         if (job.getAction().equals(SystemManager.DELETE_ACTION)) {
             s.setState(System.State.DELETED);
-            //this.em.remove(s);
+            // this.em.remove(s);
         }
-
 
         // Find the system by providerAssignedId (or the job as well)
         /*
          * String jid = job.getProviderAssignedId().toString(); //
          * providerAssignedSystemId String pasid =
-         * job.getTargetEntity().getId().toString(); Job jpersisted = null;
-         * 
-         * try { jpersisted = (Job) this.em
+         * job.getTargetEntity().getId().toString(); Job jpersisted = null; try
+         * { jpersisted = (Job) this.em
          * .createQuery("FROM Job j WHERE j.providerAssignedId=:jid")
          * .setParameter("jid", jid).getSingleResult(); } catch
          * (NoResultException e) { // ignore for now
@@ -1009,37 +999,29 @@ public class SystemManager implements ISystemManager {
          * SystemManager.logger.info("No single job for system !!" + pasid);
          * return false; } catch (Exception e) { SystemManager.logger
          * .info("Internal error in finding job for system" + pasid); return
-         * false; } System sPersisted = null;
-         * 
-         * try { if (jpersisted == null) { //** // * find the system from its
-         * providerAssignedId in fact there // * could be more than one machine
-         * with same same // * providerAssignedId? // * sPersisted = (System)
-         * this.em .createQuery(
+         * false; } System sPersisted = null; try { if (jpersisted == null) {
+         * //** // * find the system from its providerAssignedId in fact there
+         * // * could be more than one machine with same same // *
+         * providerAssignedId? // * sPersisted = (System) this.em .createQuery(
          * "FROM System s WHERE s.providerAssignedId=:pamid")
-         * .setParameter("pamid", pasid).getSingleResult();
-         * 
-         * } else { // find the machine from its id Integer mid =
+         * .setParameter("pamid", pasid).getSingleResult(); } else { // find the
+         * machine from its id Integer mid =
          * Integer.valueOf(jpersisted.getTargetEntity() .getId().toString());
-         * sPersisted = this.em.find(System.class, mid); }
-         * 
-         * } catch (NoResultException e) {
+         * sPersisted = this.em.find(System.class, mid); } } catch
+         * (NoResultException e) {
          * SystemManager.logger.info("Could not find the system or job for " +
          * pasid); return false; } catch (NonUniqueResultException e) {
          * SystemManager.logger.info("Multiple system found for " + pasid);
          * return false; } catch (Exception e) { SystemManager.logger
          * .info("Unknown error : Could not find the system or job for " +
-         * pasid); return false; }
-         * 
-         * // update the system by invoking the connector CloudProviderAccount
-         * cpa = sPersisted.getCloudProviderAccount(); ICloudProviderConnector
+         * pasid); return false; } // update the system by invoking the
+         * connector CloudProviderAccount cpa =
+         * sPersisted.getCloudProviderAccount(); ICloudProviderConnector
          * connector; try { connector = this.getCloudProviderConnector(cpa); }
          * catch (CloudProviderException e) { // no point to return false?
          * SystemManager.logger.info("Could not get cloud connector " +
-         * e.getMessage()); return false; }
-         * 
-         * // TODO: update system in the database...
-         * 
-         * this.em.flush();
+         * e.getMessage()); return false; } // TODO: update system in the
+         * database... this.em.flush();
          */
         return true;
     }

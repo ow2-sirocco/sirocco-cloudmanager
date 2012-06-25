@@ -459,6 +459,25 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return null;
     }
 
+    private boolean waitForJob(Job j, long maxTimeSecond) {
+        long time = 0;
+        while (j.getStatus().equals(Job.Status.RUNNING)) {
+            try {
+                time++;
+                if (time > maxTimeSecond) {
+                    return true;
+                }
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+            }
+        }
+        if (j.getStatus().equals(Status.FAILED) || j.getStatus().equals(Status.CANCELLED)
+            || j.getStatus().equals(Status.RUNNING)) {
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public Job createSystem(final SystemCreate systemCreate) throws ConnectorException {
 
@@ -475,15 +494,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         system.setLocation(this.cloudProviderLocation);
         system.setDescription(systemCreate.getSystemTemplate().getDescription());
         system.setName(systemCreate.getSystemTemplate().getName());
-        // systemCreate.getSystemTemplate().getComponentDescriptors().
 
         Set<ComponentDescriptor> componentDescriptors = systemCreate.getSystemTemplate().getComponentDescriptors();
 
         // iterating through descriptors
-        // fusion of manager algorithm create+handleJob :)
 
-        boolean failed = false;
-        boolean cancelled = false;
+        boolean failedCancelled = false;
 
         Iterator<ComponentDescriptor> iter = componentDescriptors.iterator();
         while (iter.hasNext()) {
@@ -502,20 +518,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     mc.setDescription(cd.getComponentDescription());
                     mc.setProperties(cd.getProperties());
                     Job j = this.createMachine(mc);
-                    while (j.getStatus().equals(Job.Status.RUNNING)) {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                        }
-                    }
+                    failedCancelled = waitForJob(j, maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         system.getMachines().add((Machine) j.getTargetEntity());
-                    }
-                    if (j.getStatus().equals(Status.FAILED)) {
-                        failed = true;
-                    }
-                    if (j.getStatus().equals(Status.CANCELLED)) {
-                        cancelled = true;
                     }
                 }
             }
@@ -533,20 +538,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     vc.setProperties(cd.getProperties());
 
                     Job j = this.createVolume(vc);
-                    while (j.getStatus().equals(Job.Status.RUNNING)) {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                        }
-                    }
+                    failedCancelled = waitForJob(j, maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         system.getVolumes().add((Volume) j.getTargetEntity());
-                    }
-                    if (j.getStatus().equals(Status.FAILED)) {
-                        failed = true;
-                    }
-                    if (j.getStatus().equals(Status.CANCELLED)) {
-                        cancelled = true;
                     }
                 }
             }
@@ -564,20 +558,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     sc.setProperties(cd.getProperties());
 
                     Job j = this.createSystem(sc);
-                    while (j.getStatus().equals(Job.Status.RUNNING)) {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                        }
-                    }
+                    failedCancelled = waitForJob(j, maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         system.getSystems().add((System) j.getTargetEntity());
-                    }
-                    if (j.getStatus().equals(Status.FAILED)) {
-                        failed = true;
-                    }
-                    if (j.getStatus().equals(Status.CANCELLED)) {
-                        cancelled = true;
                     }
                 }
             }
@@ -595,31 +578,20 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     nc.setProperties(cd.getProperties());
 
                     Job j = this.createNetwork(nc);
-                    while (j.getStatus().equals(Job.Status.RUNNING)) {
-                        try {
-                            Thread.sleep(500);
-                        } catch (InterruptedException e) {
-                        }
-                    }
+                    failedCancelled = waitForJob(j, maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         system.getNetworks().add((Network) j.getTargetEntity());
-                    }
-                    if (j.getStatus().equals(Status.FAILED)) {
-                        failed = true;
-                    }
-                    if (j.getStatus().equals(Status.CANCELLED)) {
-                        cancelled = true;
                     }
                 }
             }
         }
 
-        if (failed || cancelled) {
+        if (failedCancelled) {
             // one or more jobs are failed, so all is failed
             system.setState(System.State.ERROR);
         }
 
-        return this.simulateProviderTask(system, SystemAction.CREATE, failed | cancelled);
+        return simulateProviderTask(system, SystemAction.CREATE, failedCancelled);
     }
 
     // private utility methods for System services (start,stop,etc)
@@ -628,15 +600,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         boolean failedCancelled = false;
         for (CloudResource m : l) {
             Job j = this.callSystemService(m, action, m.getProviderAssignedId().toString());
-            while (j.getStatus().equals(Job.Status.RUNNING)) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                }
-            }
-            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
-                failedCancelled = true;
-            }
+            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
         return failedCancelled;
     }
@@ -753,6 +717,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static final List<System.State> forbiddenSystemRestartActions = ImmutableList.of();
 
+    private static final long maxJobTimeInSeconds = 600;
+
     private Job doSystemService(final String systemId, final System.State temporaryState, final SystemAction action,
         final List<System.State> forbiddenStates) throws ConnectorException {
         MockCloudProviderConnector.logger.info(action + " system with providerAssignedId " + systemId);
@@ -821,51 +787,19 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         for (Machine m : system.getMachines()) {
             Job j = this.deleteMachine(m.getId().toString());
-            while (j.getStatus().equals(Job.Status.RUNNING)) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                }
-            }
-            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
-                failedCancelled = true;
-            }
+            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
         for (System m : system.getSystems()) {
             Job j = this.deleteSystem(m.getId().toString());
-            while (j.getStatus().equals(Job.Status.RUNNING)) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                }
-            }
-            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
-                failedCancelled = true;
-            }
+            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
         for (Volume m : system.getVolumes()) {
             Job j = this.deleteVolume(m.getId().toString());
-            while (j.getStatus().equals(Job.Status.RUNNING)) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                }
-            }
-            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
-                failedCancelled = true;
-            }
+            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
         for (Network m : system.getNetworks()) {
             Job j = this.deleteNetwork(m.getId().toString());
-            while (j.getStatus().equals(Job.Status.RUNNING)) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                }
-            }
-            if ((j.getStatus().equals(Status.FAILED)) || (j.getStatus().equals(Status.CANCELLED))) {
-                failedCancelled = true;
-            }
+            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
         system.setState(System.State.DELETING);
 

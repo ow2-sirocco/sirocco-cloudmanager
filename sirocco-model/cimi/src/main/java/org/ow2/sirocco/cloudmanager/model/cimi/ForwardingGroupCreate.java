@@ -25,35 +25,10 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
-import java.io.Serializable;
-import java.util.Map;
-
-public class ForwardingGroupCreate implements Serializable {
+public class ForwardingGroupCreate extends CloudEntityCreate {
     private static final long serialVersionUID = 1L;
 
-    private String name;
-
-    private String description;
-
-    private Map<String, String> properties;
-
     private ForwardingGroupTemplate forwardingGroupTemplate;
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
 
     public ForwardingGroupTemplate getForwardingGroupTemplate() {
         return this.forwardingGroupTemplate;
@@ -62,13 +37,4 @@ public class ForwardingGroupCreate implements Serializable {
     public void setForwardingGroupTemplate(final ForwardingGroupTemplate forwardingGroupTemplate) {
         this.forwardingGroupTemplate = forwardingGroupTemplate;
     }
-
-    public Map<String, String> getProperties() {
-        return this.properties;
-    }
-
-    public void setProperties(final Map<String, String> properties) {
-        this.properties = properties;
-    }
-
 }

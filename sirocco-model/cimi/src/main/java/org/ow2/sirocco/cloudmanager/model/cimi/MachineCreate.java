@@ -25,44 +25,11 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
-import java.io.Serializable;
-import java.util.Map;
-
-public class MachineCreate implements Serializable {
+public class MachineCreate extends CloudEntityCreate {
 
     private static final long serialVersionUID = -1L;
 
-    private String name;
-
-    private String description;
-
-    private Map<String, String> properties;
-
     private MachineTemplate machineTemplate;
-
-    public String getName() {
-        return this.name;
-    }
-
-    public void setName(final String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return this.description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public Map<String, String> getProperties() {
-        return this.properties;
-    }
-
-    public void setProperties(final Map<String, String> properties) {
-        this.properties = properties;
-    }
 
     public MachineTemplate getMachineTemplate() {
         return this.machineTemplate;
