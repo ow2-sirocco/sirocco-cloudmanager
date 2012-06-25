@@ -43,8 +43,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -52,10 +50,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
@@ -289,24 +284,22 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
         //
 
         private String findSuitableInstanceType(final MachineConfiguration machineConfig) {
-            long memoryInMBytes = (long) (machineConfig.getMemory().getQuantity() * machineConfig.getMemory().getUnit()
-                .valueInBytes())
-                / (1024L * 1024);
+            long memoryInMBytes = machineConfig.getMemory() / 1024;
 
             for (Hardware hardware : AmazonCloudProviderConnectorFactory.AWSEC2_HARDWARE_MAP.values()) {
                 if (memoryInMBytes == hardware.getRam()) {
-                    if (machineConfig.getCpu().getNumberCpu() == hardware.getProcessors().size()) {
+                    if (machineConfig.getCpu() == hardware.getProcessors().size()) {
                         // special test for micro instance with no disk
                         if (hardware.getVolumes().size() == 0 && machineConfig.getDiskTemplates().size() == 1
-                            && machineConfig.getDiskTemplates().get(0).getQuantity() == 0) {
+                            && machineConfig.getDiskTemplates().get(0).getCapacity() == 0) {
                             return hardware.getProviderId();
                         }
                         if (machineConfig.getDiskTemplates().size() == hardware.getVolumes().size()) {
                             // XXX we assume that disks are ordered the same way
                             int i = 0;
                             for (; i < machineConfig.getDiskTemplates().size(); i++) {
-                                long diskSizeInGigaBytes = (long) (machineConfig.getDiskTemplates().get(i).getQuantity()
-                                    * machineConfig.getDiskTemplates().get(0).getUnit().valueInBytes() / (1000 * 1000));
+                                long diskSizeInGigaBytes = machineConfig.getDiskTemplates().get(i).getCapacity()
+                                    / (1000 * 1000);
                                 long hardwareDiskSizeInGigaBytes = hardware.getVolumes().get(i).getSize().longValue();
                                 if (diskSizeInGigaBytes != hardwareDiskSizeInGigaBytes) {
                                     break;
@@ -386,29 +379,19 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
             }
 
             Hardware hardware = AmazonCloudProviderConnectorFactory.AWSEC2_HARDWARE_MAP.get(runningInstance.getInstanceType());
-            Cpu cpu = new Cpu();
-            cpu.setNumberCpu(hardware.getProcessors().size());
-            machine.setCpu(cpu);
-            Memory memory = new Memory();
-            memory.setQuantity((float) hardware.getRam());
-            memory.setUnit(MemoryUnit.MEGIBYTE);
+            machine.setCpu(hardware.getProcessors().size());
+            machine.setMemory(hardware.getRam() * 1024);
             List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
             if (hardware.getVolumes().size() == 0) {
                 MachineDisk machineDisk = new MachineDisk();
-                Disk disk = new Disk();
-                disk.setQuantity(0.0f);
-                disk.setUnit(StorageUnit.MEGABYTE);
                 machineDisk.setInitialLocation("");
-                machineDisk.setDisk(disk);
+                machineDisk.setCapacity(0);
                 machineDisks.add(machineDisk);
             } else {
                 for (org.jclouds.compute.domain.Volume volume : hardware.getVolumes()) {
                     MachineDisk machineDisk = new MachineDisk();
-                    Disk disk = new Disk();
-                    disk.setQuantity(volume.getSize() * 1024);
-                    disk.setUnit(StorageUnit.MEGABYTE);
                     machineDisk.setInitialLocation(volume.getDevice());
-                    machineDisk.setDisk(disk);
+                    machineDisk.setCapacity((int) (volume.getSize() * 1000 * 1000));
                     machineDisks.add(machineDisk);
                 }
             }
@@ -772,7 +755,6 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
 
         private void fromEbsVolumetToCimiVolume(final org.jclouds.ec2.domain.Volume ebsVolume, final Volume cimiVolume) {
             cimiVolume.setProviderAssignedId(ebsVolume.getId());
-            Disk disk = new Disk();
             cimiVolume.setCapacity(ebsVolume.getSize() * 1000 * 1000);
             cimiVolume.setState(this.fromEbsVolumeStatusToCimiVolumeState(ebsVolume.getStatus()));
         }

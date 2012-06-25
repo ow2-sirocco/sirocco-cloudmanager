@@ -69,8 +69,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -79,10 +77,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
@@ -276,16 +271,14 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         private String findSuitableFlavor(final MachineConfiguration machineConfig) {
             for (Flavor flavor : this.flavors) {
-                long memoryInBytes = (long) (machineConfig.getMemory().getQuantity() * machineConfig.getMemory().getUnit()
-                    .valueInBytes());
-                long flavorMemoryInBytes = flavor.getRam() * 1024 * 1024;
-                if (memoryInBytes == flavorMemoryInBytes) {
-                    if (machineConfig.getCpu().getNumberCpu() == flavor.getVcpus()) {
+                long memoryInKBytes = machineConfig.getMemory();
+                long flavorMemoryInKBytes = flavor.getRam() * 1024;
+                if (memoryInKBytes == flavorMemoryInKBytes) {
+                    if (machineConfig.getCpu() == flavor.getVcpus()) {
                         if (machineConfig.getDiskTemplates().size() == 1) {
-                            long diskSizeInBytes = (long) (machineConfig.getDiskTemplates().get(0).getQuantity() * machineConfig
-                                .getDiskTemplates().get(0).getUnit().valueInBytes());
-                            long flavorDiskSizeInBytes = flavor.getDisk() * 1000 * 1000;
-                            if (diskSizeInBytes == flavorDiskSizeInBytes) {
+                            long diskSizeInKBytes = machineConfig.getDiskTemplates().get(0).getCapacity();
+                            long flavorDiskSizeInKBytes = flavor.getDisk() * 1000;
+                            if (diskSizeInKBytes == flavorDiskSizeInKBytes) {
                                 return flavor.getId();
                             }
                         }
@@ -368,18 +361,11 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             }
 
             Flavor flavor = this.novaClient.getFlavorClientForZone(this.zone).getFlavor(server.getFlavor().getId());
-            Cpu cpu = new Cpu();
-            cpu.setNumberCpu(flavor.getVcpus());
-            machine.setCpu(cpu);
-            Memory memory = new Memory();
-            memory.setQuantity((float) flavor.getRam());
-            memory.setUnit(MemoryUnit.MEGIBYTE);
+            machine.setCpu(flavor.getVcpus());
+            machine.setMemory(flavor.getRam() * 1024);
             List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
             MachineDisk machineDisk = new MachineDisk();
-            Disk disk = new Disk();
-            disk.setQuantity((float) flavor.getDisk());
-            disk.setUnit(StorageUnit.MEGABYTE);
-            machineDisk.setDisk(disk);
+            machineDisk.setCapacity(flavor.getDisk() * 1000);
             machineDisks.add(machineDisk);
             machine.setDisks(machineDisks);
         }

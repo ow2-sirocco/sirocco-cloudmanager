@@ -57,7 +57,6 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -68,11 +67,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
-import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
@@ -229,26 +226,17 @@ public class MachineManagerTest {
         properties.put("entity", "machineconfiguration");
         in_c.setProperties(properties);
 
-        Cpu cpu = new Cpu();
-        cpu.setCpuSpeedUnit(Cpu.Frequency.GIGA);
-        cpu.setQuantity((float) 3.5);
-        cpu.setNumberCpu(1);
-        Memory mem = new Memory();
-        mem.setUnit(Memory.MemoryUnit.MEGIBYTE);
-        mem.setQuantity((float) 1.5);
-
         List<DiskTemplate> dTemplates = new ArrayList<DiskTemplate>();
 
         for (int i = 0; i < 2; i++) {
             DiskTemplate dt = new DiskTemplate();
-            dt.setUnit(StorageUnit.MEGABYTE);
-            dt.setQuantity((float) 4.5);
+            dt.setCapacity(4500);
             dt.setFormat("ext3");
             dt.setInitialLocation("/dev/sd" + i);
             dTemplates.add(dt);
         }
-        in_c.setCpu(cpu);
-        in_c.setMemory(mem);
+        in_c.setCpu(1);
+        in_c.setMemory(1024 + 512);
         in_c.setDiskTemplates(dTemplates);
         return in_c;
     }
@@ -373,8 +361,6 @@ public class MachineManagerTest {
         Assert.assertNotNull(machine.getId());
         Assert.assertEquals(machine.getName(), "myMachine_" + this.mcounter);
         Assert.assertEquals(machine.getDescription(), "my machine" + this.mcounter);
-
-        Assert.assertEquals(machine.getMemory().getUnit(), Memory.MemoryUnit.MEGIBYTE);
 
         this.startMachine(machine.getId().toString());
 

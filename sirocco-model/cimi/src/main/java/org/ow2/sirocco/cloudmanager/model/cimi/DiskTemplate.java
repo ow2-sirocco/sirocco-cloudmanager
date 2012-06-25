@@ -27,39 +27,24 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
-import javax.persistence.Column;
 import javax.persistence.Embeddable;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 
 @Embeddable
 public class DiskTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private StorageUnit unit;
-
-    private Float quantity;
+    private Integer capacity;
 
     private String format;
 
     private String initialLocation;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "disktemplate_unit")
-    public StorageUnit getUnit() {
-        return this.unit;
+    public Integer getCapacity() {
+        return this.capacity;
     }
 
-    public void setUnit(final StorageUnit unit) {
-        this.unit = unit;
-    }
-
-    public Float getQuantity() {
-        return this.quantity;
-    }
-
-    public void setQuantity(final Float quantity) {
-        this.quantity = quantity;
+    public void setCapacity(final Integer capacity) {
+        this.capacity = capacity;
     }
 
     public String getFormat() {
@@ -80,9 +65,8 @@ public class DiskTemplate implements Serializable {
 
     @Override
     public String toString() {
-        return "DiskTemplate [unit=" + this.unit + ", quantity="
-                + this.quantity + ", format=" + this.format
-                + ", initialLocation=" + this.initialLocation + "]";
+        return "DiskTemplate [capacity=" + this.capacity + ", format=" + this.format + ", initialLocation="
+            + this.initialLocation + "]";
     }
 
 }

@@ -60,7 +60,6 @@ import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -75,8 +74,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
-import org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -207,22 +204,14 @@ public class CimiPrimerScenarioTest {
         MachineConfiguration machineConfig = new MachineConfiguration();
         machineConfig.setName(name);
         machineConfig.setDescription(description);
-        Cpu cpu = new Cpu();
-        cpu.setCpuSpeedUnit(Cpu.Frequency.GIGA);
-        cpu.setQuantity((float) 3.5);
-        cpu.setNumberCpu(numCpus);
-        Memory mem = new Memory();
-        mem.setUnit(Memory.MemoryUnit.MEGIBYTE);
-        mem.setQuantity((float) ramSizeInMB);
 
         DiskTemplate disk = new DiskTemplate();
-        disk.setUnit(StorageUnit.MEGABYTE);
-        disk.setQuantity((float) diskSizeInGB);
+        disk.setCapacity(diskSizeInGB * 1000 * 1000);
         disk.setInitialLocation(location);
         disk.setFormat("ext3");
 
-        machineConfig.setCpu(cpu);
-        machineConfig.setMemory(mem);
+        machineConfig.setCpu(numCpus);
+        machineConfig.setMemory(ramSizeInMB * 1024);
         machineConfig.setDiskTemplates(Collections.singletonList(disk));
         return machineConfig;
     }

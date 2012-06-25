@@ -45,8 +45,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor.ComponentType;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
@@ -232,16 +230,13 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         this.machines.put(machineProviderAssignedId, machine);
         MockCloudProviderConnector.logger.info("Creating machine with providerAssignedId " + machineProviderAssignedId);
         machine.setState(Machine.State.CREATING);
-        machine.setCpu(new Cpu(machineCreate.getMachineTemplate().getMachineConfiguration().getCpu()));
+        machine.setCpu(machineCreate.getMachineTemplate().getMachineConfiguration().getCpu());
         machine.setMemory(machineCreate.getMachineTemplate().getMachineConfiguration().getMemory());
         List<MachineDisk> disks = new ArrayList<MachineDisk>();
         if (machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates() != null) {
             for (DiskTemplate diskTemplate : machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates()) {
                 MachineDisk mdisk = new MachineDisk();
-                // TODO
-                // disk.setDiskUnit(diskTemplate.getDiskUnit());
-                mdisk.setDisk(new Disk());
-                mdisk.getDisk().setQuantity(diskTemplate.getQuantity());
+                mdisk.setCapacity(diskTemplate.getCapacity());
                 mdisk.setInitialLocation(diskTemplate.getInitialLocation());
                 disks.add(mdisk);
             }

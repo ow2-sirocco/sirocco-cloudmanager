@@ -30,15 +30,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.JoinColumn;
 import javax.persistence.Transient;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -46,7 +45,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
-@NamedQueries({ @NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state") })
+@NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
 public class Machine extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -60,9 +59,9 @@ public class Machine extends CloudResource implements Serializable {
 
     private State state;
 
-    private Cpu cpu;
+    private Integer cpu;
 
-    private Memory memory;
+    private Integer memory;
 
     @OneToMany
     private List<MachineVolume> volumes;
@@ -94,21 +93,19 @@ public class Machine extends CloudResource implements Serializable {
         this.state = state;
     }
 
-    @Embedded
-    public Cpu getCpu() {
+    public Integer getCpu() {
         return this.cpu;
     }
 
-    public void setCpu(final Cpu cpu) {
+    public void setCpu(final Integer cpu) {
         this.cpu = cpu;
     }
 
-    @Embedded
-    public Memory getMemory() {
+    public Integer getMemory() {
         return this.memory;
     }
 
-    public void setMemory(final Memory memory) {
+    public void setMemory(final Integer memory) {
         this.memory = memory;
     }
 
@@ -122,8 +119,8 @@ public class Machine extends CloudResource implements Serializable {
     }
 
     public void addMachineDisk(final MachineDisk disk) {
-        if (!getDisks().contains(disk)) {
-            getDisks().add(disk);
+        if (!this.getDisks().contains(disk)) {
+            this.getDisks().add(disk);
         }
     }
 
@@ -133,14 +130,14 @@ public class Machine extends CloudResource implements Serializable {
     }
 
     public void addMachineVolume(final MachineVolume mv) {
-        if (!getVolumes().contains(mv)) {
-            getVolumes().add(mv);
+        if (!this.getVolumes().contains(mv)) {
+            this.getVolumes().add(mv);
         }
     }
 
     public void removeMachineVolume(final MachineVolume mv) {
-        if (getVolumes().contains(mv)) {
-            getVolumes().remove(mv);
+        if (this.getVolumes().contains(mv)) {
+            this.getVolumes().remove(mv);
         }
     }
 
@@ -155,13 +152,12 @@ public class Machine extends CloudResource implements Serializable {
     }
 
     public void addNetworkInterface(final MachineNetworkInterface networkInterface) {
-        if (!getNetworkInterfaces().contains(networkInterface)) {
-            getNetworkInterfaces().add(networkInterface);
+        if (!this.getNetworkInterfaces().contains(networkInterface)) {
+            this.getNetworkInterfaces().add(networkInterface);
         }
     }
 
-    public void setNetworkInterfaces(
-            final List<MachineNetworkInterface> networkInterfaces) {
+    public void setNetworkInterfaces(final List<MachineNetworkInterface> networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 
@@ -170,8 +166,7 @@ public class Machine extends CloudResource implements Serializable {
         return this.cloudProviderAccount;
     }
 
-    public void setCloudProviderAccount(
-            final CloudProviderAccount cloudProviderAccount) {
+    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
         this.cloudProviderAccount = cloudProviderAccount;
     }
 

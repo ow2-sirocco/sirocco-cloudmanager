@@ -27,12 +27,10 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
-import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 
 @Entity
 public class MachineDisk implements Serializable, Identifiable {
@@ -46,7 +44,7 @@ public class MachineDisk implements Serializable, Identifiable {
 
     private String initialLocation;
 
-    private Disk disk;
+    private Integer capacity;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -58,13 +56,12 @@ public class MachineDisk implements Serializable, Identifiable {
         this.id = id;
     }
 
-    @Embedded
-    public Disk getDisk() {
-        return this.disk;
+    public Integer getCapacity() {
+        return this.capacity;
     }
 
-    public void setDisk(final Disk disk) {
-        this.disk = disk;
+    public void setCapacity(final Integer capacity) {
+        this.capacity = capacity;
     }
 
     public String getInitialLocation() {

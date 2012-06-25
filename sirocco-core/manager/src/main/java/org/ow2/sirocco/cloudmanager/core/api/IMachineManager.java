@@ -38,15 +38,14 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 
 /**
  * Machine management operations
  */
-public interface IMachineManager extends IJobListener{
+public interface IMachineManager extends IJobListener {
 
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.MachineManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager@Remote";
 
@@ -139,12 +138,12 @@ public interface IMachineManager extends IJobListener{
     List<MachineVolume> getMachineVolumes(final String machineId) throws ResourceNotFoundException, CloudProviderException,
         InvalidRequestException;
 
-    Job addVolumeToMachine(final String machineId, final String volumeId, final String initialLocation)
-        throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
+    Job addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ResourceNotFoundException,
+        CloudProviderException, InvalidRequestException;
 
     MachineVolume getVolumeFromMachine(String machineId, String mvId) throws ResourceNotFoundException, CloudProviderException,
-    InvalidRequestException;
-    
+        InvalidRequestException;
+
     Job removeVolumeFromMachine(String machineId, String mvId) throws ResourceNotFoundException, CloudProviderException,
         InvalidRequestException;
 
@@ -160,15 +159,15 @@ public interface IMachineManager extends IJobListener{
 
     Job addDiskToMachine(final String machineId, final MachineDisk disk) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException;
-    
-    MachineDisk getDiskFromMachine(String machineId, String machineDiskId) throws ResourceNotFoundException, CloudProviderException,
-    InvalidRequestException;
+
+    MachineDisk getDiskFromMachine(String machineId, String machineDiskId) throws ResourceNotFoundException,
+        CloudProviderException, InvalidRequestException;
 
     Job removeDiskFromMachine(String machineId, String machineDiskId) throws ResourceNotFoundException, CloudProviderException,
         InvalidRequestException;
-    
-    Job updateDiskOnMachine(String machineId, String machineDiskId) throws ResourceNotFoundException, CloudProviderException,
-    InvalidRequestException;
+
+    Job updateDiskInMachine(String machineId, String machineDiskId) throws ResourceNotFoundException, CloudProviderException,
+        InvalidRequestException;
 
     //
     // machine network interface operations
@@ -182,12 +181,12 @@ public interface IMachineManager extends IJobListener{
 
     Job removeNetworkInterfaceFromMachine(String machineId, String nicId) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException;
-    
+
     MachineNetworkInterface getNetworkInterfaceFromMachine(String machineId, String nicId) throws ResourceNotFoundException,
-    CloudProviderException, InvalidRequestException;
-    
-    Job updateNetworkInterfaceOnMachine(String machineId, String nicId) throws ResourceNotFoundException,
-    CloudProviderException, InvalidRequestException;
+        CloudProviderException, InvalidRequestException;
+
+    Job updateNetworkInterfaceInMachine(String machineId, String nicId) throws ResourceNotFoundException,
+        CloudProviderException, InvalidRequestException;
 
     List<Machine> getMachines() throws CloudProviderException;
 
