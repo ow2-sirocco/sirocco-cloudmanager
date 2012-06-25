@@ -29,14 +29,14 @@ import java.util.List;
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
+import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeConfiguration;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "list machines")
-public class MachineListCommand implements Command {
-    public static String COMMAND_NAME = "machine-list";
+@Parameters(commandDescription = "list volume config")
+public class VolumeConfigListCommand implements Command {
+    public static String COMMAND_NAME = "volumeconfig-list";
 
     @Parameter(names = "-first", description = "First index of entity to return")
     private Integer first = -1;
@@ -49,25 +49,28 @@ public class MachineListCommand implements Command {
 
     @Override
     public String getName() {
-        return MachineListCommand.COMMAND_NAME;
+        return VolumeConfigListCommand.COMMAND_NAME;
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<Machine> machines = Machine.getMachines(cimiClient);
+        List<VolumeConfiguration> volumeConfigs = VolumeConfiguration.getVolumeConfigurations(cimiClient);
 
-        Table table = new Table(4);
+        Table table = new Table(5);
         table.addCell("ID");
         table.addCell("Name");
         table.addCell("Description");
-        table.addCell("State");
+        table.addCell("Capacity (MB)");
+        table.addCell("Format");
 
-        for (Machine machine : machines) {
-            table.addCell(machine.getId());
-            table.addCell(machine.getName());
-            table.addCell(machine.getDescription());
-            table.addCell(machine.getState().toString());
+        for (VolumeConfiguration volumeConfig : volumeConfigs) {
+            table.addCell(volumeConfig.getId());
+            table.addCell(volumeConfig.getName());
+            table.addCell(volumeConfig.getDescription());
+            table.addCell(Integer.toString(volumeConfig.getCapacity()));
+            table.addCell(volumeConfig.getFormat());
         }
         System.out.println(table.render());
+
     }
 }

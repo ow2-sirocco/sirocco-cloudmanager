@@ -29,14 +29,14 @@ import java.util.List;
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
+import org.ow2.sirocco.apis.rest.cimi.sdk.Volume;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "list machines")
-public class MachineListCommand implements Command {
-    public static String COMMAND_NAME = "machine-list";
+@Parameters(commandDescription = "list volumes")
+public class VolumeListCommand implements Command {
+    public static String COMMAND_NAME = "volume-list";
 
     @Parameter(names = "-first", description = "First index of entity to return")
     private Integer first = -1;
@@ -49,24 +49,28 @@ public class MachineListCommand implements Command {
 
     @Override
     public String getName() {
-        return MachineListCommand.COMMAND_NAME;
+        return VolumeListCommand.COMMAND_NAME;
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<Machine> machines = Machine.getMachines(cimiClient);
+        List<Volume> volumes = Volume.getVolumes(cimiClient);
 
-        Table table = new Table(4);
+        Table table = new Table(6);
         table.addCell("ID");
         table.addCell("Name");
         table.addCell("Description");
         table.addCell("State");
+        table.addCell("Capacity (MB)");
+        table.addCell("Bootable");
 
-        for (Machine machine : machines) {
-            table.addCell(machine.getId());
-            table.addCell(machine.getName());
-            table.addCell(machine.getDescription());
-            table.addCell(machine.getState().toString());
+        for (Volume volume : volumes) {
+            table.addCell(volume.getId());
+            table.addCell(volume.getName());
+            table.addCell(volume.getDescription());
+            table.addCell(volume.getState().toString());
+            table.addCell(Integer.toString(volume.getCapacity()));
+            table.addCell(Boolean.toString(volume.getBootable()));
         }
         System.out.println(table.render());
     }

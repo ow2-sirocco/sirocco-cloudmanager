@@ -106,7 +106,31 @@ public class CimiClient {
     String getMachineConfigurationsPath() {
         return this.cloudEntryPoint.getMachineConfigs().getHref();
     }
+    
+    String getVolumesPath() {
+        return this.cloudEntryPoint.getVolumes().getHref();
+    }
 
+    String getVolumeImagesPath() {
+        return this.cloudEntryPoint.getVolumeImages().getHref();
+    }
+
+    String getVolumeTemplatesPath() {
+        return this.cloudEntryPoint.getVolumeTemplates().getHref();
+    }
+
+    String getVolumeConfigurationsPath() {
+        return this.cloudEntryPoint.getVolumeConfigurations().getHref();
+    }
+    
+    String getCredentialsPath() {
+        return this.cloudEntryPoint.getCredentials().getHref();
+    }
+
+    String getCredentialTemplatesPath() {
+        return this.cloudEntryPoint.getCredentialsTemplates().getHref();
+    }
+    
     String getJobsPath() {
         return this.cloudEntryPoint.getJobs().getHref();
     }

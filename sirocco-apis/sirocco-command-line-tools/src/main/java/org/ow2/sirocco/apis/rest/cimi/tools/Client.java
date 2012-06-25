@@ -52,7 +52,12 @@ public class Client {
         new MachineImageShowCommand(), new MachineImageListCommand(), new MachineImageDeleteCommand(),
         new MachineConfigCreateCommand(), new MachineConfigShowCommand(), new MachineConfigListCommand(),
         new MachineConfigDeleteCommand(), new MachineTemplateCreateCommand(), new MachineTemplateShowCommand(),
-        new MachineTemplateListCommand(), new MachineTemplateDeleteCommand(), new JobListCommand(), new JobShowCommand()};
+        new MachineTemplateListCommand(), new MachineTemplateDeleteCommand(), new JobListCommand(), new JobShowCommand(),
+        new CredentialCreateCommand(), new CredentialShowCommand(), new CredentialListCommand(), new CredentialDeleteCommand(),
+        new VolumeConfigCreateCommand(), new VolumeConfigShowCommand(), new VolumeConfigListCommand(),
+        new VolumeConfigDeleteCommand(), new VolumeTemplateCreateCommand(), new VolumeTemplateShowCommand(),
+        new VolumeTemplateListCommand(), new VolumeTemplateDeleteCommand(), new VolumeCreateCommand(), new VolumeShowCommand(),
+        new VolumeListCommand(), new VolumeDeleteCommand()};
 
     private Client(final String[] args) {
         String userName = System.getenv(Client.SIROCCO_USERNAME_ENV_NAME);

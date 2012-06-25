@@ -26,27 +26,25 @@ package org.ow2.sirocco.apis.rest.cimi.tools;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Job;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
+import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeTemplate;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "delete machine")
-public class MachineDeleteCommand implements Command {
-    @Parameter(names = "-id", description = "id of the machine", required = true)
-    private String machineId;
+@Parameters(commandDescription = "delete volume template")
+public class VolumeTemplateDeleteCommand implements Command {
+    @Parameter(names = "-id", description = "id of the volume template", required = true)
+    private String volumeTemplateId;
 
     @Override
     public String getName() {
-        return "machine-delete";
+        return "volumetemplate-delete";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Machine machine = new Machine(cimiClient, this.machineId);
-        Job job = machine.delete();
-        System.out.println("Machine " + this.machineId + " being deleted");
-        JobListCommand.printJob(job);
+        VolumeTemplate volumeTemplate = new VolumeTemplate(cimiClient, this.volumeTemplateId);
+        volumeTemplate.delete();
+        System.out.println("VolumeTemplate " + this.volumeTemplateId + " deleted");
     }
 }

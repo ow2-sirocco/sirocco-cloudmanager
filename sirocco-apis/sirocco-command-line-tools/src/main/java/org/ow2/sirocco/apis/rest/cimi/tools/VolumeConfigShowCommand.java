@@ -24,29 +24,45 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Job;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
+import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeConfiguration;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "delete machine")
-public class MachineDeleteCommand implements Command {
-    @Parameter(names = "-id", description = "id of the machine", required = true)
-    private String machineId;
+@Parameters(commandDescription = "show volume config")
+public class VolumeConfigShowCommand implements Command {
+    @Parameter(names = "-id", description = "id of the volume config", required = true)
+    private String volumeConfigId;
 
     @Override
     public String getName() {
-        return "machine-delete";
+        return "volumeconfig-show";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Machine machine = new Machine(cimiClient, this.machineId);
-        Job job = machine.delete();
-        System.out.println("Machine " + this.machineId + " being deleted");
-        JobListCommand.printJob(job);
+        VolumeConfiguration volumeConfig = VolumeConfiguration.getVolumeConfigurationByReference(cimiClient,
+            this.volumeConfigId);
+
+        Table table = new Table(2);
+        table.addCell("Attribute");
+        table.addCell("Value");
+
+        table.addCell("id");
+        table.addCell(volumeConfig.getId());
+
+        table.addCell("description");
+        table.addCell(volumeConfig.getDescription());
+        table.addCell("capacity (MB)");
+        table.addCell(Integer.toString(volumeConfig.getCapacity()));
+        table.addCell("format");
+        table.addCell(volumeConfig.getFormat());
+        table.addCell("type");
+        table.addCell(volumeConfig.getType());
+
+        System.out.println(table.render());
     }
 }
