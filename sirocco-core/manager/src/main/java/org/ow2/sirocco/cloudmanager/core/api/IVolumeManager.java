@@ -41,7 +41,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 /**
  * Volume management operations
  */
-public interface IVolumeManager extends IJobListener{
+public interface IVolumeManager extends IJobListener {
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.VolumeManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager@Remote";
 
     /**
@@ -374,12 +374,12 @@ public interface IVolumeManager extends IJobListener{
 
     Job deleteVolumeImage(String volumeImageId) throws ResourceNotFoundException, CloudProviderException;
 
-    Job removeImageFromVolume(String volumeId, String imageId) throws ResourceNotFoundException, CloudProviderException;
+    Job removeVolumeImageFromVolume(String volumeId, String volumeImageId) throws ResourceNotFoundException,
+        CloudProviderException;
 
     List<Volume> getVolumes() throws CloudProviderException;
 
-    List<VolumeConfiguration> getVolumeConfigurations()
-            throws CloudProviderException;
+    List<VolumeConfiguration> getVolumeConfigurations() throws CloudProviderException;
 
     List<VolumeImage> getVolumeImages() throws CloudProviderException;
 

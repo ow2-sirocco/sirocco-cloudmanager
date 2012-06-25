@@ -896,7 +896,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public Job removeImageFromVolume(final String volumeId, final String imageId) throws ResourceNotFoundException,
+    public Job removeVolumeImageFromVolume(final String volumeId, final String imageId) throws ResourceNotFoundException,
         CloudProviderException {
         // XXX ask the connector to perform the operation ?
         Volume volume = this.getVolumeById(volumeId);
