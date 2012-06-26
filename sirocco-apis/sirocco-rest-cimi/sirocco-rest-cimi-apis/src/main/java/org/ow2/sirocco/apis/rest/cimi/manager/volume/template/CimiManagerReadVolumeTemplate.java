@@ -59,8 +59,7 @@ public class CimiManagerReadVolumeTemplate extends CimiManagerReadAbstract {
         if (true == select.isEmpty()) {
             out = this.manager.getVolumeTemplateById(context.getRequest().getId());
         } else {
-            // FIXME
-            throw new UnsupportedOperationException();
+            out = this.manager.getVolumeTemplateAttributes(context.getRequest().getId(), select.getAttributes());
         }
         return out;
     }

@@ -59,11 +59,7 @@ public class CimiManagerReadVolumeConfiguration extends CimiManagerReadAbstract 
         if (true == select.isEmpty()) {
             out = this.manager.getVolumeConfigurationById(context.getRequest().getId());
         } else {
-            // FIXME
-            throw new UnsupportedOperationException();
-            // out =
-            // this.manager.getVolumeConfigurationAttributes(context.getRequest().getId(),
-            // select.getAttributes());
+            out = this.manager.getVolumeConfigurationAttributes(context.getRequest().getId(), select.getAttributes());
         }
         return out;
     }
