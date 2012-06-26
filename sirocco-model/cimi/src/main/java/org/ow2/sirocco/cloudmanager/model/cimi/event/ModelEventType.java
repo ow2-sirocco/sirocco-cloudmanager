@@ -34,14 +34,14 @@ public class ModelEventType extends EventType implements Serializable {
     private static final long serialVersionUID = 1L;
     
     // TODO kind of modification reported (create/update/delete)??
-    private String change;
+    private String modelchange;
 
-    public String getChange() {
-        return change;
+    public String getModelChange() {
+        return modelchange;
     }
 
-    public void setChange(String change) {
-        this.change = change;
+    public void setModelChange(String modelchange) {
+        this.modelchange = modelchange;
     }
     
     

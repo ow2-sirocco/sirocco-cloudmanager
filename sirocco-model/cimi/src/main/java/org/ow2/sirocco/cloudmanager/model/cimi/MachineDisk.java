@@ -28,6 +28,8 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -42,6 +44,12 @@ public class MachineDisk implements Serializable, Identifiable {
 
     private Integer id;
 
+    public static enum State {
+        ACTIVE, DELETED
+    }
+
+    private State state;
+    
     private String initialLocation;
 
     private Integer capacity;
@@ -56,6 +64,13 @@ public class MachineDisk implements Serializable, Identifiable {
         this.id = id;
     }
 
+    public void setState(MachineDisk.State state) {
+        this.state = state;
+    }
+    @Enumerated(EnumType.STRING)
+    public MachineDisk.State getState() {
+        return this.state;
+    }
     public Integer getCapacity() {
         return this.capacity;
     }

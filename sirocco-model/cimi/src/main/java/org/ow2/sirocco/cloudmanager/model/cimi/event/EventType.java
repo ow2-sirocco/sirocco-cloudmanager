@@ -28,6 +28,9 @@ package org.ow2.sirocco.cloudmanager.model.cimi.event;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.OneToOne;
@@ -40,11 +43,23 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 public abstract class EventType implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    protected Integer id;
+    
     // TODO what is this?
     private String          resName;
     private CloudResource   resource;
     private String          detail;
     
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    public Integer getId() {
+        return this.id;
+    }
+
+    public void setId(final Integer id) {
+        this.id = id;
+    }
+
     public String getResName() {
         return resName;
     }

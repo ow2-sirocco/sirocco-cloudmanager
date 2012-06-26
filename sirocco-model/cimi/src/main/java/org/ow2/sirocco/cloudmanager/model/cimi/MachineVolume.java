@@ -51,12 +51,13 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
     private Volume volume;
 
     public static enum State {
-        PENDING, ATTACHING, ATTACHED, DETACHING, DETACHED, CANCELLED, ERROR
+        PENDING, ATTACHING, ATTACHED, DETACHING, DETACHED, CANCELLED, DELETED, ERROR
     }
 
     private State state;
 
-    // unidirectional
+    // unidirectional 
+    // oneToOne until shareable volume support is added
     @OneToOne
     public Volume getVolume() {
         return this.volume;

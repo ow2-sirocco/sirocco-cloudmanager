@@ -65,12 +65,9 @@ public class Volume extends CloudResource implements Serializable {
 
     private List<VolumeImage> images;
 
-    private Collection<MachineVolume> machineVolumes;
-
     private CloudProviderAccount cloudProviderAccount;
 
     public Volume() {
-        this.machineVolumes = new ArrayList<MachineVolume>();
     }
 
     @Enumerated(EnumType.STRING)
@@ -96,15 +93,6 @@ public class Volume extends CloudResource implements Serializable {
 
     public void setBootable(final Boolean bootable) {
         this.bootable = bootable;
-    }
-
-    @OneToMany(mappedBy = "volume")
-    public Collection<MachineVolume> getMachineVolumes() {
-        return this.machineVolumes;
-    }
-
-    public void setMachineVolumes(final Collection<MachineVolume> machineVs) {
-        this.machineVolumes = machineVs;
     }
 
     public String getType() {

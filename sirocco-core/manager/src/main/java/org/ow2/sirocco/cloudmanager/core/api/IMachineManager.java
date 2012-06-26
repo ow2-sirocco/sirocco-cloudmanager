@@ -166,7 +166,7 @@ public interface IMachineManager extends IJobListener {
     Job removeDiskFromMachine(String machineId, String machineDiskId) throws ResourceNotFoundException, CloudProviderException,
         InvalidRequestException;
 
-    Job updateDiskInMachine(String machineId, String machineDiskId) throws ResourceNotFoundException, CloudProviderException,
+    Job updateDiskInMachine(String machineId, MachineDisk disk) throws ResourceNotFoundException, CloudProviderException,
         InvalidRequestException;
 
     //
@@ -185,7 +185,7 @@ public interface IMachineManager extends IJobListener {
     MachineNetworkInterface getNetworkInterfaceFromMachine(String machineId, String nicId) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException;
 
-    Job updateNetworkInterfaceInMachine(String machineId, String nicId) throws ResourceNotFoundException,
+    Job updateNetworkInterfaceInMachine(String machineId, final MachineNetworkInterface nic) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException;
 
     List<Machine> getMachines() throws CloudProviderException;

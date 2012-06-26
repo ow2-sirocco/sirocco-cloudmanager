@@ -922,7 +922,46 @@ public class CimiPrimerScenarioTest {
             }
 
         }
+        List<MachineVolume> attached = machine.getVolumes();
+        if (attached == null) {
+            System.out.println("no volumes for machine " +machineId);
+        } else {
+            System.out.println(" machine " +machineId +" has " +attached.size() +" volumes ");
+        }
+        /** delete machine without detaching volumes */
+        boolean caught = false;
+        Job deleteJob = null;
+        try {
+            deleteJob = this.machineManager.deleteMachine(machineId);
+        } catch (Exception e) {
+            caught = true;
+        }
+        System.out.println("deletion of " +machineId +" returned with exception "+caught);
+        if ((attached != null) && (attached.size() > 0)) {
+            Assert.assertEquals(caught, true);
+            
+            System.out.println(" Machine deletion failed correct behaviour " +caught + " exception ");
+            /** detach volumes first */
+            for (MachineVolume volume : attached) {
+                
+                deleteJob = this.machineManager.removeVolumeFromMachine(machineId, volume.getId().toString());
+                this.waitForJobCompletion(deleteJob);
+                System.out.println("detach of volume " +volume.getVolume().getId() +" terminated ");
+            }
+            System.out.println(" delete machine now that volumes are detached " +machineId);
 
+            deleteJob = this.machineManager.deleteMachine(machineId);
+
+        } 
+       
+        if (deleteJob.getStatus() == Job.Status.RUNNING) {
+            System.out.println(" testScenarioThree : wait for deletion of machine " +machineId);
+            this.waitForJobCompletion(deleteJob);
+        } else {
+            System.out.println("Machine deletion completed " + machineId);
+        }
+       
+        System.out.println("testScenarioThree return without deleting machine ");
     }
 
     @Test
