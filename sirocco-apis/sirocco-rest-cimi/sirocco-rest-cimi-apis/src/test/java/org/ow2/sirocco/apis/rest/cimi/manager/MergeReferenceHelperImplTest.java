@@ -240,48 +240,6 @@ public class MergeReferenceHelperImplTest {
 
     /**
      * Test method for
-     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration, org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration)}
-     * .
-     */
-    @Test
-    public void testMergeCimiDiskConfiguration() {
-        MergeReferenceHelperImpl merger = new MergeReferenceHelperImpl();
-        CimiDiskConfiguration cimi;
-        CimiDiskConfiguration cimiRef;
-
-        CimiCapacity refCapacity = new CimiCapacity();
-        cimiRef = new CimiDiskConfiguration();
-        cimiRef.setInitialLocation("refInitialLocation");
-        cimiRef.setCapacity(refCapacity);
-        cimiRef.setFormat("refFormat");
-
-        // Source null
-        cimi = new CimiDiskConfiguration();
-        merger.merge(null, cimi);
-
-        // Destination without value
-        cimi = new CimiDiskConfiguration();
-        merger.merge(cimiRef, cimi);
-
-        Assert.assertEquals("refInitialLocation", cimi.getInitialLocation());
-        Assert.assertSame(refCapacity, cimi.getCapacity());
-        Assert.assertEquals("refFormat", cimi.getFormat());
-
-        // Destination with values
-        CimiCapacity cimiCapacity = new CimiCapacity();
-        cimi = new CimiDiskConfiguration();
-        cimi.setInitialLocation("initialLocation");
-        cimi.setCapacity(cimiCapacity);
-        cimi.setFormat("format");
-        merger.merge(cimiRef, cimi);
-
-        Assert.assertEquals("initialLocation", cimi.getInitialLocation());
-        Assert.assertSame(cimiCapacity, cimi.getCapacity());
-        Assert.assertEquals("format", cimi.getFormat());
-    }
-
-    /**
-     * Test method for
      * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk, org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk)}
      * .
      */
@@ -298,7 +256,7 @@ public class MergeReferenceHelperImplTest {
 
         // Source null
         cimi = new CimiMachineDisk();
-        merger.merge(null, cimi);
+        merger.merge((CimiMachineDisk) null, cimi);
 
         // Destination without value
         cimi = new CimiMachineDisk();

@@ -22,24 +22,24 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.manager.volume;
+package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerDeleteAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Manage DELETE request of Volume.
+ * Manage DELETE request of MachineDisk.
  */
-@Component("CimiManagerDeleteVolume")
-public class CimiManagerDeleteVolume extends CimiManagerDeleteAbstract {
+@Component("CimiManagerDeleteMachineDisk")
+public class CimiManagerDeleteMachineDisk extends CimiManagerDeleteAbstract {
 
     @Autowired
-    @Qualifier("IVolumeManager")
-    private IVolumeManager manager;
+    @Qualifier("IMachineManager")
+    private IMachineManager manager;
 
     /**
      * {@inheritDoc}
@@ -49,7 +49,7 @@ public class CimiManagerDeleteVolume extends CimiManagerDeleteAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.deleteVolume(context.getRequest().getId());
+        return this.manager.removeDiskFromMachine(context.getRequest().getIdParent(), context.getRequest().getId());
     }
 
     // /**

@@ -52,6 +52,8 @@ import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MemoryConverter;
@@ -92,6 +94,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
@@ -462,6 +466,14 @@ public class ConfigFactory {
 
         item = new ItemConfig(StorageUnit.class);
         item.putData(ConfigFactory.CONVERTER, new StorageUnitConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiMachineTemplateVolume.class);
+        item.putData(ConfigFactory.CONVERTER, new MachineTemplateVolumeConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiMachineTemplateVolumeTemplate.class);
+        item.putData(ConfigFactory.CONVERTER, new MachineTemplateVolumeTemplateConverter());
         items.add(item);
 
         return items;

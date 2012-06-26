@@ -51,7 +51,7 @@ public abstract class CimiResourceAbstract implements CimiResource {
     private String href;
 
     /** All the operations of the resource */
-    CimiOperationArray operations;
+    private CimiOperationArray operations;
 
     /**
      * {@inheritDoc}
@@ -154,7 +154,6 @@ public abstract class CimiResourceAbstract implements CimiResource {
             this.operations = new CimiOperationArray();
             this.operations.setArray(operations);
         }
-
     }
 
     /**

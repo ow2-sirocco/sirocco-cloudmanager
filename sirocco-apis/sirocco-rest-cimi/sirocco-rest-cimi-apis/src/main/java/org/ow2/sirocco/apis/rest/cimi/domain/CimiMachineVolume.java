@@ -119,5 +119,4 @@ public class CimiMachineVolume extends CimiObjectCommonAbstract {
     public ExchangeType getExchangeType() {
         return ExchangeType.MachineVolume;
     }
-
 }

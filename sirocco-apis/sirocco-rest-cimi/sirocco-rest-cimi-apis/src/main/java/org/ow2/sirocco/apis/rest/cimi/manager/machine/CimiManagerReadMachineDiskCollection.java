@@ -85,8 +85,6 @@ public class CimiManagerReadMachineDiskCollection extends CimiManagerReadAbstrac
         super.afterConvertToResponse(context, dataService);
 
         CimiResource resource = (CimiResource) context.getResponse().getCimiData();
-
         resource.add(new CimiOperation(Operation.ADD.getRel(), resource.getId()));
-
     }
 }

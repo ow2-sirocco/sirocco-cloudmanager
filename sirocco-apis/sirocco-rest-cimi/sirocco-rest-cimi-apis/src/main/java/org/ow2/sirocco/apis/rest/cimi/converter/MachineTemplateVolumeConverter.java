@@ -24,32 +24,23 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import java.util.List;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiMachine}</li>
- * <li>Service model: {@link Machine}</li>
+ * <li>CIMI model: {@link CimiMachineTemplateVolume}</li>
+ * <li>Service model: {@link MachineVolume}</li>
  * </ul>
  * </p>
  */
-public class MachineConverter extends ObjectCommonConverter {
-
+public class MachineTemplateVolumeConverter extends VolumeConverter {
     /**
      * {@inheritDoc}
      * 
@@ -58,7 +49,7 @@ public class MachineConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiMachine cimi = new CimiMachine();
+        CimiMachineTemplateVolume cimi = new CimiMachineTemplateVolume();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -71,7 +62,7 @@ public class MachineConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (Machine) dataService, (CimiMachine) dataCimi);
+        this.doCopyToCimi(context, (MachineVolume) dataService, (CimiMachineTemplateVolume) dataCimi);
     }
 
     /**
@@ -82,7 +73,7 @@ public class MachineConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Machine service = new Machine();
+        MachineVolume service = new MachineVolume();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -96,7 +87,7 @@ public class MachineConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiMachine) dataCimi, (Machine) dataService);
+        this.doCopyToService(context, (CimiMachineTemplateVolume) dataCimi, (MachineVolume) dataService);
     }
 
     /**
@@ -106,18 +97,10 @@ public class MachineConverter extends ObjectCommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final CimiContext context, final Machine dataService, final CimiMachine dataCimi) {
-        this.fill(context, dataService, dataCimi);
-        if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
-            dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
-            dataCimi.setDisks((CimiMachineDiskCollection) context.convertNextCimi(dataService.getDisks(),
-                CimiMachineDiskCollection.class));
-            // TODO dataCimi.setNetworkInterfaces(???);
-            dataCimi.setState(HelperConverter.toString(dataService.getState()));
-            dataCimi.setVolumes((CimiMachineVolumeCollection) context.convertNextCimi(dataService.getVolumes(),
-                CimiMachineVolumeCollection.class));
-        }
+    protected void doCopyToCimi(final CimiContext context, final MachineVolume dataService,
+        final CimiMachineTemplateVolume dataCimi) {
+        dataCimi.setInitialLocation(dataService.getInitialLocation());
+        this.doCopyToCimi(context, dataService.getVolume(), dataCimi);
     }
 
     /**
@@ -127,16 +110,9 @@ public class MachineConverter extends ObjectCommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    @SuppressWarnings("unchecked")
-    protected void doCopyToService(final CimiContext context, final CimiMachine dataCimi, final Machine dataService) {
-        this.fill(context, dataCimi, dataService);
-        dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
-        dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
-        dataService.setDisks((List<MachineDisk>) context.convertNextService(dataCimi.getDisks()));
-        // TODO dataService.setNetworkInterfaces(???);
-        dataService.setVolumes((List<MachineVolume>) context.convertNextService(dataCimi.getVolumes()));
-
-        // Next Read only
-        // dataService.setState(dataService.getState());
+    protected void doCopyToService(final CimiContext context, final CimiMachineTemplateVolume dataCimi,
+        final MachineVolume dataService) {
+        dataService.setInitialLocation(dataCimi.getInitialLocation());
+        dataService.setVolume((Volume) context.convertNextService(dataCimi, CimiVolume.class));
     }
 }

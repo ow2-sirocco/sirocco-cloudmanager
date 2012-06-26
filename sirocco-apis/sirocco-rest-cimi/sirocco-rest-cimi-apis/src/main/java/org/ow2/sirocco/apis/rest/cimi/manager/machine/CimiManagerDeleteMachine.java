@@ -24,14 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
-import javax.ws.rs.core.Response;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerDeleteAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -57,24 +52,28 @@ public class CimiManagerDeleteMachine extends CimiManagerDeleteAbstract {
         return this.manager.deleteMachine(context.getRequest().getId());
     }
 
-    /**
-     * Call after the conversion.
-     * 
-     * @param request The CIMI request
-     * @param response The CIMI response
-     * @param dataService The output service data
-     */
-    @Override
-    protected void afterConvertToResponse(final CimiContext context, final Object dataService) {
-        if (null == context.getResponse().getCimiData()) {
-            // Job
-            if (dataService instanceof Job) {
-                CimiJob cimi = (CimiJob) context.convertToCimi(dataService, CimiJob.class);
-                context.getResponse().setCimiData(cimi);
-                context.getResponse().putHeader(Constants.HEADER_CIMI_JOB_URI, cimi.getId());
-                context.getResponse().putHeader(Constants.HEADER_LOCATION, cimi.getTargetResource());
-                context.getResponse().setStatus(Response.Status.ACCEPTED);
-            }
-        }
-    }
+    // /**
+    // * Call after the conversion.
+    // *
+    // * @param request The CIMI request
+    // * @param response The CIMI response
+    // * @param dataService The output service data
+    // */
+    // @Override
+    // protected void afterConvertToResponse(final CimiContext context, final
+    // Object dataService) {
+    // if (null == context.getResponse().getCimiData()) {
+    // // Job
+    // if (dataService instanceof Job) {
+    // CimiJob cimi = (CimiJob) context.convertToCimi(dataService,
+    // CimiJob.class);
+    // context.getResponse().setCimiData(cimi);
+    // context.getResponse().putHeader(Constants.HEADER_CIMI_JOB_URI,
+    // cimi.getId());
+    // context.getResponse().putHeader(Constants.HEADER_LOCATION,
+    // cimi.getTargetResource());
+    // context.getResponse().setStatus(Response.Status.ACCEPTED);
+    // }
+    // }
+    // }
 }

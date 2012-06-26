@@ -46,6 +46,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
@@ -69,7 +70,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 
 /**
  * Converters tests of machines resources.
@@ -553,7 +556,7 @@ public class MachinesConverterTest {
         Assert.assertNull(cimi.getMachineConfig());
         Assert.assertNull(cimi.getMachineImage());
 
-        // Full Cimi -> Service
+        // Full Cimi -> Service : without arrays
         cimi = new CimiMachineTemplate();
         cimi.setCredentials(new CimiCredentials());
         cimi.setMachineConfig(new CimiMachineConfiguration());
@@ -564,7 +567,7 @@ public class MachinesConverterTest {
         Assert.assertEquals(MachineConfiguration.class, service.getMachineConfiguration().getClass());
         Assert.assertEquals(MachineImage.class, service.getMachineImage().getClass());
 
-        // Full Service -> Cimi
+        // Full Service -> Cimi : without arrays
         service = new MachineTemplate();
         service.setCredentials(new Credentials());
         service.setMachineConfiguration(new MachineConfiguration());
@@ -574,6 +577,47 @@ public class MachinesConverterTest {
         Assert.assertEquals(CimiCredentials.class, cimi.getCredentials().getClass());
         Assert.assertEquals(CimiMachineConfiguration.class, cimi.getMachineConfig().getClass());
         Assert.assertEquals(CimiMachineImage.class, cimi.getMachineImage().getClass());
+
+        // Full Cimi -> Service : with MachineVolume
+        cimi = new CimiMachineTemplate();
+        CimiMachineTemplateVolume cimiMVFMT_1 = new CimiMachineTemplateVolume();
+        cimiMVFMT_1.setInitialLocation("initialLocation_1");
+        cimiMVFMT_1.setName("name_1");
+        CimiMachineTemplateVolume cimiMVFMT_2 = new CimiMachineTemplateVolume();
+        cimiMVFMT_2.setInitialLocation("initialLocation_2");
+        cimiMVFMT_2.setName("name_2");
+        cimi.setVolumes(new CimiMachineTemplateVolume[] {cimiMVFMT_1, cimiMVFMT_2});
+
+        service = (MachineTemplate) this.context.convertToService(cimi);
+        Assert.assertNotNull(service.getVolumes());
+        Assert.assertEquals(2, service.getVolumes().size());
+        Assert.assertEquals("initialLocation_1", service.getVolumes().get(0).getInitialLocation());
+        Assert.assertEquals("name_1", service.getVolumes().get(0).getVolume().getName());
+        Assert.assertEquals("initialLocation_2", service.getVolumes().get(1).getInitialLocation());
+        Assert.assertEquals("name_2", service.getVolumes().get(1).getVolume().getName());
+
+        // Full Service -> Cimi : with MachineVolume
+        service = new MachineTemplate();
+        service.setVolumes(new ArrayList<MachineVolume>());
+        MachineVolume mv1 = new MachineVolume();
+        mv1.setInitialLocation("initialLocation_1");
+        mv1.setVolume(new Volume());
+        mv1.getVolume().setName("name_1");
+        service.getVolumes().add(mv1);
+        MachineVolume mv2 = new MachineVolume();
+        mv2.setInitialLocation("initialLocation_2");
+        mv2.setVolume(new Volume());
+        mv2.getVolume().setName("name_2");
+        service.getVolumes().add(mv2);
+
+        cimi = (CimiMachineTemplate) this.context.convertToCimi(service, CimiMachineTemplate.class);
+        Assert.assertNotNull(cimi.getVolumes());
+        Assert.assertEquals(2, cimi.getVolumes().length);
+        Assert.assertEquals("initialLocation_1", cimi.getVolumes()[0].getInitialLocation());
+        Assert.assertEquals("name_1", cimi.getVolumes()[0].getName());
+        Assert.assertEquals("initialLocation_2", cimi.getVolumes()[1].getInitialLocation());
+        Assert.assertEquals("name_2", cimi.getVolumes()[1].getName());
+
     }
 
     @Test

@@ -31,11 +31,11 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class MachineTemplateVolumeTemplate.
+ * Class MachineTemplateVolume.
  */
-@XmlRootElement(name = "MachineTemplateVolumeTemplate")
+@XmlRootElement(name = "MachineTemplateVolume")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineTemplateVolumeTemplate extends CimiVolumeTemplate {
+public class CimiMachineTemplateVolume extends CimiVolume {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -44,6 +44,13 @@ public class CimiMachineTemplateVolumeTemplate extends CimiVolumeTemplate {
      * Field "initialLocation".
      */
     private String initialLocation;
+
+    /**
+     * Default constructor.
+     */
+    public CimiMachineTemplateVolume() {
+        super();
+    }
 
     /**
      * Return the value of field "initialLocation".
@@ -75,4 +82,5 @@ public class CimiMachineTemplateVolumeTemplate extends CimiVolumeTemplate {
         has = has || (null != this.getInitialLocation());
         return has;
     }
+
 }

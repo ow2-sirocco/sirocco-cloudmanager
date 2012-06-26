@@ -551,6 +551,34 @@ public class CimiResourceBuilderHelper {
             cimi.setMachineConfig(CimiResourceBuilderHelper.buildCimiMachineConfiguration(id, index, expand));
             cimi.setMachineImage(CimiResourceBuilderHelper.buildCimiMachineImage(id, index, expand));
             // TODO Volume, NetworkInterface, ...
+            // CimiMachineTemplateVolume mvol1 = new
+            // CimiMachineTemplateVolume();
+            // mvol1.setInitialLocation("initialLocationVolume_1");
+            // mvol1.setHref("hrefVolume_1");
+            // mvol1.setId("idVolume_1");
+            // mvol1.setName("nameVolume_1");
+            // CimiMachineTemplateVolume mvol2 = new
+            // CimiMachineTemplateVolume();
+            // mvol2.setInitialLocation("initialLocationVolume_1");
+            // mvol2.setHref("hrefVolume_2");
+            // mvol2.setId("idVolume_2");
+            // mvol2.setName("nameVolume_2");
+            // cimi.setVolumes(new CimiMachineTemplateVolume[] {mvol1, mvol2});
+            //
+            // CimiMachineTemplateVolumeTemplate mvoltemp1 = new
+            // CimiMachineTemplateVolumeTemplate();
+            // mvoltemp1.setInitialLocation("initialLocationVolumeTemplate_1");
+            // mvoltemp1.setHref("hrefVolumeTemplate_1");
+            // mvoltemp1.setId("idVolumeTemplate_1");
+            // mvoltemp1.setName("nameVolumeTemplate_1");
+            // CimiMachineTemplateVolumeTemplate mvoltemp2 = new
+            // CimiMachineTemplateVolumeTemplate();
+            // mvoltemp2.setInitialLocation("initialLocationVolumeTemplate_2");
+            // mvoltemp2.setHref("hrefVolumeTemplate_2");
+            // mvoltemp2.setId("idVolumeTemplate_2");
+            // mvoltemp2.setName("nameVolumeTemplate_2");
+            // cimi.setVolumeTemplates(new CimiMachineTemplateVolumeTemplate[]
+            // {mvoltemp1, mvoltemp2});
         }
         return cimi;
     }

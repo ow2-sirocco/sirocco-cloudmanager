@@ -29,6 +29,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
@@ -38,111 +39,120 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 
 /**
- * Interface of a helper to get complete entity passed by reference or by value
- * during its creation
+ * Interface of a helper to get complete resource passed by reference or by
+ * value during its creation.
  * <p>
- * For all methods of this interface : the given entity is searched in services
- * only if its reference is known. Then, and only if necessary, the found
- * reference is merged with the given data of entity.
+ * For all methods of this interface : the given resource is searched in
+ * services only if its reference is known. Then, and only if necessary, the
+ * found reference is merged with the given data of resource.
  * </p>
  */
 public interface MergeReferenceHelper {
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiCredentials cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiCredentialsCreate cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiCredentialsTemplate cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiMachineCreate cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiMachineConfiguration cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    void merge(final CimiContext context, final CimiMachineDisk cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiMachineImage cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiMachineTemplate cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiVolumeCreate cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiVolumeConfiguration cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiVolumeImage cimi) throws Exception;
 
     /**
-     * Merge the reference of a entity only if necessary.
+     * Merge the reference of a resource only if necessary.
      * 
      * @param context The working context
-     * @param cimi The entity with values or reference
+     * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
     void merge(final CimiContext context, final CimiVolumeTemplate cimi) throws Exception;

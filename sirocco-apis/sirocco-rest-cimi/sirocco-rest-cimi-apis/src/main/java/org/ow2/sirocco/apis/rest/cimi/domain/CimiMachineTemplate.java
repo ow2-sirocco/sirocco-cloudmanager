@@ -24,11 +24,15 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import java.util.List;
+
 import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
@@ -71,14 +75,14 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      */
     @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
-    private CimiMachineVolume[] volumes;
+    private CimiMachineTemplateVolumeArray volumes;
 
     /**
      * Field "volumeTemplates".
      */
     @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
-    private CimiMachineTemplateVolumeTemplate[] volumeTemplates;
+    private CimiMachineTemplateVolumeTemplateArray volumeTemplates;
 
     /**
      * Field "networkInterfaces".
@@ -162,7 +166,38 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiMachineVolume[] getVolumes() {
+    @XmlElement(name = "volume")
+    @JsonProperty(value = "volumes")
+    public CimiMachineTemplateVolume[] getVolumes() {
+        CimiMachineTemplateVolume[] items = null;
+        if (null != this.volumes) {
+            items = this.volumes.getArray();
+        }
+        return items;
+    }
+
+    /**
+     * Set the value of field "volumes".
+     * 
+     * @param volumes The value
+     */
+    public void setVolumes(final CimiMachineTemplateVolume[] volumes) {
+        if (null == volumes) {
+            this.volumes = null;
+        } else {
+            this.volumes = new CimiMachineTemplateVolumeArray();
+            this.volumes.setArray(volumes);
+        }
+    }
+
+    /**
+     * Return the value of field "volumes".
+     * 
+     * @return The value
+     */
+    @XmlTransient
+    @JsonIgnore
+    public List<CimiMachineTemplateVolume> getListVolumes() {
         return this.volumes;
     }
 
@@ -171,8 +206,13 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @param volumes The value
      */
-    public void setVolumes(final CimiMachineVolume[] volumes) {
-        this.volumes = volumes;
+    public void setListVolumes(final List<CimiMachineTemplateVolume> volumes) {
+        if (null == volumes) {
+            this.volumes = null;
+        } else {
+            this.volumes = new CimiMachineTemplateVolumeArray();
+            this.volumes.addAll(volumes);
+        }
     }
 
     /**
@@ -180,8 +220,14 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
+    @XmlElement(name = "volumeTemplate")
+    @JsonProperty(value = "volumeTemplates")
     public CimiMachineTemplateVolumeTemplate[] getVolumeTemplates() {
-        return this.volumeTemplates;
+        CimiMachineTemplateVolumeTemplate[] items = null;
+        if (null != this.volumeTemplates) {
+            items = this.volumeTemplates.getArray();
+        }
+        return items;
     }
 
     /**
@@ -190,7 +236,38 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * @param volumeTemplates The value
      */
     public void setVolumeTemplates(final CimiMachineTemplateVolumeTemplate[] volumeTemplates) {
-        this.volumeTemplates = volumeTemplates;
+        if (null == volumeTemplates) {
+            this.volumeTemplates = null;
+        } else {
+            this.volumeTemplates = new CimiMachineTemplateVolumeTemplateArray();
+            this.volumeTemplates.setArray(volumeTemplates);
+        }
+
+    }
+
+    /**
+     * Return the value of field "volumeTemplates".
+     * 
+     * @return The value
+     */
+    @XmlTransient
+    @JsonIgnore
+    public List<CimiMachineTemplateVolumeTemplate> getListVolumeTemplates() {
+        return this.volumeTemplates;
+    }
+
+    /**
+     * Set the value of field "volumeTemplates".
+     * 
+     * @param volumeTemplates The value
+     */
+    public void setListVolumeTemplates(final List<CimiMachineTemplateVolumeTemplate> volumeTemplates) {
+        if (null == volumeTemplates) {
+            this.volumeTemplates = null;
+        } else {
+            this.volumeTemplates = new CimiMachineTemplateVolumeTemplateArray();
+            this.volumeTemplates.addAll(volumeTemplates);
+        }
     }
 
     /**
@@ -224,6 +301,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
         has = has || (null != this.getMachineImage());
         has = has || (null != this.getNetworkInterfaces());
         has = has || (null != this.getVolumes());
+        has = has || (null != this.getVolumeTemplates());
         return has;
     }
 
@@ -237,6 +315,46 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
     @JsonIgnore
     public ExchangeType getExchangeType() {
         return ExchangeType.MachineTemplate;
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiMachineTemplateVolumeArray extends CimiArrayAbstract<CimiMachineTemplateVolume> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiArray#newEmptyArraySized()
+         */
+        @Override
+        public CimiMachineTemplateVolume[] newEmptyArraySized() {
+            return new CimiMachineTemplateVolume[this.size()];
+        }
+
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiMachineTemplateVolumeTemplateArray extends CimiArrayAbstract<CimiMachineTemplateVolumeTemplate> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiArray#newEmptyArraySized()
+         */
+        @Override
+        public CimiMachineTemplateVolumeTemplate[] newEmptyArraySized() {
+            return new CimiMachineTemplateVolumeTemplate[this.size()];
+        }
+
     }
 
 }

@@ -24,15 +24,22 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -113,51 +120,26 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
                 CimiMachineImage.class));
 
             // TODO NetworkInterfaces
-            // if ((null != dataService.getNetworkInterfaces()) &&
-            // (dataService.getNetworkInterfaces().size() > 0)) {
-            // List<CimiNetworkInterface> listCimis = new
-            // ArrayList<CimiNetworkInterface>();
-            // EntityConverter converter =
-            // context.getConverter(CimiNetworkInterface.class);
-            // for (NetworkInterface itemService :
-            // dataService.getNetworkInterfaces()) {
-            // listCimis.add((CimiNetworkInterface) converter.toCimi(context,
-            // itemService));
-            // }
-            // dataCimi.setNetworkInterfaces(listCimis.toArray(new
-            // CimiNetworkInterface[listCimis.size()]));
-            // }
 
-            // TODO MachineVolume
-            // if ((null != dataService.getVolumes()) &&
-            // (dataService.getVolumes().size() > 0)) {
-            // List<CimiMachineVolume> listCimis = new
-            // ArrayList<CimiMachineVolume>();
-            // EntityConverter converter =
-            // context.getConverter(CimiMachineVolume.class);
-            // for (MachineVolume itemService : dataService.getVolumes()) {
-            // listCimis.add((CimiVolume) converter.toCimi(context,
-            // itemService));
-            // }
-            // dataCimi.setVolumes(listCimis.toArray(new
-            // CimiMachineVolume[listCimis.size()]));
-            // }
+            // Volume
+            if ((null != dataService.getVolumes()) && (dataService.getVolumes().size() > 0)) {
+                List<CimiMachineTemplateVolume> listCimis = new ArrayList<CimiMachineTemplateVolume>();
+                for (MachineVolume itemService : dataService.getVolumes()) {
+                    listCimis.add((CimiMachineTemplateVolume) context.convertNextCimi(itemService,
+                        CimiMachineTemplateVolume.class));
+                }
+                dataCimi.setVolumes(listCimis.toArray(new CimiMachineTemplateVolume[listCimis.size()]));
+            }
 
-            // TODO VolumeTemplate
-            // if ((null != dataService.getVolumeTemplates()) &&
-            // (dataService.getVolumeTemplates().size() > 0)) {
-            // List<CimiVolumeTemplate> listCimis = new
-            // ArrayList<CimiVolumeTemplate>();
-            // EntityConverter converter =
-            // context.getConverter(CimiVolumeTemplate.class);
-            // for (VolumeTemplate itemService :
-            // dataService.getVolumeTemplates()) {
-            // listCimis.add((CimiVolumeTemplate) converter.toCimi(context,
-            // itemService));
-            // }
-            // dataCimi.setVolumeTemplates(listCimis.toArray(new
-            // CimiVolumeTemplate[listCimis.size()]));
-            // }
+            // VolumeTemplate
+            if ((null != dataService.getVolumeTemplates()) && (dataService.getVolumeTemplates().size() > 0)) {
+                List<CimiMachineTemplateVolumeTemplate> listCimis = new ArrayList<CimiMachineTemplateVolumeTemplate>();
+                for (MachineVolumeTemplate itemService : dataService.getVolumeTemplates()) {
+                    listCimis.add((CimiMachineTemplateVolumeTemplate) context.convertNextCimi(itemService,
+                        CimiMachineTemplateVolumeTemplate.class));
+                }
+                dataCimi.setVolumeTemplates(listCimis.toArray(new CimiMachineTemplateVolumeTemplate[listCimis.size()]));
+            }
         }
     }
 
@@ -176,10 +158,23 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
         dataService.setMachineConfiguration((MachineConfiguration) context.convertNextService(dataCimi.getMachineConfig()));
         // TODO NetworkInterfaces
         // dataService.setNetworkInterfaces(dataCimi.getUserName());
-        // TODO MachineVolume
-        // dataService.setVolumes(dataCimi.getUserName());
-        // TODO VolumeTemplate
-        // dataService.setVolumeTemplates(dataCimi.getUserName());
+
+        // Volume
+        if ((null != dataCimi.getVolumes()) && (dataCimi.getVolumes().length > 0)) {
+            List<MachineVolume> listServices = new ArrayList<MachineVolume>();
+            for (CimiMachineTemplateVolume itemCimi : dataCimi.getVolumes()) {
+                listServices.add((MachineVolume) context.convertNextService(itemCimi));
+            }
+            dataService.setVolumes(listServices);
+        }
+        // VolumeTemplate
+        if ((null != dataCimi.getVolumeTemplates()) && (dataCimi.getVolumeTemplates().length > 0)) {
+            List<MachineVolumeTemplate> listServices = new ArrayList<MachineVolumeTemplate>();
+            for (CimiMachineTemplateVolumeTemplate itemCimi : dataCimi.getVolumeTemplates()) {
+                listServices.add((MachineVolumeTemplate) context.convertNextService(itemCimi));
+            }
+            dataService.setVolumeTemplates(listServices);
+        }
     }
 
 }

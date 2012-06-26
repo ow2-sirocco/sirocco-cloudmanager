@@ -91,6 +91,22 @@ public class MachineRestResource extends RestResourceAbstract {
     private CimiManager cimiManagerActionMachine;
 
     @Autowired
+    @Qualifier("CimiManagerReadMachineDisk")
+    private CimiManager cimiManagerReadMachineDisk;
+
+    @Autowired
+    @Qualifier("CimiManagerReadMachineDiskCollection")
+    private CimiManager cimiManagerReadMachineDiskCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerCreateMachineDisk")
+    private CimiManager cimiManagerCreateMachineDisk;
+
+    @Autowired
+    @Qualifier("CimiManagerDeleteMachineDisk")
+    private CimiManager cimiManagerDeleteMachineDisk;
+
+    @Autowired
     @Qualifier("CimiManagerOperationNotImplemented")
     private CimiManager cimiOperationNotImplemented;
 
@@ -189,7 +205,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readDisks(@PathParam("idParent") final String idParent) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), (String) null, idParent);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerReadMachineDiskCollection.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
@@ -205,7 +221,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readDisk(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerReadMachineDisk.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
@@ -237,7 +253,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("/{idParent}" + ConstantsPath.DISK_PATH)
     public Response createDisk(@PathParam("idParent") final String idParent, final CimiMachineDisk cimiData) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), null, idParent, cimiData);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerCreateMachineDisk.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
@@ -252,7 +268,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("/{idParent}" + ConstantsPath.DISK_PATH + "/{id}")
     public Response deleteDisk(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerDeleteMachineDisk.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
