@@ -33,10 +33,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
-import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 
 /**
  * System management operations
@@ -45,49 +46,47 @@ public interface ISystemManager extends IJobListener {
 
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.SystemManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager@Remote";
 
-    //create
-    Job createSystem(SystemCreate systemCreate) throws CloudProviderException;    
-    SystemTemplate createSystemTemplate(SystemTemplate systemTemplate) throws CloudProviderException;    
-    
-    //get by id
+    // create
+    Job createSystem(SystemCreate systemCreate) throws CloudProviderException;
+
+    SystemTemplate createSystemTemplate(SystemTemplate systemTemplate) throws CloudProviderException;
+
+    // get by id
     System getSystemById(String systemId) throws CloudProviderException;
+
     SystemTemplate getSystemTemplateById(String systemTemplateId) throws CloudProviderException;
-    
+
     // add/remove on system collections
-    Job addVolumeToSystem(Volume volume,String systemId) throws CloudProviderException;
-    Job removeVolumeFromSystem(String volumeId,String systemId) throws CloudProviderException;
-    
-    Job addSystemToSystem(System system,String systemId) throws CloudProviderException;
-    Job removeSystemFromSystem(String systemToRemoveId,String systemId) throws CloudProviderException;    
-    
-    Job addMachineToSystem(Machine machine,String systemId) throws CloudProviderException;
-    Job removeMachineFromSystem(String machineId,String systemId) throws CloudProviderException;    
-    
-    Job addCredentialToSystem(Credentials credential,String systemId) throws CloudProviderException;
-    Job removeCredentialFromSystem(String credentialId,String systemId) throws CloudProviderException;      
+    Job addEntityToSystem(final String systemId, final CloudCollection entity) throws CloudProviderException;
 
-    //management of SystemTemplate map
-    boolean addComponentDescriptorToSystemTemplate(ComponentDescriptor componentDescriptor,String systemTemplateId) throws CloudProviderException;
-    boolean removeComponentDescriptorFromSystemTemplate(String componentDescriptorId,String systemTemplateId) throws CloudProviderException;
-    
-    //management of compponent Descriptors
-    System updateComponentDescriptor(final String id,
-            Map<String, Object> updatedAttributes)
-            throws CloudProviderException;    
-    
-    //global entity updates
-    System updateSystem(final String id,
-            Map<String, Object> updatedAttributes)
-            throws CloudProviderException;
-    SystemTemplate updateSystemTemplate(final String id,
-            Map<String, Object> updatedAttributes)
-            throws CloudProviderException;
+    Job removeEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException;
 
-    //operations on system
+    Job updateEntityInSystem(final String systemId, final CloudCollection entity) throws CloudProviderException;
+
+    // management of SystemTemplate map
+    boolean addComponentDescriptorToSystemTemplate(ComponentDescriptor componentDescriptor, String systemTemplateId)
+        throws CloudProviderException;
+
+    boolean removeComponentDescriptorFromSystemTemplate(String componentDescriptorId, String systemTemplateId)
+        throws CloudProviderException;
+
+    // management of compponent Descriptors
+    System updateComponentDescriptor(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
+
+    // global entity updates
+    System updateSystem(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
+
+    SystemTemplate updateSystemTemplate(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
+
+    // operations on system
     Job startSystem(String systemId) throws CloudProviderException;
+
     Job stopSystem(String systemId) throws CloudProviderException;
+
     Job deleteSystem(String systemId) throws CloudProviderException;
+
     List<System> getSystems() throws CloudProviderException;
+
     List<SystemTemplate> getSystemTemplates() throws CloudProviderException;
-    
+
 }

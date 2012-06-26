@@ -23,7 +23,9 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.model.cimi;
+package org.ow2.sirocco.cloudmanager.model.cimi.system;
+
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntityCreate;
 
 public class SystemCreate extends CloudEntityCreate {
 

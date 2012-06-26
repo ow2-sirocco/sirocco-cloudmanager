@@ -19,52 +19,46 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: $
+ *  $Id: CloudResource.java 1258 2012-05-21 12:35:04Z ycas7461 $
  *
  */
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
-import javax.persistence.Lob;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
+
 
 @Entity
-public class Credentials extends CloudResource implements Serializable {
+@Inheritance(strategy = InheritanceType.JOINED)
+public abstract class CloudCollection extends CloudEntity {
     private static final long serialVersionUID = 1L;
-
-    private String userName;
-
-    private String password;
-
-    private byte[] publicKey;
-
-    public Credentials() {
+    private CloudResource resource;
+    public static enum State {
+        NOT_AVAILABLE, AVAILABLE, DELETED
     }
 
-    public String getUserName() {
-        return this.userName;
+    private State state;
+
+    @OneToOne(optional=false)
+    @JoinColumn(name="cloudcoll_ent_id")
+    public CloudResource getResource() {
+        return resource;
     }
 
-    public void setUserName(final String userName) {
-        this.userName = userName;
+    public void setResource(
+            CloudResource resource) {
+        this.resource = resource;
     }
 
-    public String getPassword() {
-        return this.password;
+    public State getState() {
+        return state;
     }
 
-    public void setPassword(final String password) {
-        this.password = password;
-    }
-
-    @Lob
-    public byte[] getPublicKey() {
-        return this.publicKey;
-    }
-
-    public void setPublicKey(final byte[] key) {
-        this.publicKey = key;
+    public void setState(State state) {
+        this.state = state;
     }
 }

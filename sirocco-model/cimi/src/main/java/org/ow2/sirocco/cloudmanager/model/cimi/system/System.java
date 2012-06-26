@@ -23,17 +23,19 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.model.cimi;
+package org.ow2.sirocco.cloudmanager.model.cimi.system;
 
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
@@ -49,60 +51,60 @@ public class System extends CloudResource implements Serializable {
         CREATING, CREATED, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, MIXED, DELETING, DELETED, ERROR
     }
 
-    private List<Credentials> credentials;
+    private List<SystemCredentials> credentials;
 
-    private List<Machine> machines;
+    private List<SystemMachine> machines;
 
-    private List<System> systems;
+    private List<SystemSystem> systems;
 
     private State state;
 
-    private List<Volume> volumes;
+    private List<SystemVolume> volumes;
     
-    private List<Network> networks;
+    private List<SystemNetwork> networks;
 
     private CloudProviderAccount cloudProviderAccount;
 
     public System() {
     }
     
-    @OneToMany
+    @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="system_id")
-    public List<Credentials> getCredentials() {
+    public List<SystemCredentials> getCredentials() {
         return credentials;
     }
 
-    public void setCredentials(List<Credentials> credentials) {
+    public void setCredentials(List<SystemCredentials> credentials) {
         this.credentials = credentials;
     }
 
-    @OneToMany
+    @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="system_id")
-    public List<Machine> getMachines() {
+    public List<SystemMachine> getMachines() {
         return machines;
     }
 
-    public void setMachines(List<Machine> machines) {
+    public void setMachines(List<SystemMachine> machines) {
         this.machines = machines;
     }
 
-    @OneToMany
+    @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="system_id")
-    public List<System> getSystems() {
+    public List<SystemSystem> getSystems() {
         return systems;
     }
 
-    public void setSystems(List<System> systems) {
+    public void setSystems(List<SystemSystem> systems) {
         this.systems = systems;
     }
 
-    @OneToMany
+    @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="system_id")
-    public List<Volume> getVolumes() {
+    public List<SystemVolume> getVolumes() {
         return volumes;
     }
 
-    public void setVolumes(List<Volume> volumes) {
+    public void setVolumes(List<SystemVolume> volumes) {
         this.volumes = volumes;
     }
 
@@ -131,13 +133,13 @@ public class System extends CloudResource implements Serializable {
         this.location = location;
     }
     
-    @OneToMany
+    @OneToMany(cascade=CascadeType.ALL)
     @JoinColumn(name="system_id")
-    public List<Network> getNetworks() {
+    public List<SystemNetwork> getNetworks() {
         return networks;
     }
 
-    public void setNetworks(List<Network> networks) {
+    public void setNetworks(List<SystemNetwork> networks) {
         this.networks = networks;
     }
 

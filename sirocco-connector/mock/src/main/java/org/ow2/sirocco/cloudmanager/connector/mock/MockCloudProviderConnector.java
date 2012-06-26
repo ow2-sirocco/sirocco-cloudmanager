@@ -42,6 +42,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollection;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor.ComponentType;
@@ -65,15 +66,19 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.System;
-import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
-import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
@@ -515,7 +520,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     Job j = this.createMachine(mc);
                     failedCancelled = waitForJob(j, maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
-                        system.getMachines().add((Machine) j.getTargetEntity());
+                        SystemMachine sm = new SystemMachine();
+                        sm.setResource(j.getTargetEntity());
+                        system.getMachines().add(sm);
                     }
                 }
             }
@@ -535,7 +542,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     Job j = this.createVolume(vc);
                     failedCancelled = waitForJob(j, maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
-                        system.getVolumes().add((Volume) j.getTargetEntity());
+                        SystemVolume sv = new SystemVolume();
+                        sv.setResource(j.getTargetEntity());
+                        system.getVolumes().add(sv);
                     }
                 }
             }
@@ -555,7 +564,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     Job j = this.createSystem(sc);
                     failedCancelled = waitForJob(j, maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
-                        system.getSystems().add((System) j.getTargetEntity());
+                        SystemSystem ss = new SystemSystem();
+                        ss.setResource(j.getTargetEntity());
+                        system.getSystems().add(ss);
                     }
                 }
             }
@@ -575,7 +586,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     Job j = this.createNetwork(nc);
                     failedCancelled = waitForJob(j, maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
-                        system.getNetworks().add((Network) j.getTargetEntity());
+                        SystemNetwork sn = new SystemNetwork();
+                        sn.setResource(j.getTargetEntity());
+                        system.getNetworks().add(sn);
                     }
                 }
             }
@@ -591,10 +604,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     // private utility methods for System services (start,stop,etc)
 
-    private boolean serviceSystem(final List<? extends CloudResource> l, final SystemAction action) throws ConnectorException {
+    private boolean serviceSystem(final List<? extends CloudCollection> l, final SystemAction action) throws ConnectorException {
         boolean failedCancelled = false;
-        for (CloudResource m : l) {
-            Job j = this.callSystemService(m, action, m.getProviderAssignedId().toString());
+        for (CloudCollection m : l) {
+            Job j = this.callSystemService(m.getResource(), action, m.getResource().getProviderAssignedId().toString());
             failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
         return failedCancelled;
@@ -780,20 +793,20 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         boolean failedCancelled = false;
 
-        for (Machine m : system.getMachines()) {
-            Job j = this.deleteMachine(m.getId().toString());
+        for (SystemMachine m : system.getMachines()) {
+            Job j = this.deleteMachine(m.getResource().getId().toString());
             failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
-        for (System m : system.getSystems()) {
-            Job j = this.deleteSystem(m.getId().toString());
+        for (SystemSystem m : system.getSystems()) {
+            Job j = this.deleteSystem(m.getResource().getId().toString());
             failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
-        for (Volume m : system.getVolumes()) {
-            Job j = this.deleteVolume(m.getId().toString());
+        for (SystemVolume m : system.getVolumes()) {
+            Job j = this.deleteVolume(m.getResource().getId().toString());
             failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
-        for (Network m : system.getNetworks()) {
-            Job j = this.deleteNetwork(m.getId().toString());
+        for (SystemNetwork m : system.getNetworks()) {
+            Job j = this.deleteNetwork(m.getResource().getId().toString());
             failedCancelled = waitForJob(j, maxJobTimeInSeconds);
         }
         system.setState(System.State.DELETING);

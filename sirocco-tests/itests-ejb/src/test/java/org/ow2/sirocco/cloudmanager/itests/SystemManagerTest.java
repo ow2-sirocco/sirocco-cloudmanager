@@ -21,12 +21,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.System;
-import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
-import org.ow2.sirocco.cloudmanager.model.cimi.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 
 @SuppressWarnings("unused")
 public class SystemManagerTest extends SiroccoTester {
@@ -151,19 +151,22 @@ public class SystemManagerTest extends SiroccoTester {
                 throw new Exception("system operation time out");
             }
         }
+
         // verif
-        org.ow2.sirocco.cloudmanager.model.cimi.System sv1 = this.systemManager.getSystemById(systemId);
+        org.ow2.sirocco.cloudmanager.model.cimi.system.System sv1 = systemManager.getSystemById(systemId);
 
         Assert.assertEquals(sv1.getName(), "systemTest1");
         Assert.assertEquals(sv1.getDescription(), "descr-sc1");
+
         Assert.assertEquals(sv1.getMachines().size(), 2);
         Assert.assertEquals(sv1.getMachines().get(0).getName(), "MaMachine0");
         Assert.assertEquals(sv1.getMachines().get(0).getDescription(), "desc-comp");
+        // Assert.assertEquals(sv1.getMachines().get(0).getCpu().getCpuSpeedUnit(),Cpu.Frequency.GIGA);
         Assert.assertEquals(sv1.getMachines().get(1).getName(), "MaMachine1");
         Assert.assertEquals(sv1.getMachines().get(1).getDescription(), "desc-comp");
 
         Assert.assertEquals(sv1.getSystems().size(), 2);
-        org.ow2.sirocco.cloudmanager.model.cimi.System s1 = this.systemManager.getSystemById(sv1.getSystems().get(0).getId()
+        org.ow2.sirocco.cloudmanager.model.cimi.system.System s1 = systemManager.getSystemById(sv1.getSystems().get(0).getId()
             .toString());
         Assert.assertEquals(s1.getName(), "MonSystemeBisque0");
         Assert.assertEquals(s1.getDescription(), "desc-comp3");
@@ -174,15 +177,16 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals(s1.getMachines().get(1).getDescription(), "desc-comp2");
         Assert.assertEquals(s1.getMachines().get(2).getName(), "MaMachineBisque2");
         Assert.assertEquals(s1.getMachines().get(2).getDescription(), "desc-comp2");
-        org.ow2.sirocco.cloudmanager.model.cimi.System s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getId()
+        org.ow2.sirocco.cloudmanager.model.cimi.system.System s2 = systemManager.getSystemById(sv1.getSystems().get(1).getId()
             .toString());
         Assert.assertEquals(s2.getName(), "MonSystemeBisque1");
         Assert.assertEquals(s2.getDescription(), "desc-comp3");
         Assert.assertEquals(s2.getMachines().size(), 3);
 
-        j = this.systemManager.startSystem(systemId);
+        j = systemManager.startSystem(systemId);
         jobId = j.getId().toString();
         counter = 130;
+
         while (true) {
             j = this.jobManager.getJobById(jobId);
             if (j.getStatus() != Job.Status.RUNNING) {
@@ -239,12 +243,14 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals(s2.getMachines().get(2).getState(), Machine.State.STOPPED);
 
         // some manipulations
-        this.systemManager.removeMachineFromSystem(sv1.getMachines().get(1).getId().toString(), systemId);
-        this.systemManager.removeSystemFromSystem(sv1.getSystems().get(0).getId().toString(), systemId);
-        sv1 = this.systemManager.getSystemById(systemId);
+        // this.systemManager.removeMachineFromSystem(sv1.getMachines().get(1).getId().toString(),
+        // systemId);
+        // this.systemManager.removeSystemFromSystem(sv1.getSystems().get(0).getId().toString(),
+        // systemId);
+        // sv1 = this.systemManager.getSystemById(systemId);
 
-        Assert.assertEquals(sv1.getMachines().size(), 1);
-        Assert.assertEquals(sv1.getSystems().size(), 1);
+        // Assert.assertEquals(sv1.getMachines().size(), 1);
+        // Assert.assertEquals(sv1.getSystems().size(), 1);
 
         j = this.systemManager.deleteSystem(systemId);
         jobId = j.getId().toString();

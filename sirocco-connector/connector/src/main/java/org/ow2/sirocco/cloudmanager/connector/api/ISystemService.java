@@ -26,7 +26,7 @@
 package org.ow2.sirocco.cloudmanager.connector.api;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.SystemCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 
 public interface ISystemService {
     Job createSystem(SystemCreate systemCreate) throws ConnectorException;
