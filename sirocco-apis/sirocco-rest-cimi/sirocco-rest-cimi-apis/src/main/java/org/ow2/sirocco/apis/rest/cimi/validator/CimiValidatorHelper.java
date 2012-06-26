@@ -154,19 +154,6 @@ public class CimiValidatorHelper {
         return valid;
     }
 
-    // FIXME in comment?
-    // /**
-    // * Validate a bean.
-    // *
-    // * @param <T> The type of bean
-    // * @param beanToValidate Bean to validate
-    // * @return True if the bean is valid
-    // */
-    // public <T> boolean validate(final T beanToValidate) {
-    // return this.validate(null, beanToValidate);
-    // }
-
-    // FIXME in comment?
     /**
      * Validate a bean with a array of filters.
      * 
