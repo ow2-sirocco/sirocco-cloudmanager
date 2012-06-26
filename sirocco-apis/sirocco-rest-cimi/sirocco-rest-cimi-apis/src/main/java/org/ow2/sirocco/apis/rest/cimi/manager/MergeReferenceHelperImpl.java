@@ -45,6 +45,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
@@ -61,8 +62,10 @@ import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
@@ -189,13 +192,26 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Override
     public void merge(final CimiContext context, final CimiMachineDisk cimi) throws Exception {
         if (true == cimi.hasReference()) {
-            // FIXME Operation don't exist in manager
-            // MachineDisk dataService =
-            // this.managerMachine.getMachineDiskById(context.getRequest().getIdParent(),
-            // HrefHelper.extractIdString(cimi.getHref()));
-            // CimiMachineDisk cimiRef = (CimiMachineDisk)
-            // context.convertToCimi(dataService, CimiMachineDisk.class);
-            // this.merge(cimiRef, cimi);
+            MachineDisk dataService = this.managerMachine.getDiskFromMachine(context.getRequest().getIdParent(),
+                HrefHelper.extractIdString(cimi.getHref()));
+            CimiMachineDisk cimiRef = (CimiMachineDisk) context.convertToCimi(dataService, CimiMachineDisk.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiMachineVolume cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            MachineVolume dataService = this.managerMachine.getVolumeFromMachine(context.getRequest().getIdParent(),
+                HrefHelper.extractIdString(cimi.getHref()));
+            CimiMachineVolume cimiRef = (CimiMachineVolume) context.convertToCimi(dataService, CimiMachineVolume.class);
+            this.merge(cimiRef, cimi);
         }
     }
 
@@ -656,7 +672,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
-     * Merge disk data.
+     * Merge machine disk data.
      * 
      * @param cimiRef Source to merge
      * @param cimi Merged destination
@@ -671,6 +687,26 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             }
             if (null == cimi.getInitialLocation()) {
                 cimi.setInitialLocation(cimiRef.getInitialLocation());
+            }
+        }
+    }
+
+    /**
+     * Merge machine volume data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiMachineVolume cimiRef, final CimiMachineVolume cimi) {
+        if (null != cimiRef) {
+            this.mergeCommon(cimiRef, cimi);
+            if (null == cimi.getInitialLocation()) {
+                cimi.setInitialLocation(cimiRef.getInitialLocation());
+            }
+            if (null == cimi.getVolume()) {
+                cimi.setVolume(cimiRef.getVolume());
+            } else {
+                this.merge(cimiRef.getVolume(), cimi.getVolume());
             }
         }
     }

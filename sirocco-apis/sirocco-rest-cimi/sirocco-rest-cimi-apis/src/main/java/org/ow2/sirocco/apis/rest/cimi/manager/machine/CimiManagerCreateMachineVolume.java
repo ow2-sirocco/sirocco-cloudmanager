@@ -24,22 +24,24 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
-import javax.ws.rs.core.Response;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
-import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
+import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Manage READ request of disk of a Machine.
+ * Manage CREATE request of Machine.
  */
-@Component("CimiManagerReadMachineDisk")
-public class CimiManagerReadMachineDisk extends CimiManagerReadAbstract {
+@Component("CimiManagerCreateMachineVolume")
+public class CimiManagerCreateMachineVolume extends CimiManagerCreateAbstract {
+    @Autowired
+    @Qualifier("MergeReferenceHelper")
+    private MergeReferenceHelper mergeReference;
 
     @Autowired
     @Qualifier("IMachineManager")
@@ -53,22 +55,17 @@ public class CimiManagerReadMachineDisk extends CimiManagerReadAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        MachineDisk out = null;
-        out = this.manager.getDiskFromMachine(context.getRequest().getIdParent(), context.getRequest().getId());
-        return out;
+        return this.manager.addVolumeToMachine(context.getRequest().getIdParent(), (MachineVolume) dataService);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
-     *      java.lang.Object)
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#beforeConvertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
      */
     @Override
-    protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiMachineDisk cimi = (CimiMachineDisk) context.convertToCimi(dataService, CimiMachineDisk.class);
-        context.getResponse().setCimiData(cimi);
-        context.getResponse().setStatus(Response.Status.OK);
+    protected void beforeConvertToDataService(final CimiContext context) throws Exception {
+        this.mergeReference.merge(context, (CimiMachineVolume) context.getRequest().getCimiData());
     }
 
 }

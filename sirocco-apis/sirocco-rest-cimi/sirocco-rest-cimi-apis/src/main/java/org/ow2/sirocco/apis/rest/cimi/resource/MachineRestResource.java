@@ -107,8 +107,28 @@ public class MachineRestResource extends RestResourceAbstract {
     private CimiManager cimiManagerDeleteMachineDisk;
 
     @Autowired
-    @Qualifier("CimiManagerOperationNotImplemented")
-    private CimiManager cimiOperationNotImplemented;
+    @Qualifier("CimiManagerUpdateMachineDisk")
+    private CimiManager cimiManagerUpdateMachineDisk;
+
+    @Autowired
+    @Qualifier("CimiManagerReadMachineVolume")
+    private CimiManager cimiManagerReadMachineVolume;
+
+    @Autowired
+    @Qualifier("CimiManagerReadMachineVolumeCollection")
+    private CimiManager cimiManagerReadMachineVolumeCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerCreateMachineVolume")
+    private CimiManager cimiManagerCreateMachineVolume;
+
+    @Autowired
+    @Qualifier("CimiManagerDeleteMachineVolume")
+    private CimiManager cimiManagerDeleteMachineVolume;
+
+    @Autowired
+    @Qualifier("CimiManagerUpdateMachineVolume")
+    private CimiManager cimiManagerUpdateMachineVolume;
 
     /**
      * Get a machine.
@@ -238,7 +258,7 @@ public class MachineRestResource extends RestResourceAbstract {
     public Response updateDisk(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
         final CimiMachineDisk cimiData) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent, cimiData);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerUpdateMachineDisk.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
@@ -283,7 +303,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readVolumes(@PathParam("idParent") final String idParent) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), (String) null, idParent);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerReadMachineVolumeCollection.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
@@ -299,7 +319,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readVolume(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerReadMachineVolume.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
@@ -316,7 +336,7 @@ public class MachineRestResource extends RestResourceAbstract {
     public Response updateVolume(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
         final CimiMachineVolume cimiData) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent, cimiData);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerUpdateMachineVolume.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
@@ -331,7 +351,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("/{idParent}" + ConstantsPath.VOLUME_PATH)
     public Response createVolume(@PathParam("idParent") final String idParent, final CimiMachineVolume cimiData) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), null, idParent, cimiData);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerCreateMachineVolume.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 
@@ -346,7 +366,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("/{idParent}" + ConstantsPath.VOLUME_PATH + "/{id}")
     public Response deleteVolume(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
         CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, idParent);
-        this.cimiOperationNotImplemented.execute(context);
+        this.cimiManagerDeleteMachineVolume.execute(context);
         return HelperResponse.buildResponse(context.getResponse());
     }
 

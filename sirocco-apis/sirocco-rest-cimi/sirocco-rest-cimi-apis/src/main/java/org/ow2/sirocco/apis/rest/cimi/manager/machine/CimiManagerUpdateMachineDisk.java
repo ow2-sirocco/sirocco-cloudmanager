@@ -24,22 +24,18 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
-import javax.ws.rs.core.Response;
-
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
-import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
+import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Manage READ request of disk of a Machine.
+ * Manage UPDATE request of MachineDisk.
  */
-@Component("CimiManagerReadMachineDisk")
-public class CimiManagerReadMachineDisk extends CimiManagerReadAbstract {
+@Component("CimiManagerUpdateMachineDisk")
+public class CimiManagerUpdateMachineDisk extends CimiManagerUpdateAbstract {
 
     @Autowired
     @Qualifier("IMachineManager")
@@ -53,22 +49,12 @@ public class CimiManagerReadMachineDisk extends CimiManagerReadAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        MachineDisk out = null;
-        out = this.manager.getDiskFromMachine(context.getRequest().getIdParent(), context.getRequest().getId());
-        return out;
+        throw new UnsupportedOperationException();
+        // FIXME
+        // Object out;
+        // out =
+        // this.manager.updateDiskInMachine(context.getRequest().getIdParent(),
+        // (MachineDisk) dataService);
+        // return out;
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#convertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiMachineDisk cimi = (CimiMachineDisk) context.convertToCimi(dataService, CimiMachineDisk.class);
-        context.getResponse().setCimiData(cimi);
-        context.getResponse().setStatus(Response.Status.OK);
-    }
-
 }

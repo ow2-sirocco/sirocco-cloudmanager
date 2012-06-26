@@ -26,20 +26,22 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Manage READ request of disk of a Machine.
+ * Manage READ request of Volumes collection of a machine.
  */
-@Component("CimiManagerReadMachineDisk")
-public class CimiManagerReadMachineDisk extends CimiManagerReadAbstract {
+@Component("CimiManagerReadMachineVolumeCollection")
+public class CimiManagerReadMachineVolumeCollection extends CimiManagerReadAbstract {
 
     @Autowired
     @Qualifier("IMachineManager")
@@ -53,8 +55,8 @@ public class CimiManagerReadMachineDisk extends CimiManagerReadAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        MachineDisk out = null;
-        out = this.manager.getDiskFromMachine(context.getRequest().getIdParent(), context.getRequest().getId());
+        Object out = null;
+        out = this.manager.getMachineVolumes(context.getRequest().getIdParent());
         return out;
     }
 
@@ -66,9 +68,23 @@ public class CimiManagerReadMachineDisk extends CimiManagerReadAbstract {
      */
     @Override
     protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiMachineDisk cimi = (CimiMachineDisk) context.convertToCimi(dataService, CimiMachineDisk.class);
+        CimiMachineVolumeCollection cimi = (CimiMachineVolumeCollection) context.convertToCimi(dataService,
+            CimiMachineVolumeCollection.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      java.lang.Object)
+     */
+    @Override
+    protected void afterConvertToResponse(final CimiContext context, final Object dataService) {
+        super.afterConvertToResponse(context, dataService);
+
+        CimiResource resource = (CimiResource) context.getResponse().getCimiData();
+        resource.add(new CimiOperation(Operation.ADD.getRel(), resource.getId()));
+    }
 }
