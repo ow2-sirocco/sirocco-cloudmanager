@@ -166,7 +166,7 @@ public class CimiPrimerScenarioTest {
     @Before
     public void setUp() throws Exception {
         System.out.println("CimiPrimerScenarioTest : setUp ");
-        // this.setUpDatabase();
+        this.setUpDatabase();
         this.connectToCloudManager();
         User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
         CloudProvider provider = this.cloudProviderManager.createCloudProvider(CimiPrimerScenarioTest.CLOUD_PROVIDER_TYPE,
@@ -924,9 +924,9 @@ public class CimiPrimerScenarioTest {
         }
         List<MachineVolume> attached = machine.getVolumes();
         if (attached == null) {
-            System.out.println("no volumes for machine " +machineId);
+            System.out.println("no volumes for machine " + machineId);
         } else {
-            System.out.println(" machine " +machineId +" has " +attached.size() +" volumes ");
+            System.out.println(" machine " + machineId + " has " + attached.size() + " volumes ");
         }
         /** delete machine without detaching volumes */
         boolean caught = false;
@@ -936,31 +936,31 @@ public class CimiPrimerScenarioTest {
         } catch (Exception e) {
             caught = true;
         }
-        System.out.println("deletion of " +machineId +" returned with exception "+caught);
+        System.out.println("deletion of " + machineId + " returned with exception " + caught);
         if ((attached != null) && (attached.size() > 0)) {
             Assert.assertEquals(caught, true);
-            
-            System.out.println(" Machine deletion failed correct behaviour " +caught + " exception ");
+
+            System.out.println(" Machine deletion failed correct behaviour " + caught + " exception ");
             /** detach volumes first */
             for (MachineVolume volume : attached) {
-                
+
                 deleteJob = this.machineManager.removeVolumeFromMachine(machineId, volume.getId().toString());
                 this.waitForJobCompletion(deleteJob);
-                System.out.println("detach of volume " +volume.getVolume().getId() +" terminated " );
+                System.out.println("detach of volume " + volume.getVolume().getId() + " terminated ");
             }
-            System.out.println(" delete machine now that volumes are detached " +machineId);
+            System.out.println(" delete machine now that volumes are detached " + machineId);
 
             deleteJob = this.machineManager.deleteMachine(machineId);
 
-        } 
-       
+        }
+
         if (deleteJob.getStatus() == Job.Status.RUNNING) {
-            System.out.println(" testScenarioThree : wait for deletion of machine " +machineId);
+            System.out.println(" testScenarioThree : wait for deletion of machine " + machineId);
             this.waitForJobCompletion(deleteJob);
         } else {
             System.out.println("Machine deletion completed " + machineId);
         }
-       
+
     }
 
     @Test
