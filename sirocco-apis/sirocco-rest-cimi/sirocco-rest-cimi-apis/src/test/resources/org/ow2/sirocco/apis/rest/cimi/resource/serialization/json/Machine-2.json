@@ -22,15 +22,8 @@
 	],
 	"href":"hrefValue_2",
 	"state":"stateValue_2",
-	"cpu":{
-		"numberVirtualCpus":2,
-		"frequency":200.0,
-		"units":"unitValue_2"
-	},
-	"memory":{
-		"quantity":2,
-		"units":"unitValue_2"
-	},
+	"cpu":2,
+	"memory":2,
 	"disks":{
 		"id":"idValue_2",
 		"resourceURI":"http://schemas.dmtf.org/cimi/1/DiskCollection",
@@ -57,10 +50,7 @@
 				},
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
-				"capacity":{
-					"quantity":2,
-					"units":"unitValue_2_0"
-				},
+				"capacity":2,
 				"initialLocation":"initialLocation_2_0",
 				"id":"idValue_2_0",
 				"href":"hrefValue_2_0",
@@ -86,10 +76,7 @@
 				},
 				"created":"2002-03-03T02:02:02.002Z",
 				"updated":"2002-03-03T02:02:02.002Z",
-				"capacity":{
-					"quantity":2,
-					"units":"unitValue_2_1"
-				},
+				"capacity":2,
 				"initialLocation":"initialLocation_2_1",
 				"id":"idValue_2_1",
 				"href":"hrefValue_2_1",

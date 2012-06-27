@@ -43,13 +43,6 @@ public class WritingCompositionValidatorTest {
         cimi.setInitialLocation("il");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(cimi));
 
-        cimi = new CimiMachineDisk();
-        cimi.setCapacity(123);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(cimi));
-
-        cimi = new CimiMachineDisk();
-        cimi.setCapacity(5565);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(cimi));
     }
 
     @Test

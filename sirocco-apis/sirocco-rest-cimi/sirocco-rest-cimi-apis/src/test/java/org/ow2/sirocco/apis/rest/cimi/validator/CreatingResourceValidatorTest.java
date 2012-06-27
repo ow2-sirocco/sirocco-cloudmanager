@@ -110,13 +110,6 @@ public class CreatingResourceValidatorTest {
         cimi.setCpu(11);
         cimi.setMemory(22);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
-
-        // KO by reference and value : BAD CPU
-        cimi = new CimiMachineConfiguration(this.request.getBaseUri()
-            + ExchangeType.MachineConfiguration.getPathType().getPathname() + "/17");
-        cimi.setCpu(11);
-        cimi.setMemory(22);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
     }
 
     @Test
@@ -234,14 +227,6 @@ public class CreatingResourceValidatorTest {
         template = new CimiMachineTemplate("hrefFoo");
         template.setMachineConfig(new CimiMachineConfiguration(11, 22));
         template.setMachineImage(new CimiMachineImage(new ImageLocation("foo")));
-        cimi = new CimiMachineCreate();
-        cimi.setMachineTemplate(template);
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
-
-        // KO by reference and value
-        template = new CimiMachineTemplate(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathType().getPathname()
-            + "/7");
-        template.setMachineConfig(new CimiMachineConfiguration(11, 22));
         cimi = new CimiMachineCreate();
         cimi.setMachineTemplate(template);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));

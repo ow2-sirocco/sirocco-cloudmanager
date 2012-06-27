@@ -34,21 +34,11 @@
 			
 		],
 		"href":"hrefValue_1",
-		"cpu":{
-			"numberVirtualCpus":1,
-			"frequency":100.0,
-			"units":"unitValue_1"
-		},
-		"memory":{
-			"quantity":1,
-			"units":"unitValue_1"
-		},
+		"cpu":1,
+		"memory":1,
 		"disks":[
 			{
-				"capacity":{
-					"quantity":1,
-					"units":"unitValue_1_0"
-				},
+				"capacity":1,
 				"format":"formatValue_1_0",
 				"initialLocation":"initialLocationValue_1_0"
 			}

@@ -14,23 +14,23 @@
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
 		<updated>2003-04-04T03:03:03.003Z</updated>
-		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_0" />
+		<cpu>3</cpu>
 		<disk>
-			<capacity quantity="3" units="unitValue_3_0" />
+			<capacity>3</capacity>
 			<initialLocation>initialLocationValue_3_0</initialLocation>
 			<format>formatValue_3_0</format>
 		</disk>
 		<disk>
-			<capacity quantity="3" units="unitValue_3_1" />
+			<capacity>3</capacity>
 			<initialLocation>initialLocationValue_3_1</initialLocation>
 			<format>formatValue_3_1</format>
 		</disk>
 		<disk>
-			<capacity quantity="3" units="unitValue_3_2" />
+			<capacity>3</capacity>
 			<initialLocation>initialLocationValue_3_2</initialLocation>
 			<format>formatValue_3_2</format>
 		</disk>
-		<memory quantity="3" units="unitValue_3_0" />
+		<memory>3</memory>
 	</MachineConfiguration>
 	<MachineConfiguration href="hrefValue_3_1" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 		<description>descriptionValue_3_1</description>
@@ -44,23 +44,23 @@
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
 		<updated>2003-04-04T03:03:03.003Z</updated>
-		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_1" />
+		<cpu>3</cpu>
 		<disk>
-			<capacity quantity="3" units="unitValue_3_0" />
+			<capacity>3</capacity>
 			<initialLocation>initialLocationValue_3_0</initialLocation>
 			<format>formatValue_3_0</format>
 		</disk>
 		<disk>
-			<capacity quantity="3" units="unitValue_3_1" />
+			<capacity>3</capacity>
 			<initialLocation>initialLocationValue_3_1</initialLocation>
 			<format>formatValue_3_1</format>
 		</disk>
 		<disk>
-			<capacity quantity="3" units="unitValue_3_2" />
+			<capacity>3</capacity>
 			<initialLocation>initialLocationValue_3_2</initialLocation>
 			<format>formatValue_3_2</format>
 		</disk>
-		<memory quantity="3" units="unitValue_3_1" />
+		<memory>3</memory>
 	</MachineConfiguration>
 	<MachineConfiguration href="hrefValue_3_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 		<description>descriptionValue_3_2</description>
@@ -74,23 +74,23 @@
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
 		<updated>2003-04-04T03:03:03.003Z</updated>
-		<cpu frequency="300.0" numberVirtualCpus="3" units="unitValue_3_2" />
+		<cpu>3</cpu>
 		<disk>
-			<capacity quantity="3" units="unitValue_3_0" />
+			<capacity>3</capacity>
 			<initialLocation>initialLocationValue_3_0</initialLocation>
 			<format>formatValue_3_0</format>
 		</disk>
 		<disk>
-			<capacity quantity="3" units="unitValue_3_1" />
+			<capacity>3</capacity>
 			<initialLocation>initialLocationValue_3_1</initialLocation>
 			<format>formatValue_3_1</format>
 		</disk>
 		<disk>
-			<capacity quantity="3" units="unitValue_3_2" />
+			<capacity>3</capacity>
 			<initialLocation>initialLocationValue_3_2</initialLocation>
 			<format>formatValue_3_2</format>
 		</disk>
-		<memory quantity="3" units="unitValue_3_2" />
+		<memory>3</memory>
 	</MachineConfiguration>
 	<operation href="hrefValue_3_0" rel="relValue_3_0" />
 	<operation href="hrefValue_3_1" rel="relValue_3_1" />

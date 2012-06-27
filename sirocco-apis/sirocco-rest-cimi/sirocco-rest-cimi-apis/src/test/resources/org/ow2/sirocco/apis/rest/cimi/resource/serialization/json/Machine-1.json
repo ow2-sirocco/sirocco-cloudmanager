@@ -17,15 +17,8 @@
 	],
 	"href":"hrefValue_1",
 	"state":"stateValue_1",
-	"cpu":{
-		"numberVirtualCpus":1,
-		"frequency":100.0,
-		"units":"unitValue_1"
-	},
-	"memory":{
-		"quantity":1,
-		"units":"unitValue_1"
-	},
+	"cpu":1,
+	"memory":1,
 	"disks":{
 		"id":"idValue_1",
 		"resourceURI":"http://schemas.dmtf.org/cimi/1/DiskCollection",
@@ -47,10 +40,7 @@
 				},
 				"created":"2001-02-02T01:01:01.001Z",
 				"updated":"2001-02-02T01:01:01.001Z",
-				"capacity":{
-					"quantity":1,
-					"units":"unitValue_1_0"
-				},
+				"capacity":1,
 				"initialLocation":"initialLocation_1_0",
 				"id":"idValue_1_0",
 				"href":"hrefValue_1_0",

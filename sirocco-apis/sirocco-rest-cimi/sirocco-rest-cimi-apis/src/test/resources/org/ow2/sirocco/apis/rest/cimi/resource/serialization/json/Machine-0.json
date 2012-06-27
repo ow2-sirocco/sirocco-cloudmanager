@@ -7,13 +7,6 @@
 	"updated":"2000-01-01T00:00:00.000Z",
 	"href":"hrefValue_0",
 	"state":"stateValue_0",
-	"cpu":{
-		"numberVirtualCpus":0,
-		"frequency":0.0,
-		"units":"unitValue_0"
-	},
-	"memory":{
-		"quantity":0,
-		"units":"unitValue_0"
-	}
+	"cpu":0,
+	"memory":0
 }

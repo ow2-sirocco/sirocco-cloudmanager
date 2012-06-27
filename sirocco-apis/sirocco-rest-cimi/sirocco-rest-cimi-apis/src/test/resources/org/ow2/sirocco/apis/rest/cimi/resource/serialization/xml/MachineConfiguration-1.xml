@@ -7,11 +7,11 @@
 	<id>idValue_1</id>
 	<operation href="hrefValue_1_0" rel="relValue_1_0" />
 	<updated>2001-02-02T01:01:01.001Z</updated>
-	<cpu frequency="100.0" numberVirtualCpus="1" units="unitValue_1" />
+	<cpu>1</cpu>
 	<disk>
 		<initialLocation>initialLocationValue_1_0</initialLocation>
-		<capacity quantity="1" units="unitValue_1_0" />
+		<capacity>1</capacity>
 		<format>formatValue_1_0</format>
 	</disk>
-	<memory quantity="1" units="unitValue_1" />
+	<memory>1</memory>
 </MachineConfiguration>

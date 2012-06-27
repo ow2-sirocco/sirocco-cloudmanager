@@ -47,37 +47,21 @@
 				
 			],
 			"href":"hrefValue_3_0",
-			"cpu":{
-				"numberVirtualCpus":3,
-				"frequency":300.0,
-				"units":"unitValue_3_0"
-			},
-			"memory":{
-				"quantity":3,
-				"units":"unitValue_3_0"
-			},
+			"cpu":3,
+			"memory":3,
 			"disks":[
 				{
-					"capacity":{
-						"quantity":3,
-						"units":"unitValue_3_0"
-					},
+					"capacity":3,
 					"format":"formatValue_3_0",
 					"initialLocation":"initialLocationValue_3_0"
 				},
 				{
-					"capacity":{
-						"quantity":3,
-						"units":"unitValue_3_1"
-					},
+					"capacity":3,
 					"format":"formatValue_3_1",
 					"initialLocation":"initialLocationValue_3_1"
 				},
 				{
-					"capacity":{
-						"quantity":3,
-						"units":"unitValue_3_2"
-					},
+					"capacity":3,
 					"format":"formatValue_3_2",
 					"initialLocation":"initialLocationValue_3_2"
 				}
@@ -113,37 +97,21 @@
 				
 			],
 			"href":"hrefValue_3_1",
-			"cpu":{
-				"numberVirtualCpus":3,
-				"frequency":300.0,
-				"units":"unitValue_3_1"
-			},
-			"memory":{
-				"quantity":3,
-				"units":"unitValue_3_1"
-			},
+			"cpu":3,
+			"memory":3,
 			"disks":[
 				{
-					"capacity":{
-						"quantity":3,
-						"units":"unitValue_3_0"
-					},
+					"capacity":3,
 					"format":"formatValue_3_0",
 					"initialLocation":"initialLocationValue_3_0"
 				},
 				{
-					"capacity":{
-						"quantity":3,
-						"units":"unitValue_3_1"
-					},
+					"capacity":3,
 					"format":"formatValue_3_1",
 					"initialLocation":"initialLocationValue_3_1"
 				},
 				{
-					"capacity":{
-						"quantity":3,
-						"units":"unitValue_3_2"
-					},
+					"capacity":3,
 					"format":"formatValue_3_2",
 					"initialLocation":"initialLocationValue_3_2"
 				}
@@ -179,37 +147,21 @@
 				
 			],
 			"href":"hrefValue_3_2",
-			"cpu":{
-				"numberVirtualCpus":3,
-				"frequency":300.0,
-				"units":"unitValue_3_2"
-			},
-			"memory":{
-				"quantity":3,
-				"units":"unitValue_3_2"
-			},
+			"cpu":3,
+			"memory":3,
 			"disks":[
 				{
-					"capacity":{
-						"quantity":3,
-						"units":"unitValue_3_0"
-					},
+					"capacity":3,
 					"format":"formatValue_3_0",
 					"initialLocation":"initialLocationValue_3_0"
 				},
 				{
-					"capacity":{
-						"quantity":3,
-						"units":"unitValue_3_1"
-					},
+					"capacity":3,
 					"format":"formatValue_3_1",
 					"initialLocation":"initialLocationValue_3_1"
 				},
 				{
-					"capacity":{
-						"quantity":3,
-						"units":"unitValue_3_2"
-					},
+					"capacity":3,
 					"format":"formatValue_3_2",
 					"initialLocation":"initialLocationValue_3_2"
 				}

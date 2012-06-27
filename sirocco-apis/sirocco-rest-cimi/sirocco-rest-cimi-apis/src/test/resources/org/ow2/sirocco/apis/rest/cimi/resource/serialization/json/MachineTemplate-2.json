@@ -44,29 +44,16 @@
 			
 		],
 		"href":"hrefValue_2",
-		"cpu":{
-			"numberVirtualCpus":2,
-			"frequency":200.0,
-			"units":"unitValue_2"
-		},
-		"memory":{
-			"quantity":2,
-			"units":"unitValue_2"
-		},
+		"cpu":2,
+		"memory":2,
 		"disks":[
 			{
-				"capacity":{
-					"quantity":2,
-					"units":"unitValue_2_0"
-				},
+				"capacity":2,
 				"format":"formatValue_2_0",
 				"initialLocation":"initialLocationValue_2_0"
 			},
 			{
-				"capacity":{
-					"quantity":2,
-					"units":"unitValue_2_1"
-				},
+				"capacity":2,
 				"format":"formatValue_2_1",
 				"initialLocation":"initialLocationValue_2_1"
 			}

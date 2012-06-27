@@ -7,7 +7,7 @@
 	<id>idValue_1</id>
 	<operation href="hrefValue_1_0" rel="relValue_1_0" />
 	<updated>2001-02-02T01:01:01.001Z</updated>
-	<cpu frequency="100.0" numberVirtualCpus="1" units="unitValue_1" />
+	<cpu>1</cpu>
 	<disks href="hrefValue_1" resourceURI="http://schemas.dmtf.org/cimi/1/DiskCollection">
 		<id>idValue_1</id>
 		<operation href="hrefValue_1_0" rel="relValue_1_0" />
@@ -20,10 +20,10 @@
 			<id>idValue_1_0</id>
 			<operation href="hrefValue_1_0" rel="relValue_1_0" />
 			<updated>2001-02-02T01:01:01.001Z</updated>
-			<capacity quantity="1" units="unitValue_1_0" />
+			<capacity>1</capacity>
 			<initialLocation>initialLocation_1_0</initialLocation>
 		</Disk>
 	</disks>
-	<memory quantity="1" units="unitValue_1" />
+	<memory>1</memory>
 	<state>stateValue_1</state>
 </Machine>
