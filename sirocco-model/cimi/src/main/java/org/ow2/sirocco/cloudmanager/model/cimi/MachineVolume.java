@@ -30,10 +30,6 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -44,19 +40,17 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
 	 */
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
-
     private String initialLocation;
 
     private Volume volume;
 
     public static enum State {
-        PENDING, ATTACHING, ATTACHED, DETACHING, DETACHED, CANCELLED, DELETED, ERROR
+        PENDING, ATTACHING, ATTACHED, DETACHING, DETACHED, DELETED, ERROR
     }
 
     private State state;
 
-    // unidirectional 
+    // unidirectional
     // oneToOne until shareable volume support is added
     @OneToOne
     public Volume getVolume() {
