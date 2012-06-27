@@ -61,8 +61,8 @@ public class MachineConfigListCommand implements Command {
         table.addCell("Name");
         table.addCell("Description");
         table.addCell("Cpu");
-        table.addCell("Memory (MB)");
-        table.addCell("Disks (GB)");
+        table.addCell("Memory (KB)");
+        table.addCell("Disks (KB)");
 
         for (MachineConfiguration machineConfig : machineConfigs) {
             table.addCell(machineConfig.getId());

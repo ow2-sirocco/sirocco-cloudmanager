@@ -56,7 +56,7 @@ public class VolumeConfigShowCommand implements Command {
 
         table.addCell("description");
         table.addCell(volumeConfig.getDescription());
-        table.addCell("capacity (MB)");
+        table.addCell("capacity (KB)");
         table.addCell(Integer.toString(volumeConfig.getCapacity()));
         table.addCell("format");
         table.addCell(volumeConfig.getFormat());

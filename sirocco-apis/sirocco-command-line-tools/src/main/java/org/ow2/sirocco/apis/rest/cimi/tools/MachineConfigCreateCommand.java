@@ -49,10 +49,10 @@ public class MachineConfigCreateCommand implements Command {
     @Parameter(names = "-cpu", description = "number of cpu", required = true)
     private int numberOfCpus;
 
-    @Parameter(names = "-mem", description = "memory size in MB", required = true)
-    private int memoryInMB;
+    @Parameter(names = "-mem", description = "memory size in KB", required = true)
+    private int memoryInKB;
 
-    @Parameter(names = "-disk", description = "add disk with size in GB", required = true)
+    @Parameter(names = "-disk", description = "add disk with size in KB", required = true)
     private List<Integer> diskSizes = new ArrayList<Integer>();
 
     @Override
@@ -72,7 +72,7 @@ public class MachineConfigCreateCommand implements Command {
             }
         }
         machineConfig.setCpu(this.numberOfCpus);
-        machineConfig.setMemory(this.memoryInMB);
+        machineConfig.setMemory(this.memoryInKB);
 
         Disk disks[] = new Disk[this.diskSizes.size()];
         for (int i = 0; i < disks.length; i++) {

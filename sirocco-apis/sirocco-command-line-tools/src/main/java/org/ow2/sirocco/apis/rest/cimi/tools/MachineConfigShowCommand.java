@@ -61,13 +61,13 @@ public class MachineConfigShowCommand implements Command {
         table.addCell(machineConfig.getDescription());
         table.addCell("cpu");
         table.addCell(Integer.toString(machineConfig.getCpu()));
-        table.addCell("memory");
+        table.addCell("memory (KB)");
         table.addCell(Integer.toString(machineConfig.getMemory()));
 
         for (int i = 0; i < machineConfig.getDisks().length; i++) {
             Disk disk = machineConfig.getDisks()[i];
             table.addCell("disk #" + i);
-            table.addCell("capacity=" + disk.capacity + "GB, format=" + disk.format + ", initialLocation="
+            table.addCell("capacity=" + disk.capacity + "KB, format=" + disk.format + ", initialLocation="
                 + disk.initialLocation);
         }
 

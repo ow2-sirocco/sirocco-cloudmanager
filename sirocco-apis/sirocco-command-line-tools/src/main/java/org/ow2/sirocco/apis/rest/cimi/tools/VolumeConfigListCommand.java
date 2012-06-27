@@ -60,7 +60,7 @@ public class VolumeConfigListCommand implements Command {
         table.addCell("ID");
         table.addCell("Name");
         table.addCell("Description");
-        table.addCell("Capacity (MB)");
+        table.addCell("Capacity (KB)");
         table.addCell("Format");
 
         for (VolumeConfiguration volumeConfig : volumeConfigs) {

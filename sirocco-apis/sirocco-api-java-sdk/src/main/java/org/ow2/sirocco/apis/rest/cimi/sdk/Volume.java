@@ -28,7 +28,6 @@ package org.ow2.sirocco.apis.rest.cimi.sdk;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
@@ -62,14 +61,11 @@ public class Volume extends Resource<CimiVolume> {
     }
 
     public int getCapacity() {
-        return this.cimiObject.getCapacity().getQuantity();
+        return this.cimiObject.getCapacity();
     }
 
     public void setCapacity(final int capacity) {
-        CimiCapacity cimiCapacity = new CimiCapacity();
-        cimiCapacity.setQuantity(capacity);
-        cimiCapacity.setUnits("kilobyte");
-        this.cimiObject.setCapacity(cimiCapacity);
+        this.cimiObject.setCapacity(capacity);
     }
 
     public boolean getBootable() {

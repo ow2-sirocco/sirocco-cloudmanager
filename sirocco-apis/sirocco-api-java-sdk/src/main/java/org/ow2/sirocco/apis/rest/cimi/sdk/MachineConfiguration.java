@@ -28,12 +28,9 @@ package org.ow2.sirocco.apis.rest.cimi.sdk;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
@@ -46,7 +43,7 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
 
         static Disk from(final CimiDiskConfiguration diskConfig) {
             Disk disk = new Disk();
-            disk.capacity = diskConfig.getCapacity().getQuantity();
+            disk.capacity = diskConfig.getCapacity();
             disk.format = diskConfig.getFormat();
             disk.initialLocation = diskConfig.getInitialLocation();
             return disk;
@@ -68,26 +65,19 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
     }
 
     public int getCpu() {
-        return this.cimiObject.getCpu().getNumberVirtualCpus();
+        return this.cimiObject.getCpu();
     }
 
     public void setCpu(final int cpu) {
-        CimiCpu cpuInfo = new CimiCpu();
-        cpuInfo.setNumberVirtualCpus(cpu);
-        cpuInfo.setFrequency(1.0f);
-        cpuInfo.setUnits("gigahertz");
-        this.cimiObject.setCpu(cpuInfo);
+        this.cimiObject.setCpu(cpu);
     }
 
     public int getMemory() {
-        return this.cimiObject.getMemory().getQuantity();
+        return this.cimiObject.getMemory();
     }
 
     public void setMemory(final int memory) {
-        CimiMemory memoryInfo = new CimiMemory();
-        memoryInfo.setQuantity(memory);
-        memoryInfo.setUnits("mebibyte");
-        this.cimiObject.setMemory(memoryInfo);
+        this.cimiObject.setMemory(memory);
     }
 
     public Disk[] getDisks() {
@@ -102,10 +92,7 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
         CimiDiskConfiguration diskConfigs[] = new CimiDiskConfiguration[disks.length];
         for (int i = 0; i < disks.length; i++) {
             diskConfigs[i] = new CimiDiskConfiguration();
-            CimiCapacity diskCapacity = new CimiCapacity();
-            diskCapacity.setUnits("gigabyte");
-            diskCapacity.setQuantity(disks[i].capacity);
-            diskConfigs[i].setCapacity(diskCapacity);
+            diskConfigs[i].setCapacity(disks[i].capacity);
             if (disks[i].format != null) {
                 diskConfigs[i].setFormat(disks[i].format);
             } else {

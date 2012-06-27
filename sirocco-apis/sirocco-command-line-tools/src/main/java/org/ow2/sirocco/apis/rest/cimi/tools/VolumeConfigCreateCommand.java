@@ -44,7 +44,7 @@ public class VolumeConfigCreateCommand implements Command {
     @Parameter(names = "-properties", variableArity = true, description = "key value pairs", required = false)
     private List<String> properties;
 
-    @Parameter(names = "-capacity", description = "capacity in MB", required = true)
+    @Parameter(names = "-capacity", description = "capacity in KB", required = true)
     private int capacity;
 
     @Parameter(names = "-format", description = "format", required = true)
