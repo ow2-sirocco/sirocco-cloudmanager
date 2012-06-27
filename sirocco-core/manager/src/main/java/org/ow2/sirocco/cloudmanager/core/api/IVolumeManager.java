@@ -37,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
 
 /**
  * Volume management operations
@@ -374,8 +375,16 @@ public interface IVolumeManager extends IJobListener {
 
     Job deleteVolumeImage(String volumeImageId) throws ResourceNotFoundException, CloudProviderException;
 
-    Job removeVolumeImageFromVolume(String volumeId, String volumeImageId) throws ResourceNotFoundException,
+    Job removeVolumeImageFromVolume(String volumeId, String volumeVolumeImageId) throws ResourceNotFoundException,
         CloudProviderException;
+
+    void updateVolumeImageInVolume(String volumeId, VolumeVolumeImage volumeVolumeImage) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    VolumeVolumeImage getVolumeImageFromVolume(String volumeId, String volumeVolumeImageId) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    List<VolumeVolumeImage> getVolumeVolumeImages(String volumeId) throws ResourceNotFoundException, CloudProviderException;
 
     List<Volume> getVolumes() throws CloudProviderException;
 

@@ -63,7 +63,7 @@ public class Volume extends CloudResource implements Serializable {
 
     private Boolean bootable;
 
-    private List<VolumeImage> images;
+    private List<VolumeVolumeImage> images;
 
     private CloudProviderAccount cloudProviderAccount;
 
@@ -103,12 +103,12 @@ public class Volume extends CloudResource implements Serializable {
         this.type = type;
     }
 
-    @OneToMany(mappedBy = "owner", fetch = FetchType.EAGER)
-    public List<VolumeImage> getImages() {
+    @OneToMany(fetch = FetchType.EAGER)
+    public List<VolumeVolumeImage> getImages() {
         return this.images;
     }
 
-    public void setImages(final List<VolumeImage> images) {
+    public void setImages(final List<VolumeVolumeImage> images) {
         this.images = images;
     }
 

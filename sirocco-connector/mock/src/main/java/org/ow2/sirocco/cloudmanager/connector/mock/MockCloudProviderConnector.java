@@ -459,7 +459,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return null;
     }
 
-    private boolean waitForJob(Job j, long maxTimeSecond) {
+    private boolean waitForJob(final Job j, final long maxTimeSecond) {
         long time = 0;
         while (j.getStatus().equals(Job.Status.RUNNING)) {
             try {
@@ -518,7 +518,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     mc.setDescription(cd.getComponentDescription());
                     mc.setProperties(cd.getProperties());
                     Job j = this.createMachine(mc);
-                    failedCancelled = waitForJob(j, maxJobTimeInSeconds);
+                    failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemMachine sm = new SystemMachine();
                         sm.setResource(j.getTargetEntity());
@@ -540,7 +540,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     vc.setProperties(cd.getProperties());
 
                     Job j = this.createVolume(vc);
-                    failedCancelled = waitForJob(j, maxJobTimeInSeconds);
+                    failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemVolume sv = new SystemVolume();
                         sv.setResource(j.getTargetEntity());
@@ -562,7 +562,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     sc.setProperties(cd.getProperties());
 
                     Job j = this.createSystem(sc);
-                    failedCancelled = waitForJob(j, maxJobTimeInSeconds);
+                    failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemSystem ss = new SystemSystem();
                         ss.setResource(j.getTargetEntity());
@@ -584,7 +584,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     nc.setProperties(cd.getProperties());
 
                     Job j = this.createNetwork(nc);
-                    failedCancelled = waitForJob(j, maxJobTimeInSeconds);
+                    failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemNetwork sn = new SystemNetwork();
                         sn.setResource(j.getTargetEntity());
@@ -599,7 +599,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             system.setState(System.State.ERROR);
         }
 
-        return simulateProviderTask(system, SystemAction.CREATE, failedCancelled);
+        return this.simulateProviderTask(system, SystemAction.CREATE, failedCancelled);
     }
 
     // private utility methods for System services (start,stop,etc)
@@ -608,7 +608,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         boolean failedCancelled = false;
         for (CloudCollection m : l) {
             Job j = this.callSystemService(m.getResource(), action, m.getResource().getProviderAssignedId().toString());
-            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
+            failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         return failedCancelled;
     }
@@ -795,19 +795,19 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         for (SystemMachine m : system.getMachines()) {
             Job j = this.deleteMachine(m.getResource().getId().toString());
-            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
+            failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         for (SystemSystem m : system.getSystems()) {
             Job j = this.deleteSystem(m.getResource().getId().toString());
-            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
+            failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         for (SystemVolume m : system.getVolumes()) {
             Job j = this.deleteVolume(m.getResource().getId().toString());
-            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
+            failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         for (SystemNetwork m : system.getNetworks()) {
             Job j = this.deleteNetwork(m.getResource().getId().toString());
-            failedCancelled = waitForJob(j, maxJobTimeInSeconds);
+            failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         system.setState(System.State.DELETING);
 
@@ -861,7 +861,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final VolumeImage volumeImage = new VolumeImage();
         volumeImage.setBootable(from.getBootable());
         volumeImage.setImageLocation(from.getImageLocation());
-        volumeImage.setOwner(null);
         volumeImage.setProviderAssignedId(volumeImageProviderAssignedId);
         this.volumeImages.put(volumeImageProviderAssignedId, volumeImage);
         volumeImage.setState(VolumeImage.State.CREATING);
@@ -889,7 +888,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final VolumeImage volumeImage = new VolumeImage();
         volumeImage.setBootable(from.getBootable());
         volumeImage.setImageLocation(from.getImageLocation());
-        volumeImage.setOwner(volume);
         volumeImage.setProviderAssignedId(volumeImageProviderAssignedId);
         this.volumeImages.put(volumeImageProviderAssignedId, volumeImage);
         volumeImage.setState(VolumeImage.State.CREATING);
@@ -899,7 +897,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             public VolumeImage call() throws Exception {
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 volumeImage.setState(VolumeImage.State.AVAILABLE);
-                volume.getImages().add(volumeImage);
                 return volumeImage;
             }
         };

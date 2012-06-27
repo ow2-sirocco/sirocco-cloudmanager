@@ -52,8 +52,6 @@ public class VolumeImage extends CloudResource implements Serializable {
 
     private String imageLocation;
 
-    private Volume owner;
-
     private Boolean bootable;
 
     private CloudProviderAccount cloudProviderAccount;
@@ -75,15 +73,6 @@ public class VolumeImage extends CloudResource implements Serializable {
 
     public void setImageLocation(final String imageLocation) {
         this.imageLocation = imageLocation;
-    }
-
-    @ManyToOne
-    public Volume getOwner() {
-        return this.owner;
-    }
-
-    public void setOwner(final Volume owner) {
-        this.owner = owner;
     }
 
     public Boolean getBootable() {

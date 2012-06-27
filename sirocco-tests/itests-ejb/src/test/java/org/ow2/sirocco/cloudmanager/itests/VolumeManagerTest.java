@@ -59,6 +59,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
@@ -357,9 +358,9 @@ public class VolumeManagerTest {
         String volumeId = this.createVolume();
         Volume volume = this.volumeManager.getVolumeById(volumeId);
 
-        String volumeImageId = this.createVolumeImage(volume);
+        // CREATE snapshot
 
-        // CREATE
+        String volumeImageId = this.createVolumeImage(volume);
 
         VolumeImage volumeImage = this.volumeManager.getVolumeImageById(volumeImageId);
         Assert.assertNotNull("Cannot find volume image just created", volumeImage);
@@ -371,13 +372,21 @@ public class VolumeManagerTest {
         Assert.assertEquals(volumeImage.getDescription(), "my volumeImage");
         Assert.assertNotNull(volumeImage.getProperties());
         Assert.assertTrue(volumeImage.getProperties().get("department").equals("MAPS"));
-        Assert.assertEquals(volumeImage.getOwner().getName(), "myVolume0");
+
+        List<VolumeImage> volumeImages = this.volumeManager.getVolumeImages();
+        Assert.assertTrue(volumeImages.contains(volumeImage));
 
         volume = this.volumeManager.getVolumeById(volumeId);
-        List<VolumeImage> snapshots = this.volumeManager.getVolumeImages();
-        Assert.assertTrue(snapshots.contains(volumeImage));
 
-        // UPDATE
+        List<VolumeVolumeImage> volumeVolumeImages = volume.getImages();
+        Assert.assertEquals(volumeVolumeImages.size(), 1);
+        VolumeVolumeImage volumeVolumeImage = volumeVolumeImages.get(0);
+        String volumeVolumeImageId = volumeVolumeImage.getId().toString();
+        Assert.assertEquals(volumeVolumeImage.getVolumeImage().getId().toString(), volumeImageId);
+
+        volumeVolumeImage = this.volumeManager.getVolumeImageFromVolume(volumeId, volumeVolumeImageId);
+
+        // UPDATE VolumeImage
 
         Map<String, Object> updatedAttributes = new HashMap<String, Object>();
         updatedAttributes.put("name", "myNewVolumeImage");
@@ -388,16 +397,36 @@ public class VolumeManagerTest {
 
         // Remove from Volume
 
-        job = this.volumeManager.removeVolumeImageFromVolume(volumeId, volumeImageId);
+        job = this.volumeManager.removeVolumeImageFromVolume(volumeId, volumeVolumeImageId);
+        this.waitForJobCompletion(job);
         volumeImage = this.volumeManager.getVolumeImageById(volumeImageId);
         volume = this.volumeManager.getVolumeById(volumeId);
-        Assert.assertNull(volumeImage.getOwner());
         Assert.assertEquals(volume.getImages().size(), 0);
 
         // DELETE
 
         this.deleteVolumeImage(volumeImage.getId().toString());
         this.deleteVolume(volume.getId().toString());
+
+        try {
+            this.volumeManager.getVolumeById(volumeId);
+            Assert.fail("entity not deleted");
+        } catch (ResourceNotFoundException ex) {
+        }
+
+        try {
+            this.volumeManager.getVolumeImageById(volumeImageId);
+            Assert.fail("entity not deleted");
+        } catch (ResourceNotFoundException ex) {
+            // ok
+        }
+
+        try {
+            this.volumeManager.getVolumeImageFromVolume(volumeId, volumeVolumeImageId);
+            Assert.fail("entity not deleted");
+        } catch (ResourceNotFoundException ex) {
+            // ok
+        }
     }
 
     @Test
