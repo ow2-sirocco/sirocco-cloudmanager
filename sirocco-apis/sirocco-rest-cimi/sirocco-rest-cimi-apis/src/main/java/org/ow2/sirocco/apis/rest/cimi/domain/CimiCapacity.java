@@ -41,6 +41,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
  */
 @XmlRootElement(name = "Capacity")
 @JsonSerialize(include = Inclusion.NON_NULL)
+@Deprecated
 public class CimiCapacity implements Serializable {
 
     /** Serial number */

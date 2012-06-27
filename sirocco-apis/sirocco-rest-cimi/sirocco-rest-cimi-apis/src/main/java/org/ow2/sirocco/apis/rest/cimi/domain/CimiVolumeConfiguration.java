@@ -60,7 +60,7 @@ public class CimiVolumeConfiguration extends CimiObjectCommonAbstract {
      */
     @Valid
     @NotNull(groups = {GroupCreateByValue.class})
-    private CimiCapacity capacity;
+    private Integer capacity;
 
     /**
      * Default constructor.
@@ -92,7 +92,7 @@ public class CimiVolumeConfiguration extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiCapacity getCapacity() {
+    public Integer getCapacity() {
         return this.capacity;
     }
 
@@ -101,7 +101,7 @@ public class CimiVolumeConfiguration extends CimiObjectCommonAbstract {
      * 
      * @param capacity The value
      */
-    public void setCapacity(final CimiCapacity capacity) {
+    public void setCapacity(final Integer capacity) {
         this.capacity = capacity;
     }
 

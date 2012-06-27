@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 /**
  * Memory unit : Binary quantity unit.
  */
+@Deprecated
 public enum MemoryUnit {
     BYTE("byte", "B"), KibiBYTE("kibibyte", "KiB"), MebiBYTE("mebibyte", "MiB"), GibiBYTE("gibibyte", "GiB"), TebiBYTE(
         "tebibyte", "TiB"), PebiBYTE("pebibyte", "PiB"), ExbiBYTE("exbibyte", "EiB"), ZebiBYTE("zebibyte", "ZiB"), YobiBYTE(

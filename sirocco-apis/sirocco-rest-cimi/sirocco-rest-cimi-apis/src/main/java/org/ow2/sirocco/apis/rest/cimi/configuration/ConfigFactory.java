@@ -29,16 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.CapacityConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CloudEntryPointConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.CpuConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.DiskConfigurationConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.FrequencyUnitConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.JobCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.JobConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineCollectionConverter;
@@ -56,9 +53,6 @@ import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MemoryConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MemoryUnitConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.StorageUnitConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConfigurationCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConfigurationConverter;
@@ -71,9 +65,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.VolumeTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeVolumeImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeVolumeImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
@@ -98,7 +90,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
@@ -111,9 +102,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
-import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
-import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
-import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -440,32 +428,8 @@ public class ConfigFactory {
         ItemConfig item;
         List<ItemConfig> items = new ArrayList<ItemConfig>();
 
-        item = new ItemConfig(CimiCapacity.class);
-        item.putData(ConfigFactory.CONVERTER, new CapacityConverter());
-        items.add(item);
-
-        item = new ItemConfig(CimiCpu.class);
-        item.putData(ConfigFactory.CONVERTER, new CpuConverter());
-        items.add(item);
-
         item = new ItemConfig(CimiDiskConfiguration.class);
         item.putData(ConfigFactory.CONVERTER, new DiskConfigurationConverter());
-        items.add(item);
-
-        item = new ItemConfig(CimiMemory.class);
-        item.putData(ConfigFactory.CONVERTER, new MemoryConverter());
-        items.add(item);
-
-        item = new ItemConfig(FrequencyUnit.class);
-        item.putData(ConfigFactory.CONVERTER, new FrequencyUnitConverter());
-        items.add(item);
-
-        item = new ItemConfig(MemoryUnit.class);
-        item.putData(ConfigFactory.CONVERTER, new MemoryUnitConverter());
-        items.add(item);
-
-        item = new ItemConfig(StorageUnit.class);
-        item.putData(ConfigFactory.CONVERTER, new StorageUnitConverter());
         items.add(item);
 
         item = new ItemConfig(CimiMachineTemplateVolume.class);

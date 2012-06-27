@@ -35,10 +35,8 @@ import java.util.TimeZone;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
@@ -59,7 +57,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
@@ -373,37 +370,12 @@ public class CimiResourceBuilderHelper {
         return collec;
     }
 
-    public static CimiMemory buildCimiMemory(final Integer id, final Integer index) {
-        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
-        CimiMemory cimi = new CimiMemory();
-        cimi.setQuantity(id);
-        cimi.setUnits("unitValue" + postfix);
-        return cimi;
-    }
-
-    public static CimiCapacity buildCimiCapacity(final Integer id, final Integer index) {
-        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
-        CimiCapacity cimi = new CimiCapacity();
-        cimi.setQuantity(id);
-        cimi.setUnits("unitValue" + postfix);
-        return cimi;
-    }
-
-    public static CimiCpu buildCimiCpu(final Integer id, final Integer index) {
-        String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
-        CimiCpu cimi = new CimiCpu();
-        cimi.setFrequency(new Float(id * 100.0));
-        cimi.setNumberVirtualCpus(id);
-        cimi.setUnits("unitValue" + postfix);
-        return cimi;
-    }
-
     public static CimiMachineDisk buildCimiMachineDisk(final Integer id, final Integer index, final Boolean expand) {
         String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiMachineDisk cimi = new CimiMachineDisk();
         CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
         if ((null != expand) && (true == expand)) {
-            cimi.setCapacity(CimiResourceBuilderHelper.buildCimiCapacity(id, index));
+            cimi.setCapacity(id);
             cimi.setInitialLocation("initialLocation" + postfix);
         }
         return cimi;
@@ -431,7 +403,7 @@ public class CimiResourceBuilderHelper {
         String postfix = CimiResourceBuilderHelper.buildPostfix(id, index);
         CimiDiskConfiguration cimi = new CimiDiskConfiguration();
         cimi.setInitialLocation("initialLocationValue" + postfix);
-        cimi.setCapacity(CimiResourceBuilderHelper.buildCimiCapacity(id, index));
+        cimi.setCapacity(id);
         cimi.setFormat("formatValue" + postfix);
         return cimi;
     }
@@ -453,11 +425,11 @@ public class CimiResourceBuilderHelper {
         CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
 
         if ((null != expand) && (true == expand)) {
-            cimi.setCpu(CimiResourceBuilderHelper.buildCimiCpu(id, index));
+            cimi.setCpu(id);
             if ((null != id) && (id > 0)) {
                 cimi.setDisks(CimiResourceBuilderHelper.buildCimiMachineDiskCollection(id, expand, true));
             }
-            cimi.setMemory(CimiResourceBuilderHelper.buildCimiMemory(id, index));
+            cimi.setMemory(id);
             cimi.setState("stateValue" + postfix);
             // TODO Volume, NetworkInterface, ...
         }
@@ -494,8 +466,8 @@ public class CimiResourceBuilderHelper {
         CimiResourceBuilderHelper.fillCimiObjectCommon(cimi, id, index, expand);
 
         if ((null != expand) && (true == expand)) {
-            cimi.setCpu(CimiResourceBuilderHelper.buildCimiCpu(id, index));
-            cimi.setMemory(CimiResourceBuilderHelper.buildCimiMemory(id, index));
+            cimi.setCpu(id);
+            cimi.setMemory(id);
             if ((null != id) && (id > 0)) {
                 List<CimiDiskConfiguration> cimis = new ArrayList<CimiDiskConfiguration>();
                 for (int i = 0; i < id; i++) {

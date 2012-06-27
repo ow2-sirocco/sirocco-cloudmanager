@@ -26,7 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -38,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
  * </ul>
  * </p>
  */
+@Deprecated
 public class MemoryUnitConverter implements CimiConverter {
     /**
      * {@inheritDoc}
@@ -49,42 +49,44 @@ public class MemoryUnitConverter implements CimiConverter {
     public Object toCimi(final CimiContext context, final Object dataService) {
         String cimi = null;
         if (null != dataService) {
-            try {
-                Memory.MemoryUnit service = (Memory.MemoryUnit) dataService;
-                switch (service) {
-                case BYTE:
-                    cimi = MemoryUnit.BYTE.getLabel();
-                    break;
-                case KIBIBYTE:
-                    cimi = MemoryUnit.KibiBYTE.getLabel();
-                    break;
-                case MEGIBYTE:
-                    cimi = MemoryUnit.MebiBYTE.getLabel();
-                    break;
-                case GIGIBYTE:
-                    cimi = MemoryUnit.GibiBYTE.getLabel();
-                    break;
-                case TEBIBYTE:
-                    cimi = MemoryUnit.TebiBYTE.getLabel();
-                    break;
-                case PETIBYTE:
-                    cimi = MemoryUnit.PebiBYTE.getLabel();
-                    break;
-                case EXBIBYTE:
-                    cimi = MemoryUnit.ExbiBYTE.getLabel();
-                    break;
-                case ZEBIBYTE:
-                    cimi = MemoryUnit.ZebiBYTE.getLabel();
-                    break;
-                case YOBIBYTE:
-                    cimi = MemoryUnit.YobiBYTE.getLabel();
-                    break;
-                default:
-                    throw new InvalidConversionException("Unknown MemoryUnit Unit : " + service);
-                }
-            } catch (ClassCastException e) {
-                throw new InvalidConversionException("Unknown MemoryUnit Unit : " + dataService);
-            }
+            // try {
+            // Memory.MemoryUnit service = (Memory.MemoryUnit) dataService;
+            // switch (service) {
+            // case BYTE:
+            // cimi = MemoryUnit.BYTE.getLabel();
+            // break;
+            // case KIBIBYTE:
+            // cimi = MemoryUnit.KibiBYTE.getLabel();
+            // break;
+            // case MEGIBYTE:
+            // cimi = MemoryUnit.MebiBYTE.getLabel();
+            // break;
+            // case GIGIBYTE:
+            // cimi = MemoryUnit.GibiBYTE.getLabel();
+            // break;
+            // case TEBIBYTE:
+            // cimi = MemoryUnit.TebiBYTE.getLabel();
+            // break;
+            // case PETIBYTE:
+            // cimi = MemoryUnit.PebiBYTE.getLabel();
+            // break;
+            // case EXBIBYTE:
+            // cimi = MemoryUnit.ExbiBYTE.getLabel();
+            // break;
+            // case ZEBIBYTE:
+            // cimi = MemoryUnit.ZebiBYTE.getLabel();
+            // break;
+            // case YOBIBYTE:
+            // cimi = MemoryUnit.YobiBYTE.getLabel();
+            // break;
+            // default:
+            // throw new InvalidConversionException("Unknown MemoryUnit Unit : "
+            // + service);
+            // }
+            // } catch (ClassCastException e) {
+            // throw new InvalidConversionException("Unknown MemoryUnit Unit : "
+            // + dataService);
+            // }
         }
         return cimi;
     }
@@ -97,45 +99,48 @@ public class MemoryUnitConverter implements CimiConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Memory.MemoryUnit service = null;
-        if (null != dataCimi) {
-            MemoryUnit cimi = MemoryUnit.findValueOf((String) dataCimi);
-            if (null == cimi) {
-                throw new InvalidConversionException("Unknown MemoryUnit Unit : " + dataCimi);
-            }
-            switch (cimi) {
-            case BYTE:
-                service = Memory.MemoryUnit.BYTE;
-                break;
-            case KibiBYTE:
-                service = Memory.MemoryUnit.KIBIBYTE;
-                break;
-            case MebiBYTE:
-                service = Memory.MemoryUnit.MEGIBYTE;
-                break;
-            case GibiBYTE:
-                service = Memory.MemoryUnit.GIGIBYTE;
-                break;
-            case TebiBYTE:
-                service = Memory.MemoryUnit.TEBIBYTE;
-                break;
-            case PebiBYTE:
-                service = Memory.MemoryUnit.PETIBYTE;
-                break;
-            case ExbiBYTE:
-                service = Memory.MemoryUnit.EXBIBYTE;
-                break;
-            case ZebiBYTE:
-                service = Memory.MemoryUnit.ZEBIBYTE;
-                break;
-            case YobiBYTE:
-                service = Memory.MemoryUnit.YOBIBYTE;
-                break;
-            default:
-                throw new InvalidConversionException("Unknown MemoryUnit Unit : " + dataCimi);
-            }
-        }
-        return service;
+        // Memory.MemoryUnit service = null;
+        // if (null != dataCimi) {
+        // MemoryUnit cimi = MemoryUnit.findValueOf((String) dataCimi);
+        // if (null == cimi) {
+        // throw new InvalidConversionException("Unknown MemoryUnit Unit : " +
+        // dataCimi);
+        // }
+        // switch (cimi) {
+        // case BYTE:
+        // service = Memory.MemoryUnit.BYTE;
+        // break;
+        // case KibiBYTE:
+        // service = Memory.MemoryUnit.KIBIBYTE;
+        // break;
+        // case MebiBYTE:
+        // service = Memory.MemoryUnit.MEGIBYTE;
+        // break;
+        // case GibiBYTE:
+        // service = Memory.MemoryUnit.GIGIBYTE;
+        // break;
+        // case TebiBYTE:
+        // service = Memory.MemoryUnit.TEBIBYTE;
+        // break;
+        // case PebiBYTE:
+        // service = Memory.MemoryUnit.PETIBYTE;
+        // break;
+        // case ExbiBYTE:
+        // service = Memory.MemoryUnit.EXBIBYTE;
+        // break;
+        // case ZebiBYTE:
+        // service = Memory.MemoryUnit.ZEBIBYTE;
+        // break;
+        // case YobiBYTE:
+        // service = Memory.MemoryUnit.YOBIBYTE;
+        // break;
+        // default:
+        // throw new InvalidConversionException("Unknown MemoryUnit Unit : " +
+        // dataCimi);
+        // }
+        // }
+        // return service;
+        return null;
     }
 
     /**

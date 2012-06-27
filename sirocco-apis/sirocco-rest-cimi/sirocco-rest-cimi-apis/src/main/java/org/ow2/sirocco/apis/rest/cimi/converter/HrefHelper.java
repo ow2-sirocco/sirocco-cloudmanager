@@ -84,8 +84,10 @@ public class HrefHelper {
      */
     public static String extractIdString(final String href) {
         String id = null;
-        int posId = href.lastIndexOf('/');
-        id = href.substring(posId + 1);
+        if (null != href) {
+            int posId = href.lastIndexOf('/');
+            id = href.substring(posId + 1);
+        }
         return id;
     }
 

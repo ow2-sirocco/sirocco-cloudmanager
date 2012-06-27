@@ -30,10 +30,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
@@ -54,7 +52,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
@@ -361,11 +358,11 @@ public class WritingResourceValidatorTest {
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachine();
-        cimi.setCpu(new CimiCpu(1f, "unit", 1));
-        cimi.setMemory(new CimiMemory(1, "unit"));
+        cimi.setCpu(11);
+        cimi.setMemory(22);
         cimi.setDisks(new CimiMachineDiskCollection());
-        cimi.getDisks().add(new CimiMachineDisk(new CimiCapacity(123, "unit")));
-        cimi.getDisks().add(new CimiMachineDisk(new CimiCapacity(456, "unit")));
+        cimi.getDisks().add(new CimiMachineDisk(123));
+        cimi.getDisks().add(new CimiMachineDisk(456));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
@@ -386,40 +383,40 @@ public class WritingResourceValidatorTest {
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
-        cimi.setCpu(new CimiCpu(1f, "unit", 1));
-        cimi.setMemory(new CimiMemory(1, "unit"));
+        cimi.setCpu(11);
+        cimi.setMemory(22);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
-        cimi.setCpu(new CimiCpu(1f, "unit", 1));
-        cimi.setMemory(new CimiMemory(1, "unit"));
-        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(new CimiCapacity(1, "unit"), "f", "ap")});
+        cimi.setCpu(11);
+        cimi.setMemory(22);
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(1024, "f", "ap")});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
-        cimi.setCpu(new CimiCpu(1f, "unit", 1));
-        cimi.setMemory(new CimiMemory(1, "unit"));
-        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(new CimiCapacity(1, "unit"), "f", "ap"),
-            new CimiDiskConfiguration(new CimiCapacity(2, "unit2"), "f2", "ap2")});
+        cimi.setCpu(11);
+        cimi.setMemory(22);
+        cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration(1024, "f", "ap"),
+            new CimiDiskConfiguration(2048, "f2", "ap2")});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
         cimi = new CimiMachineConfiguration();
-        cimi.setCpu(new CimiCpu(1f, "unit", 1));
-        cimi.setMemory(new CimiMemory(1, "unit"));
+        cimi.setCpu(11);
+        cimi.setMemory(22);
         cimi.setDisks(new CimiDiskConfiguration[0]);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
-        cimi.setCpu(new CimiCpu(1f, "unit", 1));
-        cimi.setMemory(new CimiMemory(1, "unit"));
+        cimi.setCpu(11);
+        cimi.setMemory(22);
         cimi.setDisks(new CimiDiskConfiguration[] {new CimiDiskConfiguration()});
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineConfiguration();
-        cimi.setCpu(new CimiCpu(1f, "unit", 1));
-        cimi.setMemory(new CimiMemory(1, "unit"));
+        cimi.setCpu(11);
+        cimi.setMemory(22);
         cimi.setDisks(new CimiDiskConfiguration[] {null, null});
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }

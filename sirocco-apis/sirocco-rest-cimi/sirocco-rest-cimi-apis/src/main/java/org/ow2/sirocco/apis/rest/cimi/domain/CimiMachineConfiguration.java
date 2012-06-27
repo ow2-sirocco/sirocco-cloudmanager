@@ -51,16 +51,18 @@ public class CimiMachineConfiguration extends CimiObjectCommonAbstract {
     /**
      * Field "cpu".
      */
-    @Valid
-    @NotNull(groups = {GroupCreateByValue.class})
-    private CimiCpu cpu;
+    private Integer cpu;
+
+    /**
+     * Field "cpuArch".
+     */
+    private String cpuArch;
 
     /**
      * Field "memory".
      */
-    @Valid
     @NotNull(groups = {GroupCreateByValue.class})
-    private CimiMemory memory;
+    private Integer memory;
 
     /**
      * Field "disks".
@@ -92,7 +94,7 @@ public class CimiMachineConfiguration extends CimiObjectCommonAbstract {
      * @param cpu The CPU
      * @param memory The memory
      */
-    public CimiMachineConfiguration(final CimiCpu cpu, final CimiMemory memory) {
+    public CimiMachineConfiguration(final Integer cpu, final Integer memory) {
         super();
         this.cpu = cpu;
         this.memory = memory;
@@ -103,7 +105,7 @@ public class CimiMachineConfiguration extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiCpu getCpu() {
+    public Integer getCpu() {
         return this.cpu;
     }
 
@@ -112,8 +114,26 @@ public class CimiMachineConfiguration extends CimiObjectCommonAbstract {
      * 
      * @param cpu The value
      */
-    public void setCpu(final CimiCpu cpu) {
+    public void setCpu(final Integer cpu) {
         this.cpu = cpu;
+    }
+
+    /**
+     * Return the value of field "cpuArch".
+     * 
+     * @return The value
+     */
+    public String getCpuArch() {
+        return this.cpuArch;
+    }
+
+    /**
+     * Set the value of field "cpuArch".
+     * 
+     * @param cpuArch The value
+     */
+    public void setCpuArch(final String cpuArch) {
+        this.cpuArch = cpuArch;
     }
 
     /**
@@ -121,7 +141,7 @@ public class CimiMachineConfiguration extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiMemory getMemory() {
+    public Integer getMemory() {
         return this.memory;
     }
 
@@ -130,7 +150,7 @@ public class CimiMachineConfiguration extends CimiObjectCommonAbstract {
      * 
      * @param memory The value
      */
-    public void setMemory(final CimiMemory memory) {
+    public void setMemory(final Integer memory) {
         this.memory = memory;
     }
 

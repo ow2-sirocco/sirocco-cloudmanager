@@ -26,17 +26,13 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -109,8 +105,8 @@ public class MachineConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final Machine dataService, final CimiMachine dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
-            dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
+            dataCimi.setCpu(dataService.getCpu());
+            dataCimi.setMemory(dataService.getMemory());
             dataCimi.setDisks((CimiMachineDiskCollection) context.convertNextCimi(dataService.getDisks(),
                 CimiMachineDiskCollection.class));
             // TODO dataCimi.setNetworkInterfaces(???);
@@ -130,8 +126,8 @@ public class MachineConverter extends ObjectCommonConverter {
     @SuppressWarnings("unchecked")
     protected void doCopyToService(final CimiContext context, final CimiMachine dataCimi, final Machine dataService) {
         this.fill(context, dataCimi, dataService);
-        dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
-        dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
+        dataService.setCpu(dataCimi.getCpu());
+        dataService.setMemory(dataCimi.getMemory());
         dataService.setDisks((List<MachineDisk>) context.convertNextService(dataCimi.getDisks()));
         // TODO dataService.setNetworkInterfaces(???);
         dataService.setVolumes((List<MachineVolume>) context.convertNextService(dataCimi.getVolumes()));

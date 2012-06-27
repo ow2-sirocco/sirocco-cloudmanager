@@ -25,9 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
-import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -39,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
  * </ul>
  * </p>
  */
+@Deprecated
 public class MemoryConverter implements CimiConverter {
     /**
      * {@inheritDoc}
@@ -61,7 +60,8 @@ public class MemoryConverter implements CimiConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (Memory) dataService, (CimiMemory) dataCimi);
+        // this.doCopyToCimi(context, (Memory) dataService, (CimiMemory)
+        // dataCimi);
     }
 
     /**
@@ -72,9 +72,10 @@ public class MemoryConverter implements CimiConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Memory service = new Memory();
-        this.copyToService(context, dataCimi, service);
-        return service;
+        // Memory service = new Memory();
+        // this.copyToService(context, dataCimi, service);
+        // return service;
+        return null;
     }
 
     /**
@@ -86,7 +87,8 @@ public class MemoryConverter implements CimiConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiMemory) dataCimi, (Memory) dataService);
+        // this.doCopyToService(context, (CimiMemory) dataCimi, (Memory)
+        // dataService);
     }
 
     /**
@@ -96,10 +98,12 @@ public class MemoryConverter implements CimiConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final CimiContext context, final Memory dataService, final CimiMemory dataCimi) {
-        dataCimi.setQuantity(HelperConverter.toInteger(dataService.getQuantity()));
-        dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnit(), MemoryUnit.class));
-    }
+    // protected void doCopyToCimi(final CimiContext context, final Memory
+    // dataService, final CimiMemory dataCimi) {
+    // dataCimi.setQuantity(HelperConverter.toInteger(dataService.getQuantity()));
+    // dataCimi.setUnits((String) context.convertNextCimi(dataService.getUnit(),
+    // MemoryUnit.class));
+    // }
 
     /**
      * Copy data from a CIMI object to a service object.
@@ -108,9 +112,11 @@ public class MemoryConverter implements CimiConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final CimiContext context, final CimiMemory dataCimi, final Memory dataService) {
-        dataService.setQuantity(HelperConverter.toFloat(dataCimi.getQuantity()));
-        dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit) context.convertNextService(
-            dataCimi.getUnits(), MemoryUnit.class));
-    }
+    // protected void doCopyToService(final CimiContext context, final
+    // CimiMemory dataCimi, final Memory dataService) {
+    // dataService.setQuantity(HelperConverter.toFloat(dataCimi.getQuantity()));
+    // dataService.setUnit((org.ow2.sirocco.cloudmanager.model.cimi.Memory.MemoryUnit)
+    // context.convertNextService(
+    // dataCimi.getUnits(), MemoryUnit.class));
+    // }
 }

@@ -24,10 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 
 /**
@@ -101,7 +99,7 @@ public class VolumeConfigurationConverter extends ObjectCommonConverter {
         final CimiVolumeConfiguration dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService.getCapacity(), CimiCapacity.class));
+            dataCimi.setCapacity(dataService.getCapacity());
             dataCimi.setFormat(dataService.getFormat());
             dataCimi.setType(dataService.getType());
         }
@@ -117,7 +115,7 @@ public class VolumeConfigurationConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiVolumeConfiguration dataCimi,
         final VolumeConfiguration dataService) {
         this.fill(context, dataCimi, dataService);
-        dataService.setCapacity((Disk) context.convertNextService(dataCimi.getCapacity()));
+        dataService.setCapacity(dataCimi.getCapacity());
         dataService.setFormat(dataCimi.getFormat());
         dataService.setType(dataCimi.getType());
     }

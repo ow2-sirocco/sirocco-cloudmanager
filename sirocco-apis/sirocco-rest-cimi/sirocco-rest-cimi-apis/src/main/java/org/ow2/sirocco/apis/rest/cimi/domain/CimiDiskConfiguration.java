@@ -49,7 +49,7 @@ public class CimiDiskConfiguration implements Serializable {
      */
     @Valid
     @NotNull(groups = {GroupWrite.class})
-    private CimiCapacity capacity;
+    private Integer capacity;
 
     /**
      * Field "format".
@@ -88,7 +88,7 @@ public class CimiDiskConfiguration implements Serializable {
      * @param initialLocation The initial location
      * @param capacity The capacity
      */
-    public CimiDiskConfiguration(final CimiCapacity capacity, final String format, final String initialLocation) {
+    public CimiDiskConfiguration(final Integer capacity, final String format, final String initialLocation) {
         super();
         this.setCapacity(capacity);
         this.setFormat(format);
@@ -118,7 +118,7 @@ public class CimiDiskConfiguration implements Serializable {
      * 
      * @return The value
      */
-    public CimiCapacity getCapacity() {
+    public Integer getCapacity() {
         return this.capacity;
     }
 
@@ -127,7 +127,7 @@ public class CimiDiskConfiguration implements Serializable {
      * 
      * @param capacity The value
      */
-    public void setCapacity(final CimiCapacity capacity) {
+    public void setCapacity(final Integer capacity) {
         this.capacity = capacity;
     }
 

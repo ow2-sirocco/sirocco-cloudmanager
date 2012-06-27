@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 /**
  * Frequency unit.
  */
+@Deprecated
 public enum FrequencyUnit {
     HERTZ("hertz", "Hz"), DECAHERTZ("decahertz", "daHz"), HECTOHERTZ("hectohertz", "hHz"), KILOHERTZ("kilohertz", "kHz"), MEGAHERTZ(
         "megahertz", "MHz"), GIGAHERTZ("gigahertz", "GHz"), TERAHERTZ("terahertz", "THz"), PETAHERTZ("petahertz", "PHz"), EXAHERTZ(

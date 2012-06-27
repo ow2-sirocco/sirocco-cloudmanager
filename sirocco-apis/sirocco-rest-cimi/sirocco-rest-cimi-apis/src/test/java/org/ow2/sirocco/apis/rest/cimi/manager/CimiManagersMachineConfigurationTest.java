@@ -33,9 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
@@ -119,8 +117,8 @@ public class CimiManagersMachineConfigurationTest {
         EasyMock.replay(this.service);
 
         CimiMachineConfiguration cimi = new CimiMachineConfiguration();
-        cimi.setCpu(new CimiCpu(1f, "gigaHertz", 1));
-        cimi.setMemory(new CimiMemory(1, "MiB"));
+        cimi.setCpu(11);
+        cimi.setMemory(22);
 
         this.request.setCimiData(cimi);
         this.managerCreate.execute(this.context);

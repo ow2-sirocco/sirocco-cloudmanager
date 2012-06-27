@@ -31,9 +31,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.HrefHelper;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
@@ -46,7 +44,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
@@ -401,8 +398,6 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             }
             if (null == cimi.getCapacity()) {
                 cimi.setCapacity(cimiRef.getCapacity());
-            } else {
-                this.merge(cimiRef.getCapacity(), cimi.getCapacity());
             }
             if (null == cimi.getImages()) {
                 cimi.setImages(cimiRef.getImages());
@@ -429,8 +424,6 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             this.mergeCommon(cimiRef, cimi);
             if (null == cimi.getCapacity()) {
                 cimi.setCapacity(cimiRef.getCapacity());
-            } else {
-                this.merge(cimiRef.getCapacity(), cimi.getCapacity());
             }
             if (null == cimi.getFormat()) {
                 cimi.setFormat(cimiRef.getFormat());
@@ -574,13 +567,9 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             this.mergeCommon(cimiRef, cimi);
             if (null == cimi.getCpu()) {
                 cimi.setCpu(cimiRef.getCpu());
-            } else {
-                this.merge(cimiRef.getCpu(), cimi.getCpu());
             }
             if (null == cimi.getMemory()) {
                 cimi.setMemory(cimiRef.getMemory());
-            } else {
-                this.merge(cimiRef.getMemory(), cimi.getMemory());
             }
             if ((null != cimiRef.getDisks()) && (cimiRef.getDisks().length > 0)) {
                 if (null == cimi.getDisks()) {
@@ -635,43 +624,6 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
-     * Merge CPU data.
-     * 
-     * @param cimiRef Source to merge
-     * @param cimi Merged destination
-     */
-    protected void merge(final CimiCpu cimiRef, final CimiCpu cimi) {
-        if (null != cimiRef) {
-            if (null == cimi.getFrequency()) {
-                cimi.setFrequency(cimiRef.getFrequency());
-            }
-            if (null == cimi.getNumberVirtualCpus()) {
-                cimi.setNumberVirtualCpus(cimiRef.getNumberVirtualCpus());
-            }
-            if (null == cimi.getUnits()) {
-                cimi.setUnits(cimiRef.getUnits());
-            }
-        }
-    }
-
-    /**
-     * Merge memory data.
-     * 
-     * @param cimiRef Source to merge
-     * @param cimi Merged destination
-     */
-    protected void merge(final CimiMemory cimiRef, final CimiMemory cimi) {
-        if (null != cimiRef) {
-            if (null == cimi.getQuantity()) {
-                cimi.setQuantity(cimiRef.getQuantity());
-            }
-            if (null == cimi.getUnits()) {
-                cimi.setUnits(cimiRef.getUnits());
-            }
-        }
-    }
-
-    /**
      * Merge machine disk data.
      * 
      * @param cimiRef Source to merge
@@ -682,8 +634,6 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             this.mergeCommon(cimiRef, cimi);
             if (null == cimi.getCapacity()) {
                 cimi.setCapacity(cimiRef.getCapacity());
-            } else {
-                this.merge(cimiRef.getCapacity(), cimi.getCapacity());
             }
             if (null == cimi.getInitialLocation()) {
                 cimi.setInitialLocation(cimiRef.getInitialLocation());
@@ -707,23 +657,6 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
                 cimi.setVolume(cimiRef.getVolume());
             } else {
                 this.merge(cimiRef.getVolume(), cimi.getVolume());
-            }
-        }
-    }
-
-    /**
-     * Merge capacity data.
-     * 
-     * @param cimiRef Source to merge
-     * @param cimi Merged destination
-     */
-    protected void merge(final CimiCapacity cimiRef, final CimiCapacity cimi) {
-        if (null != cimiRef) {
-            if (null == cimi.getQuantity()) {
-                cimi.setQuantity(cimiRef.getQuantity());
-            }
-            if (null == cimi.getUnits()) {
-                cimi.setUnits(cimiRef.getUnits());
             }
         }
     }

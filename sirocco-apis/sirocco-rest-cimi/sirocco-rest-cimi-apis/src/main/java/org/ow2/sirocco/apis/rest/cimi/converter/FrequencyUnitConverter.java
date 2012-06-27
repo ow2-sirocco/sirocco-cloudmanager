@@ -26,8 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -39,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
  * </ul>
  * </p>
  */
+@Deprecated
 public class FrequencyUnitConverter implements CimiConverter {
     /**
      * {@inheritDoc}
@@ -50,24 +49,26 @@ public class FrequencyUnitConverter implements CimiConverter {
     public Object toCimi(final CimiContext context, final Object dataService) {
         String cimi = null;
         if (null != dataService) {
-            try {
-                Frequency service = (Frequency) dataService;
-                switch (service) {
-                case HERTZ:
-                    cimi = FrequencyUnit.HERTZ.getLabel();
-                    break;
-                case MEGA:
-                    cimi = FrequencyUnit.MEGAHERTZ.getLabel();
-                    break;
-                case GIGA:
-                    cimi = FrequencyUnit.GIGAHERTZ.getLabel();
-                    break;
-                default:
-                    throw new InvalidConversionException("Unknown Frequency Unit : " + service);
-                }
-            } catch (ClassCastException e) {
-                throw new InvalidConversionException("Unknown Frequency Unit : " + dataService);
-            }
+            // try {
+            // Frequency service = (Frequency) dataService;
+            // switch (service) {
+            // case HERTZ:
+            // cimi = FrequencyUnit.HERTZ.getLabel();
+            // break;
+            // case MEGA:
+            // cimi = FrequencyUnit.MEGAHERTZ.getLabel();
+            // break;
+            // case GIGA:
+            // cimi = FrequencyUnit.GIGAHERTZ.getLabel();
+            // break;
+            // default:
+            // throw new InvalidConversionException("Unknown Frequency Unit : "
+            // + service);
+            // }
+            // } catch (ClassCastException e) {
+            // throw new InvalidConversionException("Unknown Frequency Unit : "
+            // + dataService);
+            // }
         }
         return cimi;
     }
@@ -80,27 +81,30 @@ public class FrequencyUnitConverter implements CimiConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Frequency service = null;
-        if (null != dataCimi) {
-            FrequencyUnit cimi = FrequencyUnit.findValueOf((String) dataCimi);
-            if (null == cimi) {
-                throw new InvalidConversionException("Unknown Frequency Unit : " + dataCimi);
-            }
-            switch (cimi) {
-            case HERTZ:
-                service = Frequency.HERTZ;
-                break;
-            case MEGAHERTZ:
-                service = Frequency.MEGA;
-                break;
-            case GIGAHERTZ:
-                service = Frequency.GIGA;
-                break;
-            default:
-                throw new InvalidConversionException("Unknown Frequency Unit : " + dataCimi);
-            }
-        }
-        return service;
+        // Frequency service = null;
+        // if (null != dataCimi) {
+        // FrequencyUnit cimi = FrequencyUnit.findValueOf((String) dataCimi);
+        // if (null == cimi) {
+        // throw new InvalidConversionException("Unknown Frequency Unit : " +
+        // dataCimi);
+        // }
+        // switch (cimi) {
+        // case HERTZ:
+        // service = Frequency.HERTZ;
+        // break;
+        // case MEGAHERTZ:
+        // service = Frequency.MEGA;
+        // break;
+        // case GIGAHERTZ:
+        // service = Frequency.GIGA;
+        // break;
+        // default:
+        // throw new InvalidConversionException("Unknown Frequency Unit : " +
+        // dataCimi);
+        // }
+        // }
+        // return service;
+        return null;
     }
 
     /**

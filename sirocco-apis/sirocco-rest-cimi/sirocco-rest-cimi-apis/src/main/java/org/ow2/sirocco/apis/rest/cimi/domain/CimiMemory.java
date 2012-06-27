@@ -39,6 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
  */
 @XmlRootElement(name = "Memory")
 @JsonSerialize(include = Inclusion.NON_NULL)
+@Deprecated
 public class CimiMemory implements Serializable {
 
     /** Serial number */

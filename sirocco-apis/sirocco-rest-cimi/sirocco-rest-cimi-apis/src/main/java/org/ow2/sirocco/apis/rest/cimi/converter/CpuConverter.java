@@ -25,10 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
-import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -40,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
  * </ul>
  * </p>
  */
+@Deprecated
 public class CpuConverter implements CimiConverter {
     /**
      * {@inheritDoc}
@@ -62,7 +60,7 @@ public class CpuConverter implements CimiConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (Cpu) dataService, (CimiCpu) dataCimi);
+        // this.doCopyToCimi(context, (Cpu) dataService, (CimiCpu) dataCimi);
     }
 
     /**
@@ -73,9 +71,10 @@ public class CpuConverter implements CimiConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Cpu service = new Cpu();
-        this.copyToService(context, dataCimi, service);
-        return service;
+        // Cpu service = new Cpu();
+        // this.copyToService(context, dataCimi, service);
+        // return service;
+        return null;
     }
 
     /**
@@ -87,7 +86,7 @@ public class CpuConverter implements CimiConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiCpu) dataCimi, (Cpu) dataService);
+        // this.doCopyToService(context, (CimiCpu) dataCimi, (Cpu) dataService);
     }
 
     /**
@@ -97,11 +96,14 @@ public class CpuConverter implements CimiConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final CimiContext context, final Cpu dataService, final CimiCpu dataCimi) {
-        dataCimi.setFrequency(dataService.getQuantity());
-        dataCimi.setNumberVirtualCpus(dataService.getNumberCpu());
-        dataCimi.setUnits((String) context.convertNextCimi(dataService.getCpuSpeedUnit(), FrequencyUnit.class));
-    }
+    // protected void doCopyToCimi(final CimiContext context, final Cpu
+    // dataService, final CimiCpu dataCimi) {
+    // dataCimi.setFrequency(dataService.getQuantity());
+    // dataCimi.setNumberVirtualCpus(dataService.getNumberCpu());
+    // dataCimi.setUnits((String)
+    // context.convertNextCimi(dataService.getCpuSpeedUnit(),
+    // FrequencyUnit.class));
+    // }
 
     /**
      * Copy data from a CIMI object to a service object.
@@ -110,9 +112,11 @@ public class CpuConverter implements CimiConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final CimiContext context, final CimiCpu dataCimi, final Cpu dataService) {
-        dataService.setQuantity(dataCimi.getFrequency());
-        dataService.setNumberCpu(dataCimi.getNumberVirtualCpus());
-        dataService.setCpuSpeedUnit((Frequency) context.convertNextService(dataCimi.getUnits(), FrequencyUnit.class));
-    }
+    // protected void doCopyToService(final CimiContext context, final CimiCpu
+    // dataCimi, final Cpu dataService) {
+    // dataService.setQuantity(dataCimi.getFrequency());
+    // dataService.setNumberCpu(dataCimi.getNumberVirtualCpus());
+    // dataService.setCpuSpeedUnit((Frequency)
+    // context.convertNextService(dataCimi.getUnits(), FrequencyUnit.class));
+    // }
 }

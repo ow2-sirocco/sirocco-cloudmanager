@@ -24,10 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 
 /**
@@ -99,7 +97,7 @@ public class MachineDiskConverter extends ObjectCommonConverter {
      */
     protected void doCopyToCimi(final CimiContext context, final MachineDisk dataService, final CimiMachineDisk dataCimi) {
         this.fill(context, dataService, dataCimi);
-        dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService.getDisk(), CimiCapacity.class));
+        dataCimi.setCapacity(dataService.getCapacity());
         dataCimi.setInitialLocation(dataService.getInitialLocation());
     }
 
@@ -112,7 +110,7 @@ public class MachineDiskConverter extends ObjectCommonConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineDisk dataCimi, final MachineDisk dataService) {
         this.fill(context, dataCimi, dataService);
-        dataService.setDisk((Disk) context.convertNextService(dataCimi.getCapacity()));
+        dataService.setCapacity(dataCimi.getCapacity());
         dataService.setInitialLocation(dataCimi.getInitialLocation());
     }
 }

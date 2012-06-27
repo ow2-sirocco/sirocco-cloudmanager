@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 /**
  * Storage unit : Decimal quantity unit.
  */
+@Deprecated
 public enum StorageUnit {
     BYTE("byte", "B"), KILOBYTE("kilobyte", "kB"), MEGABYTE("megabyte", "MB"), GIGABYTE("gigabyte", "GB"), TERABYTE("terabyte",
         "TB"), PETABYTE("petabyte", "PB"), EXABYTE("exabyte", "EB"), ZETTABYTE("zettabyte", "ZB"), YOTTABYTE("yottabyte", " YB");

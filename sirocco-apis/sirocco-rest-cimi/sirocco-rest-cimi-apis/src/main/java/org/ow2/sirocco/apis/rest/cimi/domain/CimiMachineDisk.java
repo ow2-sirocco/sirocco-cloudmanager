@@ -46,7 +46,7 @@ public class CimiMachineDisk extends CimiObjectCommonAbstract {
      * Field "capacity".
      */
     @Valid
-    private CimiCapacity capacity;
+    private Integer capacity;
 
     /**
      * Field "initialLocation".
@@ -65,7 +65,7 @@ public class CimiMachineDisk extends CimiObjectCommonAbstract {
      * 
      * @param capacity The capacity
      */
-    public CimiMachineDisk(final CimiCapacity capacity) {
+    public CimiMachineDisk(final Integer capacity) {
         super();
         this.setCapacity(capacity);
     }
@@ -75,7 +75,7 @@ public class CimiMachineDisk extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiCapacity getCapacity() {
+    public Integer getCapacity() {
         return this.capacity;
     }
 
@@ -84,7 +84,7 @@ public class CimiMachineDisk extends CimiObjectCommonAbstract {
      * 
      * @param capacity The value
      */
-    public void setCapacity(final CimiCapacity capacity) {
+    public void setCapacity(final Integer capacity) {
         this.capacity = capacity;
     }
 

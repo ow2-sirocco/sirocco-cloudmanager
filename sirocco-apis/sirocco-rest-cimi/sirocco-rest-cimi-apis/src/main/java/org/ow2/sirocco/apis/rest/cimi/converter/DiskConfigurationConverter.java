@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
@@ -97,9 +96,9 @@ public class DiskConfigurationConverter implements CimiConverter {
      * @param dataCimi Destination CIMI object
      */
     protected void doCopyToCimi(final CimiContext context, final DiskTemplate dataService, final CimiDiskConfiguration dataCimi) {
-        dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService, CimiCapacity.class));
-        dataCimi.setInitialLocation(dataService.getInitialLocation());
+        dataCimi.setCapacity(dataService.getCapacity());
         dataCimi.setFormat(dataService.getFormat());
+        dataCimi.setInitialLocation(dataService.getInitialLocation());
     }
 
     /**
@@ -111,10 +110,8 @@ public class DiskConfigurationConverter implements CimiConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiDiskConfiguration dataCimi,
         final DiskTemplate dataService) {
-        dataService.setInitialLocation(dataCimi.getInitialLocation());
-        if (null != dataCimi.getCapacity()) {
-            context.getConverter(CimiCapacity.class).copyToService(context, dataCimi.getCapacity(), dataService);
-        }
+        dataService.setCapacity(dataCimi.getCapacity());
         dataService.setFormat(dataCimi.getFormat());
+        dataService.setInitialLocation(dataCimi.getInitialLocation());
     }
 }

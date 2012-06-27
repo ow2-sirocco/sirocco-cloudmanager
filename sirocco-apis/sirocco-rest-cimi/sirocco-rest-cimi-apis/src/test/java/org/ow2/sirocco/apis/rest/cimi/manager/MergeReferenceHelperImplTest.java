@@ -30,21 +30,15 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
-import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
-import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
-import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 
 /**
  * Implementation test.
@@ -160,86 +154,6 @@ public class MergeReferenceHelperImplTest {
 
     /**
      * Test method for
-     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu, org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu)}
-     * .
-     */
-    @Test
-    public void testMergeCimiCpu() {
-        MergeReferenceHelperImpl merger = new MergeReferenceHelperImpl();
-        CimiCpu cimi;
-        CimiCpu cimiRef;
-
-        cimiRef = new CimiCpu();
-        cimiRef.setFrequency(1.5f);
-        cimiRef.setNumberVirtualCpus(2);
-        cimiRef.setUnits(FrequencyUnit.GIGAHERTZ.getLabel());
-
-        // Source null
-        cimi = new CimiCpu();
-        merger.merge(null, cimi);
-
-        // Destination without value
-        cimi = new CimiCpu();
-
-        merger.merge(cimiRef, cimi);
-
-        Assert.assertEquals(1.5f, cimi.getFrequency());
-        Assert.assertEquals(2, cimi.getNumberVirtualCpus().intValue());
-        Assert.assertEquals(FrequencyUnit.GIGAHERTZ.getLabel(), cimi.getUnits());
-
-        // Destination with values
-        cimi = new CimiCpu();
-        cimi.setFrequency(3.18f);
-        cimi.setNumberVirtualCpus(5);
-        cimi.setUnits(FrequencyUnit.KILOHERTZ.getLabel());
-
-        merger.merge(cimiRef, cimi);
-
-        Assert.assertEquals(3.18f, cimi.getFrequency());
-        Assert.assertEquals(5, cimi.getNumberVirtualCpus().intValue());
-        Assert.assertEquals(FrequencyUnit.KILOHERTZ.getLabel(), cimi.getUnits());
-    }
-
-    /**
-     * Test method for
-     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory, org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory)}
-     * .
-     */
-    @Test
-    public void testMergeCimiMemory() {
-        MergeReferenceHelperImpl merger = new MergeReferenceHelperImpl();
-        CimiMemory cimi;
-        CimiMemory cimiRef;
-
-        cimiRef = new CimiMemory();
-        cimiRef.setQuantity(3);
-        cimiRef.setUnits(MemoryUnit.GibiBYTE.getLabel());
-
-        // Source null
-        cimi = new CimiMemory();
-        merger.merge(null, cimi);
-
-        // Destination without value
-        cimi = new CimiMemory();
-
-        merger.merge(cimiRef, cimi);
-
-        Assert.assertEquals(3, cimi.getQuantity().intValue());
-        Assert.assertEquals(MemoryUnit.GibiBYTE.getLabel(), cimi.getUnits());
-
-        // Destination with values
-        cimi = new CimiMemory();
-        cimi.setQuantity(200);
-        cimi.setUnits(MemoryUnit.KibiBYTE.getLabel());
-
-        merger.merge(cimiRef, cimi);
-
-        Assert.assertEquals(200, cimi.getQuantity().intValue());
-        Assert.assertEquals(MemoryUnit.KibiBYTE.getLabel(), cimi.getUnits());
-    }
-
-    /**
-     * Test method for
      * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk, org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk)}
      * .
      */
@@ -249,9 +163,8 @@ public class MergeReferenceHelperImplTest {
         CimiMachineDisk cimi;
         CimiMachineDisk cimiRef;
 
-        CimiCapacity refCapacity = new CimiCapacity();
         cimiRef = new CimiMachineDisk();
-        cimiRef.setCapacity(refCapacity);
+        cimiRef.setCapacity(10);
         cimiRef.setInitialLocation("refInitialLocation");
 
         // Source null
@@ -262,56 +175,17 @@ public class MergeReferenceHelperImplTest {
         cimi = new CimiMachineDisk();
         merger.merge(cimiRef, cimi);
 
-        Assert.assertSame(refCapacity, cimi.getCapacity());
+        Assert.assertEquals(10, cimi.getCapacity().intValue());
         Assert.assertEquals("refInitialLocation", cimi.getInitialLocation());
 
         // Destination with values
-        CimiCapacity cimiCapacity = new CimiCapacity();
         cimi = new CimiMachineDisk();
-        cimi.setCapacity(cimiCapacity);
+        cimi.setCapacity(25);
         cimi.setInitialLocation("initialLocation");
         merger.merge(cimiRef, cimi);
 
-        Assert.assertSame(cimiCapacity, cimi.getCapacity());
+        Assert.assertEquals(25, cimi.getCapacity().intValue());
         Assert.assertEquals("initialLocation", cimi.getInitialLocation());
-    }
-
-    /**
-     * Test method for
-     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity, org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity)}
-     * .
-     */
-    @Test
-    public void testMergeCimiCapacity() {
-        MergeReferenceHelperImpl merger = new MergeReferenceHelperImpl();
-        CimiCapacity cimi;
-        CimiCapacity cimiRef;
-
-        cimiRef = new CimiCapacity();
-        cimiRef.setQuantity(3);
-        cimiRef.setUnits(StorageUnit.GIGABYTE.getLabel());
-
-        // Source null
-        cimi = new CimiCapacity();
-        merger.merge(null, cimi);
-
-        // Destination without value
-        cimi = new CimiCapacity();
-
-        merger.merge(cimiRef, cimi);
-
-        Assert.assertEquals(3, cimi.getQuantity().intValue());
-        Assert.assertEquals(StorageUnit.GIGABYTE.getLabel(), cimi.getUnits());
-
-        // Destination with values
-        cimi = new CimiCapacity();
-        cimi.setQuantity(200);
-        cimi.setUnits(StorageUnit.KILOBYTE.getLabel());
-
-        merger.merge(cimiRef, cimi);
-
-        Assert.assertEquals(200, cimi.getQuantity().intValue());
-        Assert.assertEquals(StorageUnit.KILOBYTE.getLabel(), cimi.getUnits());
     }
 
     /**
@@ -405,12 +279,10 @@ public class MergeReferenceHelperImplTest {
         CimiMachineConfiguration cimi;
         CimiMachineConfiguration cimiRef;
 
-        CimiCpu refCpu = new CimiCpu();
-        CimiMemory refMemory = new CimiMemory();
         cimiRef = new CimiMachineConfiguration();
         cimiRef.setId("refId");
-        cimiRef.setCpu(refCpu);
-        cimiRef.setMemory(refMemory);
+        cimiRef.setCpu(11);
+        cimiRef.setMemory(22);
 
         // Source null
         cimi = new CimiMachineConfiguration();
@@ -421,20 +293,18 @@ public class MergeReferenceHelperImplTest {
         merger.merge(cimiRef, cimi);
 
         Assert.assertEquals("refId", cimi.getId());
-        Assert.assertSame(refCpu, cimi.getCpu());
-        Assert.assertSame(refMemory, cimi.getMemory());
+        Assert.assertEquals(11, cimi.getCpu().intValue());
+        Assert.assertEquals(22, cimi.getMemory().intValue());
         Assert.assertNull(cimi.getDisks());
 
         // Destination with values
-        CimiCpu cimiCpu = new CimiCpu();
-        CimiMemory cimiMemory = new CimiMemory();
         cimi = new CimiMachineConfiguration();
-        cimi.setCpu(cimiCpu);
-        cimi.setMemory(cimiMemory);
+        cimi.setCpu(50);
+        cimi.setMemory(100);
         merger.merge(cimiRef, cimi);
 
-        Assert.assertSame(cimiCpu, cimi.getCpu());
-        Assert.assertSame(cimiMemory, cimi.getMemory());
+        Assert.assertEquals(50, cimi.getCpu().intValue());
+        Assert.assertEquals(100, cimi.getMemory().intValue());
 
         // Destination without value : disk empty
         cimiRef = new CimiMachineConfiguration();

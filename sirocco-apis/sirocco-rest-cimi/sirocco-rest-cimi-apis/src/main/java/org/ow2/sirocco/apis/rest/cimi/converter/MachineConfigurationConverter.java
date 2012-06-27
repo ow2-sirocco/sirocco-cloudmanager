@@ -27,15 +27,11 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -108,8 +104,8 @@ public class MachineConfigurationConverter extends ObjectCommonConverter {
         final CimiMachineConfiguration dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setCpu((CimiCpu) context.convertNextCimi(dataService.getCpu(), CimiCpu.class));
-            dataCimi.setMemory((CimiMemory) context.convertNextCimi(dataService.getMemory(), CimiMemory.class));
+            dataCimi.setCpu(dataService.getCpu());
+            dataCimi.setMemory(dataService.getMemory());
 
             if ((null != dataService.getDiskTemplates()) && (dataService.getDiskTemplates().size() > 0)) {
                 List<CimiDiskConfiguration> listCimis = new ArrayList<CimiDiskConfiguration>();
@@ -132,8 +128,8 @@ public class MachineConfigurationConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiMachineConfiguration dataCimi,
         final MachineConfiguration dataService) {
         this.fill(context, dataCimi, dataService);
-        dataService.setCpu((Cpu) context.convertNextService(dataCimi.getCpu()));
-        dataService.setMemory((Memory) context.convertNextService(dataCimi.getMemory()));
+        dataService.setCpu(dataCimi.getCpu());
+        dataService.setMemory(dataCimi.getMemory());
 
         if ((null != dataCimi.getDisks()) && (dataCimi.getDisks().length > 0)) {
             List<DiskTemplate> listServices = new ArrayList<DiskTemplate>();

@@ -33,10 +33,8 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
@@ -57,7 +55,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
@@ -72,9 +69,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
-import org.ow2.sirocco.apis.rest.cimi.domain.FrequencyUnit;
-import org.ow2.sirocco.apis.rest.cimi.domain.MemoryUnit;
-import org.ow2.sirocco.apis.rest.cimi.domain.StorageUnit;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
@@ -83,11 +77,8 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu;
-import org.ow2.sirocco.cloudmanager.model.cimi.Cpu.Frequency;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -97,7 +88,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.Memory;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
@@ -125,226 +115,252 @@ public class CommonsConverterTest {
         this.context = new CimiContextImpl(this.request, new CimiResponse());
     }
 
-    @Test
-    public void testFrequencyUnit() throws Exception {
-        // Null Cimi -> Service
-        Assert.assertNull(this.context.getConverter(FrequencyUnit.class).toService(this.context, null));
-        // Empty Cimi -> Service
-        try {
-            this.context.getConverter(FrequencyUnit.class).toService(this.context, new String());
-            // KO
-            Assert.fail();
-        } catch (InvalidConversionException e) {
-        }
-        // Full Cimi -> Service
-        for (FrequencyUnit cimi : FrequencyUnit.values()) {
-            try {
-                this.context.getConverter(FrequencyUnit.class).toService(this.context, cimi.getLabel().toString());
-                switch (cimi) {
-                case HERTZ:
-                case MEGAHERTZ:
-                case GIGAHERTZ:
-                    // OK
-                    break;
-                default:
-                    // KO
-                    Assert.fail();
-                }
-            } catch (InvalidConversionException e) {
-                // OK
-            }
-        }
+    // @Test
+    // public void testFrequencyUnit() throws Exception {
+    // // Null Cimi -> Service
+    // Assert.assertNull(this.context.getConverter(FrequencyUnit.class).toService(this.context,
+    // null));
+    // // Empty Cimi -> Service
+    // try {
+    // this.context.getConverter(FrequencyUnit.class).toService(this.context,
+    // new String());
+    // // KO
+    // Assert.fail();
+    // } catch (InvalidConversionException e) {
+    // }
+    // // Full Cimi -> Service
+    // for (FrequencyUnit cimi : FrequencyUnit.values()) {
+    // try {
+    // this.context.getConverter(FrequencyUnit.class).toService(this.context,
+    // cimi.getLabel().toString());
+    // switch (cimi) {
+    // case HERTZ:
+    // case MEGAHERTZ:
+    // case GIGAHERTZ:
+    // // OK
+    // break;
+    // default:
+    // // KO
+    // Assert.fail();
+    // }
+    // } catch (InvalidConversionException e) {
+    // // OK
+    // }
+    // }
+    //
+    // // Null Service -> Cimi
+    // Assert.assertNull(this.context.getConverter(FrequencyUnit.class).toCimi(this.context,
+    // null));
+    // // Full Service -> Cimi
+    // for (Frequency service : Frequency.values()) {
+    // this.context.getConverter(FrequencyUnit.class).toCimi(this.context,
+    // service);
+    // }
+    // }
 
-        // Null Service -> Cimi
-        Assert.assertNull(this.context.getConverter(FrequencyUnit.class).toCimi(this.context, null));
-        // Full Service -> Cimi
-        for (Frequency service : Frequency.values()) {
-            this.context.getConverter(FrequencyUnit.class).toCimi(this.context, service);
-        }
-    }
+    // @Test
+    // public void testMemoryUnit() throws Exception {
+    // // Null Cimi -> Service
+    // Assert.assertNull(this.context.getConverter(MemoryUnit.class).toService(this.context,
+    // null));
+    // // Empty Cimi -> Service
+    // try {
+    // this.context.getConverter(MemoryUnit.class).toService(this.context, new
+    // String());
+    // // KO
+    // Assert.fail();
+    // } catch (InvalidConversionException e) {
+    // }
+    // // Full Cimi -> Service
+    // for (MemoryUnit cimi : MemoryUnit.values()) {
+    // this.context.getConverter(MemoryUnit.class).toService(this.context,
+    // cimi.getLabel().toString());
+    // }
+    //
+    // // Null Service -> Cimi
+    // Assert.assertNull(this.context.getConverter(MemoryUnit.class).toCimi(this.context,
+    // null));
+    // // Full Service -> Cimi
+    // for (Memory.MemoryUnit service : Memory.MemoryUnit.values()) {
+    // this.context.getConverter(MemoryUnit.class).toCimi(this.context,
+    // service);
+    // }
+    // }
 
-    @Test
-    public void testMemoryUnit() throws Exception {
-        // Null Cimi -> Service
-        Assert.assertNull(this.context.getConverter(MemoryUnit.class).toService(this.context, null));
-        // Empty Cimi -> Service
-        try {
-            this.context.getConverter(MemoryUnit.class).toService(this.context, new String());
-            // KO
-            Assert.fail();
-        } catch (InvalidConversionException e) {
-        }
-        // Full Cimi -> Service
-        for (MemoryUnit cimi : MemoryUnit.values()) {
-            this.context.getConverter(MemoryUnit.class).toService(this.context, cimi.getLabel().toString());
-        }
+    // @Test
+    // public void testStorageUnit() throws Exception {
+    // // Null Cimi -> Service
+    // Assert.assertNull(this.context.getConverter(StorageUnit.class).toService(this.context,
+    // null));
+    // // Empty Cimi -> Service
+    // try {
+    // this.context.getConverter(StorageUnit.class).toService(this.context, new
+    // String());
+    // // KO
+    // Assert.fail();
+    // } catch (InvalidConversionException e) {
+    // }
+    // // Full Cimi -> Service
+    // for (StorageUnit cimi : StorageUnit.values()) {
+    // this.context.getConverter(StorageUnit.class).toService(this.context,
+    // cimi.getLabel().toString());
+    // }
+    //
+    // // Null Service -> Cimi
+    // Assert.assertNull(this.context.getConverter(StorageUnit.class).toCimi(this.context,
+    // null));
+    // // Full Service -> Cimi
+    // for (org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit service :
+    // org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit
+    // .values()) {
+    // this.context.getConverter(StorageUnit.class).toCimi(this.context,
+    // service);
+    // }
+    // }
 
-        // Null Service -> Cimi
-        Assert.assertNull(this.context.getConverter(MemoryUnit.class).toCimi(this.context, null));
-        // Full Service -> Cimi
-        for (Memory.MemoryUnit service : Memory.MemoryUnit.values()) {
-            this.context.getConverter(MemoryUnit.class).toCimi(this.context, service);
-        }
-    }
+    // @Test
+    // public void testCimiCpu() throws Exception {
+    // CimiCpu cimi;
+    // Cpu service;
+    //
+    // // Empty Cimi -> Service
+    // service = (Cpu) this.context.convertToService(new CimiCpu());
+    // Assert.assertNull(service.getCpuSpeedUnit());
+    // Assert.assertNull(service.getNumberCpu());
+    // Assert.assertNull(service.getQuantity());
+    //
+    // // Empty Service -> Cimi
+    // cimi = (CimiCpu) this.context.convertToCimi(new Cpu(), CimiCpu.class);
+    // Assert.assertNull(cimi.getFrequency());
+    // Assert.assertNull(cimi.getNumberVirtualCpus());
+    // Assert.assertNull(cimi.getUnits());
+    //
+    // // Full Cimi -> Service
+    // cimi = new CimiCpu();
+    // cimi.setFrequency(2f);
+    // cimi.setNumberVirtualCpus(3);
+    // cimi.setUnits(FrequencyUnit.GIGAHERTZ.getLabel());
+    //
+    // service = (Cpu) this.context.convertToService(cimi);
+    // Assert.assertEquals(2, service.getQuantity().longValue());
+    // Assert.assertEquals(3, service.getNumberCpu().intValue());
+    // Assert.assertEquals(Cpu.Frequency.GIGA, service.getCpuSpeedUnit());
+    //
+    // // Full Service -> Cimi
+    // service = new Cpu();
+    // service.setCpuSpeedUnit(Frequency.MEGA);
+    // service.setNumberCpu(3);
+    // service.setQuantity(4f);
+    //
+    // cimi = (CimiCpu) this.context.convertToCimi(service, CimiCpu.class);
+    // Assert.assertEquals(4, cimi.getFrequency().longValue());
+    // Assert.assertEquals(3, cimi.getNumberVirtualCpus().intValue());
+    // Assert.assertEquals(FrequencyUnit.MEGAHERTZ.getLabel(), cimi.getUnits());
+    // }
 
-    @Test
-    public void testStorageUnit() throws Exception {
-        // Null Cimi -> Service
-        Assert.assertNull(this.context.getConverter(StorageUnit.class).toService(this.context, null));
-        // Empty Cimi -> Service
-        try {
-            this.context.getConverter(StorageUnit.class).toService(this.context, new String());
-            // KO
-            Assert.fail();
-        } catch (InvalidConversionException e) {
-        }
-        // Full Cimi -> Service
-        for (StorageUnit cimi : StorageUnit.values()) {
-            this.context.getConverter(StorageUnit.class).toService(this.context, cimi.getLabel().toString());
-        }
+    // @Test
+    // public void testCimiMemory() throws Exception {
+    // CimiMemory cimi;
+    // Memory service;
+    //
+    // // Empty Cimi -> Service
+    // service = (Memory) this.context.convertToService(new CimiMemory());
+    // Assert.assertNull(service.getQuantity());
+    // Assert.assertNull(service.getUnit());
+    //
+    // // Empty Service -> Cimi
+    // cimi = (CimiMemory) this.context.convertToCimi(new Memory(),
+    // CimiMemory.class);
+    // Assert.assertNull(cimi.getQuantity());
+    // Assert.assertNull(cimi.getUnits());
+    //
+    // // Full Cimi -> Service
+    // cimi = new CimiMemory();
+    // cimi.setQuantity(5);
+    // cimi.setUnits(MemoryUnit.GibiBYTE.getLabel());
+    //
+    // service = (Memory) this.context.convertToService(cimi);
+    // Assert.assertEquals(5, service.getQuantity().longValue());
+    // Assert.assertEquals(Memory.MemoryUnit.GIGIBYTE, service.getUnit());
+    //
+    // // Full Service -> Cimi
+    // service = new Memory();
+    // service.setQuantity(4f);
+    // service.setUnit(Memory.MemoryUnit.MEGIBYTE);
+    //
+    // cimi = (CimiMemory) this.context.convertToCimi(service,
+    // CimiMemory.class);
+    // Assert.assertEquals(4, cimi.getQuantity().longValue());
+    // Assert.assertEquals(MemoryUnit.MebiBYTE.getLabel(), cimi.getUnits());
+    // }
 
-        // Null Service -> Cimi
-        Assert.assertNull(this.context.getConverter(StorageUnit.class).toCimi(this.context, null));
-        // Full Service -> Cimi
-        for (org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit service : org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit
-            .values()) {
-            this.context.getConverter(StorageUnit.class).toCimi(this.context, service);
-        }
-    }
-
-    @Test
-    public void testCimiCpu() throws Exception {
-        CimiCpu cimi;
-        Cpu service;
-
-        // Empty Cimi -> Service
-        service = (Cpu) this.context.convertToService(new CimiCpu());
-        Assert.assertNull(service.getCpuSpeedUnit());
-        Assert.assertNull(service.getNumberCpu());
-        Assert.assertNull(service.getQuantity());
-
-        // Empty Service -> Cimi
-        cimi = (CimiCpu) this.context.convertToCimi(new Cpu(), CimiCpu.class);
-        Assert.assertNull(cimi.getFrequency());
-        Assert.assertNull(cimi.getNumberVirtualCpus());
-        Assert.assertNull(cimi.getUnits());
-
-        // Full Cimi -> Service
-        cimi = new CimiCpu();
-        cimi.setFrequency(2f);
-        cimi.setNumberVirtualCpus(3);
-        cimi.setUnits(FrequencyUnit.GIGAHERTZ.getLabel());
-
-        service = (Cpu) this.context.convertToService(cimi);
-        Assert.assertEquals(2, service.getQuantity().longValue());
-        Assert.assertEquals(3, service.getNumberCpu().intValue());
-        Assert.assertEquals(Cpu.Frequency.GIGA, service.getCpuSpeedUnit());
-
-        // Full Service -> Cimi
-        service = new Cpu();
-        service.setCpuSpeedUnit(Frequency.MEGA);
-        service.setNumberCpu(3);
-        service.setQuantity(4f);
-
-        cimi = (CimiCpu) this.context.convertToCimi(service, CimiCpu.class);
-        Assert.assertEquals(4, cimi.getFrequency().longValue());
-        Assert.assertEquals(3, cimi.getNumberVirtualCpus().intValue());
-        Assert.assertEquals(FrequencyUnit.MEGAHERTZ.getLabel(), cimi.getUnits());
-    }
-
-    @Test
-    public void testCimiMemory() throws Exception {
-        CimiMemory cimi;
-        Memory service;
-
-        // Empty Cimi -> Service
-        service = (Memory) this.context.convertToService(new CimiMemory());
-        Assert.assertNull(service.getQuantity());
-        Assert.assertNull(service.getUnit());
-
-        // Empty Service -> Cimi
-        cimi = (CimiMemory) this.context.convertToCimi(new Memory(), CimiMemory.class);
-        Assert.assertNull(cimi.getQuantity());
-        Assert.assertNull(cimi.getUnits());
-
-        // Full Cimi -> Service
-        cimi = new CimiMemory();
-        cimi.setQuantity(5);
-        cimi.setUnits(MemoryUnit.GibiBYTE.getLabel());
-
-        service = (Memory) this.context.convertToService(cimi);
-        Assert.assertEquals(5, service.getQuantity().longValue());
-        Assert.assertEquals(Memory.MemoryUnit.GIGIBYTE, service.getUnit());
-
-        // Full Service -> Cimi
-        service = new Memory();
-        service.setQuantity(4f);
-        service.setUnit(Memory.MemoryUnit.MEGIBYTE);
-
-        cimi = (CimiMemory) this.context.convertToCimi(service, CimiMemory.class);
-        Assert.assertEquals(4, cimi.getQuantity().longValue());
-        Assert.assertEquals(MemoryUnit.MebiBYTE.getLabel(), cimi.getUnits());
-    }
-
-    @Test
-    public void testCimiCapacity() throws Exception {
-        CimiCapacity cimi;
-        Object service;
-
-        // Empty Cimi (CimiDiskConfiguration) -> Service
-        service = this.context.convertToService(new CimiDiskConfiguration());
-        Assert.assertEquals(DiskTemplate.class, service.getClass());
-        Assert.assertNull(((DiskTemplate) service).getQuantity());
-        Assert.assertNull(((DiskTemplate) service).getUnit());
-
-        // Empty Cimi (CimiCapacity) -> Service
-        service = this.context.convertToService(new CimiCapacity());
-        Assert.assertEquals(Disk.class, service.getClass());
-        Assert.assertNull(((Disk) service).getQuantity());
-        Assert.assertNull(((Disk) service).getUnits());
-
-        // Empty Service (DiskTemplate) -> Cimi
-        cimi = (CimiCapacity) this.context.convertToCimi(new DiskTemplate(), CimiCapacity.class);
-        Assert.assertNull(cimi.getQuantity());
-        Assert.assertNull(cimi.getUnits());
-
-        // Empty Service (Disk) -> Cimi
-        cimi = (CimiCapacity) this.context.convertToCimi(new Disk(), CimiCapacity.class);
-        Assert.assertNull(cimi.getQuantity());
-        Assert.assertNull(cimi.getUnits());
-
-        // Full Cimi (CimiDiskConfiguration) -> Service
-        CimiDiskConfiguration cimiDiskConf = new CimiDiskConfiguration();
-        cimiDiskConf.setCapacity(new CimiCapacity(5, StorageUnit.GIGABYTE.getLabel()));
-        service = this.context.convertToService(cimiDiskConf);
-        Assert.assertEquals(5, ((DiskTemplate) service).getQuantity().longValue());
-        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.GIGABYTE, ((DiskTemplate) service).getUnit());
-
-        // Full Cimi (CimiCapacity) -> Service
-        cimi = new CimiCapacity(7, StorageUnit.EXABYTE.getLabel());
-        service = this.context.convertToService(cimi);
-        Assert.assertEquals(7, ((Disk) service).getQuantity().longValue());
-        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.EXABYTE, ((Disk) service).getUnits());
-
-        // Full Service (DiskTemplate) -> Cimi
-        DiskTemplate serviceDiskTemplate = new DiskTemplate();
-        serviceDiskTemplate.setQuantity(44f);
-        serviceDiskTemplate.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.KILOBYTE);
-
-        cimi = (CimiCapacity) this.context.convertToCimi(serviceDiskTemplate, CimiCapacity.class);
-        Assert.assertEquals(44, cimi.getQuantity().longValue());
-        Assert.assertEquals(StorageUnit.KILOBYTE.getLabel(), cimi.getUnits());
-
-        // Full Service (Disk) -> Cimi
-        Disk serviceDisk = new Disk();
-        serviceDisk.setQuantity(17f);
-        serviceDisk.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.TERABYTE);
-
-        cimi = (CimiCapacity) this.context.convertToCimi(serviceDisk, CimiCapacity.class);
-        Assert.assertEquals(17, cimi.getQuantity().longValue());
-        Assert.assertEquals(StorageUnit.TERABYTE.getLabel(), cimi.getUnits());
-
-    }
+    // @Test
+    // public void testCimiCapacity() throws Exception {
+    // CimiCapacity cimi;
+    // Object service;
+    //
+    // // Empty Cimi (CimiDiskConfiguration) -> Service
+    // service = this.context.convertToService(new CimiDiskConfiguration());
+    // Assert.assertEquals(DiskTemplate.class, service.getClass());
+    // Assert.assertNull(((DiskTemplate) service).getQuantity());
+    // Assert.assertNull(((DiskTemplate) service).getUnit());
+    //
+    // // Empty Cimi (CimiCapacity) -> Service
+    // service = this.context.convertToService(new CimiCapacity());
+    // Assert.assertEquals(Disk.class, service.getClass());
+    // Assert.assertNull(((Disk) service).getQuantity());
+    // Assert.assertNull(((Disk) service).getUnits());
+    //
+    // // Empty Service (DiskTemplate) -> Cimi
+    // cimi = (CimiCapacity) this.context.convertToCimi(new DiskTemplate(),
+    // CimiCapacity.class);
+    // Assert.assertNull(cimi.getQuantity());
+    // Assert.assertNull(cimi.getUnits());
+    //
+    // // Empty Service (Disk) -> Cimi
+    // cimi = (CimiCapacity) this.context.convertToCimi(new Disk(),
+    // CimiCapacity.class);
+    // Assert.assertNull(cimi.getQuantity());
+    // Assert.assertNull(cimi.getUnits());
+    //
+    // // Full Cimi (CimiDiskConfiguration) -> Service
+    // CimiDiskConfiguration cimiDiskConf = new CimiDiskConfiguration();
+    // cimiDiskConf.setCapacity(new CimiCapacity(5,
+    // StorageUnit.GIGABYTE.getLabel()));
+    // service = this.context.convertToService(cimiDiskConf);
+    // Assert.assertEquals(5, ((DiskTemplate)
+    // service).getQuantity().longValue());
+    // Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.GIGABYTE,
+    // ((DiskTemplate) service).getUnit());
+    //
+    // // Full Cimi (CimiCapacity) -> Service
+    // cimi = new CimiCapacity(7, StorageUnit.EXABYTE.getLabel());
+    // service = this.context.convertToService(cimi);
+    // Assert.assertEquals(7, ((Disk) service).getQuantity().longValue());
+    // Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.EXABYTE,
+    // ((Disk) service).getUnits());
+    //
+    // // Full Service (DiskTemplate) -> Cimi
+    // DiskTemplate serviceDiskTemplate = new DiskTemplate();
+    // serviceDiskTemplate.setQuantity(44f);
+    // serviceDiskTemplate.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.KILOBYTE);
+    //
+    // cimi = (CimiCapacity) this.context.convertToCimi(serviceDiskTemplate,
+    // CimiCapacity.class);
+    // Assert.assertEquals(44, cimi.getQuantity().longValue());
+    // Assert.assertEquals(StorageUnit.KILOBYTE.getLabel(), cimi.getUnits());
+    //
+    // // Full Service (Disk) -> Cimi
+    // Disk serviceDisk = new Disk();
+    // serviceDisk.setQuantity(17f);
+    // serviceDisk.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.TERABYTE);
+    //
+    // cimi = (CimiCapacity) this.context.convertToCimi(serviceDisk,
+    // CimiCapacity.class);
+    // Assert.assertEquals(17, cimi.getQuantity().longValue());
+    // Assert.assertEquals(StorageUnit.TERABYTE.getLabel(), cimi.getUnits());
+    //
+    // }
 
     @Test
     public void testCimiDiskConfiguration() throws Exception {
@@ -353,43 +369,38 @@ public class CommonsConverterTest {
 
         // Empty Cimi -> Service
         service = (DiskTemplate) this.context.convertToService(new CimiDiskConfiguration());
-        Assert.assertNull(service.getInitialLocation());
+        Assert.assertNull(service.getCapacity());
         Assert.assertNull(service.getFormat());
-        Assert.assertNull(service.getQuantity());
-        Assert.assertNull(service.getUnit());
+        Assert.assertNull(service.getInitialLocation());
 
         // Empty Service -> Cimi
         cimi = (CimiDiskConfiguration) this.context.convertToCimi(new DiskTemplate(), CimiDiskConfiguration.class);
-        Assert.assertNull(cimi.getInitialLocation());
+        Assert.assertNull(cimi.getCapacity());
         Assert.assertNull(cimi.getFormat());
-        Assert.assertNotNull(cimi.getCapacity());
-        Assert.assertNull(cimi.getCapacity().getQuantity());
-        Assert.assertNull(cimi.getCapacity().getUnits());
+        Assert.assertNull(cimi.getInitialLocation());
 
         // Full Cimi -> Service
         cimi = new CimiDiskConfiguration();
-        cimi.setInitialLocation("initialLocation");
+        cimi.setCapacity(5);
         cimi.setFormat("format");
-        cimi.setCapacity(new CimiCapacity(5, StorageUnit.PETABYTE.getLabel()));
+        cimi.setInitialLocation("initialLocation");
 
         service = (DiskTemplate) this.context.convertToService(cimi);
-        Assert.assertEquals("initialLocation", service.getInitialLocation());
+        Assert.assertEquals(5, service.getCapacity().intValue());
         Assert.assertEquals("format", service.getFormat());
-        Assert.assertEquals(5, service.getQuantity().longValue());
-        Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.PETABYTE, service.getUnit());
+        Assert.assertEquals("initialLocation", service.getInitialLocation());
 
         // Full Service -> Cimi
         service = new DiskTemplate();
-        service.setInitialLocation("initialLocation");
+        service.setCapacity(7);
         service.setFormat("format");
-        service.setQuantity(7f);
-        service.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.MEGABYTE);
+        service.setInitialLocation("initialLocation");
 
         cimi = (CimiDiskConfiguration) this.context.convertToCimi(service, CimiDiskConfiguration.class);
-        Assert.assertEquals("initialLocation", cimi.getInitialLocation());
+        Assert.assertEquals(7, cimi.getCapacity().intValue());
         Assert.assertEquals("format", cimi.getFormat());
-        Assert.assertEquals(7, cimi.getCapacity().getQuantity().intValue());
-        Assert.assertEquals(StorageUnit.MEGABYTE.getLabel(), cimi.getCapacity().getUnits());
+        Assert.assertEquals("initialLocation", cimi.getInitialLocation());
+
     }
 
     @Test
@@ -553,7 +564,7 @@ public class CommonsConverterTest {
                 this.request.setIdParent("999");
                 break;
             case DiskCollection:
-                service = new ArrayList<Disk>();
+                service = new ArrayList<MachineDisk>();
                 cimiClass = CimiMachineDiskCollection.class;
                 // Add idParent of request
                 this.request.setIdParent("999");

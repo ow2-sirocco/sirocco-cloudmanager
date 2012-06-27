@@ -37,7 +37,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCpu;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
@@ -45,7 +44,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMemory;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -204,7 +202,7 @@ public class CimiManagersMachineTest {
         EasyMock.replay(this.service);
 
         CimiMachineTemplate template = new CimiMachineTemplate();
-        template.setMachineConfig(new CimiMachineConfiguration(new CimiCpu(1f, "megaHertz", 1), new CimiMemory(1, "mebiByte")));
+        template.setMachineConfig(new CimiMachineConfiguration(1, 2));
         template.setMachineImage(new CimiMachineImage(new ImageLocation("foo")));
         CimiMachineCreate cimi = new CimiMachineCreate();
         cimi.setMachineTemplate(template);

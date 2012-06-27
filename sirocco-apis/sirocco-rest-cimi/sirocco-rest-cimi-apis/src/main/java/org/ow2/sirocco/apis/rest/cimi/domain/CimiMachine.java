@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -53,14 +52,17 @@ public class CimiMachine extends CimiObjectCommonAbstract {
     /**
      * Field "cpu".
      */
-    @Valid
-    private CimiCpu cpu;
+    private Integer cpu;
+
+    /**
+     * Field "cpuArch".
+     */
+    private String cpuArch;
 
     /**
      * Field "memory".
      */
-    @Valid
-    private CimiMemory memory;
+    private Integer memory;
 
     /**
      * Field "disks".
@@ -122,7 +124,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiCpu getCpu() {
+    public Integer getCpu() {
         return this.cpu;
     }
 
@@ -131,8 +133,26 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @param cpu The value
      */
-    public void setCpu(final CimiCpu cpu) {
+    public void setCpu(final Integer cpu) {
         this.cpu = cpu;
+    }
+
+    /**
+     * Return the value of field "cpuArch".
+     * 
+     * @return The value
+     */
+    public String getCpuArch() {
+        return this.cpuArch;
+    }
+
+    /**
+     * Set the value of field "cpuArch".
+     * 
+     * @param cpuArch The value
+     */
+    public void setCpuArch(final String cpuArch) {
+        this.cpuArch = cpuArch;
     }
 
     /**
@@ -140,7 +160,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiMemory getMemory() {
+    public Integer getMemory() {
         return this.memory;
     }
 
@@ -149,7 +169,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @param memory The value
      */
-    public void setMemory(final CimiMemory memory) {
+    public void setMemory(final Integer memory) {
         this.memory = memory;
     }
 

@@ -39,6 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
  */
 @XmlRootElement(name = "Cpu")
 @JsonSerialize(include = Inclusion.NON_NULL)
+@Deprecated
 public class CimiCpu implements Serializable {
 
     /** Serial number */

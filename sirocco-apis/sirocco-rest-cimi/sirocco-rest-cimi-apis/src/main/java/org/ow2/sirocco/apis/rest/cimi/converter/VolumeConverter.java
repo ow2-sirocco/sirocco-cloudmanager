@@ -24,11 +24,13 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCapacity;
+import java.util.List;
+
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Disk;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -102,12 +104,11 @@ public class VolumeConverter extends ObjectCommonConverter {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setBootable(dataService.getBootable());
-            dataCimi.setCapacity((CimiCapacity) context.convertNextCimi(dataService.getCapacity(), CimiCapacity.class));
+            dataCimi.setCapacity(dataService.getCapacity());
+            dataCimi.setImages((CimiVolumeVolumeImageCollection) context.convertNextCimi(dataService.getImages(),
+                CimiVolumeVolumeImageCollection.class));
             dataCimi.setState(HelperConverter.toString(dataService.getState()));
             dataCimi.setType(dataService.getType());
-
-            // TODO dataCimi.setImages
-
         }
     }
 
@@ -118,12 +119,12 @@ public class VolumeConverter extends ObjectCommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
+    @SuppressWarnings("unchecked")
     protected void doCopyToService(final CimiContext context, final CimiVolume dataCimi, final Volume dataService) {
         this.fill(context, dataCimi, dataService);
         dataService.setBootable(dataCimi.getBootable());
-        dataService.setCapacity((Disk) context.convertNextService(dataCimi.getCapacity()));
-
-        // TODO dataService.setImages(???);
+        dataService.setCapacity(dataCimi.getCapacity());
+        dataService.setImages((List<VolumeVolumeImage>) context.convertNextService(dataCimi.getImages()));
 
         // Next Read only
         // dataService.setState(dataService.getState());
