@@ -43,6 +43,8 @@ public interface IMachineImageManager {
 
     Job createMachineImage(MachineImage machineImage) throws CloudProviderException;
 
+    Job captureMachine(MachineImage machineImage, String machineId) throws CloudProviderException;
+
     List<MachineImage> getMachineImages() throws CloudProviderException;
 
     MachineImage getMachineImageById(String imageId) throws ResourceNotFoundException, CloudProviderException;

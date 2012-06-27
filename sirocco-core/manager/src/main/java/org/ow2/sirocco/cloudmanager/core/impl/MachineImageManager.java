@@ -47,8 +47,8 @@ import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
-import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
@@ -76,7 +76,7 @@ public class MachineImageManager implements IMachineImageManager {
     public void setSessionContext(final SessionContext ctx) {
         this.ctx = ctx;
     }
-    
+
     private User getUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
         return this.userManager.getUserByUsername(username);
@@ -105,10 +105,10 @@ public class MachineImageManager implements IMachineImageManager {
         this.em.flush();
         return j;
     }
-    
+
     @Override
-    public List<MachineImage> getMachineImages() throws CloudProviderException{
-        return UtilsForManagers.getEntityList("MachineImage",this.em,this.getUser().getUsername());
+    public List<MachineImage> getMachineImages() throws CloudProviderException {
+        return UtilsForManagers.getEntityList("MachineImage", this.em, this.getUser().getUsername());
     }
 
     public MachineImage getMachineImageById(final String imageId) throws CloudProviderException {
@@ -206,6 +206,12 @@ public class MachineImageManager implements IMachineImageManager {
             e.printStackTrace();
             throw new CloudProviderException("Error updating machine image  " + e.getMessage());
         }
+    }
+
+    @Override
+    public Job captureMachine(final MachineImage machineImage, final String machineId) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        throw new ServiceUnavailableException();
     }
 
 }
