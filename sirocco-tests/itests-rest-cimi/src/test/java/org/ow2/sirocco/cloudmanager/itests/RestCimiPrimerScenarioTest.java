@@ -456,15 +456,11 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("getName: " + machineConfiguration.getName());
         System.out.println("getDescription: " + machineConfiguration.getDescription());
         System.out.println("getCreated: " + machineConfiguration.getCreated());
-        System.out.println("getCpu().getNumberVirtualCpus: " + machineConfiguration.getCpu().getNumberVirtualCpus());
-        System.out.println("getCpu().getFrequency: " + machineConfiguration.getCpu().getFrequency());
-        System.out.println("getCpu().getUnits: " + machineConfiguration.getCpu().getUnits());
-        System.out.println("getMemory().getQuantity: " + machineConfiguration.getMemory().getQuantity());
-        System.out.println("getMemory().getUnit: " + machineConfiguration.getMemory().getUnits());
+        System.out.println("getCpu: " + machineConfiguration.getCpu());
+        System.out.println("getMemory: " + machineConfiguration.getMemory());
         for (CimiDiskConfiguration diskConfig : machineConfiguration.getDisks()) {
             System.out.println("disk.getInitialLocation: " + diskConfig.getInitialLocation());
-            System.out.println("disk.getCapacity.getQuantity: " + diskConfig.getCapacity().getQuantity());
-            System.out.println("disk.getCapacity.getUnits: " + diskConfig.getCapacity().getUnits());
+            System.out.println("disk.getCapacity: " + diskConfig.getCapacity());
             System.out.println("disk.getFormat: " + diskConfig.getFormat());
         }
         this.printTitleTest("Choose a Machine Configuration (first one)", false);
@@ -569,15 +565,11 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("getCreated: " + machine.getCreated());
         System.out.println("getUpdated: " + machine.getUpdated());
         System.out.println("State: " + machine.getState());
-        System.out.println("getCpu().getNumberVirtualCpus: " + machine.getCpu().getNumberVirtualCpus());
-        System.out.println("getCpu().getFrequency: " + machine.getCpu().getFrequency());
-        System.out.println("getCpu().getUnits: " + machine.getCpu().getUnits());
-        System.out.println("getMemory().getQuantity: " + machine.getMemory().getQuantity());
-        System.out.println("getMemory().getUnit: " + machine.getMemory().getUnits());
+        System.out.println("getCpu: " + machine.getCpu());
+        System.out.println("getMemory: " + machine.getMemory());
         if ((null != machine.getDisks()) && (null != machine.getDisks().getCollection())) {
             for (CimiMachineDisk disk : machine.getDisks().getCollection()) {
-                System.out.println("disk.getCapacity.getQuantity: " + disk.getCapacity().getQuantity());
-                System.out.println("disk.getCapacity.getUnits: " + disk.getCapacity().getUnits());
+                System.out.println("disk.getCapacity: " + disk.getCapacity());
             }
         }
         for (CimiOperation operation : machine.getOperations()) {
