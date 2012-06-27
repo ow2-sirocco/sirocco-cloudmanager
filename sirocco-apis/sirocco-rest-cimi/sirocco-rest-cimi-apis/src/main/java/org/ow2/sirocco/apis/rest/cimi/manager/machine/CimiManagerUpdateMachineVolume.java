@@ -50,8 +50,6 @@ public class CimiManagerUpdateMachineVolume extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        Object out;
-        out = this.manager.updateVolumeOnMachine(context.getRequest().getIdParent(), (MachineVolume) dataService);
-        return out;
+        return this.manager.updateVolumeOnMachine(context.getRequest().getIdParent(), (MachineVolume) dataService);
     }
 }

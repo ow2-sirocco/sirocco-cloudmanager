@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -49,12 +50,6 @@ public class CimiManagerUpdateMachineDisk extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        throw new UnsupportedOperationException();
-        // FIXME
-        // Object out;
-        // out =
-        // this.manager.updateDiskInMachine(context.getRequest().getIdParent(),
-        // (MachineDisk) dataService);
-        // return out;
+        return this.manager.updateDiskInMachine(context.getRequest().getIdParent(), (MachineDisk) dataService);
     }
 }
