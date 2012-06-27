@@ -30,47 +30,34 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 @Entity
-public class MachineDisk implements Serializable, Identifiable {
+public class MachineDisk extends CloudEntity implements Serializable, Identifiable {
 
     /**
 	 * 
 	 */
     private static final long serialVersionUID = 1L;
 
-    private Integer id;
-
     public static enum State {
         ACTIVE, DELETED
     }
 
     private State state;
-    
+
     private String initialLocation;
 
     private Integer capacity;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    public Integer getId() {
-        return this.id;
-    }
-
-    public void setId(final Integer id) {
-        this.id = id;
-    }
-
-    public void setState(MachineDisk.State state) {
+    public void setState(final MachineDisk.State state) {
         this.state = state;
     }
+
     @Enumerated(EnumType.STRING)
     public MachineDisk.State getState() {
         return this.state;
     }
+
     public Integer getCapacity() {
         return this.capacity;
     }
