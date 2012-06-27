@@ -21,7 +21,7 @@ import javax.persistence.EntityManager;
 
 import org.hibernate.proxy.HibernateProxy;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 public class UtilsForManagers {
@@ -176,10 +176,10 @@ public class UtilsForManagers {
      * @return
      * @throws CloudProviderException
      */
-    public static CloudCollection getCloudCollectionById(final EntityManager em, final String entityId)
+    public static CloudCollectionItem getCloudCollectionById(final EntityManager em, final String entityId)
         throws CloudProviderException {
-        CloudCollection obj = (CloudCollection) em
-            .createQuery("FROM " + CloudCollection.class.getName() + " WHERE v.id=:idd ORDER BY v.id")
+        CloudCollectionItem obj = (CloudCollectionItem) em
+            .createQuery("FROM " + CloudCollectionItem.class.getName() + " WHERE v.id=:idd ORDER BY v.id")
             .setParameter("idd", entityId).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
@@ -214,10 +214,10 @@ public class UtilsForManagers {
      * @return
      * @throws CloudProviderException
      */
-    public static CloudCollection getCloudCollectionFromCloudResource(final EntityManager em, CloudResource ce)
+    public static CloudCollectionItem getCloudCollectionFromCloudResource(final EntityManager em, CloudResource ce)
         throws CloudProviderException {
-        CloudCollection obj = (CloudCollection) em
-            .createQuery("FROM " + CloudCollection.class.getName() + " WHERE v.resource.id=:resourceId ORDER BY v.id")
+        CloudCollectionItem obj = (CloudCollectionItem) em
+            .createQuery("FROM " + CloudCollectionItem.class.getName() + " WHERE v.resource.id=:resourceId ORDER BY v.id")
             .setParameter("resourceId", ce.getId().toString()).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");

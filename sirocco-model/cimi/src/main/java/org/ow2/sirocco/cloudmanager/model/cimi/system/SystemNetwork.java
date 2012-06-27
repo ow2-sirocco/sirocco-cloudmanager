@@ -27,10 +27,10 @@ package org.ow2.sirocco.cloudmanager.model.cimi.system;
 
 import javax.persistence.Entity;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 
 @Entity
-public class SystemNetwork extends CloudCollection {
+public class SystemNetwork extends CloudCollectionItem {
     private static final long serialVersionUID = 1L;
 
 }

@@ -42,10 +42,8 @@ import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
@@ -72,6 +70,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
@@ -79,6 +78,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
@@ -510,12 +510,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     MachineCreate mc = new MachineCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        mc.setName(cd.getComponentName() + new Integer(i).toString());
+                        mc.setName(cd.getName() + new Integer(i).toString());
                     }
 
                     MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
                     mc.setMachineTemplate(mt);
-                    mc.setDescription(cd.getComponentDescription());
+                    mc.setDescription(cd.getDescription());
                     mc.setProperties(cd.getProperties());
                     Job j = this.createMachine(mc);
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
@@ -532,11 +532,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     VolumeCreate vc = new VolumeCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        vc.setName(cd.getComponentName() + new Integer(i).toString());
+                        vc.setName(cd.getName() + new Integer(i).toString());
                     }
                     VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
                     vc.setVolumeTemplate(vt);
-                    vc.setDescription(cd.getComponentDescription());
+                    vc.setDescription(cd.getDescription());
                     vc.setProperties(cd.getProperties());
 
                     Job j = this.createVolume(vc);
@@ -554,11 +554,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     SystemCreate sc = new SystemCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        sc.setName(cd.getComponentName() + new Integer(i).toString());
+                        sc.setName(cd.getName() + new Integer(i).toString());
                     }
                     SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
                     sc.setSystemTemplate(st);
-                    sc.setDescription(cd.getComponentDescription());
+                    sc.setDescription(cd.getDescription());
                     sc.setProperties(cd.getProperties());
 
                     Job j = this.createSystem(sc);
@@ -576,11 +576,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     NetworkCreate nc = new NetworkCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        nc.setName(cd.getComponentName() + new Integer(i).toString());
+                        nc.setName(cd.getName() + new Integer(i).toString());
                     }
                     NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
                     nc.setNetworkTemplate(nt);
-                    nc.setDescription(cd.getComponentDescription());
+                    nc.setDescription(cd.getDescription());
                     nc.setProperties(cd.getProperties());
 
                     Job j = this.createNetwork(nc);
@@ -604,9 +604,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     // private utility methods for System services (start,stop,etc)
 
-    private boolean serviceSystem(final List<? extends CloudCollection> l, final SystemAction action) throws ConnectorException {
+    private boolean serviceSystem(final List<? extends CloudCollectionItem> l, final SystemAction action) throws ConnectorException {
         boolean failedCancelled = false;
-        for (CloudCollection m : l) {
+        for (CloudCollectionItem m : l) {
             Job j = this.callSystemService(m.getResource(), action, m.getResource().getProviderAssignedId().toString());
             failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }

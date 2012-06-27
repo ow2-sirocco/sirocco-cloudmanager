@@ -32,7 +32,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
 
 @Entity
 public class SystemTemplate extends CloudTemplate {

@@ -29,12 +29,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
@@ -57,11 +57,11 @@ public interface ISystemManager extends IJobListener {
     SystemTemplate getSystemTemplateById(String systemTemplateId) throws CloudProviderException;
 
     // add/remove on system collections
-    Job addEntityToSystem(final String systemId, final CloudCollection entity) throws CloudProviderException;
+    Job addEntityToSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException;
 
     Job removeEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException;
 
-    Job updateEntityInSystem(final String systemId, final CloudCollection entity) throws CloudProviderException;
+    Job updateEntityInSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException;
 
     // management of SystemTemplate map
     boolean addComponentDescriptorToSystemTemplate(ComponentDescriptor componentDescriptor, String systemTemplateId)

@@ -31,26 +31,26 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
-
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
-public abstract class CloudCollection extends CloudEntity {
+public abstract class CloudCollectionItem extends CloudEntity {
     private static final long serialVersionUID = 1L;
+
     private CloudResource resource;
+
     public static enum State {
-        NOT_AVAILABLE, AVAILABLE, DELETED
+        NOT_AVAILABLE, AVAILABLE, DELETED, ATTACHING, ATTACHED, DETACHING, DETACHED, ERROR
     }
 
     private State state;
 
-    @OneToOne(optional=false)
-    @JoinColumn(name="cloudcoll_ent_id")
+    @OneToOne(optional = false)
+    @JoinColumn(name = "cloudcoll_ent_id")
     public CloudResource getResource() {
         return resource;
     }
 
-    public void setResource(
-            CloudResource resource) {
+    public void setResource(CloudResource resource) {
         this.resource = resource;
     }
 

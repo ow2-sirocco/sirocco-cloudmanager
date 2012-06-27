@@ -10,8 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.itests.util.SiroccoTester;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -24,9 +22,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 
 @SuppressWarnings("unused")
 public class SystemManagerTest extends SiroccoTester {
@@ -78,20 +78,20 @@ public class SystemManagerTest extends SiroccoTester {
         // machineTemplate=machineManager.createMachineTemplate(machineTemplate);
 
         ComponentDescriptor component1 = new ComponentDescriptor();
-        component1.setComponentName("MaMachine");
+        component1.setName("MaMachine");
         component1.setComponentQuantity(2);
         component1.setComponentType(ComponentType.MACHINE);
-        component1.setComponentDescription("desc-comp");
+        component1.setDescription("desc-comp");
         HashMap<String, Object> map1 = new HashMap<String, Object>();
         map1.put("testProp", "testPropValue");
         component1.setComponentProperties(map1);
         component1.setComponentTemplate(machineTemplate);
 
         ComponentDescriptor component2 = new ComponentDescriptor();
-        component2.setComponentName("MaMachineBisque");
+        component2.setName("MaMachineBisque");
         component2.setComponentQuantity(3);
         component2.setComponentType(ComponentType.MACHINE);
-        component2.setComponentDescription("desc-comp2");
+        component2.setDescription("desc-comp2");
         HashMap<String, Object> map2 = new HashMap<String, Object>();
         map2.put("testProp", "testPropValue2");
         component2.setComponentProperties(map2);
@@ -125,10 +125,10 @@ public class SystemManagerTest extends SiroccoTester {
         // systemTemplate2=systemManager.createSystemTemplate(systemTemplate2);
 
         ComponentDescriptor component3 = new ComponentDescriptor();
-        component3.setComponentName("MonSystemeBisque");
+        component3.setName("MonSystemeBisque");
         component3.setComponentQuantity(2);
         component3.setComponentType(ComponentType.SYSTEM);
-        component3.setComponentDescription("desc-comp3");
+        component3.setDescription("desc-comp3");
         HashMap<String, Object> map3 = new HashMap<String, Object>();
         map3.put("testProp", "testPropValue3");
         component3.setComponentProperties(map3);

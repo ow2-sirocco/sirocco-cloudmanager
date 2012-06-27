@@ -70,8 +70,6 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableExcepti
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor;
-import org.ow2.sirocco.cloudmanager.model.cimi.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -83,7 +81,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollection;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
@@ -91,6 +89,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
@@ -98,6 +97,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 
@@ -217,11 +217,11 @@ public class SystemManager implements ISystemManager {
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     CredentialsCreate cc = new CredentialsCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        cc.setName(cd.getComponentName() + new Integer(i).toString());
+                        cc.setName(cd.getName() + new Integer(i).toString());
                     }
                     CredentialsTemplate ct = (CredentialsTemplate) cd.getComponentTemplate();
                     cc.setCredentialTemplate(ct);
-                    cc.setDescription(cd.getComponentDescription());
+                    cc.setDescription(cd.getDescription());
                     cc.setProperties(cd.getProperties());
 
                     // no job for credentials!
@@ -278,11 +278,11 @@ public class SystemManager implements ISystemManager {
                     for (int i = 0; i < cd.getComponentQuantity(); i++) {
                         MachineCreate mc = new MachineCreate();
                         if (cd.getComponentQuantity() > 1) {
-                            mc.setName(cd.getComponentName() + new Integer(i).toString());
+                            mc.setName(cd.getName() + new Integer(i).toString());
                         }
                         MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
                         mc.setMachineTemplate(mt);
-                        mc.setDescription(cd.getComponentDescription());
+                        mc.setDescription(cd.getDescription());
                         mc.setProperties(cd.getProperties());
 
                         Job j = machineManager.createMachine(mc);
@@ -299,11 +299,11 @@ public class SystemManager implements ISystemManager {
                     for (int i = 0; i < cd.getComponentQuantity(); i++) {
                         VolumeCreate vc = new VolumeCreate();
                         if (cd.getComponentQuantity() > 1) {
-                            vc.setName(cd.getComponentName() + new Integer(i).toString());
+                            vc.setName(cd.getName() + new Integer(i).toString());
                         }
                         VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
                         vc.setVolumeTemplate(vt);
-                        vc.setDescription(cd.getComponentDescription());
+                        vc.setDescription(cd.getDescription());
                         vc.setProperties(cd.getProperties());
 
                         Job j = volumeManager.createVolume(vc);
@@ -320,11 +320,11 @@ public class SystemManager implements ISystemManager {
                     for (int i = 0; i < cd.getComponentQuantity(); i++) {
                         SystemCreate sc = new SystemCreate();
                         if (cd.getComponentQuantity() > 1) {
-                            sc.setName(cd.getComponentName() + new Integer(i).toString());
+                            sc.setName(cd.getName() + new Integer(i).toString());
                         }
                         SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
                         sc.setSystemTemplate(st);
-                        sc.setDescription(cd.getComponentDescription());
+                        sc.setDescription(cd.getDescription());
                         sc.setProperties(cd.getProperties());
 
                         Job j = this.createSystem(sc);
@@ -341,11 +341,11 @@ public class SystemManager implements ISystemManager {
                     for (int i = 0; i < cd.getComponentQuantity(); i++) {
                         NetworkCreate nc = new NetworkCreate();
                         if (cd.getComponentQuantity() > 1) {
-                            nc.setName(cd.getComponentName() + new Integer(i).toString());
+                            nc.setName(cd.getName() + new Integer(i).toString());
                         }
                         NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
                         nc.setNetworkTemplate(nt);
-                        nc.setDescription(cd.getComponentDescription());
+                        nc.setDescription(cd.getDescription());
                         nc.setProperties(cd.getProperties());
 
                         Job j = networkManager.createNetwork(nc);
@@ -425,14 +425,14 @@ public class SystemManager implements ISystemManager {
         return result;
     }
 
-    public List<CloudCollection> getEntityFromSystem(final String systemId, final String collectionType) {
+    public List<CloudCollectionItem> getEntityFromSystem(final String systemId, final String collectionType) {
 
         return null;
 
     }
 
     @Override
-    public Job addEntityToSystem(final String systemId, final CloudCollection entity) throws CloudProviderException {
+    public Job addEntityToSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException {
 
         System s = this.getSystemById(systemId);
 
@@ -480,7 +480,7 @@ public class SystemManager implements ISystemManager {
         // should we delete linked resource? (Machine,etc)
 
         System s = this.getSystemById(systemId);
-        CloudCollection ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
+        CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
         if (ce == null || s == null) {
             throw new CloudProviderException("bad id given in parameter");
         }
@@ -515,7 +515,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job updateEntityInSystem(final String systemId, final CloudCollection entity) throws CloudProviderException {
+    public Job updateEntityInSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException {
 
         // should we update the linked resource?
         System s = this.getSystemById(systemId);

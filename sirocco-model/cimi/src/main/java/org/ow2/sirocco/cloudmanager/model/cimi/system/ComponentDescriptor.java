@@ -23,7 +23,7 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.model.cimi;
+package org.ow2.sirocco.cloudmanager.model.cimi.system;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -31,6 +31,9 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.OneToOne;
+
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
 
 @Entity
 public class ComponentDescriptor extends CloudEntity implements Serializable {
@@ -40,8 +43,6 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
         SYSTEM,VOLUME,MACHINE,CREDENTIALS,NETWORK
     }
     
-    private String componentName;
-    private String componentDescription;
     private HashMap<String,Object> componentProperties;
     /**
      * Type of component to be instanciated
@@ -53,19 +54,6 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
     private CloudTemplate componentTemplate;
     private Integer componentQuantity;
     
-    
-    public String getComponentName() {
-        return componentName;
-    }
-    public void setComponentName(String name) {
-        this.componentName = name;
-    }
-    public String getComponentDescription() {
-        return componentDescription;
-    }
-    public void setComponentDescription(String description) {
-        this.componentDescription = description;
-    }
     @Lob
     public HashMap<String, Object> getComponentProperties() {
         return componentProperties;
