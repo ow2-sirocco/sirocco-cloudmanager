@@ -1635,8 +1635,8 @@ public class MachineManager implements IMachineManager {
             if (notification.getStatus() == Job.Status.SUCCESS) {
                 mv.setState(MachineVolume.State.DETACHED);
                 mv.setVolume(null);
-                this.em.remove(mv);
-                this.em.flush();
+                // this.em.remove(mv);
+                
             } else {
                 MachineManager.logger.info("completeDeviceAttachmentToMachine ");
             }
@@ -1686,7 +1686,7 @@ public class MachineManager implements IMachineManager {
         }
         String op = notification.getAction();
         /**
-         * TODO: a better way to identify operation and targeted entities!
+         * TODO: unify method to identify operation and related entities!
          */
         if (notification.getProperties().containsKey("parent-machine")) {
             /**
@@ -1724,12 +1724,17 @@ public class MachineManager implements IMachineManager {
                     return this.completeMachineCreation(notification, mpersisted, updated);
                 } else {
                     /** machine volume attachment or detachment leaf job as part of machine create */
+                    MachineManager.logger.info("completeMachineCreation complete device management " +notification.getStatus());
                     return this.completeDeviceManagement(true, notification, mpersisted, updated);
                 }
             } else if (op.equals("edit")) {
                 mpersisted.setCpu(updated.getCpu());
                 mpersisted.setMemory(updated.getMemory());
                 mpersisted.setUpdated(new Date());
+            } else if (op.equals("delete")) {
+                /** machine volume attachment or detachment leaf job  */
+                MachineManager.logger.info("completeMachineCreation complete device management (delete ) " +notification.getStatus());
+                return this.completeDeviceManagement(true, notification, mpersisted, updated);
             } else {
                 MachineManager.logger.info("unexpected notification " +notification.getId() +" on machine " +mpersisted.getId());
             }
@@ -1930,9 +1935,9 @@ public class MachineManager implements IMachineManager {
             throw new ServiceUnavailableException(" in remove volume from machine " + m.getId());
         }
         if (j.getStatus() == Job.Status.FAILED) {
-            throw new CloudProviderException("Could not add volume to machine " + m.getId());
+            throw new CloudProviderException("Could not remove volume to machine " + m.getId());
         }
-        
+        MachineManager.logger.info("removeVolumeFromMachine " +machineId + " volume " +mvId + " job status " +j.getStatus());
         try {
             UtilsForManagers.emitJobListenerMessage(j.getProviderAssignedId(), this.ctx);
         } catch (Exception e) {

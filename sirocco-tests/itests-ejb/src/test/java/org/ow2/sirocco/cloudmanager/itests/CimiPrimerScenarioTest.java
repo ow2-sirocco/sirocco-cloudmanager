@@ -946,7 +946,7 @@ public class CimiPrimerScenarioTest {
                 
                 deleteJob = this.machineManager.removeVolumeFromMachine(machineId, volume.getId().toString());
                 this.waitForJobCompletion(deleteJob);
-                System.out.println("detach of volume " +volume.getVolume().getId() +" terminated ");
+                System.out.println("detach of volume " +volume.getVolume().getId() +" terminated " );
             }
             System.out.println(" delete machine now that volumes are detached " +machineId);
 
@@ -961,7 +961,6 @@ public class CimiPrimerScenarioTest {
             System.out.println("Machine deletion completed " + machineId);
         }
        
-        System.out.println("testScenarioThree return without deleting machine ");
     }
 
     @Test
