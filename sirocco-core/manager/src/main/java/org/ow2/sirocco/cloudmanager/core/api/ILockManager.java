@@ -34,7 +34,9 @@ public interface ILockManager {
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.LockManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteLockManager@Remote";
     
     void lock(String targetId,String targetType) throws CloudProviderException;
-    
+
+    void lock(String targetId,String targetType,int maxRetryDelayInSeconds) throws CloudProviderException;
+
     void unlockUntransacted(String targetId,String targetType) throws CloudProviderException;
     
     void unlock(String targetId, String targetType) throws CloudProviderException;

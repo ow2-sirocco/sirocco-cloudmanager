@@ -114,24 +114,32 @@ public class LockManager implements ILockManager {
     private SessionContext sessionContext;
 
     /**
+     * to call internal methods by passing by the proxy.<br>
+     * It is used to take care of transaction annotations on methods<br>
+     * because if EJB method is called with <i>this</i>, it is not taken<br>
+     * into account
+     * 
+     * @return
+     */
+    private ILockManager getThis() {
+        return this.sessionContext.getBusinessObject(ILockManager.class);
+    }
+
+    /**
      * used to lock an object, **works in its own transaction**
      */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void lock(String targetId, String targetType)
-            throws CloudProviderException {
-        LockManager.logger.debug("locking object " + targetId + " of type "
-                + targetType);
+    public void lock(String targetId, String targetType) throws CloudProviderException {
+        LockManager.logger.debug("locking object " + targetId + " of type " + targetType);
 
         // is there already a lock, and if true, the lock is still valid?
         LockItem li = null;
         try {
             li = (LockItem) this.em
-                    .createQuery(
-                            "SELECT j FROM LockItem j WHERE j.lockedObjectId=:lockedObjectId and j.lockedObjectType=:lockedObjectType")
-                    .setParameter("lockedObjectId", targetId)
-                    .setParameter("lockedObjectType", targetType)
-                    .getSingleResult();
+                .createQuery(
+                    "SELECT j FROM LockItem j WHERE j.lockedObjectId=:lockedObjectId and j.lockedObjectType=:lockedObjectType")
+                .setParameter("lockedObjectId", targetId).setParameter("lockedObjectType", targetType).getSingleResult();
         } catch (NoResultException e) {
             // no lock, we can lock it!
         }
@@ -140,12 +148,16 @@ public class LockManager implements ILockManager {
             // the object is locked, verifying that the lock is still valid
             // should have been automatically deleted by a scheduled utility
             // task
-            long lockedTime = li.getLockedTime().getTime()
-                    + lockTimeoutInSeconds * 1000;
+            long lockedTime = li.getLockedTime().getTime() + lockTimeoutInSeconds * 1000;
             long currentTime = new Date().getTime();
             if (currentTime < lockedTime) {
                 throw new CloudProviderException("unable to lock object "
-                        + targetId + " of type " + targetType+" because it is locked until "+DateFormat.getDateTimeInstance(DateFormat.FULL,DateFormat.FULL, Locale.getDefault()).format(new Date(lockedTime)));
+                    + targetId
+                    + " of type "
+                    + targetType
+                    + " because it is locked until "
+                    + DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL, Locale.getDefault()).format(
+                        new Date(lockedTime)));
             } else {
                 // the lock has expired
                 this.em.remove(li);
@@ -166,12 +178,47 @@ public class LockManager implements ILockManager {
         try {
             this.em.persist(lock);
         } catch (RuntimeException e) {
-            throw new CloudProviderException("unable to lock object "
-                    + targetId + " of type " + targetType+" because of exception "+e.getMessage());
+            throw new CloudProviderException("unable to lock object " + targetId + " of type " + targetType
+                + " because of exception " + e.getMessage());
         }
 
-        LockManager.logger.info("locked object " + targetId + " of type "
-                + targetType);
+        LockManager.logger.info("locked object " + targetId + " of type " + targetType);
+
+    }
+
+    /**
+     * used to lock an object. maxRetryDelayInSeconds is used to allow this
+     * method to do more than 1 attempt before throwing an exception
+     */
+    public void lock(String targetId, String targetType, int maxRetryDelayInSeconds) throws CloudProviderException {
+
+        boolean locked = false;
+        CloudProviderException exc = new CloudProviderException("unknown exception");
+
+        int nbRetry = 20;
+
+        for (int i = 0; i < nbRetry; i++) {
+            try {
+                try {
+                    if (i > 0) {
+                        Thread.sleep((1000 * maxRetryDelayInSeconds) / nbRetry);
+                    }
+                } catch (InterruptedException e) {
+                }
+                this.getThis().lock(targetId, targetType);
+                locked = true;
+            } catch (CloudProviderException e) {
+                locked = false;
+                exc = e;
+            }
+
+            if (locked) {
+                break;
+            }
+        }
+        if (!locked) {
+            throw exc;
+        }
 
     }
 
@@ -180,46 +227,40 @@ public class LockManager implements ILockManager {
      */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void unlockUntransacted(String targetId, String targetType)
-            throws CloudProviderException {
-        _unlock(targetId,targetType,false);
+    public void unlockUntransacted(String targetId, String targetType) throws CloudProviderException {
+        _unlock(targetId, targetType, false);
     }
-    
+
     /**
      * used to unlock an object, **works in the current transaction**
      */
     @Override
-    public void unlock(String targetId, String targetType) throws CloudProviderException{
-        _unlock(targetId,targetType,true);
+    public void unlock(String targetId, String targetType) throws CloudProviderException {
+        _unlock(targetId, targetType, true);
     }
-    
-    private void _unlock(String targetId, String targetType,boolean transacted) throws CloudProviderException{
+
+    private void _unlock(String targetId, String targetType, boolean transacted) throws CloudProviderException {
         // we only remove an existing lockItem with the key targetId+targetType
-        LockManager.logger.debug("unlocking object " + targetId + " of type "
-                + targetType+" - "+transacted);
+        LockManager.logger.debug("unlocking object " + targetId + " of type " + targetType + " - " + transacted);
 
         // is there already a lock?
         LockItem li = null;
         try {
             li = (LockItem) this.em
-                    .createQuery(
-                            "SELECT j FROM LockItem j WHERE j.lockedObjectId=:lockedObjectId and j.lockedObjectType=:lockedObjectType")
-                    .setParameter("lockedObjectId", targetId)
-                    .setParameter("lockedObjectType", targetType)
-                    .getSingleResult();
+                .createQuery(
+                    "SELECT j FROM LockItem j WHERE j.lockedObjectId=:lockedObjectId and j.lockedObjectType=:lockedObjectType")
+                .setParameter("lockedObjectId", targetId).setParameter("lockedObjectType", targetType).getSingleResult();
         } catch (NoResultException e) {
             // no lock!
-            throw new CloudProviderException("unable to unlock object "
-                    + targetId + " of type " + targetType
-                    + " because no lock exists!");
+            throw new CloudProviderException("unable to unlock object " + targetId + " of type " + targetType
+                + " because no lock exists!");
         }
 
         if (li != null) {
             this.em.remove(li);
         }
 
-        LockManager.logger.info("unlocked object " + targetId + " of type "
-                + targetType+" - "+transacted);        
+        LockManager.logger.info("unlocked object " + targetId + " of type " + targetType + " - " + transacted);
     }
 
 }

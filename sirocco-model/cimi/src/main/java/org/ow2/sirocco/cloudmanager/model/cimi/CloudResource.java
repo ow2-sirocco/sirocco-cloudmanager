@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -41,6 +42,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Version;
 
 import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
@@ -72,6 +74,19 @@ public abstract class CloudResource implements Serializable, Resource {
     protected Set<Job> workingJobs;
 
     // protected Collection<CloudProvider> cloudProviders;
+    
+    protected long versionNum;
+    
+    
+    @Version
+    @Column(name="OPTLOCK")    
+    protected long getVersionNum() {
+        return versionNum;
+    }
+
+    protected void setVersionNum(long versionNum) {
+        this.versionNum = versionNum;
+    }
 
     public String getProviderAssignedId() {
         return this.providerAssignedId;

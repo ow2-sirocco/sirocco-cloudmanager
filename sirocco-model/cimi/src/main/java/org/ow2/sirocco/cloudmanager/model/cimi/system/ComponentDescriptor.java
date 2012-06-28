@@ -43,7 +43,6 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
         SYSTEM,VOLUME,MACHINE,CREDENTIALS,NETWORK
     }
     
-    private HashMap<String,Object> componentProperties;
     /**
      * Type of component to be instanciated
      */
@@ -54,13 +53,6 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
     private CloudTemplate componentTemplate;
     private Integer componentQuantity;
     
-    @Lob
-    public HashMap<String, Object> getComponentProperties() {
-        return componentProperties;
-    }
-    public void setComponentProperties(HashMap<String, Object> properties) {
-        this.componentProperties = properties;
-    }
     public ComponentType getComponentType() {
         return componentType;
     }

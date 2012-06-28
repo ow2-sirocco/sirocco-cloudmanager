@@ -87,7 +87,7 @@ public class Job extends CloudEntity implements Serializable {
 
     private List<CloudResource> affectedEntities;
     
-    protected long versionNum;
+    /*protected long versionNum;
     
     
     @Version
@@ -98,7 +98,7 @@ public class Job extends CloudEntity implements Serializable {
 
     protected void setVersionNum(long versionNum) {
         this.versionNum = versionNum;
-    }
+    }*/
 
     public Job() {
     }

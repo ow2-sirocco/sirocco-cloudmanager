@@ -128,9 +128,10 @@ public class UserManager implements IUserManager {
         return result;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public List<User> getUsers() throws CloudProviderException {
-        return this.em.createQuery("Select u From User u").getResultList();
+        return (List<User>)this.em.createQuery("Select u From User u").getResultList();
     }
 
     @SuppressWarnings("unchecked")

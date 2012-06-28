@@ -217,8 +217,8 @@ public class UtilsForManagers {
     public static CloudCollectionItem getCloudCollectionFromCloudResource(final EntityManager em, CloudResource ce)
         throws CloudProviderException {
         CloudCollectionItem obj = (CloudCollectionItem) em
-            .createQuery("FROM " + CloudCollectionItem.class.getName() + " WHERE v.resource.id=:resourceId ORDER BY v.id")
-            .setParameter("resourceId", ce.getId().toString()).getSingleResult();
+            .createQuery("FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId ORDER BY v.id")
+            .setParameter("resourceId", ce.getId()).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
         }

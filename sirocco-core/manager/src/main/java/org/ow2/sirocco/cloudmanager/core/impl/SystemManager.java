@@ -53,6 +53,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
+import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobListener;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
@@ -183,6 +184,17 @@ public class SystemManager implements ISystemManager {
         return this.userManager.getUserByUsername(username);
     }
 
+    private boolean isSystemSupportedInConnector(ICloudProviderConnector connector) {
+        boolean isSystemSupportedInConnector = false;
+        try {
+            ISystemService sysServ = connector.getSystemService();
+            isSystemSupportedInConnector = true;
+        } catch (ConnectorException e1) {
+            isSystemSupportedInConnector = false;
+        }
+        return isSystemSupportedInConnector;
+    }
+
     @Override
     public Job createSystem(final SystemCreate systemCreate) throws CloudProviderException {
 
@@ -235,12 +247,12 @@ public class SystemManager implements ISystemManager {
             }
         }
 
-        if (0 == 0) {
+        ICloudProviderConnector connector = this.getCloudProviderConnector();
+        if (connector == null) {
+            throw new CloudProviderException("no connector found");
+        }
 
-            ICloudProviderConnector connector = this.getCloudProviderConnector();
-            if (connector == null) {
-                throw new CloudProviderException("no connector found");
-            }
+        if (isSystemSupportedInConnector(connector)) {
 
             // sending command to selected connector
             Job job = null;
@@ -614,11 +626,15 @@ public class SystemManager implements ISystemManager {
     public Job startSystem(final String systemId) throws CloudProviderException {
 
         Job parentJob = null;
-        if (0 == 0) {
+
+        System s = this.getSystemById(systemId);
+
+        ICloudProviderConnector connector = this.getConnector(s);
+
+        if (isSystemSupportedInConnector(connector)) {
             parentJob = this.doService(systemId, START_ACTION);
         } else {
             // implementation for system not supported by underlying connector
-            System s = this.getSystemById(systemId);
             s.setState(State.STARTING);
             // creation of main system job
             parentJob = this.createJob(START_ACTION, s);
@@ -652,11 +668,15 @@ public class SystemManager implements ISystemManager {
     @Override
     public Job stopSystem(final String systemId) throws CloudProviderException {
         Job parentJob = null;
-        if (0 == 0) {
+
+        System s = this.getSystemById(systemId);
+
+        ICloudProviderConnector connector = this.getConnector(s);
+
+        if (isSystemSupportedInConnector(connector)) {
             parentJob = this.doService(systemId, STOP_ACTION);
         } else {
             // implementation for system not supported by underlying connector
-            System s = this.getSystemById(systemId);
             s.setState(State.STOPPING);
             // creation of main system job
             parentJob = this.createJob(STOP_ACTION, s);
@@ -690,11 +710,15 @@ public class SystemManager implements ISystemManager {
     @Override
     public Job deleteSystem(final String systemId) throws CloudProviderException {
         Job parentJob = null;
-        if (0 == 0) {
+
+        System s = this.getSystemById(systemId);
+
+        ICloudProviderConnector connector = this.getConnector(s);
+
+        if (isSystemSupportedInConnector(connector)) {
             parentJob = this.doService(systemId, DELETE_ACTION);
         } else {
             // implementation for system not supported by underlying connector
-            System s = this.getSystemById(systemId);
             s.setState(State.DELETING);
             // creation of main system job
             parentJob = this.createJob(DELETE_ACTION, s);
@@ -737,34 +761,52 @@ public class SystemManager implements ISystemManager {
 
         // implementation for system not supported by underlying connector
 
-        /*
-         * ICloudProviderConnector connector = this.getConnector(s); if
-         * (connector == null) { throw new
-         * CloudProviderException("no connector found"); } Job j; try { if
-         * (action.equals("start")) { j =
-         * connector.getSystemService().startSystem( s.getProviderAssignedId());
-         * s.setState(System.State.STARTING); } else if (action.equals("stop"))
-         * { j = connector.getSystemService().stopSystem(
-         * s.getProviderAssignedId()); s.setState(System.State.STOPPING); } else
-         * { throw new ServiceUnavailableException(
-         * "Unsupported operation action " + action + " on system id " +
-         * s.getProviderAssignedId() + " " + s.getId()); } } catch
-         * (ConnectorException e) { throw new
-         * ServiceUnavailableException(e.getMessage() + " action " + action +
-         * " system id " + s.getProviderAssignedId() + " " + s.getId()); }
-         * j.setTargetEntity(s); j.setUser(this.getUser()); this.em.persist(j);
-         * this.em.flush(); if (j.getStatus() == Job.Status.RUNNING) { try {
-         * connector.setNotificationOnJobCompletion(j .getProviderAssignedId());
-         * } catch (Exception e) { throw new
-         * ServiceUnavailableException(e.getMessage() + "  system " + action); }
-         * } // Ask for connector to notify when job completes try {
-         * connector.setNotificationOnJobCompletion(j.getProviderAssignedId());
-         * } catch (Exception e) { throw new
-         * ServiceUnavailableException(e.getMessage()); } this.relConnector(s,
-         * connector);
-         */
+        ICloudProviderConnector connector = this.getConnector(s);
+        if (connector == null) {
+            throw new CloudProviderException("no connector found");
+        }
+        
+        Job parentJob = this.createJob(action, s);
+        this.em.persist(parentJob);
+        this.em.flush();
+        
+        Job j;
+        try {
+            if (action.equals(START_ACTION)) {
+                j = connector.getSystemService().startSystem(s.getProviderAssignedId());
+                s.setState(System.State.STARTING);
+                j.setParentJob(parentJob);
+            } else if (action.equals(STOP_ACTION)) {
+                j = connector.getSystemService().stopSystem(s.getProviderAssignedId());
+                s.setState(System.State.STOPPING);
+                j.setParentJob(parentJob);
+            }else if (action.equals(DELETE_ACTION)) {
+                j = connector.getSystemService().deleteSystem(s.getProviderAssignedId());
+                s.setState(System.State.DELETING);
+                j.setParentJob(parentJob);
+            }
+            else {
+                throw new ServiceUnavailableException("Unsupported operation action " + action + " on system id "
+                    + s.getProviderAssignedId() + " " + s.getId());
+            }
+        } catch (ConnectorException e) {
+            throw new ServiceUnavailableException(e.getMessage() + " action " + action + " system id "
+                + s.getProviderAssignedId() + " " + s.getId());
+        }
 
-        return null;
+        j.setTargetEntity(s);
+        j.setUser(this.getUser());
+        this.em.persist(j);
+        this.em.flush();
+
+        // Ask for connector to notify when job completes
+        try {
+            UtilsForManagers.emitJobListenerMessage(j.getProviderAssignedId(), this.ctx);
+        } catch (Exception e) {
+            throw new ServiceUnavailableException(e.getMessage());
+        }
+
+        return parentJob;
 
     }
 

@@ -146,7 +146,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public ISystemService getSystemService() throws ConnectorException {
-        return this;
+        throw new ConnectorException();
+        //return this;
     }
 
     @Override
