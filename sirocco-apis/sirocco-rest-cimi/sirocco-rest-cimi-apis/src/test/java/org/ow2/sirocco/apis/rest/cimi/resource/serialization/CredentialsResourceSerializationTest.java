@@ -59,7 +59,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
         int statusResponse;
 
         // JSON : id = 0
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/0").accept(MediaType.APPLICATION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/0").accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -74,7 +74,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
             new StringReader(entityResponse));
 
         // JSON : id = 1
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/1").accept(MediaType.APPLICATION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/1").accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -89,7 +89,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
             new StringReader(entityResponse));
 
         // JSON : id = 2
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/2").accept(MediaType.APPLICATION_JSON_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/2").accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
@@ -117,7 +117,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
         int statusResponse;
 
         // XML : id = 0
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/0").accept(MediaType.APPLICATION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/0").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -132,7 +132,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
             new StringReader(entityResponse));
 
         // XML : id = 1
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/1").accept(MediaType.APPLICATION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/1").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);
@@ -147,7 +147,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
             new StringReader(entityResponse));
 
         // XML : id = 2
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/2").accept(MediaType.APPLICATION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/2").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).get(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
@@ -177,7 +177,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
     //
     // // JSON : id = 0
     // clientResponse =
-    // this.resource().path(ConstantsPath.CREDENTIALS).accept(MediaType.APPLICATION_JSON_TYPE)
+    // this.resource().path(ConstantsPath.CREDENTIAL).accept(MediaType.APPLICATION_JSON_TYPE)
     // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
     // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
     // 0).get(ClientResponse.class);
@@ -201,7 +201,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
     //
     // // JSON : id = 1
     // clientResponse =
-    // this.resource().path(ConstantsPath.CREDENTIALS).accept(MediaType.APPLICATION_JSON_TYPE)
+    // this.resource().path(ConstantsPath.CREDENTIAL).accept(MediaType.APPLICATION_JSON_TYPE)
     // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
     // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
     // 1).get(ClientResponse.class);
@@ -225,7 +225,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
     //
     // // JSON : id = 3
     // clientResponse =
-    // this.resource().path(ConstantsPath.CREDENTIALS).accept(MediaType.APPLICATION_JSON_TYPE)
+    // this.resource().path(ConstantsPath.CREDENTIAL).accept(MediaType.APPLICATION_JSON_TYPE)
     // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
     // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
     // 3).get(ClientResponse.class);
@@ -249,7 +249,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
     //
     // // JSON : id = 3, expand
     // clientResponse =
-    // this.resource().path(ConstantsPath.CREDENTIALS).accept(MediaType.APPLICATION_JSON_TYPE)
+    // this.resource().path(ConstantsPath.CREDENTIAL).accept(MediaType.APPLICATION_JSON_TYPE)
     // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
     // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
     // 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
@@ -288,7 +288,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
     //
     // // XML : id = 0
     // clientResponse =
-    // this.resource().path(ConstantsPath.CREDENTIALS).accept(MediaType.APPLICATION_XML_TYPE)
+    // this.resource().path(ConstantsPath.CREDENTIAL).accept(MediaType.APPLICATION_XML_TYPE)
     // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
     // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
     // 0).get(ClientResponse.class);
@@ -312,7 +312,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
     //
     // // XML : id = 1
     // clientResponse =
-    // this.resource().path(ConstantsPath.CREDENTIALS).accept(MediaType.APPLICATION_XML_TYPE)
+    // this.resource().path(ConstantsPath.CREDENTIAL).accept(MediaType.APPLICATION_XML_TYPE)
     // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
     // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
     // 1).get(ClientResponse.class);
@@ -336,7 +336,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
     //
     // // XML : id = 3
     // clientResponse =
-    // this.resource().path(ConstantsPath.CREDENTIALS).accept(MediaType.APPLICATION_XML_TYPE)
+    // this.resource().path(ConstantsPath.CREDENTIAL).accept(MediaType.APPLICATION_XML_TYPE)
     // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
     // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
     // 3).get(ClientResponse.class);
@@ -360,7 +360,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
     //
     // // XML : id = 3, expand
     // clientResponse =
-    // this.resource().path(ConstantsPath.CREDENTIALS).accept(MediaType.APPLICATION_XML_TYPE)
+    // this.resource().path(ConstantsPath.CREDENTIAL).accept(MediaType.APPLICATION_XML_TYPE)
     // .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
     // .header(Constants.HEADER_SIROCCO_INFO_TEST_ID,
     // 3).header(Constants.HEADER_SIROCCO_INFO_TEST_EXPAND, true)
@@ -398,7 +398,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
         // JSON : id = 0
         clientResponse = this
             .resource()
-            .path(ConstantsPath.CREDENTIALS + "/0")
+            .path(ConstantsPath.CREDENTIAL + "/0")
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "Credentials-0.json"),
@@ -419,7 +419,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
         // JSON : id = 1
         clientResponse = this
             .resource()
-            .path(ConstantsPath.CREDENTIALS + "/1")
+            .path(ConstantsPath.CREDENTIAL + "/1")
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "Credentials-1.json"),
@@ -440,7 +440,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
         // JSON : id = 2
         clientResponse = this
             .resource()
-            .path(ConstantsPath.CREDENTIALS + "/2")
+            .path(ConstantsPath.CREDENTIAL + "/2")
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "Credentials-2.json"),
@@ -472,7 +472,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
         int statusResponse;
 
         // XML : id = 0
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/0").accept(MediaType.APPLICATION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/0").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "Credentials-0.xml"), MediaType.APPLICATION_XML)
             .put(ClientResponse.class);
@@ -490,7 +490,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
             entityResponse));
 
         // XML : id = 1
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/1").accept(MediaType.APPLICATION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/1").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "Credentials-1.xml"), MediaType.APPLICATION_XML)
             .put(ClientResponse.class);
@@ -508,7 +508,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
             entityResponse));
 
         // XML : id = 2
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/2").accept(MediaType.APPLICATION_XML_TYPE)
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/2").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "Credentials-2.xml"), MediaType.APPLICATION_XML)
             .put(ClientResponse.class);
@@ -542,7 +542,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
         // JSON : id = 1
         clientResponse = this
             .resource()
-            .path(ConstantsPath.CREDENTIALS)
+            .path(ConstantsPath.CREDENTIAL)
             .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "CredentialsCreate-1.json"),
@@ -564,7 +564,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
 
         Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_LOCATION));
         Assert.assertTrue(heardersResponse.get(Constants.HEADER_LOCATION).get(0)
-            .endsWith(ConstantsPath.CREDENTIALS + "/" + "targetResourceValue_1"));
+            .endsWith(ConstantsPath.CREDENTIAL + "/" + "targetResourceValue_1"));
 
         JsonAssert.assertJsonEquals(SerializationHelper.getResourceAsReader(JsonLocator.class, "Job-1.json"), new StringReader(
             entityResponse));
@@ -585,7 +585,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
         // XML : id = 1
         clientResponse = this
             .resource()
-            .path(ConstantsPath.CREDENTIALS)
+            .path(ConstantsPath.CREDENTIAL)
             .accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "CredentialsCreate-1.xml"),
@@ -607,7 +607,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
 
         Assert.assertTrue(heardersResponse.containsKey(Constants.HEADER_LOCATION));
         Assert.assertTrue(heardersResponse.get(Constants.HEADER_LOCATION).get(0)
-            .endsWith(ConstantsPath.CREDENTIALS + "/" + "targetResourceValue_1"));
+            .endsWith(ConstantsPath.CREDENTIAL + "/" + "targetResourceValue_1"));
         XMLAssert.assertXMLEqual(SerializationHelper.getResourceAsReader(XmlLocator.class, "Job-1.xml"), new StringReader(
             entityResponse));
     }
@@ -619,7 +619,7 @@ public class CredentialsResourceSerializationTest extends SerializationTestBase 
         int statusResponse;
 
         // JSON and XML : id = 0
-        clientResponse = this.resource().path(ConstantsPath.CREDENTIALS + "/0")
+        clientResponse = this.resource().path(ConstantsPath.CREDENTIAL + "/0")
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI).delete(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();

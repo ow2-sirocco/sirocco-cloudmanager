@@ -48,10 +48,10 @@ public abstract class MockCimiManager implements CimiManager {
         case CloudEntryPoint:
             cimi = this.buildCloudEntryPoint(request);
             break;
-        case Credentials:
+        case Credential:
             cimi = this.buildCredentials(request);
             break;
-        case CredentialsTemplate:
+        case CredentialTemplate:
             cimi = this.buildCredentialsTemplate(request);
             break;
         case Job:
@@ -97,15 +97,15 @@ public abstract class MockCimiManager implements CimiManager {
 
         switch (type) {
         case POST:
-            cimi = CimiResourceBuilderHelper.buildCimiCredentialsCreate(1);
+            cimi = CimiResourceBuilderHelper.buildCimiCredentialCreate(1);
             break;
         case GET:
         case PUT:
             if (null == request.getId()) {
-                cimi = CimiResourceBuilderHelper.buildCimiCredentialsCollection(request.getHeader()
+                cimi = CimiResourceBuilderHelper.buildCimiCredentialCollection(request.getHeader()
                     .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiCredentials(Integer.valueOf(request.getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiCredential(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:
@@ -122,15 +122,15 @@ public abstract class MockCimiManager implements CimiManager {
 
         switch (type) {
         case POST:
-            cimi = CimiResourceBuilderHelper.buildCimiCredentialsTemplate(1);
+            cimi = CimiResourceBuilderHelper.buildCimiCredentialTemplate(1);
             break;
         case GET:
         case PUT:
             if (null == request.getId()) {
-                cimi = CimiResourceBuilderHelper.buildCimiCredentialsTemplateCollection(request.getHeader()
+                cimi = CimiResourceBuilderHelper.buildCimiCredentialTemplateCollection(request.getHeader()
                     .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiCredentialsTemplate(Integer.valueOf(request.getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiCredentialTemplate(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:

@@ -60,8 +60,8 @@ public class AssertReferencePathValidatorTest {
                 case CloudEntryPoint:
                     item = new ItemConfig(MyCloudEntryPoint.class, ExchangeType.CloudEntryPoint);
                     break;
-                case Credentials:
-                    item = new ItemConfig(MyCredentials.class, ExchangeType.Credentials);
+                case Credential:
+                    item = new ItemConfig(MyCredentials.class, ExchangeType.Credential);
                     break;
                 case MachineImage:
                     item = new ItemConfig(MyImage.class, ExchangeType.MachineImage);
@@ -111,7 +111,7 @@ public class AssertReferencePathValidatorTest {
 
         @Override
         public ExchangeType getExchangeType() {
-            return ExchangeType.Credentials;
+            return ExchangeType.Credential;
         }
     }
 
@@ -160,13 +160,13 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri());
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname());
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credential.getPathType().getPathname());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(this.request.getBaseUri() + "foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname() + "/foo/1");
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credential.getPathType().getPathname() + "/foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(toTest.getExchangeType().makeHref(this.request.getBaseUri(), (String) null));
@@ -179,7 +179,7 @@ public class AssertReferencePathValidatorTest {
         MyCredentials toTest = new MyCredentials();
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname() + "/1");
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credential.getPathType().getPathname() + "/1");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref("A");
@@ -191,13 +191,13 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(this.request.getBaseUri());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname());
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credential.getPathType().getPathname());
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(this.request.getBaseUri() + "foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
-        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credentials.getPathType().getPathname() + "/foo/1");
+        toTest.setHref(this.request.getBaseUri() + ExchangeType.Credential.getPathType().getPathname() + "/foo/1");
         Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
 
         toTest.setHref(toTest.getExchangeType().makeHref(this.request.getBaseUri(), (String) null));

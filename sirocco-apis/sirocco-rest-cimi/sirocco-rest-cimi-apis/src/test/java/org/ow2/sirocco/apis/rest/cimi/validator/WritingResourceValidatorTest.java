@@ -53,6 +53,18 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
@@ -96,9 +108,9 @@ public class WritingResourceValidatorTest {
             cimi = this.newResource(type);
 
             if (null != cimi) {
-                // System.out.println(type);
+                System.out.println(type);
                 cimi.setHref(type.makeHref(this.request.getBaseUri(), "987", "123"));
-                // System.out.println(cimi.getHref());
+                System.out.println(cimi.getHref());
                 Assert.assertTrue("Test " + type, CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
                 if (true == type.hasParent()) {
@@ -136,19 +148,19 @@ public class WritingResourceValidatorTest {
         case CloudEntryPoint:
             cimi = new CimiCloudEntryPoint();
             break;
-        case Credentials:
+        case Credential:
             cimi = new CimiCredentials();
             break;
-        case CredentialsCollection:
+        case CredentialCollection:
             cimi = new CimiCredentialsCollection();
             break;
-        case CredentialsCreate:
+        case CredentialCreate:
             cimi = null;
             break;
-        case CredentialsTemplate:
+        case CredentialTemplate:
             cimi = new CimiCredentialsTemplate();
             break;
-        case CredentialsTemplateCollection:
+        case CredentialTemplateCollection:
             cimi = new CimiCredentialsTemplateCollection();
             break;
         case Disk:
@@ -231,6 +243,45 @@ public class WritingResourceValidatorTest {
             break;
         case VolumeVolumeImageCollection:
             cimi = new CimiVolumeVolumeImageCollection();
+            break;
+        case System:
+            cimi = new CimiSystem();
+            break;
+        case SystemCollection:
+            cimi = new CimiSystemCollection();
+            break;
+        case SystemCreate:
+            cimi = null;
+            break;
+        case SystemCredential:
+            cimi = new CimiSystemCredential();
+            break;
+        case SystemCredentialCollection:
+            cimi = new CimiSystemCredentialCollection();
+            break;
+        case SystemMachine:
+            cimi = new CimiSystemMachine();
+            break;
+        case SystemMachineCollection:
+            cimi = new CimiSystemMachineCollection();
+            break;
+        case SystemSystem:
+            cimi = new CimiSystemSystem();
+            break;
+        case SystemSystemCollection:
+            cimi = new CimiSystemSystemCollection();
+            break;
+        case SystemTemplate:
+            cimi = new CimiSystemTemplate();
+            break;
+        case SystemTemplateCollection:
+            cimi = new CimiSystemTemplateCollection();
+            break;
+        case SystemVolume:
+            cimi = new CimiSystemVolume();
+            break;
+        case SystemVolumeCollection:
+            cimi = new CimiSystemVolumeCollection();
             break;
         default:
             Assert.fail("In test method \"newResource\" : " + type.name() + " not found");

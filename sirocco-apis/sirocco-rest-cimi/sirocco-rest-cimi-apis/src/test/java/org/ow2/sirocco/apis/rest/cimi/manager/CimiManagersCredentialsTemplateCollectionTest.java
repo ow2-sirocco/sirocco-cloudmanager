@@ -113,13 +113,13 @@ public class CimiManagersCredentialsTemplateCollectionTest {
         this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH,
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH,
             ((CimiCredentialsTemplateCollection) this.response.getCimiData()).getId());
         CimiCredentialsTemplateCollection cimiCollect = (CimiCredentialsTemplateCollection) this.response.getCimiData();
         Assert.assertNotNull(cimiCollect.getArray());
         Assert.assertEquals(3, cimiCollect.getArray().length);
         for (int i = 0; i < cimiCollect.getArray().length; i++) {
-            Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
+            Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
         }
         EasyMock.verify(this.service);
     }
@@ -138,7 +138,7 @@ public class CimiManagersCredentialsTemplateCollectionTest {
         this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH,
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH,
             ((CimiCredentialsTemplateCollection) this.response.getCimiData()).getId());
 
         EasyMock.verify(this.service);
@@ -164,13 +164,13 @@ public class CimiManagersCredentialsTemplateCollectionTest {
         this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH,
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH,
             ((CimiCredentialsTemplateCollection) this.response.getCimiData()).getId());
         CimiCredentialsTemplateCollection cimiCollect = (CimiCredentialsTemplateCollection) this.response.getCimiData();
         Assert.assertNotNull(cimiCollect.getArray());
         Assert.assertEquals(23, cimiCollect.getArray().length);
         for (int i = 0; i < cimiCollect.getArray().length; i++) {
-            Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
+            Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
         }
         EasyMock.verify(this.service);
     }

@@ -124,31 +124,31 @@ public class CreatingResourceValidatorTest {
         // OK by values
         template = new CimiCredentialsTemplate("user", "pass", null);
         cimi = new CimiCredentialsCreate();
-        cimi.setCredentialsTemplate(template);
+        cimi.setCredentialTemplate(template);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference
         template = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         cimi = new CimiCredentialsCreate();
-        cimi.setCredentialsTemplate(template);
+        cimi.setCredentialTemplate(template);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
         template = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         template.setUserName("user");
         template.setPassword("pass");
         cimi = new CimiCredentialsCreate();
-        cimi.setCredentialsTemplate(template);
+        cimi.setCredentialTemplate(template);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by reference and value
         template = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         template.setKey(new byte[0]);
         cimi = new CimiCredentialsCreate();
-        cimi.setCredentialsTemplate(template);
+        cimi.setCredentialTemplate(template);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
     }
 
@@ -174,19 +174,19 @@ public class CreatingResourceValidatorTest {
 
         // OK by reference
         cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
         cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         cimi.setUserName("user");
         cimi.setPassword("pass");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by reference and value
         cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/17");
+            + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         cimi.setKey(new byte[0]);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
     }

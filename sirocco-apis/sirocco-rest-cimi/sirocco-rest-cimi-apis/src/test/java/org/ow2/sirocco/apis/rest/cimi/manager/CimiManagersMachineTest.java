@@ -282,7 +282,7 @@ public class CimiManagersMachineTest {
         template.setMachineImage(new CimiMachineImage(this.request.getBaseUri()
             + ExchangeType.MachineImage.getPathType().getPathname() + "/234"));
         template.setCredentials(new CimiCredentials(this.request.getBaseUri()
-            + ExchangeType.Credentials.getPathType().getPathname() + "/345"));
+            + ExchangeType.Credential.getPathType().getPathname() + "/345"));
         CimiMachineCreate cimi = new CimiMachineCreate();
         cimi.setMachineTemplate(template);
         this.request.setCimiData(cimi);

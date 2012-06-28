@@ -57,6 +57,18 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
@@ -92,6 +104,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 
 /**
  * Converters tests of common data.
@@ -535,24 +553,24 @@ public class CommonsConverterTest {
                 ((Identifiable) service).setId(11);
                 cimiClass = CimiCloudEntryPoint.class;
                 break;
-            case Credentials:
+            case Credential:
                 service = new Credentials();
                 ((Identifiable) service).setId(11);
                 cimiClass = CimiCredentials.class;
                 break;
-            case CredentialsCollection:
+            case CredentialCollection:
                 service = new ArrayList<Credentials>();
                 cimiClass = CimiCredentialsCollection.class;
                 break;
-            case CredentialsCreate:
+            case CredentialCreate:
                 service = null;
                 break;
-            case CredentialsTemplate:
+            case CredentialTemplate:
                 service = new CredentialsTemplate();
                 ((Identifiable) service).setId(11);
                 cimiClass = CimiCredentialsTemplate.class;
                 break;
-            case CredentialsTemplateCollection:
+            case CredentialTemplateCollection:
                 service = new ArrayList<CredentialsTemplate>();
                 cimiClass = CimiCredentialsTemplateCollection.class;
                 break;
@@ -682,6 +700,79 @@ public class CommonsConverterTest {
             case VolumeVolumeImageCollection:
                 service = new ArrayList<VolumeImage>();
                 cimiClass = CimiVolumeVolumeImageCollection.class;
+                // Add idParent of request
+                this.request.setIdParent("999");
+                break;
+            case System:
+                service = new System();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiSystem.class;
+                break;
+            case SystemCollection:
+                service = new ArrayList<System>();
+                cimiClass = CimiSystemCollection.class;
+                break;
+            case SystemCreate:
+                service = null;
+                break;
+            case SystemCredential:
+                service = new SystemCredentials();
+                ((Identifiable) service).setId(111);
+                cimiClass = CimiSystemCredential.class;
+                // Add idParent of request
+                this.request.setIdParent("999");
+                break;
+            case SystemCredentialCollection:
+                service = new ArrayList<SystemCredentials>();
+                cimiClass = CimiSystemCredentialCollection.class;
+                // Add idParent of request
+                this.request.setIdParent("999");
+                break;
+            case SystemMachine:
+                service = new SystemMachine();
+                ((Identifiable) service).setId(111);
+                cimiClass = CimiSystemMachine.class;
+                // Add idParent of request
+                this.request.setIdParent("999");
+                break;
+            case SystemMachineCollection:
+                service = new ArrayList<SystemMachine>();
+                cimiClass = CimiSystemMachineCollection.class;
+                // Add idParent of request
+                this.request.setIdParent("999");
+                break;
+            case SystemSystem:
+                service = new SystemSystem();
+                ((Identifiable) service).setId(111);
+                cimiClass = CimiSystemSystem.class;
+                // Add idParent of request
+                this.request.setIdParent("999");
+                break;
+            case SystemSystemCollection:
+                service = new ArrayList<SystemSystem>();
+                cimiClass = CimiSystemSystemCollection.class;
+                // Add idParent of request
+                this.request.setIdParent("999");
+                break;
+            case SystemTemplate:
+                service = new SystemTemplate();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiSystemTemplate.class;
+                break;
+            case SystemTemplateCollection:
+                service = new ArrayList<SystemTemplate>();
+                cimiClass = CimiSystemTemplateCollection.class;
+                break;
+            case SystemVolume:
+                service = new SystemVolume();
+                ((Identifiable) service).setId(111);
+                cimiClass = CimiSystemVolume.class;
+                // Add idParent of request
+                this.request.setIdParent("999");
+                break;
+            case SystemVolumeCollection:
+                service = new ArrayList<SystemVolume>();
+                cimiClass = CimiSystemVolumeCollection.class;
                 // Add idParent of request
                 this.request.setIdParent("999");
                 break;

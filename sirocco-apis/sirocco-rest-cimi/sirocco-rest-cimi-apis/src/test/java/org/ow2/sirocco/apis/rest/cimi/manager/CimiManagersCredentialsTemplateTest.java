@@ -122,9 +122,9 @@ public class CimiManagersCredentialsTemplateTest {
 
         Assert.assertEquals(201, this.response.getStatus());
         Assert.assertNotNull(this.response.getHeaders());
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH + "/789",
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH + "/789",
             this.response.getHeaders().get(Constants.HEADER_LOCATION));
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH + "/789",
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH + "/789",
             ((CimiCredentialsTemplate) this.response.getCimiData()).getId());
         EasyMock.verify(this.service);
     }
@@ -145,15 +145,15 @@ public class CimiManagersCredentialsTemplateTest {
         EasyMock.replay(this.service);
 
         CimiCredentialsTemplate cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
-            + ExchangeType.CredentialsTemplate.getPathType().getPathname() + "/13");
+            + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/13");
         this.request.setCimiData(cimi);
         this.managerCreate.execute(this.context);
 
         Assert.assertEquals(201, this.response.getStatus());
         Assert.assertNotNull(this.response.getHeaders());
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH + "/789",
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH + "/789",
             this.response.getHeaders().get(Constants.HEADER_LOCATION));
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH + "/789",
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH + "/789",
             ((CimiCredentialsTemplate) this.response.getCimiData()).getId());
         EasyMock.verify(this.service);
     }
@@ -170,7 +170,7 @@ public class CimiManagersCredentialsTemplateTest {
         this.managerRead.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH + "/1",
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH + "/1",
             ((CimiCredentialsTemplate) this.response.getCimiData()).getId());
         EasyMock.verify(this.service);
     }

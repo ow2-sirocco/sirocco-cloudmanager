@@ -168,8 +168,8 @@ public class CimiManagersCloudEntryPointTest {
         CimiCloudEntryPoint cimiCloud = (CimiCloudEntryPoint) this.response.getCimiData();
 
         Assert.assertEquals(ConstantsPath.CLOUDENTRYPOINT_PATH, cimiCloud.getId());
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_PATH, cimiCloud.getCredentials().getHref());
-        Assert.assertEquals(ConstantsPath.CREDENTIALS_TEMPLATE_PATH, cimiCloud.getCredentialsTemplates().getHref());
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_PATH, cimiCloud.getCredentials().getHref());
+        Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH, cimiCloud.getCredentialTemplates().getHref());
         Assert.assertEquals(ConstantsPath.JOB_PATH, cimiCloud.getJobs().getHref());
         Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH, cimiCloud.getMachineConfigs().getHref());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH, cimiCloud.getMachineImages().getHref());
