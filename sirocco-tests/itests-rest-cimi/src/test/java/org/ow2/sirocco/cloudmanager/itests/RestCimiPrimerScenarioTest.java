@@ -373,8 +373,8 @@ public class RestCimiPrimerScenarioTest {
         if (null != cloudEntryPoint.getCredentials()) {
             System.out.println("getCredentials: " + cloudEntryPoint.getCredentials().getHref());
         }
-        if (null != cloudEntryPoint.getCredentialsTemplates()) {
-            System.out.println("getCredentialsTemplates: " + cloudEntryPoint.getCredentialsTemplates().getHref());
+        if (null != cloudEntryPoint.getCredentialTemplates()) {
+            System.out.println("getCredentialsTemplates: " + cloudEntryPoint.getCredentialTemplates().getHref());
         }
         if (null != cloudEntryPoint.getMachineConfigs()) {
             System.out.println("getMachineConfigs: " + cloudEntryPoint.getMachineConfigs().getHref());
@@ -479,17 +479,17 @@ public class RestCimiPrimerScenarioTest {
         credentialsTemplate.setUserName("JoeSmith");
         credentialsTemplate.setPassword("letmein");
         CimiCredentialsCreate credentialsCreate = new CimiCredentialsCreate();
-        credentialsCreate.setCredentialsTemplate(credentialsTemplate);
+        credentialsCreate.setCredentialTemplate(credentialsTemplate);
         credentialsCreate.setName("Default");
         credentialsCreate.setDescription("Default User");
 
-        service = webResource.path(ConstantsPath.CREDENTIALS_PATH);
+        service = webResource.path(ConstantsPath.CREDENTIAL_PATH);
         response = this.authentication(service).accept(mediaType).entity(credentialsCreate, mediaType)
             .post(ClientResponse.class);
         Assert.assertEquals(201, response.getStatus());
         CimiCredentials credentials = response.getEntity(CimiCredentials.class);
 
-        System.out.println("====== " + ExchangeType.Credentials + " : create");
+        System.out.println("====== " + ExchangeType.Credential + " : create");
         System.out.println("Location: " + response.getLocation());
         System.out.println("Header: " + response.getHeaders());
         System.out.println("credentials.getId: " + credentials.getId());
