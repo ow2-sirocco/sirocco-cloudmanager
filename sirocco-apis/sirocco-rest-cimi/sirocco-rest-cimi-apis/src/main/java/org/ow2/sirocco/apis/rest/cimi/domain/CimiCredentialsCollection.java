@@ -49,7 +49,7 @@ public class CimiCredentialsCollection extends CimiCollectionAbstract<CimiCreden
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
     @Override
-    @XmlElement(name = "Credentials")
+    @XmlElement(name = "Credential")
     @JsonProperty(value = "credentials")
     public CimiCredentials[] getArray() {
         return super.getArray();
@@ -85,7 +85,7 @@ public class CimiCredentialsCollection extends CimiCollectionAbstract<CimiCreden
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        return ExchangeType.CredentialsCollection;
+        return ExchangeType.CredentialCollection;
     }
 
     /**

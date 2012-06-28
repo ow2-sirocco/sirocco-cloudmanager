@@ -12,7 +12,7 @@
 	<updated>2002-03-03T02:02:02.002Z</updated>
 	<baseURI>baseUriValue_2</baseURI>
 	<credentials href="hrefValue_2" />
-	<credentialsTemplates href="hrefValue_2" />
+	<credentialTemplates href="hrefValue_2" />
 	<jobTime>2</jobTime>
 	<jobs href="hrefValue_2" />
 	<machineConfigs href="hrefValue_2" />

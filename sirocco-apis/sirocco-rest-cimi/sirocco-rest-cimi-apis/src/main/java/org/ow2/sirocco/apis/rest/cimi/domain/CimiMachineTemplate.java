@@ -242,7 +242,6 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
             this.volumeTemplates = new CimiMachineTemplateVolumeTemplateArray();
             this.volumeTemplates.setArray(volumeTemplates);
         }
-
     }
 
     /**
@@ -334,7 +333,6 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
         public CimiMachineTemplateVolume[] newEmptyArraySized() {
             return new CimiMachineTemplateVolume[this.size()];
         }
-
     }
 
     /**
@@ -354,7 +352,6 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
         public CimiMachineTemplateVolumeTemplate[] newEmptyArraySized() {
             return new CimiMachineTemplateVolumeTemplate[this.size()];
         }
-
     }
 
 }

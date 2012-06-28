@@ -36,9 +36,9 @@ public enum PathType {
     /** */
     CloudEntryPoint(ConstantsPath.CLOUDENTRYPOINT),
     /** */
-    Credentials(ConstantsPath.CREDENTIALS),
+    Credential(ConstantsPath.CREDENTIAL),
     /** */
-    CredentialsTemplate(ConstantsPath.CREDENTIALS_TEMPLATE),
+    CredentialTemplate(ConstantsPath.CREDENTIAL_TEMPLATE),
     /** */
     Job(ConstantsPath.JOB),
     /** */
@@ -53,6 +53,18 @@ public enum PathType {
     MachineDisk(ConstantsPath.DISK, Machine),
     /** */
     MachineVolume(ConstantsPath.VOLUME, Machine),
+    /** */
+    System(ConstantsPath.SYSTEM),
+    /** */
+    SystemCredential(ConstantsPath.CREDENTIAL, System),
+    /** */
+    SystemMachine(ConstantsPath.MACHINE, System),
+    /** */
+    SystemSystem(ConstantsPath.SYSTEM, System),
+    /** */
+    SystemVolume(ConstantsPath.VOLUME, System),
+    /** */
+    SystemTemplate(ConstantsPath.SYSTEM_TEMPLATE),
     /** */
     Volume(ConstantsPath.VOLUME),
     /** */

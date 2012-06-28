@@ -5,7 +5,7 @@
 	<created>2000-01-01T00:00:00.000Z</created>
 	<id>idValue_0</id>
 	<updated>2000-01-01T00:00:00.000Z</updated>
-	<credentials href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/Credentials">
+	<credentials href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/Credential">
 		<description>descriptionValue_0</description>
 		<name>nameValue_0</name>
 		<created>2000-01-01T00:00:00.000Z</created>

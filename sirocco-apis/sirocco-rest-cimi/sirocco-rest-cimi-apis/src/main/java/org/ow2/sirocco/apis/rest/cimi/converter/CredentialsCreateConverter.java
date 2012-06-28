@@ -118,9 +118,9 @@ public class CredentialsCreateConverter implements CimiConverter {
     protected void doCopyToService(final CimiContext context, final CimiCredentialsCreate dataCimi,
         final CredentialsCreate dataService) {
         this.fill(dataCimi, dataService);
-        if (null != dataCimi.getCredentialsTemplate()) {
-            dataService.setCredentialTemplate((CredentialsTemplate) context.convertNextService(dataCimi
-                .getCredentialsTemplate()));
+        if (null != dataCimi.getCredentialTemplate()) {
+            dataService
+                .setCredentialTemplate((CredentialsTemplate) context.convertNextService(dataCimi.getCredentialTemplate()));
         }
     }
 

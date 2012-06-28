@@ -39,7 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 /**
  * Class Credentials.
  */
-@XmlRootElement(name = "Credentials")
+@XmlRootElement(name = "Credential")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiCredentials extends CimiObjectCommonAbstract {
 
@@ -158,7 +158,7 @@ public class CimiCredentials extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        return ExchangeType.Credentials;
+        return ExchangeType.Credential;
     }
 
 }

@@ -53,9 +53,9 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     private CimiCredentialsCollection credentials;
 
     /**
-     * Field "credentialsTemplates".
+     * Field "credentialTemplates".
      */
-    private CimiCredentialsTemplateCollection credentialsTemplates;
+    private CimiCredentialsTemplateCollection credentialTemplates;
 
     /**
      * Field "jobs".
@@ -153,28 +153,28 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     /**
      * Set the value of field "credentials".
      * 
-     * @param Credentialss The value
+     * @param Credentials The value
      */
     public void setCredentials(final CimiCredentialsCollection credentials) {
         this.credentials = credentials;
     }
 
     /**
-     * Return the value of field "credentialsTemplates".
+     * Return the value of field "credentialTemplates".
      * 
      * @return The value
      */
-    public CimiCredentialsTemplateCollection getCredentialsTemplates() {
-        return this.credentialsTemplates;
+    public CimiCredentialsTemplateCollection getCredentialTemplates() {
+        return this.credentialTemplates;
     }
 
     /**
-     * Set the value of field "CredentialsTemplates".
+     * Set the value of field "credentialTemplates".
      * 
-     * @param CredentialsTemplates The value
+     * @param credentialTemplates The value
      */
-    public void setCredentialsTemplates(final CimiCredentialsTemplateCollection credentialsTemplates) {
-        this.credentialsTemplates = credentialsTemplates;
+    public void setCredentialTemplates(final CimiCredentialsTemplateCollection credentialTemplates) {
+        this.credentialTemplates = credentialTemplates;
     }
 
     /**

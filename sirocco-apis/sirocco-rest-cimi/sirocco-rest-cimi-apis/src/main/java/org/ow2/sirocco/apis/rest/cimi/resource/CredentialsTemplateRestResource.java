@@ -46,20 +46,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Credentials Template REST resource.
+ * Credential Template REST resource.
  * <p>
  * Operations supports :
  * <ul>
- * <li>Create a credentials template</li>
- * <li>Delete a credentials template</li>
- * <li>Read a credentials template</li>
- * <li>Read a collection of credentials templates</li>
- * <li>Update a credentials template</li>
+ * <li>Create a credential template</li>
+ * <li>Delete a credential template</li>
+ * <li>Read a credential template</li>
+ * <li>Read a collection of credential templates</li>
+ * <li>Update a credential template</li>
  * </ul>
  * </p>
  */
 @Component
-@Path(ConstantsPath.CREDENTIALS_TEMPLATE_PATH)
+@Path(ConstantsPath.CREDENTIAL_TEMPLATE_PATH)
 public class CredentialsTemplateRestResource extends RestResourceAbstract {
 
     @Autowired
@@ -83,9 +83,9 @@ public class CredentialsTemplateRestResource extends RestResourceAbstract {
     private CimiManager cimiManagerCreateCredentialsTemplate;
 
     /**
-     * Get a credentials template.
+     * Get a credential template.
      * 
-     * @param id The ID of credentials to get
+     * @param id The ID of credential to get
      * @return The REST response
      */
     @GET
@@ -98,7 +98,7 @@ public class CredentialsTemplateRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Get a collection of credentials templates.
+     * Get a collection of credential templates.
      * 
      * @return The REST response
      */
@@ -111,9 +111,9 @@ public class CredentialsTemplateRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Update a credentials template.
+     * Update a credential template.
      * 
-     * @param id The ID of credentials to update
+     * @param id The ID of credential to update
      * @return The REST response
      */
     @PUT
@@ -126,7 +126,7 @@ public class CredentialsTemplateRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Create a credentials template.
+     * Create a credential template.
      * 
      * @return The REST response
      */
@@ -139,9 +139,9 @@ public class CredentialsTemplateRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Delete a credentials template.
+     * Delete a credential template.
      * 
-     * @param id The ID of credentials to delete
+     * @param id The ID of credential to delete
      * @return The REST response
      */
     @DELETE

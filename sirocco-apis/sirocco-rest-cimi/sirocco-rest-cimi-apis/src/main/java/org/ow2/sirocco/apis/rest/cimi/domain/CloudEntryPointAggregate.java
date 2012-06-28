@@ -133,7 +133,7 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     /**
      * Set the value of field "credentials".
      * 
-     * @param Credentialss The value
+     * @param Credentials The value
      */
     public void setCredentials(final List<Credentials> credentials) {
         this.credentials = credentials;

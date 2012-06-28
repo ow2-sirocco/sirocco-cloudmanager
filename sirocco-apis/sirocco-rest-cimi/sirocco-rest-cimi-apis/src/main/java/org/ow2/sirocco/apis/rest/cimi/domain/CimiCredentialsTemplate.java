@@ -36,7 +36,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  * <p>
  * </p>
  */
-@XmlRootElement(name = "CredentialsTemplate")
+@XmlRootElement(name = "CredentialTemplate")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiCredentialsTemplate extends CimiCredentials {
 
@@ -79,7 +79,7 @@ public class CimiCredentialsTemplate extends CimiCredentials {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        return ExchangeType.CredentialsTemplate;
+        return ExchangeType.CredentialTemplate;
     }
 
 }

@@ -92,7 +92,7 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
         // machineConfigs OK
         // machineImages OK
         // credentials OK
-        // credentialTemplates OK
+        // credentialsTemplates OK
         // volumes
         // volumeTemplates
         // volumeConfigs

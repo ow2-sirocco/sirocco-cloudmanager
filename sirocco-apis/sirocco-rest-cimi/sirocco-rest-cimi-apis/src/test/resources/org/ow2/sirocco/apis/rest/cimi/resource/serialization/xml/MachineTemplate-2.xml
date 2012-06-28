@@ -9,7 +9,7 @@
 	<operation href="hrefValue_2_0" rel="relValue_2_0" />
 	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 	<updated>2002-03-03T02:02:02.002Z</updated>
-	<credentials href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/Credentials">
+	<credentials href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/Credential">
 		<description>descriptionValue_2</description>
 		<name>nameValue_2</name>
 		<property key="keyProp_2_0">valueProp_2_0</property>

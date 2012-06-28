@@ -37,7 +37,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 /**
  * Class Credentials Create.
  */
-@XmlRootElement(name = "CredentialsCreate")
+@XmlRootElement(name = "CredentialCreate")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiCredentialsCreate extends CimiCommon implements CimiExchange {
 
@@ -46,20 +46,20 @@ public class CimiCredentialsCreate extends CimiCommon implements CimiExchange {
 
     @ValidChild
     @NotNull(groups = GroupCreateByValue.class)
-    private CimiCredentialsTemplate credentialsTemplate;
+    private CimiCredentialsTemplate credentialTemplate;
 
     /**
-     * @return the credentialsTemplate
+     * @return the credentialTemplate
      */
-    public CimiCredentialsTemplate getCredentialsTemplate() {
-        return this.credentialsTemplate;
+    public CimiCredentialsTemplate getCredentialTemplate() {
+        return this.credentialTemplate;
     }
 
     /**
-     * @param credentialsTemplate the credentialsTemplate to set
+     * @param credentialTemplate the credentialTemplate to set
      */
-    public void setCredentialsTemplate(final CimiCredentialsTemplate credentialsTemplate) {
-        this.credentialsTemplate = credentialsTemplate;
+    public void setCredentialTemplate(final CimiCredentialsTemplate credentialTemplate) {
+        this.credentialTemplate = credentialTemplate;
     }
 
     /**
@@ -71,6 +71,6 @@ public class CimiCredentialsCreate extends CimiCommon implements CimiExchange {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        return ExchangeType.CredentialsCreate;
+        return ExchangeType.CredentialCreate;
     }
 }

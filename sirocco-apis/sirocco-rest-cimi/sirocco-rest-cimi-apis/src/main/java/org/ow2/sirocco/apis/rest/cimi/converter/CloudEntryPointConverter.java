@@ -111,7 +111,7 @@ public class CloudEntryPointConverter extends ObjectCommonConverter {
 
             dataCimi.setCredentials((CimiCredentialsCollection) context.convertNextCimi(dataService.getCredentials(),
                 CimiCredentialsCollection.class));
-            dataCimi.setCredentialsTemplates((CimiCredentialsTemplateCollection) context.convertNextCimi(
+            dataCimi.setCredentialTemplates((CimiCredentialsTemplateCollection) context.convertNextCimi(
                 dataService.getCredentialsTemplates(), CimiCredentialsTemplateCollection.class));
 
             dataCimi.setJobs((CimiJobCollection) context.convertNextCimi(dataService.getJobs(), CimiJobCollection.class));

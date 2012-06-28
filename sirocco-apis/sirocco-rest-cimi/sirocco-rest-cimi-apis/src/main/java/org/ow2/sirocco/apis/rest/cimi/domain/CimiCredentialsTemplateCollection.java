@@ -49,8 +49,8 @@ public class CimiCredentialsTemplateCollection extends CimiCollectionAbstract<Ci
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#getArray()
      */
     @Override
-    @XmlElement(name = "CredentialsTemplate")
-    @JsonProperty(value = "credentialsTemplates")
+    @XmlElement(name = "CredentialTemplate")
+    @JsonProperty(value = "credentialTemplates")
     public CimiCredentialsTemplate[] getArray() {
         return super.getArray();
     }
@@ -61,7 +61,7 @@ public class CimiCredentialsTemplateCollection extends CimiCollectionAbstract<Ci
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    @JsonProperty(value = "credentialsTemplates")
+    @JsonProperty(value = "credentialTemplates")
     public void setArray(final CimiCredentialsTemplate[] items) {
         super.setArray(items);
     }
@@ -85,7 +85,7 @@ public class CimiCredentialsTemplateCollection extends CimiCollectionAbstract<Ci
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        return ExchangeType.CredentialsTemplateCollection;
+        return ExchangeType.CredentialTemplateCollection;
     }
 
     /**

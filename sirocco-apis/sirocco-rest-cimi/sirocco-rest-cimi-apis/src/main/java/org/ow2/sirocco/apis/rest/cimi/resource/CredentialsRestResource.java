@@ -47,20 +47,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Credentials REST resource.
+ * Credential REST resource.
  * <p>
  * Operations supports :
  * <ul>
- * <li>Create a credentials</li>
- * <li>Delete a credentials</li>
- * <li>Read a credentials</li>
- * <li>Read a collection of credentials</li>
- * <li>Update a credentials</li>
+ * <li>Create a credential</li>
+ * <li>Delete a credential</li>
+ * <li>Read a credential</li>
+ * <li>Read a collection of credential</li>
+ * <li>Update a credential</li>
  * </ul>
  * </p>
  */
 @Component
-@Path(ConstantsPath.CREDENTIALS_PATH)
+@Path(ConstantsPath.CREDENTIAL_PATH)
 public class CredentialsRestResource extends RestResourceAbstract {
 
     @Autowired
@@ -84,9 +84,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     private CimiManager cimiManagerCreateCredentials;
 
     /**
-     * Get a credentials.
+     * Get a credential.
      * 
-     * @param id The ID of credentials to get
+     * @param id The ID of credential to get
      * @return The REST response
      */
     @GET
@@ -99,7 +99,7 @@ public class CredentialsRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Get a collection of credentials.
+     * Get a collection of credential.
      * 
      * @return The REST response
      */
@@ -112,9 +112,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Update a credentials.
+     * Update a credential.
      * 
-     * @param id The ID of credentials to update
+     * @param id The ID of credential to update
      * @return The REST response
      */
     @PUT
@@ -127,7 +127,7 @@ public class CredentialsRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Create a credentials.
+     * Create a credential.
      * 
      * @return The REST response
      */
@@ -140,9 +140,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Delete a credentials.
+     * Delete a credential.
      * 
-     * @param id The ID of credentials to delete
+     * @param id The ID of credential to delete
      * @return The REST response
      */
     @DELETE

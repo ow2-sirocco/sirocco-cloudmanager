@@ -32,13 +32,13 @@ public abstract class ConstantsPath {
 
     public static final String CLOUDENTRYPOINT_PATH = "/" + ConstantsPath.CLOUDENTRYPOINT;
 
-    public static final String CREDENTIALS = "credentials";
+    public static final String CREDENTIAL = "credentials";
 
-    public static final String CREDENTIALS_PATH = "/" + ConstantsPath.CREDENTIALS;
+    public static final String CREDENTIAL_PATH = "/" + ConstantsPath.CREDENTIAL;
 
-    public static final String CREDENTIALS_TEMPLATE = "credentialsTemplates";
+    public static final String CREDENTIAL_TEMPLATE = "credentialTemplates";
 
-    public static final String CREDENTIALS_TEMPLATE_PATH = "/" + ConstantsPath.CREDENTIALS_TEMPLATE;
+    public static final String CREDENTIAL_TEMPLATE_PATH = "/" + ConstantsPath.CREDENTIAL_TEMPLATE;
 
     public static final String DISK = "disks";
 
@@ -63,6 +63,14 @@ public abstract class ConstantsPath {
     public static final String MACHINE_CONFIGURATION = "machineConfigs";
 
     public static final String MACHINE_CONFIGURATION_PATH = "/" + ConstantsPath.MACHINE_CONFIGURATION;
+
+    public static final String SYSTEM = "systems";
+
+    public static final String SYSTEM_PATH = "/" + ConstantsPath.SYSTEM;
+
+    public static final String SYSTEM_TEMPLATE = "systemTemplates";
+
+    public static final String SYSTEM_TEMPLATE_PATH = "/" + ConstantsPath.SYSTEM_TEMPLATE;
 
     public static final String VOLUME = "volumes";
 

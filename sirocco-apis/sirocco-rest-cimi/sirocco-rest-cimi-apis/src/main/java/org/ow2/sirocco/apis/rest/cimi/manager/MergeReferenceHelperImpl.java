@@ -134,7 +134,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     @Override
     public void merge(final CimiContext context, final CimiCredentialsCreate cimi) throws Exception {
-        this.merge(context, cimi.getCredentialsTemplate());
+        this.merge(context, cimi.getCredentialTemplate());
     }
 
     /**

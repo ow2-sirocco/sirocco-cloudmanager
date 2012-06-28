@@ -36,10 +36,9 @@ public enum ExchangeType {
     /** */
     CloudEntryPoint(PathType.CloudEntryPoint, false),
     /** */
-    Credentials(PathType.Credentials), CredentialsCollection(PathType.Credentials, false), CredentialsCreate(
-        PathType.Credentials),
+    Credential(PathType.Credential), CredentialCollection(PathType.Credential, false), CredentialCreate(PathType.Credential),
     /** */
-    CredentialsTemplate(PathType.CredentialsTemplate), CredentialsTemplateCollection(PathType.CredentialsTemplate, false),
+    CredentialTemplate(PathType.CredentialTemplate), CredentialTemplateCollection(PathType.CredentialTemplate, false),
     /** */
     Disk(PathType.MachineDisk), DiskCollection(PathType.MachineDisk, false),
     /** */
@@ -56,6 +55,20 @@ public enum ExchangeType {
     MachineTemplate(PathType.MachineTemplate), MachineTemplateCollection(PathType.MachineTemplate, false),
     /** */
     MachineVolume(PathType.MachineVolume), MachineVolumeCollection(PathType.MachineVolume, false),
+    /** */
+    System(PathType.System), SystemCollection(PathType.System, false),
+    /** */
+    SystemCreate(PathType.System),
+    /** */
+    SystemCredential(PathType.SystemCredential), SystemCredentialCollection(PathType.SystemCredential, false),
+    /** */
+    SystemMachine(PathType.SystemMachine), SystemMachineCollection(PathType.SystemMachine, false),
+    /** */
+    SystemSystem(PathType.SystemSystem), SystemSystemCollection(PathType.SystemSystem, false),
+    /** */
+    SystemVolume(PathType.SystemVolume), SystemVolumeCollection(PathType.SystemVolume, false),
+    /** */
+    SystemTemplate(PathType.SystemTemplate), SystemTemplateCollection(PathType.SystemTemplate, false),
     /** */
     Volume(PathType.Volume), VolumeCollection(PathType.Volume, false),
     /** */

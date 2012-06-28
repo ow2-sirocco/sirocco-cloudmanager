@@ -98,6 +98,8 @@ public class CimiContextImpl implements CimiContext {
         try {
             ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
             converter = (CimiConverter) item.getData(ConfigFactory.CONVERTER);
+        } catch (ConfigurationException e) {
+            throw e;
         } catch (Exception e) {
             throw new ConfigurationException("CimiConverter not found in configuration for " + klass.getName());
         }
@@ -206,13 +208,19 @@ public class CimiContextImpl implements CimiContext {
         if (typeRoot != typeCurrent) {
             switch (typeRoot) {
             case CloudEntryPoint:
-            case CredentialsCollection:
-            case CredentialsTemplateCollection:
+            case CredentialCollection:
+            case CredentialTemplateCollection:
             case JobCollection:
             case MachineCollection:
             case MachineConfigurationCollection:
             case MachineImageCollection:
             case MachineTemplateCollection:
+            case SystemCollection:
+            case SystemTemplateCollection:
+            case VolumeCollection:
+            case VolumeConfigurationCollection:
+            case VolumeImageCollection:
+            case VolumeTemplateCollection:
                 expand = this.getRequest().getHeader().getCimiExpand().hasExpandAll();
                 break;
             default:
@@ -236,13 +244,19 @@ public class CimiContextImpl implements CimiContext {
         if (typeRoot != typeCurrent) {
             switch (typeRoot) {
             case CloudEntryPoint:
-            case CredentialsCollection:
-            case CredentialsTemplateCollection:
+            case CredentialCollection:
+            case CredentialTemplateCollection:
             case JobCollection:
             case MachineCollection:
             case MachineConfigurationCollection:
             case MachineImageCollection:
             case MachineTemplateCollection:
+            case SystemCollection:
+            case SystemTemplateCollection:
+            case VolumeCollection:
+            case VolumeConfigurationCollection:
+            case VolumeImageCollection:
+            case VolumeTemplateCollection:
                 reference = true;
                 break;
             default:
