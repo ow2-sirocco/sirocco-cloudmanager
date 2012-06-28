@@ -116,6 +116,7 @@ public class System extends CloudResource implements Serializable {
         this.state = state;
     }
 
+    @ManyToOne
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }

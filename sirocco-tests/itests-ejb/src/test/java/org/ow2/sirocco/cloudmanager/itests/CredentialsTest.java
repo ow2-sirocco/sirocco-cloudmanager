@@ -46,6 +46,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -110,7 +111,8 @@ public class CredentialsTest {
         XmlDataSet dataSet = new XmlDataSet(reader);
         databaseTest = new PropertiesBasedJdbcDatabaseTester();
         databaseTest.setDataSet(dataSet);
-        databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        //databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        databaseTest.setSetUpOperation(new CustomDBUnitDeleteAllOperation(System.getProperty("database.type")));
         databaseTest.onSetup();
     }
 

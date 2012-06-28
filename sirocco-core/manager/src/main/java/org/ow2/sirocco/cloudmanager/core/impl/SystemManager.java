@@ -251,6 +251,8 @@ public class SystemManager implements ISystemManager {
         if (connector == null) {
             throw new CloudProviderException("no connector found");
         }
+        
+        system.setCloudProviderAccount(connector.getCloudProviderAccount());
 
         if (isSystemSupportedInConnector(connector)) {
 

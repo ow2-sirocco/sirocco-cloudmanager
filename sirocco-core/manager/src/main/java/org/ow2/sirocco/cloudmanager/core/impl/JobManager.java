@@ -275,7 +275,7 @@ public class JobManager implements IJobManager {
         String lockId = "";
 
         try {
-            this.lockManager.lock(topmostid, Job.class.getCanonicalName(),10);
+            this.lockManager.lock(topmostid, Job.class.getCanonicalName());
         } catch (CloudProviderException e) {
             JobManager.logger.warn("Unable to lock Job " + topmostid + " - " + e.getMessage());
             throw e;
