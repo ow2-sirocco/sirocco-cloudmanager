@@ -40,6 +40,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
@@ -110,6 +112,7 @@ public class Machine extends CloudResource implements Serializable {
     }
 
     @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     public List<MachineDisk> getDisks() {
         return this.disks;
     }
@@ -125,6 +128,7 @@ public class Machine extends CloudResource implements Serializable {
     }
 
     @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
@@ -146,6 +150,7 @@ public class Machine extends CloudResource implements Serializable {
     }
 
     @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "machine_id", referencedColumnName = "id")
     public List<MachineNetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
