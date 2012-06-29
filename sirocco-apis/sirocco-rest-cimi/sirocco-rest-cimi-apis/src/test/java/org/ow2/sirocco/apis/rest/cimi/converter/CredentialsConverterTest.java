@@ -107,7 +107,7 @@ public class CredentialsConverterTest {
         cimi = (CimiCredentials) this.context.convertToCimi(service, CimiCredentials.class);
         Assert.assertNull(cimi.getPassword());
         Assert.assertEquals("userName", cimi.getUserName());
-        Assert.assertNull(cimi.getKey());
+        Assert.assertArrayEquals(service.getPublicKey(), cimi.getKey());
 
         // Full Service -> Cimi with "write only" data
         this.context.setConvertedWriteOnly(true);
