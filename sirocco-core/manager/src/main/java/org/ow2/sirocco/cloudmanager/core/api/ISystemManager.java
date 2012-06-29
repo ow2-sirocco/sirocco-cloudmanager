@@ -53,12 +53,16 @@ public interface ISystemManager extends IJobListener {
 
     SystemTemplate getSystemTemplateById(String systemTemplateId) throws CloudProviderException;
 
-    // add/remove on system collections
+    // CRUD on system collections
     Job addEntityToSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException;
 
     Job removeEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException;
 
     Job updateEntityInSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException;
+
+    CloudCollectionItem getEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException;
+
+    List<CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType) throws CloudProviderException;
 
     // management of SystemTemplate map
     boolean addComponentDescriptorToSystemTemplate(ComponentDescriptor componentDescriptor, String systemTemplateId)

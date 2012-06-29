@@ -256,6 +256,9 @@ public class JobManager implements IJobManager {
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public String getJobIdFromProvider(final Job providerJob) throws NoResultException {
         Job job = null;
+        if (providerJob==null){JobManager.logger.warn("providerJob is null");}
+        if (providerJob.getProviderAssignedId()==null){JobManager.logger.warn("providerJob ProviderAssignedId is null");}
+        JobManager.logger.info(" getting persisted job from provider job of providerAssignedId "+providerJob.getProviderAssignedId());
         try {
             job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
                 .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
@@ -264,6 +267,9 @@ public class JobManager implements IJobManager {
             JobManager.logger.error("Cannot find job with providerAssignedId " + providerJob.getProviderAssignedId());
             throw e;
         }
+        if (job==null){JobManager.logger.warn("job is null");}
+
+        JobManager.logger.info(" got persisted job "+job.getId());
         return job.getId().toString();
     }
 

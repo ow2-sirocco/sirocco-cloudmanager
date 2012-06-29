@@ -40,6 +40,7 @@ import javax.persistence.OneToMany;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 
 @Entity
@@ -55,6 +56,8 @@ public class CloudProviderAccount implements Serializable {
     private Set<User> users;
 
     private Set<Machine> machines;
+    
+    private Set<System> systems;
 
     private Set<Volume> volumes;
 
@@ -149,6 +152,15 @@ public class CloudProviderAccount implements Serializable {
 
     public void setUsers(final Set<User> users) {
         this.users = users;
+    }
+
+    @OneToMany(mappedBy = "cloudProviderAccount")
+    public Set<System> getSystems() {
+        return systems;
+    }
+
+    public void setSystems(Set<System> systems) {
+        this.systems = systems;
     }
 
 }

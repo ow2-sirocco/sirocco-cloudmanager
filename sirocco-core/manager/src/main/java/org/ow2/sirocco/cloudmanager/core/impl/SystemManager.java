@@ -54,6 +54,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
+import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobListener;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
@@ -178,6 +179,9 @@ public class SystemManager implements ISystemManager {
 
     @EJB
     private IJobManager jobManager;
+    
+    @EJB
+    private ICloudProviderManager cloudProviderManager;
 
     private User getUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
@@ -251,8 +255,15 @@ public class SystemManager implements ISystemManager {
         if (connector == null) {
             throw new CloudProviderException("no connector found");
         }
-        
-        system.setCloudProviderAccount(connector.getCloudProviderAccount());
+        CloudProviderAccount cpa=this.selectCloudProviderAccount(this.selectCloudProvider());
+        //achtung: we get cloud provider account via an osgi bundle that gets it from ejb
+        //it breaks hibernate lazy loading feature...
+        //so we get again cloud provider account from it's id
+        SystemManager.logger.info("cpa id: "+cpa.getId());
+        system.setCloudProviderAccount(cpa);
+        Set<System> sett=cpa.getSystems();sett.add(system);
+        cpa.setSystems(sett);
+        this.em.flush();
 
         if (isSystemSupportedInConnector(connector)) {
 
@@ -439,12 +450,6 @@ public class SystemManager implements ISystemManager {
         return result;
     }
 
-    public List<CloudCollectionItem> getEntityFromSystem(final String systemId, final String collectionType) {
-
-        return null;
-
-    }
-
     @Override
     public Job addEntityToSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException {
 
@@ -563,6 +568,27 @@ public class SystemManager implements ISystemManager {
         this.em.persist(job);
 
         return job;
+    }
+    
+    public CloudCollectionItem getEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException {
+        CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
+        if (ce == null) {
+            throw new CloudProviderException("bad id given in parameter");
+        }        
+        return ce;
+    }
+    
+    @Override
+    public List<CloudCollectionItem> getEntityListFromSystem(String systemId, String entityType) throws CloudProviderException {
+        System s = this.getSystemById(systemId);
+        if (s == null) {
+            throw new CloudProviderException("bad id given in parameter");
+        }
+        
+        
+        
+        
+        return null;
     }
 
     @Override
@@ -883,6 +909,8 @@ public class SystemManager implements ISystemManager {
         }
 
         CloudProviderLocation location = null;
+        
+        SystemManager.logger.info("getCloudProviderConnector: cloudProviderAccount has id "+cloudProviderAccount.getId());
 
         return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
     }
@@ -1097,5 +1125,4 @@ public class SystemManager implements ISystemManager {
          */
         return true;
     }
-
 }
