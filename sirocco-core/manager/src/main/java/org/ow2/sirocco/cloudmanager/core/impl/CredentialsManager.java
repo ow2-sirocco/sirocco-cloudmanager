@@ -152,18 +152,6 @@ public class CredentialsManager implements ICredentialsManager {
         if (cred == null) {
             throw new ResourceNotFoundException("Credentials " + credentialsId + " not found");
         }
-        /**
-         * Would be nice to use em.detach instead
-         */
-        Credentials c = new Credentials();
-        c.setUserName(cred.getUserName());
-        c.setName(cred.getName());
-        c.setId(cred.getId());
-        c.setProperties(cred.getProperties());
-        c.setCreated(cred.getCreated());
-        c.setUpdated(cred.getUpdated());
-        c.setPassword("");
-        c.setPublicKey(null);
         return cred;
     }
 
