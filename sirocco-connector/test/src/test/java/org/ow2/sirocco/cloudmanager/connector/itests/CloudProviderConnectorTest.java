@@ -222,6 +222,7 @@ public class CloudProviderConnectorTest {
             credentials.setPublicKey(this.key.getBytes());
             machineTemplate.setCredentials(credentials);
         }
+        machineTemplate.setUserData("color=blue\nip=1.2.3.4\n");
         machineCreate.setMachineTemplate(machineTemplate);
         machineCreate.setName("test");
 

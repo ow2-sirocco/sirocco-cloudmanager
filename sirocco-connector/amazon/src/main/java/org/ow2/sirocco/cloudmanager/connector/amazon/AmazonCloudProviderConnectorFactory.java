@@ -439,6 +439,10 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
             if (keyPair != null) {
                 options = options.withKeyName(keyPair.getKeyName());
             }
+            String userData = machineCreate.getMachineTemplate().getUserData();
+            if (userData != null) {
+                options.withUserData(userData.getBytes());
+            }
             Reservation<? extends AWSRunningInstance> reservation = AmazonCloudProviderConnector.this.syncClient
                 .getInstanceServices().runInstancesInRegion(AmazonCloudProviderConnector.this.amazonRegionCode,
                     this.defaultAvailabilityZone, machineCreate.getMachineTemplate().getMachineImage().getProviderAssignedId(),

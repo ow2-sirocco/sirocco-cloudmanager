@@ -462,6 +462,11 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 options.keyPairName(keyPairName);
             }
 
+            String userData = machineCreate.getMachineTemplate().getUserData();
+            if (userData != null) {
+                options.userData(userData.getBytes());
+            }
+
             String imageId = machineCreate.getMachineTemplate().getMachineImage().getProviderAssignedId();
             String serverName = null;
             if (machineCreate.getName() != null) {
