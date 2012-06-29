@@ -69,7 +69,7 @@ public abstract class ObjectCommonConverter extends CommonConverter implements C
      */
     protected void fill(final CimiContext context, final CimiObjectCommon dataCimi, final Identifiable dataService) {
         if (null != dataCimi.getId()) {
-            dataService.setId(HrefHelper.extractId(dataCimi.getId()));
+            dataService.setId(PathHelper.extractId(dataCimi.getId()));
         }
     }
 
@@ -105,7 +105,7 @@ public abstract class ObjectCommonConverter extends CommonConverter implements C
     protected void fill(final CimiContext context, final CimiObjectCommon dataCimi, final Resource dataService) {
         this.fill(dataCimi, dataService);
         if (null != dataCimi.getId()) {
-            dataService.setId(HrefHelper.extractId(dataCimi.getId()));
+            dataService.setId(PathHelper.extractId(dataCimi.getId()));
         }
     }
 }

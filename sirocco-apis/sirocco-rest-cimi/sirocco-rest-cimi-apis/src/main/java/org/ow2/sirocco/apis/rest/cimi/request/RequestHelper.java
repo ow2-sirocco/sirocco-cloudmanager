@@ -38,12 +38,12 @@ import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
  * 
  * @see CimiRequest
  */
-public class HelperRequest {
+public class RequestHelper {
 
     public static CimiRequest buildRequest(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
         final String idParent, final CimiData cimiData) {
         CimiRequest request = new CimiRequest();
-        request.setHeader(HelperRequest.buildRequestHeader(infos));
+        request.setHeader(RequestHelper.buildRequestHeader(infos));
         request.setId(id);
         request.setIdParent(idParent);
         request.setCimiData(cimiData);
@@ -60,10 +60,10 @@ public class HelperRequest {
             requestHeader.setVersion(versions.get(0));
         }
 
-        requestHeader.setCimiSelect(new CimiSelect(HelperRequest.transformQueryParamToList(Constants.PARAM_CIMI_SELECT, infos
+        requestHeader.setCimiSelect(new CimiSelect(RequestHelper.transformQueryParamToList(Constants.PARAM_CIMI_SELECT, infos
             .getUriInfo().getQueryParameters())));
 
-        requestHeader.setCimiExpand(new CimiExpand(HelperRequest.transformQueryParamToList(Constants.PARAM_CIMI_EXPAND, infos
+        requestHeader.setCimiExpand(new CimiExpand(RequestHelper.transformQueryParamToList(Constants.PARAM_CIMI_EXPAND, infos
             .getUriInfo().getQueryParameters())));
 
         List<String> siroccoInfoTestsId = infos.getHeaders().getRequestHeader(Constants.HEADER_SIROCCO_INFO_TEST_ID);

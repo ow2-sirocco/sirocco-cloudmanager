@@ -39,8 +39,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.HelperContext;
-import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.ContextHelper;
+import org.ow2.sirocco.apis.rest.cimi.request.ResponseHelper;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -93,9 +93,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("/{id}")
     public Response read(@PathParam("id") final String id) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerReadCredentials.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -106,9 +106,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response read() {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos());
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos());
         this.cimiManagerReadCredentialsCollection.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -121,9 +121,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("/{id}")
     public Response update(@PathParam("id") final String id, final CimiCredentials cimiData) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, cimiData);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id, cimiData);
         this.cimiManagerUpdateCredentials.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -134,9 +134,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response create(final CimiCredentialsCreate cimiData) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), cimiData);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
         this.cimiManagerCreateCredentials.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -148,9 +148,9 @@ public class CredentialsRestResource extends RestResourceAbstract {
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") final String id) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerDeleteCredentials.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
 }

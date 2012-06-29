@@ -30,33 +30,33 @@ import org.ow2.sirocco.apis.rest.cimi.resource.RestResourceAbstract;
 /**
  * Utility to build CIMI Context with the data of REST request.
  */
-public class HelperContext {
+public class ContextHelper {
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos) {
-        return HelperContext.buildContext(infos, null, null, null);
+        return ContextHelper.buildContext(infos, null, null, null);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final CimiData cimiData) {
-        return HelperContext.buildContext(infos, null, null, cimiData);
+        return ContextHelper.buildContext(infos, null, null, cimiData);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id) {
-        return HelperContext.buildContext(infos, id, null, null);
+        return ContextHelper.buildContext(infos, id, null, null);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
         final CimiData cimiData) {
-        return HelperContext.buildContext(infos, id, null, cimiData);
+        return ContextHelper.buildContext(infos, id, null, cimiData);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
         final String idParent) {
-        return HelperContext.buildContext(infos, id, idParent, null);
+        return ContextHelper.buildContext(infos, id, idParent, null);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
         final String idParent, final CimiData cimiData) {
-        CimiRequest request = HelperRequest.buildRequest(infos, id, idParent, cimiData);
+        CimiRequest request = RequestHelper.buildRequest(infos, id, idParent, cimiData);
         CimiResponse response = new CimiResponse();
         return new CimiContextImpl(request, response);
     }

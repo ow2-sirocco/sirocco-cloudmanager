@@ -110,7 +110,7 @@ public class MachineConverter extends ObjectCommonConverter {
             dataCimi.setDisks((CimiMachineDiskCollection) context.convertNextCimi(dataService.getDisks(),
                 CimiMachineDiskCollection.class));
             // TODO dataCimi.setNetworkInterfaces(???);
-            dataCimi.setState(HelperConverter.toString(dataService.getState()));
+            dataCimi.setState(ConverterHelper.toString(dataService.getState()));
             dataCimi.setVolumes((CimiMachineVolumeCollection) context.convertNextCimi(dataService.getVolumes(),
                 CimiMachineVolumeCollection.class));
         }

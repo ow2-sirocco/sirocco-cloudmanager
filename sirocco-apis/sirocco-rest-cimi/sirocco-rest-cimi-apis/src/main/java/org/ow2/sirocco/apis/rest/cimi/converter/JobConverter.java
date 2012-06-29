@@ -110,7 +110,7 @@ public class JobConverter extends ObjectCommonConverter {
             dataCimi.setIsCancellable(dataService.getIsCancellable());
             dataCimi.setProgress(dataService.getProgress());
             dataCimi.setReturnCode(dataService.getReturnCode());
-            dataCimi.setStatus(HelperConverter.toString(dataService.getStatus()));
+            dataCimi.setStatus(ConverterHelper.toString(dataService.getStatus()));
             dataCimi.setStatusMessage(dataService.getStatusMessage());
             dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
             dataCimi.setTargetResource(this.makeHrefTargetResource(context, dataService.getTargetEntity()));

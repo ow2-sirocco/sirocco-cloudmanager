@@ -39,8 +39,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.HelperContext;
-import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.ContextHelper;
+import org.ow2.sirocco.apis.rest.cimi.request.ResponseHelper;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -97,9 +97,9 @@ public class MachineConfigurationRestResource extends RestResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("/{id}")
     public Response read(@PathParam("id") final String id) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerReadMachineConfiguration.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -110,9 +110,9 @@ public class MachineConfigurationRestResource extends RestResourceAbstract {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response read() {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos());
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos());
         this.cimiManagerReadMachineConfigurationCollection.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -125,9 +125,9 @@ public class MachineConfigurationRestResource extends RestResourceAbstract {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("/{id}")
     public Response update(@PathParam("id") final String id, final CimiMachineConfiguration cimiData) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id, cimiData);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id, cimiData);
         this.cimiManagerUpdateMachineConfiguration.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -139,9 +139,9 @@ public class MachineConfigurationRestResource extends RestResourceAbstract {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Deprecated
     public Response update(final CimiMachineConfigurationCollection cimiData) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), cimiData);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
         this.cimiManagerUpdateMachineConfigurationCollection.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -152,9 +152,9 @@ public class MachineConfigurationRestResource extends RestResourceAbstract {
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response create(final CimiMachineConfiguration cimiData) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), cimiData);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
         this.cimiManagerCreateMachineConfiguration.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -166,8 +166,8 @@ public class MachineConfigurationRestResource extends RestResourceAbstract {
     @DELETE
     @Path("/{id}")
     public Response delete(@PathParam("id") final String id) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), id);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id);
         this.cimiManagerDeleteMachineConfiguration.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 }

@@ -103,8 +103,8 @@ public class MachineImageConverter extends ObjectCommonConverter {
             if (null != dataService.getImageLocation()) {
                 dataCimi.setImageLocation(new ImageLocation(dataService.getImageLocation()));
             }
-            dataCimi.setState(HelperConverter.toString(dataService.getState()));
-            dataCimi.setType(HelperConverter.toString(dataService.getType()));
+            dataCimi.setState(ConverterHelper.toString(dataService.getState()));
+            dataCimi.setType(ConverterHelper.toString(dataService.getType()));
         }
     }
 

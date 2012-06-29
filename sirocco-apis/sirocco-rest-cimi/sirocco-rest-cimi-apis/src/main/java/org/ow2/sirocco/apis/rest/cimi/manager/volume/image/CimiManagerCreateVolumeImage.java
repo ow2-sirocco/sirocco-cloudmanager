@@ -24,7 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.volume.image;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.HrefHelper;
+import org.ow2.sirocco.apis.rest.cimi.converter.PathHelper;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
@@ -65,7 +65,7 @@ public class CimiManagerCreateVolumeImage extends CimiManagerCreateAbstract {
         // Extract ID Volume of imageLocation and verify it before using the
         // service to create with snapshot
         if (null != image.getImageLocation()) {
-            idVolumeSnapshot = HrefHelper.extractIdString(image.getImageLocation());
+            idVolumeSnapshot = PathHelper.extractIdString(image.getImageLocation());
             if (false == image.getImageLocation().equals(context.makeHref(CimiVolume.class, idVolumeSnapshot))) {
                 idVolumeSnapshot = null;
             }

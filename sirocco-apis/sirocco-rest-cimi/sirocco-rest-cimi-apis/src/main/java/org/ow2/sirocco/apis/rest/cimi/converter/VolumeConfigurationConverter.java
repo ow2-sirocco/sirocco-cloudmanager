@@ -101,7 +101,7 @@ public class VolumeConfigurationConverter extends ObjectCommonConverter {
         if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setCapacity(dataService.getCapacity());
             dataCimi.setFormat(dataService.getFormat());
-            dataCimi.setType(dataService.getType());
+            dataCimi.setType(PathHelper.makeCimiURI(dataService.getType()));
         }
     }
 
@@ -117,7 +117,7 @@ public class VolumeConfigurationConverter extends ObjectCommonConverter {
         this.fill(context, dataCimi, dataService);
         dataService.setCapacity(dataCimi.getCapacity());
         dataService.setFormat(dataCimi.getFormat());
-        dataService.setType(dataCimi.getType());
+        dataService.setType(PathHelper.extractSuffixKeyOfCimiURI(dataCimi.getType()));
     }
 
 }

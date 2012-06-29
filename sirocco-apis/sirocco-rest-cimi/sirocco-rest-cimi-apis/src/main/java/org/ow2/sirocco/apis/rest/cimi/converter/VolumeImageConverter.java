@@ -104,7 +104,7 @@ public class VolumeImageConverter extends ObjectCommonConverter {
             if (null != dataService.getImageLocation()) {
                 dataCimi.setImageLocation(new ImageLocation(dataService.getImageLocation()));
             }
-            dataCimi.setState(HelperConverter.toString(dataService.getState()));
+            dataCimi.setState(ConverterHelper.toString(dataService.getState()));
         }
     }
 

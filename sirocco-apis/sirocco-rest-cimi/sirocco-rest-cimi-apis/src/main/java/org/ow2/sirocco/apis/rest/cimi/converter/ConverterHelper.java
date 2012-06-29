@@ -33,7 +33,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 /**
  * 
  */
-public class HelperConverter {
+public class ConverterHelper {
 
     public static Float toFloat(final Integer value) {
         Float converted = null;

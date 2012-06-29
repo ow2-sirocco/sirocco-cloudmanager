@@ -35,8 +35,8 @@ import javax.ws.rs.core.Response;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.HelperContext;
-import org.ow2.sirocco.apis.rest.cimi.request.HelperResponse;
+import org.ow2.sirocco.apis.rest.cimi.request.ContextHelper;
+import org.ow2.sirocco.apis.rest.cimi.request.ResponseHelper;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -72,9 +72,9 @@ public class CloudEntryPointRestResource extends RestResourceAbstract {
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readCloudEntryPoint() {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos());
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos());
         this.cimiManagerReadCloudEntryPoint.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
     /**
@@ -85,9 +85,9 @@ public class CloudEntryPointRestResource extends RestResourceAbstract {
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response updateCloudEntryPoint(final CimiCloudEntryPoint cloudEntryPoint) {
-        CimiContext context = HelperContext.buildContext(this.getJaxRsRequestInfos(), cloudEntryPoint);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), cloudEntryPoint);
         this.cimiManagerUpdateCloudEntryPoint.execute(context);
-        return HelperResponse.buildResponse(context.getResponse());
+        return ResponseHelper.buildResponse(context.getResponse());
     }
 
 }

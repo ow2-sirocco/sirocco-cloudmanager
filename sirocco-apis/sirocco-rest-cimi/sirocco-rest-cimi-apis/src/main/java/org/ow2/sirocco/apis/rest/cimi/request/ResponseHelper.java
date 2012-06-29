@@ -38,10 +38,10 @@ import org.slf4j.LoggerFactory;
  * 
  * @see CimiResponse
  */
-public class HelperResponse {
+public class ResponseHelper {
 
     /** Logger */
-    private static final Logger LOGGER = LoggerFactory.getLogger(HelperResponse.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ResponseHelper.class);
 
     /**
      * Build REST response with a CIMI response.
@@ -56,7 +56,7 @@ public class HelperResponse {
         // Make builder with status
         if (0 == status) {
             builder = Response.serverError();
-            HelperResponse.LOGGER.error("CIMI Response Status is null");
+            ResponseHelper.LOGGER.error("CIMI Response Status is null");
         } else {
             builder = Response.status(cimiResponse.getStatus());
         }

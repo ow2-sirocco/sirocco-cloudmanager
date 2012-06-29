@@ -24,40 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+
 /**
- * Utility class for references: HREF.
+ * Utility class for CIMI paths.
  */
-public class HrefHelper {
-
-    /**
-     * Make a HREF.
-     * 
-     * @param urlBase URL base of REST server
-     * @param urlConstant A constant business
-     * @return The HREF made
-     */
-    public static String makeHref(final String urlBase, final String urlConstant) {
-        return HrefHelper.makeHref(urlBase, urlConstant, (String) null);
-
-    }
-
-    /**
-     * Make a HREF.
-     * 
-     * @param urlBase URL base of REST server
-     * @param urlConstant A constant business
-     * @param id Service ID
-     * @return The HREF made
-     */
-    public static String makeHref(final String urlBase, final String urlConstant, final Integer id) {
-        String href;
-        if (null != id) {
-            href = HrefHelper.makeHref(urlBase, urlConstant, id.toString());
-        } else {
-            href = HrefHelper.makeHref(urlBase, urlConstant, (String) null);
-        }
-        return href;
-    }
+public class PathHelper {
 
     /**
      * Make a HREF.
@@ -74,6 +46,37 @@ public class HrefHelper {
             sb.append('/').append(id);
         }
         return sb.toString();
+    }
+
+    /**
+     * Make a CIMI URI.
+     * 
+     * @param suffixKey The key to use like suffix
+     * @return The CIMI URI made
+     */
+    public static String makeCimiURI(final String suffixKey) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(ConstantsPath.CIMI_XML_NAMESPACE).append('/');
+        if (null != suffixKey) {
+            sb.append(suffixKey);
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Extract the suffix key of a CIMI URI.
+     * 
+     * @param uri A complete CIMI URI
+     * @return The suffix key or null
+     */
+    public static String extractSuffixKeyOfCimiURI(final String cimiURI) {
+        String key = null;
+        if (null != cimiURI) {
+            if (true == cimiURI.startsWith(ConstantsPath.CIMI_XML_NAMESPACE + '/')) {
+                key = cimiURI.substring(ConstantsPath.CIMI_XML_NAMESPACE.length() + 1);
+            }
+        }
+        return key;
     }
 
     /**
@@ -98,7 +101,7 @@ public class HrefHelper {
      * @return The ID service
      */
     public static Integer extractId(final String href) {
-        return Integer.valueOf(HrefHelper.extractIdString(href));
+        return Integer.valueOf(PathHelper.extractIdString(href));
     }
 
 }

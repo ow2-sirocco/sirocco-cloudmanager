@@ -107,8 +107,8 @@ public class VolumeConverter extends ObjectCommonConverter {
             dataCimi.setCapacity(dataService.getCapacity());
             dataCimi.setImages((CimiVolumeVolumeImageCollection) context.convertNextCimi(dataService.getImages(),
                 CimiVolumeVolumeImageCollection.class));
-            dataCimi.setState(HelperConverter.toString(dataService.getState()));
-            dataCimi.setType(dataService.getType());
+            dataCimi.setState(ConverterHelper.toString(dataService.getState()));
+            dataCimi.setType(PathHelper.makeCimiURI(dataService.getType()));
         }
     }
 
