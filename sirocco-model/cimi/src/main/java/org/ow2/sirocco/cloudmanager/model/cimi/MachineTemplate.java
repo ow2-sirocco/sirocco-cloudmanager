@@ -33,7 +33,9 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 public class MachineTemplate extends CloudTemplate implements Serializable {
@@ -67,8 +69,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
         return this.machineConfiguration;
     }
 
-    public void setMachineConfiguration(
-            final MachineConfiguration machineConfiguration) {
+    public void setMachineConfiguration(final MachineConfiguration machineConfiguration) {
         this.machineConfiguration = machineConfiguration;
     }
 
@@ -91,19 +92,20 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
 
     public void addMachineVolume(final MachineVolume mv) {
-        if (!getVolumes().contains(mv)) {
-            getVolumes().add(mv);
+        if (!this.getVolumes().contains(mv)) {
+            this.getVolumes().add(mv);
         }
     }
 
     public void removeMachineVolume(final MachineVolume mv) {
-        if (getVolumes().contains(mv)) {
-            getVolumes().remove(mv);
+        if (this.getVolumes().contains(mv)) {
+            this.getVolumes().remove(mv);
         }
     }
 
@@ -112,24 +114,24 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     public List<MachineVolumeTemplate> getVolumeTemplates() {
         return this.volumeTemplates;
     }
 
     public void addMachineVolumeTemplate(final MachineVolumeTemplate mvt) {
-        if (!getVolumeTemplates().contains(mvt)) {
-            getVolumeTemplates().add(mvt);
+        if (!this.getVolumeTemplates().contains(mvt)) {
+            this.getVolumeTemplates().add(mvt);
         }
     }
 
     public void removeMachineVolumeTemplate(final MachineVolumeTemplate mvt) {
-        if (getVolumeTemplates().contains(mvt)) {
-            getVolumeTemplates().remove(mvt);
+        if (this.getVolumeTemplates().contains(mvt)) {
+            this.getVolumeTemplates().remove(mvt);
         }
     }
 
-    public void setVolumeTemplates(
-            final List<MachineVolumeTemplate> volumeTemplates) {
+    public void setVolumeTemplates(final List<MachineVolumeTemplate> volumeTemplates) {
         this.volumeTemplates = volumeTemplates;
     }
 
@@ -145,8 +147,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
         }
     }
 
-    public void setNetworkInterfaces(
-            final List<MachineTemplateNetworkInterface> networkInterfaces) {
+    public void setNetworkInterfaces(final List<MachineTemplateNetworkInterface> networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 
