@@ -31,7 +31,6 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
@@ -47,6 +46,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -55,6 +55,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -82,6 +86,10 @@ public class CimiManagersCloudEntryPointTest {
     @Autowired
     @Qualifier("IMachineImageManager")
     private IMachineImageManager serviceMachineImage;
+
+    @Autowired
+    @Qualifier("IVolumeManager")
+    private IVolumeManager serviceVolume;
 
     @Autowired
     @Qualifier("CimiManagerReadCloudEntryPoint")
@@ -119,6 +127,7 @@ public class CimiManagersCloudEntryPointTest {
         EasyMock.reset(this.serviceJob);
         EasyMock.reset(this.serviceMachine);
         EasyMock.reset(this.serviceMachineImage);
+        EasyMock.reset(this.serviceVolume);
     }
 
     @Test
@@ -129,21 +138,19 @@ public class CimiManagersCloudEntryPointTest {
 
         // Credentials
         List<Credentials> credentialsCollection = new ArrayList<Credentials>();
-        // credentialsCollection.setId(600);
         List<CredentialsTemplate> credentialsTemplateCollection = new ArrayList<CredentialsTemplate>();
-        // credentialsTemplateCollection.setId(700);
         // Jobs
         List<Job> jobCollection = new ArrayList<Job>();
-        // jobCollection.setId(800);
         // Machines
         List<Machine> machineCollection = new ArrayList<Machine>();
-        // machineCollection.setId(200);
         List<MachineTemplate> machineTemplateCollection = new ArrayList<MachineTemplate>();
-        // machineTemplateCollection.setId(300);
         List<MachineConfiguration> machineConfigurationCollection = new ArrayList<MachineConfiguration>();
-        // machineConfigurationCollection.setId(400);
         List<MachineImage> machineImageCollection = new ArrayList<MachineImage>();
-        // machineImageCollection.setId(500);
+        // Volumes
+        List<Volume> volumeCollection = new ArrayList<Volume>();
+        List<VolumeTemplate> volumeTemplateCollection = new ArrayList<VolumeTemplate>();
+        List<VolumeConfiguration> volumeConfigurationCollection = new ArrayList<VolumeConfiguration>();
+        List<VolumeImage> volumeImageCollection = new ArrayList<VolumeImage>();
 
         EasyMock.expect(this.serviceCredentials.getCredentials()).andReturn(credentialsCollection);
         EasyMock.expect(this.serviceCredentials.getCredentialsTemplates()).andReturn(credentialsTemplateCollection);
@@ -161,6 +168,12 @@ public class CimiManagersCloudEntryPointTest {
         EasyMock.expect(this.serviceMachineImage.getMachineImages()).andReturn(machineImageCollection);
         EasyMock.replay(this.serviceMachineImage);
 
+        EasyMock.expect(this.serviceVolume.getVolumes()).andReturn(volumeCollection);
+        EasyMock.expect(this.serviceVolume.getVolumeTemplates()).andReturn(volumeTemplateCollection);
+        EasyMock.expect(this.serviceVolume.getVolumeConfigurations()).andReturn(volumeConfigurationCollection);
+        EasyMock.expect(this.serviceVolume.getVolumeImages()).andReturn(volumeImageCollection);
+        EasyMock.replay(this.serviceVolume);
+
         // this.request.setId("1");
         this.managerRead.execute(this.context);
 
@@ -168,23 +181,32 @@ public class CimiManagersCloudEntryPointTest {
         CimiCloudEntryPoint cimiCloud = (CimiCloudEntryPoint) this.response.getCimiData();
 
         Assert.assertEquals(ConstantsPath.CLOUDENTRYPOINT_PATH, cimiCloud.getId());
+
         Assert.assertEquals(ConstantsPath.CREDENTIAL_PATH, cimiCloud.getCredentials().getHref());
         Assert.assertEquals(ConstantsPath.CREDENTIAL_TEMPLATE_PATH, cimiCloud.getCredentialTemplates().getHref());
+
         Assert.assertEquals(ConstantsPath.JOB_PATH, cimiCloud.getJobs().getHref());
+
+        Assert.assertEquals(ConstantsPath.MACHINE_PATH, cimiCloud.getMachines().getHref());
         Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH, cimiCloud.getMachineConfigs().getHref());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH, cimiCloud.getMachineImages().getHref());
-        Assert.assertEquals(ConstantsPath.MACHINE_PATH, cimiCloud.getMachines().getHref());
         Assert.assertEquals(ConstantsPath.MACHINE_TEMPLATE_PATH, cimiCloud.getMachineTemplates().getHref());
+
+        Assert.assertEquals(ConstantsPath.VOLUME_PATH, cimiCloud.getVolumes().getHref());
+        Assert.assertEquals(ConstantsPath.VOLUME_CONFIGURATION_PATH, cimiCloud.getVolumeConfigurations().getHref());
+        Assert.assertEquals(ConstantsPath.VOLUME_IMAGE_PATH, cimiCloud.getVolumeImages().getHref());
+        Assert.assertEquals(ConstantsPath.VOLUME_TEMPLATE_PATH, cimiCloud.getVolumeTemplates().getHref());
 
         EasyMock.verify(this.serviceCredentials);
         EasyMock.verify(this.serviceJob);
         EasyMock.verify(this.serviceMachine);
         EasyMock.verify(this.serviceMachineImage);
+        EasyMock.verify(this.serviceVolume);
     }
 
-    @Test
-    @Ignore
-    public void testReadWithCimiSelect() throws Exception {
-        // TODO
-    }
+    // @Test
+    // @Ignore
+    // public void testReadWithCimiSelect() throws Exception {
+    // // TODO
+    // }
 }

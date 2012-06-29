@@ -34,11 +34,15 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 
 /**
  * Aggregation of CloudEntryPoint to add all items necesary for CIMI.
  */
-// TODO Others resources : Volumes, ...
+// TODO Others resources : Network, Meter, ...
 public class CloudEntryPointAggregate extends CloudEntryPoint {
 
     /** Serial. */
@@ -84,25 +88,25 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      */
     private List<MachineTemplate> machineTemplates;
 
-    // /**
-    // * Field "volumeTemplates".
-    // */
-    // private VolumeTemplate> volumeTemplates;
-    //
-    // /**
-    // * Field "volumeConfigurations".
-    // */
-    // private VolumeConfiguration> volumeConfigurations;
-    //
-    // /**
-    // * Field "volumeImages".
-    // */
-    // private VolumeImage> volumeImages;
-    //
-    // /**
-    // * Field "volumes".
-    // */
-    // private Volume> volumes;
+    /**
+     * Field "volumeTemplates".
+     */
+    private List<VolumeTemplate> volumeTemplates;
+
+    /**
+     * Field "volumeConfigurations".
+     */
+    private List<VolumeConfiguration> volumeConfigurations;
+
+    /**
+     * Field "volumes".
+     */
+    private List<Volume> volumes;
+
+    /**
+     * Field "volumeImages".
+     */
+    private List<VolumeImage> volumeImages;
 
     /**
      * Parameterized constructor.
@@ -265,78 +269,76 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
         this.machineTemplates = machineTemplates;
     }
 
-    // /**
-    // * Return the value of field "volumeTemplates".
-    // *
-    // * @return The value
-    // */
-    // public VolumeTemplate> getVolumeTemplates() {
-    // return this.volumeTemplates;
-    // }
-    //
-    // /**
-    // * Set the value of field "volumeTemplates".
-    // *
-    // * @param volumeTemplates The value
-    // */
-    // public void setVolumeTemplates(final VolumeTemplate>
-    // volumeTemplates) {
-    // this.volumeTemplates = volumeTemplates;
-    // }
-    //
-    // /**
-    // * Return the value of field "volumeConfigurations".
-    // *
-    // * @return The value
-    // */
-    // public VolumeConfiguration> getVolumeConfigurations() {
-    // return this.volumeConfigurations;
-    // }
-    //
-    // /**
-    // * Set the value of field "volumeConfigurations".
-    // *
-    // * @param volumeConfigurations The value
-    // */
-    // public void setVolumeConfigurations(final VolumeConfiguration>
-    // volumeConfigurations) {
-    // this.volumeConfigurations = volumeConfigurations;
-    // }
-    //
-    // /**
-    // * Return the value of field "volumeImages".
-    // *
-    // * @return The value
-    // */
-    // public VolumeImage> getVolumeImages() {
-    // return this.volumeImages;
-    // }
-    //
-    // /**
-    // * Set the value of field "volumeImages".
-    // *
-    // * @param volumeImages The value
-    // */
-    // public void setVolumeImages(final VolumeImage> volumeImages) {
-    // this.volumeImages = volumeImages;
-    // }
-    //
-    // /**
-    // * Return the value of field "volumes".
-    // *
-    // * @return The value
-    // */
-    // public Volume> getVolumes() {
-    // return this.volumes;
-    // }
-    //
-    // /**
-    // * Set the value of field "volumes".
-    // *
-    // * @param volumes The value
-    // */
-    // public void setVolumes(final Volume> volumes) {
-    // this.volumes = volumes;
-    // }
+    /**
+     * Return the value of field "volumeConfigurations".
+     * 
+     * @return The value
+     */
+    public List<VolumeConfiguration> getVolumeConfigurations() {
+        return this.volumeConfigurations;
+    }
+
+    /**
+     * Set the value of field "volumeConfigurations".
+     * 
+     * @param volumeConfigurations The value
+     */
+    public void setVolumeConfigurations(final List<VolumeConfiguration> volumeConfigurations) {
+        this.volumeConfigurations = volumeConfigurations;
+    }
+
+    /**
+     * Return the value of field "volumeImages".
+     * 
+     * @return The value
+     */
+    public List<VolumeImage> getVolumeImages() {
+        return this.volumeImages;
+    }
+
+    /**
+     * Set the value of field "volumeImages".
+     * 
+     * @param volumeImages The value
+     */
+    public void setVolumeImages(final List<VolumeImage> volumeImages) {
+        this.volumeImages = volumeImages;
+    }
+
+    /**
+     * Return the value of field "volumes".
+     * 
+     * @return The value
+     */
+    public List<Volume> getVolumes() {
+        return this.volumes;
+    }
+
+    /**
+     * Set the value of field "volumes".
+     * 
+     * @param volumes The value
+     */
+    public void setVolumes(final List<Volume> volumes) {
+        this.volumes = volumes;
+    }
+
+    /**
+     * Return the value of field "volumeTemplates".
+     * 
+     * @return The value
+     */
+    public List<VolumeTemplate> getVolumeTemplates() {
+        return this.volumeTemplates;
+    }
+
+    /**
+     * Set the value of field "volumeTemplates".
+     * 
+     * @param volumeTemplates The value
+     */
+    public void setVolumeTemplates(final List<VolumeTemplate> volumeTemplates) {
+        this.volumeTemplates = volumeTemplates;
+    }
 
 }

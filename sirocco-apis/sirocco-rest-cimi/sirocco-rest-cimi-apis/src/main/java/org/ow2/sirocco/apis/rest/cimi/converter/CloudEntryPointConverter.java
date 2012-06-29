@@ -32,6 +32,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
@@ -124,6 +128,15 @@ public class CloudEntryPointConverter extends ObjectCommonConverter {
                 CimiMachineCollection.class));
             dataCimi.setMachineTemplates((CimiMachineTemplateCollection) context.convertNextCimi(
                 dataService.getMachineTemplates(), CimiMachineTemplateCollection.class));
+
+            dataCimi.setVolumeConfigurations((CimiVolumeConfigurationCollection) context.convertNextCimi(
+                dataService.getVolumeConfigurations(), CimiVolumeConfigurationCollection.class));
+            dataCimi.setVolumeImages((CimiVolumeImageCollection) context.convertNextCimi(dataService.getVolumeImages(),
+                CimiVolumeImageCollection.class));
+            dataCimi.setVolumes((CimiVolumeCollection) context.convertNextCimi(dataService.getVolumes(),
+                CimiVolumeCollection.class));
+            dataCimi.setVolumeTemplates((CimiVolumeTemplateCollection) context.convertNextCimi(
+                dataService.getVolumeTemplates(), CimiVolumeTemplateCollection.class));
         }
     }
 
