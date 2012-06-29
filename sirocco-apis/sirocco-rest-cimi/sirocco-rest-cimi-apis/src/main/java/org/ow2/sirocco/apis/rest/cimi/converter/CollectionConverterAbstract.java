@@ -54,39 +54,13 @@ public abstract class CollectionConverterAbstract implements CimiConverter {
      */
     protected <E extends CimiResource> void fill(final CimiContext context, final Object dataService,
         final CimiCollection<E> dataCimi) {
-        // FIXME
         if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setResourceURI(dataCimi.getExchangeType().getResourceURI());
-            // if (null == dataService.getId()) {
             dataCimi.setId(context.makeHrefBase(dataCimi));
-            // } else {
-            // dataCimi.setId(context.makeHref(dataCimi,
-            // dataService.getId().toString()));
-            // }
         }
         if (true == context.mustBeReferenced(dataCimi)) {
-            // if (null == dataService.getId()) {
             dataCimi.setHref(context.makeHrefBase(dataCimi));
-            // } else {
-            // dataCimi.setHref(context.makeHref(dataCimi,
-            // dataService.getId().toString()));
-            // }
         }
-    }
-
-    /**
-     * Fill the common data from a CIMI collection to a service collection.
-     * 
-     * @param context The current context
-     * @param dataCimi Source CIMI collection
-     * @param dataService Destination service collection
-     */
-    protected <E extends CimiResource> void fill(final CimiContext context, final CimiCollection<E> dataCimi,
-        final Object dataService) {
-        // FIXME
-        // if (null != dataCimi.getId()) {
-        // dataService.setId(HrefHelper.extractId(dataCimi.getId()));
-        // }
     }
 
     /**
