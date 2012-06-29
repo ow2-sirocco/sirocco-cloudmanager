@@ -69,7 +69,7 @@ public class CimiSystemCredential extends CimiObjectCommonAbstract {
      * 
      * @param credential The value
      */
-    public void setCredentials(final CimiCredentials credential) {
+    public void setCredential(final CimiCredentials credential) {
         this.credential = credential;
     }
 
