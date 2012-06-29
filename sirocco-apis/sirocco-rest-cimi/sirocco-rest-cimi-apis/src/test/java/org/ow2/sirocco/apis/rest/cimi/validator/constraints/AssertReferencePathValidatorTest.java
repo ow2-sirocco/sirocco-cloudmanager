@@ -288,4 +288,16 @@ public class AssertReferencePathValidatorTest {
         toTest.setHref(toTest.getExchangeType().makeHref(this.request.getBaseUri(), (String) null));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validate(this.context, toTest, GroupWrite.class));
     }
+
+    @Test
+    public void testReferenceByFragmentID() {
+        MyImage toTestImage = new MyImage();
+        toTestImage.setHref("#MyImage");
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTestImage, GroupWrite.class));
+
+        MyCollectionConfig toTestCollecConfig = new MyCollectionConfig();
+        toTestCollecConfig.setHref("#MyCollectionConfiguration");
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validate(this.context, toTestCollecConfig, GroupWrite.class));
+    }
+
 }
