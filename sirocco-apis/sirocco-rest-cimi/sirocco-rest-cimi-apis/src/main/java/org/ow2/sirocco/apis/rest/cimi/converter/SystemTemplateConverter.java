@@ -24,8 +24,15 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiComponentDescriptor;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 
 /**
@@ -99,7 +106,15 @@ public class SystemTemplateConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final SystemTemplate dataService, final CimiSystemTemplate dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            // TODO
+            // ComponentDescriptor
+            if ((null != dataService.getComponentDescriptors()) && (dataService.getComponentDescriptors().size() > 0)) {
+                List<CimiComponentDescriptor> listCimis = new ArrayList<CimiComponentDescriptor>();
+                for (ComponentDescriptor itemService : dataService.getComponentDescriptors()) {
+                    listCimis
+                        .add((CimiComponentDescriptor) context.convertNextCimi(itemService, CimiComponentDescriptor.class));
+                }
+                dataCimi.setComponentDescriptors(listCimis.toArray(new CimiComponentDescriptor[listCimis.size()]));
+            }
         }
     }
 
@@ -113,7 +128,14 @@ public class SystemTemplateConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiSystemTemplate dataCimi,
         final SystemTemplate dataService) {
         this.fill(context, dataCimi, dataService);
-        // TODO
+        // ComponentDescriptor
+        if ((null != dataCimi.getComponentDescriptors()) && (dataCimi.getComponentDescriptors().length > 0)) {
+            Set<ComponentDescriptor> listServices = new HashSet<ComponentDescriptor>();
+            for (CimiComponentDescriptor itemCimi : dataCimi.getComponentDescriptors()) {
+                listServices.add((ComponentDescriptor) context.convertNextService(itemCimi));
+            }
+            dataService.setComponentDescriptors(listServices);
+        }
     }
 
 }

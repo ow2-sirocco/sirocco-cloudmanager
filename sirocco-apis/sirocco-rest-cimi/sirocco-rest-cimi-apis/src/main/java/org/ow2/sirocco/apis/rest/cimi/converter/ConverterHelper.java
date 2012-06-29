@@ -29,6 +29,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 
 /**
  * 
@@ -92,6 +93,14 @@ public class ConverterHelper {
     }
 
     public static String toString(final VolumeImage.State value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
+        }
+        return converted;
+    }
+
+    public static String toString(final System.State value) {
         String converted = null;
         if (null != value) {
             converted = value.toString();

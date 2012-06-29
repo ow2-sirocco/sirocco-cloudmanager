@@ -24,8 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
 
 /**
@@ -100,7 +102,7 @@ public class SystemCredentialConverter extends ObjectCommonConverter {
         final CimiSystemCredential dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            // TODO
+            dataCimi.setCredential((CimiCredentials) context.convertNextCimi(dataService.getResource(), CimiCredentials.class));
         }
     }
 
@@ -114,7 +116,7 @@ public class SystemCredentialConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiSystemCredential dataCimi,
         final SystemCredentials dataService) {
         this.fill(context, dataCimi, dataService);
-        // TODO
+        dataService.setResource((CloudResource) context.convertNextService(dataCimi.getCredential()));
     }
 
 }

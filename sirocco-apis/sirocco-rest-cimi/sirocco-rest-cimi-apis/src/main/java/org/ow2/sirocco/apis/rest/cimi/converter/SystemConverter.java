@@ -24,9 +24,19 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.List;
+
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -99,7 +109,16 @@ public class SystemConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final System dataService, final CimiSystem dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            // TODO
+            dataCimi.setCredentials((CimiSystemCredentialCollection) context.convertNextCimi(dataService.getCredentials(),
+                CimiSystemCredentialCollection.class));
+            dataCimi.setMachines((CimiSystemMachineCollection) context.convertNextCimi(dataService.getMachines(),
+                CimiSystemMachineCollection.class));
+            dataCimi.setState(ConverterHelper.toString(dataService.getState()));
+            dataCimi.setSystems((CimiSystemSystemCollection) context.convertNextCimi(dataService.getSystems(),
+                CimiSystemSystemCollection.class));
+            dataCimi.setVolumes((CimiSystemVolumeCollection) context.convertNextCimi(dataService.getVolumes(),
+                CimiSystemVolumeCollection.class));
+            // TODO Networks
         }
     }
 
@@ -110,8 +129,16 @@ public class SystemConverter extends ObjectCommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
+    @SuppressWarnings("unchecked")
     protected void doCopyToService(final CimiContext context, final CimiSystem dataCimi, final System dataService) {
         this.fill(context, dataCimi, dataService);
-        // TODO
+        dataService.setCredentials((List<SystemCredentials>) context.convertNextService(dataCimi.getCredentials()));
+        dataService.setMachines((List<SystemMachine>) context.convertNextService(dataCimi.getMachines()));
+        dataService.setSystems((List<SystemSystem>) context.convertNextService(dataCimi.getSystems()));
+        dataService.setVolumes((List<SystemVolume>) context.convertNextService(dataCimi.getVolumes()));
+        // TODO Networks
+
+        // Next Read only
+        // dataService.setState(dataService.getState());
     }
 }

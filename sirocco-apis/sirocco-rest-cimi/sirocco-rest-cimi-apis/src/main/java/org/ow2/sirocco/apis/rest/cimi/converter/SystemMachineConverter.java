@@ -24,8 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
 
 /**
@@ -99,7 +101,7 @@ public class SystemMachineConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final SystemMachine dataService, final CimiSystemMachine dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            // TODO
+            dataCimi.setMachine((CimiMachine) context.convertNextCimi(dataService.getResource(), CimiMachine.class));
         }
     }
 
@@ -112,7 +114,7 @@ public class SystemMachineConverter extends ObjectCommonConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiSystemMachine dataCimi, final SystemMachine dataService) {
         this.fill(context, dataCimi, dataService);
-        // TODO
+        dataService.setResource((CloudResource) context.convertNextService(dataCimi.getMachine()));
     }
 
 }

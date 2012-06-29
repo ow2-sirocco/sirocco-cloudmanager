@@ -25,7 +25,9 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 
 /**
@@ -97,10 +99,9 @@ public class SystemVolumeConverter extends ObjectCommonConverter {
      */
     protected void doCopyToCimi(final CimiContext context, final SystemVolume dataService, final CimiSystemVolume dataCimi) {
         this.fill(context, dataService, dataCimi);
-        // TODO
-        // dataCimi.setInitialLocation(dataService.getInitialLocation());
-        // dataCimi.setVolume((CimiVolume)
-        // context.convertNextCimi(dataService.getVolume(), CimiVolume.class));
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi.setVolume((CimiVolume) context.convertNextCimi(dataService.getResource(), CimiVolume.class));
+        }
     }
 
     /**
@@ -112,9 +113,6 @@ public class SystemVolumeConverter extends ObjectCommonConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiSystemVolume dataCimi, final SystemVolume dataService) {
         this.fill(context, dataCimi, dataService);
-        // TODO
-        // dataService.setInitialLocation(dataCimi.getInitialLocation());
-        // dataService.setVolume((Volume)
-        // context.convertNextService(dataCimi.getVolume()));
+        dataService.setResource((CloudResource) context.convertNextService(dataCimi.getVolume()));
     }
 }
