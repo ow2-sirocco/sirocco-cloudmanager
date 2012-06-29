@@ -96,7 +96,7 @@ public class MachineImageManager implements IMachineImageManager {
 
         j.setTargetEntity(mi);
         j.setStatus(Job.Status.SUCCESS);
-        j.setAction("create");
+        j.setAction("add");
         j.setParentJob(null);
         j.setNestedJobs(null);
         j.setReturnCode(0);
