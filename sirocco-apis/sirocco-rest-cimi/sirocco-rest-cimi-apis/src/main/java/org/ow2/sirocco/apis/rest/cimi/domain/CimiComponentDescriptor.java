@@ -169,6 +169,28 @@ public class CimiComponentDescriptor extends CimiCommon {
     }
 
     /**
+     * Return the value of field "systemTemplate".
+     * 
+     * @return The value
+     */
+    public CimiSystemTemplate getSystemTemplate() {
+        CimiSystemTemplate template = null;
+        if (this.component instanceof CimiSystemTemplate) {
+            template = (CimiSystemTemplate) this.component;
+        }
+        return template;
+    }
+
+    /**
+     * Set the value of field "systemTemplate".
+     * 
+     * @param systemTemplate The value
+     */
+    public void setSystemTemplate(final CimiSystemTemplate systemTemplate) {
+        this.component = systemTemplate;
+    }
+
+    /**
      * Return the value of field "volumeTemplate".
      * 
      * @return The value
