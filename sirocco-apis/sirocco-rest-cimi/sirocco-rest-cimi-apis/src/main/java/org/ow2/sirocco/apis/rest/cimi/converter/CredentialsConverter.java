@@ -100,9 +100,9 @@ public class CredentialsConverter extends ObjectCommonConverter {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setUserName(dataService.getUserName());
+            dataCimi.setKey(dataService.getPublicKey());
             // Next write only
             if (true == context.isConvertedWriteOnly()) {
-                dataCimi.setKey(dataService.getPublicKey());
                 dataCimi.setPassword(dataService.getPassword());
             }
         }
