@@ -57,6 +57,9 @@ public class MachineConfigShowCommand implements Command {
         table.addCell("id");
         table.addCell(machineConfig.getId());
 
+        table.addCell("name");
+        table.addCell(machineConfig.getName());
+
         table.addCell("description");
         table.addCell(machineConfig.getDescription());
         table.addCell("cpu");
@@ -81,8 +84,10 @@ public class MachineConfigShowCommand implements Command {
         }
         table.addCell("properties");
         StringBuffer sb = new StringBuffer();
-        for (Map.Entry<String, String> prop : machineConfig.getProperties().entrySet()) {
-            sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+        if (machineConfig.getProperties() != null) {
+            for (Map.Entry<String, String> prop : machineConfig.getProperties().entrySet()) {
+                sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+            }
         }
         table.addCell(sb.toString());
 

@@ -33,11 +33,37 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.sdk.Machine.NetworkInterface.Type;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class Machine extends Resource<CimiMachine> {
     public static enum State {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
+    }
+
+    public static class NetworkInterface {
+        public static enum Type {
+            PUBLIC, PRIVATE
+        }
+
+        private final Type type;
+
+        private final String ip;
+
+        public Type getType() {
+            return this.type;
+        }
+
+        public String getIp() {
+            return this.ip;
+        }
+
+        public NetworkInterface(final Type type, final String ip) {
+            super();
+            this.type = type;
+            this.ip = ip;
+        }
     }
 
     public Machine(final CimiClient cimiClient, final String id) {
@@ -56,6 +82,24 @@ public class Machine extends Resource<CimiMachine> {
 
     public State getState() {
         return State.valueOf(this.cimiObject.getState());
+    }
+
+    public int getCpu() {
+        return this.cimiObject.getCpu();
+    }
+
+    public int getMemory() {
+        return this.cimiObject.getMemory();
+    }
+
+    public List<NetworkInterface> getNetworkInterface() {
+        List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
+        for (CimiNetworkInterface cimiNic : this.cimiObject.getNetworkInterfaces()) {
+            // XXX fixme
+            NetworkInterface nic = new NetworkInterface(Type.PUBLIC, cimiNic.getAddress());
+            nics.add(nic);
+        }
+        return nics;
     }
 
     public Job start() throws CimiException {
@@ -89,8 +133,7 @@ public class Machine extends Resource<CimiMachine> {
 
         if (machinesCollection.getCollection() != null) {
             for (CimiMachine cimiMachine : machinesCollection.getCollection().getArray()) {
-                // result.add(new Machine(client, cimiMachine));
-                result.add(Machine.getMachineByReference(client, cimiMachine.getHref()));
+                result.add(new Machine(client, cimiMachine));
             }
         }
         return result;

@@ -104,7 +104,7 @@ public class MachineImage extends Resource<CimiMachineImage> {
 
         if (machineImagesCollection.getCollection() != null) {
             for (CimiMachineImage cimiMachineImage : machineImagesCollection.getCollection().getArray()) {
-                result.add(MachineImage.getMachineImageByReference(client, cimiMachineImage.getHref()));
+                result.add(new MachineImage(client, cimiMachineImage));
             }
         }
         return result;

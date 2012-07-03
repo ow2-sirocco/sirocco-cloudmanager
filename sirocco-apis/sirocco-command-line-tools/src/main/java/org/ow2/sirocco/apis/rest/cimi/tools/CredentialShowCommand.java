@@ -58,7 +58,11 @@ public class CredentialShowCommand implements Command {
         table.addCell("description");
         table.addCell(cred.getDescription());
         table.addCell("public key");
-        table.addCell(cred.getPublicKey().substring(0, 10) + "...");
+        if (cred.getPublicKey() != null) {
+            table.addCell(cred.getPublicKey().substring(0, 10) + "...");
+        } else {
+            table.addCell("");
+        }
         table.addCell("created");
         table.addCell(cred.getCreated().toString());
         table.addCell("updated");
@@ -69,8 +73,10 @@ public class CredentialShowCommand implements Command {
         }
         table.addCell("properties");
         StringBuffer sb = new StringBuffer();
-        for (Map.Entry<String, String> prop : cred.getProperties().entrySet()) {
-            sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+        if (cred.getProperties() != null) {
+            for (Map.Entry<String, String> prop : cred.getProperties().entrySet()) {
+                sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+            }
         }
         table.addCell(sb.toString());
 

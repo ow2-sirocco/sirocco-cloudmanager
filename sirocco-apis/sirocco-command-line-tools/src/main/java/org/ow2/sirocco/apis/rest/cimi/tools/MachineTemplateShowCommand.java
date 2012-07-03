@@ -74,8 +74,10 @@ public class MachineTemplateShowCommand implements Command {
         }
         table.addCell("properties");
         StringBuffer sb = new StringBuffer();
-        for (Map.Entry<String, String> prop : machineTemplate.getProperties().entrySet()) {
-            sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+        if (machineTemplate.getProperties() != null) {
+            for (Map.Entry<String, String> prop : machineTemplate.getProperties().entrySet()) {
+                sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+            }
         }
         table.addCell(sb.toString());
 

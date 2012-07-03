@@ -66,7 +66,11 @@ public class CredentialListCommand implements Command {
             table.addCell(cred.getId());
             table.addCell(cred.getName());
             table.addCell(cred.getDescription());
-            table.addCell(cred.getPublicKey().substring(0, 10) + "...");
+            if (cred.getPublicKey() != null) {
+                table.addCell(cred.getPublicKey().substring(0, 10) + "...");
+            } else {
+                table.addCell("");
+            }
         }
         System.out.println(table.render());
     }

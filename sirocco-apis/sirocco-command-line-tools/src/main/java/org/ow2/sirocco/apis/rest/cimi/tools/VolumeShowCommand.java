@@ -75,8 +75,10 @@ public class VolumeShowCommand implements Command {
         }
         table.addCell("properties");
         StringBuffer sb = new StringBuffer();
-        for (Map.Entry<String, String> prop : volume.getProperties().entrySet()) {
-            sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+        if (volume.getProperties() != null) {
+            for (Map.Entry<String, String> prop : volume.getProperties().entrySet()) {
+                sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+            }
         }
         table.addCell(sb.toString());
 

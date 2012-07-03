@@ -93,8 +93,7 @@ public class Volume extends Resource<CimiVolume> {
 
         if (volumeCollection.getCollection() != null) {
             for (CimiVolume cimiVolume : volumeCollection.getCollection().getArray()) {
-                // result.add(new Machine(client, cimiMachine));
-                result.add(Volume.getVolumeByReference(client, cimiVolume.getHref()));
+                result.add(new Volume(client, cimiVolume));
             }
         }
         return result;

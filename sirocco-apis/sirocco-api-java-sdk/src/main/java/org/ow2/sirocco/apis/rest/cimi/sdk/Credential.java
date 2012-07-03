@@ -65,7 +65,11 @@ public class Credential extends Resource<CimiCredentials> {
     }
 
     public String getPublicKey() {
-        return new String(this.cimiObject.getKey());
+        if (this.cimiObject.getKey() != null) {
+            return new String(this.cimiObject.getKey());
+        } else {
+            return null;
+        }
     }
 
     public void setPublicKey(final String key) {
@@ -78,20 +82,20 @@ public class Credential extends Resource<CimiCredentials> {
 
     public static Credential createCredential(final CimiClient client, final CredentialCreate credentialCreate)
         throws CimiException {
-        CimiCredentials cimiObject = client.postRequest(ConstantsPath.CREDENTIALS_PATH, credentialCreate.cimiCredentialsCreate,
+        CimiCredentials cimiObject = client.postRequest(ConstantsPath.CREDENTIAL_PATH, credentialCreate.cimiCredentialsCreate,
             CimiCredentials.class);
         return new Credential(client, cimiObject);
     }
 
     public static List<Credential> getCredentials(final CimiClient client) throws CimiException {
-        CimiCredentialsCollection volumeConfigCollection = client.getRequest(
+        CimiCredentialsCollection credentialCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getCredentials().getHref()), CimiCredentialsCollection.class);
 
         List<Credential> result = new ArrayList<Credential>();
 
-        if (volumeConfigCollection.getCollection() != null) {
-            for (CimiCredentials cimiVolumeConfig : volumeConfigCollection.getCollection().getArray()) {
-                result.add(Credential.getCredentialByReference(client, cimiVolumeConfig.getHref()));
+        if (credentialCollection.getCollection() != null) {
+            for (CimiCredentials cimiCrdential : credentialCollection.getCollection().getArray()) {
+                result.add(new Credential(client, cimiCrdential));
             }
         }
         return result;

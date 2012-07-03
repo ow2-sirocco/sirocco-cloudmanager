@@ -74,8 +74,10 @@ public class VolumeTemplateShowCommand implements Command {
         }
         table.addCell("properties");
         StringBuffer sb = new StringBuffer();
-        for (Map.Entry<String, String> prop : volumeTemplate.getProperties().entrySet()) {
-            sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+        if (volumeTemplate.getProperties() != null) {
+            for (Map.Entry<String, String> prop : volumeTemplate.getProperties().entrySet()) {
+                sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+            }
         }
         table.addCell(sb.toString());
 

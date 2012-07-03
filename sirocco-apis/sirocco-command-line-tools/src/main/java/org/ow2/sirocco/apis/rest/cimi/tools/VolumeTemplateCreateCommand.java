@@ -69,8 +69,10 @@ public class VolumeTemplateCreateCommand implements Command {
         }
         VolumeConfiguration volumeConfig = new VolumeConfiguration(cimiClient, this.volumeConfigId);
         volumeTemplate.setVolumeConfig(volumeConfig);
-        VolumeImage volumeImage = new VolumeImage(cimiClient, this.volumeImageId);
-        volumeTemplate.setVolumeImage(volumeImage);
+        if (this.volumeImageId != null) {
+            VolumeImage volumeImage = new VolumeImage(cimiClient, this.volumeImageId);
+            volumeTemplate.setVolumeImage(volumeImage);
+        }
 
         volumeTemplate = VolumeTemplate.createVolumeTemplate(cimiClient, volumeTemplate);
 

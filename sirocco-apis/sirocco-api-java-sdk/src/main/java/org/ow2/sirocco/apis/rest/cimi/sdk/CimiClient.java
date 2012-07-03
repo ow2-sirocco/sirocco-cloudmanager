@@ -106,7 +106,7 @@ public class CimiClient {
     String getMachineConfigurationsPath() {
         return this.cloudEntryPoint.getMachineConfigs().getHref();
     }
-    
+
     String getVolumesPath() {
         return this.cloudEntryPoint.getVolumes().getHref();
     }
@@ -122,15 +122,15 @@ public class CimiClient {
     String getVolumeConfigurationsPath() {
         return this.cloudEntryPoint.getVolumeConfigurations().getHref();
     }
-    
+
     String getCredentialsPath() {
         return this.cloudEntryPoint.getCredentials().getHref();
     }
 
     String getCredentialTemplatesPath() {
-        return this.cloudEntryPoint.getCredentialsTemplates().getHref();
+        return this.cloudEntryPoint.getCredentialTemplates().getHref();
     }
-    
+
     String getJobsPath() {
         return this.cloudEntryPoint.getJobs().getHref();
     }
@@ -205,7 +205,7 @@ public class CimiClient {
     }
 
     <U> U getRequest(final String path, final Class<U> clazz) throws CimiException {
-        WebResource service = this.webResource.path(path);
+        WebResource service = this.webResource.path(path).queryParam("expand", "*");
         ClientResponse response = this.authentication(service, this.userName, this.password).accept(this.mediaType)
             .get(ClientResponse.class);
         this.handleResponseStatus(response);

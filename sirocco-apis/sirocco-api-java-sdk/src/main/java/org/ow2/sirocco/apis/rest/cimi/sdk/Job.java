@@ -102,7 +102,7 @@ public class Job extends Resource<CimiJob> {
         List<Job> result = new ArrayList<Job>();
 
         for (CimiJob cimiJob : jobCollection.getCollection().getArray()) {
-            result.add(Job.getJobByReference(client, cimiJob.getHref()));
+            result.add(new Job(client, cimiJob));
         }
         return result;
     }

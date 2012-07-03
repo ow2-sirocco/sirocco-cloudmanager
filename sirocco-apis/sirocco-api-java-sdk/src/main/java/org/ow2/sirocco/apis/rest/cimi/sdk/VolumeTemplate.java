@@ -65,7 +65,7 @@ public class VolumeTemplate extends Resource<CimiVolumeTemplate> {
 
         if (volumeTemplateCollection.getCollection() != null) {
             for (CimiVolumeTemplate cimiVolumeTemplate : volumeTemplateCollection.getCollection().getArray()) {
-                result.add(VolumeTemplate.getVolumeTemplateByReference(client, cimiVolumeTemplate.getHref()));
+                result.add(new VolumeTemplate(client, cimiVolumeTemplate));
             }
         }
         return result;

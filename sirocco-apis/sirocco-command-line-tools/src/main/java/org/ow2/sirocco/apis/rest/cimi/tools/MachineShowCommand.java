@@ -55,6 +55,8 @@ public class MachineShowCommand implements Command {
         table.addCell("id");
         table.addCell(machine.getId());
 
+        table.addCell("name");
+        table.addCell(machine.getName());
         table.addCell("description");
         table.addCell(machine.getDescription());
         table.addCell("status");
@@ -69,8 +71,23 @@ public class MachineShowCommand implements Command {
         }
         table.addCell("properties");
         StringBuffer sb = new StringBuffer();
-        for (Map.Entry<String, String> prop : machine.getProperties().entrySet()) {
-            sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+        if (machine.getProperties() != null) {
+            for (Map.Entry<String, String> prop : machine.getProperties().entrySet()) {
+                sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+            }
+        }
+        table.addCell(sb.toString());
+
+        table.addCell("cpu");
+        table.addCell(Integer.toString(machine.getCpu()));
+
+        table.addCell("memory");
+        table.addCell(Integer.toString(machine.getMemory()));
+
+        table.addCell("IP addresses");
+        sb = new StringBuffer();
+        for (Machine.NetworkInterface nic : machine.getNetworkInterface()) {
+            sb.append(nic.getType() + ": " + nic.getIp());
         }
         table.addCell(sb.toString());
 

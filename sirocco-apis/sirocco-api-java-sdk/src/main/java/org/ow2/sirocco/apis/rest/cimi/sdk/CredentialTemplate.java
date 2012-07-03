@@ -52,14 +52,14 @@ public class CredentialTemplate extends Resource<CimiCredentialsTemplate> {
 
     public static CredentialTemplate createCredentialTemplate(final CimiClient client,
         final CredentialTemplate credentialTemplate) throws CimiException {
-        CimiCredentialsTemplate cimiObject = client.postRequest(ConstantsPath.CREDENTIALS_TEMPLATE_PATH,
+        CimiCredentialsTemplate cimiObject = client.postRequest(ConstantsPath.CREDENTIAL_TEMPLATE_PATH,
             credentialTemplate.cimiObject, CimiCredentialsTemplate.class);
         return new CredentialTemplate(client, cimiObject);
     }
 
     public static List<CredentialTemplate> getCredentialTemplates(final CimiClient client) throws CimiException {
         CimiCredentialsTemplateCollection credentialTemplateCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getCredentialsTemplates().getHref()),
+            client.extractPath(client.cloudEntryPoint.getCredentialTemplates().getHref()),
             CimiCredentialsTemplateCollection.class);
 
         List<CredentialTemplate> result = new ArrayList<CredentialTemplate>();

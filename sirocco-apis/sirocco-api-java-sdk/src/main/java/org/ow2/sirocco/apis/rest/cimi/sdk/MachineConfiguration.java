@@ -126,7 +126,7 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
 
         if (machineConfigCollection.getCollection() != null) {
             for (CimiMachineConfiguration cimiMachineConfig : machineConfigCollection.getCollection().getArray()) {
-                result.add(MachineConfiguration.getMachineConfigurationByReference(client, cimiMachineConfig.getHref()));
+                result.add(new MachineConfiguration(client, cimiMachineConfig));
             }
         }
         return result;

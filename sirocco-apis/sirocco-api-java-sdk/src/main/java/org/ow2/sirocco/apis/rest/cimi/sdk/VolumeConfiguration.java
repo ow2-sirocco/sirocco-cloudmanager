@@ -92,7 +92,7 @@ public class VolumeConfiguration extends Resource<CimiVolumeConfiguration> {
 
         if (volumeConfigCollection.getCollection() != null) {
             for (CimiVolumeConfiguration cimiVolumeConfig : volumeConfigCollection.getCollection().getArray()) {
-                result.add(VolumeConfiguration.getVolumeConfigurationByReference(client, cimiVolumeConfig.getHref()));
+                result.add(new VolumeConfiguration(client, cimiVolumeConfig));
             }
         }
         return result;

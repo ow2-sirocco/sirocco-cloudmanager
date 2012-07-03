@@ -65,7 +65,7 @@ public class MachineTemplate extends Resource<CimiMachineTemplate> {
 
         if (machineTemplateCollection.getCollection() != null) {
             for (CimiMachineTemplate cimiMachineTemplate : machineTemplateCollection.getCollection().getArray()) {
-                result.add(MachineTemplate.getMachineTemplateByReference(client, cimiMachineTemplate.getHref()));
+                result.add(new MachineTemplate(client, cimiMachineTemplate));
             }
         }
         return result;

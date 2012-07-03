@@ -76,7 +76,7 @@ public class CredentialCreate {
 
     public void setCredentialTemplate(final CredentialTemplate credentialTemplate) {
         this.credentialTemplate = credentialTemplate;
-        this.cimiCredentialsCreate.setCredentialsTemplate(credentialTemplate.cimiObject);
+        this.cimiCredentialsCreate.setCredentialTemplate(credentialTemplate.cimiObject);
     }
 
 }
