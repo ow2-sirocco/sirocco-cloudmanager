@@ -42,7 +42,7 @@ public class Event extends CloudEntity implements Serializable {
     
     protected String    type;
     
-    @OneToOne(cascade=CascadeType.ALL)
+    
     protected EventType content;
     
     public static enum Outcome {

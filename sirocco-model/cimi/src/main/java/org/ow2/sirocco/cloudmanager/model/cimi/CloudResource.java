@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -39,6 +40,7 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -46,6 +48,8 @@ import javax.persistence.Version;
 
 import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
+import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -76,6 +80,11 @@ public abstract class CloudResource implements Serializable, Resource {
     // protected Collection<CloudProvider> cloudProviders;
     
     protected long versionNum;
+    
+    protected List<Meter>   meters;
+    
+    
+    protected EventLog  eventLog;
     
     
     @Version
@@ -187,4 +196,23 @@ public abstract class CloudResource implements Serializable, Resource {
     public void setUser(final User user) {
         this.user = user;
     }
+    
+    @OneToMany(mappedBy = "targetResource")
+    public List<Meter> getMeters() {
+        return meters;
+    }
+
+    public void setMeters(List<Meter> meters) {
+        this.meters = meters;
+    }
+
+    @OneToOne(mappedBy = "targetResource")
+    public EventLog getEventLog() {
+        return eventLog;
+    }
+
+    public void setEventLog(EventLog eventLog) {
+        this.eventLog = eventLog;
+    }
+
 }
