@@ -15,7 +15,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 import org.ow2.easybeans.osgi.annotation.OSGiResource;
@@ -27,6 +26,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteNetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
@@ -198,22 +198,10 @@ public class NetworkManager implements INetworkManager {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<Network> getNetworks(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<Network> getNetworks(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em
-            .createQuery("FROM Network v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<Network> getNetworks(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("Network", this.em, user.getUsername(), first, last, filters, attributes, true);
     }
 
     @Override
@@ -346,21 +334,11 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public List<NetworkConfiguration> getNetworkConfigurations(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<NetworkConfiguration> getNetworkConfigurations(final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM NetworkConfiguration v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<NetworkConfiguration> getNetworkConfigurations(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("NetworkConfiguration", this.em, user.getUsername(), first, last, filters,
+            attributes, false);
     }
 
     @Override
@@ -434,21 +412,11 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public List<NetworkTemplate> getNetworkTemplates(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<NetworkTemplate> getNetworkTemplates(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM NetworkTemplate v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<NetworkTemplate> getNetworkTemplates(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("NetworkTemplate", this.em, user.getUsername(), first, last, filters, attributes,
+            false);
     }
 
     @Override
@@ -645,22 +613,11 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public List<NetworkPort> getNetworkPorts(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<NetworkPort> getNetworkPorts(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em
-            .createQuery("FROM NetworkPort v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<NetworkPort> getNetworkPorts(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("NetworkPort", this.em, user.getUsername(), first, last, filters, attributes,
+            true);
     }
 
     @Override
@@ -729,21 +686,11 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public List<NetworkPortConfiguration> getNetworkPortConfigurations(final int first, final int last,
-        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+    public QueryResult<NetworkPortConfiguration> getNetworkPortConfigurations(final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM NetworkPortConfiguration v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<NetworkPortConfiguration> getNetworkPortConfigurations(final List<String> attributes,
-        final String filterExpression) throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("NetworkPortConfiguration", this.em, user.getUsername(), first, last, filters,
+            attributes, false);
     }
 
     @Override
@@ -821,21 +768,11 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public List<NetworkPortTemplate> getNetworkPortTemplates(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<NetworkPortTemplate> getNetworkPortTemplates(final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM NetworkPortTemplate v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<NetworkPortTemplate> getNetworkPortTemplates(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("NetworkPortTemplate", this.em, user.getUsername(), first, last, filters,
+            attributes, false);
     }
 
     @Override
@@ -909,21 +846,11 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public List<ForwardingGroupTemplate> getForwardingGroupTemplates(final int first, final int last,
-        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+    public QueryResult<ForwardingGroupTemplate> getForwardingGroupTemplates(final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM ForwardingGroupTemplate v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<ForwardingGroupTemplate> getForwardingGroupTemplates(final List<String> attributes,
-        final String filterExpression) throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("ForwardingGroupTemplate", this.em, user.getUsername(), first, last, filters,
+            attributes, false);
     }
 
     @Override
@@ -1045,21 +972,11 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public List<ForwardingGroup> getForwardingGroups(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<ForwardingGroup> getForwardingGroups(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM ForwardingGroup v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<ForwardingGroup> getForwardingGroups(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("ForwardingGroup", this.em, user.getUsername(), first, last, filters, attributes,
+            true);
     }
 
     @Override
@@ -1220,21 +1137,10 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public List<Address> getAddresses(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<Address> getAddresses(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM Address v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<Address> getAddresses(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("Address", this.em, user.getUsername(), first, last, filters, attributes, false);
     }
 
     @Override
@@ -1301,21 +1207,11 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public List<AddressTemplate> getAddressTemplates(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<AddressTemplate> getAddressTemplates(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM AddressTemplate v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<AddressTemplate> getAddressTemplates(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        return UtilsForManagers.getEntityList("AddressTemplate", this.em, user.getUsername(), first, last, filters, attributes,
+            false);
     }
 
     @Override

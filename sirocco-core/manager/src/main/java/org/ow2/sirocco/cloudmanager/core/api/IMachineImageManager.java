@@ -60,9 +60,6 @@ public interface IMachineImageManager {
     void updateMachineImageAttributes(String imageId, Map<String, Object> attributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
-    List<MachineImage> getMachineImages(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<MachineImage> getMachineImages(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<MachineImage> getMachineImages(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 }

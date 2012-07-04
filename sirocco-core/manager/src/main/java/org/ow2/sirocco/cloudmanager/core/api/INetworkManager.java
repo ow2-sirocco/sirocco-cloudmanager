@@ -66,11 +66,8 @@ public interface INetworkManager {
 
     List<Network> getNetworks() throws CloudProviderException;
 
-    List<Network> getNetworks(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<Network> getNetworks(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<Network> getNetworks(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     Job updateNetwork(Network network) throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
@@ -91,11 +88,8 @@ public interface INetworkManager {
     NetworkConfiguration getNetworkConfigurationAttributes(final String networkConfigId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
 
-    List<NetworkConfiguration> getNetworkConfigurations(int first, int last, List<String> attributes)
-        throws InvalidRequestException, CloudProviderException;
-
-    List<NetworkConfiguration> getNetworkConfigurations(List<String> attributes, String filterExpression)
-        throws InvalidRequestException, CloudProviderException;
+    QueryResult<NetworkConfiguration> getNetworkConfigurations(int first, int last, List<String> filters,
+        List<String> attributes) throws InvalidRequestException, CloudProviderException;
 
     void updateNetworkConfiguration(NetworkConfiguration networkConfig) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
@@ -118,11 +112,8 @@ public interface INetworkManager {
     NetworkTemplate getNetworkTemplateAttributes(final String networkTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
 
-    List<NetworkTemplate> getNetworkTemplates(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<NetworkTemplate> getNetworkTemplates(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<NetworkTemplate> getNetworkTemplates(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     void updateNetworkTemplate(NetworkTemplate networkTemplate) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
@@ -147,11 +138,8 @@ public interface INetworkManager {
     NetworkPort getNetworkPortAttributes(final String networkPortId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
 
-    List<NetworkPort> getNetworkPorts(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<NetworkPort> getNetworkPorts(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<NetworkPort> getNetworkPorts(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     Job updateNetworkPort(NetworkPort networkPort) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
@@ -174,11 +162,8 @@ public interface INetworkManager {
     NetworkPortConfiguration getNetworkPortConfigurationAttributes(final String networkPortConfigurationId,
         List<String> attributes) throws ResourceNotFoundException, CloudProviderException;
 
-    List<NetworkPortConfiguration> getNetworkPortConfigurations(int first, int last, List<String> attributes)
-        throws InvalidRequestException, CloudProviderException;
-
-    List<NetworkPortConfiguration> getNetworkPortConfigurations(List<String> attributes, String filterExpression)
-        throws InvalidRequestException, CloudProviderException;
+    QueryResult<NetworkPortConfiguration> getNetworkPortConfigurations(int first, int last, List<String> filters,
+        List<String> attributes) throws InvalidRequestException, CloudProviderException;
 
     void updateNetworkPortConfiguration(NetworkPortConfiguration networkPort) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
@@ -201,10 +186,7 @@ public interface INetworkManager {
     NetworkPortTemplate getNetworkPortTemplateAttributes(final String networkPortTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
 
-    List<NetworkPortTemplate> getNetworkPortTemplates(int first, int last, List<String> attributes)
-        throws InvalidRequestException, CloudProviderException;
-
-    List<NetworkPortTemplate> getNetworkPortTemplates(List<String> attributes, String filterExpression)
+    QueryResult<NetworkPortTemplate> getNetworkPortTemplates(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 
     void updateNetworkPortTemplate(NetworkPortTemplate networkPort) throws ResourceNotFoundException, InvalidRequestException,
@@ -227,11 +209,8 @@ public interface INetworkManager {
     ForwardingGroupTemplate getForwardingGroupTemplateAttributes(final String forwardingGroupTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
 
-    List<ForwardingGroupTemplate> getForwardingGroupTemplates(int first, int last, List<String> attributes)
-        throws InvalidRequestException, CloudProviderException;
-
-    List<ForwardingGroupTemplate> getForwardingGroupTemplates(List<String> attributes, String filterExpression)
-        throws InvalidRequestException, CloudProviderException;
+    QueryResult<ForwardingGroupTemplate> getForwardingGroupTemplates(int first, int last, List<String> filters,
+        List<String> attributes) throws InvalidRequestException, CloudProviderException;
 
     void updateForwardingGroupTemplate(ForwardingGroupTemplate forwardingGroupTemplate) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
@@ -254,11 +233,8 @@ public interface INetworkManager {
     ForwardingGroup getForwardingGroupAttributes(final String forwardingGroupId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
 
-    List<ForwardingGroup> getForwardingGroups(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<ForwardingGroup> getForwardingGroups(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<ForwardingGroup> getForwardingGroups(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     Job updateForwardingGroup(ForwardingGroup forwardingGroup) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
@@ -285,11 +261,8 @@ public interface INetworkManager {
     Address getAddressAttributes(final String addressId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
 
-    List<Address> getAddresses(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<Address> getAddresses(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<Address> getAddresses(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     Job updateAddress(Address address) throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
@@ -310,11 +283,8 @@ public interface INetworkManager {
     AddressTemplate getAddressTemplateAttributes(final String addressTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
 
-    List<AddressTemplate> getAddressTemplates(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<AddressTemplate> getAddressTemplates(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<AddressTemplate> getAddressTemplates(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     void updateAddressTemplate(AddressTemplate addressTemplate) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;

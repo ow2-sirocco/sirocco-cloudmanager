@@ -51,6 +51,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -376,6 +377,8 @@ public class VolumeManagerTest {
         List<VolumeImage> volumeImages = this.volumeManager.getVolumeImages();
         Assert.assertTrue(volumeImages.contains(volumeImage));
 
+        // read
+
         volume = this.volumeManager.getVolumeById(volumeId);
 
         List<VolumeVolumeImage> volumeVolumeImages = volume.getImages();
@@ -385,6 +388,14 @@ public class VolumeManagerTest {
         Assert.assertEquals(volumeVolumeImage.getVolumeImage().getId().toString(), volumeImageId);
 
         volumeVolumeImage = this.volumeManager.getVolumeImageFromVolume(volumeId, volumeVolumeImageId);
+
+        volumeVolumeImages = this.volumeManager.getVolumeVolumeImages(volumeId);
+        Assert.assertEquals(1, volumeVolumeImages.size());
+        Assert.assertEquals(volumeVolumeImageId, volumeVolumeImages.get(0).getId().toString());
+
+        QueryResult<VolumeVolumeImage> query = this.volumeManager.getVolumeVolumeImages(volumeId, 0, 10, null, null);
+        Assert.assertEquals(1, query.getCount());
+        Assert.assertEquals(volumeVolumeImageId, query.getItems().get(0).getId().toString());
 
         // UPDATE VolumeImage
 
@@ -439,20 +450,24 @@ public class VolumeManagerTest {
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-        volumes = this.volumeManager.getVolumes(0, 9, attributes);
-        Assert.assertEquals(10, volumes.size());
+        QueryResult<Volume> query = this.volumeManager.getVolumes(0, 9, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(10, query.getItems().size());
         for (int i = 0; i < 10; i++) {
-            Assert.assertEquals("myVolume" + i, volumes.get(i).getName());
+            Assert.assertEquals("myVolume" + i, query.getItems().get(i).getName());
         }
-        volumes = this.volumeManager.getVolumes(10, 25, attributes);
-        Assert.assertEquals(10, volumes.size());
-        volumes = this.volumeManager.getVolumes(20, 100, attributes);
-        Assert.assertEquals(0, volumes.size());
+        query = this.volumeManager.getVolumes(10, 25, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(10, query.getItems().size());
+        query = this.volumeManager.getVolumes(20, 100, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(0, query.getItems().size());
 
-        volumes = this.volumeManager.getVolumes(attributes, null);
-        Assert.assertEquals(20, volumes.size());
+        query = this.volumeManager.getVolumes(-1, -1, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(20, query.getItems().size());
         for (int i = 0; i < 20; i++) {
-            Assert.assertEquals("myVolume" + i, volumes.get(i).getName());
+            Assert.assertEquals("myVolume" + i, query.getItems().get(i).getName());
             this.deleteVolume(volumes.get(i).getId().toString());
         }
         volumes = this.volumeManager.getVolumes();
@@ -469,21 +484,25 @@ public class VolumeManagerTest {
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-        volumeConfigs = this.volumeManager.getVolumeConfigurations(0, 9, attributes);
-        Assert.assertEquals(10, volumeConfigs.size());
+        QueryResult<VolumeConfiguration> query = this.volumeManager.getVolumeConfigurations(0, 9, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(10, query.getItems().size());
         for (int i = 0; i < 10; i++) {
-            Assert.assertEquals("myVolumeConfig" + i, volumeConfigs.get(i).getName());
+            Assert.assertEquals("myVolumeConfig" + i, query.getItems().get(i).getName());
         }
-        volumeConfigs = this.volumeManager.getVolumeConfigurations(10, 25, attributes);
-        Assert.assertEquals(10, volumeConfigs.size());
-        volumeConfigs = this.volumeManager.getVolumeConfigurations(20, 100, attributes);
-        Assert.assertEquals(0, volumeConfigs.size());
+        query = this.volumeManager.getVolumeConfigurations(10, 25, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(10, query.getItems().size());
+        query = this.volumeManager.getVolumeConfigurations(20, 100, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(0, query.getItems().size());
 
-        volumeConfigs = this.volumeManager.getVolumeConfigurations(attributes, null);
-        Assert.assertEquals(20, volumeConfigs.size());
+        query = this.volumeManager.getVolumeConfigurations(-1, -1, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(20, query.getItems().size());
         for (int i = 0; i < 20; i++) {
-            Assert.assertEquals("myVolumeConfig" + i, volumeConfigs.get(i).getName());
-            this.volumeManager.deleteVolumeConfiguration(volumeConfigs.get(i).getId().toString());
+            Assert.assertEquals("myVolumeConfig" + i, query.getItems().get(i).getName());
+            this.volumeManager.deleteVolumeConfiguration(query.getItems().get(i).getId().toString());
         }
         volumeConfigs = this.volumeManager.getVolumeConfigurations();
         Assert.assertEquals(0, volumeConfigs.size());
@@ -499,22 +518,26 @@ public class VolumeManagerTest {
 
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
-        volumeTemplates = this.volumeManager.getVolumeTemplates(0, 9, attributes);
-        Assert.assertEquals(10, volumeTemplates.size());
+        QueryResult<VolumeTemplate> query = this.volumeManager.getVolumeTemplates(0, 9, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(10, query.getItems().size());
         for (int i = 0; i < 10; i++) {
-            Assert.assertEquals("myVolumeTemplate" + i, volumeTemplates.get(i).getName());
+            Assert.assertEquals("myVolumeTemplate" + i, query.getItems().get(i).getName());
         }
-        volumeTemplates = this.volumeManager.getVolumeTemplates(10, 25, attributes);
-        Assert.assertEquals(10, volumeTemplates.size());
-        volumeTemplates = this.volumeManager.getVolumeTemplates(20, 100, attributes);
-        Assert.assertEquals(0, volumeTemplates.size());
+        query = this.volumeManager.getVolumeTemplates(10, 25, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(10, query.getItems().size());
+        query = this.volumeManager.getVolumeTemplates(20, 100, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(0, query.getItems().size());
 
-        volumeTemplates = this.volumeManager.getVolumeTemplates(attributes, null);
-        Assert.assertEquals(20, volumeTemplates.size());
+        query = this.volumeManager.getVolumeTemplates(-1, -1, null, attributes);
+        Assert.assertEquals(query.getCount(), 20);
+        Assert.assertEquals(20, query.getItems().size());
         for (int i = 0; i < 20; i++) {
-            Assert.assertEquals("myVolumeTemplate" + i, volumeTemplates.get(i).getName());
-            this.volumeManager.deleteVolumeTemplate(volumeTemplates.get(i).getId().toString());
-            this.volumeManager.deleteVolumeConfiguration(volumeTemplates.get(i).getVolumeConfig().getId().toString());
+            Assert.assertEquals("myVolumeTemplate" + i, query.getItems().get(i).getName());
+            this.volumeManager.deleteVolumeTemplate(query.getItems().get(i).getId().toString());
+            this.volumeManager.deleteVolumeConfiguration(query.getItems().get(i).getVolumeConfig().getId().toString());
         }
         volumeTemplates = this.volumeManager.getVolumeTemplates();
         Assert.assertEquals(0, volumeTemplates.size());

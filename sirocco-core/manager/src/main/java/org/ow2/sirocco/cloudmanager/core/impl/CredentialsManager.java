@@ -39,12 +39,12 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
-import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
@@ -71,8 +71,6 @@ public class CredentialsManager implements ICredentialsManager {
     @EJB
     private IUserManager userManager;
 
-    private User user;
-
     @Resource
     public void setSessionContext(final SessionContext ctx) {
         this.ctx = ctx;
@@ -81,11 +79,6 @@ public class CredentialsManager implements ICredentialsManager {
     private User getUser() throws CloudProviderException {
         String username = this.ctx.getCallerPrincipal().getName();
         return this.userManager.getUserByUsername(username);
-    }
-
-    private void setUser() throws CloudProviderException {
-        String username = this.ctx.getCallerPrincipal().getName();
-        this.user = this.userManager.getUserByUsername(username);
     }
 
     private void validateCredentials(final Credentials cred) throws CloudProviderException {
@@ -107,13 +100,11 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     public Credentials createCredentials(final CredentialsCreate credentialsCreate) throws CloudProviderException {
-        this.setUser();
-        // validate user
         CredentialsManager.logger.info("validateCredentials ");
 
         Credentials credentials = new Credentials();
         credentials.setCreated(new Date());
-        credentials.setUser(this.user);
+        credentials.setUser(this.getUser());
         credentials.setUserName(credentialsCreate.getCredentialsTemplate().getUserName());
         credentials.setPassword(credentialsCreate.getCredentialsTemplate().getPassword());
         credentials.setPublicKey(credentialsCreate.getCredentialsTemplate().getPublicKey());
@@ -128,15 +119,14 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     public void updateCredentials(final Credentials credentials) throws CloudProviderException {
-
-        this.setUser();
+        User user = this.getUser();
 
         Credentials c = this.em.find(Credentials.class, credentials.getId());
         if (c == null) {
             throw new ResourceNotFoundException(" Could not find credential " + credentials.getId());
         }
-        if (c.getUser().getUsername() != this.user.getUsername()) {
-            throw new CloudProviderException(" Unauthorized to change creds " + this.user.getUsername());
+        if (c.getUser().getUsername() != user.getUsername()) {
+            throw new CloudProviderException(" Unauthorized to change creds " + user.getUsername());
         }
         this.validateCredentials(credentials);
         this.em.merge(credentials);
@@ -144,7 +134,7 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     public Credentials getCredentialsById(final String credentialsId) throws CloudProviderException {
-        this.setUser();
+        User user = this.getUser();
         if (credentialsId == null) {
             throw new InvalidRequestException("null credentials id");
         }
@@ -157,7 +147,7 @@ public class CredentialsManager implements ICredentialsManager {
 
     public void deleteCredentials(final String credentialsId) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException {
-        this.setUser();
+        User user = this.getUser();
         if (credentialsId == null) {
             throw new InvalidRequestException("null credentials id");
         }
@@ -205,42 +195,26 @@ public class CredentialsManager implements ICredentialsManager {
         this.em.flush();
     }
 
-    public List<Credentials> getCredentials(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        this.setUser();
-        throw new InvalidRequestException(" getCredentials with filter expression ");
-    }
-
     @Override
     public List<Credentials> getCredentials() throws CloudProviderException {
         return this.em.createQuery("SELECT c FROM Credentials c WHERE c.user.id=:userid")
             .setParameter("userid", this.getUser().getId()).getResultList();
     }
 
-    public List<Credentials> getCredentials(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
-
-        this.setUser();
-        if ((first < 0) || (last < 0) || (last < first)) {
-            throw new InvalidRequestException(" Illegal array index " + first + " " + last);
-        }
-
-        Query query = this.em.createNamedQuery("FROM Credentials c WHERE c.user.username=:userName ORDER BY c.id");
-        query.setParameter("userName", this.user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        List<Credentials> creds = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-
-        return creds;
-
+    @Override
+    public QueryResult<Credentials> getCredentials(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        User user = this.getUser();
+        return UtilsForManagers.getEntityList("Credentials", this.em, user.getUsername(), first, last, filters, attributes,
+            false);
     }
 
     @Override
     public CredentialsTemplate createCredentialsTemplate(final CredentialsTemplate credentialsTemplate)
         throws CloudProviderException {
-        this.setUser();
+        User user = this.getUser();
 
-        credentialsTemplate.setUser(this.user);
+        credentialsTemplate.setUser(user);
         credentialsTemplate.setCreated(new Date());
 
         CredentialsManager.logger.info("Persist credentialsTemplate  " + credentialsTemplate.getName());
@@ -275,23 +249,16 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     @Override
-    public List<CredentialsTemplate> getCredentialsTemplates(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public List<CredentialsTemplate> getCredentialsTemplates() throws CloudProviderException {
         return this.em.createQuery("SELECT c FROM CredentialsTemplate c WHERE c.user.id=:userid")
             .setParameter("userid", this.getUser().getId()).getResultList();
     }
 
     @Override
-    public List<CredentialsTemplate> getCredentialsTemplates(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+    public QueryResult<CredentialsTemplate> getCredentialsTemplates(final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        User user = this.getUser();
+        return UtilsForManagers.getEntityList("CredentialsTemplate", this.em, user.getUsername(), first, last, filters,
+            attributes, false);
     }
-
 }

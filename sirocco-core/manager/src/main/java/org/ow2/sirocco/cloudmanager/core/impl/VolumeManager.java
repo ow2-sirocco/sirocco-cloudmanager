@@ -13,7 +13,6 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
-import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 import org.ow2.easybeans.osgi.annotation.OSGiResource;
@@ -26,6 +25,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
@@ -281,39 +281,12 @@ public class VolumeManager implements IVolumeManager {
         return UtilsForManagers.getEntityList("Volume", this.em, this.getUser().getUsername());
     }
 
-    @Override
-    public List<Volume> getVolumes(final List<String> attributes, final String filterExpression) throws CloudProviderException {
-        // TODO
-        if (filterExpression != null && !filterExpression.isEmpty()) {
-            throw new UnsupportedOperationException();
-        }
-        User user = this.getUser();
-        return this.em.createQuery("FROM Volume v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id ")
-            .setParameter("username", user.getUsername()).getResultList();
-    }
-
     @SuppressWarnings("unchecked")
     @Override
-    public List<Volume> getVolumes(final int first, final int last, final List<String> attributes)
-        throws CloudProviderException {
+    public QueryResult<Volume> getVolumes(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM Volume v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<VolumeConfiguration> getVolumeConfigurations(final List<String> attributes, final String filterExpression)
-        throws CloudProviderException {
-        if (filterExpression != null && !filterExpression.isEmpty()) {
-            // TODO
-            throw new UnsupportedOperationException();
-        }
-        User user = this.getUser();
-        return this.em.createQuery("FROM VolumeConfiguration v WHERE v.user.username=:username ORDER BY v.id")
-            .setParameter("username", user.getUsername()).getResultList();
+        return UtilsForManagers.getEntityList("Volume", this.em, user.getUsername(), first, last, filters, attributes, true);
     }
 
     @Override
@@ -324,26 +297,11 @@ public class VolumeManager implements IVolumeManager {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<VolumeConfiguration> getVolumeConfigurations(final int first, final int last, final List<String> attributes)
-        throws CloudProviderException {
+    public QueryResult<VolumeConfiguration> getVolumeConfigurations(final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM VolumeConfiguration v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<VolumeTemplate> getVolumeTemplates(final List<String> attributes, final String filterExpression)
-        throws CloudProviderException {
-        if (filterExpression != null && !filterExpression.isEmpty()) {
-            // TODO
-            throw new UnsupportedOperationException();
-        }
-        User user = this.getUser();
-        return this.em.createQuery("FROM VolumeTemplate v WHERE v.user.username=:username ORDER BY v.id")
-            .setParameter("username", user.getUsername()).getResultList();
+        return UtilsForManagers.getEntityList("VolumeConfiguration", this.em, user.getUsername(), first, last, filters,
+            attributes, false);
     }
 
     @Override
@@ -354,14 +312,11 @@ public class VolumeManager implements IVolumeManager {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<VolumeTemplate> getVolumeTemplates(final int first, final int last, final List<String> attributes)
-        throws CloudProviderException {
+    public QueryResult<VolumeTemplate> getVolumeTemplates(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM VolumeTemplate v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
+        return UtilsForManagers.getEntityList("VolumeTemplate", this.em, user.getUsername(), first, last, filters, attributes,
+            false);
     }
 
     @SuppressWarnings("unchecked")
@@ -805,27 +760,11 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public List<VolumeImage> getVolumeImages(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<VolumeImage> getVolumeImages(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em
-            .createQuery("FROM VolumeImage v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<VolumeImage> getVolumeImages(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO
-        if (filterExpression != null && !filterExpression.isEmpty()) {
-            throw new UnsupportedOperationException();
-        }
-        User user = this.getUser();
-        return this.em.createQuery("FROM VolumeImage v WHERE v.user.username=:username AND v.state<>'DELETED' ORDER BY v.id ")
-            .setParameter("username", user.getUsername()).getResultList();
+        return UtilsForManagers.getEntityList("VolumeImage", this.em, user.getUsername(), first, last, filters, attributes,
+            false);
     }
 
     @Override
@@ -932,6 +871,13 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
+    public QueryResult<VolumeVolumeImage> getVolumeVolumeImages(final String volumeId, final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        return UtilsForManagers.getCollectionItemList("VolumeVolumeImage", this.em, this.getUser().getUsername(), first, last,
+            filters, attributes, false, "Volume", "images", volumeId);
+    }
+
+    @Override
     public void updateVolumeImageInVolume(final String volumeId, final VolumeVolumeImage updatedVolumeVolumeImage)
         throws ResourceNotFoundException, CloudProviderException {
         VolumeVolumeImage volumeVolumeImage = this.getVolumeImageFromVolume(volumeId, updatedVolumeVolumeImage.getId()
@@ -972,6 +918,14 @@ public class VolumeManager implements IVolumeManager {
         j.setStatus(Status.SUCCESS);
         this.em.persist(j);
         return j;
+    }
+
+    @Override
+    public Job updateVolumeImageAttributesInVolume(final String volumeId, final String volumeVolumeImageId,
+        final Map<String, Object> updatedAttributes) throws InvalidRequestException, ResourceNotFoundException,
+        CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

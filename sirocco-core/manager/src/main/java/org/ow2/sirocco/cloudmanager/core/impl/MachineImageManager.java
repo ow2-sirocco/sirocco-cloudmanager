@@ -38,12 +38,12 @@ import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
-import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
@@ -162,25 +162,11 @@ public class MachineImageManager implements IMachineImageManager {
 
     }
 
-    public List<MachineImage> getMachineImages(final List<String> attributes, final String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
-        throw new InvalidRequestException(" Select images by query expression not supported ");
-    }
-
-    public List<MachineImage> getMachineImages(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
-        if ((first < 0) || (last < 0) || (last < first)) {
-            throw new InvalidRequestException(" Illegal array index " + first + " " + last);
-        }
-
-        Query query = this.em
-            .createNamedQuery("FROM MachineImage i WHERE i.user.username=:userName AND i.state<>'DELETED' ORDER BY i.id");
-        query.setParameter("userName", this.getUser().getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        List<MachineImage> images = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-
-        return images;
+    @Override
+    public QueryResult<MachineImage> getMachineImages(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        return UtilsForManagers.getEntityList("MachineImage", this.em, this.getUser().getUsername(), first, last, filters,
+            attributes, true);
     }
 
     @Override

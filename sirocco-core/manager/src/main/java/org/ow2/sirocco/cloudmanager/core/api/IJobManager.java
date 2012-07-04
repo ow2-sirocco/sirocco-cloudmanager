@@ -46,9 +46,8 @@ public interface IJobManager {
 
     Job getJobAttributes(final String id, List<String> attributes) throws ResourceNotFoundException, CloudProviderException;
 
-    List<Job> getJobs(List<String> attributes, String filterExpression) throws InvalidRequestException, CloudProviderException;
-
-    List<Job> getJobs(int first, int last, List<String> attributes) throws InvalidRequestException, CloudProviderException;
+    QueryResult<Job> getJobs(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     void updateJob(Job job) throws CloudProviderException;
 
@@ -56,13 +55,13 @@ public interface IJobManager {
         InvalidRequestException, CloudProviderException;
 
     void deleteJob(String id) throws CloudProviderException;
-    
+
     String getTopmostJobId(String jobId) throws CloudProviderException;
-    
+
     void handleWorkflowEvent(Job j) throws Exception;
-    
+
     String getJobIdFromProvider(Job providerJob);
 
     List<Job> getJobs() throws CloudProviderException;
-    
+
 }

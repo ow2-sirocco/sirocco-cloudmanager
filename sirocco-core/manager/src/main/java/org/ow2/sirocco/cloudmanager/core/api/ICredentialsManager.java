@@ -54,11 +54,8 @@ public interface ICredentialsManager {
     void updateCredentialsAttributes(String credentialsId, Map<String, Object> attributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
-    List<Credentials> getCredentials(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<Credentials> getCredentials(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<Credentials> getCredentials(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     CredentialsTemplate createCredentialsTemplate(CredentialsTemplate credentialsTemplate) throws CloudProviderException;
 
@@ -72,14 +69,10 @@ public interface ICredentialsManager {
     void updateCredentialsTemplateAttributes(String credentialsTemplateId, Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-    List<CredentialsTemplate> getCredentialsTemplates(List<String> attributes, String filterExpression)
-        throws InvalidRequestException, CloudProviderException;
-
-    List<CredentialsTemplate> getCredentialsTemplates(int first, int last, List<String> attributes)
+    QueryResult<CredentialsTemplate> getCredentialsTemplates(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 
     List<Credentials> getCredentials() throws CloudProviderException;
 
-    List<CredentialsTemplate> getCredentialsTemplates()
-            throws CloudProviderException;
+    List<CredentialsTemplate> getCredentialsTemplates() throws CloudProviderException;
 }

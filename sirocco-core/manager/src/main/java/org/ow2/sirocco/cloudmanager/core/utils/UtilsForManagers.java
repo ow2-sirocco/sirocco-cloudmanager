@@ -12,19 +12,22 @@ import java.util.Map;
 import javax.ejb.EJBContext;
 import javax.jms.Connection;
 import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
 import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 
+import org.apache.log4j.Logger;
 import org.hibernate.proxy.HibernateProxy;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 public class UtilsForManagers {
+    private static Logger logger = Logger.getLogger(UtilsForManagers.class.getName());
 
     /**
      * This generic method fills a bean with a map of attribute names and
@@ -41,12 +44,12 @@ public class UtilsForManagers {
      * @throws NoSuchFieldException
      * @throws InvocationTargetException
      */
-    public static Object fillObject(Object obj, Map<String, Object> updatedAttributes) throws InstantiationException,
-        IllegalAccessException, IllegalArgumentException, IntrospectionException, NoSuchFieldException,
-        InvocationTargetException {
+    public static Object fillObject(final Object obj, final Map<String, Object> updatedAttributes)
+        throws InstantiationException, IllegalAccessException, IllegalArgumentException, IntrospectionException,
+        NoSuchFieldException, InvocationTargetException {
 
         for (Map.Entry<String, Object> attr : updatedAttributes.entrySet()) {
-            invokeSetter(obj, attr.getKey(), attr.getValue());
+            UtilsForManagers.invokeSetter(obj, attr.getKey(), attr.getValue());
         }
 
         return obj;
@@ -68,20 +71,23 @@ public class UtilsForManagers {
      * @throws IllegalAccessException
      * @throws InvocationTargetException
      */
-    private static Object invokeSetter(Object targetObj, String attrName, Object attrValue) throws IntrospectionException,
-        NoSuchFieldException, IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+    private static Object invokeSetter(final Object targetObj, final String attrName, final Object attrValue)
+        throws IntrospectionException, NoSuchFieldException, IllegalArgumentException, IllegalAccessException,
+        InvocationTargetException {
 
         BeanInfo info = Introspector.getBeanInfo(targetObj.getClass());
-        for (PropertyDescriptor pd : info.getPropertyDescriptors())
-            if (attrName.equals(pd.getName()))
+        for (PropertyDescriptor pd : info.getPropertyDescriptors()) {
+            if (attrName.equals(pd.getName())) {
                 return pd.getWriteMethod().invoke(targetObj, attrValue);
+            }
+        }
         throw new NoSuchFieldException(targetObj.getClass() + " has no field " + attrName);
     }
 
     public static Object getEntityThroughProxy(Object o) {
         if (o instanceof HibernateProxy) {
             HibernateProxy oProxy = (HibernateProxy) o;
-            o = (Object) oProxy.getHibernateLazyInitializer().getImplementation();
+            o = oProxy.getHibernateLazyInitializer().getImplementation();
         }
         return o;
 
@@ -97,8 +103,8 @@ public class UtilsForManagers {
      * @param ctx
      * @throws Exception
      */
-    public static void emitJobListenerMessage(final Serializable payload, EJBContext ctx) throws Exception {
-        emitJMSMessage(payload, ctx, "JobEmission");
+    public static void emitJobListenerMessage(final Serializable payload, final EJBContext ctx) throws Exception {
+        UtilsForManagers.emitJMSMessage(payload, ctx, "JobEmission");
     }
 
     /**
@@ -109,14 +115,15 @@ public class UtilsForManagers {
      * @param queueName
      * @throws Exception
      */
-    public static void emitJMSMessage(final Serializable payload, EJBContext ctx, String queueName) throws Exception {
+    public static void emitJMSMessage(final Serializable payload, final EJBContext ctx, final String queueName)
+        throws Exception {
         ConnectionFactory cf = (ConnectionFactory) ctx.lookup("QCF");
         Queue queue = (Queue) ctx.lookup(queueName);
         Connection conn = cf.createConnection();
 
         Session sess = conn.createSession(true, Session.AUTO_ACKNOWLEDGE);
 
-        MessageProducer mp = sess.createProducer((Destination) queue);
+        MessageProducer mp = sess.createProducer(queue);
 
         ObjectMessage msg = sess.createObjectMessage();
         msg.setObject(payload);
@@ -137,7 +144,8 @@ public class UtilsForManagers {
      * @return
      */
     @SuppressWarnings({"rawtypes"})
-    public static List getEntityList(String entityType, EntityManager em, String username, boolean verifyDeletedState) {
+    public static List getEntityList(final String entityType, final EntityManager em, final String username,
+        final boolean verifyDeletedState) {
         String userQuery = "", stateQuery = "";
 
         if (!(("".equals(username) || username == null))) {
@@ -163,9 +171,83 @@ public class UtilsForManagers {
      * @return
      */
     @SuppressWarnings({"rawtypes"})
-    public static List getEntityList(String entityType, EntityManager em, String username) {
-        return getEntityList(entityType, em, username, true);
+    public static List getEntityList(final String entityType, final EntityManager em, final String username) {
+        return UtilsForManagers.getEntityList(entityType, em, username, true);
 
+    }
+
+    public static <E> QueryResult<E> getEntityList(final String entityType, final EntityManager em, final String username,
+        final int first, final int last, final List<String> filters, final List<String> attributes,
+        final boolean verifyDeletedState) {
+        StringBuffer whereClauseSB = new StringBuffer();
+        if (username != null) {
+            whereClauseSB.append(" v.user.username=:username ");
+        }
+        if (verifyDeletedState) {
+            if (whereClauseSB.length() > 0) {
+                whereClauseSB.append(" AND ");
+            }
+            whereClauseSB.append(" v.state<>'DELETED' ");
+        }
+        String whereClause = whereClauseSB.toString();
+        int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + entityType + " v WHERE " + whereClause)
+            .setParameter("username", username).getSingleResult()).intValue();
+        Query query = em.createQuery("FROM " + entityType + " v WHERE " + whereClause + " ORDER BY v.id").setParameter(
+            "username", username);
+        if (first != -1) {
+            query.setFirstResult(first);
+        }
+        if (last != -1) {
+            if (first != -1) {
+                query.setMaxResults(last - first + 1);
+            } else {
+                query.setMaxResults(last + 1);
+            }
+        }
+        List<E> items = query.getResultList();
+        return new QueryResult<E>(count, items);
+    }
+
+    public static <E> QueryResult<E> getCollectionItemList(final String entityType, final EntityManager em,
+        final String username, final int first, final int last, final List<String> filters, final List<String> attributes,
+        final boolean verifyDeletedState, final String containerType, final String containerAttributeName,
+        final String containerId) {
+        StringBuffer whereClauseSB = new StringBuffer();
+        if (username != null) {
+            whereClauseSB.append(" v.user.username=:username ");
+        }
+        if (verifyDeletedState) {
+            if (whereClauseSB.length() > 0) {
+                whereClauseSB.append(" AND ");
+            }
+            whereClauseSB.append(" vv.state<>'DELETED' ");
+        }
+        if (whereClauseSB.length() > 0) {
+            whereClauseSB.append(" AND ");
+        }
+        whereClauseSB.append("v.id=:cid ");
+        String whereClause = whereClauseSB.toString();
+        String queryExpression = "SELECT COUNT(vv) FROM " + entityType + " vv, " + containerType + " v WHERE vv MEMBER OF v."
+            + containerAttributeName + " AND " + whereClause;
+        int count = ((Number) em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(containerId))
+            .setParameter("username", username).getSingleResult()).intValue();
+        queryExpression = "SELECT vv FROM " + entityType + " vv, " + containerType + " v WHERE vv MEMBER OF v."
+            + containerAttributeName + " AND " + whereClause + " ORDER BY vv.id";
+        Query query = em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(containerId))
+            .setParameter("username", username);
+
+        if (first != -1) {
+            query.setFirstResult(first);
+        }
+        if (last != -1) {
+            if (first != -1) {
+                query.setMaxResults(last - first + 1);
+            } else {
+                query.setMaxResults(last + 1);
+            }
+        }
+        List<E> items = query.getResultList();
+        return new QueryResult<E>(count, items);
     }
 
     /**
@@ -214,7 +296,7 @@ public class UtilsForManagers {
      * @return
      * @throws CloudProviderException
      */
-    public static CloudCollectionItem getCloudCollectionFromCloudResource(final EntityManager em, CloudResource ce)
+    public static CloudCollectionItem getCloudCollectionFromCloudResource(final EntityManager em, final CloudResource ce)
         throws CloudProviderException {
         CloudCollectionItem obj = (CloudCollectionItem) em
             .createQuery("FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId ORDER BY v.id")

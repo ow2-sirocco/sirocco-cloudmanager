@@ -147,21 +147,6 @@ public interface IVolumeManager extends IJobListener {
         CloudProviderException;
 
     /**
-     * Retrieves some attributes of all Volumes belonging to the caller that
-     * match a supplied filter expression
-     * 
-     * @param attributes the list of attributes to retrieve
-     * @param filterExpression a filter expression compliant with the DMTF CIMI
-     *        syntax, if null no filtering is performed
-     * @return a list of Volumes matching the filter expression, for each
-     *         Volume, only the requested attributes are guaranteed to be filled
-     * @throws InvalidRequestException raised if the the request is invalid
-     * @throws CloudProviderException raised if the input parameters are invalid
-     */
-    List<Volume> getVolumes(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
-
-    /**
      * Retrieves some attributes of all Volumes belonging to the caller within a
      * specific range, only Volumes
      * 
@@ -175,23 +160,7 @@ public interface IVolumeManager extends IJobListener {
      * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if the input parameters are invalid
      */
-    List<Volume> getVolumes(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
-
-    /**
-     * Retrieves some attributes of all Volume Configurations belonging to the
-     * caller that match a supplied filter expression
-     * 
-     * @param attributes the list of attributes to retrieve
-     * @param filterExpression a filter expression compliant with the DMTF CIMI
-     *        syntax, if null no filtering is performed
-     * @return a list of VolumeConfiguration matching the filter expression, for
-     *         each VolumeConfiguration, only the requested attributes are
-     *         guaranteed to be filled
-     * @throws InvalidRequestException raised if the the request is invalid
-     * @throws CloudProviderException raised if the input parameters are invalid
-     */
-    List<VolumeConfiguration> getVolumeConfigurations(List<String> attributes, String filterExpression)
+    QueryResult<Volume> getVolumes(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 
     /**
@@ -209,24 +178,8 @@ public interface IVolumeManager extends IJobListener {
      * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if the input parameters are invalid
      */
-    List<VolumeConfiguration> getVolumeConfigurations(int first, int last, List<String> attributes)
+    QueryResult<VolumeConfiguration> getVolumeConfigurations(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
-
-    /**
-     * Retrieves some attributes of all Volume Templates belonging to the caller
-     * that match a supplied filter expression
-     * 
-     * @param attributes the list of attributes to retrieve
-     * @param filterExpression a filter expression compliant with the DMTF CIMI
-     *        syntax, if null no filtering is performed
-     * @return a list of VolumeTemplate matching the filter expression, for each
-     *         VolumeTemplate, only the requested attributes are guaranteed to
-     *         be filled
-     * @throws InvalidRequestException raised if the the request is invalid
-     * @throws CloudProviderException raised if the input parameters are invalid
-     */
-    List<VolumeTemplate> getVolumeTemplates(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
 
     /**
      * Retrieves some attributes of all VolumeTemplates belonging to the caller
@@ -243,8 +196,8 @@ public interface IVolumeManager extends IJobListener {
      * @throws InvalidRequestException raised if the the request is invalid
      * @throws CloudProviderException raised if the input parameters are invalid
      */
-    List<VolumeTemplate> getVolumeTemplates(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<VolumeTemplate> getVolumeTemplates(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     /**
      * Updates a volume, this operation is asynchronous
@@ -361,11 +314,8 @@ public interface IVolumeManager extends IJobListener {
 
     VolumeImage getVolumeImageById(final String volumeImageId) throws ResourceNotFoundException;
 
-    List<VolumeImage> getVolumeImages(int first, int last, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
-
-    List<VolumeImage> getVolumeImages(List<String> attributes, String filterExpression) throws InvalidRequestException,
-        CloudProviderException;
+    QueryResult<VolumeImage> getVolumeImages(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
     Job updateVolumeImage(VolumeImage volumeImage) throws InvalidRequestException, ResourceNotFoundException,
         CloudProviderException;
@@ -381,8 +331,14 @@ public interface IVolumeManager extends IJobListener {
     void updateVolumeImageInVolume(String volumeId, VolumeVolumeImage volumeVolumeImage) throws ResourceNotFoundException,
         CloudProviderException;
 
+    Job updateVolumeImageAttributesInVolume(String volumeId, String volumeVolumeImageId, Map<String, Object> updatedAttributes)
+        throws InvalidRequestException, ResourceNotFoundException, CloudProviderException;
+
     VolumeVolumeImage getVolumeImageFromVolume(String volumeId, String volumeVolumeImageId) throws ResourceNotFoundException,
         CloudProviderException;
+
+    QueryResult<VolumeVolumeImage> getVolumeVolumeImages(String volumeId, int first, int last, List<String> filters,
+        List<String> attributes) throws InvalidRequestException, CloudProviderException;
 
     List<VolumeVolumeImage> getVolumeVolumeImages(String volumeId) throws ResourceNotFoundException, CloudProviderException;
 

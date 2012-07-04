@@ -53,9 +53,11 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -198,17 +200,10 @@ public class JobManager implements IJobManager {
     }
 
     @Override
-    public List<Job> getJobs(final int first, final int last, final List<String> attributes) throws InvalidRequestException,
-        CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<Job> getJobs(final List<String> attributes, final String filterExpression) throws InvalidRequestException,
-        CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+    public QueryResult<Job> getJobs(final int first, final int last, final List<String> filters, final List<String> attributes)
+        throws InvalidRequestException, CloudProviderException {
+        User user = this.getUser();
+        return UtilsForManagers.getEntityList("Job", this.em, user.getUsername(), first, last, filters, attributes, false);
     }
 
     @Override
@@ -256,9 +251,14 @@ public class JobManager implements IJobManager {
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
     public String getJobIdFromProvider(final Job providerJob) throws NoResultException {
         Job job = null;
-        if (providerJob==null){JobManager.logger.warn("providerJob is null");}
-        if (providerJob.getProviderAssignedId()==null){JobManager.logger.warn("providerJob ProviderAssignedId is null");}
-        JobManager.logger.info(" getting persisted job from provider job of providerAssignedId "+providerJob.getProviderAssignedId());
+        if (providerJob == null) {
+            JobManager.logger.warn("providerJob is null");
+        }
+        if (providerJob.getProviderAssignedId() == null) {
+            JobManager.logger.warn("providerJob ProviderAssignedId is null");
+        }
+        JobManager.logger.info(" getting persisted job from provider job of providerAssignedId "
+            + providerJob.getProviderAssignedId());
         try {
             job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
                 .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
@@ -267,9 +267,11 @@ public class JobManager implements IJobManager {
             JobManager.logger.error("Cannot find job with providerAssignedId " + providerJob.getProviderAssignedId());
             throw e;
         }
-        if (job==null){JobManager.logger.warn("job is null");}
+        if (job == null) {
+            JobManager.logger.warn("job is null");
+        }
 
-        JobManager.logger.info(" got persisted job "+job.getId());
+        JobManager.logger.info(" got persisted job " + job.getId());
         return job.getId().toString();
     }
 

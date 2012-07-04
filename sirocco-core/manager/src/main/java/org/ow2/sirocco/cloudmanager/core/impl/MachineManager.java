@@ -56,6 +56,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
@@ -523,24 +524,17 @@ public class MachineManager implements IMachineManager {
         m.initFSM();
     }
 
-    public List<Machine> getMachines(final int first, final int last, final List<String> attributes)
-        throws CloudProviderException {
+    @Override
+    public QueryResult<Machine> getMachines(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws CloudProviderException {
 
-        if ((first < 0) || (last < 0) || (last < first)) {
-            throw new InvalidRequestException(" Illegal array index " + first + " " + last);
-        }
+        QueryResult<Machine> result = UtilsForManagers.getEntityList("Machine", this.em, this.getUser().getUsername(), first,
+            last, filters, attributes, true);
 
-        Query query = this.em
-            .createNamedQuery("FROM Machine v WHERE v.user.username=:userName AND v.state<>'DELETED' ORDER BY v.id");
-        query.setParameter("userName", this.getUser().getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        List<Machine> machines = query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-
-        for (Machine machine : machines) {
+        for (Machine machine : result.getItems()) {
             this.readMachineAttributes(machine);
         }
-        return machines;
+        return result;
     }
 
     @Override
@@ -885,26 +879,11 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public List<MachineConfiguration> getMachineConfigurations(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<MachineConfiguration> getMachineConfigurations(final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        Query query = this.em.createQuery("FROM MachineConfiguration v WHERE v.user.username=:username ORDER BY v.id");
-        query.setParameter("username", user.getUsername());
-        query.setMaxResults(last - first + 1);
-        query.setFirstResult(first);
-        return query.setFirstResult(first).setMaxResults(last - first + 1).getResultList();
-    }
-
-    @Override
-    public List<MachineConfiguration> getMachineConfigurations(final List<String> attributes, final String queryExpression)
-        throws InvalidRequestException, CloudProviderException {
-        if (queryExpression != null && !queryExpression.isEmpty()) {
-            // TODO
-            throw new UnsupportedOperationException();
-        }
-        User user = this.getUser();
-        return this.em.createQuery("FROM MachineConfiguration v WHERE v.user.username=:username ORDER BY v.id")
-            .setParameter("username", user.getUsername()).getResultList();
+        return UtilsForManagers.getEntityList("MachineConfiguration", this.em, user.getUsername(), first, last, filters,
+            attributes, true);
     }
 
     public MachineConfiguration createMachineConfiguration(final MachineConfiguration machineConfig)
@@ -1216,10 +1195,10 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public List<MachineTemplate> getMachineTemplates(final int first, final int last, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+    public QueryResult<MachineTemplate> getMachineTemplates(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        return UtilsForManagers.getEntityList("MachineTemplate", this.em, this.getUser().getUsername(), first, last, filters,
+            attributes, false);
     }
 
     @Override
@@ -1230,13 +1209,6 @@ public class MachineManager implements IMachineManager {
             machineTemplate.getMachineConfiguration().getDiskTemplates().size();
         }
         return machineTemplates;
-    }
-
-    @Override
-    public List<MachineTemplate> getMachineTemplates(final List<String> attributes, final String queryExpression)
-        throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     /**
@@ -1803,6 +1775,13 @@ public class MachineManager implements IMachineManager {
         return completed;
     }
 
+    @Override
+    public QueryResult<MachineVolume> getMachineVolumes(final String machineId, final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        return UtilsForManagers.getCollectionItemList("MachineVolume", this.em, this.getUser().getUsername(), first, last,
+            filters, attributes, false, "Machine", "volumes", machineId);
+    }
+
     private Job addVolumeToMachine(final Machine m, final MachineVolume mv) throws ServiceUnavailableException {
         /**
          * Invoke the connector to add volume to machine
@@ -2085,6 +2064,14 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
+    public Job updateVolumeAttributesInMachine(final String machineId, final String mvId,
+        final Map<String, Object> updatedAttributes) throws ResourceNotFoundException, CloudProviderException,
+        InvalidRequestException {
+        // TODO Auto-generated method stub
+        throw new ServiceUnavailableException(" Operation not permitted ");
+    }
+
+    @Override
     public MachineVolume getVolumeFromMachine(final String machineId, final String mVolId) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException {
 
@@ -2122,6 +2109,13 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
+    public QueryResult<MachineDisk> getMachineDisks(final String machineId, final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        return UtilsForManagers.getCollectionItemList("MachineDisk", this.em, this.getUser().getUsername(), first, last,
+            filters, attributes, false, "Machine", "disks", machineId);
+    }
+
+    @Override
     public Job removeDiskFromMachine(final String machineId, final String machineDiskId) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException {
         throw new ServiceUnavailableException(" Operation not permitted ");
@@ -2153,6 +2147,14 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
+    public Job updateDiskAttributesInMachine(final String machineId, final String machineDiskId,
+        final Map<String, Object> updatedAttributes) throws ResourceNotFoundException, CloudProviderException,
+        InvalidRequestException {
+        // TODO Auto-generated method stub
+        throw new ServiceUnavailableException(" Operation not permitted ");
+    }
+
+    @Override
     public Job addNetworkInterfaceToMachine(final String machineId, final MachineNetworkInterface nic)
         throws ResourceNotFoundException, CloudProviderException, InvalidRequestException {
         // TODO Auto-generated method stub
@@ -2169,6 +2171,14 @@ public class MachineManager implements IMachineManager {
     @Override
     public Job updateNetworkInterfaceInMachine(final String machineId, final MachineNetworkInterface nic)
         throws ResourceNotFoundException, CloudProviderException, InvalidRequestException {
+        // TODO Auto-generated method stub
+        throw new ServiceUnavailableException(" Operation not permitted ");
+    }
+
+    @Override
+    public Job updateNetworkInterfaceAttributesInMachine(final String machineId, final String nicId,
+        final Map<String, Object> updatedAttributes) throws ResourceNotFoundException, CloudProviderException,
+        InvalidRequestException {
         // TODO Auto-generated method stub
         throw new ServiceUnavailableException(" Operation not permitted ");
     }
@@ -2196,8 +2206,21 @@ public class MachineManager implements IMachineManager {
     @Override
     public List<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException {
-        // TODO Auto-generated method stub
-        return null;
+        Machine m = this.getMachineById(machineId);
+
+        List<MachineNetworkInterface> nics = m.getNetworkInterfaces();
+        if (nics != null) {
+            nics.size();
+        }
+        return nics;
+    }
+
+    @Override
+    public QueryResult<MachineNetworkInterface> getMachineNetworkInterface(final String machineId, final int first,
+        final int last, final List<String> filters, final List<String> attributes) throws InvalidRequestException,
+        CloudProviderException {
+        return UtilsForManagers.getCollectionItemList("MachineNetworkInterface", this.em, this.getUser().getUsername(), first,
+            last, filters, attributes, false, "Machine", "networkInterfaces", machineId);
     }
 
 }
