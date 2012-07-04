@@ -165,7 +165,7 @@ public class CloudProviderConnectorTest {
         cloudProviderAccount.setPassword(password);
 
         CloudProvider cloudProvider = new CloudProvider();
-        cloudProvider.setEndPoint(endpoint);
+        cloudProvider.setEndpoint(endpoint);
 
         cloudProviderAccount.setCloudProvider(cloudProvider);
 

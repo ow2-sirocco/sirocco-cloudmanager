@@ -27,9 +27,11 @@ package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -37,11 +39,12 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 
 @Entity
 public class CloudProviderAccount implements Serializable {
@@ -53,10 +56,12 @@ public class CloudProviderAccount implements Serializable {
 
     private String password;
 
+    private Map<String, String> properties;
+
     private Set<User> users;
 
     private Set<Machine> machines;
-    
+
     private Set<System> systems;
 
     private Set<Volume> volumes;
@@ -98,6 +103,15 @@ public class CloudProviderAccount implements Serializable {
 
     public void setPassword(final String password) {
         this.password = password;
+    }
+
+    public void setProperties(final Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+    @CollectionOfElements(fetch = FetchType.EAGER)
+    public Map<String, String> getProperties() {
+        return this.properties;
     }
 
     @OneToMany(mappedBy = "cloudProviderAccount")
@@ -156,10 +170,10 @@ public class CloudProviderAccount implements Serializable {
 
     @OneToMany(mappedBy = "cloudProviderAccount")
     public Set<System> getSystems() {
-        return systems;
+        return this.systems;
     }
 
-    public void setSystems(Set<System> systems) {
+    public void setSystems(final Set<System> systems) {
         this.systems = systems;
     }
 

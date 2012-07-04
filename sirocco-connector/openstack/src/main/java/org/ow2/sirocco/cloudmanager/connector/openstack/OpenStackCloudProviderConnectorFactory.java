@@ -189,7 +189,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             this.cloudProviderAccount = cloudProviderAccount;
 
             Properties overrides = new Properties();
-            overrides.setProperty(Constants.PROPERTY_ENDPOINT, cloudProviderAccount.getCloudProvider().getEndPoint());
+            overrides.setProperty(Constants.PROPERTY_ENDPOINT, cloudProviderAccount.getCloudProvider().getEndpoint());
             overrides.setProperty(Constants.PROPERTY_API_VERSION, "2.0");
             overrides.setProperty(Constants.PROPERTY_TRUST_ALL_CERTS, "true");
             overrides.setProperty(Constants.PROPERTY_RELAX_HOSTNAME, "true");

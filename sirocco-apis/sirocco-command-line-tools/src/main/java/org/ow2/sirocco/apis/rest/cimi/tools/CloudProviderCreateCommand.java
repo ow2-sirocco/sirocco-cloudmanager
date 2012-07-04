@@ -25,6 +25,10 @@
 
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -50,6 +54,9 @@ public class CloudProviderCreateCommand implements Command {
     @Parameter(names = "-endpoint", description = "endpoint", required = true)
     private String endpoint;
 
+    @Parameter(names = "-properties", variableArity = true, description = "key value pairs", required = false)
+    private List<String> properties;
+
     @Override
     public String getName() {
         return CloudProviderCreateCommand.COMMAND_NAME;
@@ -64,7 +71,15 @@ public class CloudProviderCreateCommand implements Command {
         CloudProvider provider = new CloudProvider();
         provider.setCloudProviderType(this.type);
         provider.setDescription(this.description);
-        provider.setEndPoint(this.endpoint);
+        provider.setEndpoint(this.endpoint);
+
+        if (this.properties != null) {
+            Map<String, String> props = new HashMap<String, String>();
+            for (int i = 0; i < this.properties.size() / 2; i++) {
+                props.put(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
+            }
+            provider.setProperties(props);
+        }
 
         provider = cloudProviderManager.createCloudProvider(provider);
 
@@ -76,7 +91,7 @@ public class CloudProviderCreateCommand implements Command {
 
         table.addCell(provider.getId().toString());
         table.addCell(provider.getCloudProviderType());
-        table.addCell(provider.getEndPoint());
+        table.addCell(provider.getEndpoint());
         table.addCell(provider.getDescription());
 
         System.out.println(table.render());

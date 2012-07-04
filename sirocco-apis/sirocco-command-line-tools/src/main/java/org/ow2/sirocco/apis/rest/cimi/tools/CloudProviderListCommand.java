@@ -64,7 +64,7 @@ public class CloudProviderListCommand implements Command {
         for (CloudProvider provider : providers) {
             table.addCell(provider.getId().toString());
             table.addCell(provider.getCloudProviderType());
-            table.addCell(provider.getEndPoint());
+            table.addCell(provider.getEndpoint());
             table.addCell(provider.getDescription());
         }
 

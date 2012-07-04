@@ -27,14 +27,18 @@ package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.CollectionOfElements;
 
 /**
  * A CloudProvider can provision compute resources (virtual machines along with
@@ -52,7 +56,9 @@ public class CloudProvider implements Serializable {
 
     private String description;
 
-    private String endPoint;
+    private String endpoint;
+
+    private Map<String, String> properties;
 
     private Set<CloudProviderAccount> cloudProviderAccounts;
 
@@ -84,16 +90,25 @@ public class CloudProvider implements Serializable {
         return this.description;
     }
 
+    public void setProperties(final Map<String, String> properties) {
+        this.properties = properties;
+    }
+
+    @CollectionOfElements(fetch = FetchType.EAGER)
+    public Map<String, String> getProperties() {
+        return this.properties;
+    }
+
     public void setDescription(final String description) {
         this.description = description;
     }
 
-    public String getEndPoint() {
-        return this.endPoint;
+    public String getEndpoint() {
+        return this.endpoint;
     }
 
-    public void setEndPoint(final String endPoint) {
-        this.endPoint = endPoint;
+    public void setEndpoint(final String endPoint) {
+        this.endpoint = endPoint;
     }
 
     @OneToMany(mappedBy = "cloudProvider")

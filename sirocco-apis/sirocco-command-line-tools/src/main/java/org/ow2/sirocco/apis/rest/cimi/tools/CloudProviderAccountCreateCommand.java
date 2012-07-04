@@ -25,6 +25,10 @@
 
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -51,6 +55,9 @@ public class CloudProviderAccountCreateCommand implements Command {
     @Parameter(names = "-provider", description = "provider id", required = true)
     private String providerId;
 
+    @Parameter(names = "-properties", variableArity = true, description = "key value pairs", required = false)
+    private List<String> properties;
+
     @Override
     public String getName() {
         return CloudProviderAccountCreateCommand.COMMAND_NAME;
@@ -69,6 +76,14 @@ public class CloudProviderAccountCreateCommand implements Command {
         CloudProvider provider = cloudProviderManager.getCloudProviderById(this.providerId);
 
         account.setCloudProvider(provider);
+
+        if (this.properties != null) {
+            Map<String, String> props = new HashMap<String, String>();
+            for (int i = 0; i < this.properties.size() / 2; i++) {
+                props.put(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
+            }
+            provider.setProperties(props);
+        }
 
         account = cloudProviderManager.createCloudProviderAccount(account);
 
