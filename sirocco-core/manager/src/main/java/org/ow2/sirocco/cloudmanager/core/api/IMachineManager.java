@@ -209,7 +209,7 @@ public interface IMachineManager extends IJobListener {
     List<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException;
 
-    QueryResult<MachineNetworkInterface> getMachineNetworkInterface(final String machineId, int first, int last,
+    QueryResult<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId, int first, int last,
         List<String> filters, List<String> attributes) throws InvalidRequestException, CloudProviderException;
 
     Job addNetworkInterfaceToMachine(final String machineId, final MachineNetworkInterface nic)

@@ -2216,7 +2216,7 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public QueryResult<MachineNetworkInterface> getMachineNetworkInterface(final String machineId, final int first,
+    public QueryResult<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId, final int first,
         final int last, final List<String> filters, final List<String> attributes) throws InvalidRequestException,
         CloudProviderException {
         return UtilsForManagers.getCollectionItemList("MachineNetworkInterface", this.em, this.getUser().getUsername(), first,
