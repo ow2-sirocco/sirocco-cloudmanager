@@ -34,6 +34,10 @@ import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
  */
 public enum ExchangeType {
     /** */
+    Address(PathType.Address), AddressCollection(PathType.Address, false), AddressCreate(PathType.Address),
+    /** */
+    AddressTemplate(PathType.AddressTemplate), AddressTemplateCollection(PathType.AddressTemplate, false),
+    /** */
     CloudEntryPoint(PathType.CloudEntryPoint, false),
     /** */
     Credential(PathType.Credential), CredentialCollection(PathType.Credential, false), CredentialCreate(PathType.Credential),
@@ -51,6 +55,12 @@ public enum ExchangeType {
     MachineConfiguration(PathType.MachineConfiguration), MachineConfigurationCollection(PathType.MachineConfiguration, false),
     /** */
     MachineImage(PathType.MachineImage), MachineImageCollection(PathType.MachineImage, false),
+    /** */
+    MachineNetworkInterface(PathType.MachineNetworkInterface), MachineNetworkInterfaceCollection(
+        PathType.MachineNetworkInterface, false),
+    /** */
+    MachineNetworkInterfaceAddress(PathType.MachineNetworkInterfaceAddress), MachineNetworkInterfaceAddressCollection(
+        PathType.MachineNetworkInterfaceAddress, false),
     /** */
     MachineTemplate(PathType.MachineTemplate), MachineTemplateCollection(PathType.MachineTemplate, false),
     /** */

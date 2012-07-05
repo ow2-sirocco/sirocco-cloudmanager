@@ -30,9 +30,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
-import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
-import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class Machine.
@@ -67,23 +64,17 @@ public class CimiMachine extends CimiObjectCommonAbstract {
     /**
      * Field "disks".
      */
-    @ValidChild
-    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiMachineDiskCollection disks;
 
     /**
      * Field "volumes".
      */
-    @ValidChild
-    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiMachineVolumeCollection volumes;
 
     /**
      * Field "networkInterfaces".
      */
-    @ValidChild
-    @NotEmptyIfNotNull(groups = {GroupWrite.class})
-    private CimiNetworkInterface[] networkInterfaces;
+    private CimiMachineNetworkInterfaceCollection networkInterfaces;
 
     /**
      * Default constructor.
@@ -214,7 +205,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiNetworkInterface[] getNetworkInterfaces() {
+    public CimiMachineNetworkInterfaceCollection getNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
@@ -223,7 +214,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
      * 
      * @param networkInterfaces The value
      */
-    public void setNetworkInterfaces(final CimiNetworkInterface[] networkInterfaces) {
+    public void setNetworkInterfaces(final CimiMachineNetworkInterfaceCollection networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 
@@ -236,10 +227,14 @@ public class CimiMachine extends CimiObjectCommonAbstract {
     public boolean hasValues() {
         boolean has = super.hasValues();
         has = has || (null != this.getCpu());
-        has = has || (null != this.getDisks());
         has = has || (null != this.getMemory());
-        has = has || (null != this.getNetworkInterfaces());
-        has = has || (null != this.getVolumes());
+
+        // Next read-only
+        // has = has || (null != this.getState());
+        // has = has || (null != this.getCpuArch());
+        // has = has || (null != this.getDisks());
+        // has = has || (null != this.getNetworkInterfaces());
+        // has = has || (null != this.getVolumes());
         return has;
     }
 

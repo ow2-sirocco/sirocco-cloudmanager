@@ -36,6 +36,10 @@ public enum PathType {
     /** */
     CloudEntryPoint(ConstantsPath.CLOUDENTRYPOINT),
     /** */
+    Address(ConstantsPath.ADDRESS),
+    /** */
+    AddressTemplate(ConstantsPath.ADDRESS_TEMPLATE),
+    /** */
     Credential(ConstantsPath.CREDENTIAL),
     /** */
     CredentialTemplate(ConstantsPath.CREDENTIAL_TEMPLATE),
@@ -52,7 +56,15 @@ public enum PathType {
     /** */
     MachineDisk(ConstantsPath.DISK, Machine),
     /** */
+    MachineNetworkInterface(ConstantsPath.NETWORK, Machine),
+    /** */
+    MachineNetworkInterfaceAddress(ConstantsPath.ADDRESS, MachineNetworkInterface),
+    /** */
     MachineVolume(ConstantsPath.VOLUME, Machine),
+    /** */
+    Network(ConstantsPath.NETWORK),
+    /** */
+    NetworkTemplate(ConstantsPath.NETWORK_TEMPLATE),
     /** */
     System(ConstantsPath.SYSTEM),
     /** */
@@ -104,9 +116,12 @@ public enum PathType {
     }
 
     /**
-     * Get the pathname.
+     * Get the complete path with the parents pathname.
+     * <p>
+     * The ID parents are replaced by a the character "*"
+     * </p>
      * 
-     * @return The pathname
+     * @return The complete path
      */
     public String getPath() {
         StringBuilder sb = new StringBuilder();
@@ -119,9 +134,9 @@ public enum PathType {
     }
 
     /**
-     * Get the pathname.
+     * Get the list of pathnames.
      * 
-     * @return The pathname
+     * @return The list of pathnames
      */
     public List<String> getPaths() {
         List<String> list = null;
@@ -141,6 +156,20 @@ public enum PathType {
      */
     public boolean hasParent() {
         return (null != this.parent);
+    }
+
+    /**
+     * Get the number of parents.
+     * 
+     * @return The number of parents
+     */
+    public int getParentDepth() {
+        int depth = 0;
+        if (true == this.hasParent()) {
+            depth++;
+            depth += this.parent.getParentDepth();
+        }
+        return depth;
     }
 
     /**

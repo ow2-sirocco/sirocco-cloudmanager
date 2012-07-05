@@ -28,6 +28,14 @@ public abstract class ConstantsPath {
 
     public static final String CIMI_XML_NAMESPACE = "http://schemas.dmtf.org/cimi/1";
 
+    public static final String ADDRESS = "addresses";
+
+    public static final String ADDRESS_PATH = "/" + ConstantsPath.ADDRESS;
+
+    public static final String ADDRESS_TEMPLATE = "addressTemplates";
+
+    public static final String ADDRESS_TEMPLATE_PATH = "/" + ConstantsPath.ADDRESS_TEMPLATE;
+
     public static final String CLOUDENTRYPOINT = "";
 
     public static final String CLOUDENTRYPOINT_PATH = "/" + ConstantsPath.CLOUDENTRYPOINT;
@@ -63,6 +71,14 @@ public abstract class ConstantsPath {
     public static final String MACHINE_CONFIGURATION = "machineConfigs";
 
     public static final String MACHINE_CONFIGURATION_PATH = "/" + ConstantsPath.MACHINE_CONFIGURATION;
+
+    public static final String NETWORK = "networks";
+
+    public static final String NETWORK_PATH = "/" + ConstantsPath.NETWORK;
+
+    public static final String NETWORK_TEMPLATE = "networkTemplates";
+
+    public static final String NETWORK_TEMPLATE_PATH = "/" + ConstantsPath.NETWORK_TEMPLATE;
 
     public static final String SYSTEM = "systems";
 

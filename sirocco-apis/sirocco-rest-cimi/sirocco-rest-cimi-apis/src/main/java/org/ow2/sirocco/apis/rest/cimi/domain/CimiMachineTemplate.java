@@ -89,7 +89,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      */
     @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
-    private CimiNetworkInterface[] networkInterfaces;
+    private CimiNetwork[] networkInterfaces;
 
     /**
      * Default constructor.
@@ -274,7 +274,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiNetworkInterface[] getNetworkInterfaces() {
+    public CimiNetwork[] getNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
@@ -283,7 +283,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @param networkInterfaces The value
      */
-    public void setNetworkInterfaces(final CimiNetworkInterface[] networkInterfaces) {
+    public void setNetworkInterfaces(final CimiNetwork[] networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
     }
 
