@@ -24,15 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import java.util.List;
-
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -109,7 +106,8 @@ public class MachineConverter extends ObjectCommonConverter {
             dataCimi.setMemory(dataService.getMemory());
             dataCimi.setDisks((CimiMachineDiskCollection) context.convertNextCimi(dataService.getDisks(),
                 CimiMachineDiskCollection.class));
-            // TODO dataCimi.setNetworkInterfaces(???);
+            dataCimi.setNetworkInterfaces((CimiMachineNetworkInterfaceCollection) context.convertNextCimi(
+                dataService.getNetworkInterfaces(), CimiMachineNetworkInterfaceCollection.class));
             dataCimi.setState(ConverterHelper.toString(dataService.getState()));
             dataCimi.setVolumes((CimiMachineVolumeCollection) context.convertNextCimi(dataService.getVolumes(),
                 CimiMachineVolumeCollection.class));
@@ -123,16 +121,20 @@ public class MachineConverter extends ObjectCommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    @SuppressWarnings("unchecked")
     protected void doCopyToService(final CimiContext context, final CimiMachine dataCimi, final Machine dataService) {
         this.fill(context, dataCimi, dataService);
         dataService.setCpu(dataCimi.getCpu());
         dataService.setMemory(dataCimi.getMemory());
-        dataService.setDisks((List<MachineDisk>) context.convertNextService(dataCimi.getDisks()));
-        // TODO dataService.setNetworkInterfaces(???);
-        dataService.setVolumes((List<MachineVolume>) context.convertNextService(dataCimi.getVolumes()));
 
         // Next Read only
+        // cpuArch ???
+        // dataService.setDisks((List<MachineDisk>)
+        // context.convertNextService(dataCimi.getDisks()));
+        // dataService.setNetworkInterfaces((List<MachineNetworkInterface>)
+        // context.convertNextService(dataCimi
+        // .getNetworkInterfaces()));
+        // dataService.setVolumes((List<MachineVolume>)
+        // context.convertNextService(dataCimi.getVolumes()));
         // dataService.setState(dataService.getState());
     }
 }

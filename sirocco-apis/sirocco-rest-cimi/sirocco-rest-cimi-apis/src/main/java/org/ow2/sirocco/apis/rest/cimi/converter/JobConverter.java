@@ -147,7 +147,7 @@ public class JobConverter extends ObjectCommonConverter {
         this.fill(context, dataCimi, dataService);
     }
 
-    protected String makeHrefTargetResource(final CimiContext context, final Object targetDataService) {
+    protected String makeHrefTargetResource(final CimiContext context, final CloudResource targetDataService) {
         String href = null;
         if (null != targetDataService) {
             Class<? extends CimiResource> targetType = context.findAssociate(targetDataService.getClass());
