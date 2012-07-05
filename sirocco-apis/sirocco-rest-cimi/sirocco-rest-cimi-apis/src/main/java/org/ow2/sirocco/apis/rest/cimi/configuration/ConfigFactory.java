@@ -29,6 +29,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.ow2.sirocco.apis.rest.cimi.converter.AddressCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.AddressConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.AddressCreateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.AddressTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.AddressTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CloudEntryPointConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsConverter;
@@ -47,6 +52,10 @@ import org.ow2.sirocco.apis.rest.cimi.converter.MachineDiskCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineDiskConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceAddressCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceAddressConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeConverter;
@@ -78,6 +87,11 @@ import org.ow2.sirocco.apis.rest.cimi.converter.VolumeTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeVolumeImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeVolumeImageConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
@@ -97,6 +111,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
@@ -201,6 +219,30 @@ public class ConfigFactory {
         Map<String, ExchangeType> associatedNames;
 
         switch (type) {
+        case Address:
+            item = new ItemConfig(CimiAddress.class, ExchangeType.Address);
+            item.putData(ConfigFactory.CONVERTER, new AddressConverter());
+            break;
+
+        case AddressCollection:
+            item = new ItemConfig(CimiAddressCollection.class, ExchangeType.AddressCollection);
+            item.putData(ConfigFactory.CONVERTER, new AddressCollectionConverter());
+            break;
+
+        case AddressCreate:
+            item = new ItemConfig(CimiAddressCreate.class, ExchangeType.AddressCreate);
+            item.putData(ConfigFactory.CONVERTER, new AddressCreateConverter());
+            break;
+
+        case AddressTemplate:
+            item = new ItemConfig(CimiAddressTemplate.class, ExchangeType.AddressTemplate);
+            item.putData(ConfigFactory.CONVERTER, new AddressTemplateConverter());
+            break;
+
+        case AddressTemplateCollection:
+            item = new ItemConfig(CimiAddressTemplateCollection.class, ExchangeType.AddressTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new AddressTemplateCollectionConverter());
+            break;
 
         case CloudEntryPoint:
             item = new ItemConfig(CimiCloudEntryPoint.class, ExchangeType.CloudEntryPoint);
@@ -315,6 +357,27 @@ public class ConfigFactory {
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
             associatedNames.put("machineImages", ExchangeType.MachineImage);
+            break;
+
+        case MachineNetworkInterface:
+            item = new ItemConfig(CimiMachineNetworkInterface.class, ExchangeType.MachineNetworkInterface);
+            item.putData(ConfigFactory.CONVERTER, new MachineNetworkInterfaceConverter());
+            break;
+
+        case MachineNetworkInterfaceCollection:
+            item = new ItemConfig(CimiMachineNetworkInterfaceCollection.class, ExchangeType.MachineNetworkInterfaceCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineNetworkInterfaceCollectionConverter());
+            break;
+
+        case MachineNetworkInterfaceAddress:
+            item = new ItemConfig(CimiMachineNetworkInterfaceAddress.class, ExchangeType.MachineNetworkInterfaceAddress);
+            item.putData(ConfigFactory.CONVERTER, new MachineNetworkInterfaceAddressConverter());
+            break;
+
+        case MachineNetworkInterfaceAddressCollection:
+            item = new ItemConfig(CimiMachineNetworkInterfaceAddressCollection.class,
+                ExchangeType.MachineNetworkInterfaceAddressCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineNetworkInterfaceAddressCollectionConverter());
             break;
 
         case MachineTemplate:
