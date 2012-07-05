@@ -24,8 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.request;
 
+import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigFactory;
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 /**
  *
@@ -65,6 +67,20 @@ public interface CimiContext {
      * @return A CIMI instance converted
      */
     Object convertToCimi(Object service, Class<?> cimiAssociate);
+
+    /**
+     * Convert a service child object to a CIMI child object.
+     * <p>
+     * Before the convert, finds the CIMI Resource class associate to the Cloud
+     * Resource class of the given instance. The association is defined by the
+     * configuration.
+     * </p>
+     * 
+     * @param service The service instance to convert
+     * @return A CIMI instance converted or null if service is null
+     * @see CimiContext#findAssociate(Class)
+     */
+    Object convertNextCimi(final CloudResource service);
 
     /**
      * Convert a service child object to a CIMI child object.
@@ -166,8 +182,10 @@ public interface CimiContext {
      * Find a CIMI class associate to a service class.
      * 
      * @param service The service class
-     * @return The CIMI class or null if not found
+     * @return The CIMI class found
+     * @throws ConfigurationException If associate CIMI class not found
+     * @see ConfigFactory
      */
-    Class<? extends CimiResource> findAssociate(Class<?> service);
+    Class<? extends CimiResource> findAssociate(Class<? extends CloudResource> service);
 
 }

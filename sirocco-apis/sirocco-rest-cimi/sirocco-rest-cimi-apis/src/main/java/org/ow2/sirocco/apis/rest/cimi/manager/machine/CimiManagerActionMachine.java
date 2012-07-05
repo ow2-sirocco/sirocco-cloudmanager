@@ -90,10 +90,10 @@ public class CimiManagerActionMachine extends CimiManagerAbstract {
         ActionType type = ActionType.findPath(cimiAction.getAction());
         switch (type) {
         case START:
-            out = this.manager.startMachine(context.getRequest().getId());
+            out = this.manager.startMachine(context.getRequest().getIds().getId());
             break;
         case STOP:
-            out = this.manager.stopMachine(context.getRequest().getId());
+            out = this.manager.stopMachine(context.getRequest().getIds().getId());
             break;
         default:
             throw new UnsupportedOperationException();

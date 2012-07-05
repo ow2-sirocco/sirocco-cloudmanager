@@ -42,6 +42,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.request.IdRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
@@ -168,7 +169,7 @@ public class CimiManagersCredentialsTest {
         EasyMock.expect(this.service.getCredentialsById("321")).andReturn(machine);
         EasyMock.replay(this.service);
 
-        this.request.setId("321");
+        this.request.setIds(new IdRequest("321"));
         this.managerRead.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
@@ -182,7 +183,7 @@ public class CimiManagersCredentialsTest {
         this.service.deleteCredentials("1");
         EasyMock.replay(this.service);
 
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.managerDelete.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
@@ -197,7 +198,7 @@ public class CimiManagersCredentialsTest {
 
         CimiCredentials cimi = new CimiCredentials();
         cimi.setName("foo");
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
 
         this.managerUpdate.execute(this.context);
@@ -219,7 +220,7 @@ public class CimiManagersCredentialsTest {
         CimiCredentials cimi = new CimiCredentials();
         cimi.setName("fooName");
         cimi.setDescription("fooDescription");
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"name", "description"});
 

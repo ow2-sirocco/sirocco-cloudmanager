@@ -49,7 +49,7 @@ public class CimiManagerDeleteMachineImage extends CimiManagerDeleteAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        this.manager.deleteMachineImage(context.getRequest().getId());
+        this.manager.deleteMachineImage(context.getRequest().getIds().getId());
         return null;
     }
 

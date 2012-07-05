@@ -33,30 +33,29 @@ import org.ow2.sirocco.apis.rest.cimi.resource.RestResourceAbstract;
 public class ContextHelper {
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos) {
-        return ContextHelper.buildContext(infos, null, null, null);
+        return ContextHelper.buildContext(infos, (IdRequest) null, (CimiData) null);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final CimiData cimiData) {
-        return ContextHelper.buildContext(infos, null, null, cimiData);
+        return ContextHelper.buildContext(infos, (IdRequest) null, cimiData);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id) {
-        return ContextHelper.buildContext(infos, id, null, null);
+        return ContextHelper.buildContext(infos, new IdRequest(id), (CimiData) null);
     }
 
     public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
         final CimiData cimiData) {
-        return ContextHelper.buildContext(infos, id, null, cimiData);
+        return ContextHelper.buildContext(infos, new IdRequest(id), cimiData);
     }
 
-    public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
-        final String idParent) {
-        return ContextHelper.buildContext(infos, id, idParent, null);
+    public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final IdRequest ids) {
+        return ContextHelper.buildContext(infos, ids, null);
     }
 
-    public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final String id,
-        final String idParent, final CimiData cimiData) {
-        CimiRequest request = RequestHelper.buildRequest(infos, id, idParent, cimiData);
+    public static CimiContext buildContext(final RestResourceAbstract.JaxRsRequestInfos infos, final IdRequest ids,
+        final CimiData cimiData) {
+        CimiRequest request = RequestHelper.buildRequest(infos, ids, cimiData);
         CimiResponse response = new CimiResponse();
         return new CimiContextImpl(request, response);
     }

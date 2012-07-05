@@ -55,7 +55,7 @@ public class CimiManagerUpdateMachineConfiguration extends CimiManagerUpdateAbst
         if (true == select.isEmpty()) {
             this.manager.updateMachineConfiguration((MachineConfiguration) dataService);
         } else {
-            this.manager.updateMachineConfigurationAttributes(context.getRequest().getId(),
+            this.manager.updateMachineConfigurationAttributes(context.getRequest().getIds().getId(),
                 select.dispatchAttributesValues(dataService));
         }
         return null;

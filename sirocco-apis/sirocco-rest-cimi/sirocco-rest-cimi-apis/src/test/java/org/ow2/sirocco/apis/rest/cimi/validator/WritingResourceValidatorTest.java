@@ -30,6 +30,10 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
@@ -48,6 +52,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
@@ -103,25 +111,38 @@ public class WritingResourceValidatorTest {
     public void testAllResourcesWithHref() throws Exception {
         CimiResource cimi = null;
 
+        String[] ids;
+
         for (ExchangeType type : ExchangeType.values()) {
 
             cimi = this.newResource(type);
 
             if (null != cimi) {
-                System.out.println(type);
-                cimi.setHref(type.makeHref(this.request.getBaseUri(), "987", "123"));
-                System.out.println(cimi.getHref());
+                // System.out.println();
+                // System.out.println(type);
+
+                // Make IDS for the exchange type to test and its parents
+                ids = new String[type.getPathType().getParentDepth() + 1];
+                for (int i = 0; i < ids.length; i++) {
+                    ids[i] = String.valueOf((i + 100) * 7);
+                }
+                // Test HREF
+                cimi.setHref(type.makeHref(this.request.getBaseUri(), ids));
+                // System.out.println(cimi.getHref());
                 Assert.assertTrue("Test " + type, CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
-                if (true == type.hasParent()) {
-                    cimi.setHref(type.makeHref(this.request.getBaseUri(), "123"));
-                } else {
-                    cimi.setHref(type.makeHref(this.request.getBaseUri(), (String) null));
+                // Make IDS as a collection only for its parents
+                ids = new String[type.getPathType().getParentDepth()];
+                for (int i = 0; i < ids.length; i++) {
+                    ids[i] = String.valueOf((i + 100) * 7);
                 }
+                cimi.setHref(type.makeHref(this.request.getBaseUri(), ids));
                 // System.out.println(cimi.getHref());
                 if (true == type.hasIdInReference()) {
+                    // The type is not a collection, is missing an ID
                     Assert.assertFalse("Test " + type, CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
                 } else {
+                    // The type is a collection
                     Assert.assertTrue("Test " + type, CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
                 }
 
@@ -145,6 +166,21 @@ public class WritingResourceValidatorTest {
     private CimiResource newResource(final ExchangeType type) {
         CimiResource cimi = null;
         switch (type) {
+        case Address:
+            cimi = new CimiAddress();
+            break;
+        case AddressCollection:
+            cimi = new CimiAddressCollection();
+            break;
+        case AddressCreate:
+            cimi = null;
+            break;
+        case AddressTemplate:
+            cimi = new CimiAddressTemplate();
+            break;
+        case AddressTemplateCollection:
+            cimi = new CimiAddressTemplateCollection();
+            break;
         case CloudEntryPoint:
             cimi = new CimiCloudEntryPoint();
             break;
@@ -198,6 +234,18 @@ public class WritingResourceValidatorTest {
             break;
         case MachineImageCollection:
             cimi = new CimiMachineImageCollection();
+            break;
+        case MachineNetworkInterface:
+            cimi = new CimiMachineNetworkInterface();
+            break;
+        case MachineNetworkInterfaceCollection:
+            cimi = new CimiMachineNetworkInterfaceCollection();
+            break;
+        case MachineNetworkInterfaceAddress:
+            cimi = new CimiMachineNetworkInterfaceAddress();
+            break;
+        case MachineNetworkInterfaceAddressCollection:
+            cimi = new CimiMachineNetworkInterfaceAddressCollection();
             break;
         case MachineTemplate:
             cimi = new CimiMachineTemplate();
@@ -415,13 +463,6 @@ public class WritingResourceValidatorTest {
         cimi.getDisks().add(new CimiMachineDisk(123));
         cimi.getDisks().add(new CimiMachineDisk(456));
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
-
-        // --------------- KO
-
-        cimi = new CimiMachine();
-        cimi.setDisks(new CimiMachineDiskCollection());
-
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }
 
     @Test

@@ -55,7 +55,7 @@ public class CimiManagerUpdateVolumeImage extends CimiManagerUpdateAbstract {
         if (true == select.isEmpty()) {
             this.manager.updateVolumeImage((VolumeImage) dataService);
         } else {
-            this.manager.updateVolumeImageAttributes(context.getRequest().getId(),
+            this.manager.updateVolumeImageAttributes(context.getRequest().getIds().getId(),
                 select.dispatchAttributesValues(dataService));
         }
         return null;

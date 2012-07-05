@@ -24,7 +24,10 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.request;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.configuration.AppConfig;
 import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigFactory;
@@ -34,6 +37,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 
 /**
@@ -117,6 +121,22 @@ public class CimiContextImpl implements CimiContext {
         this.stackConvertedCimiClass.clear();
         this.stackConvertedIdService.clear();
         return this.convertNextCimi(service, cimiAssociate);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertNextCimi(java.lang.Object,
+     *      java.lang.Class)
+     */
+    @Override
+    public Object convertNextCimi(final CloudResource service) {
+        Object converted = null;
+        if (null != service) {
+            Class<? extends CimiResource> cimiAssociate = this.findAssociate(service.getClass());
+            converted = this.convertNextCimi(service, cimiAssociate);
+        }
+        return converted;
     }
 
     /**
@@ -301,16 +321,26 @@ public class CimiContextImpl implements CimiContext {
         // Detects if type has parent
         if (true == type.hasParent()) {
             // Adds id parent of the request if exists
-            if (null != this.getRequest().getIdParent()) {
-                href = type.makeHref(this.getRequest().getBaseUri(), this.getRequest().getIdParent(), id);
+            if (null != this.getRequest().getIds().getIdParent()) {
+                href = type.makeHref(this.getRequest().getBaseUri(), this.getRequest().getIds().makeArrayWithParents(id));
             } else {
                 // Adds id parent of the service if exists
-                Integer idParentService = this.findServiceIdParent();
-                if (null != idParentService) {
-                    href = type.makeHref(this.getRequest().getBaseUri(), idParentService.toString(), id);
+                List<Integer> idsParent = this.findAllServiceIdParent();
+                if (idsParent.size() > 0) {
+                    // Reverse order : oldest to youngest
+                    Collections.reverse(idsParent);
+                    List<String> idsString = new ArrayList<String>();
+                    for (Integer serviceId : idsParent) {
+                        idsString.add(serviceId.toString());
+                    }
+                    // Add id
+                    idsString.add(id);
+                    // Make HREF
+                    href = type.makeHref(this.getRequest().getBaseUri(), idsString.toArray(new String[idsString.size()]));
                 }
             }
         } else {
+            // None parent
             href = type.makeHref(this.getRequest().getBaseUri(), id);
         }
         return href;
@@ -343,7 +373,7 @@ public class CimiContextImpl implements CimiContext {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public Class<? extends CimiResource> findAssociate(final Class<?> klass) {
+    public Class<? extends CimiResource> findAssociate(final Class<? extends CloudResource> klass) {
         Class<? extends CimiResource> cimi = null;
         try {
             ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
@@ -364,17 +394,22 @@ public class CimiContextImpl implements CimiContext {
     }
 
     /**
-     * Finds the "ID parent" stored in the stack "ID service" for the current
+     * Finds all "ID parent" stored in the stack "ID service" for the current
      * object being converted.
      * 
-     * @return The IdParent or null if not found
+     * @return A list of all IdParents, the list is empty if none idParent is
+     *         found
      */
-    protected Integer findServiceIdParent() {
+    protected List<Integer> findAllServiceIdParent() {
+        List<Integer> idsParent = new ArrayList<Integer>();
         Integer idParent = null;
-        for (int i = 1; (i < this.stackConvertedIdService.size()) && (null == idParent); i++) {
+        for (int i = 1; i < this.stackConvertedIdService.size(); i++) {
             idParent = this.stackConvertedIdService.get(i);
+            if (null != idParent) {
+                idsParent.add(idParent);
+            }
         }
-        return idParent;
+        return idsParent;
     }
 
     /**

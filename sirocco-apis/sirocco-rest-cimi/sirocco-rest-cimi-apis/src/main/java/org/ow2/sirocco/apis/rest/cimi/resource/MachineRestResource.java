@@ -43,6 +43,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.ContextHelper;
+import org.ow2.sirocco.apis.rest.cimi.request.IdRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.ResponseHelper;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -224,7 +225,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("{idParent}" + ConstantsPath.DISK_PATH)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readDisks(@PathParam("idParent") final String idParent) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), (String) null, idParent);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent));
         this.cimiManagerReadMachineDiskCollection.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
@@ -240,7 +241,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("/{idParent}" + ConstantsPath.DISK_PATH + "/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readDisk(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id, idParent);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
         this.cimiManagerReadMachineDisk.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
@@ -257,7 +258,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("/{idParent}" + ConstantsPath.DISK_PATH + "/{id}")
     public Response updateDisk(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
         final CimiMachineDisk cimiData) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id, idParent, cimiData);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent), cimiData);
         this.cimiManagerUpdateMachineDisk.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
@@ -272,7 +273,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("/{idParent}" + ConstantsPath.DISK_PATH)
     public Response createDisk(@PathParam("idParent") final String idParent, final CimiMachineDisk cimiData) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), null, idParent, cimiData);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent), cimiData);
         this.cimiManagerCreateMachineDisk.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
@@ -287,7 +288,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @DELETE
     @Path("/{idParent}" + ConstantsPath.DISK_PATH + "/{id}")
     public Response deleteDisk(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id, idParent);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
         this.cimiManagerDeleteMachineDisk.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
@@ -302,7 +303,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("{idParent}" + ConstantsPath.VOLUME_PATH)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readVolumes(@PathParam("idParent") final String idParent) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), (String) null, idParent);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent));
         this.cimiManagerReadMachineVolumeCollection.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
@@ -318,7 +319,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("/{idParent}" + ConstantsPath.VOLUME_PATH + "/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readVolume(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id, idParent);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
         this.cimiManagerReadMachineVolume.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
@@ -335,7 +336,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Path("/{idParent}" + ConstantsPath.VOLUME_PATH + "/{id}")
     public Response updateVolume(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
         final CimiMachineVolume cimiData) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id, idParent, cimiData);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent), cimiData);
         this.cimiManagerUpdateMachineVolume.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
@@ -350,7 +351,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     @Path("/{idParent}" + ConstantsPath.VOLUME_PATH)
     public Response createVolume(@PathParam("idParent") final String idParent, final CimiMachineVolume cimiData) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), null, idParent, cimiData);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent), cimiData);
         this.cimiManagerCreateMachineVolume.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
@@ -365,7 +366,7 @@ public class MachineRestResource extends RestResourceAbstract {
     @DELETE
     @Path("/{idParent}" + ConstantsPath.VOLUME_PATH + "/{id}")
     public Response deleteVolume(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
-        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id, idParent);
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
         this.cimiManagerDeleteMachineVolume.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }

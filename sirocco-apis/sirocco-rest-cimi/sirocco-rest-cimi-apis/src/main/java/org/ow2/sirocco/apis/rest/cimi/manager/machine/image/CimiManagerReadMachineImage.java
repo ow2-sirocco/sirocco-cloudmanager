@@ -57,9 +57,9 @@ public class CimiManagerReadMachineImage extends CimiManagerReadAbstract {
         MachineImage out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getMachineImageById(context.getRequest().getId());
+            out = this.manager.getMachineImageById(context.getRequest().getIds().getId());
         } else {
-            out = this.manager.getMachineImageAttributes(context.getRequest().getId(), select.getAttributes());
+            out = this.manager.getMachineImageAttributes(context.getRequest().getIds().getId(), select.getAttributes());
         }
         return out;
     }

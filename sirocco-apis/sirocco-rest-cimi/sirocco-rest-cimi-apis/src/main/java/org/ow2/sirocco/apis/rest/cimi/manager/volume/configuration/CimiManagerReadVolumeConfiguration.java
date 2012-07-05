@@ -57,9 +57,9 @@ public class CimiManagerReadVolumeConfiguration extends CimiManagerReadAbstract 
         VolumeConfiguration out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getVolumeConfigurationById(context.getRequest().getId());
+            out = this.manager.getVolumeConfigurationById(context.getRequest().getIds().getId());
         } else {
-            out = this.manager.getVolumeConfigurationAttributes(context.getRequest().getId(), select.getAttributes());
+            out = this.manager.getVolumeConfigurationAttributes(context.getRequest().getIds().getId(), select.getAttributes());
         }
         return out;
     }

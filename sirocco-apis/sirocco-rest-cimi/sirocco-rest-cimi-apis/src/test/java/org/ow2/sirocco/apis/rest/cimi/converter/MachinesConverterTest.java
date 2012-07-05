@@ -39,7 +39,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
@@ -395,7 +394,12 @@ public class MachinesConverterTest {
         Assert.assertNull(service.getCpu());
         Assert.assertNull(service.getMemory());
         Assert.assertNull(service.getState());
-        Assert.assertNull(service.getDisks());
+        Assert.assertNotNull(service.getDisks());
+        Assert.assertEquals(0, service.getDisks().size());
+        Assert.assertNotNull(service.getNetworkInterfaces());
+        Assert.assertEquals(0, service.getNetworkInterfaces().size());
+        Assert.assertNotNull(service.getVolumes());
+        Assert.assertEquals(0, service.getVolumes().size());
 
         // Empty Service -> Cimi
         cimi = (CimiMachine) this.context.convertToCimi(new Machine(), CimiMachine.class);
@@ -405,7 +409,7 @@ public class MachinesConverterTest {
         Assert.assertNull(cimi.getMemory());
         Assert.assertNull(cimi.getState());
 
-        // Full Cimi -> Service : without collections
+        // Full Cimi -> Service
         cimi = new CimiMachine();
         cimi.setCpu(3);
         cimi.setMemory(1024);
@@ -415,24 +419,9 @@ public class MachinesConverterTest {
         Assert.assertEquals(3, service.getCpu().intValue());
         Assert.assertEquals(1024, service.getMemory().intValue());
         Assert.assertNull(service.getState());
-
-        // Full Cimi -> Service : Empty MachineDisk Collection
-        cimi = new CimiMachine();
-        cimi.setDisks(new CimiMachineDiskCollection());
-
-        service = (Machine) this.context.convertToService(cimi);
-        Assert.assertNotNull(service.getDisks());
-        Assert.assertNull(cimi.getDisks().getCollection());
-
-        // Full Cimi -> Service : Full MachineDisk Collection
-        cimi = new CimiMachine();
-        CimiMachineDiskCollection cimiMachineDisks = new CimiMachineDiskCollection();
-        cimiMachineDisks.add(new CimiMachineDisk());
-        cimiMachineDisks.add(new CimiMachineDisk());
-        cimi.setDisks(cimiMachineDisks);
-
-        service = (Machine) this.context.convertToService(cimi);
-        Assert.assertEquals(2, service.getDisks().size());
+        Assert.assertEquals(0, service.getDisks().size());
+        Assert.assertEquals(0, service.getNetworkInterfaces().size());
+        Assert.assertEquals(0, service.getVolumes().size());
 
         // Full Service -> Cimi : without collections
         service = new Machine();

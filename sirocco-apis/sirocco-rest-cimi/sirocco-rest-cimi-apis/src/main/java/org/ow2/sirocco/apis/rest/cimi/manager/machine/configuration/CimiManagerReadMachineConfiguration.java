@@ -57,7 +57,7 @@ public class CimiManagerReadMachineConfiguration extends CimiManagerReadAbstract
         MachineConfiguration out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getMachineConfigurationById(context.getRequest().getId());
+            out = this.manager.getMachineConfigurationById(context.getRequest().getIds().getId());
         } else {
             // FIXME
             throw new UnsupportedOperationException();

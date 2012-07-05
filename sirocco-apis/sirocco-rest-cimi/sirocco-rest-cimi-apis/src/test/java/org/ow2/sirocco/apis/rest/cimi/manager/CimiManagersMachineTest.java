@@ -51,6 +51,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.request.IdRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
@@ -153,7 +154,7 @@ public class CimiManagersMachineTest {
 
         CimiAction cimi = new CimiAction();
         cimi.setAction(ActionType.START.getPath());
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
         this.managerAction.execute(this.context);
 
@@ -178,7 +179,7 @@ public class CimiManagersMachineTest {
 
         CimiAction cimi = new CimiAction();
         cimi.setAction(ActionType.STOP.getPath());
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
         this.managerAction.execute(this.context);
 
@@ -304,7 +305,7 @@ public class CimiManagersMachineTest {
         EasyMock.expect(this.service.getMachineById("1")).andReturn(machine);
         EasyMock.replay(this.service);
 
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.managerRead.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
@@ -321,7 +322,7 @@ public class CimiManagersMachineTest {
         EasyMock.expect(this.service.getMachineAttributes(EasyMock.eq("1"), EasyMock.eq(list))).andReturn(machine);
         EasyMock.replay(this.service);
 
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"name", "description"});
         this.managerRead.execute(this.context);
 
@@ -342,7 +343,7 @@ public class CimiManagersMachineTest {
         EasyMock.expect(this.service.deleteMachine("1")).andReturn(job);
         EasyMock.replay(this.service);
 
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.managerDelete.execute(this.context);
 
         Assert.assertEquals(202, this.response.getStatus());
@@ -366,7 +367,7 @@ public class CimiManagersMachineTest {
 
         CimiMachine cimi = new CimiMachine();
         cimi.setName("foo");
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
 
         this.managerUpdate.execute(this.context);
@@ -397,7 +398,7 @@ public class CimiManagersMachineTest {
         CimiMachine cimi = new CimiMachine();
         cimi.setName("fooName");
         cimi.setDescription("fooDescription");
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"name", "description"});
 

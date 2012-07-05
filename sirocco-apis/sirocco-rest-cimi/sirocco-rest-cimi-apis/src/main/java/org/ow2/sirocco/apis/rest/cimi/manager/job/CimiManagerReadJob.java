@@ -57,9 +57,9 @@ public class CimiManagerReadJob extends CimiManagerReadAbstract {
         Job out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getJobById(context.getRequest().getId());
+            out = this.manager.getJobById(context.getRequest().getIds().getId());
         } else {
-            out = this.manager.getJobAttributes(context.getRequest().getId(), select.getAttributes());
+            out = this.manager.getJobAttributes(context.getRequest().getIds().getId(), select.getAttributes());
         }
         return out;
     }

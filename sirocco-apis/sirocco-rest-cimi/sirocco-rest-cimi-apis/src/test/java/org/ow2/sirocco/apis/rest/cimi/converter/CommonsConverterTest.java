@@ -33,6 +33,10 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
@@ -51,6 +55,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
@@ -87,7 +95,10 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.request.IdRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
+import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -98,6 +109,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
@@ -132,253 +144,6 @@ public class CommonsConverterTest {
 
         this.context = new CimiContextImpl(this.request, new CimiResponse());
     }
-
-    // @Test
-    // public void testFrequencyUnit() throws Exception {
-    // // Null Cimi -> Service
-    // Assert.assertNull(this.context.getConverter(FrequencyUnit.class).toService(this.context,
-    // null));
-    // // Empty Cimi -> Service
-    // try {
-    // this.context.getConverter(FrequencyUnit.class).toService(this.context,
-    // new String());
-    // // KO
-    // Assert.fail();
-    // } catch (InvalidConversionException e) {
-    // }
-    // // Full Cimi -> Service
-    // for (FrequencyUnit cimi : FrequencyUnit.values()) {
-    // try {
-    // this.context.getConverter(FrequencyUnit.class).toService(this.context,
-    // cimi.getLabel().toString());
-    // switch (cimi) {
-    // case HERTZ:
-    // case MEGAHERTZ:
-    // case GIGAHERTZ:
-    // // OK
-    // break;
-    // default:
-    // // KO
-    // Assert.fail();
-    // }
-    // } catch (InvalidConversionException e) {
-    // // OK
-    // }
-    // }
-    //
-    // // Null Service -> Cimi
-    // Assert.assertNull(this.context.getConverter(FrequencyUnit.class).toCimi(this.context,
-    // null));
-    // // Full Service -> Cimi
-    // for (Frequency service : Frequency.values()) {
-    // this.context.getConverter(FrequencyUnit.class).toCimi(this.context,
-    // service);
-    // }
-    // }
-
-    // @Test
-    // public void testMemoryUnit() throws Exception {
-    // // Null Cimi -> Service
-    // Assert.assertNull(this.context.getConverter(MemoryUnit.class).toService(this.context,
-    // null));
-    // // Empty Cimi -> Service
-    // try {
-    // this.context.getConverter(MemoryUnit.class).toService(this.context, new
-    // String());
-    // // KO
-    // Assert.fail();
-    // } catch (InvalidConversionException e) {
-    // }
-    // // Full Cimi -> Service
-    // for (MemoryUnit cimi : MemoryUnit.values()) {
-    // this.context.getConverter(MemoryUnit.class).toService(this.context,
-    // cimi.getLabel().toString());
-    // }
-    //
-    // // Null Service -> Cimi
-    // Assert.assertNull(this.context.getConverter(MemoryUnit.class).toCimi(this.context,
-    // null));
-    // // Full Service -> Cimi
-    // for (Memory.MemoryUnit service : Memory.MemoryUnit.values()) {
-    // this.context.getConverter(MemoryUnit.class).toCimi(this.context,
-    // service);
-    // }
-    // }
-
-    // @Test
-    // public void testStorageUnit() throws Exception {
-    // // Null Cimi -> Service
-    // Assert.assertNull(this.context.getConverter(StorageUnit.class).toService(this.context,
-    // null));
-    // // Empty Cimi -> Service
-    // try {
-    // this.context.getConverter(StorageUnit.class).toService(this.context, new
-    // String());
-    // // KO
-    // Assert.fail();
-    // } catch (InvalidConversionException e) {
-    // }
-    // // Full Cimi -> Service
-    // for (StorageUnit cimi : StorageUnit.values()) {
-    // this.context.getConverter(StorageUnit.class).toService(this.context,
-    // cimi.getLabel().toString());
-    // }
-    //
-    // // Null Service -> Cimi
-    // Assert.assertNull(this.context.getConverter(StorageUnit.class).toCimi(this.context,
-    // null));
-    // // Full Service -> Cimi
-    // for (org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit service :
-    // org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit
-    // .values()) {
-    // this.context.getConverter(StorageUnit.class).toCimi(this.context,
-    // service);
-    // }
-    // }
-
-    // @Test
-    // public void testCimiCpu() throws Exception {
-    // CimiCpu cimi;
-    // Cpu service;
-    //
-    // // Empty Cimi -> Service
-    // service = (Cpu) this.context.convertToService(new CimiCpu());
-    // Assert.assertNull(service.getCpuSpeedUnit());
-    // Assert.assertNull(service.getNumberCpu());
-    // Assert.assertNull(service.getQuantity());
-    //
-    // // Empty Service -> Cimi
-    // cimi = (CimiCpu) this.context.convertToCimi(new Cpu(), CimiCpu.class);
-    // Assert.assertNull(cimi.getFrequency());
-    // Assert.assertNull(cimi.getNumberVirtualCpus());
-    // Assert.assertNull(cimi.getUnits());
-    //
-    // // Full Cimi -> Service
-    // cimi = new CimiCpu();
-    // cimi.setFrequency(2f);
-    // cimi.setNumberVirtualCpus(3);
-    // cimi.setUnits(FrequencyUnit.GIGAHERTZ.getLabel());
-    //
-    // service = (Cpu) this.context.convertToService(cimi);
-    // Assert.assertEquals(2, service.getQuantity().longValue());
-    // Assert.assertEquals(3, service.getNumberCpu().intValue());
-    // Assert.assertEquals(Cpu.Frequency.GIGA, service.getCpuSpeedUnit());
-    //
-    // // Full Service -> Cimi
-    // service = new Cpu();
-    // service.setCpuSpeedUnit(Frequency.MEGA);
-    // service.setNumberCpu(3);
-    // service.setQuantity(4f);
-    //
-    // cimi = (CimiCpu) this.context.convertToCimi(service, CimiCpu.class);
-    // Assert.assertEquals(4, cimi.getFrequency().longValue());
-    // Assert.assertEquals(3, cimi.getNumberVirtualCpus().intValue());
-    // Assert.assertEquals(FrequencyUnit.MEGAHERTZ.getLabel(), cimi.getUnits());
-    // }
-
-    // @Test
-    // public void testCimiMemory() throws Exception {
-    // CimiMemory cimi;
-    // Memory service;
-    //
-    // // Empty Cimi -> Service
-    // service = (Memory) this.context.convertToService(new CimiMemory());
-    // Assert.assertNull(service.getQuantity());
-    // Assert.assertNull(service.getUnit());
-    //
-    // // Empty Service -> Cimi
-    // cimi = (CimiMemory) this.context.convertToCimi(new Memory(),
-    // CimiMemory.class);
-    // Assert.assertNull(cimi.getQuantity());
-    // Assert.assertNull(cimi.getUnits());
-    //
-    // // Full Cimi -> Service
-    // cimi = new CimiMemory();
-    // cimi.setQuantity(5);
-    // cimi.setUnits(MemoryUnit.GibiBYTE.getLabel());
-    //
-    // service = (Memory) this.context.convertToService(cimi);
-    // Assert.assertEquals(5, service.getQuantity().longValue());
-    // Assert.assertEquals(Memory.MemoryUnit.GIGIBYTE, service.getUnit());
-    //
-    // // Full Service -> Cimi
-    // service = new Memory();
-    // service.setQuantity(4f);
-    // service.setUnit(Memory.MemoryUnit.MEGIBYTE);
-    //
-    // cimi = (CimiMemory) this.context.convertToCimi(service,
-    // CimiMemory.class);
-    // Assert.assertEquals(4, cimi.getQuantity().longValue());
-    // Assert.assertEquals(MemoryUnit.MebiBYTE.getLabel(), cimi.getUnits());
-    // }
-
-    // @Test
-    // public void testCimiCapacity() throws Exception {
-    // CimiCapacity cimi;
-    // Object service;
-    //
-    // // Empty Cimi (CimiDiskConfiguration) -> Service
-    // service = this.context.convertToService(new CimiDiskConfiguration());
-    // Assert.assertEquals(DiskTemplate.class, service.getClass());
-    // Assert.assertNull(((DiskTemplate) service).getQuantity());
-    // Assert.assertNull(((DiskTemplate) service).getUnit());
-    //
-    // // Empty Cimi (CimiCapacity) -> Service
-    // service = this.context.convertToService(new CimiCapacity());
-    // Assert.assertEquals(Disk.class, service.getClass());
-    // Assert.assertNull(((Disk) service).getQuantity());
-    // Assert.assertNull(((Disk) service).getUnits());
-    //
-    // // Empty Service (DiskTemplate) -> Cimi
-    // cimi = (CimiCapacity) this.context.convertToCimi(new DiskTemplate(),
-    // CimiCapacity.class);
-    // Assert.assertNull(cimi.getQuantity());
-    // Assert.assertNull(cimi.getUnits());
-    //
-    // // Empty Service (Disk) -> Cimi
-    // cimi = (CimiCapacity) this.context.convertToCimi(new Disk(),
-    // CimiCapacity.class);
-    // Assert.assertNull(cimi.getQuantity());
-    // Assert.assertNull(cimi.getUnits());
-    //
-    // // Full Cimi (CimiDiskConfiguration) -> Service
-    // CimiDiskConfiguration cimiDiskConf = new CimiDiskConfiguration();
-    // cimiDiskConf.setCapacity(new CimiCapacity(5,
-    // StorageUnit.GIGABYTE.getLabel()));
-    // service = this.context.convertToService(cimiDiskConf);
-    // Assert.assertEquals(5, ((DiskTemplate)
-    // service).getQuantity().longValue());
-    // Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.GIGABYTE,
-    // ((DiskTemplate) service).getUnit());
-    //
-    // // Full Cimi (CimiCapacity) -> Service
-    // cimi = new CimiCapacity(7, StorageUnit.EXABYTE.getLabel());
-    // service = this.context.convertToService(cimi);
-    // Assert.assertEquals(7, ((Disk) service).getQuantity().longValue());
-    // Assert.assertEquals(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.EXABYTE,
-    // ((Disk) service).getUnits());
-    //
-    // // Full Service (DiskTemplate) -> Cimi
-    // DiskTemplate serviceDiskTemplate = new DiskTemplate();
-    // serviceDiskTemplate.setQuantity(44f);
-    // serviceDiskTemplate.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.KILOBYTE);
-    //
-    // cimi = (CimiCapacity) this.context.convertToCimi(serviceDiskTemplate,
-    // CimiCapacity.class);
-    // Assert.assertEquals(44, cimi.getQuantity().longValue());
-    // Assert.assertEquals(StorageUnit.KILOBYTE.getLabel(), cimi.getUnits());
-    //
-    // // Full Service (Disk) -> Cimi
-    // Disk serviceDisk = new Disk();
-    // serviceDisk.setQuantity(17f);
-    // serviceDisk.setUnit(org.ow2.sirocco.cloudmanager.model.cimi.StorageUnit.TERABYTE);
-    //
-    // cimi = (CimiCapacity) this.context.convertToCimi(serviceDisk,
-    // CimiCapacity.class);
-    // Assert.assertEquals(17, cimi.getQuantity().longValue());
-    // Assert.assertEquals(StorageUnit.TERABYTE.getLabel(), cimi.getUnits());
-    //
-    // }
 
     @Test
     public void testCimiDiskConfiguration() throws Exception {
@@ -544,10 +309,32 @@ public class CommonsConverterTest {
 
         for (ExchangeType type : ExchangeType.values()) {
 
-            // Removes idParent of request
-            this.request.setIdParent(null);
+            // Removes ids in request
+            this.request.setIds(new IdRequest());
 
             switch (type) {
+            case Address:
+                service = new Address();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiAddress.class;
+                break;
+            case AddressCollection:
+                service = new ArrayList<Address>();
+                cimiClass = CimiAddressCollection.class;
+                break;
+            case AddressCreate:
+                service = null;
+                break;
+            case AddressTemplate:
+                service = new AddressTemplate();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiAddressTemplate.class;
+                break;
+            case AddressTemplateCollection:
+                service = new ArrayList<AddressTemplate>();
+                cimiClass = CimiAddressTemplateCollection.class;
+                break;
+
             case CloudEntryPoint:
                 service = new CloudEntryPointAggregate(new CloudEntryPoint());
                 ((Identifiable) service).setId(11);
@@ -578,14 +365,14 @@ public class CommonsConverterTest {
                 service = new MachineDisk();
                 ((MachineDisk) service).setId(111);
                 cimiClass = CimiMachineDisk.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case DiskCollection:
                 service = new ArrayList<MachineDisk>();
                 cimiClass = CimiMachineDiskCollection.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case Job:
                 service = new Job();
@@ -629,6 +416,32 @@ public class CommonsConverterTest {
                 service = new ArrayList<MachineImage>();
                 cimiClass = CimiMachineImageCollection.class;
                 break;
+            case MachineNetworkInterface:
+                service = new MachineNetworkInterface();
+                ((MachineNetworkInterface) service).setId(111);
+                cimiClass = CimiMachineNetworkInterface.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case MachineNetworkInterfaceCollection:
+                service = new ArrayList<MachineNetworkInterface>();
+                cimiClass = CimiMachineNetworkInterfaceCollection.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case MachineNetworkInterfaceAddress:
+                service = new Address();
+                ((Address) service).setId(111);
+                cimiClass = CimiMachineNetworkInterfaceAddress.class;
+                // Add id grandparent and parent in request
+                this.request.setIds(new IdRequest(null, "999", "7777"));
+                break;
+            case MachineNetworkInterfaceAddressCollection:
+                service = new ArrayList<Address>();
+                cimiClass = CimiMachineNetworkInterfaceAddressCollection.class;
+                // Add id grandparent and parent in request
+                this.request.setIds(new IdRequest(null, "999", "7777"));
+                break;
             case MachineTemplate:
                 service = new MachineTemplate();
                 ((Identifiable) service).setId(11);
@@ -642,14 +455,14 @@ public class CommonsConverterTest {
                 service = new MachineVolume();
                 ((MachineVolume) service).setId(111);
                 cimiClass = CimiMachineVolume.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case MachineVolumeCollection:
                 service = new ArrayList<MachineVolume>();
                 cimiClass = CimiMachineVolumeCollection.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case Volume:
                 service = new Volume();
@@ -694,14 +507,14 @@ public class CommonsConverterTest {
                 service = new VolumeImage();
                 ((Identifiable) service).setId(111);
                 cimiClass = CimiVolumeVolumeImage.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case VolumeVolumeImageCollection:
                 service = new ArrayList<VolumeImage>();
                 cimiClass = CimiVolumeVolumeImageCollection.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case System:
                 service = new System();
@@ -719,40 +532,40 @@ public class CommonsConverterTest {
                 service = new SystemCredentials();
                 ((Identifiable) service).setId(111);
                 cimiClass = CimiSystemCredential.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case SystemCredentialCollection:
                 service = new ArrayList<SystemCredentials>();
                 cimiClass = CimiSystemCredentialCollection.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case SystemMachine:
                 service = new SystemMachine();
                 ((Identifiable) service).setId(111);
                 cimiClass = CimiSystemMachine.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case SystemMachineCollection:
                 service = new ArrayList<SystemMachine>();
                 cimiClass = CimiSystemMachineCollection.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case SystemSystem:
                 service = new SystemSystem();
                 ((Identifiable) service).setId(111);
                 cimiClass = CimiSystemSystem.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case SystemSystemCollection:
                 service = new ArrayList<SystemSystem>();
                 cimiClass = CimiSystemSystemCollection.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case SystemTemplate:
                 service = new SystemTemplate();
@@ -767,14 +580,14 @@ public class CommonsConverterTest {
                 service = new SystemVolume();
                 ((Identifiable) service).setId(111);
                 cimiClass = CimiSystemVolume.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case SystemVolumeCollection:
                 service = new ArrayList<SystemVolume>();
                 cimiClass = CimiSystemVolumeCollection.class;
-                // Add idParent of request
-                this.request.setIdParent("999");
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             default:
                 Assert.fail(type.name());
@@ -782,19 +595,34 @@ public class CommonsConverterTest {
             }
             if (null != service) {
                 cimi = (CimiResource) this.context.convertToCimi(service, cimiClass);
-                if (true == type.hasIdInReference()) {
-                    if (true == type.hasParent()) {
-                        Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "999", "111"), cimi.getId());
-                    } else {
+                switch (type.getPathType().getParentDepth()) {
+                case 0:
+                    if (true == type.hasIdInReference()) {
                         Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "11"), cimi.getId());
-                    }
-                } else {
-                    if (true == type.hasParent()) {
-                        Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "999"), cimi.getId());
                     } else {
                         Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri()), cimi.getId());
                     }
+                    break;
+                case 1:
+                    if (true == type.hasIdInReference()) {
+                        Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "999", "111"), cimi.getId());
+                    } else {
+                        Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "999"), cimi.getId());
+                    }
+                    break;
 
+                case 2:
+                    if (true == type.hasIdInReference()) {
+                        Assert.assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "7777", "999", "111"),
+                            cimi.getId());
+                    } else {
+                        Assert
+                            .assertEquals("in " + type, type.makeHref(this.request.getBaseUri(), "7777", "999"), cimi.getId());
+                    }
+                    break;
+                default:
+                    Assert.fail("Depth not provided");
+                    break;
                 }
                 Assert.assertEquals("in " + type, type.getResourceURI(), cimi.getResourceURI());
             }
@@ -808,6 +636,7 @@ public class CommonsConverterTest {
         Machine sMachine = new Machine();
         sMachine.setId(9999);
         sMachine.setDisks(new ArrayList<MachineDisk>());
+        sMachine.setNetworkInterfaces(new ArrayList<MachineNetworkInterface>());
 
         MachineDisk sDiskOne = new MachineDisk();
         sDiskOne.setId(111);
@@ -819,11 +648,22 @@ public class CommonsConverterTest {
         sDiskThree.setId(333);
         sMachine.getDisks().add(sDiskThree);
 
+        MachineNetworkInterface sNetworkOne = new MachineNetworkInterface();
+        sNetworkOne.setId(7111);
+        sMachine.getNetworkInterfaces().add(sNetworkOne);
+
+        sNetworkOne.setAddresses(new ArrayList<Address>());
+        Address sAddressOneOne = new Address();
+        sAddressOneOne.setId(777111);
+        sNetworkOne.getAddresses().add(sAddressOneOne);
+
         cimi = (CimiMachine) this.context.convertToCimi(sMachine, CimiMachine.class);
 
+        // Machine
         Assert.assertEquals("in " + cimi.getExchangeType(), ExchangeType.Machine.makeHref(this.request.getBaseUri(), "9999"),
             cimi.getId());
 
+        // MachineDisk
         Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "111"),
             cimi.getDisks().getCollection().get(0).getId());
         Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "222"),
@@ -831,5 +671,14 @@ public class CommonsConverterTest {
         Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "333"),
             cimi.getDisks().getCollection().get(2).getId());
 
+        // MachineNetworkInterface
+        Assert.assertEquals("in " + ExchangeType.MachineNetworkInterface,
+            ExchangeType.MachineNetworkInterface.makeHref(this.request.getBaseUri(), "9999", "7111"), cimi
+                .getNetworkInterfaces().getCollection().get(0).getId());
+
+        // MachineNetworkInterfaceAddress
+        Assert.assertEquals("in " + ExchangeType.MachineNetworkInterfaceAddress,
+            ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "777111"), cimi
+                .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(0).getId());
     }
 }

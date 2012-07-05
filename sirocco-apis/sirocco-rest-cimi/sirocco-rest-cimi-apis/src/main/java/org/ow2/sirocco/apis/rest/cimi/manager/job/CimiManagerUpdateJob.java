@@ -55,7 +55,7 @@ public class CimiManagerUpdateJob extends CimiManagerUpdateAbstract {
         if (true == select.isEmpty()) {
             this.manager.updateJob((Job) dataService);
         } else {
-            this.manager.updateJobAttributes(context.getRequest().getId(), select.dispatchAttributesValues(dataService));
+            this.manager.updateJobAttributes(context.getRequest().getIds().getId(), select.dispatchAttributesValues(dataService));
         }
         return null;
     }

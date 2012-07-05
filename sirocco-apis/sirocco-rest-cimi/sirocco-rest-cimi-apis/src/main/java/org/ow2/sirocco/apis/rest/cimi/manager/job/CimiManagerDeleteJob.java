@@ -49,7 +49,7 @@ public class CimiManagerDeleteJob extends CimiManagerDeleteAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        this.manager.deleteJob(context.getRequest().getId());
+        this.manager.deleteJob(context.getRequest().getIds().getId());
         return null;
     }
 

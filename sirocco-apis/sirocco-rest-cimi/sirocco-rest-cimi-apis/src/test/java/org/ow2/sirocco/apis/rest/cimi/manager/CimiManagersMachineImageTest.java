@@ -44,6 +44,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.request.IdRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
@@ -175,7 +176,7 @@ public class CimiManagersMachineImageTest {
         EasyMock.expect(this.service.getMachineImageById("1")).andReturn(machine);
         EasyMock.replay(this.service);
 
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.managerRead.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
@@ -192,7 +193,7 @@ public class CimiManagersMachineImageTest {
         EasyMock.expect(this.service.getMachineImageAttributes(EasyMock.eq("1"), EasyMock.eq(list))).andReturn(machine);
         EasyMock.replay(this.service);
 
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"name", "description"});
         this.managerRead.execute(this.context);
 
@@ -207,7 +208,7 @@ public class CimiManagersMachineImageTest {
         this.service.deleteMachineImage("1");
         EasyMock.replay(this.service);
 
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.managerDelete.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
@@ -222,7 +223,7 @@ public class CimiManagersMachineImageTest {
 
         CimiMachineImage cimi = new CimiMachineImage();
         cimi.setName("foo");
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
 
         this.managerUpdate.execute(this.context);
@@ -244,7 +245,7 @@ public class CimiManagersMachineImageTest {
         CimiMachineImage cimi = new CimiMachineImage();
         cimi.setName("fooName");
         cimi.setDescription("fooDescription");
-        this.request.setId("1");
+        this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
         this.request.getHeader().getCimiSelect().setSelects(new String[] {"name", "description"});
 

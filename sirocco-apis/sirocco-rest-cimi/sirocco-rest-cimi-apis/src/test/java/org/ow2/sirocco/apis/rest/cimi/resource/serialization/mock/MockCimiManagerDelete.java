@@ -47,7 +47,7 @@ public class MockCimiManagerDelete implements CimiManager {
     public void execute(final CimiContext context) {
         try {
             // Test ID
-            Integer.valueOf(context.getRequest().getId());
+            Integer.valueOf(context.getRequest().getIds().getId());
 
             // Build response
             context.getResponse().setCimiData(null);

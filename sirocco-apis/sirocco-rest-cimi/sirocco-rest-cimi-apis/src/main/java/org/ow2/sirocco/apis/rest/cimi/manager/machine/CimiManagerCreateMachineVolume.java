@@ -55,7 +55,7 @@ public class CimiManagerCreateMachineVolume extends CimiManagerCreateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.addVolumeToMachine(context.getRequest().getIdParent(), (MachineVolume) dataService);
+        return this.manager.addVolumeToMachine(context.getRequest().getIds().getIdParent(), (MachineVolume) dataService);
     }
 
     /**

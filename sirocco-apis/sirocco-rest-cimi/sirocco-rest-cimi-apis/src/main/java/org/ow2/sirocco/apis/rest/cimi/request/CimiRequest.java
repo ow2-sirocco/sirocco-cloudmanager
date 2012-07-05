@@ -33,9 +33,7 @@ public class CimiRequest {
 
     private RequestHeader header;
 
-    private String id;
-
-    private String idParent;
+    private IdRequest idRequest = new IdRequest();
 
     private CimiData cimiData;
 
@@ -51,22 +49,6 @@ public class CimiRequest {
 
     public void setHeader(final RequestHeader header) {
         this.header = header;
-    }
-
-    public String getId() {
-        return this.id;
-    }
-
-    public void setId(final String id) {
-        this.id = id;
-    }
-
-    public String getIdParent() {
-        return this.idParent;
-    }
-
-    public void setIdParent(final String idParent) {
-        this.idParent = idParent;
     }
 
     public CimiData getCimiData() {
@@ -99,6 +81,20 @@ public class CimiRequest {
 
     public void setMethod(final String method) {
         this.method = method;
+    }
+
+    /**
+     * @return the idRequest
+     */
+    public IdRequest getIds() {
+        return this.idRequest;
+    }
+
+    /**
+     * @param idRequest the idRequest to set
+     */
+    public void setIds(final IdRequest idRequest) {
+        this.idRequest = idRequest;
     }
 
 }
