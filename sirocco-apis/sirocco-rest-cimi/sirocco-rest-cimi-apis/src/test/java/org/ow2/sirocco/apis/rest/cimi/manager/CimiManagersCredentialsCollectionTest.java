@@ -25,7 +25,6 @@
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.easymock.EasyMock;
@@ -122,52 +121,60 @@ public class CimiManagersCredentialsCollectionTest {
         EasyMock.verify(this.service);
     }
 
-    @Test
     // FIXME Adapt to the last CIMI specification
-    public void testReadWithCimiSelectAttributes() throws Exception {
+    // @Test
+    // public void testReadWithCimiSelectAttributes() throws Exception {
+    //
+    // List<Credentials> list = new ArrayList<Credentials>();
+    // EasyMock.expect(
+    // this.service.getCredentials(EasyMock.eq(Arrays.asList(new String[]
+    // {"operations"})), EasyMock.eq((String) null)))
+    // .andReturn(list);
+    // EasyMock.replay(this.service);
+    //
+    // this.request.getHeader().getCimiSelect().setSelects(new String[]
+    // {"operations"});
+    // this.manager.execute(this.context);
+    //
+    // Assert.assertEquals(200, this.response.getStatus());
+    // Assert.assertEquals(ConstantsPath.CREDENTIAL_PATH,
+    // ((CimiCredentialsCollection) this.response.getCimiData()).getId());
+    //
+    // EasyMock.verify(this.service);
+    // }
 
-        List<Credentials> list = new ArrayList<Credentials>();
-        EasyMock.expect(
-            this.service.getCredentials(EasyMock.eq(Arrays.asList(new String[] {"operations"})), EasyMock.eq((String) null)))
-            .andReturn(list);
-        EasyMock.replay(this.service);
-
-        this.request.getHeader().getCimiSelect().setSelects(new String[] {"operations"});
-        this.manager.execute(this.context);
-
-        Assert.assertEquals(200, this.response.getStatus());
-        Assert.assertEquals(ConstantsPath.CREDENTIAL_PATH, ((CimiCredentialsCollection) this.response.getCimiData()).getId());
-
-        EasyMock.verify(this.service);
-    }
-
-    @Test
     // FIXME Adapt to the last CIMI specification
-    public void testReadWithCimiSelectArrays() throws Exception {
-        Credentials item;
-        List<Credentials> list = new ArrayList<Credentials>();
-        for (int i = 0; i < 23; i++) {
-            item = new Credentials();
-            item.setId(i + 13);
-            list.add(item);
-        }
-
-        EasyMock.expect(
-            this.service.getCredentials(EasyMock.eq(1), EasyMock.eq(23),
-                EasyMock.eq(Arrays.asList(new String[] {"machineImages"})))).andReturn(list);
-        EasyMock.replay(this.service);
-
-        this.request.getHeader().getCimiSelect().setSelects(new String[] {"machineImages[1-23]"});
-        this.manager.execute(this.context);
-
-        Assert.assertEquals(200, this.response.getStatus());
-        Assert.assertEquals(ConstantsPath.CREDENTIAL_PATH, ((CimiCredentialsCollection) this.response.getCimiData()).getId());
-        CimiCredentialsCollection cimiCollect = (CimiCredentialsCollection) this.response.getCimiData();
-        Assert.assertNotNull(cimiCollect.getArray());
-        Assert.assertEquals(23, cimiCollect.getArray().length);
-        for (int i = 0; i < cimiCollect.getArray().length; i++) {
-            Assert.assertEquals(ConstantsPath.CREDENTIAL_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
-        }
-        EasyMock.verify(this.service);
-    }
+    // @Test
+    // public void testReadWithCimiSelectArrays() throws Exception {
+    // Credentials item;
+    // List<Credentials> list = new ArrayList<Credentials>();
+    // for (int i = 0; i < 23; i++) {
+    // item = new Credentials();
+    // item.setId(i + 13);
+    // list.add(item);
+    // }
+    //
+    // EasyMock.expect(
+    // this.service.getCredentials(EasyMock.eq(1), EasyMock.eq(23),
+    // EasyMock.eq(Arrays.asList(new String[]
+    // {"machineImages"})))).andReturn(list);
+    // EasyMock.replay(this.service);
+    //
+    // this.request.getHeader().getCimiSelect().setSelects(new String[]
+    // {"machineImages[1-23]"});
+    // this.manager.execute(this.context);
+    //
+    // Assert.assertEquals(200, this.response.getStatus());
+    // Assert.assertEquals(ConstantsPath.CREDENTIAL_PATH,
+    // ((CimiCredentialsCollection) this.response.getCimiData()).getId());
+    // CimiCredentialsCollection cimiCollect = (CimiCredentialsCollection)
+    // this.response.getCimiData();
+    // Assert.assertNotNull(cimiCollect.getArray());
+    // Assert.assertEquals(23, cimiCollect.getArray().length);
+    // for (int i = 0; i < cimiCollect.getArray().length; i++) {
+    // Assert.assertEquals(ConstantsPath.CREDENTIAL_PATH + "/" + (i + 13),
+    // cimiCollect.getArray()[i].getHref());
+    // }
+    // EasyMock.verify(this.service);
+    // }
 }

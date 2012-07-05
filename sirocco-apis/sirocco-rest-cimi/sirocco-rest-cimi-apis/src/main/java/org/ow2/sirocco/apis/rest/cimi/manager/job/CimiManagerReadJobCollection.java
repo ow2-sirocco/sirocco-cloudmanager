@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.job;
 
-import java.util.List;
-
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
@@ -36,6 +34,8 @@ import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -63,12 +63,9 @@ public class CimiManagerReadJobCollection extends CimiManagerReadAbstract {
         if (true == select.isEmpty()) {
             out = this.manager.getJobs();
         } else {
-            if (true == select.isNumericArrayPresent()) {
-                List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());
-                out = this.manager.getJobs(numsArray.get(0).intValue(), numsArray.get(1).intValue(), select.getAttributes());
-            } else {
-                out = this.manager.getJobs(select.getAttributes(), select.getExpressionArray(select.getIndexFirstArray()));
-            }
+            QueryResult<Job> results = this.manager.getJobs(-1, -1, null, select.getAttributes());
+            out = results.getItems();
+            // TODO First, Last, Filter
         }
         return out;
     }

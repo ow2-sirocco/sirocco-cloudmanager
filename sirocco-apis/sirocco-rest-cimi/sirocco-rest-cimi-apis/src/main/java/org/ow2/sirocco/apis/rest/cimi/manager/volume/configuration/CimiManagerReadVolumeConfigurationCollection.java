@@ -24,18 +24,18 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.volume.configuration;
 
-import java.util.List;
-
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -63,14 +63,10 @@ public class CimiManagerReadVolumeConfigurationCollection extends CimiManagerRea
         if (true == select.isEmpty()) {
             out = this.manager.getVolumeConfigurations();
         } else {
-            if (true == select.isNumericArrayPresent()) {
-                List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());
-                out = this.manager.getVolumeConfigurations(numsArray.get(0).intValue(), numsArray.get(1).intValue(),
-                    select.getAttributes());
-            } else {
-                out = this.manager.getVolumeConfigurations(select.getAttributes(),
-                    select.getExpressionArray(select.getIndexFirstArray()));
-            }
+            QueryResult<VolumeConfiguration> results = this.manager.getVolumeConfigurations(-1, -1, null,
+                select.getAttributes());
+            out = results.getItems();
+            // TODO First, Last, Filter
         }
         return out;
     }

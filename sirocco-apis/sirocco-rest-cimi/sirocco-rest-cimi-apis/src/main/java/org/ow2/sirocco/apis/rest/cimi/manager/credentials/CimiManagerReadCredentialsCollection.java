@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.credentials;
 
-import java.util.List;
-
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
@@ -36,6 +34,8 @@ import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -63,14 +63,9 @@ public class CimiManagerReadCredentialsCollection extends CimiManagerReadAbstrac
         if (true == select.isEmpty()) {
             out = this.manager.getCredentials();
         } else {
-            if (true == select.isNumericArrayPresent()) {
-                List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());
-                out = this.manager.getCredentials(numsArray.get(0).intValue(), numsArray.get(1).intValue(),
-                    select.getAttributes());
-            } else {
-                out = this.manager.getCredentials(select.getAttributes(),
-                    select.getExpressionArray(select.getIndexFirstArray()));
-            }
+            QueryResult<Credentials> results = this.manager.getCredentials(-1, -1, null, select.getAttributes());
+            out = results.getItems();
+            // TODO First, Last, Filter
         }
         return out;
     }

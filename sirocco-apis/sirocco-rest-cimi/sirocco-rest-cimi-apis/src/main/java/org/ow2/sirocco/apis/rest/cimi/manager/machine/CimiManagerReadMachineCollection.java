@@ -24,8 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
-import java.util.List;
-
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
@@ -36,6 +34,8 @@ import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -63,13 +63,9 @@ public class CimiManagerReadMachineCollection extends CimiManagerReadAbstract {
         if (true == select.isEmpty()) {
             out = this.manager.getMachines();
         } else {
-            if (true == select.isNumericArrayPresent()) {
-                List<Integer> numsArray = select.getNumericArray(select.getIndexFirstArray());
-                out = this.manager
-                    .getMachines(numsArray.get(0).intValue(), numsArray.get(1).intValue(), select.getAttributes());
-            } else {
-                out = this.manager.getMachines(select.getAttributes(), select.getExpressionArray(select.getIndexFirstArray()));
-            }
+            QueryResult<Machine> results = this.manager.getMachines(-1, -1, null, select.getAttributes());
+            out = results.getItems();
+            // TODO First, Last, Filter
         }
         return out;
     }
