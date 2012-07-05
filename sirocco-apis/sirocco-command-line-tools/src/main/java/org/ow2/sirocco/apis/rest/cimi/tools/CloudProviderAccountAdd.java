@@ -42,7 +42,7 @@ public class CloudProviderAccountAdd implements Command {
     @Parameter(names = "-account", description = "account id", required = true)
     private String accountId;
 
-    @Parameter(names = "-user", description = "user id", required = false)
+    @Parameter(names = "-user", description = "user id", required = true)
     private String userId;
 
     @Override
