@@ -13,7 +13,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
 import org.apache.felix.ipojo.annotations.Component;
+import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
+import org.apache.felix.ipojo.annotations.ServiceProperty;
 import org.jclouds.Constants;
 import org.jclouds.aws.ec2.AWSEC2AsyncClient;
 import org.jclouds.aws.ec2.AWSEC2Client;
@@ -68,9 +70,12 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.inject.Module;
 
-@Component(immediate = true)
+@Component(public_factory = false)
+@Provides
 public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnectorFactory {
     private static Log logger = LogFactory.getLog(AmazonCloudProviderConnectorFactory.class);
+
+    public static final String CLOUD_PROVIDER_TYPE = "amazon";
 
     private static int DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS = 180;
 
@@ -109,6 +114,9 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
                 this.put(InstanceType.T1_MICRO, EC2HardwareBuilder.t1_micro().build());
             }
         });
+
+    @ServiceProperty(name = ICloudProviderConnectorFactory.CLOUD_PROVIDER_TYPE_PROPERTY, value = AmazonCloudProviderConnectorFactory.CLOUD_PROVIDER_TYPE)
+    private String cloudProviderType;
 
     @Requires
     private IJobManager jobManager;

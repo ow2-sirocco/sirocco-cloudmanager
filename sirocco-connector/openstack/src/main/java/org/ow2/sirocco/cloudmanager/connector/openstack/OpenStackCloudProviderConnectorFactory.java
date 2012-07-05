@@ -39,7 +39,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 
 import org.apache.felix.ipojo.annotations.Component;
+import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
+import org.apache.felix.ipojo.annotations.ServiceProperty;
 import org.jclouds.Constants;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.ComputeServiceContextFactory;
@@ -94,13 +96,19 @@ import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.google.inject.Module;
 
-@Component(immediate = true)
+@Component(public_factory = false)
+@Provides
 public class OpenStackCloudProviderConnectorFactory implements ICloudProviderConnectorFactory {
     private static Log logger = LogFactory.getLog(OpenStackCloudProviderConnectorFactory.class);
+
+    public static final String CLOUD_PROVIDER_TYPE = "openstack";
 
     private static int DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS = 240;
 
     private static final int THREADPOOL_SIZE = 10;
+
+    @ServiceProperty(name = ICloudProviderConnectorFactory.CLOUD_PROVIDER_TYPE_PROPERTY, value = OpenStackCloudProviderConnectorFactory.CLOUD_PROVIDER_TYPE)
+    private String cloudProviderType;
 
     @Requires
     private IJobManager jobManager;
