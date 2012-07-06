@@ -426,6 +426,7 @@ public class ConfigFactory {
         case VolumeCreate:
             item = new ItemConfig(CimiVolumeCreate.class, ExchangeType.VolumeCreate);
             item.putData(ConfigFactory.CONVERTER, new VolumeCreateConverter());
+            break;
 
         case VolumeImage:
             item = new ItemConfig(CimiVolumeImage.class, ExchangeType.VolumeImage);
@@ -446,6 +447,7 @@ public class ConfigFactory {
             item = new ItemConfig(CimiVolumeTemplateCollection.class, ExchangeType.VolumeTemplateCollection);
             item.putData(ConfigFactory.CONVERTER, new VolumeTemplateCollectionConverter());
             break;
+
         case VolumeVolumeImage:
             item = new ItemConfig(CimiVolumeVolumeImage.class, ExchangeType.VolumeVolumeImage);
             item.putData(ConfigFactory.CONVERTER, new VolumeVolumeImageConverter());
