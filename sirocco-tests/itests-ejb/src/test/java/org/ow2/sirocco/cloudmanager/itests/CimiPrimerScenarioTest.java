@@ -334,7 +334,7 @@ public class CimiPrimerScenarioTest {
         MachineTemplateNetworkInterface mtnic = null;
         for (int i = 0; i < 2; i++) {
             mtnic = new MachineTemplateNetworkInterface();
-            mtnic.setState(MachineTemplateNetworkInterface.InterfaceState.STANDBY);
+            mtnic.setState(MachineTemplateNetworkInterface.InterfaceState.PASSIVE);
             machineTemplate.addNetworkInterface(mtnic);
         }
         MachineTemplate mt = null;

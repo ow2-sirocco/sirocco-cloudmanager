@@ -27,20 +27,20 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.List;
+
 import javax.persistence.Entity;
-import javax.persistence.Enumerated;
 import javax.persistence.EnumType;
-import javax.persistence.OneToMany;
+import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 @Entity
 public class MachineTemplateNetworkInterface extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-
     public static enum InterfaceState {
-        ACTIVE, STANDBY
+        ACTIVE, PASSIVE
     }
 
     @OneToMany

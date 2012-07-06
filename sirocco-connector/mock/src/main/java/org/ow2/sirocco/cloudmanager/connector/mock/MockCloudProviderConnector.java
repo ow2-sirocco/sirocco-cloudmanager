@@ -71,6 +71,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
@@ -78,7 +79,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
-import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
@@ -147,7 +147,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     @Override
     public ISystemService getSystemService() throws ConnectorException {
         throw new ConnectorException();
-        //return this;
+        // return this;
     }
 
     @Override
@@ -258,7 +258,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
                 newNetIntf.setMacAddress("00:11:22:33:44:55");
 
-                newNetIntf.setState(InterfaceState.STANDBY);
+                newNetIntf.setState(InterfaceState.PASSIVE);
 
                 newNetIntf.setNetworkType(networkInterface.getNetworkType());
 
@@ -605,7 +605,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     // private utility methods for System services (start,stop,etc)
 
-    private boolean serviceSystem(final List<? extends CloudCollectionItem> l, final SystemAction action) throws ConnectorException {
+    private boolean serviceSystem(final List<? extends CloudCollectionItem> l, final SystemAction action)
+        throws ConnectorException {
         boolean failedCancelled = false;
         for (CloudCollectionItem m : l) {
             Job j = this.callSystemService(m.getResource(), action, m.getResource().getProviderAssignedId().toString());
