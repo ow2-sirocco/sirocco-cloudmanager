@@ -76,6 +76,11 @@ public class CimiMachineNetworkInterface extends CimiObjectCommonAbstract {
     private Integer mtu;
 
     /**
+     * Field "networkType".
+     */
+    private String networkType;
+
+    /**
      * Default constructor.
      */
     public CimiMachineNetworkInterface() {
@@ -173,6 +178,24 @@ public class CimiMachineNetworkInterface extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Return the value of field "networkType".
+     * 
+     * @return The value
+     */
+    public String getNetworkType() {
+        return this.networkType;
+    }
+
+    /**
+     * Set the value of field "networkType".
+     * 
+     * @param networkType The value
+     */
+    public void setNetworkType(final String networkType) {
+        this.networkType = networkType;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
@@ -187,6 +210,7 @@ public class CimiMachineNetworkInterface extends CimiObjectCommonAbstract {
         has = has || (null != this.getNetwork());
         // TODO NetworkPort
         // has = has || (null != this.getNetworkPort());
+        has = has || (null != this.getNetworkType());
         has = has || (null != this.getState());
         return has;
     }

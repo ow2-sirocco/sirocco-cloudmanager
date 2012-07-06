@@ -101,12 +101,13 @@ public class MachineNetworkInterfaceConverter extends ObjectCommonConverter {
         this.fill(context, dataService, dataCimi);
         dataCimi.setAddresses((CimiMachineNetworkInterfaceAddressCollection) context.convertNextCimi(
             dataService.getAddresses(), CimiMachineNetworkInterfaceAddressCollection.class));
+        dataCimi.setMacAddress(dataService.getMacAddress());
+        dataCimi.setMtu(dataService.getMtu());
         // TODO Network, NetworkPort
         // dataCimi.setNetwork((CimiNetwork)
         // context.convertNextCimi(dataService.getNetwork(),
         // CimiNetwork.class));
-        dataCimi.setMacAddress(dataService.getMacAddress());
-        dataCimi.setMtu(dataService.getMtu());
+        dataCimi.setNetworkType(ConverterHelper.toString(dataService.getNetworkType()));
         dataCimi.setState(ConverterHelper.toString(dataService.getState()));
     }
 
@@ -128,8 +129,8 @@ public class MachineNetworkInterfaceConverter extends ObjectCommonConverter {
         // dataService.setNetworkPort((NetworkPort)
         // context.convertNextService(dataCimi.getNetworkPort()));
 
-        // FIXME State constants
-        // dataService.setState(dataCimi.getState());
+        dataService.setNetworkType(ConverterHelper.toNetworkType(dataCimi.getNetworkType()));
+        dataService.setState(ConverterHelper.toMachineNetworkInterfaceState(dataCimi.getState()));
 
         // Next read-only
         // dataService.setAddresses((List<Address>)

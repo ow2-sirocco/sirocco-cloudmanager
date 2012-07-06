@@ -28,6 +28,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
@@ -89,6 +91,42 @@ public class ConverterHelper {
         String converted = null;
         if (null != value) {
             converted = value.toString();
+        }
+        return converted;
+    }
+
+    public static MachineNetworkInterface.InterfaceState toMachineNetworkInterfaceState(final String value) {
+        MachineNetworkInterface.InterfaceState converted = null;
+        if (null != value) {
+            MachineNetworkInterface.InterfaceState[] allEnums = MachineNetworkInterface.InterfaceState.values();
+            for (MachineNetworkInterface.InterfaceState myEnum : allEnums) {
+                if (true == value.equalsIgnoreCase(myEnum.toString())) {
+                    converted = myEnum;
+                    break;
+                }
+            }
+        }
+        return converted;
+    }
+
+    public static String toString(final Network.Type value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
+        }
+        return converted;
+    }
+
+    public static Network.Type toNetworkType(final String value) {
+        Network.Type converted = null;
+        if (null != value) {
+            Network.Type[] allEnums = Network.Type.values();
+            for (Type myEnum : allEnums) {
+                if (true == value.equalsIgnoreCase(myEnum.toString())) {
+                    converted = myEnum;
+                    break;
+                }
+            }
         }
         return converted;
     }
