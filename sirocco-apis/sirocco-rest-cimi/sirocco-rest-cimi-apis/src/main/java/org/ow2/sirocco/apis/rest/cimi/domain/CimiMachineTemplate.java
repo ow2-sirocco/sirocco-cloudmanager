@@ -89,7 +89,12 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      */
     @ValidChild
     @NotEmptyIfNotNull(groups = {GroupWrite.class})
-    private CimiNetwork[] networkInterfaces;
+    private CimiMachineTemplateNetworkInterfaceArray networkInterfaces;
+
+    /**
+     * Field "userData".
+     */
+    private String userData;
 
     /**
      * Default constructor.
@@ -274,7 +279,38 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiNetwork[] getNetworkInterfaces() {
+    @XmlElement(name = "networkInterface")
+    @JsonProperty(value = "networkInterfaces")
+    public CimiMachineTemplateNetworkInterface[] getNetworkInterfaces() {
+        CimiMachineTemplateNetworkInterface[] items = null;
+        if (null != this.networkInterfaces) {
+            items = this.networkInterfaces.getArray();
+        }
+        return items;
+    }
+
+    /**
+     * Set the value of field "networkInterfaces".
+     * 
+     * @param networkInterfaces The value
+     */
+    public void setNetworkInterfaces(final CimiMachineTemplateNetworkInterface[] networkInterfaces) {
+        if (null == networkInterfaces) {
+            this.networkInterfaces = null;
+        } else {
+            this.networkInterfaces = new CimiMachineTemplateNetworkInterfaceArray();
+            this.networkInterfaces.setArray(networkInterfaces);
+        }
+    }
+
+    /**
+     * Return the value of field "networkInterfaces".
+     * 
+     * @return The value
+     */
+    @XmlTransient
+    @JsonIgnore
+    public List<CimiMachineTemplateNetworkInterface> getListNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
@@ -283,8 +319,31 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * 
      * @param networkInterfaces The value
      */
-    public void setNetworkInterfaces(final CimiNetwork[] networkInterfaces) {
-        this.networkInterfaces = networkInterfaces;
+    public void setListNetworkInterfaces(final List<CimiMachineTemplateNetworkInterface> networkInterfaces) {
+        if (null == networkInterfaces) {
+            this.networkInterfaces = null;
+        } else {
+            this.networkInterfaces = new CimiMachineTemplateNetworkInterfaceArray();
+            this.networkInterfaces.addAll(networkInterfaces);
+        }
+    }
+
+    /**
+     * Return the value of field "userData".
+     * 
+     * @return The value
+     */
+    public String getUserData() {
+        return this.userData;
+    }
+
+    /**
+     * Set the value of field "userData".
+     * 
+     * @param userData The value
+     */
+    public void setUserData(final String userData) {
+        this.userData = userData;
     }
 
     /**
@@ -351,6 +410,25 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
         @Override
         public CimiMachineTemplateVolumeTemplate[] newEmptyArraySized() {
             return new CimiMachineTemplateVolumeTemplate[this.size()];
+        }
+    }
+
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiMachineTemplateNetworkInterfaceArray extends CimiArrayAbstract<CimiMachineTemplateNetworkInterface> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiArray#newEmptyArraySized()
+         */
+        @Override
+        public CimiMachineTemplateNetworkInterface[] newEmptyArraySized() {
+            return new CimiMachineTemplateNetworkInterface[this.size()];
         }
     }
 

@@ -28,6 +28,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
@@ -100,6 +101,28 @@ public class ConverterHelper {
         if (null != value) {
             MachineNetworkInterface.InterfaceState[] allEnums = MachineNetworkInterface.InterfaceState.values();
             for (MachineNetworkInterface.InterfaceState myEnum : allEnums) {
+                if (true == value.equalsIgnoreCase(myEnum.toString())) {
+                    converted = myEnum;
+                    break;
+                }
+            }
+        }
+        return converted;
+    }
+
+    public static String toString(final MachineTemplateNetworkInterface.InterfaceState value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
+        }
+        return converted;
+    }
+
+    public static MachineTemplateNetworkInterface.InterfaceState toMachineTemplateNetworkInterfaceState(final String value) {
+        MachineTemplateNetworkInterface.InterfaceState converted = null;
+        if (null != value) {
+            MachineTemplateNetworkInterface.InterfaceState[] allEnums = MachineTemplateNetworkInterface.InterfaceState.values();
+            for (MachineTemplateNetworkInterface.InterfaceState myEnum : allEnums) {
                 if (true == value.equalsIgnoreCase(myEnum.toString())) {
                     converted = myEnum;
                     break;
