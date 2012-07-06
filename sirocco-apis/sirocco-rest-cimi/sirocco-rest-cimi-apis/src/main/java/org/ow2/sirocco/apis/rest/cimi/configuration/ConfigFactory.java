@@ -58,6 +58,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceCollectio
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateNetworkInterfaceConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeCollectionConverter;
@@ -98,6 +99,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
@@ -117,10 +119,12 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddressC
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
@@ -146,14 +150,32 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
+import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -191,7 +213,7 @@ public class ConfigFactory {
      */
     protected List<ItemConfig> buildItems() {
         List<ItemConfig> items = this.buildExchangeItems();
-        items.addAll(this.buildServiceItems());
+        items.addAll(this.buildServiceResources());
         items.addAll(this.buildOtherItems());
         return items;
     }
@@ -534,48 +556,77 @@ public class ConfigFactory {
     }
 
     /**
-     * Build the configuration for service classes.
+     * Build the configuration for service resources classes.
      * 
      * @return A list of config items
      */
-    // TODO Complete with all service resources
-    protected List<ItemConfig> buildServiceItems() {
-        ItemConfig item;
+    protected List<ItemConfig> buildServiceResources() {
         List<ItemConfig> items = new ArrayList<ItemConfig>();
 
-        item = new ItemConfig(CloudEntryPoint.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiCloudEntryPoint.class);
-        items.add(item);
+        // CloudEntity
+        items.add(this.makeAssociate(Address.class, CimiAddress.class));
+        items.add(this.makeAssociate(AddressTemplate.class, CimiAddressTemplate.class));
+        items.add(this.makeAssociate(CloudEntryPoint.class, CimiCloudEntryPoint.class));
+        // TODO ComponentDescriptor
+        // TODO Event
+        // TODO EventLog
+        // TODO ForwardingGroupTemplate
+        items.add(this.makeAssociate(Job.class, CimiJob.class));
+        items.add(this.makeAssociate(MachineConfiguration.class, CimiMachineConfiguration.class));
+        items.add(this.makeAssociate(MachineDisk.class, CimiMachineDisk.class));
+        items.add(this.makeAssociate(MachineTemplateNetworkInterface.class, CimiMachineTemplateNetworkInterface.class));
+        // TODO Meter
+        // TODO MeterConfiguration
+        // TODO MeterSample
+        // TODO MeterTemplate
+        // TODO NetworkConfiguration
+        // TODO NetworkPortConfiguration
+        // TODO NetworkPortTemplate
+        items.add(this.makeAssociate(VolumeConfiguration.class, CimiVolumeConfiguration.class));
+        items.add(this.makeAssociate(VolumeVolumeImage.class, CimiVolumeVolumeImage.class));
 
-        item = new ItemConfig(Credentials.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiCredentials.class);
-        items.add(item);
+        // CloudCollectionItem
+        items.add(this.makeAssociate(SystemCredentials.class, CimiSystemCredential.class));
+        items.add(this.makeAssociate(SystemMachine.class, CimiSystemMachine.class));
+        // TODO SystemNetwork
+        items.add(this.makeAssociate(SystemSystem.class, CimiSystemSystem.class));
+        items.add(this.makeAssociate(SystemVolume.class, CimiSystemVolume.class));
 
-        item = new ItemConfig(CredentialsTemplate.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiCredentialsTemplate.class);
-        items.add(item);
+        // CloudTemplate
+        items.add(this.makeAssociate(CredentialsTemplate.class, CimiCredentialsTemplate.class));
+        // TODO EventLogTemplate
+        items.add(this.makeAssociate(MachineTemplate.class, CimiMachineTemplate.class));
+        // TODO NetworkTemplate
+        items.add(this.makeAssociate(SystemTemplate.class, CimiSystemTemplate.class));
+        items.add(this.makeAssociate(VolumeTemplate.class, CimiVolumeTemplate.class));
 
-        item = new ItemConfig(Job.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiJob.class);
-        items.add(item);
-
-        item = new ItemConfig(Machine.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachine.class);
-        items.add(item);
-
-        item = new ItemConfig(MachineTemplate.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachineTemplate.class);
-        items.add(item);
-
-        item = new ItemConfig(MachineConfiguration.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachineConfiguration.class);
-        items.add(item);
-
-        item = new ItemConfig(MachineImage.class);
-        item.putData(ConfigFactory.ASSOCIATE_TO, CimiMachineImage.class);
-        items.add(item);
+        // CloudResource
+        items.add(this.makeAssociate(Credentials.class, CimiCredentials.class));
+        // TODO ForwardingGroup
+        items.add(this.makeAssociate(Machine.class, CimiMachine.class));
+        items.add(this.makeAssociate(MachineImage.class, CimiMachineImage.class));
+        items.add(this.makeAssociate(MachineNetworkInterface.class, CimiMachineNetworkInterface.class));
+        items.add(this.makeAssociate(MachineVolume.class, CimiMachineVolume.class));
+        items.add(this.makeAssociate(Network.class, CimiNetwork.class));
+        // TODO NetworkPort
+        items.add(this.makeAssociate(System.class, CimiSystem.class));
+        items.add(this.makeAssociate(Volume.class, CimiVolume.class));
+        items.add(this.makeAssociate(VolumeImage.class, CimiVolumeImage.class));
 
         return items;
+    }
+
+    /**
+     * Make Associate Item Config.
+     * 
+     * @param classToConfig The class to add to the config
+     * @param classToAssociate The CIMI class to associate
+     * @return A associate config item
+     */
+    protected ItemConfig makeAssociate(final Class<?> classToConfig, final Class<? extends CimiData> classToAssociate) {
+        ItemConfig item = new ItemConfig(classToConfig);
+        item.putData(ConfigFactory.ASSOCIATE_TO, classToAssociate);
+        return item;
     }
 
     /**
@@ -597,6 +648,10 @@ public class ConfigFactory {
 
         item = new ItemConfig(CimiMachineTemplateVolumeTemplate.class);
         item.putData(ConfigFactory.CONVERTER, new MachineTemplateVolumeTemplateConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiMachineTemplateNetworkInterface.class);
+        item.putData(ConfigFactory.CONVERTER, new MachineTemplateNetworkInterfaceConverter());
         items.add(item);
 
         return items;
