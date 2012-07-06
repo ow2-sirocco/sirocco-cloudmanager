@@ -33,7 +33,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.sdk.Machine.NetworkInterface.Type;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
@@ -94,9 +94,12 @@ public class Machine extends Resource<CimiMachine> {
 
     public List<NetworkInterface> getNetworkInterface() {
         List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
-        for (CimiNetworkInterface cimiNic : this.cimiObject.getNetworkInterfaces()) {
-            // XXX fixme
-            NetworkInterface nic = new NetworkInterface(Type.PUBLIC, cimiNic.getAddress());
+        for (CimiMachineNetworkInterface cimiNic : this.cimiObject.getNetworkInterfaces().getArray()) {
+            String ip = "";
+            if (cimiNic.getAddresses().getArray().length > 0) {
+                ip = cimiNic.getAddresses().getArray()[0].getAddress().getIp();
+            }
+            NetworkInterface nic = new NetworkInterface(Type.PUBLIC, ip);
             nics.add(nic);
         }
         return nics;
