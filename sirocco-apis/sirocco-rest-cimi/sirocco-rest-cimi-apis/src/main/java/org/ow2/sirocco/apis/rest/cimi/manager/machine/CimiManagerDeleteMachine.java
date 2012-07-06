@@ -49,7 +49,7 @@ public class CimiManagerDeleteMachine extends CimiManagerDeleteAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.deleteMachine(context.getRequest().getIds().getId());
+        return this.manager.deleteMachine(context.getRequest().getId());
     }
 
     // /**

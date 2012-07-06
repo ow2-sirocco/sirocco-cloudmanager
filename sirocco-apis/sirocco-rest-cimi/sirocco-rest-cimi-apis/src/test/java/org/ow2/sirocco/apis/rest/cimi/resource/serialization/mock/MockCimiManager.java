@@ -102,11 +102,11 @@ public abstract class MockCimiManager implements CimiManager {
             break;
         case GET:
         case PUT:
-            if (null == request.getIds()) {
+            if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiCredentialCollection(request.getHeader()
                     .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiCredential(Integer.valueOf(request.getIds().getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiCredential(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:
@@ -127,11 +127,11 @@ public abstract class MockCimiManager implements CimiManager {
             break;
         case GET:
         case PUT:
-            if (null == request.getIds()) {
+            if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiCredentialTemplateCollection(request.getHeader()
                     .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiCredentialTemplate(Integer.valueOf(request.getIds().getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiCredentialTemplate(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:
@@ -148,19 +148,19 @@ public abstract class MockCimiManager implements CimiManager {
 
         switch (type) {
         case POST:
-            if (null == request.getIds()) {
+            if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineCreate(1);
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiAction(Integer.valueOf(request.getIds().getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiAction(Integer.valueOf(request.getId()));
             }
             break;
         case GET:
         case PUT:
-            if (null == request.getIds()) {
+            if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineCollection(request.getHeader().getIntegerSiroccoInfoTestId(),
                     true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiMachine(Integer.valueOf(request.getIds().getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiMachine(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:
@@ -181,11 +181,11 @@ public abstract class MockCimiManager implements CimiManager {
             break;
         case GET:
         case PUT:
-            if (null == request.getIds()) {
+            if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineConfigurationCollection(request.getHeader()
                     .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiMachineConfiguration(Integer.valueOf(request.getIds().getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiMachineConfiguration(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:
@@ -206,11 +206,11 @@ public abstract class MockCimiManager implements CimiManager {
             break;
         case GET:
         case PUT:
-            if (null == request.getIds()) {
+            if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineImageCollection(request.getHeader()
                     .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiMachineImage(Integer.valueOf(request.getIds().getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiMachineImage(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:
@@ -231,11 +231,11 @@ public abstract class MockCimiManager implements CimiManager {
             break;
         case GET:
         case PUT:
-            if (null == request.getIds()) {
+            if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiMachineTemplateCollection(request.getHeader()
                     .getIntegerSiroccoInfoTestId(), true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiMachineTemplate(Integer.valueOf(request.getIds().getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiMachineTemplate(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:
@@ -256,11 +256,11 @@ public abstract class MockCimiManager implements CimiManager {
             break;
         case GET:
         case PUT:
-            if (null == request.getIds()) {
+            if (null == request.getId()) {
                 cimi = CimiResourceBuilderHelper.buildCimiJobCollection(request.getHeader().getIntegerSiroccoInfoTestId(),
                     true, request.getHeader().getCimiExpand().hasExpandAll());
             } else {
-                cimi = CimiResourceBuilderHelper.buildCimiJob(Integer.valueOf(request.getIds().getId()));
+                cimi = CimiResourceBuilderHelper.buildCimiJob(Integer.valueOf(request.getId()));
             }
             break;
         case DELETE:

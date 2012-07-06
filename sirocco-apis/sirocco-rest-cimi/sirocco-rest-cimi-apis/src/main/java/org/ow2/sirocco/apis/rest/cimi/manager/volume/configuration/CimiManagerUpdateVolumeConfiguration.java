@@ -55,7 +55,7 @@ public class CimiManagerUpdateVolumeConfiguration extends CimiManagerUpdateAbstr
         if (true == select.isEmpty()) {
             this.manager.updateVolumeConfiguration((VolumeConfiguration) dataService);
         } else {
-            this.manager.updateVolumeConfigurationAttributes(context.getRequest().getIds().getId(),
+            this.manager.updateVolumeConfigurationAttributes(context.getRequest().getId(),
                 select.dispatchAttributesValues(dataService));
         }
         return null;

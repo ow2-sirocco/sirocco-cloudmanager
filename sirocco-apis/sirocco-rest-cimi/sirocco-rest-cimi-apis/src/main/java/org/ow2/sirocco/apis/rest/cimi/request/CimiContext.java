@@ -24,15 +24,17 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.request;
 
+import java.io.Serializable;
+
 import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigFactory;
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 /**
- *
+ * The context used by a REST request during his processing.
  */
-public interface CimiContext {
+public interface CimiContext extends Serializable {
 
     /**
      * Get the current request.

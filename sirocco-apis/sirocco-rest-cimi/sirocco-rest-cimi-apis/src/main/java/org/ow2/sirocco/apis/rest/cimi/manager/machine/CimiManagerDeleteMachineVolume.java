@@ -49,8 +49,7 @@ public class CimiManagerDeleteMachineVolume extends CimiManagerDeleteAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.removeVolumeFromMachine(context.getRequest().getIds().getIdParent(), context.getRequest().getIds()
-            .getId());
+        return this.manager.removeVolumeFromMachine(context.getRequest().getIdParent(), context.getRequest().getId());
     }
 
 }

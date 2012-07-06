@@ -24,9 +24,14 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.request;
 
+import java.io.Serializable;
+
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertVersion;
 
-public class RequestHeader {
+public class RequestHeader implements Serializable {
+
+    /** Serial number */
+    private static final long serialVersionUID = 1L;
 
     private CimiSelect cimiSelect;
 

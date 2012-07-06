@@ -189,7 +189,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Override
     public void merge(final CimiContext context, final CimiMachineDisk cimi) throws Exception {
         if (true == cimi.hasReference()) {
-            MachineDisk dataService = this.managerMachine.getDiskFromMachine(context.getRequest().getIds().getIdParent(),
+            MachineDisk dataService = this.managerMachine.getDiskFromMachine(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
             CimiMachineDisk cimiRef = (CimiMachineDisk) context.convertToCimi(dataService, CimiMachineDisk.class);
             this.merge(cimiRef, cimi);
@@ -205,7 +205,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Override
     public void merge(final CimiContext context, final CimiMachineVolume cimi) throws Exception {
         if (true == cimi.hasReference()) {
-            MachineVolume dataService = this.managerMachine.getVolumeFromMachine(context.getRequest().getIds().getIdParent(),
+            MachineVolume dataService = this.managerMachine.getVolumeFromMachine(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
             CimiMachineVolume cimiRef = (CimiMachineVolume) context.convertToCimi(dataService, CimiMachineVolume.class);
             this.merge(cimiRef, cimi);

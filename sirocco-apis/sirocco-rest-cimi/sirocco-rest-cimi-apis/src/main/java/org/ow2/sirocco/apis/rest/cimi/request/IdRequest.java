@@ -1,17 +1,26 @@
 package org.ow2.sirocco.apis.rest.cimi.request;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class IdRequest {
-    /** The seniority for the current ID (youngest) */
-    public static final int ID_CURRENT = 0;
+/**
+ * Container for all identifiers passed on a REST request.
+ */
+public class IdRequest implements Serializable {
 
-    /** The seniority for the parent ID */
-    public static final int ID_PARENT = 1;
+    /** Serial number */
+    private static final long serialVersionUID = 1L;
 
-    /** The seniority for the grandparent ID */
-    public static final int ID_GRAND_PARENT = 2;
+    /**
+     * Enumerate all types of identifiers of a request.
+     */
+    public static enum Type {
+        // If you add a type, be careful about sequencing of the
+        // enumeration: youngest to oldest.
+        // It's used to calculate the position in the list.
+        RESOURCE, RESOURCE_PARENT, RESOURCE_GRAND_PARENT
+    }
 
     /** The list of IDs */
     private List<String> idList;
@@ -24,15 +33,15 @@ public class IdRequest {
     }
 
     /**
-     * Constructor with all IDs of the resources ordered by seniority from
-     * youngest to oldest.
+     * Constructor with all IDs of the resources ordered by type from youngest
+     * to oldest.
      * <p>
      * By example, if they are 3 IDs : the first (index = 0) is the ID of the
      * current resource, the second (index = 1) is the ID of the parent
      * resource, the third (index = 2) is the ID of the grandparent resource.
      * </p>
      * 
-     * @param ids A array with all IDs of the request ordered by seniority from
+     * @param ids A array with all IDs of the request ordered by type from
      *        youngest to oldest
      */
     public IdRequest(final String... ids) {
@@ -45,8 +54,8 @@ public class IdRequest {
     /**
      * Get all IDs of the resources.
      * 
-     * @return A array with all IDs of the request stored ordered by seniority
-     *         from oldest to youngest or null if none ID
+     * @return A array with all IDs of the request stored ordered by type from
+     *         oldest to youngest or null if none ID
      * @see #setIds(String[])
      */
     public List<String> getIdList() {
@@ -54,27 +63,16 @@ public class IdRequest {
     }
 
     /**
-     * Get the ID of a resource by seniority.
-     * <p>
-     * For the seniority, zero is the youngest and more the value is high, more
-     * is older. By example,
-     * <ul>
-     * <li>with 0, you get the current ID</li>
-     * <li>with 1, you get the parent ID</li>
-     * <li>with 2, you get the grandparent ID</li>
-     * <li>. . .</li>
-     * </p>
+     * Get the ID of a resource by type.
      * 
-     * @param seniority The seniority value of the ID to get
-     * @return The requested ID or null if none ID exist in the given seniority
-     * @see CimiRequest#ID_CURRENT
-     * @see CimiRequest#ID_PARENT
-     * @see CimiRequest#ID_GRAND_PARENT
+     * @param type The type of the ID to get
+     * @return The requested ID or null if none ID exist in the given type
+     * @see IdRequest.Type
      */
-    public String getId(final int seniority) {
+    public String getId(final IdRequest.Type type) {
         String id = null;
-        if ((seniority >= 0) && (seniority < this.idList.size())) {
-            id = this.idList.get(seniority);
+        if ((type.ordinal() < this.idList.size())) {
+            id = this.idList.get(type.ordinal());
         }
         return id;
     }
@@ -85,7 +83,7 @@ public class IdRequest {
      * @return The ID of the youngest resource or null if none ID
      */
     public String getId() {
-        return this.getId(IdRequest.ID_CURRENT);
+        return this.getId(IdRequest.Type.RESOURCE);
     }
 
     /**
@@ -94,7 +92,7 @@ public class IdRequest {
      * @return The parent ID or null if none parent ID
      */
     public String getIdParent() {
-        return this.getId(IdRequest.ID_PARENT);
+        return this.getId(IdRequest.Type.RESOURCE_PARENT);
     }
 
     /**

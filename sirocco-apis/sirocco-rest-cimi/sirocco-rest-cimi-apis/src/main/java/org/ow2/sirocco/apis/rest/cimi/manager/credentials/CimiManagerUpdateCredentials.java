@@ -56,7 +56,7 @@ public class CimiManagerUpdateCredentials extends CimiManagerUpdateAbstract {
             this.manager.updateCredentials((Credentials) dataService);
         } else {
             this.manager
-                .updateCredentialsAttributes(context.getRequest().getIds().getId(), select.dispatchAttributesValues(dataService));
+                .updateCredentialsAttributes(context.getRequest().getId(), select.dispatchAttributesValues(dataService));
         }
         return null;
     }

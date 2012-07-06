@@ -49,7 +49,7 @@ public class CimiManagerDeleteVolume extends CimiManagerDeleteAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.deleteVolume(context.getRequest().getIds().getId());
+        return this.manager.deleteVolume(context.getRequest().getId());
     }
 
     // /**

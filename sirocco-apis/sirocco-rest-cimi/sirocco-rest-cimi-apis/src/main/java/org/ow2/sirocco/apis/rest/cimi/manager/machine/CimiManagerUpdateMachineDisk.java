@@ -50,6 +50,6 @@ public class CimiManagerUpdateMachineDisk extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.updateDiskInMachine(context.getRequest().getIds().getIdParent(), (MachineDisk) dataService);
+        return this.manager.updateDiskInMachine(context.getRequest().getIdParent(), (MachineDisk) dataService);
     }
 }

@@ -55,7 +55,7 @@ public class CimiManagerUpdateMachineTemplate extends CimiManagerUpdateAbstract 
         if (true == select.isEmpty()) {
             this.manager.updateMachineTemplate((MachineTemplate) dataService);
         } else {
-            this.manager.updateMachineTemplateAttributes(context.getRequest().getIds().getId(),
+            this.manager.updateMachineTemplateAttributes(context.getRequest().getId(),
                 select.dispatchAttributesValues(dataService));
         }
         return null;

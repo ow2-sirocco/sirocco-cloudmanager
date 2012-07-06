@@ -49,7 +49,7 @@ public class CimiManagerDeleteCredentials extends CimiManagerDeleteAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        this.manager.deleteCredentials(context.getRequest().getIds().getId());
+        this.manager.deleteCredentials(context.getRequest().getId());
         return null;
     }
 

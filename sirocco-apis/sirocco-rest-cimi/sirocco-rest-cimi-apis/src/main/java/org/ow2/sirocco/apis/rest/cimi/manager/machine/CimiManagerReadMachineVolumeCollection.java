@@ -56,7 +56,7 @@ public class CimiManagerReadMachineVolumeCollection extends CimiManagerReadAbstr
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        out = this.manager.getMachineVolumes(context.getRequest().getIds().getIdParent());
+        out = this.manager.getMachineVolumes(context.getRequest().getIdParent());
         return out;
     }
 

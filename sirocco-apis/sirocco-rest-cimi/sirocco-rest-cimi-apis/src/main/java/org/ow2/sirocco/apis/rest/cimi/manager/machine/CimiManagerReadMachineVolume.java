@@ -54,8 +54,7 @@ public class CimiManagerReadMachineVolume extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         MachineVolume out = null;
-        out = this.manager.getVolumeFromMachine(context.getRequest().getIds().getIdParent(), context.getRequest().getIds()
-            .getId());
+        out = this.manager.getVolumeFromMachine(context.getRequest().getIdParent(), context.getRequest().getId());
         return out;
     }
 

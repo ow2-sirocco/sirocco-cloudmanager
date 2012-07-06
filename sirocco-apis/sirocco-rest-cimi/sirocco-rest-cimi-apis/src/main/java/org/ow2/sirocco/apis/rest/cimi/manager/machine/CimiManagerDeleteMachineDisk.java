@@ -49,8 +49,7 @@ public class CimiManagerDeleteMachineDisk extends CimiManagerDeleteAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.removeDiskFromMachine(context.getRequest().getIds().getIdParent(), context.getRequest().getIds()
-            .getId());
+        return this.manager.removeDiskFromMachine(context.getRequest().getIdParent(), context.getRequest().getId());
     }
 
     // /**

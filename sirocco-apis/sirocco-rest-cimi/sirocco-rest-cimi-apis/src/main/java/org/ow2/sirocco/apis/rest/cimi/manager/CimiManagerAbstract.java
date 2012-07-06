@@ -273,7 +273,7 @@ public abstract class CimiManagerAbstract implements CimiManager {
      * @param exception The exception to convert
      */
     private void convertToResponse(final CimiContext context, final ResourceNotFoundException exception) {
-        CimiManagerAbstract.LOGGER.debug("Resource not found : {}", context.getRequest().getIds().getId());
+        CimiManagerAbstract.LOGGER.debug("Resource not found : {}", context.getRequest().getId());
         context.getResponse().setStatus(Response.Status.NOT_FOUND);
         context.getResponse().setErrorMessage(exception.getMessage());
     }

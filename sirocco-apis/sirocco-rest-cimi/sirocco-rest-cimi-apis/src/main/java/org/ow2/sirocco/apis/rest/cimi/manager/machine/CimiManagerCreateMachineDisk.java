@@ -55,7 +55,7 @@ public class CimiManagerCreateMachineDisk extends CimiManagerCreateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.addDiskToMachine(context.getRequest().getIds().getIdParent(), (MachineDisk) dataService);
+        return this.manager.addDiskToMachine(context.getRequest().getIdParent(), (MachineDisk) dataService);
     }
 
     /**

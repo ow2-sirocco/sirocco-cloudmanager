@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.request;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,7 +35,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 /**
  * Data container for a CIMI response.
  */
-public class CimiResponse {
+public class CimiResponse implements Serializable {
+
+    /** Serial number */
+    private static final long serialVersionUID = 1L;
 
     /** CIMI Data */
     private CimiData cimiData;

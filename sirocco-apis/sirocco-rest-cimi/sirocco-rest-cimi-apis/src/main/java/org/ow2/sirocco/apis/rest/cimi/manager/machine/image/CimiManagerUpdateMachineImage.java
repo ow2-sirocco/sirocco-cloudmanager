@@ -55,7 +55,7 @@ public class CimiManagerUpdateMachineImage extends CimiManagerUpdateAbstract {
         if (true == select.isEmpty()) {
             this.manager.updateMachineImage((MachineImage) dataService);
         } else {
-            this.manager.updateMachineImageAttributes(context.getRequest().getIds().getId(),
+            this.manager.updateMachineImageAttributes(context.getRequest().getId(),
                 select.dispatchAttributesValues(dataService));
         }
         return null;

@@ -57,7 +57,7 @@ public class CimiManagerReadVolumeImage extends CimiManagerReadAbstract {
         VolumeImage out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getVolumeImageById(context.getRequest().getIds().getId());
+            out = this.manager.getVolumeImageById(context.getRequest().getId());
         } else {
             // FIXME out =
             // this.manager.getVolumeImageAttributes(context.getRequest().getId(),

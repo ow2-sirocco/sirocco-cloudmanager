@@ -41,18 +41,26 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 
 /**
- * .
+ * The context used by a REST request during his processing.
  */
 public class CimiContextImpl implements CimiContext {
 
+    /** Serial number */
+    private static final long serialVersionUID = 1L;
+
+    /** The current request */
     private CimiRequest request;
 
+    /** The current response */
     private CimiResponse response;
 
+    /** Indicator to force the write-only conversion */
     private boolean convertedWriteOnly;
 
+    /** The stack of CIMI classes used during conversion */
     private LinkedList<Class<?>> stackConvertedCimiClass;
 
+    /** The stack of resources IDs of service classes used during conversion */
     private LinkedList<Integer> stackConvertedIdService;
 
     /**
@@ -320,11 +328,11 @@ public class CimiContextImpl implements CimiContext {
         ExchangeType type = this.getType(classToUse);
         // Detects if type has parent
         if (true == type.hasParent()) {
-            // Adds id parent of the request if exists
-            if (null != this.getRequest().getIds().getIdParent()) {
+            // Adds all IDs parent of the request if exists
+            if (true == this.getRequest().hasParentIds()) {
                 href = type.makeHref(this.getRequest().getBaseUri(), this.getRequest().getIds().makeArrayWithParents(id));
             } else {
-                // Adds id parent of the service if exists
+                // Adds all IDs parent of the service if exists
                 List<Integer> idsParent = this.findAllServiceIdParent();
                 if (idsParent.size() > 0) {
                     // Reverse order : oldest to youngest

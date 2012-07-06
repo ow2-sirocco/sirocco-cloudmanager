@@ -55,7 +55,7 @@ public class CimiManagerUpdateCredentialsTemplate extends CimiManagerUpdateAbstr
         if (true == select.isEmpty()) {
             this.manager.updateCredentialsTemplate((CredentialsTemplate) dataService);
         } else {
-            this.manager.updateCredentialsTemplateAttributes(context.getRequest().getIds().getId(),
+            this.manager.updateCredentialsTemplateAttributes(context.getRequest().getId(),
                 select.dispatchAttributesValues(dataService));
         }
         return null;

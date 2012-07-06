@@ -56,7 +56,7 @@ public class CimiManagerReadMachineDiskCollection extends CimiManagerReadAbstrac
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        out = this.manager.getMachineDisks(context.getRequest().getIds().getIdParent());
+        out = this.manager.getMachineDisks(context.getRequest().getIdParent());
         return out;
     }
 

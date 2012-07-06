@@ -57,9 +57,9 @@ public class CimiManagerReadMachine extends CimiManagerReadAbstract {
         Machine out = null;
         CimiSelect select = context.getRequest().getHeader().getCimiSelect();
         if (true == select.isEmpty()) {
-            out = this.manager.getMachineById(context.getRequest().getIds().getId());
+            out = this.manager.getMachineById(context.getRequest().getId());
         } else {
-            out = this.manager.getMachineAttributes(context.getRequest().getIds().getId(), select.getAttributes());
+            out = this.manager.getMachineAttributes(context.getRequest().getId(), select.getAttributes());
         }
         return out;
     }
