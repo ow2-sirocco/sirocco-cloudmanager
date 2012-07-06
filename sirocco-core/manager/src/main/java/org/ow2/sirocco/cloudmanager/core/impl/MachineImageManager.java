@@ -94,6 +94,8 @@ public class MachineImageManager implements IMachineImageManager {
         this.em.persist(mi);
         this.em.flush();
 
+        j.setCreated(new Date());
+        j.setDescription("MachineImage creation");
         j.setTargetEntity(mi);
         j.setStatus(Job.Status.SUCCESS);
         j.setAction("add");
