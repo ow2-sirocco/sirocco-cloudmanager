@@ -31,9 +31,9 @@ import java.util.List;
 public class QueryResult<E> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private final int count;
+    private int count;
 
-    private final List<E> items;
+    private List<E> items;
 
     public QueryResult(final int count, final List<E> items) {
         super();
@@ -47,6 +47,14 @@ public class QueryResult<E> implements Serializable {
 
     public List<E> getItems() {
         return this.items;
+    }
+
+    public void setCount(final int count) {
+        this.count = count;
+    }
+
+    public void setItems(final List<E> items) {
+        this.items = items;
     }
 
 }
