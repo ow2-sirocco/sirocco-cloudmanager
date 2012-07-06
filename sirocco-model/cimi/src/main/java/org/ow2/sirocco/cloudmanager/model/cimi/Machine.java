@@ -78,7 +78,7 @@ public class Machine extends CloudResource implements Serializable {
     private CloudProviderAccount cloudProviderAccount;
 
     @Transient
-    private FSM<Machine.State, String> fsm;
+    private transient FSM<Machine.State, String> fsm;
 
     public Machine() {
         this.networkInterfaces = new ArrayList<MachineNetworkInterface>();
