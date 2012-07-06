@@ -542,16 +542,6 @@ public class MachineManager implements IMachineManager {
         return UtilsForManagers.getEntityList("Machine", this.em, this.getUser().getUsername());
     }
 
-    // TODO
-    public List<Machine> getMachines(final List<String> attributes, final String queryExpression) throws CloudProviderException {
-        List<Machine> machines = new ArrayList<Machine>();
-        if (queryExpression != null && !queryExpression.isEmpty()) {
-            // TODO
-            throw new UnsupportedOperationException();
-        }
-        return machines;
-    }
-
     /**
      * Operations on Machine
      */
@@ -882,8 +872,12 @@ public class MachineManager implements IMachineManager {
     public QueryResult<MachineConfiguration> getMachineConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("MachineConfiguration", this.em, user.getUsername(), first, last, filters,
-            attributes, true);
+        QueryResult<MachineConfiguration> machineConfigs = UtilsForManagers.getEntityList("MachineConfiguration", this.em,
+            user.getUsername(), first, last, filters, attributes, false);
+        for (MachineConfiguration machineConfig : machineConfigs.getItems()) {
+            machineConfig.getDiskTemplates().size();
+        }
+        return machineConfigs;
     }
 
     public MachineConfiguration createMachineConfiguration(final MachineConfiguration machineConfig)
@@ -1330,7 +1324,9 @@ public class MachineManager implements IMachineManager {
 
             NetworkPort networkPort = nic.getNetworkPort();
 
-            this.em.persist(networkPort);
+            if (networkPort != null) {
+                this.em.persist(networkPort);
+            }
 
             this.em.persist(nic);
             persisted.addNetworkInterface(nic);
