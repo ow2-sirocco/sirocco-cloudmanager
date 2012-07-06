@@ -27,9 +27,10 @@ package org.ow2.sirocco.apis.rest.cimi.request;
 import java.io.Serializable;
 
 import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigFactory;
+import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigurationException;
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * The context used by a REST request during his processing.
@@ -82,7 +83,7 @@ public interface CimiContext extends Serializable {
      * @return A CIMI instance converted or null if service is null
      * @see CimiContext#findAssociate(Class)
      */
-    Object convertNextCimi(final CloudResource service);
+    Object convertNextCimi(final Resource service);
 
     /**
      * Convert a service child object to a CIMI child object.
@@ -188,6 +189,6 @@ public interface CimiContext extends Serializable {
      * @throws ConfigurationException If associate CIMI class not found
      * @see ConfigFactory
      */
-    Class<? extends CimiResource> findAssociate(Class<? extends CloudResource> service);
+    Class<? extends CimiResource> findAssociate(Class<? extends Resource> service);
 
 }

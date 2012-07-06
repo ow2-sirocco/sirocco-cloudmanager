@@ -37,8 +37,8 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
+import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
  * The context used by a REST request during his processing.
@@ -134,11 +134,10 @@ public class CimiContextImpl implements CimiContext {
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertNextCimi(java.lang.Object,
-     *      java.lang.Class)
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertNextCimi(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
      */
     @Override
-    public Object convertNextCimi(final CloudResource service) {
+    public Object convertNextCimi(final Resource service) {
         Object converted = null;
         if (null != service) {
             Class<? extends CimiResource> cimiAssociate = this.findAssociate(service.getClass());
@@ -156,23 +155,11 @@ public class CimiContextImpl implements CimiContext {
     @Override
     public Object convertNextCimi(final Object service, final Class<?> cimiAssociate) {
         Object converted = null;
-        // System.out.println(">>> convertNextCimi:" + service + ", " +
-        // cimiAssociate.getSimpleName());
-        // if (service instanceof Identifiable) {
-        // Identifiable idService = (Identifiable) service;
-        // System.out.println("=== convertNextCimi: ID=" + idService.getId());
-        // }
-        // System.out.println(">>> convertNextCimi:" + service + ", " +
-        // cimiAssociate.getSimpleName());
         if (null != service) {
             this.stackConvertedCimiClass.push(cimiAssociate);
             if (service instanceof Identifiable) {
                 Identifiable idService = (Identifiable) service;
                 this.stackConvertedIdService.push(idService.getId());
-                // System.out.println("=== convertNextCimi: stackConvertedIdService="
-                // + this.stackConvertedIdService);
-                // System.out.println("=== convertNextCimi: findServiceIdParent="
-                // + this.findServiceIdParent());
             } else {
                 this.stackConvertedIdService.push(null);
             }
@@ -180,9 +167,6 @@ public class CimiContextImpl implements CimiContext {
             this.stackConvertedCimiClass.pop();
             this.stackConvertedIdService.pop();
         }
-        // System.out.println("<<< convertNextCimi:" + service + ", return=" +
-        // converted + ", stackConvertedIdService="
-        // + this.stackConvertedIdService);
         return converted;
     }
 
@@ -235,20 +219,31 @@ public class CimiContextImpl implements CimiContext {
         ExchangeType typeRoot = this.getType(this.getRootConverting());
         if (typeRoot != typeCurrent) {
             switch (typeRoot) {
+            case AddressCollection:
+            case AddressTemplateCollection:
             case CloudEntryPoint:
             case CredentialCollection:
             case CredentialTemplateCollection:
+            case DiskCollection:
             case JobCollection:
             case MachineCollection:
             case MachineConfigurationCollection:
             case MachineImageCollection:
+            case MachineNetworkInterfaceAddressCollection:
+            case MachineNetworkInterfaceCollection:
             case MachineTemplateCollection:
+            case MachineVolumeCollection:
             case SystemCollection:
+            case SystemCredentialCollection:
+            case SystemMachineCollection:
+            case SystemSystemCollection:
             case SystemTemplateCollection:
+            case SystemVolumeCollection:
             case VolumeCollection:
             case VolumeConfigurationCollection:
             case VolumeImageCollection:
             case VolumeTemplateCollection:
+            case VolumeVolumeImageCollection:
                 expand = this.getRequest().getHeader().getCimiExpand().hasExpandAll();
                 break;
             default:
@@ -271,20 +266,31 @@ public class CimiContextImpl implements CimiContext {
         ExchangeType typeRoot = this.getType(this.getRootConverting());
         if (typeRoot != typeCurrent) {
             switch (typeRoot) {
+            case AddressCollection:
+            case AddressTemplateCollection:
             case CloudEntryPoint:
             case CredentialCollection:
             case CredentialTemplateCollection:
+            case DiskCollection:
             case JobCollection:
             case MachineCollection:
             case MachineConfigurationCollection:
             case MachineImageCollection:
+            case MachineNetworkInterfaceAddressCollection:
+            case MachineNetworkInterfaceCollection:
             case MachineTemplateCollection:
+            case MachineVolumeCollection:
             case SystemCollection:
+            case SystemCredentialCollection:
+            case SystemMachineCollection:
+            case SystemSystemCollection:
             case SystemTemplateCollection:
+            case SystemVolumeCollection:
             case VolumeCollection:
             case VolumeConfigurationCollection:
             case VolumeImageCollection:
             case VolumeTemplateCollection:
+            case VolumeVolumeImageCollection:
                 reference = true;
                 break;
             default:
@@ -381,7 +387,7 @@ public class CimiContextImpl implements CimiContext {
      */
     @SuppressWarnings("unchecked")
     @Override
-    public Class<? extends CimiResource> findAssociate(final Class<? extends CloudResource> klass) {
+    public Class<? extends CimiResource> findAssociate(final Class<? extends Resource> klass) {
         Class<? extends CimiResource> cimi = null;
         try {
             ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
