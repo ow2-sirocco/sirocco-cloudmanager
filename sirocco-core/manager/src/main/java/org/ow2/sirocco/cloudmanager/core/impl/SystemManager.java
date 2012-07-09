@@ -25,8 +25,8 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -38,11 +38,7 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.NonUniqueResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.Query;
@@ -55,22 +51,22 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
+import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
-import org.ow2.sirocco.cloudmanager.core.api.IJobListener;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
@@ -83,7 +79,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
@@ -92,18 +87,16 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
-import org.ow2.sirocco.cloudmanager.model.cimi.system.System.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
-
-import com.google.common.collect.ImmutableList;
 
 @Stateless
 @Remote(IRemoteSystemManager.class)
@@ -179,7 +172,7 @@ public class SystemManager implements ISystemManager {
 
     @EJB
     private IJobManager jobManager;
-    
+
     @EJB
     private ICloudProviderManager cloudProviderManager;
 
@@ -188,7 +181,7 @@ public class SystemManager implements ISystemManager {
         return this.userManager.getUserByUsername(username);
     }
 
-    private boolean isSystemSupportedInConnector(ICloudProviderConnector connector) {
+    private boolean isSystemSupportedInConnector(final ICloudProviderConnector connector) {
         boolean isSystemSupportedInConnector = false;
         try {
             ISystemService sysServ = connector.getSystemService();
@@ -217,7 +210,7 @@ public class SystemManager implements ISystemManager {
         this.em.flush();
 
         // creation of main system job
-        Job parentJob = this.createJob(CREATE_ACTION, system);
+        Job parentJob = this.createJob(SystemManager.CREATE_ACTION, system);
         this.em.persist(parentJob);
         this.em.flush();
 
@@ -241,7 +234,7 @@ public class SystemManager implements ISystemManager {
                     cc.setProperties(cd.getProperties());
 
                     // no job for credentials!
-                    Credentials c = credentialsManager.createCredentials(cc);
+                    Credentials c = this.credentialsManager.createCredentials(cc);
                     SystemCredentials sc = new SystemCredentials();
                     sc.setResource(c);
                     sc.setState(SystemCredentials.State.AVAILABLE);
@@ -251,21 +244,33 @@ public class SystemManager implements ISystemManager {
             }
         }
 
-        ICloudProviderConnector connector = this.getCloudProviderConnector();
+        // ICloudProviderConnector connector = this.getCloudProviderConnector();
+        // if (connector == null) {
+        // throw new CloudProviderException("no connector found");
+        // }
+        // CloudProviderAccount cpa =
+        // this.selectCloudProviderAccount(this.selectCloudProvider());
+
+        Placement placement = this.cloudProviderManager.placeResource(systemCreate.getProperties());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         if (connector == null) {
-            throw new CloudProviderException("no connector found");
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
-        CloudProviderAccount cpa=this.selectCloudProviderAccount(this.selectCloudProvider());
-        //achtung: we get cloud provider account via an osgi bundle that gets it from ejb
-        //it breaks hibernate lazy loading feature...
-        //so we get again cloud provider account from it's id
-        SystemManager.logger.info("cpa id: "+cpa.getId());
-        system.setCloudProviderAccount(cpa);
-        Set<System> sett=cpa.getSystems();sett.add(system);
-        cpa.setSystems(sett);
+
+        // achtung: we get cloud provider account via an osgi bundle that gets
+        // it from ejb
+        // it breaks hibernate lazy loading feature...
+        // so we get again cloud provider account from it's id
+        SystemManager.logger.info("cpa id: " + placement.getAccount().getId());
+        system.setCloudProviderAccount(placement.getAccount());
+        system.setLocation(placement.getLocation());
+        Set<System> sett = placement.getAccount().getSystems();
+        sett.add(system);
+        placement.getAccount().setSystems(sett);
         this.em.flush();
 
-        if (isSystemSupportedInConnector(connector)) {
+        if (this.isSystemSupportedInConnector(connector)) {
 
             // sending command to selected connector
             Job job = null;
@@ -308,9 +313,15 @@ public class SystemManager implements ISystemManager {
                         MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
                         mc.setMachineTemplate(mt);
                         mc.setDescription(cd.getDescription());
-                        mc.setProperties(cd.getProperties());
+                        Map<String, String> props = cd.getProperties();
+                        if (props == null) {
+                            props = new HashMap<String, String>();
+                        }
+                        props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
+                        props.put("location", placement.getLocation().getCountryName());
+                        mc.setProperties(props);
 
-                        Job j = machineManager.createMachine(mc);
+                        Job j = this.machineManager.createMachine(mc);
                         j.setParentJob(parentJob);
 
                         SystemMachine sc = new SystemMachine();
@@ -329,9 +340,15 @@ public class SystemManager implements ISystemManager {
                         VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
                         vc.setVolumeTemplate(vt);
                         vc.setDescription(cd.getDescription());
-                        vc.setProperties(cd.getProperties());
+                        Map<String, String> props = cd.getProperties();
+                        if (props == null) {
+                            props = new HashMap<String, String>();
+                        }
+                        props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
+                        props.put("location", placement.getLocation().getCountryName());
+                        vc.setProperties(props);
 
-                        Job j = volumeManager.createVolume(vc);
+                        Job j = this.volumeManager.createVolume(vc);
                         j.setParentJob(parentJob);
 
                         SystemVolume sc = new SystemVolume();
@@ -350,7 +367,13 @@ public class SystemManager implements ISystemManager {
                         SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
                         sc.setSystemTemplate(st);
                         sc.setDescription(cd.getDescription());
-                        sc.setProperties(cd.getProperties());
+                        Map<String, String> props = cd.getProperties();
+                        if (props == null) {
+                            props = new HashMap<String, String>();
+                        }
+                        props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
+                        props.put("location", placement.getLocation().getCountryName());
+                        sc.setProperties(props);
 
                         Job j = this.createSystem(sc);
                         j.setParentJob(parentJob);
@@ -371,9 +394,15 @@ public class SystemManager implements ISystemManager {
                         NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
                         nc.setNetworkTemplate(nt);
                         nc.setDescription(cd.getDescription());
-                        nc.setProperties(cd.getProperties());
+                        Map<String, String> props = cd.getProperties();
+                        if (props == null) {
+                            props = new HashMap<String, String>();
+                        }
+                        props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
+                        props.put("location", placement.getLocation().getCountryName());
+                        nc.setProperties(props);
 
-                        Job j = networkManager.createNetwork(nc);
+                        Job j = this.networkManager.createNetwork(nc);
                         j.setParentJob(parentJob);
 
                         SystemNetwork sc = new SystemNetwork();
@@ -415,6 +444,13 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
+    public QueryResult<System> getSystems(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        return UtilsForManagers.getEntityList("System", this.em, this.getUser().getUsername(), first, last, filters,
+            attributes, true);
+    }
+
+    @Override
     public System getSystemById(final String systemId) throws CloudProviderException {
         if (systemId == null) {
             throw new InvalidRequestException(" null system id");
@@ -445,6 +481,13 @@ public class SystemManager implements ISystemManager {
         return UtilsForManagers.getEntityList("SystemTemplate", this.em, this.getUser().getUsername());
     }
 
+    @Override
+    public QueryResult<SystemTemplate> getSystemTemplates(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        return UtilsForManagers.getEntityList("SystemTemplate", this.em, this.getUser().getUsername(), first, last, filters,
+            attributes, false);
+    }
+
     private ComponentDescriptor getComponentDescriptorById(final String componentDescriptorId) throws CloudProviderException {
         ComponentDescriptor result = this.em.find(ComponentDescriptor.class, new Integer(componentDescriptorId));
         return result;
@@ -468,19 +511,19 @@ public class SystemManager implements ISystemManager {
         String jobAction = null;
         if (entity instanceof SystemMachine) {
             s.getMachines().add((SystemMachine) entity);
-            jobAction = ADD_MACHINE_ACTION;
+            jobAction = SystemManager.ADD_MACHINE_ACTION;
         } else if (entity instanceof SystemVolume) {
             s.getVolumes().add((SystemVolume) entity);
-            jobAction = ADD_VOLUME_ACTION;
+            jobAction = SystemManager.ADD_VOLUME_ACTION;
         } else if (entity instanceof SystemSystem) {
             s.getSystems().add((SystemSystem) entity);
-            jobAction = ADD_SYSTEM_ACTION;
+            jobAction = SystemManager.ADD_SYSTEM_ACTION;
         } else if (entity instanceof SystemNetwork) {
             s.getNetworks().add((SystemNetwork) entity);
-            jobAction = ADD_NETWORK_ACTION;
+            jobAction = SystemManager.ADD_NETWORK_ACTION;
         } else if (entity instanceof SystemCredentials) {
             s.getCredentials().add((SystemCredentials) entity);
-            jobAction = ADD_CREDENTIAL_ACTION;
+            jobAction = SystemManager.ADD_CREDENTIAL_ACTION;
         } else {
             throw new CloudProviderException("object type can't be owned by a system");
         }
@@ -505,20 +548,20 @@ public class SystemManager implements ISystemManager {
         }
         String jobAction = null;
         if (ce instanceof SystemMachine) {
-            s.getMachines().remove((SystemMachine) ce);
-            jobAction = REMOVE_MACHINE_ACTION;
+            s.getMachines().remove(ce);
+            jobAction = SystemManager.REMOVE_MACHINE_ACTION;
         } else if (ce instanceof SystemVolume) {
-            s.getVolumes().remove((SystemVolume) ce);
-            jobAction = REMOVE_VOLUME_ACTION;
+            s.getVolumes().remove(ce);
+            jobAction = SystemManager.REMOVE_VOLUME_ACTION;
         } else if (ce instanceof SystemSystem) {
-            s.getSystems().remove((SystemSystem) ce);
-            jobAction = REMOVE_SYSTEM_ACTION;
+            s.getSystems().remove(ce);
+            jobAction = SystemManager.REMOVE_SYSTEM_ACTION;
         } else if (ce instanceof SystemNetwork) {
-            s.getNetworks().remove((SystemNetwork) ce);
-            jobAction = REMOVE_NETWORK_ACTION;
+            s.getNetworks().remove(ce);
+            jobAction = SystemManager.REMOVE_NETWORK_ACTION;
         } else if (ce instanceof SystemCredentials) {
-            s.getCredentials().remove((SystemCredentials) ce);
-            jobAction = REMOVE_CREDENTIAL_ACTION;
+            s.getCredentials().remove(ce);
+            jobAction = SystemManager.REMOVE_CREDENTIAL_ACTION;
         } else {
             throw new CloudProviderException("object type can't be owned by a system");
         }
@@ -548,15 +591,15 @@ public class SystemManager implements ISystemManager {
 
         String jobAction = null;
         if (entity instanceof SystemMachine) {
-            jobAction = UPDATE_MACHINE_ACTION;
+            jobAction = SystemManager.UPDATE_MACHINE_ACTION;
         } else if (entity instanceof SystemVolume) {
-            jobAction = UPDATE_VOLUME_ACTION;
+            jobAction = SystemManager.UPDATE_VOLUME_ACTION;
         } else if (entity instanceof SystemSystem) {
-            jobAction = UPDATE_SYSTEM_ACTION;
+            jobAction = SystemManager.UPDATE_SYSTEM_ACTION;
         } else if (entity instanceof SystemNetwork) {
-            jobAction = UPDATE_NETWORK_ACTION;
+            jobAction = SystemManager.UPDATE_NETWORK_ACTION;
         } else if (entity instanceof SystemCredentials) {
-            jobAction = UPDATE_CREDENTIAL_ACTION;
+            jobAction = SystemManager.UPDATE_CREDENTIAL_ACTION;
         } else {
             throw new CloudProviderException("object type can't be owned by a system");
         }
@@ -569,25 +612,23 @@ public class SystemManager implements ISystemManager {
 
         return job;
     }
-    
+
     public CloudCollectionItem getEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException {
         CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
         if (ce == null) {
             throw new CloudProviderException("bad id given in parameter");
-        }        
+        }
         return ce;
     }
-    
+
     @Override
-    public List<CloudCollectionItem> getEntityListFromSystem(String systemId, String entityType) throws CloudProviderException {
+    public List<CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType)
+        throws CloudProviderException {
         System s = this.getSystemById(systemId);
         if (s == null) {
             throw new CloudProviderException("bad id given in parameter");
         }
-        
-        
-        
-        
+
         return null;
     }
 
@@ -659,18 +700,18 @@ public class SystemManager implements ISystemManager {
 
         ICloudProviderConnector connector = this.getConnector(s);
 
-        if (isSystemSupportedInConnector(connector)) {
-            parentJob = this.doService(systemId, START_ACTION);
+        if (this.isSystemSupportedInConnector(connector)) {
+            parentJob = this.doService(systemId, SystemManager.START_ACTION);
         } else {
             // implementation for system not supported by underlying connector
             s.setState(State.STARTING);
             // creation of main system job
-            parentJob = this.createJob(START_ACTION, s);
+            parentJob = this.createJob(SystemManager.START_ACTION, s);
             this.em.persist(parentJob);
             this.em.flush();
 
             for (SystemMachine m : s.getMachines()) {
-                Job j = machineManager.startMachine(m.getResource().getId().toString());
+                Job j = this.machineManager.startMachine(m.getResource().getId().toString());
                 j.setParentJob(parentJob);
             }
             for (SystemVolume v : s.getVolumes()) {
@@ -682,7 +723,7 @@ public class SystemManager implements ISystemManager {
                 j.setParentJob(parentJob);
             }
             for (SystemNetwork n : s.getNetworks()) {
-                Job j = networkManager.startNetwork(n.getResource().getId().toString());
+                Job j = this.networkManager.startNetwork(n.getResource().getId().toString());
                 j.setParentJob(parentJob);
             }
             for (SystemCredentials c : s.getCredentials()) {
@@ -701,18 +742,18 @@ public class SystemManager implements ISystemManager {
 
         ICloudProviderConnector connector = this.getConnector(s);
 
-        if (isSystemSupportedInConnector(connector)) {
-            parentJob = this.doService(systemId, STOP_ACTION);
+        if (this.isSystemSupportedInConnector(connector)) {
+            parentJob = this.doService(systemId, SystemManager.STOP_ACTION);
         } else {
             // implementation for system not supported by underlying connector
             s.setState(State.STOPPING);
             // creation of main system job
-            parentJob = this.createJob(STOP_ACTION, s);
+            parentJob = this.createJob(SystemManager.STOP_ACTION, s);
             this.em.persist(parentJob);
             this.em.flush();
 
             for (SystemMachine m : s.getMachines()) {
-                Job j = machineManager.stopMachine(m.getResource().getId().toString());
+                Job j = this.machineManager.stopMachine(m.getResource().getId().toString());
                 j.setParentJob(parentJob);
             }
             for (SystemVolume v : s.getVolumes()) {
@@ -724,7 +765,7 @@ public class SystemManager implements ISystemManager {
                 j.setParentJob(parentJob);
             }
             for (SystemNetwork n : s.getNetworks()) {
-                Job j = networkManager.stopNetwork(n.getResource().getId().toString());
+                Job j = this.networkManager.stopNetwork(n.getResource().getId().toString());
                 j.setParentJob(parentJob);
             }
             for (SystemCredentials c : s.getCredentials()) {
@@ -743,13 +784,13 @@ public class SystemManager implements ISystemManager {
 
         ICloudProviderConnector connector = this.getConnector(s);
 
-        if (isSystemSupportedInConnector(connector)) {
-            parentJob = this.doService(systemId, DELETE_ACTION);
+        if (this.isSystemSupportedInConnector(connector)) {
+            parentJob = this.doService(systemId, SystemManager.DELETE_ACTION);
         } else {
             // implementation for system not supported by underlying connector
             s.setState(State.DELETING);
             // creation of main system job
-            parentJob = this.createJob(DELETE_ACTION, s);
+            parentJob = this.createJob(SystemManager.DELETE_ACTION, s);
             this.em.persist(parentJob);
             this.em.flush();
 
@@ -758,11 +799,11 @@ public class SystemManager implements ISystemManager {
             // Machine,etc because we must call related managers to remove them
             // in a clean way
             for (SystemMachine m : s.getMachines()) {
-                Job j = machineManager.deleteMachine(m.getResource().getId().toString());
+                Job j = this.machineManager.deleteMachine(m.getResource().getId().toString());
                 j.setParentJob(parentJob);
             }
             for (SystemVolume v : s.getVolumes()) {
-                Job j = volumeManager.deleteVolume(v.getResource().getId().toString());
+                Job j = this.volumeManager.deleteVolume(v.getResource().getId().toString());
                 j.setParentJob(parentJob);
             }
             for (SystemSystem sy : s.getSystems()) {
@@ -770,11 +811,11 @@ public class SystemManager implements ISystemManager {
                 j.setParentJob(parentJob);
             }
             for (SystemNetwork n : s.getNetworks()) {
-                Job j = networkManager.deleteNetwork(n.getResource().getId().toString());
+                Job j = this.networkManager.deleteNetwork(n.getResource().getId().toString());
                 j.setParentJob(parentJob);
             }
             for (SystemCredentials c : s.getCredentials()) {
-                credentialsManager.deleteCredentials(c.getResource().getId().toString());
+                this.credentialsManager.deleteCredentials(c.getResource().getId().toString());
                 // j.setParentJob(parentJob);
             }
         }
@@ -793,27 +834,26 @@ public class SystemManager implements ISystemManager {
         if (connector == null) {
             throw new CloudProviderException("no connector found");
         }
-        
+
         Job parentJob = this.createJob(action, s);
         this.em.persist(parentJob);
         this.em.flush();
-        
+
         Job j;
         try {
-            if (action.equals(START_ACTION)) {
+            if (action.equals(SystemManager.START_ACTION)) {
                 j = connector.getSystemService().startSystem(s.getProviderAssignedId());
                 s.setState(System.State.STARTING);
                 j.setParentJob(parentJob);
-            } else if (action.equals(STOP_ACTION)) {
+            } else if (action.equals(SystemManager.STOP_ACTION)) {
                 j = connector.getSystemService().stopSystem(s.getProviderAssignedId());
                 s.setState(System.State.STOPPING);
                 j.setParentJob(parentJob);
-            }else if (action.equals(DELETE_ACTION)) {
+            } else if (action.equals(SystemManager.DELETE_ACTION)) {
                 j = connector.getSystemService().deleteSystem(s.getProviderAssignedId());
                 s.setState(System.State.DELETING);
                 j.setParentJob(parentJob);
-            }
-            else {
+            } else {
                 throw new ServiceUnavailableException("Unsupported operation action " + action + " on system id "
                     + s.getProviderAssignedId() + " " + s.getId());
             }
@@ -909,8 +949,8 @@ public class SystemManager implements ISystemManager {
         }
 
         CloudProviderLocation location = null;
-        
-        SystemManager.logger.info("getCloudProviderConnector: cloudProviderAccount has id "+cloudProviderAccount.getId());
+
+        SystemManager.logger.info("getCloudProviderConnector: cloudProviderAccount has id " + cloudProviderAccount.getId());
 
         return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
     }
@@ -934,6 +974,16 @@ public class SystemManager implements ISystemManager {
         return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
     }
 
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount,
+        final CloudProviderLocation location) throws CloudProviderException {
+        ICloudProviderConnectorFactory connectorFactory = this.cloudProviderConnectorFactoryFinder
+            .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
+        if (connectorFactory == null) {
+            throw new CloudProviderException(" Internal error in connector factory ");
+        }
+        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
+    }
+
     private Job createJob(final String action, final CloudResource targetEntity) throws CloudProviderException {
 
         Job job = new Job();
@@ -954,7 +1004,7 @@ public class SystemManager implements ISystemManager {
 
         Job job;
         try {
-            job = jobManager.getJobById(notification_id);
+            job = this.jobManager.getJobById(notification_id);
         } catch (ResourceNotFoundException e1) {
             SystemManager.logger.info("Could not find job " + notification_id);
             return false;
@@ -972,7 +1022,7 @@ public class SystemManager implements ISystemManager {
         boolean running = false;
 
         try {
-            job = jobManager.getJobById(job.getId().toString());
+            job = this.jobManager.getJobById(job.getId().toString());
         } catch (ResourceNotFoundException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -1005,7 +1055,7 @@ public class SystemManager implements ISystemManager {
                             sc.setState(SystemMachine.State.AVAILABLE);
                             s.getMachines().add(sc);
                         }
-                        job.getProperties().put(j.getId().toString(), HANDLED_JOB);
+                        job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
                     }
                     if (j.getTargetEntity() instanceof Volume) {
                         if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
@@ -1014,7 +1064,7 @@ public class SystemManager implements ISystemManager {
                             sc.setState(SystemVolume.State.AVAILABLE);
                             s.getVolumes().add(sc);
                         }
-                        job.getProperties().put(j.getId().toString(), HANDLED_JOB);
+                        job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
                     }
                     if (j.getTargetEntity() instanceof System) {
                         if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
@@ -1023,7 +1073,7 @@ public class SystemManager implements ISystemManager {
                             sc.setState(SystemSystem.State.AVAILABLE);
                             s.getSystems().add(sc);
                         }
-                        job.getProperties().put(j.getId().toString(), HANDLED_JOB);
+                        job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
                     }
                     if (j.getTargetEntity() instanceof Network) {
                         if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
@@ -1032,7 +1082,7 @@ public class SystemManager implements ISystemManager {
                             sc.setState(SystemNetwork.State.AVAILABLE);
                             s.getNetworks().add(sc);
                         }
-                        job.getProperties().put(j.getId().toString(), HANDLED_JOB);
+                        job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
                     }
                     /*
                      * if (j.getTargetEntity() instanceof Credentials) {

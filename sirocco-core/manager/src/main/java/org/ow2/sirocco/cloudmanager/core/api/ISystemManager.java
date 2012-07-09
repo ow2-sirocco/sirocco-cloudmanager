@@ -29,8 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
@@ -62,7 +63,8 @@ public interface ISystemManager extends IJobListener {
 
     CloudCollectionItem getEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException;
 
-    List<CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType) throws CloudProviderException;
+    List<CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType)
+        throws CloudProviderException;
 
     // management of SystemTemplate map
     boolean addComponentDescriptorToSystemTemplate(ComponentDescriptor componentDescriptor, String systemTemplateId)
@@ -71,7 +73,7 @@ public interface ISystemManager extends IJobListener {
     boolean removeComponentDescriptorFromSystemTemplate(String componentDescriptorId, String systemTemplateId)
         throws CloudProviderException;
 
-    // management of compponent Descriptors
+    // management of component Descriptors
     System updateComponentDescriptor(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
 
     // global entity updates
@@ -88,6 +90,12 @@ public interface ISystemManager extends IJobListener {
 
     List<System> getSystems() throws CloudProviderException;
 
+    QueryResult<System> getSystems(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
+
     List<SystemTemplate> getSystemTemplates() throws CloudProviderException;
+
+    QueryResult<SystemTemplate> getSystemTemplates(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
 
 }
