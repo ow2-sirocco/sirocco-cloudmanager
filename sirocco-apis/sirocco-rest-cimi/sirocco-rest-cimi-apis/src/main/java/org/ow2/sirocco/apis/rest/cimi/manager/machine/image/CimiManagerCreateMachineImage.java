@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine.image;
 
+import org.ow2.sirocco.apis.rest.cimi.converter.PathHelper;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
@@ -56,7 +58,24 @@ public class CimiManagerCreateMachineImage extends CimiManagerCreateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.createMachineImage((MachineImage) dataService);
+        Object out = null;
+        String idMachineToCapture = null;
+        MachineImage image = (MachineImage) dataService;
+        // Extract ID MachineImage of imageLocation and verify it before using
+        // the service to create or capture image
+        if (null != image.getImageLocation()) {
+            idMachineToCapture = PathHelper.extractIdString(image.getImageLocation());
+            if (false == image.getImageLocation().equals(context.makeHref(CimiMachine.class, idMachineToCapture))) {
+                idMachineToCapture = null;
+            }
+        }
+        // Call services
+        if (null != idMachineToCapture) {
+            out = this.manager.captureMachine((MachineImage) dataService, idMachineToCapture);
+        } else {
+            out = this.manager.createMachineImage((MachineImage) dataService);
+        }
+        return out;
     }
 
     /**
