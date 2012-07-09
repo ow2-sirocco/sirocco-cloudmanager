@@ -318,7 +318,9 @@ public class SystemManager implements ISystemManager {
                             props = new HashMap<String, String>();
                         }
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
-                        props.put("location", placement.getLocation().getCountryName());
+                        if (placement.getLocation() != null) {
+                            props.put("location", placement.getLocation().getCountryName());
+                        }
                         mc.setProperties(props);
 
                         Job j = this.machineManager.createMachine(mc);
@@ -345,7 +347,9 @@ public class SystemManager implements ISystemManager {
                             props = new HashMap<String, String>();
                         }
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
-                        props.put("location", placement.getLocation().getCountryName());
+                        if (placement.getLocation() != null) {
+                            props.put("location", placement.getLocation().getCountryName());
+                        }
                         vc.setProperties(props);
 
                         Job j = this.volumeManager.createVolume(vc);
@@ -372,7 +376,9 @@ public class SystemManager implements ISystemManager {
                             props = new HashMap<String, String>();
                         }
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
-                        props.put("location", placement.getLocation().getCountryName());
+                        if (placement.getLocation() != null) {
+                            props.put("location", placement.getLocation().getCountryName());
+                        }
                         sc.setProperties(props);
 
                         Job j = this.createSystem(sc);
@@ -399,7 +405,9 @@ public class SystemManager implements ISystemManager {
                             props = new HashMap<String, String>();
                         }
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
-                        props.put("location", placement.getLocation().getCountryName());
+                        if (placement.getLocation() != null) {
+                            props.put("location", placement.getLocation().getCountryName());
+                        }
                         nc.setProperties(props);
 
                         Job j = this.networkManager.createNetwork(nc);
