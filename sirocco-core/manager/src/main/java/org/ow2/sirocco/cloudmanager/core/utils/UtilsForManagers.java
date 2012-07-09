@@ -152,12 +152,13 @@ public class UtilsForManagers {
             userQuery = " v.user.username=:username ";
         }
         if (verifyDeletedState) {
-            stateQuery = " v.state<>'DELETED' ";
+            if (userQuery.length() > 0) {
+                stateQuery = " AND ";
+            }
+            stateQuery = stateQuery + " v.state<>'DELETED' ";
         }
-        return em
-            .createQuery(
-                "FROM " + entityType + " v WHERE " + userQuery + (userQuery.equals("") ? "" : " AND ") + stateQuery
-                    + " ORDER BY v.id").setParameter("username", username).getResultList();
+        return em.createQuery("FROM " + entityType + " v WHERE " + userQuery + stateQuery + " ORDER BY v.id")
+            .setParameter("username", username).getResultList();
 
     }
 
