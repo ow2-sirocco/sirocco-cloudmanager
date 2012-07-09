@@ -265,7 +265,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         @Override
         public ISystemService getSystemService() throws ConnectorException {
-            return null;
+            throw new ConnectorException("Unsupported");
         }
 
         @Override
@@ -475,7 +475,12 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 options.userData(userData.getBytes());
             }
 
-            String imageId = machineCreate.getMachineTemplate().getMachineImage().getProviderAssignedId();
+            String imageIdKey = "openstack";
+            String imageId = machineCreate.getMachineTemplate().getMachineImage().getProperties().get(imageIdKey);
+            if (imageId == null) {
+                throw new ConnectorException("Cannot find imageId for key " + imageIdKey);
+            }
+
             String serverName = null;
             if (machineCreate.getName() != null) {
                 serverName = machineCreate.getName() + "-" + UUID.randomUUID();

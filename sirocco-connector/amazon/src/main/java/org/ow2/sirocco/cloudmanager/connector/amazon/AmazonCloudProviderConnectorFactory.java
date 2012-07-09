@@ -94,6 +94,8 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
             "ap-southeast-1");
         AmazonCloudProviderConnectorFactory.locationMap.put(new CloudProviderLocation("JP", "JP-13", "Japan", "Tokyo"),
             "ap-northeast-1");
+        AmazonCloudProviderConnectorFactory.locationMap.put(new CloudProviderLocation("BR", "BR-SP", "Brazil", "Sao Paulo"),
+            "sa-east-1");
     }
 
     private static final Map<String, Hardware> AWSEC2_HARDWARE_MAP = Collections
@@ -279,7 +281,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
 
         @Override
         public ISystemService getSystemService() throws ConnectorException {
-            return null;
+            throw new ConnectorException("Unsupported");
         }
 
         @Override
@@ -451,10 +453,16 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
             if (userData != null) {
                 options.withUserData(userData.getBytes());
             }
+
+            String imageIdKey = "amazon/" + this.amazonRegionCode;
+            String imageId = machineCreate.getMachineTemplate().getMachineImage().getProperties().get(imageIdKey);
+            if (imageId == null) {
+                throw new ConnectorException("Cannot find imageId for key " + imageIdKey);
+            }
+
             Reservation<? extends AWSRunningInstance> reservation = AmazonCloudProviderConnector.this.syncClient
                 .getInstanceServices().runInstancesInRegion(AmazonCloudProviderConnector.this.amazonRegionCode,
-                    this.defaultAvailabilityZone, machineCreate.getMachineTemplate().getMachineImage().getProviderAssignedId(),
-                    1, 1, options);
+                    this.defaultAvailabilityZone, imageId, 1, 1, options);
 
             final String instanceId = reservation.iterator().next().getId();
 
