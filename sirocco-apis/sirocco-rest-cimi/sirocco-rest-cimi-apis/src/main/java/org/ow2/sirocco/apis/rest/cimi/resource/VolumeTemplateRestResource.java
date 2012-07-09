@@ -68,7 +68,7 @@ public class VolumeTemplateRestResource extends RestResourceAbstract {
 
     @Autowired
     @Qualifier("CimiManagerReadVolumeTemplateCollection")
-    private CimiManager cimiManagerReadVolumeTemplateCollecion;
+    private CimiManager cimiManagerReadVolumeTemplateCollection;
 
     @Autowired
     @Qualifier("CimiManagerDeleteVolumeTemplate")
@@ -106,7 +106,7 @@ public class VolumeTemplateRestResource extends RestResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response read() {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos());
-        this.cimiManagerReadVolumeTemplateCollecion.execute(context);
+        this.cimiManagerReadVolumeTemplateCollection.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
 

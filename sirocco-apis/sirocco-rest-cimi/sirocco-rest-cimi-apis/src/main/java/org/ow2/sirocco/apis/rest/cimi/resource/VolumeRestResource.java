@@ -37,9 +37,11 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.ContextHelper;
+import org.ow2.sirocco.apis.rest.cimi.request.IdRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.ResponseHelper;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,6 +84,26 @@ public class VolumeRestResource extends RestResourceAbstract {
     @Autowired
     @Qualifier("CimiManagerCreateVolume")
     private CimiManager cimiManagerCreateVolume;
+
+    @Autowired
+    @Qualifier("CimiManagerReadVolumeVolumeImage")
+    private CimiManager cimiManagerReadVolumeVolumeImage;
+
+    @Autowired
+    @Qualifier("CimiManagerReadVolumeVolumeImageCollection")
+    private CimiManager cimiManagerReadVolumeVolumeImageCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerCreateVolumeVolumeImage")
+    private CimiManager cimiManagerCreateVolumeVolumeImage;
+
+    @Autowired
+    @Qualifier("CimiManagerDeleteVolumeVolumeImage")
+    private CimiManager cimiManagerDeleteVolumeVolumeImage;
+
+    @Autowired
+    @Qualifier("CimiManagerUpdateVolumeVolumeImage")
+    private CimiManager cimiManagerUpdateVolumeVolumeImage;
 
     /**
      * Get a volume.
@@ -152,4 +174,83 @@ public class VolumeRestResource extends RestResourceAbstract {
         this.cimiManagerDeleteVolume.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
+
+    /**
+     * Read a collection of volumeImages of a volume.
+     * 
+     * @param idParent ID volume
+     * @return The REST response
+     */
+    @GET
+    @Path("{idParent}" + ConstantsPath.VOLUME_IMAGE_PATH)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readVolumeImages(@PathParam("idParent") final String idParent) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent));
+        this.cimiManagerReadVolumeVolumeImageCollection.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a volumeImage of a volume.
+     * 
+     * @param idParent ID volume
+     * @param id ID volumeImage to read
+     * @return The REST response
+     */
+    @GET
+    @Path("/{idParent}" + ConstantsPath.VOLUME_IMAGE_PATH + "/{id}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readVolumeImage(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerReadVolumeVolumeImage.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Update a volumeImage of a volume.
+     * 
+     * @param idParent ID volume
+     * @param id ID volumeImage to update
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.VOLUME_IMAGE_PATH + "/{id}")
+    public Response updateVolumeImage(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
+        final CimiVolumeVolumeImage cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent), cimiData);
+        this.cimiManagerUpdateVolumeVolumeImage.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Create a volumeImage of a volume.
+     * 
+     * @param idParent ID volume
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.VOLUME_IMAGE_PATH)
+    public Response createVolumeImage(@PathParam("idParent") final String idParent, final CimiVolumeVolumeImage cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent), cimiData);
+        this.cimiManagerCreateVolumeVolumeImage.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Delete a volumeImage of a volume.
+     * 
+     * @param idParent ID volume
+     * @param id ID volumeImage to delete
+     * @return The REST response
+     */
+    @DELETE
+    @Path("/{idParent}" + ConstantsPath.VOLUME_IMAGE_PATH + "/{id}")
+    public Response deleteVolumeImage(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerDeleteVolumeVolumeImage.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
 }
