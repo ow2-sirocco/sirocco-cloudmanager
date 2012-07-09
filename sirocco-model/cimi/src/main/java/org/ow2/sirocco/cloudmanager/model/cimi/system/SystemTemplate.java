@@ -28,6 +28,7 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
@@ -39,14 +40,13 @@ public class SystemTemplate extends CloudTemplate {
 
     private Set<ComponentDescriptor> componentDescriptors;
 
-    @OneToMany(cascade=CascadeType.ALL)
-    @JoinColumn(name="system_temp_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name = "system_temp_id")
     public Set<ComponentDescriptor> getComponentDescriptors() {
-        return componentDescriptors;
+        return this.componentDescriptors;
     }
 
-    public void setComponentDescriptors(
-            Set<ComponentDescriptor> componentDescriptors) {
+    public void setComponentDescriptors(final Set<ComponentDescriptor> componentDescriptors) {
         this.componentDescriptors = componentDescriptors;
     }
 

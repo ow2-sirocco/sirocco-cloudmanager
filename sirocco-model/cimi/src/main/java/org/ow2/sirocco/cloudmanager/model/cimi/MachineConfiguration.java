@@ -31,6 +31,8 @@ import java.util.List;
 import javax.persistence.Entity;
 
 import org.hibernate.annotations.CollectionOfElements;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 public class MachineConfiguration extends CloudEntity implements Serializable {
@@ -59,6 +61,7 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
     }
 
     @CollectionOfElements
+    @LazyCollection(LazyCollectionOption.FALSE)
     public List<DiskTemplate> getDiskTemplates() {
         return this.diskTemplates;
     }
