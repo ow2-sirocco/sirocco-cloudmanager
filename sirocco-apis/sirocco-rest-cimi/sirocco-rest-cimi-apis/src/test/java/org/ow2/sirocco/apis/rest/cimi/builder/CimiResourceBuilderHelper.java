@@ -62,6 +62,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
 import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.ParentJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.TargetResource;
 
 /**
  * Helper to build Cimi Entities to test.
@@ -330,16 +331,16 @@ public class CimiResourceBuilderHelper {
             cimi.setReturnCode(id);
             cimi.setStatus("statusValue" + postfix);
             cimi.setStatusMessage("statusMessageValue" + postfix);
-            cimi.setTargetResource("targetResourceValue" + postfix);
+            cimi.setTargetResource(new TargetResource("targetResourceValue" + postfix));
             cimi.setTimeOfStatusChange(CimiResourceBuilderHelper.buildDate(id));
 
             if ((null != id) && (id > 0)) {
-                List<String> affectedResources = new ArrayList<String>();
+                List<TargetResource> affectedResources = new ArrayList<TargetResource>();
                 for (int i = 0; i < id; i++) {
-                    affectedResources.add(new String("affectedResourcesValue" + postfix
+                    affectedResources.add(new TargetResource("affectedResourcesValue" + postfix
                         + CimiResourceBuilderHelper.buildPostfix(id, i)));
                 }
-                cimi.setAffectedResources(affectedResources.toArray(new String[affectedResources.size()]));
+                cimi.setAffectedResources(affectedResources.toArray(new TargetResource[affectedResources.size()]));
                 cimi.setParentJob(new ParentJob("hrefParentValue" + postfix));
                 List<NestedJob> nesteds = new ArrayList<NestedJob>();
                 for (int i = 0; i < id; i++) {

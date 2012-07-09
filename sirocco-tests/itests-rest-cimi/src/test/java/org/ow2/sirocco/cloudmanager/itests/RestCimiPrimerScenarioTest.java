@@ -553,7 +553,7 @@ public class RestCimiPrimerScenarioTest {
          * Query the Machine
          */
         this.printTitleTest("Query the Machine", true);
-        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource()));
+        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource().getHref()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         CimiMachine machine = response.getEntity(CimiMachine.class);
@@ -598,7 +598,7 @@ public class RestCimiPrimerScenarioTest {
          * Query the Machine to verify if it started
          */
         this.printTitleTest("Query the Machine to verify if it started", true);
-        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource()));
+        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource().getHref()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         machine = response.getEntity(CimiMachine.class);
@@ -634,7 +634,7 @@ public class RestCimiPrimerScenarioTest {
          * Query the Machine to verify if it stopped
          */
         this.printTitleTest("Query the Machine to verify if it stopped", true);
-        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource()));
+        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource().getHref()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         machine = response.getEntity(CimiMachine.class);
@@ -671,7 +671,7 @@ public class RestCimiPrimerScenarioTest {
          * Query the Machine to verify if it updated
          */
         this.printTitleTest("Query the Machine to verify if it updated", true);
-        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource()));
+        service = webResource.path(this.extractPath(jobMachineCreate.getTargetResource().getHref()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         machine = response.getEntity(CimiMachine.class);

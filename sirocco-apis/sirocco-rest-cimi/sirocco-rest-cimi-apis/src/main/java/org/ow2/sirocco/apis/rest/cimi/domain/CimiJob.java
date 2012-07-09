@@ -50,12 +50,12 @@ public class CimiJob extends CimiObjectCommonAbstract {
     /**
      * Field "targetResource".
      */
-    private String targetResource;
+    private TargetResource targetResource;
 
     /**
      * Field "affectedResources".
      */
-    private String[] affectedResources;
+    private TargetResource[] affectedResources;
 
     /**
      * Field "action". URI
@@ -123,7 +123,7 @@ public class CimiJob extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public String getTargetResource() {
+    public TargetResource getTargetResource() {
         return this.targetResource;
     }
 
@@ -132,7 +132,7 @@ public class CimiJob extends CimiObjectCommonAbstract {
      * 
      * @param targetResource The value
      */
-    public void setTargetResource(final String targetResource) {
+    public void setTargetResource(final TargetResource targetResource) {
         this.targetResource = targetResource;
     }
 
@@ -143,7 +143,7 @@ public class CimiJob extends CimiObjectCommonAbstract {
      */
     @XmlElement(name = "affectedResource")
     @JsonProperty(value = "affectedResources")
-    public String[] getAffectedResources() {
+    public TargetResource[] getAffectedResources() {
         return this.affectedResources;
     }
 
@@ -152,7 +152,7 @@ public class CimiJob extends CimiObjectCommonAbstract {
      * 
      * @param affectedResources The value
      */
-    public void setAffectedResources(final String[] affectedResources) {
+    public void setAffectedResources(final TargetResource[] affectedResources) {
         this.affectedResources = affectedResources;
     }
 

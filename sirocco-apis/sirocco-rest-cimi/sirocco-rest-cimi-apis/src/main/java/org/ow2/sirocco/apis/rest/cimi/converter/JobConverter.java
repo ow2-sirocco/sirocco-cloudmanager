@@ -28,11 +28,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.ParentJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.TargetResource;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 
@@ -113,14 +112,28 @@ public class JobConverter extends ObjectCommonConverter {
             dataCimi.setStatus(ConverterHelper.toString(dataService.getStatus()));
             dataCimi.setStatusMessage(dataService.getStatusMessage());
             dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
-            dataCimi.setTargetResource(this.makeHrefTargetResource(context, dataService.getTargetEntity()));
-
+            // dataCimi.setTargetResource(this.buildHrefTargetResource(context,
+            // dataService.getTargetEntity()));
+            if (null != dataService.getTargetEntity()) {
+                dataCimi.setTargetResource(new TargetResource(this.buildHrefTargetResource(context,
+                    dataService.getTargetEntity())));
+            }
+            // if ((null != dataService.getAffectedEntities()) &&
+            // (dataService.getAffectedEntities().size() > 0)) {
+            // List<String> list = new ArrayList<String>();
+            // for (CloudResource resource : dataService.getAffectedEntities())
+            // {
+            // list.add(this.buildHrefTargetResource(context, resource));
+            // }
+            // dataCimi.setAffectedResources(list.toArray(new
+            // String[list.size()]));
+            // }
             if ((null != dataService.getAffectedEntities()) && (dataService.getAffectedEntities().size() > 0)) {
-                List<String> list = new ArrayList<String>();
+                List<TargetResource> list = new ArrayList<TargetResource>();
                 for (CloudResource resource : dataService.getAffectedEntities()) {
-                    list.add(this.makeHrefTargetResource(context, resource));
+                    list.add(new TargetResource(this.buildHrefTargetResource(context, resource)));
                 }
-                dataCimi.setAffectedResources(list.toArray(new String[list.size()]));
+                dataCimi.setAffectedResources(list.toArray(new TargetResource[list.size()]));
             }
 
             if (null != dataService.getParentJob()) {
@@ -145,25 +158,6 @@ public class JobConverter extends ObjectCommonConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiJob dataCimi, final Job dataService) {
         this.fill(context, dataCimi, dataService);
-    }
-
-    protected String makeHrefTargetResource(final CimiContext context, final CloudResource targetDataService) {
-        String href = null;
-        if (null != targetDataService) {
-            Class<? extends CimiResource> targetType = context.findAssociate(targetDataService.getClass());
-            href = context.makeHref(targetType, this.getTargetId(targetDataService).toString());
-        }
-        return href;
-    }
-
-    protected Integer getTargetId(final Object targetDataService) {
-        Integer id = null;
-        if (true == CloudResource.class.isAssignableFrom(targetDataService.getClass())) {
-            id = ((CloudResource) targetDataService).getId();
-        } else {
-            id = ((CloudEntity) targetDataService).getId();
-        }
-        return id;
     }
 
 }

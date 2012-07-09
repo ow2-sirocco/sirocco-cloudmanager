@@ -68,7 +68,7 @@ public class MockCimiManagerAction extends MockCimiManager {
             context.getResponse().putHeader(
                 Constants.HEADER_LOCATION,
                 PathHelper.makeHref(context.getRequest().getBaseUri(), this.extractPathname(context.getRequest().getPath()),
-                    cimiJob.getTargetResource()));
+                    cimiJob.getTargetResource().getHref()));
             context.getResponse().setStatus(Status.ACCEPTED);
         } catch (ComparisonFailure e) {
             // Build assert error

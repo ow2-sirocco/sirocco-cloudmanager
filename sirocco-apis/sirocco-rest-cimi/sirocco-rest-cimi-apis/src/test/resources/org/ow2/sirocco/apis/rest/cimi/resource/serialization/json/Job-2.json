@@ -21,10 +21,17 @@
 		}
 		
 	],
-	"targetResource":"targetResourceValue_2",
+	"targetResource":{
+		"href":"targetResourceValue_2"
+	},
 	"affectedResources":[
-		"affectedResourcesValue_2_2_0",
-		"affectedResourcesValue_2_2_1"
+		{
+			"href":"affectedResourcesValue_2_2_0"
+		},
+		{
+			"href":"affectedResourcesValue_2_2_1"
+		}
+		
 	],
 	"action":"actionValue_2",
 	"status":"statusValue_2",

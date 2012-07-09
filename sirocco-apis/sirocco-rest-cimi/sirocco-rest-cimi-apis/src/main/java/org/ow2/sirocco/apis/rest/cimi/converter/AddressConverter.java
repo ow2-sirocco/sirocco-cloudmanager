@@ -25,7 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.TargetResource;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 
@@ -111,7 +111,9 @@ public class AddressConverter extends ObjectCommonConverter {
             // context.convertNextCimi(dataService.getNetwork(),
             // CimiNetworkInterface.class));
             dataCimi.setProtocol(dataService.getProtocol());
-            dataCimi.setResource((CimiObjectCommon) context.convertNextCimi(dataService.getResource()));
+            if (null != dataService.getResource()) {
+                dataCimi.setResource(new TargetResource(this.buildHrefTargetResource(context, dataService.getResource())));
+            }
         }
     }
 

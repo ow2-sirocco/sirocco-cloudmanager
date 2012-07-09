@@ -16,9 +16,13 @@
 		}
 		
 	],
-	"targetResource":"targetResourceValue_1",
+	"targetResource":{
+		"href":"targetResourceValue_1"
+	},
 	"affectedResources":[
-		"affectedResourcesValue_1_1_0"
+		{
+			"href":"affectedResourcesValue_1_1_0"
+		}
 	],
 	"action":"actionValue_1",
 	"status":"statusValue_1",

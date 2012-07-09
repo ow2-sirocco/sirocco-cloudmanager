@@ -30,7 +30,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class TargetEntity.
+ * Class TargetResource.
  */
 @XmlRootElement(name = "TargetResource")
 @JsonSerialize(include = Inclusion.NON_NULL)

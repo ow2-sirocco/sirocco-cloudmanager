@@ -42,7 +42,7 @@ public class CimiAddress extends CimiAddressTemplate {
     private static final long serialVersionUID = 1L;
 
     /** Field "resource". */
-    private CimiObjectCommon resource;
+    private TargetResource resource;
 
     /**
      * Default constructor.
@@ -65,7 +65,7 @@ public class CimiAddress extends CimiAddressTemplate {
      * 
      * @return The value
      */
-    public CimiObjectCommon getResource() {
+    public TargetResource getResource() {
         return this.resource;
     }
 
@@ -74,15 +74,14 @@ public class CimiAddress extends CimiAddressTemplate {
      * 
      * @param resource The value
      */
-    @XmlTransient
-    public void setResource(final CimiObjectCommon resource) {
+    public void setResource(final TargetResource resource) {
         this.resource = resource;
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate#hasValues()
      */
     @Override
     public boolean hasValues() {

@@ -115,7 +115,8 @@ public class MonitoringConverterTest {
         Assert.assertEquals(11, cimi.getReturnCode().intValue());
         Assert.assertEquals(Job.Status.RUNNING.toString(), cimi.getStatus());
         Assert.assertEquals("statusMessage", cimi.getStatusMessage());
-        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/321", cimi.getTargetResource());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/321", cimi.getTargetResource()
+            .getHref());
         Assert.assertEquals(timeOfStatusChange, cimi.getTimeOfStatusChange());
 
         // Full Service -> Cimi : NestedJobs empty
@@ -165,9 +166,9 @@ public class MonitoringConverterTest {
         Assert.assertNotNull(cimi.getAffectedResources());
         Assert.assertEquals(2, cimi.getAffectedResources().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/321",
-            cimi.getAffectedResources()[0]);
+            cimi.getAffectedResources()[0].getHref());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/654",
-            cimi.getAffectedResources()[1]);
+            cimi.getAffectedResources()[1].getHref());
     }
 
     @Test
