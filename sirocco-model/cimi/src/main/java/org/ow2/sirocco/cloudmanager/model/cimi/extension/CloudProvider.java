@@ -120,7 +120,7 @@ public class CloudProvider implements Serializable {
         this.cloudProviderAccounts = cloudProviderAccounts;
     }
 
-    @ManyToMany(mappedBy = "cloudProviders")
+    @ManyToMany(mappedBy = "cloudProviders", fetch = FetchType.EAGER)
     public Set<CloudProviderLocation> getCloudProviderLocations() {
         return this.cloudProviderLocations;
     }
