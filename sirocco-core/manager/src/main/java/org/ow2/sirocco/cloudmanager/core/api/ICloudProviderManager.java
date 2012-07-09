@@ -34,8 +34,28 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 public interface ICloudProviderManager {
-
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.CloudProviderManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager@Remote";
+
+    public static class Placement {
+        final CloudProviderAccount account;
+
+        final CloudProviderLocation location;
+
+        public Placement(final CloudProviderAccount account, final CloudProviderLocation location) {
+            super();
+            this.account = account;
+            this.location = location;
+        }
+
+        public CloudProviderAccount getAccount() {
+            return this.account;
+        }
+
+        public CloudProviderLocation getLocation() {
+            return this.location;
+        }
+
+    }
 
     CloudProvider createCloudProvider(String type, String description) throws CloudProviderException;
 
@@ -78,6 +98,8 @@ public interface ICloudProviderManager {
 
     void deleteCloudProviderLocation(String cloudProviderLocationId) throws CloudProviderException;
 
+    void addLocationToCloudProvider(String cloudProviderId, String locationId) throws CloudProviderException;
+
     void addCloudProviderAccountToUser(String userId, String cloudProviderAccountId) throws CloudProviderException;
 
     void addCloudProviderAccountToUserByName(String userName, String cloudProviderAccountId) throws CloudProviderException;
@@ -95,5 +117,7 @@ public interface ICloudProviderManager {
     List<CloudProviderLocation> getCloudProviderLocations() throws CloudProviderException;
 
     List<CloudProvider> getCloudProviders() throws CloudProviderException;
+
+    Placement placeResource(final Map<String, String> properties) throws CloudProviderException;
 
 }

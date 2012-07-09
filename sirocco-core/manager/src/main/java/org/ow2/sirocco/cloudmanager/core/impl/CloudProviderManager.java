@@ -45,6 +45,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -354,7 +355,7 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     @Override
     public CloudProviderLocation createCloudProviderLocation(final CloudProviderLocation cpl) throws CloudProviderException {
-        this.normalizeCloudProviderLocation(cpl);
+        // this.normalizeCloudProviderLocation(cpl);
 
         // if (!isCloudProviderLocationValid(cpl)){throw new
         // CloudProviderException("CloudProviderLocation validation failed");}
@@ -459,7 +460,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<CloudProviderLocation> getCloudProviderLocations() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("CloudProviderLocation", this.em, this.getUser().getUsername());
+        return this.em.createQuery("Select p From CloudProviderLocation p").getResultList();
     }
 
     /**
@@ -489,6 +490,59 @@ public class CloudProviderManager implements ICloudProviderManager {
         double tt = Math.acos(t1 + t2 + t3);
 
         return 6366000 * tt;
+    }
+
+    @Override
+    public void addLocationToCloudProvider(final String cloudProviderId, final String locationId) throws CloudProviderException {
+        CloudProvider provider = this.getCloudProviderById(cloudProviderId);
+        if (provider == null) {
+            throw new ResourceNotFoundException("Wrong provider id: " + cloudProviderId);
+        }
+        CloudProviderLocation location = this.getCloudProviderLocationById(locationId);
+        if (location == null) {
+            throw new ResourceNotFoundException("Wrong location id: " + locationId);
+        }
+        provider.getCloudProviderLocations().add(location);
+        location.getCloudProviders().add(provider);
+    }
+
+    @Override
+    public Placement placeResource(final Map<String, String> properties) throws CloudProviderException {
+        User user = this.getUser();
+        String cloudProviderType = null;
+        String cloudProviderLocationCountry = null;
+        if (properties != null) {
+            cloudProviderType = properties.get("provider");
+            cloudProviderLocationCountry = properties.get("location");
+        }
+        if (cloudProviderType == null) {
+            cloudProviderType = "mock";
+        }
+        CloudProviderAccount targetAccount = null;
+        for (CloudProviderAccount account : user.getCloudProviderAccounts()) {
+            if (account.getCloudProvider().getCloudProviderType().equals(cloudProviderType)) {
+                targetAccount = account;
+                break;
+            }
+        }
+        if (targetAccount == null) {
+            throw new CloudProviderException("No provider account for user " + user.getUsername() + " and provider type "
+                + cloudProviderType);
+        }
+        CloudProviderLocation targetLocation = null;
+        if (cloudProviderLocationCountry != null) {
+            for (CloudProviderLocation loc : targetAccount.getCloudProvider().getCloudProviderLocations()) {
+                if (loc.getCountryName().equalsIgnoreCase(cloudProviderLocationCountry)) {
+                    targetLocation = loc;
+                    break;
+                }
+            }
+            if (targetLocation == null) {
+                throw new CloudProviderException("Cloud Provider " + cloudProviderType + " does not support location "
+                    + cloudProviderLocationCountry);
+            }
+        }
+        return new Placement(targetAccount, targetLocation);
     }
 
 }
