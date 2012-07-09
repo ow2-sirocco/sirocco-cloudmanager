@@ -21,6 +21,8 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
+import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
+import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -41,6 +43,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @Stateless
@@ -62,9 +65,13 @@ public class VolumeManager implements IVolumeManager {
     private IUserManager userManager;
 
     @EJB
+    private ICloudProviderManager cloudProviderManager;
+
+    @EJB
     private IJobManager jobManager;
 
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount) {
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount,
+        final CloudProviderLocation location) {
         VolumeManager.logger.info("Getting connector for cloud provider type "
             + cloudProviderAccount.getCloudProvider().getCloudProviderType());
         ICloudProviderConnectorFactory connectorFactory = this.connectorFactoryFinder
@@ -74,7 +81,7 @@ public class VolumeManager implements IVolumeManager {
                 + cloudProviderAccount.getCloudProvider().getCloudProviderType());
             return null;
         }
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, null);
+        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
     }
 
     private User getUser() throws CloudProviderException {
@@ -93,15 +100,11 @@ public class VolumeManager implements IVolumeManager {
         // retrieve user
         User user = this.getUser();
 
-        // pick up first cloud provider account associated with user
-        if (user.getCloudProviderAccounts().isEmpty()) {
-            throw new CloudProviderException("No cloud provider account for user " + user.getUsername());
-        }
-        CloudProviderAccount defaultAccount = user.getCloudProviderAccounts().iterator().next();
-        ICloudProviderConnector connector = this.getCloudProviderConnector(defaultAccount);
+        Placement placement = this.cloudProviderManager.placeResource(volumeCreate.getProperties());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         if (connector == null) {
-            throw new CloudProviderException("Cannot find cloud provider connector "
-                + defaultAccount.getCloudProvider().getCloudProviderType());
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
 
         // delegates volume creation to cloud provider connector
@@ -127,7 +130,8 @@ public class VolumeManager implements IVolumeManager {
         Volume volume = new Volume();
 
         volume.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
-        volume.setCloudProviderAccount(defaultAccount);
+        volume.setCloudProviderAccount(placement.getAccount());
+        volume.setLocation(placement.getLocation());
         volume.setCapacity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity());
         volume.setType(volumeCreate.getVolumeTemplate().getVolumeConfig().getType());
         // XXX no way to specify whether the volume is bootable ?
@@ -445,7 +449,8 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // delegates volume deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount(),
+            volume.getLocation());
         Job providerJob = null;
 
         try {
@@ -568,7 +573,8 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // update Volume entity
-        ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount(),
+            volume.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getStatus() == Job.Status.SUCCESS) {
@@ -611,7 +617,8 @@ public class VolumeManager implements IVolumeManager {
             return false;
         }
 
-        ICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount(),
+            volumeImage.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getStatus() == Job.Status.SUCCESS) {
@@ -690,15 +697,20 @@ public class VolumeManager implements IVolumeManager {
         // retrieve user
         User user = this.getUser();
 
-        // pick up first cloud provider account associated with user
-        if (user.getCloudProviderAccounts().isEmpty()) {
-            throw new CloudProviderException("No cloud provider account for user " + user.getUsername());
+        ICloudProviderConnector connector = null;
+        Placement placement;
+
+        if (volumeToSnapshot != null) {
+            connector = this.getCloudProviderConnector(volumeToSnapshot.getCloudProviderAccount(),
+                volumeToSnapshot.getLocation());
+            placement = new Placement(volumeToSnapshot.getCloudProviderAccount(), volumeToSnapshot.getLocation());
+        } else {
+            placement = this.cloudProviderManager.placeResource(volumeImage.getProperties());
+            connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         }
-        CloudProviderAccount defaultAccount = user.getCloudProviderAccounts().iterator().next();
-        ICloudProviderConnector connector = this.getCloudProviderConnector(defaultAccount);
         if (connector == null) {
-            throw new CloudProviderException("Cannot find cloud provider connector "
-                + defaultAccount.getCloudProvider().getCloudProviderType());
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
 
         // delegates volume creation to cloud provider connector
@@ -725,7 +737,8 @@ public class VolumeManager implements IVolumeManager {
         // prepare the VolumeImage entity to be persisted
 
         volumeImage.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
-        volumeImage.setCloudProviderAccount(defaultAccount);
+        volumeImage.setCloudProviderAccount(placement.getAccount());
+        volumeImage.setLocation(placement.getLocation());
         volumeImage.setUser(user);
 
         volumeImage.setState(VolumeImage.State.CREATING);
@@ -811,7 +824,8 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // delegates volume deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount(),
+            volumeImage.getLocation());
         Job providerJob = null;
 
         try {
