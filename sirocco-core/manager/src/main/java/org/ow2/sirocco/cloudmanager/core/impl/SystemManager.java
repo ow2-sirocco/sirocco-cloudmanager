@@ -486,7 +486,7 @@ public class SystemManager implements ISystemManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<SystemTemplate> getSystemTemplates() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("SystemTemplate", this.em, this.getUser().getUsername());
+        return UtilsForManagers.getEntityList("SystemTemplate", this.em, this.getUser().getUsername(), false);
     }
 
     @Override
@@ -932,7 +932,7 @@ public class SystemManager implements ISystemManager {
 
         ICloudProviderConnector connector = null;
 
-        connector = this.getCloudProviderConnector(s.getCloudProviderAccount());
+        connector = this.getCloudProviderConnector(s.getCloudProviderAccount(), s.getLocation());
         return connector;
     }
 
