@@ -51,6 +51,8 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
+import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
+import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
@@ -80,8 +82,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
@@ -104,6 +104,9 @@ public class MachineManager implements IMachineManager {
 
     @EJB
     private IUserManager userManager;
+
+    @EJB
+    private ICloudProviderManager cloudProviderManager;
 
     @EJB
     private IVolumeManager volumeManager;
@@ -398,26 +401,13 @@ public class MachineManager implements IMachineManager {
         if (this.checkQuota(this.getUser(), mt.getMachineConfiguration()) == false) {
             throw new CloudProviderException("User exceeded quota ");
         }
-        MachineManager.logger.info(" selectCloudProviders ");
-        /**
-         * Obtain list of matching provider
-         */
-        CloudProvider provider = this.selectCloudProvider(mt);
-        CloudProviderAccount account = null;
 
-        account = this.getCloudProviderAccount(provider, this.getUser(), mt);
-        if (account == null) {
-            throw new CloudProviderException("Could not find a cloud provider account ");
-        }
-        /** there must be at least one location if we are here */
-        CloudProviderLocation mylocation = null;// myprovider.getCloudProviderLocations().get(0);
-        ICloudProviderConnector connector = this.getCloudProviderConnector(account, mylocation);
+        Placement placement = this.cloudProviderManager.placeResource(machineCreate.getProperties());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         if (connector == null) {
-            throw new CloudProviderException("Could not obtain connector to provider "
-                + account.getCloudProvider().getCloudProviderType());
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
-        String connectorid = connector.getCloudProviderId();
-        MachineManager.logger.info(" got a connector " + connectorid);
 
         Job jobCreateMachine = null;
         IComputeService computeService = null;
@@ -450,10 +440,10 @@ public class MachineManager implements IMachineManager {
         m.setCpu(mt.getMachineConfiguration().getCpu());
         m.setMemory(mt.getMachineConfiguration().getMemory());
 
-        m.setCloudProviderAccount(account);
+        m.setCloudProviderAccount(placement.getAccount());
         m.setProviderAssignedId(jobCreateMachine.getTargetEntity().getProviderAssignedId());
 
-        m.setLocation(mylocation);
+        m.setLocation(placement.getLocation());
         m.setCreated(new Date());
 
         this.initVolumeCollection(m);
@@ -685,6 +675,7 @@ public class MachineManager implements IMachineManager {
         }
 
         Job job = this.createJob(m, null, "delete", j.getStatus(), null);
+        job.setDescription("Machine deletion");
         job.setProviderAssignedId(j.getProviderAssignedId());
         this.updateJob(job);
         Map<String, String> map = job.getProperties();
@@ -1312,20 +1303,15 @@ public class MachineManager implements IMachineManager {
             return;
         }
         for (MachineNetworkInterface nic : nics) {
-
-            /** TODO check that the network exists */
-
-            Network network = nic.getNetwork();
+            // TODO we ignore network and port returned by connectors
+            nic.setNetwork(null);
+            nic.setNetworkPort(null);
 
             List<Address> addresses = nic.getAddresses();
             for (Address address : addresses) {
+                address.setNetwork(null);
+                address.setResource(null);
                 this.em.persist(address);
-            }
-
-            NetworkPort networkPort = nic.getNetworkPort();
-
-            if (networkPort != null) {
-                this.em.persist(networkPort);
             }
 
             this.em.persist(nic);
