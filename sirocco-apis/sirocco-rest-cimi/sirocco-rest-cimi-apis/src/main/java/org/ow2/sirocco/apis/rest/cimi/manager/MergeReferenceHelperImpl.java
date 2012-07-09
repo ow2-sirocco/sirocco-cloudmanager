@@ -40,6 +40,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
@@ -61,6 +62,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
@@ -79,6 +81,10 @@ import org.springframework.stereotype.Component;
 public class MergeReferenceHelperImpl implements MergeReferenceHelper {
 
     @Autowired
+    @Qualifier("ICredentialsManager")
+    private ICredentialsManager managerCredentials;
+
+    @Autowired
     @Qualifier("IMachineImageManager")
     private IMachineImageManager managerMachineImage;
 
@@ -86,13 +92,13 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Qualifier("IMachineManager")
     private IMachineManager managerMachine;
 
+    // @Autowired
+    // @Qualifier("INetworkManager")
+    // private INetworkManager managerNetwork;
+
     @Autowired
     @Qualifier("IVolumeManager")
     private IVolumeManager managerVolume;
-
-    @Autowired
-    @Qualifier("ICredentialsManager")
-    private ICredentialsManager managerCredentials;
 
     /**
      * {@inheritDoc}
@@ -208,6 +214,23 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             MachineVolume dataService = this.managerMachine.getVolumeFromMachine(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
             CimiMachineVolume cimiRef = (CimiMachineVolume) context.convertToCimi(dataService, CimiMachineVolume.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiMachineNetworkInterface cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            MachineNetworkInterface dataService = this.managerMachine.getNetworkInterfaceFromMachine(context.getRequest()
+                .getIdParent(), PathHelper.extractIdString(cimi.getHref()));
+            CimiMachineNetworkInterface cimiRef = (CimiMachineNetworkInterface) context.convertToCimi(dataService,
+                CimiMachineNetworkInterface.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -658,6 +681,31 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             } else {
                 this.merge(cimiRef.getVolume(), cimi.getVolume());
             }
+        }
+    }
+
+    /**
+     * Merge machine network data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiMachineNetworkInterface cimiRef, final CimiMachineNetworkInterface cimi) {
+        if (null != cimiRef) {
+            this.mergeCommon(cimiRef, cimi);
+
+            if (null == cimi.getMacAddress()) {
+                cimi.setMacAddress(cimiRef.getMacAddress());
+            }
+            if (null == cimi.getMtu()) {
+                cimi.setMtu(cimiRef.getMtu());
+            }
+            if (null == cimi.getState()) {
+                cimi.setState(cimiRef.getState());
+            }
+            // TODO and check Network, NetworkPort, ...
+
+            // Read-only : Addresses
         }
     }
 
