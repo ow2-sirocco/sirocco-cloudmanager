@@ -47,14 +47,10 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     private Credentials credentials;
 
-    @OneToMany
     private List<MachineVolume> volumes;
 
-    @OneToMany
     private List<MachineVolumeTemplate> volumeTemplates;
 
-    @OneToMany
-    @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
     private List<MachineTemplateNetworkInterface> networkInterfaces;
 
     private String userData;
@@ -136,6 +132,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
     public List<MachineTemplateNetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
