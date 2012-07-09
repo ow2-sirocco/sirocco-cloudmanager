@@ -104,6 +104,9 @@ public class CredentialsManager implements ICredentialsManager {
 
         Credentials credentials = new Credentials();
         credentials.setCreated(new Date());
+        credentials.setName(credentialsCreate.getName());
+        credentials.setDescription(credentialsCreate.getDescription());
+        credentials.setProperties(credentialsCreate.getProperties());
         credentials.setUser(this.getUser());
         credentials.setUserName(credentialsCreate.getCredentialsTemplate().getUserName());
         credentials.setPassword(credentialsCreate.getCredentialsTemplate().getPassword());
