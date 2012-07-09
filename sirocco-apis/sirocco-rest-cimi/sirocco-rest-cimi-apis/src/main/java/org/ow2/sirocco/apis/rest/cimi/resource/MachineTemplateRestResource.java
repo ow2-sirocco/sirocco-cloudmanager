@@ -68,7 +68,7 @@ public class MachineTemplateRestResource extends RestResourceAbstract {
 
     @Autowired
     @Qualifier("CimiManagerReadMachineTemplateCollection")
-    private CimiManager cimiManagerReadMachineTemplateCollecion;
+    private CimiManager cimiManagerReadMachineTemplateCollection;
 
     @Autowired
     @Qualifier("CimiManagerDeleteMachineTemplate")
@@ -106,7 +106,7 @@ public class MachineTemplateRestResource extends RestResourceAbstract {
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response read() {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos());
-        this.cimiManagerReadMachineTemplateCollecion.execute(context);
+        this.cimiManagerReadMachineTemplateCollection.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
 
