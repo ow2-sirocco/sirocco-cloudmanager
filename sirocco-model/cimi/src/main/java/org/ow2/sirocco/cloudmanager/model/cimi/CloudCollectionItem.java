@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -44,21 +45,21 @@ public abstract class CloudCollectionItem extends CloudEntity {
 
     private State state;
 
-    @OneToOne(optional = false)
+    @OneToOne(optional = false, cascade = CascadeType.ALL)
     @JoinColumn(name = "cloudcoll_ent_id")
     public CloudResource getResource() {
-        return resource;
+        return this.resource;
     }
 
-    public void setResource(CloudResource resource) {
+    public void setResource(final CloudResource resource) {
         this.resource = resource;
     }
 
     public State getState() {
-        return state;
+        return this.state;
     }
 
-    public void setState(State state) {
+    public void setState(final State state) {
         this.state = state;
     }
 }

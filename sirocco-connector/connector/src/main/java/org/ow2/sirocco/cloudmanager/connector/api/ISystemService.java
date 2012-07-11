@@ -25,7 +25,11 @@
 
 package org.ow2.sirocco.cloudmanager.connector.api;
 
+import java.util.List;
+
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 
 public interface ISystemService {
@@ -42,4 +46,8 @@ public interface ISystemService {
     Job pauseSystem(String systemId) throws ConnectorException;
 
     Job suspendSystem(String systemId) throws ConnectorException;
+
+    System getSystem(String systemId) throws ConnectorException;
+
+    List<? extends CloudCollectionItem> getEntityListFromSystem(String systemId, String entityType) throws ConnectorException;
 }

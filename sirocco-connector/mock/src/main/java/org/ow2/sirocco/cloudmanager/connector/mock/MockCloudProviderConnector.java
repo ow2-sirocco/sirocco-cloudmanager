@@ -42,6 +42,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
+import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
@@ -74,6 +75,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
@@ -146,8 +148,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public ISystemService getSystemService() throws ConnectorException {
-        throw new ConnectorException();
-        // return this;
+        // throw new ConnectorException();
+        return this;
     }
 
     @Override
@@ -480,6 +482,37 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
+    public synchronized System getSystem(final String systemId) throws ConnectorException {
+        System system = this.systems.get(systemId);
+        if (system == null) {
+            throw new ConnectorException("System " + systemId + " does not exist");
+        }
+        return system;
+    }
+
+    @Override
+    public synchronized List<? extends CloudCollectionItem> getEntityListFromSystem(final String systemId,
+        final String entityType) throws ConnectorException {
+        System system = this.systems.get(systemId);
+        if (system == null) {
+            throw new ConnectorException("System " + systemId + " does not exist");
+        }
+        if (entityType.equals(SystemMachine.class.getName())) {
+            return system.getMachines();
+        } else if (entityType.equals(SystemVolume.class.getName())) {
+            return system.getVolumes();
+        } else if (entityType.equals(SystemSystem.class.getName())) {
+            return system.getSystems();
+        } else if (entityType.equals(SystemNetwork.class.getName())) {
+            return system.getNetworks();
+        } else if (entityType.equals(SystemCredentials.class.getName())) {
+            return system.getCredentials();
+        } else {
+            throw new ConnectorException("object type not owned by a system");
+        }
+    }
+
+    @Override
     public Job createSystem(final SystemCreate systemCreate) throws ConnectorException {
 
         // assign a random provider id
@@ -490,11 +523,17 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         system.setState(System.State.CREATING);
         MockCloudProviderConnector.logger.info("Creating system with providerAssignedId " + systemProviderAssignedId);
 
+        IJobManager jobManager = this.mockCloudProviderConnectorFactory.getJobManager();
+
         // attributes
         system.setCloudProviderAccount(this.cloudProviderAccount);
         system.setLocation(this.cloudProviderLocation);
-        system.setDescription(systemCreate.getSystemTemplate().getDescription());
-        system.setName(systemCreate.getSystemTemplate().getName());
+        system.setDescription(systemCreate.getDescription());
+        system.setName(systemCreate.getName());
+        system.setMachines(new ArrayList<SystemMachine>());
+        system.setVolumes(new ArrayList<SystemVolume>());
+        system.setSystems(new ArrayList<SystemSystem>());
+        system.setNetworks(new ArrayList<SystemNetwork>());
 
         Set<ComponentDescriptor> componentDescriptors = systemCreate.getSystemTemplate().getComponentDescriptors();
 
@@ -518,7 +557,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     mc.setMachineTemplate(mt);
                     mc.setDescription(cd.getDescription());
                     mc.setProperties(cd.getProperties());
-                    Job j = this.createMachine(mc);
+
+                    // warning:job returned by createXXX is a copy!
+                    Job j = jobManager.getJobById(this.createMachine(mc).getProviderAssignedId().toString());
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemMachine sm = new SystemMachine();
@@ -540,7 +581,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     vc.setDescription(cd.getDescription());
                     vc.setProperties(cd.getProperties());
 
-                    Job j = this.createVolume(vc);
+                    // warning:job returned by createXXX is a copy!
+                    Job j = jobManager.getJobById(this.createVolume(vc).getProviderAssignedId().toString());
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemVolume sv = new SystemVolume();
@@ -562,7 +604,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     sc.setDescription(cd.getDescription());
                     sc.setProperties(cd.getProperties());
 
-                    Job j = this.createSystem(sc);
+                    // warning:job returned by createXXX is a copy!
+                    Job j = jobManager.getJobById(this.createSystem(sc).getProviderAssignedId().toString());
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemSystem ss = new SystemSystem();
@@ -584,7 +627,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     nc.setDescription(cd.getDescription());
                     nc.setProperties(cd.getProperties());
 
-                    Job j = this.createNetwork(nc);
+                    // warning:job returned by createXXX is a copy!
+                    Job j = jobManager.getJobById(this.createNetwork(nc).getProviderAssignedId().toString());
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemNetwork sn = new SystemNetwork();

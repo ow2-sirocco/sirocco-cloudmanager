@@ -160,7 +160,7 @@ public class JobManager implements IJobManager, ManagedService {
         return jobManager;
     }
 
-    public Job newJob(final CloudResource targetEntity, final CloudResource affectedEntity, final String action,
+    public synchronized Job newJob(final CloudResource targetEntity, final CloudResource affectedEntity, final String action,
         final ListenableFuture<?> result) {
         String jobId = UUID.randomUUID().toString();
         final Job job = new Job();

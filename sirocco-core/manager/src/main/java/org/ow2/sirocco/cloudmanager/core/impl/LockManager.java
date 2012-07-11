@@ -25,75 +25,26 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.io.Serializable;
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
 
 import javax.annotation.Resource;
-import javax.ejb.EJB;
 import javax.ejb.EJBContext;
 import javax.ejb.Local;
-import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.ejb.Timeout;
-import javax.ejb.Timer;
-import javax.ejb.TimerService;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
-import javax.jms.JMSException;
-import javax.jms.Message;
-import javax.jms.ObjectMessage;
-import javax.jms.Queue;
-import javax.jms.QueueConnection;
-import javax.jms.QueueConnectionFactory;
-import javax.jms.QueueSender;
-import javax.jms.QueueSession;
-import javax.jms.Session;
-import javax.jms.Topic;
-import javax.jms.TopicConnection;
-import javax.jms.TopicConnectionFactory;
-import javax.jms.TopicPublisher;
-import javax.jms.TopicSession;
-import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
-import javax.persistence.LockModeType;
 import javax.persistence.NoResultException;
-import javax.persistence.OptimisticLockException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
-import javax.persistence.Query;
 
 import org.apache.log4j.Logger;
-import org.hibernate.exception.ConstraintViolationException;
-import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.ILockManager;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
-import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
-import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
-import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
-import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
-import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.LockItem;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
-import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 
 @Stateless
 @Local(ILockManager.class)
@@ -130,7 +81,7 @@ public class LockManager implements ILockManager {
      */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void lock(String targetId, String targetType) throws CloudProviderException {
+    public void lock(final String targetId, final String targetType) throws CloudProviderException {
         LockManager.logger.debug("locking object " + targetId + " of type " + targetType);
 
         // is there already a lock, and if true, the lock is still valid?
@@ -148,7 +99,7 @@ public class LockManager implements ILockManager {
             // the object is locked, verifying that the lock is still valid
             // should have been automatically deleted by a scheduled utility
             // task
-            long lockedTime = li.getLockedTime().getTime() + lockTimeoutInSeconds * 1000;
+            long lockedTime = li.getLockedTime().getTime() + this.lockTimeoutInSeconds * 1000;
             long currentTime = new Date().getTime();
             if (currentTime < lockedTime) {
                 throw new CloudProviderException("unable to lock object "
@@ -190,7 +141,8 @@ public class LockManager implements ILockManager {
      * used to lock an object. maxRetryDelayInSeconds is used to allow this
      * method to do more than 1 attempt before throwing an exception
      */
-    public void lock(String targetId, String targetType, int maxRetryDelayInSeconds) throws CloudProviderException {
+    public void lock(final String targetId, final String targetType, final int maxRetryDelayInSeconds)
+        throws CloudProviderException {
 
         boolean locked = false;
         CloudProviderException exc = new CloudProviderException("unknown exception");
@@ -227,19 +179,20 @@ public class LockManager implements ILockManager {
      */
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public void unlockUntransacted(String targetId, String targetType) throws CloudProviderException {
-        _unlock(targetId, targetType, false);
+    public void unlockUntransacted(final String targetId, final String targetType) throws CloudProviderException {
+        this._unlock(targetId, targetType, false);
     }
 
     /**
      * used to unlock an object, **works in the current transaction**
      */
     @Override
-    public void unlock(String targetId, String targetType) throws CloudProviderException {
-        _unlock(targetId, targetType, true);
+    public void unlock(final String targetId, final String targetType) throws CloudProviderException {
+        this._unlock(targetId, targetType, true);
     }
 
-    private void _unlock(String targetId, String targetType, boolean transacted) throws CloudProviderException {
+    private void _unlock(final String targetId, final String targetType, final boolean transacted)
+        throws CloudProviderException {
         // we only remove an existing lockItem with the key targetId+targetType
         LockManager.logger.debug("unlocking object " + targetId + " of type " + targetType + " - " + transacted);
 

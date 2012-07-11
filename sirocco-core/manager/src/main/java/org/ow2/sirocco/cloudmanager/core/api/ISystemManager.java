@@ -61,9 +61,11 @@ public interface ISystemManager extends IJobListener {
 
     Job updateEntityInSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException;
 
+    Job updateEntityAttributesInSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException;
+
     CloudCollectionItem getEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException;
 
-    List<CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType)
+    List<? extends CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType)
         throws CloudProviderException;
 
     // management of SystemTemplate map
@@ -77,9 +79,14 @@ public interface ISystemManager extends IJobListener {
     System updateComponentDescriptor(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
 
     // global entity updates
-    System updateSystem(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
+    System updateSystem(final System system) throws CloudProviderException;
 
-    SystemTemplate updateSystemTemplate(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
+    System updateAttributesInSystem(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
+
+    SystemTemplate updateSystemTemplate(final SystemTemplate systemTemplate) throws CloudProviderException;
+
+    SystemTemplate updateAttributesInSystemTemplate(final String id, Map<String, Object> updatedAttributes)
+        throws CloudProviderException;
 
     // operations on system
     Job startSystem(String systemId) throws CloudProviderException;

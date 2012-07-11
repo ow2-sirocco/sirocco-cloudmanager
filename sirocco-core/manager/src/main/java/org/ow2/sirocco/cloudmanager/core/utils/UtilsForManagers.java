@@ -262,8 +262,8 @@ public class UtilsForManagers {
     public static CloudCollectionItem getCloudCollectionById(final EntityManager em, final String entityId)
         throws CloudProviderException {
         CloudCollectionItem obj = (CloudCollectionItem) em
-            .createQuery("FROM " + CloudCollectionItem.class.getName() + " WHERE v.id=:idd ORDER BY v.id")
-            .setParameter("idd", entityId).getSingleResult();
+            .createQuery("FROM " + CloudCollectionItem.class.getName() + " WHERE v.id=:idd").setParameter("idd", entityId)
+            .getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
         }
@@ -280,8 +280,7 @@ public class UtilsForManagers {
      */
     public static CloudResource getCloudResourceById(final EntityManager em, final String resourceId)
         throws CloudProviderException {
-        CloudResource obj = (CloudResource) em
-            .createQuery("FROM " + CloudResource.class.getName() + " WHERE v.id=:idd ORDER BY v.id")
+        CloudResource obj = (CloudResource) em.createQuery("FROM " + CloudResource.class.getName() + " WHERE v.id=:idd")
             .setParameter("idd", resourceId).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
@@ -300,8 +299,19 @@ public class UtilsForManagers {
     public static CloudCollectionItem getCloudCollectionFromCloudResource(final EntityManager em, final CloudResource ce)
         throws CloudProviderException {
         CloudCollectionItem obj = (CloudCollectionItem) em
-            .createQuery("FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId ORDER BY v.id")
+            .createQuery("FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId")
             .setParameter("resourceId", ce.getId()).getSingleResult();
+        if (obj == null) {
+            throw new CloudProviderException("bad id given");
+        }
+        return obj;
+    }
+
+    public static CloudResource getResourceFromProviderId(final EntityManager em, final String providerAsynchId)
+        throws CloudProviderException {
+        CloudResource obj = (CloudResource) em
+            .createQuery("FROM " + CloudResource.class.getName() + " WHERE v.providerAssignedId=:provid")
+            .setParameter("provid", providerAsynchId).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
         }
