@@ -23,21 +23,25 @@ import org.ow2.jonas.security.auth.callback.NoInputCallbackHandler;
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
@@ -397,7 +401,7 @@ public class RestCimiPrimerScenarioTest {
         service = webResource.path(this.extractPath(cloudEntryPoint.getMachineImages().getHref()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
-        CimiMachineImageCollection machineImagesCollection = response.getEntity(CimiMachineImageCollection.class);
+        CimiMachineImageCollection machineImagesCollection = response.getEntity(CimiMachineImageCollectionRoot.class);
 
         System.out.println("====== " + ExchangeType.MachineImageCollection);
         System.out.println("ID: " + machineImagesCollection.getId());
@@ -431,7 +435,7 @@ public class RestCimiPrimerScenarioTest {
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         CimiMachineConfigurationCollection machineConfigsCollection = response
-            .getEntity(CimiMachineConfigurationCollection.class);
+            .getEntity(CimiMachineConfigurationCollectionRoot.class);
 
         System.out.println("====== " + ExchangeType.MachineConfigurationCollection);
         System.out.println("ID: " + machineConfigsCollection.getId());
@@ -472,13 +476,13 @@ public class RestCimiPrimerScenarioTest {
         // database
 
         /*
-         * Create a new Credentials resource
+         * Create a new Credential resource
          */
-        this.printTitleTest("Create a new Credentials resource", true);
-        CimiCredentialsTemplate credentialsTemplate = new CimiCredentialsTemplate();
+        this.printTitleTest("Create a new Credential resource", true);
+        CimiCredentialTemplate credentialsTemplate = new CimiCredentialTemplate();
         credentialsTemplate.setUserName("JoeSmith");
         credentialsTemplate.setPassword("letmein");
-        CimiCredentialsCreate credentialsCreate = new CimiCredentialsCreate();
+        CimiCredentialCreate credentialsCreate = new CimiCredentialCreate();
         credentialsCreate.setCredentialTemplate(credentialsTemplate);
         credentialsCreate.setName("Default");
         credentialsCreate.setDescription("Default User");
@@ -487,7 +491,7 @@ public class RestCimiPrimerScenarioTest {
         response = this.authentication(service).accept(mediaType).entity(credentialsCreate, mediaType)
             .post(ClientResponse.class);
         Assert.assertEquals(201, response.getStatus());
-        CimiCredentials credentials = response.getEntity(CimiCredentials.class);
+        CimiCredential credentials = response.getEntity(CimiCredential.class);
 
         System.out.println("====== " + ExchangeType.Credential + " : create");
         System.out.println("Location: " + response.getLocation());
@@ -497,25 +501,25 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("credentials.getUserNam: " + credentials.getUserName());
         System.out.println("credentials.getPassword: " + credentials.getPassword());
         System.out.println("credentials.getCreated: " + credentials.getCreated());
-        this.printTitleTest("Create a new Credentials resource", false);
+        this.printTitleTest("Create a new Credential resource", false);
 
         /*
          * Retrieve the list of Machine
          */
         // FIXME machine Collection not supported in rest interface
-        // CimiMachineCollection machineCollection =
+        this.printTitleTest("Retrieve the list of Machines", true);
+        service = webResource.path(this.extractPath(cloudEntryPoint.getMachines().getHref()));
+        response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
+        Assert.assertEquals(200, response.getStatus());
+        CimiMachineCollection machineCollection = response.getEntity(CimiMachineCollectionRoot.class);
+
         //
-        // service.path(this.extractPath(cloudEntryPoint.getMachines().getHref())).accept(mediaType)
-        // .get(CimiMachineCollection.class);
-        //
-        // System.out.println("====== " + CimiEntityType.MachineCollection);
-        // System.out.println("ID: " + machineCollection.getId());
-        // if (null != machineCollection.getOperations()) {
-        // for (CimiOperation maOps : machineCollection.getOperations()) {
-        // System.out.println("machine operation: " + maOps.getRel() + ", " +
-        // maOps.getHref());
-        // }
-        // }
+        // service = this.webResource.path("/machines");
+        // ClientResponse response = this.authentication(service, this.userName,
+        // this.password).accept(this.mediaType)
+        // .get(ClientResponse.class);
+        // CimiMachineCollection cimiObject =
+        // response.getEntity(CimiMachineCollection.class);
 
         /*
          * Create a new Machine
@@ -524,7 +528,7 @@ public class RestCimiPrimerScenarioTest {
         CimiMachineTemplate machineTemplate = new CimiMachineTemplate();
         machineTemplate.setMachineConfig(new CimiMachineConfiguration(machineConfiguration.getId()));
         machineTemplate.setMachineImage(new CimiMachineImage(machineImage.getId()));
-        machineTemplate.setCredentials(new CimiCredentialsTemplate(credentials.getId()));
+        machineTemplate.setCredential(new CimiCredentialTemplate(credentials.getId()));
 
         CimiMachineCreate machineCreate = new CimiMachineCreate();
         machineCreate.setName("myMachine1");
