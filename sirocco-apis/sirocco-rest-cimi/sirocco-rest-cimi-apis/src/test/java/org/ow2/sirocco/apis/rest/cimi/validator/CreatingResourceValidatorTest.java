@@ -27,8 +27,8 @@ package org.ow2.sirocco.apis.rest.cimi.validator;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
@@ -114,78 +114,78 @@ public class CreatingResourceValidatorTest {
 
     @Test
     public void testCimiCredentialsCreate() throws Exception {
-        CimiCredentialsCreate cimi;
-        CimiCredentialsTemplate template;
+        CimiCredentialCreate cimi;
+        CimiCredentialTemplate template;
 
         // KO empty
-        cimi = new CimiCredentialsCreate();
+        cimi = new CimiCredentialCreate();
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by values
-        template = new CimiCredentialsTemplate("user", "pass", null);
-        cimi = new CimiCredentialsCreate();
+        template = new CimiCredentialTemplate("user", "pass", null);
+        cimi = new CimiCredentialCreate();
         cimi.setCredentialTemplate(template);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference
-        template = new CimiCredentialsTemplate(this.request.getBaseUri()
+        template = new CimiCredentialTemplate(this.request.getBaseUri()
             + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
-        cimi = new CimiCredentialsCreate();
+        cimi = new CimiCredentialCreate();
         cimi.setCredentialTemplate(template);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
-        template = new CimiCredentialsTemplate(this.request.getBaseUri()
+        template = new CimiCredentialTemplate(this.request.getBaseUri()
             + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         template.setUserName("user");
         template.setPassword("pass");
-        cimi = new CimiCredentialsCreate();
+        cimi = new CimiCredentialCreate();
         cimi.setCredentialTemplate(template);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by reference and value
-        template = new CimiCredentialsTemplate(this.request.getBaseUri()
+        template = new CimiCredentialTemplate(this.request.getBaseUri()
             + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         template.setKey(new byte[0]);
-        cimi = new CimiCredentialsCreate();
+        cimi = new CimiCredentialCreate();
         cimi.setCredentialTemplate(template);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
     }
 
     @Test
     public void testCimiCredentialsTemplate() throws Exception {
-        CimiCredentialsTemplate cimi;
+        CimiCredentialTemplate cimi;
 
         // KO empty
-        cimi = new CimiCredentialsTemplate();
+        cimi = new CimiCredentialTemplate();
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by values
-        cimi = new CimiCredentialsTemplate("user", "pass", null);
+        cimi = new CimiCredentialTemplate("user", "pass", null);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by values
-        cimi = new CimiCredentialsTemplate("user", null, null);
+        cimi = new CimiCredentialTemplate("user", null, null);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by values
-        cimi = new CimiCredentialsTemplate(null, "pass", null);
+        cimi = new CimiCredentialTemplate(null, "pass", null);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference
-        cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
+        cimi = new CimiCredentialTemplate(this.request.getBaseUri()
             + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by reference and value
-        cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
+        cimi = new CimiCredentialTemplate(this.request.getBaseUri()
             + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         cimi.setUserName("user");
         cimi.setPassword("pass");
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by reference and value
-        cimi = new CimiCredentialsTemplate(this.request.getBaseUri()
+        cimi = new CimiCredentialTemplate(this.request.getBaseUri()
             + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
         cimi.setKey(new byte[0]);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));

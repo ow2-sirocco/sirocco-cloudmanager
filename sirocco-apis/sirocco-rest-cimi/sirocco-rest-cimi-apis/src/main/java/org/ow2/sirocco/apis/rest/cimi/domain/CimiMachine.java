@@ -30,6 +30,9 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineDiskCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollection;
 
 /**
  * Class Machine.

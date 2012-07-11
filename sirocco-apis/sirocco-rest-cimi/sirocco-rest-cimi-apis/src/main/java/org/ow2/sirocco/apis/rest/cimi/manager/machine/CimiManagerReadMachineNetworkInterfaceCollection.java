@@ -26,10 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
@@ -68,8 +68,8 @@ public class CimiManagerReadMachineNetworkInterfaceCollection extends CimiManage
      */
     @Override
     protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiMachineNetworkInterfaceCollection cimi = (CimiMachineNetworkInterfaceCollection) context.convertToCimi(dataService,
-            CimiMachineNetworkInterfaceCollection.class);
+        CimiMachineNetworkInterfaceCollectionRoot cimi = (CimiMachineNetworkInterfaceCollectionRoot) context.convertToCimi(
+            dataService, CimiMachineNetworkInterfaceCollectionRoot.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
     }

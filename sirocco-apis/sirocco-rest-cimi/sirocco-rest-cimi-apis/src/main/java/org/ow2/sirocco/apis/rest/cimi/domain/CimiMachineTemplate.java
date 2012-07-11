@@ -65,10 +65,10 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
     private CimiMachineImage machineImage;
 
     /**
-     * Field "credentials".
+     * Field "credential".
      */
     @ValidChild
-    private CimiCredentials credentials;
+    private CimiCredential credential;
 
     /**
      * Field "volumes".
@@ -149,21 +149,21 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "Credentials".
+     * Return the value of field "credential".
      * 
      * @return The value
      */
-    public CimiCredentials getCredentials() {
-        return this.credentials;
+    public CimiCredential getCredential() {
+        return this.credential;
     }
 
     /**
-     * Set the value of field "Credentials".
+     * Set the value of field "credential".
      * 
-     * @param CimiCredentials The value
+     * @param CimiCredential The value
      */
-    public void setCredentials(final CimiCredentials credentials) {
-        this.credentials = credentials;
+    public void setCredential(final CimiCredential credential) {
+        this.credential = credential;
     }
 
     /**
@@ -354,7 +354,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
     @Override
     public boolean hasValues() {
         boolean has = super.hasValues();
-        has = has || (null != this.getCredentials());
+        has = has || (null != this.getCredential());
         has = has || (null != this.getMachineConfig());
         has = has || (null != this.getMachineImage());
         has = has || (null != this.getNetworkInterfaces());

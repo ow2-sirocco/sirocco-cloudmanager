@@ -30,6 +30,17 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeTemplateCollection;
 
 /**
  * Class CloudEntryPoint.
@@ -50,12 +61,12 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     /**
      * Field "credentials".
      */
-    private CimiCredentialsCollection credentials;
+    private CimiCredentialCollection credentials;
 
     /**
      * Field "credentialTemplates".
      */
-    private CimiCredentialsTemplateCollection credentialTemplates;
+    private CimiCredentialTemplateCollection credentialTemplates;
 
     /**
      * Field "jobs".
@@ -146,7 +157,7 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiCredentialsCollection getCredentials() {
+    public CimiCredentialCollection getCredentials() {
         return this.credentials;
     }
 
@@ -155,7 +166,7 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * 
      * @param Credentials The value
      */
-    public void setCredentials(final CimiCredentialsCollection credentials) {
+    public void setCredentials(final CimiCredentialCollection credentials) {
         this.credentials = credentials;
     }
 
@@ -164,7 +175,7 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiCredentialsTemplateCollection getCredentialTemplates() {
+    public CimiCredentialTemplateCollection getCredentialTemplates() {
         return this.credentialTemplates;
     }
 
@@ -173,7 +184,7 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * 
      * @param credentialTemplates The value
      */
-    public void setCredentialTemplates(final CimiCredentialsTemplateCollection credentialTemplates) {
+    public void setCredentialTemplates(final CimiCredentialTemplateCollection credentialTemplates) {
         this.credentialTemplates = credentialTemplates;
     }
 

@@ -30,7 +30,7 @@ import java.util.Map;
 import junit.framework.Assert;
 
 import org.junit.Test;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
@@ -190,28 +190,28 @@ public class MergeReferenceHelperImplTest {
 
     /**
      * Test method for
-     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials, org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials)}
+     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#merge(org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential, org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential)}
      * .
      */
     @Test
-    public void testMergeCimiCredentials() {
+    public void testMergeCimiCredential() {
         MergeReferenceHelperImpl merger = new MergeReferenceHelperImpl();
-        CimiCredentials cimi;
-        CimiCredentials cimiRef;
+        CimiCredential cimi;
+        CimiCredential cimiRef;
 
         byte[] refKey = new byte[10];
-        cimiRef = new CimiCredentials();
+        cimiRef = new CimiCredential();
         cimiRef.setId("refId");
         cimiRef.setKey(refKey);
         cimiRef.setPassword("refPassword");
         cimiRef.setUserName("refUserName");
 
         // Source null
-        cimi = new CimiCredentials();
-        merger.merge((CimiCredentials) null, cimi);
+        cimi = new CimiCredential();
+        merger.merge((CimiCredential) null, cimi);
 
         // Destination without value
-        cimi = new CimiCredentials();
+        cimi = new CimiCredential();
         merger.merge(cimiRef, cimi);
 
         Assert.assertEquals("refId", cimi.getId());
@@ -221,7 +221,7 @@ public class MergeReferenceHelperImplTest {
 
         // Destination with values
         byte[] cimiKey = new byte[7];
-        cimi = new CimiCredentials();
+        cimi = new CimiCredential();
         cimi.setKey(cimiKey);
         cimi.setPassword("password");
         cimi.setUserName("userName");
@@ -362,12 +362,12 @@ public class MergeReferenceHelperImplTest {
         CimiMachineTemplate cimi;
         CimiMachineTemplate cimiRef;
 
-        CimiCredentials refCredentials = new CimiCredentials();
+        CimiCredential refCredential = new CimiCredential();
         CimiMachineConfiguration refMachineConfiguration = new CimiMachineConfiguration();
         CimiMachineImage refMachineImage = new CimiMachineImage();
         cimiRef = new CimiMachineTemplate();
         cimiRef.setId("refId");
-        cimiRef.setCredentials(refCredentials);
+        cimiRef.setCredential(refCredential);
         cimiRef.setMachineConfig(refMachineConfiguration);
         cimiRef.setMachineImage(refMachineImage);
 
@@ -380,21 +380,21 @@ public class MergeReferenceHelperImplTest {
         merger.merge(cimiRef, cimi);
 
         Assert.assertEquals("refId", cimi.getId());
-        Assert.assertSame(refCredentials, cimi.getCredentials());
+        Assert.assertSame(refCredential, cimi.getCredential());
         Assert.assertSame(refMachineConfiguration, cimi.getMachineConfig());
         Assert.assertSame(refMachineImage, cimi.getMachineImage());
 
         // Destination with values
-        CimiCredentials cimiCredentials = new CimiCredentials();
+        CimiCredential cimiCredential = new CimiCredential();
         CimiMachineConfiguration cimiMachineConfiguration = new CimiMachineConfiguration();
         CimiMachineImage cimiMachineImage = new CimiMachineImage();
         cimi = new CimiMachineTemplate();
-        cimi.setCredentials(cimiCredentials);
+        cimi.setCredential(cimiCredential);
         cimi.setMachineConfig(cimiMachineConfiguration);
         cimi.setMachineImage(cimiMachineImage);
         merger.merge(cimiRef, cimi);
 
-        Assert.assertSame(cimiCredentials, cimi.getCredentials());
+        Assert.assertSame(cimiCredential, cimi.getCredential());
         Assert.assertSame(cimiMachineConfiguration, cimi.getMachineConfig());
         Assert.assertSame(cimiMachineImage, cimi.getMachineImage());
     }

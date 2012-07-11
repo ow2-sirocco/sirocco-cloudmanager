@@ -129,10 +129,10 @@ public class CimiComponentDescriptor extends CimiCommon {
      * 
      * @return The value
      */
-    public CimiCredentialsTemplate getCredentialsTemplate() {
-        CimiCredentialsTemplate template = null;
-        if (this.component instanceof CimiCredentialsTemplate) {
-            template = (CimiCredentialsTemplate) this.component;
+    public CimiCredentialTemplate getCredentialsTemplate() {
+        CimiCredentialTemplate template = null;
+        if (this.component instanceof CimiCredentialTemplate) {
+            template = (CimiCredentialTemplate) this.component;
         }
         return template;
     }
@@ -142,7 +142,7 @@ public class CimiComponentDescriptor extends CimiCommon {
      * 
      * @param credentialsTemplate The value
      */
-    public void setCredentialsTemplate(final CimiCredentialsTemplate credentialsTemplate) {
+    public void setCredentialsTemplate(final CimiCredentialTemplate credentialsTemplate) {
         this.component = credentialsTemplate;
     }
 

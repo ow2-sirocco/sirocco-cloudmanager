@@ -12,7 +12,7 @@
 		<id>idValue_1</id>
 		<operation href="hrefValue_1_0" rel="relValue_1_0" />
 		<updated>2001-02-02T01:01:01.001Z</updated>
-		<credentials href="hrefValue_1"
+		<credential href="hrefValue_1"
 			resourceURI="http://schemas.dmtf.org/cimi/1/Credential">
 			<description>descriptionValue_1</description>
 			<name>nameValue_1</name>
@@ -24,7 +24,7 @@
 			<key>AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBk=</key>
 			<password>passwordValue_1</password>
 			<userName>userNameValue_1</userName>
-		</credentials>
+		</credential>
 		<machineConfig href="hrefValue_1"
 			resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
 			<description>descriptionValue_1</description>

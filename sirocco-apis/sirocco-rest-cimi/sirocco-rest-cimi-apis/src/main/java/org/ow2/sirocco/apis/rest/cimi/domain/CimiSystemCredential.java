@@ -46,7 +46,7 @@ public class CimiSystemCredential extends CimiObjectCommonAbstract {
      * Field "credential".
      */
     @ValidChild
-    private CimiCredentials credential;
+    private CimiCredential credential;
 
     /**
      * Default constructor.
@@ -60,7 +60,7 @@ public class CimiSystemCredential extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiCredentials getCredential() {
+    public CimiCredential getCredential() {
         return this.credential;
     }
 
@@ -69,7 +69,7 @@ public class CimiSystemCredential extends CimiObjectCommonAbstract {
      * 
      * @param credential The value
      */
-    public void setCredential(final CimiCredentials credential) {
+    public void setCredential(final CimiCredential credential) {
         this.credential = credential;
     }
 

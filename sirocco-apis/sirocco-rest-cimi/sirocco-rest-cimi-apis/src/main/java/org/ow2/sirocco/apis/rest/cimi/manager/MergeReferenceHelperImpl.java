@@ -31,10 +31,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.PathHelper;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
@@ -52,6 +51,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
@@ -136,10 +136,10 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
-     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate)
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate)
      */
     @Override
-    public void merge(final CimiContext context, final CimiCredentialsCreate cimi) throws Exception {
+    public void merge(final CimiContext context, final CimiCredentialCreate cimi) throws Exception {
         this.merge(context, cimi.getCredentialTemplate());
     }
 
@@ -147,15 +147,15 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
-     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate)
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate)
      */
     @Override
-    public void merge(final CimiContext context, final CimiCredentialsTemplate cimi) throws Exception {
+    public void merge(final CimiContext context, final CimiCredentialTemplate cimi) throws Exception {
         if (true == cimi.hasReference()) {
             CredentialsTemplate dataService = this.managerCredentials.getCredentialsTemplateById(PathHelper
                 .extractIdString(cimi.getHref()));
-            CimiCredentialsTemplate cimiRef = (CimiCredentialsTemplate) context.convertToCimi(dataService,
-                CimiCredentialsTemplate.class);
+            CimiCredentialTemplate cimiRef = (CimiCredentialTemplate) context.convertToCimi(dataService,
+                CimiCredentialTemplate.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -164,13 +164,13 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
-     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials)
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential)
      */
     @Override
-    public void merge(final CimiContext context, final CimiCredentials cimi) throws Exception {
+    public void merge(final CimiContext context, final CimiCredential cimi) throws Exception {
         if (true == cimi.hasReference()) {
             Credentials dataService = this.managerCredentials.getCredentialsById(PathHelper.extractIdString(cimi.getHref()));
-            CimiCredentials cimiRef = (CimiCredentials) context.convertToCimi(dataService, CimiCredentials.class);
+            CimiCredential cimiRef = (CimiCredential) context.convertToCimi(dataService, CimiCredential.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -250,8 +250,8 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             CimiMachineTemplate cimiRef = (CimiMachineTemplate) context.convertToCimi(dataService, CimiMachineTemplate.class);
             this.merge(cimiRef, cimi);
         } else {
-            if (null != cimi.getCredentials()) {
-                this.merge(context, cimi.getCredentials());
+            if (null != cimi.getCredential()) {
+                this.merge(context, cimi.getCredential());
             }
             if (null != cimi.getMachineConfig()) {
                 this.merge(context, cimi.getMachineConfig());
@@ -378,10 +378,10 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     protected void merge(final CimiMachineTemplate cimiRef, final CimiMachineTemplate cimi) {
         if (null != cimiRef) {
             this.mergeCommon(cimiRef, cimi);
-            if (null == cimi.getCredentials()) {
-                cimi.setCredentials(cimiRef.getCredentials());
+            if (null == cimi.getCredential()) {
+                cimi.setCredential(cimiRef.getCredential());
             } else {
-                this.merge(cimiRef.getCredentials(), cimi.getCredentials());
+                this.merge(cimiRef.getCredential(), cimi.getCredential());
             }
             if (null == cimi.getMachineConfig()) {
                 cimi.setMachineConfig(cimiRef.getMachineConfig());
@@ -544,12 +544,12 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
-     * Merge Credentials resource data.
+     * Merge Credential resource data.
      * 
      * @param cimiRef Source to merge
      * @param cimi Merged destination
      */
-    protected void merge(final CimiCredentials cimiRef, final CimiCredentials cimi) {
+    protected void merge(final CimiCredential cimiRef, final CimiCredential cimi) {
         if (null != cimiRef) {
             this.mergeCommon(cimiRef, cimi);
             if (null == cimi.getKey()) {

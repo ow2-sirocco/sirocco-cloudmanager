@@ -25,18 +25,18 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImageCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 
@@ -113,10 +113,10 @@ public class CloudEntryPointConverter extends ObjectCommonConverter {
         if ((true == context.mustBeExpanded(dataCimi)) || (true == context.mustBeReferenced(dataCimi))) {
             dataCimi.setBaseURI(context.getRequest().getBaseUri());
 
-            dataCimi.setCredentials((CimiCredentialsCollection) context.convertNextCimi(dataService.getCredentials(),
-                CimiCredentialsCollection.class));
-            dataCimi.setCredentialTemplates((CimiCredentialsTemplateCollection) context.convertNextCimi(
-                dataService.getCredentialsTemplates(), CimiCredentialsTemplateCollection.class));
+            dataCimi.setCredentials((CimiCredentialCollection) context.convertNextCimi(dataService.getCredentials(),
+                CimiCredentialCollection.class));
+            dataCimi.setCredentialTemplates((CimiCredentialTemplateCollection) context.convertNextCimi(
+                dataService.getCredentialsTemplates(), CimiCredentialTemplateCollection.class));
 
             dataCimi.setJobs((CimiJobCollection) context.convertNextCimi(dataService.getJobs(), CimiJobCollection.class));
 

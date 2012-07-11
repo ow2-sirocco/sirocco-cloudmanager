@@ -27,7 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
@@ -114,8 +114,8 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final MachineTemplate dataService, final CimiMachineTemplate dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setCredentials((CimiCredentials) context.convertNextCimi(dataService.getCredentials(),
-                CimiCredentials.class));
+            dataCimi
+                .setCredential((CimiCredential) context.convertNextCimi(dataService.getCredentials(), CimiCredential.class));
             dataCimi.setMachineConfig((CimiMachineConfiguration) context.convertNextCimi(dataService.getMachineConfiguration(),
                 CimiMachineConfiguration.class));
             dataCimi.setMachineImage((CimiMachineImage) context.convertNextCimi(dataService.getMachineImage(),
@@ -161,7 +161,7 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiMachineTemplate dataCimi,
         final MachineTemplate dataService) {
         this.fill(context, dataCimi, dataService);
-        dataService.setCredentials((Credentials) context.convertNextService(dataCimi.getCredentials()));
+        dataService.setCredentials((Credentials) context.convertNextService(dataCimi.getCredential()));
         dataService.setMachineImage((MachineImage) context.convertNextService(dataCimi.getMachineImage()));
         dataService.setMachineConfiguration((MachineConfiguration) context.convertNextService(dataCimi.getMachineConfig()));
         // NetworkInterface

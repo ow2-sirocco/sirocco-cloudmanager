@@ -24,9 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
@@ -58,7 +58,7 @@ public interface MergeReferenceHelper {
      * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
-    void merge(CimiContext context, CimiCredentials cimi) throws Exception;
+    void merge(CimiContext context, CimiCredential cimi) throws Exception;
 
     /**
      * Merge the reference of a resource only if necessary.
@@ -67,7 +67,7 @@ public interface MergeReferenceHelper {
      * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
-    void merge(CimiContext context, CimiCredentialsCreate cimi) throws Exception;
+    void merge(CimiContext context, CimiCredentialCreate cimi) throws Exception;
 
     /**
      * Merge the reference of a resource only if necessary.
@@ -76,7 +76,7 @@ public interface MergeReferenceHelper {
      * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
-    void merge(CimiContext context, CimiCredentialsTemplate cimi) throws Exception;
+    void merge(CimiContext context, CimiCredentialTemplate cimi) throws Exception;
 
     /**
      * Merge the reference of a resource only if necessary.

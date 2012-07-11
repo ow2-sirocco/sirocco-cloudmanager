@@ -31,60 +31,60 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCommon;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddressCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredentialCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineDiskCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
@@ -185,19 +185,19 @@ public class WritingResourceValidatorTest {
             cimi = new CimiCloudEntryPoint();
             break;
         case Credential:
-            cimi = new CimiCredentials();
+            cimi = new CimiCredential();
             break;
         case CredentialCollection:
-            cimi = new CimiCredentialsCollection();
+            cimi = new CimiCredentialCollection();
             break;
         case CredentialCreate:
             cimi = null;
             break;
         case CredentialTemplate:
-            cimi = new CimiCredentialsTemplate();
+            cimi = new CimiCredentialTemplate();
             break;
         case CredentialTemplateCollection:
-            cimi = new CimiCredentialsTemplateCollection();
+            cimi = new CimiCredentialTemplateCollection();
             break;
         case Disk:
             cimi = new CimiMachineDisk();
@@ -388,9 +388,9 @@ public class WritingResourceValidatorTest {
     }
 
     @Test
-    public void testCimiCredentials() throws Exception {
+    public void testCimiCredential() throws Exception {
 
-        CimiCredentials cimi;
+        CimiCredential cimi;
         byte[] filledKeySize3 = new byte[3];
         for (int i = 0; i < filledKeySize3.length; i++) {
             filledKeySize3[i] = (byte) (i + 2);
@@ -398,29 +398,29 @@ public class WritingResourceValidatorTest {
 
         // --------------- OK
 
-        cimi = new CimiCredentials();
+        cimi = new CimiCredential();
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
-        cimi = new CimiCredentials();
+        cimi = new CimiCredential();
         cimi.setKey(filledKeySize3);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
-        cimi = new CimiCredentials();
+        cimi = new CimiCredential();
         cimi.setKey(new byte[1]);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
-        cimi = new CimiCredentials();
+        cimi = new CimiCredential();
         cimi.setKey(new byte[0]);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
     }
 
     @Test
-    public void testCimiCredentialsTemplate() throws Exception {
+    public void testCimiCredentialTemplate() throws Exception {
 
-        CimiCredentialsTemplate cimi;
+        CimiCredentialTemplate cimi;
         byte[] filledKeySize3 = new byte[3];
         for (int i = 0; i < filledKeySize3.length; i++) {
             filledKeySize3[i] = (byte) (i + 2);
@@ -428,20 +428,20 @@ public class WritingResourceValidatorTest {
 
         // --------------- OK
 
-        cimi = new CimiCredentialsTemplate();
+        cimi = new CimiCredentialTemplate();
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
-        cimi = new CimiCredentialsTemplate();
+        cimi = new CimiCredentialTemplate();
         cimi.setKey(filledKeySize3);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
-        cimi = new CimiCredentialsTemplate();
+        cimi = new CimiCredentialTemplate();
         cimi.setKey(new byte[1]);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         // --------------- KO
 
-        cimi = new CimiCredentialsTemplate();
+        cimi = new CimiCredentialTemplate();
         cimi.setKey(new byte[0]);
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
     }
@@ -543,7 +543,7 @@ public class WritingResourceValidatorTest {
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
 
         cimi = new CimiMachineTemplate();
-        cimi.setCredentials(new CimiCredentials());
+        cimi.setCredential(new CimiCredential());
         cimi.setMachineConfig(new CimiMachineConfiguration());
         cimi.setMachineImage(new CimiMachineImage());
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));
@@ -551,7 +551,7 @@ public class WritingResourceValidatorTest {
         // --------------- KO
 
         cimi = new CimiMachineTemplate();
-        cimi.setCredentials(new CimiCredentials());
+        cimi.setCredential(new CimiCredential());
         cimi.setMachineConfig(new CimiMachineConfiguration());
         cimi.setMachineImage(new CimiMachineImage(new ImageLocation()));
         Assert.assertFalse(CimiValidatorHelper.getInstance().validateToWrite(this.context, cimi));

@@ -27,7 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;

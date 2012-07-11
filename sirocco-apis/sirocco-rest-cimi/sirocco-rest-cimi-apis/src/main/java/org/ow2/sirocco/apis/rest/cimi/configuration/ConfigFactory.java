@@ -29,127 +29,163 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.converter.AddressCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.AddressConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.AddressCreateConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.AddressTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.AddressTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CloudEntryPointConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsCollectionConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsCreateConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateCollectionConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.CredentialsTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.CredentialConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.CredentialCreateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.CredentialTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.DiskConfigurationConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.JobCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.JobConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineCollectionConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineCreateConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineDiskCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineDiskConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineImageConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceAddressCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceAddressConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineNetworkInterfaceConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateNetworkInterfaceConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeTemplateConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.SystemCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemCreateConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.SystemCredentialCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemCredentialConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.SystemMachineCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemMachineConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.SystemSystemCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemSystemConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.SystemTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemTemplateConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.SystemVolumeCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemVolumeConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.VolumeCollectionConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConfigurationCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeCreateConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.VolumeImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeImageConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.VolumeTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeTemplateConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.VolumeVolumeImageCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.VolumeVolumeImageConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.AddressCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.AddressCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.AddressTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.AddressTemplateCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.CredentialCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.CredentialCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.CredentialTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.CredentialTemplateCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.JobCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.JobCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineConfigurationCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineConfigurationCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineDiskCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineDiskCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineImageCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineImageCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineNetworkInterfaceAddressCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineNetworkInterfaceAddressCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineNetworkInterfaceCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineNetworkInterfaceCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineTemplateCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineVolumeCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineVolumeCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCredentialCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemMachineCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemSystemCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemVolumeCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeConfigurationCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeConfigurationCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeImageCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeImageCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeTemplateCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeVolumeImageCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeVolumeImageCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCreate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddressCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredentialCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressTemplateCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineDiskCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineDiskCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceAddressCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeConfigurationCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeImageCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeTemplateCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeVolumeImageCollectionRoot;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
@@ -225,8 +261,13 @@ public class ConfigFactory {
      */
     protected List<ItemConfig> buildExchangeItems() {
         List<ItemConfig> items = new ArrayList<ItemConfig>();
+        ItemConfig item = null;
         for (ExchangeType type : ExchangeType.values()) {
             items.add(this.buildExchangeItem(type));
+            item = this.buildExchangeItemCollectionRoot(type);
+            if (null != item) {
+                items.add(item);
+            }
         }
         return items;
     }
@@ -280,31 +321,31 @@ public class ConfigFactory {
             break;
 
         case Credential:
-            item = new ItemConfig(CimiCredentials.class, ExchangeType.Credential);
-            item.putData(ConfigFactory.CONVERTER, new CredentialsConverter());
+            item = new ItemConfig(CimiCredential.class, ExchangeType.Credential);
+            item.putData(ConfigFactory.CONVERTER, new CredentialConverter());
             break;
 
         case CredentialCollection:
-            item = new ItemConfig(CimiCredentialsCollection.class, ExchangeType.CredentialCollection);
-            item.putData(ConfigFactory.CONVERTER, new CredentialsCollectionConverter());
+            item = new ItemConfig(CimiCredentialCollection.class, ExchangeType.CredentialCollection);
+            item.putData(ConfigFactory.CONVERTER, new CredentialCollectionConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
             associatedNames.put("credential", ExchangeType.Credential);
             break;
 
         case CredentialCreate:
-            item = new ItemConfig(CimiCredentialsCreate.class, ExchangeType.CredentialCreate);
-            item.putData(ConfigFactory.CONVERTER, new CredentialsCreateConverter());
+            item = new ItemConfig(CimiCredentialCreate.class, ExchangeType.CredentialCreate);
+            item.putData(ConfigFactory.CONVERTER, new CredentialCreateConverter());
             break;
 
         case CredentialTemplate:
-            item = new ItemConfig(CimiCredentialsTemplate.class, ExchangeType.CredentialTemplate);
-            item.putData(ConfigFactory.CONVERTER, new CredentialsTemplateConverter());
+            item = new ItemConfig(CimiCredentialTemplate.class, ExchangeType.CredentialTemplate);
+            item.putData(ConfigFactory.CONVERTER, new CredentialTemplateConverter());
             break;
 
         case CredentialTemplateCollection:
-            item = new ItemConfig(CimiCredentialsTemplateCollection.class, ExchangeType.CredentialTemplateCollection);
-            item.putData(ConfigFactory.CONVERTER, new CredentialsTemplateCollectionConverter());
+            item = new ItemConfig(CimiCredentialTemplateCollection.class, ExchangeType.CredentialTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new CredentialTemplateCollectionConverter());
             associatedNames = new HashMap<String, ExchangeType>();
             item.putData(ConfigFactory.NAMES, associatedNames);
             associatedNames.put("credentialTemplates", ExchangeType.CredentialTemplate);
@@ -556,6 +597,196 @@ public class ConfigFactory {
     }
 
     /**
+     * Build the configuration for the given {@link ExchangeType}.
+     * 
+     * @return A item config
+     */
+    protected ItemConfig buildExchangeItemCollectionRoot(final ExchangeType type) {
+        ItemConfig item = null;
+
+        switch (type) {
+
+        case AddressCollection:
+            item = new ItemConfig(CimiAddressCollectionRoot.class, ExchangeType.AddressCollection);
+            item.putData(ConfigFactory.CONVERTER, new AddressCollectionRootConverter());
+            break;
+
+        case AddressTemplateCollection:
+            item = new ItemConfig(CimiAddressTemplateCollectionRoot.class, ExchangeType.AddressTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new AddressTemplateCollectionRootConverter());
+            break;
+
+        case CredentialCollection:
+            item = new ItemConfig(CimiCredentialCollectionRoot.class, ExchangeType.CredentialCollection);
+            item.putData(ConfigFactory.CONVERTER, new CredentialCollectionRootConverter());
+            break;
+
+        case CredentialTemplateCollection:
+            item = new ItemConfig(CimiCredentialTemplateCollectionRoot.class, ExchangeType.CredentialTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new CredentialTemplateCollectionRootConverter());
+            break;
+
+        case DiskCollection:
+            item = new ItemConfig(CimiMachineDiskCollectionRoot.class, ExchangeType.DiskCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineDiskCollectionRootConverter());
+            break;
+
+        case JobCollection:
+            item = new ItemConfig(CimiJobCollectionRoot.class, ExchangeType.JobCollection);
+            item.putData(ConfigFactory.CONVERTER, new JobCollectionRootConverter());
+            break;
+
+        case MachineCollection:
+            item = new ItemConfig(CimiMachineCollectionRoot.class, ExchangeType.MachineCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineCollectionRootConverter());
+            break;
+
+        case MachineConfigurationCollection:
+            item = new ItemConfig(CimiMachineConfigurationCollectionRoot.class, ExchangeType.MachineConfigurationCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineConfigurationCollectionRootConverter());
+            break;
+
+        case MachineImageCollection:
+            item = new ItemConfig(CimiMachineImageCollectionRoot.class, ExchangeType.MachineImageCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineImageCollectionRootConverter());
+            break;
+
+        case MachineNetworkInterfaceCollection:
+            item = new ItemConfig(CimiMachineNetworkInterfaceCollectionRoot.class,
+                ExchangeType.MachineNetworkInterfaceCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineNetworkInterfaceCollectionRootConverter());
+            break;
+
+        case MachineNetworkInterfaceAddressCollection:
+            item = new ItemConfig(CimiMachineNetworkInterfaceAddressCollectionRoot.class,
+                ExchangeType.MachineNetworkInterfaceAddressCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineNetworkInterfaceAddressCollectionRootConverter());
+            break;
+
+        case MachineTemplateCollection:
+            item = new ItemConfig(CimiMachineTemplateCollectionRoot.class, ExchangeType.MachineTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineTemplateCollectionRootConverter());
+            break;
+
+        case MachineVolumeCollection:
+            item = new ItemConfig(CimiMachineVolumeCollectionRoot.class, ExchangeType.MachineVolumeCollection);
+            item.putData(ConfigFactory.CONVERTER, new MachineVolumeCollectionRootConverter());
+            break;
+
+        case VolumeCollection:
+            item = new ItemConfig(CimiVolumeCollectionRoot.class, ExchangeType.VolumeCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeCollectionRootConverter());
+            break;
+
+        case VolumeConfigurationCollection:
+            item = new ItemConfig(CimiVolumeConfigurationCollectionRoot.class, ExchangeType.VolumeConfigurationCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeConfigurationCollectionRootConverter());
+            break;
+
+        case VolumeImageCollection:
+            item = new ItemConfig(CimiVolumeImageCollectionRoot.class, ExchangeType.VolumeImageCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeImageCollectionRootConverter());
+            break;
+
+        case VolumeTemplateCollection:
+            item = new ItemConfig(CimiVolumeTemplateCollectionRoot.class, ExchangeType.VolumeTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeTemplateCollectionRootConverter());
+            break;
+
+        case VolumeVolumeImageCollection:
+            item = new ItemConfig(CimiVolumeVolumeImageCollectionRoot.class, ExchangeType.VolumeVolumeImageCollection);
+            item.putData(ConfigFactory.CONVERTER, new VolumeVolumeImageCollectionRootConverter());
+            break;
+
+        case SystemCollection:
+            // TODO
+            // item = new ItemConfig(CimiSystemCollectionRoot.class,
+            // ExchangeType.SystemCollection);
+            // item.putData(ConfigFactory.CONVERTER, new
+            // SystemCollectionRootConverter());
+            break;
+
+        case SystemCredentialCollection:
+            // TODO
+            // item = new ItemConfig(CimiSystemCredentialCollectionRoot.class,
+            // ExchangeType.SystemCredentialCollection);
+            // item.putData(ConfigFactory.CONVERTER, new
+            // SystemCredentialCollectionRootConverter());
+            break;
+
+        case SystemMachineCollection:
+            // TODO
+            // item = new ItemConfig(CimiSystemMachineCollectionRoot.class,
+            // ExchangeType.SystemMachineCollection);
+            // item.putData(ConfigFactory.CONVERTER, new
+            // SystemMachineCollectionRootConverter());
+            break;
+
+        case SystemSystemCollection:
+            // TODO
+            // item = new ItemConfig(CimiSystemSystemCollectionRoot.class,
+            // ExchangeType.SystemSystemCollection);
+            // item.putData(ConfigFactory.CONVERTER, new
+            // SystemSystemCollectionRootConverter());
+            break;
+
+        case SystemTemplateCollection:
+            // TODO
+            // item = new ItemConfig(CimiSystemTemplateCollectionRoot.class,
+            // ExchangeType.SystemTemplateCollection);
+            // item.putData(ConfigFactory.CONVERTER, new
+            // SystemTemplateCollectionRootConverter());
+            break;
+
+        case SystemVolumeCollection:
+            // TODO
+            // item = new ItemConfig(CimiSystemVolumeCollectionRoot.class,
+            // ExchangeType.SystemVolumeCollection);
+            // item.putData(ConfigFactory.CONVERTER, new
+            // SystemVolumeCollectionRootConverter());
+            break;
+
+        case Address:
+        case AddressCreate:
+        case AddressTemplate:
+        case CloudEntryPoint:
+        case Credential:
+        case CredentialCreate:
+        case CredentialTemplate:
+        case Disk:
+        case Job:
+        case Machine:
+        case MachineAction:
+        case MachineConfiguration:
+        case MachineCreate:
+        case MachineImage:
+        case MachineNetworkInterface:
+        case MachineNetworkInterfaceAddress:
+        case MachineTemplate:
+        case MachineVolume:
+        case System:
+        case SystemCreate:
+        case SystemCredential:
+        case SystemMachine:
+        case SystemSystem:
+        case SystemTemplate:
+        case SystemVolume:
+        case Volume:
+        case VolumeConfiguration:
+        case VolumeCreate:
+        case VolumeImage:
+        case VolumeTemplate:
+        case VolumeVolumeImage:
+            break;
+
+        default:
+            ConfigFactory.LOGGER.error("Configuration not found : {}", type);
+            throw new ConfigurationException("Configuration not found : " + type);
+        }
+        return item;
+    }
+
+    /**
      * Build the configuration for service resources classes.
      * 
      * @return A list of config items
@@ -593,7 +824,7 @@ public class ConfigFactory {
         items.add(this.makeAssociate(SystemVolume.class, CimiSystemVolume.class));
 
         // CloudTemplate
-        items.add(this.makeAssociate(CredentialsTemplate.class, CimiCredentialsTemplate.class));
+        items.add(this.makeAssociate(CredentialsTemplate.class, CimiCredentialTemplate.class));
         // TODO EventLogTemplate
         items.add(this.makeAssociate(MachineTemplate.class, CimiMachineTemplate.class));
         // TODO NetworkTemplate
@@ -601,7 +832,7 @@ public class ConfigFactory {
         items.add(this.makeAssociate(VolumeTemplate.class, CimiVolumeTemplate.class));
 
         // CloudResource
-        items.add(this.makeAssociate(Credentials.class, CimiCredentials.class));
+        items.add(this.makeAssociate(Credentials.class, CimiCredential.class));
         // TODO ForwardingGroup
         items.add(this.makeAssociate(Machine.class, CimiMachine.class));
         items.add(this.makeAssociate(MachineImage.class, CimiMachineImage.class));
@@ -652,6 +883,10 @@ public class ConfigFactory {
 
         item = new ItemConfig(CimiMachineTemplateNetworkInterface.class);
         item.putData(ConfigFactory.CONVERTER, new MachineTemplateNetworkInterfaceConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiMachineCollectionRoot.class, ExchangeType.MachineCollection);
+        item.putData(ConfigFactory.CONVERTER, new MachineCollectionRootConverter());
         items.add(item);
 
         return items;

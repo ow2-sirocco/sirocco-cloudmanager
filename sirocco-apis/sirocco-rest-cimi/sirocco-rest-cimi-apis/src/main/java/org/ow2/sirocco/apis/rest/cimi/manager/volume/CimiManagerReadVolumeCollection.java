@@ -28,8 +28,8 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
@@ -78,7 +78,8 @@ public class CimiManagerReadVolumeCollection extends CimiManagerReadAbstract {
      */
     @Override
     protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiVolumeCollection cimi = (CimiVolumeCollection) context.convertToCimi(dataService, CimiVolumeCollection.class);
+        CimiVolumeCollectionRoot cimi = (CimiVolumeCollectionRoot) context.convertToCimi(dataService,
+            CimiVolumeCollectionRoot.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
     }

@@ -25,9 +25,9 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDiskCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineDiskCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 

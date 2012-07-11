@@ -37,7 +37,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
@@ -286,7 +286,7 @@ public class CimiManagersMachineTest {
             + ExchangeType.MachineConfiguration.getPathType().getPathname() + "/123"));
         template.setMachineImage(new CimiMachineImage(this.request.getBaseUri()
             + ExchangeType.MachineImage.getPathType().getPathname() + "/234"));
-        template.setCredentials(new CimiCredentials(this.request.getBaseUri()
+        template.setCredential(new CimiCredential(this.request.getBaseUri()
             + ExchangeType.Credential.getPathType().getPathname() + "/345"));
         CimiMachineCreate cimi = new CimiMachineCreate();
         cimi.setMachineTemplate(template);

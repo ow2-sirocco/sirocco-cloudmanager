@@ -31,7 +31,7 @@
 		},
 		"type":"typeValue_0"
 	},
-	"credentials":{
+	"credential":{
 		"name":"nameValue_0",
 		"description":"descriptionValue_0",
 		"id":"idValue_0",

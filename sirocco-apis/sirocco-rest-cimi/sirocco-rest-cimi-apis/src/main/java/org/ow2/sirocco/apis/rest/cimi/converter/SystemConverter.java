@@ -27,10 +27,10 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredentialCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachineCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystemCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;

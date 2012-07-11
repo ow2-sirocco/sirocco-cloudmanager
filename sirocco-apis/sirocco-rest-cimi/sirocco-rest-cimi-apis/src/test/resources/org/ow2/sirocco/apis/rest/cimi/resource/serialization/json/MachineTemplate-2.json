@@ -90,7 +90,7 @@
 		},
 		"type":"typeValue_2"
 	},
-	"credentials":{
+	"credential":{
 		"name":"nameValue_2",
 		"description":"descriptionValue_2",
 		"properties":{

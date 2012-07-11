@@ -31,21 +31,22 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
@@ -520,6 +521,73 @@ public class MachinesConverterTest {
         Assert.assertNull(cimi.getArray()[1].getName());
     }
 
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testCimiMachineCollectionRoot() throws Exception {
+        CimiMachineCollection cimi;
+        List<Machine> service;
+
+        // Empty Cimi -> Service
+        service = (List<Machine>) this.context.convertToService(new CimiMachineCollectionRoot());
+        Assert.assertNotNull(service);
+        Assert.assertEquals(0, service.size());
+
+        // Empty Service -> Cimi
+        cimi = (CimiMachineCollectionRoot) this.context
+            .convertToCimi(new ArrayList<Machine>(), CimiMachineCollectionRoot.class);
+        Assert.assertNull(cimi.getArray());
+
+        // Full Cimi -> Service
+        cimi = new CimiMachineCollectionRoot();
+        cimi.setArray(new CimiMachine[] {new CimiMachine(), new CimiMachine()});
+
+        service = (List<Machine>) this.context.convertToService(cimi);
+        Assert.assertEquals(2, service.size());
+
+        // Full Service -> Cimi
+        Machine Machine1 = new Machine();
+        Machine1.setId(1);
+        Machine1.setName("nameOne");
+        Machine Machine2 = new Machine();
+        Machine2.setId(2);
+        Machine2.setName("nameTwo");
+        Machine Machine3 = new Machine();
+        Machine3.setId(3);
+        Machine3.setName("nameThree");
+
+        service = new ArrayList<Machine>();
+        service.add(Machine1);
+        service.add(Machine2);
+        service.add(Machine3);
+
+        cimi = (CimiMachineCollectionRoot) this.context.convertToCimi(service, CimiMachineCollectionRoot.class);
+        Assert.assertEquals(3, cimi.getArray().length);
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[0].getHref());
+        Assert.assertNull(cimi.getArray()[0].getId());
+        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/2", cimi.getArray()[1].getHref());
+        Assert.assertNull(cimi.getArray()[1].getId());
+        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[2].getHref());
+        Assert.assertNull(cimi.getArray()[2].getId());
+        Assert.assertNull(cimi.getArray()[2].getName());
+
+        cimi = (CimiMachineCollection) this.context.convertToCimi(Arrays.asList(new Machine[] {Machine3, Machine1}),
+            CimiMachineCollection.class);
+        Assert.assertEquals(2, cimi.getArray().length);
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[0].getHref());
+        Assert.assertNull(cimi.getArray()[0].getId());
+        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[1].getHref());
+        Assert.assertNull(cimi.getArray()[1].getId());
+        Assert.assertNull(cimi.getArray()[1].getName());
+    }
+
     // TODO Volumes, Network, ...
     @Test
     public void testCimiMachineTemplate() throws Exception {
@@ -534,13 +602,13 @@ public class MachinesConverterTest {
 
         // Empty Service -> Cimi
         cimi = (CimiMachineTemplate) this.context.convertToCimi(new MachineTemplate(), CimiMachineTemplate.class);
-        Assert.assertNull(cimi.getCredentials());
+        Assert.assertNull(cimi.getCredential());
         Assert.assertNull(cimi.getMachineConfig());
         Assert.assertNull(cimi.getMachineImage());
 
         // Full Cimi -> Service : without arrays
         cimi = new CimiMachineTemplate();
-        cimi.setCredentials(new CimiCredentials());
+        cimi.setCredential(new CimiCredential());
         cimi.setMachineConfig(new CimiMachineConfiguration());
         cimi.setMachineImage(new CimiMachineImage());
 
@@ -556,7 +624,7 @@ public class MachinesConverterTest {
         service.setMachineImage(new MachineImage());
 
         cimi = (CimiMachineTemplate) this.context.convertToCimi(service, CimiMachineTemplate.class);
-        Assert.assertEquals(CimiCredentials.class, cimi.getCredentials().getClass());
+        Assert.assertEquals(CimiCredential.class, cimi.getCredential().getClass());
         Assert.assertEquals(CimiMachineConfiguration.class, cimi.getMachineConfig().getClass());
         Assert.assertEquals(CimiMachineImage.class, cimi.getMachineImage().getClass());
 

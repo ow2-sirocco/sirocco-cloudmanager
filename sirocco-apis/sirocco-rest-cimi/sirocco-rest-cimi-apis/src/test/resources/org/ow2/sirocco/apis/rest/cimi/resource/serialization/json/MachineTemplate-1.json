@@ -70,7 +70,7 @@
 		},
 		"type":"typeValue_1"
 	},
-	"credentials":{
+	"credential":{
 		"name":"nameValue_1",
 		"description":"descriptionValue_1",
 		"properties":{

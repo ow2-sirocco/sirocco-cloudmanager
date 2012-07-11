@@ -14,24 +14,24 @@
 	<bean id="CimiManagerUpdateCloudEntryPoint"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
-	<!-- Credentials -->
-	<bean id="CimiManagerCreateCredentials"
+	<!-- Credential -->
+	<bean id="CimiManagerCreateCredential"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
-	<bean id="CimiManagerDeleteCredentials"
+	<bean id="CimiManagerDeleteCredential"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
-	<bean id="CimiManagerReadCredentials"
+	<bean id="CimiManagerReadCredential"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
-	<bean id="CimiManagerUpdateCredentials"
+	<bean id="CimiManagerUpdateCredential"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
-	<!-- Credentials Template -->
-	<bean id="CimiManagerCreateCredentialsTemplate"
+	<!-- Credential Template -->
+	<bean id="CimiManagerCreateCredentialTemplate"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerCreate" />
-	<bean id="CimiManagerDeleteCredentialsTemplate"
+	<bean id="CimiManagerDeleteCredentialTemplate"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerDelete" />
-	<bean id="CimiManagerReadCredentialsTemplate"
+	<bean id="CimiManagerReadCredentialTemplate"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
-	<bean id="CimiManagerUpdateCredentialsTemplate"
+	<bean id="CimiManagerUpdateCredentialTemplate"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
 
 	<!-- Job -->

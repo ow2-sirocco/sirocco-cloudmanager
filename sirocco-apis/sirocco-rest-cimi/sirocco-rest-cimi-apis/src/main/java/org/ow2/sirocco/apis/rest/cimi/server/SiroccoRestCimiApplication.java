@@ -55,8 +55,8 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.ow2.sirocco.apis.rest.cimi.resource.CloudEntryPointRestResource;
-import org.ow2.sirocco.apis.rest.cimi.resource.CredentialsRestResource;
-import org.ow2.sirocco.apis.rest.cimi.resource.CredentialsTemplateRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CredentialRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.CredentialTemplateRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.JobRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.MachineConfigurationRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.MachineImageRestResource;
@@ -86,8 +86,8 @@ public class SiroccoRestCimiApplication extends Application {
 
         // Resources
         classes.add(CloudEntryPointRestResource.class);
-        classes.add(CredentialsRestResource.class);
-        classes.add(CredentialsTemplateRestResource.class);
+        classes.add(CredentialRestResource.class);
+        classes.add(CredentialTemplateRestResource.class);
         classes.add(JobRestResource.class);
         classes.add(MachineRestResource.class);
         classes.add(MachineConfigurationRestResource.class);

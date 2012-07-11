@@ -26,10 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.manager.job;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
@@ -78,7 +78,7 @@ public class CimiManagerReadJobCollection extends CimiManagerReadAbstract {
      */
     @Override
     protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiJobCollection cimi = (CimiJobCollection) context.convertToCimi(dataService, CimiJobCollection.class);
+        CimiJobCollectionRoot cimi = (CimiJobCollectionRoot) context.convertToCimi(dataService, CimiJobCollectionRoot.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
     }
