@@ -96,9 +96,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private final String cloudProviderId;
 
-    private final CloudProviderAccount cloudProviderAccount;
+    private CloudProviderAccount cloudProviderAccount;
 
-    private final CloudProviderLocation cloudProviderLocation;
+    private CloudProviderLocation cloudProviderLocation;
 
     private final MockCloudProviderConnectorFactory mockCloudProviderConnectorFactory;
 
@@ -137,8 +137,18 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
+    public void setCloudProviderAccount(final CloudProviderAccount cpa) {
+        this.cloudProviderAccount = cpa;
+    }
+
+    @Override
     public CloudProviderLocation getCloudProviderLocation() {
         return this.cloudProviderLocation;
+    }
+
+    @Override
+    public void setCloudProviderLocation(final CloudProviderLocation cpl) {
+        this.cloudProviderLocation = cpl;
     }
 
     @Override

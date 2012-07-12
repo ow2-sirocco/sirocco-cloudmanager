@@ -1207,7 +1207,10 @@ public class SystemManager implements ISystemManager {
 
                 if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
 
+                    s.setId(job.getTargetEntity().getId());
                     this.persistSystemContent(connector, s);
+                    this.em.merge(s);
+                    // ((System) job.getTargetEntity()).setState(s.getState());
                 } else if (job.getAction().equals(SystemManager.START_ACTION)
                     || job.getAction().equals(SystemManager.STOP_ACTION) || job.getAction().equals(SystemManager.DELETE_ACTION)) {
                     this.updateSystemContentState(connector, s, job.getAction());

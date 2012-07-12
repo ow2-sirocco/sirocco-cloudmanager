@@ -75,6 +75,7 @@ public class MockCloudProviderConnectorFactory implements ICloudProviderConnecto
         for (ICloudProviderConnector cloudProvider : this.cloudProvidersInUse) {
             if (cloudProvider.getCloudProviderAccount().getLogin().equals(cloudProviderAccount.getLogin())) {
                 if (cloudProviderLocation == null || cloudProvider.getCloudProviderLocation().equals(cloudProviderLocation)) {
+                    cloudProvider.setCloudProviderAccount(cloudProviderAccount);
                     return cloudProvider;
                 }
             }

@@ -182,9 +182,9 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
 
         private final String cloudProviderId;
 
-        private final CloudProviderAccount cloudProviderAccount;
+        private CloudProviderAccount cloudProviderAccount;
 
-        private final CloudProviderLocation cloudProviderLocation;
+        private CloudProviderLocation cloudProviderLocation;
 
         private String amazonRegionCode;
 
@@ -255,8 +255,18 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
         }
 
         @Override
+        public void setCloudProviderAccount(final CloudProviderAccount cpa) {
+            this.cloudProviderAccount = cpa;
+        }
+
+        @Override
         public CloudProviderLocation getCloudProviderLocation() {
             return this.cloudProviderLocation;
+        }
+
+        @Override
+        public void setCloudProviderLocation(final CloudProviderLocation cpl) {
+            this.cloudProviderLocation = cpl;
         }
 
         @Override

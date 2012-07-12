@@ -34,6 +34,10 @@ public interface ICloudProviderConnector {
 
     CloudProviderLocation getCloudProviderLocation();
 
+    void setCloudProviderAccount(CloudProviderAccount cpa);
+
+    void setCloudProviderLocation(CloudProviderLocation cpl);
+
     IComputeService getComputeService() throws ConnectorException;
 
     IVolumeService getVolumeService() throws ConnectorException;
@@ -43,6 +47,6 @@ public interface ICloudProviderConnector {
     INetworkService getNetworkService() throws ConnectorException;
 
     ISystemService getSystemService() throws ConnectorException;
-    
+
     IProviderCapability getProviderCapability() throws ConnectorException;
 }

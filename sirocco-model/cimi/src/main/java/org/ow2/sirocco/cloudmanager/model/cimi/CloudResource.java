@@ -27,11 +27,10 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.List;
 
-import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -40,15 +39,14 @@ import javax.persistence.Id;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Version;
 
 import org.hibernate.annotations.CollectionOfElements;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
 
 @Entity
@@ -78,24 +76,18 @@ public abstract class CloudResource implements Serializable, Resource {
     protected Set<Job> workingJobs;
 
     // protected Collection<CloudProvider> cloudProviders;
-    
-    protected long versionNum;
-    
-    protected List<Meter>   meters;
-    
-    
-    protected EventLog  eventLog;
-    
-    
-    @Version
-    @Column(name="OPTLOCK")    
-    protected long getVersionNum() {
-        return versionNum;
-    }
 
-    protected void setVersionNum(long versionNum) {
-        this.versionNum = versionNum;
-    }
+    protected List<Meter> meters;
+
+    protected EventLog eventLog;
+
+    /*
+     * protected long versionNum;
+     * @Version
+     * @Column(name="OPTLOCK") protected long getVersionNum() { return
+     * versionNum; } protected void setVersionNum(long versionNum) {
+     * this.versionNum = versionNum; }
+     */
 
     public String getProviderAssignedId() {
         return this.providerAssignedId;
@@ -196,22 +188,22 @@ public abstract class CloudResource implements Serializable, Resource {
     public void setUser(final User user) {
         this.user = user;
     }
-    
+
     @OneToMany(mappedBy = "targetResource")
     public List<Meter> getMeters() {
-        return meters;
+        return this.meters;
     }
 
-    public void setMeters(List<Meter> meters) {
+    public void setMeters(final List<Meter> meters) {
         this.meters = meters;
     }
 
     @OneToOne(mappedBy = "targetResource")
     public EventLog getEventLog() {
-        return eventLog;
+        return this.eventLog;
     }
 
-    public void setEventLog(EventLog eventLog) {
+    public void setEventLog(final EventLog eventLog) {
         this.eventLog = eventLog;
     }
 

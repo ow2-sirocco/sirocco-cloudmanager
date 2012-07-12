@@ -331,7 +331,8 @@ public class JobManager implements IJobManager {
         } catch (Exception e) {
             // exception, will be rollbacked: unlocking in separate transaction
             // to ensure unlocking is done
-            this.lockManager.unlockUntransacted(topmostid, Job.class.getCanonicalName());
+            // this.lockManager.unlockUntransacted(topmostid,
+            // Job.class.getCanonicalName());
             throw e;
         }
 
