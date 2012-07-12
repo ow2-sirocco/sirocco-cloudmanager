@@ -64,6 +64,8 @@ public enum ExchangeType {
     /** */
     MachineTemplate(PathType.MachineTemplate), MachineTemplateCollection(PathType.MachineTemplate, false),
     /** */
+    MachineTemplateVolume(PathType.Volume), MachineTemplateVolumeTemplate(PathType.VolumeTemplate),
+    /** */
     MachineVolume(PathType.MachineVolume), MachineVolumeCollection(PathType.MachineVolume, false),
     /** */
     System(PathType.System), SystemCollection(PathType.System, false),

@@ -456,6 +456,16 @@ public class ConfigFactory {
             associatedNames.put("machineTemplates", ExchangeType.MachineTemplate);
             break;
 
+        case MachineTemplateVolume:
+            item = new ItemConfig(CimiMachineTemplateVolume.class, ExchangeType.MachineTemplateVolume);
+            item.putData(ConfigFactory.CONVERTER, new MachineTemplateVolumeConverter());
+            break;
+
+        case MachineTemplateVolumeTemplate:
+            item = new ItemConfig(CimiMachineTemplateVolumeTemplate.class, ExchangeType.MachineTemplateVolumeTemplate);
+            item.putData(ConfigFactory.CONVERTER, new MachineTemplateVolumeTemplateConverter());
+            break;
+
         case MachineVolume:
             item = new ItemConfig(CimiMachineVolume.class, ExchangeType.MachineVolume);
             item.putData(ConfigFactory.CONVERTER, new MachineVolumeConverter());
@@ -763,6 +773,8 @@ public class ConfigFactory {
         case MachineNetworkInterface:
         case MachineNetworkInterfaceAddress:
         case MachineTemplate:
+        case MachineTemplateVolume:
+        case MachineTemplateVolumeTemplate:
         case MachineVolume:
         case System:
         case SystemCreate:
@@ -873,20 +885,8 @@ public class ConfigFactory {
         item.putData(ConfigFactory.CONVERTER, new DiskConfigurationConverter());
         items.add(item);
 
-        item = new ItemConfig(CimiMachineTemplateVolume.class);
-        item.putData(ConfigFactory.CONVERTER, new MachineTemplateVolumeConverter());
-        items.add(item);
-
-        item = new ItemConfig(CimiMachineTemplateVolumeTemplate.class);
-        item.putData(ConfigFactory.CONVERTER, new MachineTemplateVolumeTemplateConverter());
-        items.add(item);
-
         item = new ItemConfig(CimiMachineTemplateNetworkInterface.class);
         item.putData(ConfigFactory.CONVERTER, new MachineTemplateNetworkInterfaceConverter());
-        items.add(item);
-
-        item = new ItemConfig(CimiMachineCollectionRoot.class, ExchangeType.MachineCollection);
-        item.putData(ConfigFactory.CONVERTER, new MachineCollectionRootConverter());
         items.add(item);
 
         return items;
