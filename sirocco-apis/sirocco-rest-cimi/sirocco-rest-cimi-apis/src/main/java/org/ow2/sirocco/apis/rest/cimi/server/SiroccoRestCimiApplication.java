@@ -62,6 +62,8 @@ import org.ow2.sirocco.apis.rest.cimi.resource.MachineConfigurationRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.MachineImageRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.MachineRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.MachineTemplateRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.SystemRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.SystemTemplateRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.VolumeConfigurationRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.VolumeImageRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.VolumeRestResource;
@@ -93,6 +95,8 @@ public class SiroccoRestCimiApplication extends Application {
         classes.add(MachineConfigurationRestResource.class);
         classes.add(MachineImageRestResource.class);
         classes.add(MachineTemplateRestResource.class);
+        classes.add(SystemRestResource.class);
+        classes.add(SystemTemplateRestResource.class);
         classes.add(VolumeRestResource.class);
         classes.add(VolumeConfigurationRestResource.class);
         classes.add(VolumeImageRestResource.class);

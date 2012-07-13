@@ -151,7 +151,7 @@
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerRead" />
 	<bean id="CimiManagerUpdateVolumeConfiguration"
 		class="org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock.MockCimiManagerUpdate" />
-	
+
 
 	<!-- Services -->
 	<bean id="IJobManager" class="org.easymock.EasyMock"
@@ -173,6 +173,11 @@
 		factory-method="createMock">
 		<constructor-arg index="0"
 			value="org.ow2.sirocco.cloudmanager.core.api.IMachineManager" />
+	</bean>
+	<bean id="ISystemManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.ISystemManager" />
 	</bean>
 	<bean id="IVolumeManager" class="org.easymock.EasyMock"
 		factory-method="createMock">

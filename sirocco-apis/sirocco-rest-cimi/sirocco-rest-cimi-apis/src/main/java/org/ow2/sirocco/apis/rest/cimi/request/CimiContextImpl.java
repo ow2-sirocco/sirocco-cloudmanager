@@ -121,6 +121,21 @@ public class CimiContextImpl implements CimiContext {
     /**
      * {@inheritDoc}
      * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertNextCimi(org.ow2.sirocco.cloudmanager.model.cimi.Resource)
+     */
+    @Override
+    public Object convertToCimi(final Resource service) {
+        Object converted = null;
+        if (null != service) {
+            Class<? extends CimiResource> cimiAssociate = this.findAssociate(service.getClass());
+            converted = this.convertToCimi(service, cimiAssociate);
+        }
+        return converted;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
      * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertToCimi(java.lang.Object,
      *      java.lang.Class)
      */

@@ -35,6 +35,10 @@
 		business-interface="org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager"
 		lookup-home-on-startup="false">
 	</jee:local-slsb>
+	<jee:local-slsb id="ISystemManager" jndi-name="org.ow2.sirocco.cloudmanager.core.impl.SystemManager_org.ow2.sirocco.cloudmanager.core.api.ISystemManager@Local"
+		business-interface="org.ow2.sirocco.cloudmanager.core.api.ISystemManager"
+		lookup-home-on-startup="false">
+	</jee:local-slsb>
 	<jee:local-slsb id="IVolumeManager" jndi-name="org.ow2.sirocco.cloudmanager.core.impl.VolumeManager_org.ow2.sirocco.cloudmanager.core.api.IVolumeManager@Local"
 		business-interface="org.ow2.sirocco.cloudmanager.core.api.IVolumeManager"
 		lookup-home-on-startup="false">

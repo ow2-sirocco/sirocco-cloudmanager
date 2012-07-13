@@ -72,6 +72,20 @@ public interface CimiContext extends Serializable {
     Object convertToCimi(Object service, Class<?> cimiAssociate);
 
     /**
+     * Convert a service root object to a CIMI root object.
+     * <p>
+     * Before the convert, finds the CIMI Resource class associate to the Cloud
+     * Resource class of the given instance. The association is defined by the
+     * configuration.
+     * </p>
+     * 
+     * @param service The service instance to convert
+     * @return A CIMI instance converted or null if service is null
+     * @see CimiContext#findAssociate(Class)
+     */
+    Object convertToCimi(Resource service);
+
+    /**
      * Convert a service child object to a CIMI child object.
      * <p>
      * Before the convert, finds the CIMI Resource class associate to the Cloud
@@ -83,7 +97,7 @@ public interface CimiContext extends Serializable {
      * @return A CIMI instance converted or null if service is null
      * @see CimiContext#findAssociate(Class)
      */
-    Object convertNextCimi(final Resource service);
+    Object convertNextCimi(Resource service);
 
     /**
      * Convert a service child object to a CIMI child object.

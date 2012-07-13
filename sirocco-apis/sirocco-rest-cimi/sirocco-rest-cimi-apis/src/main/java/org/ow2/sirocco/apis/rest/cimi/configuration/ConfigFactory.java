@@ -90,11 +90,17 @@ import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineTemplateCollec
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineVolumeCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineVolumeCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCredentialCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCredentialCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemMachineCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemMachineCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemSystemCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemSystemCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemTemplateCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemVolumeCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemVolumeCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.VolumeConfigurationCollectionConverter;
@@ -171,11 +177,17 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateColle
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemVolumeCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeConfigurationCollection;
@@ -709,51 +721,33 @@ public class ConfigFactory {
             break;
 
         case SystemCollection:
-            // TODO
-            // item = new ItemConfig(CimiSystemCollectionRoot.class,
-            // ExchangeType.SystemCollection);
-            // item.putData(ConfigFactory.CONVERTER, new
-            // SystemCollectionRootConverter());
+            item = new ItemConfig(CimiSystemCollectionRoot.class, ExchangeType.SystemCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemCollectionRootConverter());
             break;
 
         case SystemCredentialCollection:
-            // TODO
-            // item = new ItemConfig(CimiSystemCredentialCollectionRoot.class,
-            // ExchangeType.SystemCredentialCollection);
-            // item.putData(ConfigFactory.CONVERTER, new
-            // SystemCredentialCollectionRootConverter());
+            item = new ItemConfig(CimiSystemCredentialCollectionRoot.class, ExchangeType.SystemCredentialCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemCredentialCollectionRootConverter());
             break;
 
         case SystemMachineCollection:
-            // TODO
-            // item = new ItemConfig(CimiSystemMachineCollectionRoot.class,
-            // ExchangeType.SystemMachineCollection);
-            // item.putData(ConfigFactory.CONVERTER, new
-            // SystemMachineCollectionRootConverter());
+            item = new ItemConfig(CimiSystemMachineCollectionRoot.class, ExchangeType.SystemMachineCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemMachineCollectionRootConverter());
             break;
 
         case SystemSystemCollection:
-            // TODO
-            // item = new ItemConfig(CimiSystemSystemCollectionRoot.class,
-            // ExchangeType.SystemSystemCollection);
-            // item.putData(ConfigFactory.CONVERTER, new
-            // SystemSystemCollectionRootConverter());
+            item = new ItemConfig(CimiSystemSystemCollectionRoot.class, ExchangeType.SystemSystemCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemSystemCollectionRootConverter());
             break;
 
         case SystemTemplateCollection:
-            // TODO
-            // item = new ItemConfig(CimiSystemTemplateCollectionRoot.class,
-            // ExchangeType.SystemTemplateCollection);
-            // item.putData(ConfigFactory.CONVERTER, new
-            // SystemTemplateCollectionRootConverter());
+            item = new ItemConfig(CimiSystemTemplateCollectionRoot.class, ExchangeType.SystemTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemTemplateCollectionRootConverter());
             break;
 
         case SystemVolumeCollection:
-            // TODO
-            // item = new ItemConfig(CimiSystemVolumeCollectionRoot.class,
-            // ExchangeType.SystemVolumeCollection);
-            // item.putData(ConfigFactory.CONVERTER, new
-            // SystemVolumeCollectionRootConverter());
+            item = new ItemConfig(CimiSystemVolumeCollectionRoot.class, ExchangeType.SystemVolumeCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemVolumeCollectionRootConverter());
             break;
 
         case Address:
