@@ -49,6 +49,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
@@ -112,6 +114,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
@@ -451,6 +454,18 @@ public class CommonsConverterTest {
                 service = new ArrayList<MachineTemplate>();
                 cimiClass = CimiMachineTemplateCollection.class;
                 break;
+            case MachineTemplateVolume:
+                service = new MachineVolume();
+                ((MachineVolume) service).setVolume(new Volume());
+                ((MachineVolume) service).getVolume().setId(11);
+                cimiClass = CimiMachineTemplateVolume.class;
+                break;
+            case MachineTemplateVolumeTemplate:
+                service = new MachineVolumeTemplate();
+                ((MachineVolumeTemplate) service).setVolumeTemplate(new VolumeTemplate());
+                ((MachineVolumeTemplate) service).getVolumeTemplate().setId(11);
+                cimiClass = CimiMachineTemplateVolumeTemplate.class;
+                break;
             case MachineVolume:
                 service = new MachineVolume();
                 ((MachineVolume) service).setId(111);
@@ -624,6 +639,7 @@ public class CommonsConverterTest {
                     Assert.fail("Depth not provided");
                     break;
                 }
+
                 Assert.assertEquals("in " + type, type.getResourceURI(), cimi.getResourceURI());
             }
         }

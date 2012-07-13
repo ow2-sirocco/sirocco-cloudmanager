@@ -46,6 +46,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
@@ -153,9 +155,11 @@ public class WritingResourceValidatorTest {
                 for (ExchangeType otherType : ExchangeType.values()) {
                     CimiResource cimiOther = this.newResource(otherType);
                     if ((null != cimiOther) && (type != otherType)) {
-                        cimi.setHref(otherType.makeHref(this.request.getBaseUri(), "987", "123"));
-                        Assert.assertFalse("Test " + type + " with " + otherType, CimiValidatorHelper.getInstance()
-                            .validateToWrite(this.context, cimi));
+                        if (type != otherType.getSubstituteType() && otherType != type.getSubstituteType()) {
+                            cimi.setHref(otherType.makeHref(this.request.getBaseUri(), "987", "123"));
+                            Assert.assertFalse("Test " + type + " with " + otherType, CimiValidatorHelper.getInstance()
+                                .validateToWrite(this.context, cimi));
+                        }
                     }
                 }
             }
@@ -252,6 +256,12 @@ public class WritingResourceValidatorTest {
             break;
         case MachineTemplateCollection:
             cimi = new CimiMachineTemplateCollection();
+            break;
+        case MachineTemplateVolume:
+            cimi = new CimiMachineTemplateVolume();
+            break;
+        case MachineTemplateVolumeTemplate:
+            cimi = new CimiMachineTemplateVolumeTemplate();
             break;
         case MachineVolume:
             cimi = new CimiMachineVolume();

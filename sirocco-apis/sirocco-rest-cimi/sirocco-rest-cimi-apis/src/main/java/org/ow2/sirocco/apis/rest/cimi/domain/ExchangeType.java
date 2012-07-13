@@ -64,8 +64,6 @@ public enum ExchangeType {
     /** */
     MachineTemplate(PathType.MachineTemplate), MachineTemplateCollection(PathType.MachineTemplate, false),
     /** */
-    MachineTemplateVolume(PathType.Volume), MachineTemplateVolumeTemplate(PathType.VolumeTemplate),
-    /** */
     MachineVolume(PathType.MachineVolume), MachineVolumeCollection(PathType.MachineVolume, false),
     /** */
     System(PathType.System), SystemCollection(PathType.System, false),
@@ -92,13 +90,21 @@ public enum ExchangeType {
     /** */
     VolumeImage(PathType.VolumeImage), VolumeImageCollection(PathType.VolumeImage, false),
     /** */
-    VolumeTemplate(PathType.VolumeTemplate), VolumeTemplateCollection(PathType.VolumeTemplate, false);
+    VolumeTemplate(PathType.VolumeTemplate), VolumeTemplateCollection(PathType.VolumeTemplate, false),
+    /** */
+    MachineTemplateVolume(Volume), MachineTemplateVolumeTemplate(VolumeTemplate);
 
     /** The path type of the resource. */
     PathType pathType;
 
     /** Flag ID in reference. */
     boolean idInReference;
+
+    /**
+     * The substitute resource : the Path Type and ResourceUri will be that of
+     * substitute type.
+     */
+    ExchangeType substituteType;
 
     /** Constructor. */
     private ExchangeType(final PathType pathType) {
@@ -112,6 +118,13 @@ public enum ExchangeType {
         this.idInReference = idInReference;
     }
 
+    /** Constructor. */
+    private ExchangeType(final ExchangeType substituteType) {
+        this.substituteType = substituteType;
+        this.pathType = this.substituteType.getPathType();
+        this.idInReference = this.substituteType.hasIdInReference();
+    }
+
     /**
      * Get the URI of the resource.
      * 
@@ -119,7 +132,12 @@ public enum ExchangeType {
      */
     public String getResourceURI() {
         StringBuilder sb = new StringBuilder();
-        sb.append(ConstantsPath.CIMI_XML_NAMESPACE).append('/').append(this.name());
+        sb.append(ConstantsPath.CIMI_XML_NAMESPACE).append('/');
+        if (null == this.substituteType) {
+            sb.append(this.name());
+        } else {
+            sb.append(this.substituteType.name());
+        }
         return sb.toString();
     }
 
@@ -130,6 +148,15 @@ public enum ExchangeType {
      */
     public PathType getPathType() {
         return this.pathType;
+    }
+
+    /**
+     * Get the substitute type of the resource.
+     * 
+     * @return The substitute type or null if not defined
+     */
+    public ExchangeType getSubstituteType() {
+        return this.substituteType;
     }
 
     /**
