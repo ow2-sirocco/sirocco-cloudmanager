@@ -297,7 +297,7 @@ public class SystemManager implements ISystemManager {
             } catch (Exception e) {
                 throw new ServiceUnavailableException(e.getMessage());
             }
-            this.relConnector(system, connector);
+            this.relConnector(system.getCloudProviderAccount(), connector);
 
         } else {
             // implementation when System is not supported by underlying
@@ -671,6 +671,24 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
+    public QueryResult<CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType,
+        final int first, final int last, final List<String> filters, final List<String> attributes)
+        throws CloudProviderException {
+        // TODO Auto-generated method stub
+        throw new CloudProviderException("action not implemented");
+        // return null;
+    }
+
+    @Override
+    public Job updateEntityAttributesInSystem(final String systemId, final String entityType, final String entityId,
+        final Map<String, Object> updatedAttributes) throws InvalidRequestException, ResourceNotFoundException,
+        CloudProviderException {
+        // TODO Auto-generated method stub
+        throw new CloudProviderException("action not implemented");
+        // return null;
+    }
+
+    @Override
     public boolean addComponentDescriptorToSystemTemplate(final ComponentDescriptor componentDescriptor,
         final String systemTemplateId) throws CloudProviderException {
         SystemTemplate s = this.getSystemTemplateById(systemTemplateId);
@@ -728,13 +746,6 @@ public class SystemManager implements ISystemManager {
         // TODO Auto-generated method stub
         throw new CloudProviderException("action not implemented");
         // return null;
-    }
-
-    @Override
-    public Job updateEntityAttributesInSystem(final String systemId, final CloudCollectionItem entity)
-        throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     @Override
@@ -944,8 +955,9 @@ public class SystemManager implements ISystemManager {
         return true;
     }
 
-    private void relConnector(final System ce, final ICloudProviderConnector connector) throws CloudProviderException {
-        String cpType = ce.getCloudProviderAccount().getCloudProvider().getCloudProviderType();
+    private void relConnector(final CloudProviderAccount cpa, final ICloudProviderConnector connector)
+        throws CloudProviderException {
+        String cpType = cpa.getCloudProvider().getCloudProviderType();
         ICloudProviderConnectorFactory cFactory = null;
         try {
             cFactory = this.cloudProviderConnectorFactoryFinder.getCloudProviderConnectorFactory(cpType);
@@ -1198,26 +1210,35 @@ public class SystemManager implements ISystemManager {
 
                 // getting system owned object lists from connector
                 System s = null;
+                System managedSystem = (System) job.getTargetEntity();
+                CloudProviderAccount cpa = managedSystem.getCloudProviderAccount();
 
-                try {
-                    s = connector.getSystemService().getSystem(job.getTargetEntity().getProviderAssignedId().toString());
-                } catch (ConnectorException e) {
-                    throw new CloudProviderException("unable to get system from provider");
+                if (!job.getAction().equals(SystemManager.DELETE_ACTION)) {
+                    try {
+                        s = connector.getSystemService().getSystem(job.getTargetEntity().getProviderAssignedId().toString());
+                    } catch (ConnectorException e) {
+                        throw new CloudProviderException("unable to get system from provider");
+                    }
                 }
 
                 if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
-
-                    s.setId(job.getTargetEntity().getId());
                     this.persistSystemContent(connector, s);
-                    this.em.merge(s);
-                    // ((System) job.getTargetEntity()).setState(s.getState());
+
+                    managedSystem.setMachines(s.getMachines());
+                    managedSystem.setNetworks(s.getNetworks());
+                    managedSystem.setState(s.getState());
+                    managedSystem.setSystems(s.getSystems());
+                    managedSystem.setVolumes(s.getVolumes());
                 } else if (job.getAction().equals(SystemManager.START_ACTION)
-                    || job.getAction().equals(SystemManager.STOP_ACTION) || job.getAction().equals(SystemManager.DELETE_ACTION)) {
+                    || job.getAction().equals(SystemManager.STOP_ACTION)) {
                     this.updateSystemContentState(connector, s, job.getAction());
                     // updating parent system state
                     ((System) job.getTargetEntity()).setState(s.getState());
+                } else if (job.getAction().equals(SystemManager.DELETE_ACTION)) {
+                    this.updateSystemContentState(connector, (System) job.getTargetEntity(), job.getAction());
+                    ((System) job.getTargetEntity()).setState(System.State.DELETED);
                 }
-                this.relConnector(s, connector);
+                this.relConnector(cpa, connector);
             } else {
                 // error
                 job.setStatus(connectorJob.getStatus());

@@ -310,7 +310,7 @@ public class UtilsForManagers {
     public static CloudResource getResourceFromProviderId(final EntityManager em, final String providerAsynchId)
         throws CloudProviderException {
         CloudResource obj = (CloudResource) em
-            .createQuery("FROM " + CloudResource.class.getName() + " WHERE v.providerAssignedId=:provid")
+            .createQuery("FROM " + CloudResource.class.getName() + " v WHERE v.providerAssignedId=:provid")
             .setParameter("provid", providerAsynchId).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");

@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.connector.mock;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -247,6 +248,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         machine.setProviderAssignedId(machineProviderAssignedId);
         this.machines.put(machineProviderAssignedId, machine);
         MockCloudProviderConnector.logger.info("Creating machine with providerAssignedId " + machineProviderAssignedId);
+        machine.setName(machineCreate.getName());
+        machine.setDescription(machineCreate.getDescription());
+        machine.setProperties(machineCreate.getProperties());
         machine.setState(Machine.State.CREATING);
         machine.setCpu(machineCreate.getMachineTemplate().getMachineConfiguration().getCpu());
         machine.setMemory(machineCreate.getMachineTemplate().getMachineConfiguration().getMemory());
@@ -536,14 +540,14 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         IJobManager jobManager = this.mockCloudProviderConnectorFactory.getJobManager();
 
         // attributes
-        system.setCloudProviderAccount(this.cloudProviderAccount);
-        system.setLocation(this.cloudProviderLocation);
         system.setDescription(systemCreate.getDescription());
         system.setName(systemCreate.getName());
         system.setMachines(new ArrayList<SystemMachine>());
         system.setVolumes(new ArrayList<SystemVolume>());
         system.setSystems(new ArrayList<SystemSystem>());
         system.setNetworks(new ArrayList<SystemNetwork>());
+        system.setCredentials(new ArrayList<SystemCredentials>());
+        system.setProperties(new HashMap<String, String>());
 
         Set<ComponentDescriptor> componentDescriptors = systemCreate.getSystemTemplate().getComponentDescriptors();
 
@@ -662,8 +666,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     private boolean serviceSystem(final List<? extends CloudCollectionItem> l, final SystemAction action)
         throws ConnectorException {
         boolean failedCancelled = false;
+        IJobManager jobManager = this.mockCloudProviderConnectorFactory.getJobManager();
         for (CloudCollectionItem m : l) {
-            Job j = this.callSystemService(m.getResource(), action, m.getResource().getProviderAssignedId().toString());
+            // warning:job returned by createXXX is a copy!
+            Job j = jobManager.getJobById(this
+                .callSystemService(m.getResource(), action, m.getResource().getProviderAssignedId().toString())
+                .getProviderAssignedId().toString());
             failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         return failedCancelled;
@@ -842,6 +850,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     @Override
     public Job deleteSystem(final String systemId) throws ConnectorException {
         MockCloudProviderConnector.logger.info("deleting system with providerAssignedId " + systemId);
+        IJobManager jobManager = this.mockCloudProviderConnectorFactory.getJobManager();
+
         final System system = this.systems.get(systemId);
         if (system == null) {
             throw new ConnectorException("System " + systemId + " doesn't exist");
@@ -850,19 +860,27 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         boolean failedCancelled = false;
 
         for (SystemMachine m : system.getMachines()) {
-            Job j = this.deleteMachine(m.getResource().getId().toString());
+            // warning:job returned by createXXX is a copy!
+            Job j = jobManager.getJobById(this.deleteMachine(m.getResource().getProviderAssignedId().toString())
+                .getProviderAssignedId().toString());
             failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         for (SystemSystem m : system.getSystems()) {
-            Job j = this.deleteSystem(m.getResource().getId().toString());
+            // warning:job returned by createXXX is a copy!
+            Job j = jobManager.getJobById(this.deleteSystem(m.getResource().getProviderAssignedId().toString())
+                .getProviderAssignedId().toString());
             failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         for (SystemVolume m : system.getVolumes()) {
-            Job j = this.deleteVolume(m.getResource().getId().toString());
+            // warning:job returned by createXXX is a copy!
+            Job j = jobManager.getJobById(this.deleteVolume(m.getResource().getProviderAssignedId().toString())
+                .getProviderAssignedId().toString());
             failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         for (SystemNetwork m : system.getNetworks()) {
-            Job j = this.deleteNetwork(m.getResource().getId().toString());
+            // warning:job returned by createXXX is a copy!
+            Job j = jobManager.getJobById(this.deleteNetwork(m.getResource().getProviderAssignedId().toString())
+                .getProviderAssignedId().toString());
             failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         system.setState(System.State.DELETING);

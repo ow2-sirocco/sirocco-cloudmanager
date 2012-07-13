@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
@@ -61,12 +62,17 @@ public interface ISystemManager extends IJobListener {
 
     Job updateEntityInSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException;
 
-    Job updateEntityAttributesInSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException;
+    Job updateEntityAttributesInSystem(String systemId, final String entityType, String entityId,
+        Map<String, Object> updatedAttributes) throws InvalidRequestException, ResourceNotFoundException,
+        CloudProviderException;
 
     CloudCollectionItem getEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException;
 
     List<? extends CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType)
         throws CloudProviderException;
+
+    QueryResult<CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType, int first,
+        int last, List<String> filters, List<String> attributes) throws CloudProviderException;
 
     // management of SystemTemplate map
     boolean addComponentDescriptorToSystemTemplate(ComponentDescriptor componentDescriptor, String systemTemplateId)
