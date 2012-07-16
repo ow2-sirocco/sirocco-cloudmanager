@@ -558,12 +558,12 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
         }
 
         @Override
-        public Job restartMachine(final String machineId) throws ConnectorException {
+        public Job restartMachine(final String machineId, final boolean force) throws ConnectorException {
             final ServerClient serverClient = this.novaClient.getServerClientForZone(this.zone);
             final Callable<Void> startTask = new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    serverClient.rebootServer(machineId, RebootType.SOFT);
+                    serverClient.rebootServer(machineId, force ? RebootType.HARD : RebootType.SOFT);
                     int waitTimeInSeconds = OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
                     do {
                         Server server = serverClient.getServer(machineId);

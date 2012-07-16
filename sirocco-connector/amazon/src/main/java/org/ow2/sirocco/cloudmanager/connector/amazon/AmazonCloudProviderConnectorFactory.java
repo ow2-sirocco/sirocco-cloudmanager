@@ -576,7 +576,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
         }
 
         @Override
-        public Job restartMachine(final String machineId) throws ConnectorException {
+        public Job restartMachine(final String machineId, final boolean force) throws ConnectorException {
             final Machine machine = this.getMachine(machineId);
 
             try {

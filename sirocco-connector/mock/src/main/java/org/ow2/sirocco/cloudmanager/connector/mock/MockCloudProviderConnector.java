@@ -382,7 +382,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
-    public synchronized Job restartMachine(final String machineId) throws ConnectorException {
+    public synchronized Job restartMachine(final String machineId, final boolean force) throws ConnectorException {
         final Machine machine = this.machines.get(machineId);
         if (machine == null) {
             throw new ConnectorException("Machine " + machineId + " doesn't exist");
@@ -564,7 +564,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     MachineCreate mc = new MachineCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        mc.setName(cd.getName() + new Integer(i).toString());
+                        String name = cd.getName() == null ? "" : cd.getName();
+                        mc.setName(name + new Integer(i).toString());
+                    } else {
+                        mc.setName(cd.getName());
                     }
 
                     MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
@@ -588,7 +591,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     VolumeCreate vc = new VolumeCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        vc.setName(cd.getName() + new Integer(i).toString());
+                        String name = cd.getName() == null ? "" : cd.getName();
+                        vc.setName(name + new Integer(i).toString());
+                    } else {
+                        vc.setName(cd.getName());
                     }
                     VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
                     vc.setVolumeTemplate(vt);
@@ -611,7 +617,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     SystemCreate sc = new SystemCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        sc.setName(cd.getName() + new Integer(i).toString());
+                        String name = cd.getName() == null ? "" : cd.getName();
+                        sc.setName(name + new Integer(i).toString());
+                    } else {
+                        sc.setName(cd.getName());
                     }
                     SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
                     sc.setSystemTemplate(st);
@@ -634,7 +643,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     NetworkCreate nc = new NetworkCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        nc.setName(cd.getName() + new Integer(i).toString());
+                        String name = cd.getName() == null ? "" : cd.getName();
+                        nc.setName(name + new Integer(i).toString());
+                    } else {
+                        nc.setName(cd.getName());
                     }
                     NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
                     nc.setNetworkTemplate(nt);
@@ -690,7 +702,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             case PAUSE:
                 return this.pauseMachine(providerId);
             case RESTART:
-                return this.restartMachine(providerId);
+                return this.restartMachine(providerId, false);
             }
         }
         if (ce.getClass().equals(System.class)) {
