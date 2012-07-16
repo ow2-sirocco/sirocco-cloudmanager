@@ -92,6 +92,11 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
     private CimiMachineTemplateNetworkInterfaceArray networkInterfaces;
 
     /**
+     * Field "initialState".
+     */
+    private String initialState;
+
+    /**
      * Field "userData".
      */
     private String userData;
@@ -347,6 +352,24 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Return the value of field "initialState".
+     * 
+     * @return The value
+     */
+    public String getInitialState() {
+        return this.initialState;
+    }
+
+    /**
+     * Set the value of field "initialState".
+     * 
+     * @param initialState The value
+     */
+    public void setInitialState(final String initialState) {
+        this.initialState = initialState;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
@@ -355,11 +378,13 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
     public boolean hasValues() {
         boolean has = super.hasValues();
         has = has || (null != this.getCredential());
+        has = has || (null != this.getInitialState());
         has = has || (null != this.getMachineConfig());
         has = has || (null != this.getMachineImage());
-        has = has || (null != this.getNetworkInterfaces());
-        has = has || (null != this.getVolumes());
-        has = has || (null != this.getVolumeTemplates());
+        has = has || (null != this.getListNetworkInterfaces());
+        has = has || (null != this.getUserData());
+        has = has || (null != this.getListVolumes());
+        has = has || (null != this.getListVolumeTemplates());
         return has;
     }
 

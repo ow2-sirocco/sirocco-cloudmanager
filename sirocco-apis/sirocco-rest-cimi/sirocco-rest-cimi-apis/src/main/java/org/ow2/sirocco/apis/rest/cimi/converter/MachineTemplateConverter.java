@@ -116,6 +116,7 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
         if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi
                 .setCredential((CimiCredential) context.convertNextCimi(dataService.getCredentials(), CimiCredential.class));
+            dataCimi.setInitialState(ConverterHelper.toString(dataService.getInitialState()));
             dataCimi.setMachineConfig((CimiMachineConfiguration) context.convertNextCimi(dataService.getMachineConfiguration(),
                 CimiMachineConfiguration.class));
             dataCimi.setMachineImage((CimiMachineImage) context.convertNextCimi(dataService.getMachineImage(),
@@ -129,6 +130,7 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
                 }
                 dataCimi.setListNetworkInterfaces(listCimis);
             }
+            dataCimi.setUserData(dataService.getUserData());
             // Volume
             if ((null != dataService.getVolumes()) && (false == dataService.getVolumes().isEmpty())) {
                 List<CimiMachineTemplateVolume> listCimis = new ArrayList<CimiMachineTemplateVolume>();
@@ -147,7 +149,6 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
                 }
                 dataCimi.setListVolumeTemplates(listCimis);
             }
-            dataCimi.setUserData(dataService.getUserData());
         }
     }
 
@@ -162,6 +163,7 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
         final MachineTemplate dataService) {
         this.fill(context, dataCimi, dataService);
         dataService.setCredentials((Credentials) context.convertNextService(dataCimi.getCredential()));
+        dataService.setInitialState(ConverterHelper.toMachineState(dataCimi.getInitialState()));
         dataService.setMachineImage((MachineImage) context.convertNextService(dataCimi.getMachineImage()));
         dataService.setMachineConfiguration((MachineConfiguration) context.convertNextService(dataCimi.getMachineConfig()));
         // NetworkInterface
@@ -172,6 +174,7 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
             }
             dataService.setNetworkInterfaces(listServices);
         }
+        dataService.setUserData(dataCimi.getUserData());
         // Volume
         if ((null != dataCimi.getListVolumes()) && (false == dataCimi.getListVolumes().isEmpty())) {
             List<MachineVolume> listServices = new ArrayList<MachineVolume>();
@@ -188,7 +191,6 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
             }
             dataService.setVolumeTemplates(listServices);
         }
-        dataService.setUserData(dataCimi.getUserData());
     }
 
 }

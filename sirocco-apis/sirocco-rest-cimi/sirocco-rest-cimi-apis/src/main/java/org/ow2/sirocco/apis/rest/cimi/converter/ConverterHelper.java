@@ -66,6 +66,20 @@ public class ConverterHelper {
         return converted;
     }
 
+    public static Machine.State toMachineState(final String value) {
+        Machine.State converted = null;
+        if (null != value) {
+            Machine.State[] allEnums = Machine.State.values();
+            for (Machine.State myEnum : allEnums) {
+                if (true == value.equalsIgnoreCase(myEnum.toString())) {
+                    converted = myEnum;
+                    break;
+                }
+            }
+        }
+        return converted;
+    }
+
     public static String toString(final Machine.State value) {
         String converted = null;
         if (null != value) {
