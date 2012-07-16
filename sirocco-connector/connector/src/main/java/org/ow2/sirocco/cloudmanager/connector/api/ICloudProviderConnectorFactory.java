@@ -34,7 +34,7 @@ public interface ICloudProviderConnectorFactory {
     String CLOUD_PROVIDER_TYPE_PROPERTY = "cloudprovider.type";
 
     ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount,
-        final CloudProviderLocation cloudProviderLocation);
+        final CloudProviderLocation cloudProviderLocation) throws ConnectorException;
 
     void disposeCloudProviderConnector(final String cloudProviderId) throws ConnectorException;
 

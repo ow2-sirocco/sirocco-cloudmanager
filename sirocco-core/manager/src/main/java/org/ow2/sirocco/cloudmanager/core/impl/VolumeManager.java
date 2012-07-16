@@ -71,7 +71,7 @@ public class VolumeManager implements IVolumeManager {
     private IJobManager jobManager;
 
     private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount,
-        final CloudProviderLocation location) {
+        final CloudProviderLocation location) throws CloudProviderException {
         VolumeManager.logger.info("Getting connector for cloud provider type "
             + cloudProviderAccount.getCloudProvider().getCloudProviderType());
         ICloudProviderConnectorFactory connectorFactory = this.connectorFactoryFinder
@@ -81,7 +81,11 @@ public class VolumeManager implements IVolumeManager {
                 + cloudProviderAccount.getCloudProvider().getCloudProviderType());
             return null;
         }
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
+        try {
+            return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
     }
 
     private User getUser() throws CloudProviderException {
@@ -541,7 +545,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public boolean jobCompletionHandler(final String job_id) {
+    public boolean jobCompletionHandler(final String job_id) throws CloudProviderException {
         Job job;
         try {
             job = this.jobManager.getJobById(job_id);
@@ -561,7 +565,7 @@ public class VolumeManager implements IVolumeManager {
         return false;
     }
 
-    public boolean volumeCompletionHandler(final Job providerJob) {
+    public boolean volumeCompletionHandler(final Job providerJob) throws CloudProviderException {
         // retrieve the Volume whose providerAssignedId is job.getTargetEntity()
         Volume volume = null;
 
@@ -607,7 +611,7 @@ public class VolumeManager implements IVolumeManager {
         return true;
     }
 
-    public boolean volumeImageCompletionHandler(final Job providerJob) {
+    public boolean volumeImageCompletionHandler(final Job providerJob) throws CloudProviderException {
         VolumeImage volumeImage = null;
 
         try {

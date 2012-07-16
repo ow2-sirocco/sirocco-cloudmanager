@@ -1038,7 +1038,11 @@ public class SystemManager implements ISystemManager {
 
         SystemManager.logger.info("getCloudProviderConnector: cloudProviderAccount has id " + cloudProviderAccount.getId());
 
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
+        try {
+            return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
+        } catch (ConnectorException ex) {
+            throw new CloudProviderException(ex.getMessage());
+        }
     }
 
     private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
@@ -1057,7 +1061,11 @@ public class SystemManager implements ISystemManager {
 
         CloudProviderLocation location = null;
 
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
+        try {
+            return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
     }
 
     private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount,
@@ -1067,7 +1075,11 @@ public class SystemManager implements ISystemManager {
         if (connectorFactory == null) {
             throw new CloudProviderException(" Internal error in connector factory ");
         }
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
+        try {
+            return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
     }
 
     private Job createJob(final String action, final CloudResource targetEntity) throws CloudProviderException {

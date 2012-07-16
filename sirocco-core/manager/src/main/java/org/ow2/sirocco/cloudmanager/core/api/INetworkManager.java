@@ -294,6 +294,6 @@ public interface INetworkManager {
 
     void deleteAddressTemplate(String addressTemplateId) throws ResourceNotFoundException, CloudProviderException;
 
-    boolean jobCompletionHandler(final Job job);
+    boolean jobCompletionHandler(final Job job) throws CloudProviderException;
 
 }

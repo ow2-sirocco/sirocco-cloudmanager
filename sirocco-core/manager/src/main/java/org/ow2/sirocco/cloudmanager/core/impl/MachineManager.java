@@ -185,7 +185,11 @@ public class MachineManager implements IMachineManager {
         if (connectorFactory == null) {
             throw new CloudProviderException(" Internal error in connector factory ");
         }
-        return connectorFactory.getCloudProviderConnector(account, location);
+        try {
+            return connectorFactory.getCloudProviderConnector(account, location);
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
     }
 
     private void relConnector(final Machine m, final ICloudProviderConnector connector) throws CloudProviderException {

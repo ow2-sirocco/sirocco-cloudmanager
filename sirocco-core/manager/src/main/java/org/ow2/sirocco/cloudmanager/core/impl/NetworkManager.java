@@ -69,7 +69,8 @@ public class NetworkManager implements INetworkManager {
     @EJB
     private IUserManager userManager;
 
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount) {
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
+        throws CloudProviderException {
         NetworkManager.logger.info("Getting connector for cloud provider type "
             + cloudProviderAccount.getCloudProvider().getCloudProviderType());
         ICloudProviderConnectorFactory connectorFactory = this.connectorFactoryFinder
@@ -79,7 +80,11 @@ public class NetworkManager implements INetworkManager {
                 + cloudProviderAccount.getCloudProvider().getCloudProviderType());
             return null;
         }
-        return connectorFactory.getCloudProviderConnector(cloudProviderAccount, null);
+        try {
+            return connectorFactory.getCloudProviderConnector(cloudProviderAccount, null);
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
     }
 
     private User getUser() throws CloudProviderException {
@@ -1240,7 +1245,7 @@ public class NetworkManager implements INetworkManager {
     //
 
     @Override
-    public boolean jobCompletionHandler(final Job job) {
+    public boolean jobCompletionHandler(final Job job) throws CloudProviderException {
         if (job.getTargetEntity() instanceof Network) {
             return this.networkCompletionHandler(job);
         } else if (job.getTargetEntity() instanceof NetworkPort) {
@@ -1270,7 +1275,7 @@ public class NetworkManager implements INetworkManager {
         return forwardingGroup;
     }
 
-    private boolean networkCompletionHandler(final Job providerJob) {
+    private boolean networkCompletionHandler(final Job providerJob) throws CloudProviderException {
         // retrieve the Network whose providerAssignedId is
         // job.getTargetEntity()
         Network network = null;
@@ -1348,7 +1353,7 @@ public class NetworkManager implements INetworkManager {
         return true;
     }
 
-    private boolean networkPortCompletionHandler(final Job providerJob) {
+    private boolean networkPortCompletionHandler(final Job providerJob) throws CloudProviderException {
         // retrieve the Network whose providerAssignedId is
         // job.getTargetEntity()
         NetworkPort networkPort = null;
@@ -1429,7 +1434,7 @@ public class NetworkManager implements INetworkManager {
         return true;
     }
 
-    private boolean forwardingGroupCompletionHandler(final Job providerJob) {
+    private boolean forwardingGroupCompletionHandler(final Job providerJob) throws CloudProviderException {
         ForwardingGroup forwardingGroup = null;
 
         try {
