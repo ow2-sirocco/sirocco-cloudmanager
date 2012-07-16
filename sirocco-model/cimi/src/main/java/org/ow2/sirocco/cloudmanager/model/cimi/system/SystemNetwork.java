@@ -26,11 +26,18 @@
 package org.ow2.sirocco.cloudmanager.model.cimi.system;
 
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 
 @Entity
 public class SystemNetwork extends CloudCollectionItem {
     private static final long serialVersionUID = 1L;
+
+    @Transient
+    public Network getNetwork() {
+        return (Network) this.getResource();
+    }
 
 }

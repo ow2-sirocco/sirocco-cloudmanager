@@ -230,7 +230,10 @@ public class SystemManager implements ISystemManager {
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     CredentialsCreate cc = new CredentialsCreate();
                     if (cd.getComponentQuantity() > 1) {
-                        cc.setName(cd.getName() + new Integer(i).toString());
+                        String name = cd.getName() == null ? "" : cd.getName();
+                        cc.setName(name + new Integer(i).toString());
+                    } else {
+                        cc.setName(cd.getName());
                     }
                     CredentialsTemplate ct = (CredentialsTemplate) cd.getComponentTemplate();
                     cc.setCredentialTemplate(ct);
@@ -314,7 +317,10 @@ public class SystemManager implements ISystemManager {
                     for (int i = 0; i < cd.getComponentQuantity(); i++) {
                         MachineCreate mc = new MachineCreate();
                         if (cd.getComponentQuantity() > 1) {
-                            mc.setName(cd.getName() + new Integer(i).toString());
+                            String name = cd.getName() == null ? "" : cd.getName();
+                            mc.setName(name + new Integer(i).toString());
+                        } else {
+                            mc.setName(cd.getName());
                         }
                         MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
                         mc.setMachineTemplate(mt);
@@ -343,7 +349,10 @@ public class SystemManager implements ISystemManager {
                     for (int i = 0; i < cd.getComponentQuantity(); i++) {
                         VolumeCreate vc = new VolumeCreate();
                         if (cd.getComponentQuantity() > 1) {
-                            vc.setName(cd.getName() + new Integer(i).toString());
+                            String name = cd.getName() == null ? "" : cd.getName();
+                            vc.setName(name + new Integer(i).toString());
+                        } else {
+                            vc.setName(cd.getName());
                         }
                         VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
                         vc.setVolumeTemplate(vt);
@@ -372,7 +381,10 @@ public class SystemManager implements ISystemManager {
                     for (int i = 0; i < cd.getComponentQuantity(); i++) {
                         SystemCreate sc = new SystemCreate();
                         if (cd.getComponentQuantity() > 1) {
-                            sc.setName(cd.getName() + new Integer(i).toString());
+                            String name = cd.getName() == null ? "" : cd.getName();
+                            sc.setName(name + new Integer(i).toString());
+                        } else {
+                            sc.setName(cd.getName());
                         }
                         SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
                         sc.setSystemTemplate(st);
@@ -401,7 +413,10 @@ public class SystemManager implements ISystemManager {
                     for (int i = 0; i < cd.getComponentQuantity(); i++) {
                         NetworkCreate nc = new NetworkCreate();
                         if (cd.getComponentQuantity() > 1) {
-                            nc.setName(cd.getName() + new Integer(i).toString());
+                            String name = cd.getName() == null ? "" : cd.getName();
+                            nc.setName(name + new Integer(i).toString());
+                        } else {
+                            nc.setName(cd.getName());
                         }
                         NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
                         nc.setNetworkTemplate(nt);
@@ -1079,8 +1094,8 @@ public class SystemManager implements ISystemManager {
      * @param providerSystem
      * @throws CloudProviderException
      */
-    private void persistSystemContent(final ICloudProviderConnector connector, final System providerSystem)
-        throws CloudProviderException {
+    private void persistSystemContent(final System providerSystem, final User user, final CloudProviderAccount account,
+        final CloudProviderLocation location) throws CloudProviderException {
         // getting system owned object lists from connector
         System s = providerSystem;
         List<SystemMachine> machines = providerSystem.getMachines();
@@ -1090,15 +1105,24 @@ public class SystemManager implements ISystemManager {
 
         // creating and adding objects
         for (SystemNetwork sn : networks) {
+            sn.getNetwork().setUser(user);
+            sn.getNetwork().setCloudProviderAccount(account);
+            sn.getNetwork().setLocation(location);
             this.em.persist(sn);
         }
         this.em.flush();
         for (SystemVolume sv : volumes) {
+            sv.getVolume().setUser(user);
+            sv.getVolume().setCloudProviderAccount(account);
+            sv.getVolume().setLocation(location);
             this.em.persist(sv);
         }
         this.em.flush();
         for (SystemMachine sm : machines) {
-            Machine mach = ((Machine) sm.getResource());
+            Machine mach = sm.getMachine();
+            mach.setUser(user);
+            mach.setCloudProviderAccount(account);
+            mach.setLocation(location);
             List<MachineDisk> diskColl = mach.getDisks();
             for (MachineDisk disk : diskColl) {
                 this.em.persist(disk);
@@ -1108,7 +1132,10 @@ public class SystemManager implements ISystemManager {
         }
         this.em.flush();
         for (SystemSystem ss : systems) {
-            this.persistSystemContent(connector, (System) ss.getResource());
+            ss.getSystem().setCloudProviderAccount(account);
+            ss.getSystem().setLocation(location);
+            ss.getSystem().setUser(user);
+            this.persistSystemContent((System) ss.getResource(), user, account, location);
             this.em.persist(ss);
         }
         this.em.flush();
@@ -1202,16 +1229,18 @@ public class SystemManager implements ISystemManager {
             if (connectorJob.getStatus().equals(Status.SUCCESS)) {
                 // success!
                 job.setStatus(Status.SUCCESS);
-                // storing new objects owned by system by querying connector
-                ICloudProviderConnector connector = this.getCloudProviderConnector();
-                if (connector == null) {
-                    throw new CloudProviderException("no connector found");
-                }
 
                 // getting system owned object lists from connector
                 System s = null;
                 System managedSystem = (System) job.getTargetEntity();
                 CloudProviderAccount cpa = managedSystem.getCloudProviderAccount();
+                CloudProviderLocation location = managedSystem.getLocation();
+
+                // storing new objects owned by system by querying connector
+                ICloudProviderConnector connector = this.getCloudProviderConnector(cpa, location);
+                if (connector == null) {
+                    throw new CloudProviderException("no connector found");
+                }
 
                 if (!job.getAction().equals(SystemManager.DELETE_ACTION)) {
                     try {
@@ -1222,7 +1251,7 @@ public class SystemManager implements ISystemManager {
                 }
 
                 if (job.getAction().equals(SystemManager.CREATE_ACTION)) {
-                    this.persistSystemContent(connector, s);
+                    this.persistSystemContent(s, managedSystem.getUser(), cpa, location);
 
                     managedSystem.setMachines(s.getMachines());
                     managedSystem.setNetworks(s.getNetworks());
