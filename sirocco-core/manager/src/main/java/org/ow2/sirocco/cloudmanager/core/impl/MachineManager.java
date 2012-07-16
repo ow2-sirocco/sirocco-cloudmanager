@@ -569,7 +569,22 @@ public class MachineManager implements IMachineManager {
         return this.doService(machineId, "stop");
     }
 
-    private Job doService(final String machineId, final String action) throws CloudProviderException {
+    public Job suspendMachine(final String machineId) throws CloudProviderException {
+
+        return this.doService(machineId, "suspend");
+    }
+
+    public Job restartMachine(final String machineId, final boolean force) throws CloudProviderException {
+
+        return this.doService(machineId, "restart", force);
+    }
+
+    public Job pauseMachine(final String machineId) throws CloudProviderException {
+
+        return this.doService(machineId, "pause");
+    }
+
+    private Job doService(final String machineId, final String action, final Object... params) throws CloudProviderException {
 
         Job j;
         Machine m = this.checkOps(machineId, action);
@@ -589,6 +604,15 @@ public class MachineManager implements IMachineManager {
             } else if (action.equals("stop")) {
                 j = computeService.stopMachine(m.getProviderAssignedId());
                 m.setState(Machine.State.STOPPING);
+            } else if (action.equals("suspend")) {
+                j = computeService.suspendMachine(m.getProviderAssignedId());
+                m.setState(Machine.State.SUSPENDING);
+            } else if (action.equals("pause")) {
+                j = computeService.pauseMachine(m.getProviderAssignedId());
+                m.setState(Machine.State.PAUSING);
+            } else if (action.equals("restart")) {
+                boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
+                j = computeService.restartMachine(m.getProviderAssignedId(), force);
             } else {
                 // TODO capabilities
                 throw new ServiceUnavailableException("Unsupported operation action " + action + " on machine id "
@@ -606,6 +630,7 @@ public class MachineManager implements IMachineManager {
         Map<String, String> map = job.getProperties();
         map.put("parent-machine", "ok");
         job.setProperties(map);
+        job.setDescription("Machine " + action);
 
         /** Ask connector for notification */
 
@@ -648,6 +673,8 @@ public class MachineManager implements IMachineManager {
 
         ICloudProviderConnector connector = this.getConnector(m);
         IComputeService computeService;
+
+        m.setState(Machine.State.DELETING);
 
         try {
             computeService = connector.getComputeService();

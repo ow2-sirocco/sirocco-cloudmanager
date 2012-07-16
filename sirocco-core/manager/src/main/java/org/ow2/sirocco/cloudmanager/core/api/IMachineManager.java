@@ -61,6 +61,12 @@ public interface IMachineManager extends IJobListener {
 
     Job stopMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
+    Job suspendMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
+
+    Job restartMachine(final String machineId, boolean force) throws ResourceNotFoundException, CloudProviderException;
+
+    Job pauseMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
+
     Job deleteMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
     List<Machine> getMachines() throws CloudProviderException;
