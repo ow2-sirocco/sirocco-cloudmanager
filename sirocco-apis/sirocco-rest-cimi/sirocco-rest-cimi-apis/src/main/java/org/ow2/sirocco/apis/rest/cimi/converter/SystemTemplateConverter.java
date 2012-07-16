@@ -129,7 +129,7 @@ public class SystemTemplateConverter extends ObjectCommonConverter {
         final SystemTemplate dataService) {
         this.fill(context, dataCimi, dataService);
         // ComponentDescriptor
-        if ((null != dataCimi.getComponentDescriptors()) && (dataCimi.getComponentDescriptors().length > 0)) {
+        if ((null != dataCimi.getListComponentDescriptors()) && (dataCimi.getListComponentDescriptors().size() > 0)) {
             Set<ComponentDescriptor> listServices = new HashSet<ComponentDescriptor>();
             for (CimiComponentDescriptor itemCimi : dataCimi.getComponentDescriptors()) {
                 listServices.add((ComponentDescriptor) context.convertNextService(itemCimi));

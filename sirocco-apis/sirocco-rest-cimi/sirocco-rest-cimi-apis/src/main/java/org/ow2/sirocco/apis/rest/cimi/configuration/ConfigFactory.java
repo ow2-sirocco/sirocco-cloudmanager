@@ -33,6 +33,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.AddressConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.AddressCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.AddressTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CloudEntryPointConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.ComponentDescriptorConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialTemplateConverter;
@@ -116,6 +117,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiComponentDescriptor;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
@@ -881,6 +883,10 @@ public class ConfigFactory {
 
         item = new ItemConfig(CimiMachineTemplateNetworkInterface.class);
         item.putData(ConfigFactory.CONVERTER, new MachineTemplateNetworkInterfaceConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiComponentDescriptor.class);
+        item.putData(ConfigFactory.CONVERTER, new ComponentDescriptorConverter());
         items.add(item);
 
         return items;
