@@ -55,6 +55,8 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     private String userData;
 
+    private Machine.State initialState;
+
     public MachineTemplate() {
 
         this.networkInterfaces = new ArrayList<MachineTemplateNetworkInterface>();
@@ -154,6 +156,14 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     public void setUserData(final String userData) {
         this.userData = userData;
+    }
+
+    public Machine.State getInitialState() {
+        return this.initialState;
+    }
+
+    public void setInitialState(final Machine.State initialState) {
+        this.initialState = initialState;
     }
 
 }
