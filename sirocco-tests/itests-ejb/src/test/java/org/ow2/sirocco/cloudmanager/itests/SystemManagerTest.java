@@ -299,8 +299,11 @@ public class SystemManagerTest extends SiroccoTester {
         }
         Assert.assertEquals(j.getStatus(), Job.Status.SUCCESS);
 
-        sv1 = this.systemManager.getSystemById(systemId);
-
+        try {
+            sv1 = this.systemManager.getSystemById(systemId);
+        } catch (Exception e) {
+            sv1 = null;
+        }
         Assert.assertNull(sv1);
 
     }
