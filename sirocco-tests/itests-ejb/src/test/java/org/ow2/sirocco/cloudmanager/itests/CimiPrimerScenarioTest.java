@@ -166,7 +166,7 @@ public class CimiPrimerScenarioTest {
     @Before
     public void setUp() throws Exception {
         System.out.println("CimiPrimerScenarioTest : setUp ");
-        // this.setUpDatabase();
+        this.setUpDatabase();
         this.connectToCloudManager();
         User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
         CloudProvider provider = this.cloudProviderManager.createCloudProvider(CimiPrimerScenarioTest.CLOUD_PROVIDER_TYPE,
