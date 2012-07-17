@@ -166,7 +166,7 @@ public class CimiPrimerScenarioTest {
     @Before
     public void setUp() throws Exception {
         System.out.println("CimiPrimerScenarioTest : setUp ");
-        this.setUpDatabase();
+        // this.setUpDatabase();
         this.connectToCloudManager();
         User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
         CloudProvider provider = this.cloudProviderManager.createCloudProvider(CimiPrimerScenarioTest.CLOUD_PROVIDER_TYPE,
@@ -227,7 +227,7 @@ public class CimiPrimerScenarioTest {
         return volumeConfig;
     }
 
-    private void initDatabase() throws Exception {
+    public void initDatabase() throws Exception {
         MachineImage image = new MachineImage();
         image.setName("WinXP SP2");
         image.setDescription("Windows XP with Service Pack 2");
@@ -332,9 +332,10 @@ public class CimiPrimerScenarioTest {
 
         // create network interfaces
         MachineTemplateNetworkInterface mtnic = null;
+        MachineTemplateNetworkInterface.InterfaceState ss = MachineTemplateNetworkInterface.InterfaceState.ACTIVE;
         for (int i = 0; i < 2; i++) {
             mtnic = new MachineTemplateNetworkInterface();
-            mtnic.setState(MachineTemplateNetworkInterface.InterfaceState.PASSIVE);
+            mtnic.setState(MachineTemplateNetworkInterface.InterfaceState.ACTIVE);
             machineTemplate.addNetworkInterface(mtnic);
         }
         MachineTemplate mt = null;
@@ -444,7 +445,7 @@ public class CimiPrimerScenarioTest {
         return machineId;
     }
 
-    String createMachineWithPreExistingVolumes() throws Exception {
+    public String createMachineWithPreExistingVolumes() throws Exception {
         /**
          * Retrieve the list of Machine Images
          */
@@ -538,7 +539,7 @@ public class CimiPrimerScenarioTest {
         return machineId;
     }
 
-    String createMachineWithNewVolumes() throws Exception {
+    public String createMachineWithNewVolumes() throws Exception {
         /**
          * Retrieve the list of Machine Images
          */
@@ -629,7 +630,7 @@ public class CimiPrimerScenarioTest {
         return machineId;
     }
 
-    private VolumeTemplate createVolumeTemplate(final String name) throws Exception {
+    public VolumeTemplate createVolumeTemplate(final String name) throws Exception {
         /**
          * Retrieve the list of Volume Configurations
          */
@@ -654,7 +655,7 @@ public class CimiPrimerScenarioTest {
         return volumeTemplate;
     }
 
-    private Volume createVolume(final String name) throws Exception {
+    public Volume createVolume(final String name) throws Exception {
         String volumeId;
         /**
          * Retrieve the list of Volume Configurations

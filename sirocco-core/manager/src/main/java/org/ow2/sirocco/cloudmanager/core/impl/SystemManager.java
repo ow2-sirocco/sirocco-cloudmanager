@@ -75,7 +75,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
@@ -1135,12 +1134,12 @@ public class SystemManager implements ISystemManager {
             mach.setUser(user);
             mach.setCloudProviderAccount(account);
             mach.setLocation(location);
-            List<MachineDisk> diskColl = mach.getDisks();
-            for (MachineDisk disk : diskColl) {
-                this.em.persist(disk);
-            }
+            mach.setCreated(new Date());
+
+            this.machineManager.persistMachineInSystem(mach);
             this.em.flush();
             this.em.persist(sm);
+
         }
         this.em.flush();
         for (SystemSystem ss : systems) {
@@ -1172,14 +1171,17 @@ public class SystemManager implements ISystemManager {
         List<SystemNetwork> networks = providerSystem.getNetworks();
 
         // syncing objects status
-        for (SystemNetwork sn : networks) {
-            Network lmanaged = (Network) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+
+        for (SystemMachine sn : machines) {
+            Machine lmanaged = (Machine) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
                 .getProviderAssignedId());
-            lmanaged.setState(((Network) sn.getResource()).getState());
+            lmanaged.setState(((Machine) sn.getResource()).getState());
             if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                lmanaged.setState(Network.State.DELETED);
+                // lmanaged.setState(Machine.State.DELETED);
+                this.machineManager.deleteMachineInSystem(lmanaged);
             }
         }
+
         for (SystemVolume sn : volumes) {
             Volume lmanaged = (Volume) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
                 .getProviderAssignedId());
@@ -1188,12 +1190,12 @@ public class SystemManager implements ISystemManager {
                 lmanaged.setState(Volume.State.DELETED);
             }
         }
-        for (SystemMachine sn : machines) {
-            Machine lmanaged = (Machine) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+        for (SystemNetwork sn : networks) {
+            Network lmanaged = (Network) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
                 .getProviderAssignedId());
-            lmanaged.setState(((Machine) sn.getResource()).getState());
+            lmanaged.setState(((Network) sn.getResource()).getState());
             if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                lmanaged.setState(Machine.State.DELETED);
+                lmanaged.setState(Network.State.DELETED);
             }
         }
         for (SystemSystem sn : systems) {

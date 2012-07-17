@@ -3,13 +3,14 @@ package org.ow2.sirocco.cloudmanager.itests;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.itests.util.SiroccoTester;
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -19,6 +20,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
@@ -73,9 +75,32 @@ public class SystemManagerTest extends SiroccoTester {
         Credentials out_cr = this.credManager.createCredentials(machineTest.initCredentials());
 
         machineTemplate.setCredentials(out_cr);
-        machineTemplate.setVolumes(new ArrayList<MachineVolume>());
+
+        this.initDatabase();
+        Volume v = this.createVolume("testVolumeAttach");
+
+        ArrayList<MachineVolume> vtItems = new ArrayList<MachineVolume>();
+        MachineVolume mv = new MachineVolume();
+        mv.setVolume(v);
+        mv.setInitialLocation("/dev/sda");
+        vtItems.add(mv);
+
+        machineTemplate.setVolumes(vtItems);
         machineTemplate.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
-        machineTemplate.setNetworkInterfaces(new ArrayList<MachineTemplateNetworkInterface>());
+
+        MachineTemplateNetworkInterface mtnic = null;
+
+        for (int i = 0; i < 2; i++) {
+            mtnic = new MachineTemplateNetworkInterface();
+            mtnic.setState(MachineTemplateNetworkInterface.InterfaceState.ACTIVE);
+            List<Address> addresses = new ArrayList<Address>();
+            Address addr = new Address();
+            String ip = "AA.BB.CC.D" + i;
+            addr.setIp(ip);
+            addresses.add(addr);
+            mtnic.setAddresses(addresses);
+            machineTemplate.addNetworkInterface(mtnic);
+        }
 
         // machineTemplate=machineManager.createMachineTemplate(machineTemplate);
 
@@ -272,14 +297,9 @@ public class SystemManagerTest extends SiroccoTester {
                 throw new Exception("system operation time out");
             }
         }
-
         Assert.assertEquals(j.getStatus(), Job.Status.SUCCESS);
 
-        try {
-            sv1 = this.systemManager.getSystemById(systemId);
-        } catch (ResourceNotFoundException e) {
-            sv1 = null;
-        }
+        sv1 = this.systemManager.getSystemById(systemId);
 
         Assert.assertNull(sv1);
 

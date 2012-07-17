@@ -29,14 +29,14 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.OneToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Column;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
@@ -45,119 +45,123 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 public class Meter extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected CloudResource   targetResource;
-    
-    protected String          units;
-    
-    protected Integer         sampleInterval;
-    
-   
-    protected MeterConfiguration.TimeScope       timeScope;
-    
-    
-    protected MeterConfiguration.IntervalDuration    intervalDuration;
-    
-    protected boolean             isContinuous;
-    
-    protected List<MeterSample>   samples;
-    
-    protected String              minValue;
-    
-    protected String              maxValue;
-    
-    protected Date              stopTime;
-    
-    protected Date              expiresTime;
+    protected CloudResource targetResource;
+
+    protected String units;
+
+    protected Integer sampleInterval;
+
+    protected MeterConfiguration.TimeScope timeScope;
+
+    protected MeterConfiguration.IntervalDuration intervalDuration;
+
+    protected boolean isContinuous;
+
+    protected List<MeterSample> samples;
+
+    protected String minValue;
+
+    protected String maxValue;
+
+    protected Date stopTime;
+
+    protected Date expiresTime;
 
     @ManyToOne
     public CloudResource getTargetResource() {
-        return targetResource;
+        return this.targetResource;
     }
 
-    public void setTargetResource(CloudResource targetResource) {
+    public void setTargetResource(final CloudResource targetResource) {
         this.targetResource = targetResource;
     }
 
     public String getUnits() {
-        return units;
+        return this.units;
     }
 
-    public void setUnits(String units) {
+    public void setUnits(final String units) {
         this.units = units;
     }
 
     public Integer getSampleInterval() {
-        return sampleInterval;
+        return this.sampleInterval;
     }
 
-    public void setSampleInterval(Integer sampleInterval) {
+    public void setSampleInterval(final Integer sampleInterval) {
         this.sampleInterval = sampleInterval;
     }
+
     @Enumerated(EnumType.STRING)
     public MeterConfiguration.TimeScope getTimeScope() {
-        return timeScope;
+        return this.timeScope;
+
     }
 
-    public void setTimeScope(MeterConfiguration.TimeScope timeScope) {
+    public void setTimeScope(final MeterConfiguration.TimeScope timeScope) {
         this.timeScope = timeScope;
     }
+
     @Enumerated(EnumType.STRING)
     public MeterConfiguration.IntervalDuration getIntervalDuration() {
-        return intervalDuration;
+        return this.intervalDuration;
     }
 
-    public void setIntervalDuration(MeterConfiguration.IntervalDuration intervalDuration) {
+    public void setIntervalDuration(final MeterConfiguration.IntervalDuration intervalDuration) {
         this.intervalDuration = intervalDuration;
     }
 
     public boolean isContinuous() {
-        return isContinuous;
+        return this.isContinuous;
     }
 
-    public void setContinuous(boolean isContinuous) {
+    public void setContinuous(final boolean isContinuous) {
         this.isContinuous = isContinuous;
     }
 
     @OneToMany
     public List<MeterSample> getSamples() {
-        return samples;
+        return this.samples;
     }
 
-    public void setSamples(List<MeterSample> samples) {
+    public void setSamples(final List<MeterSample> samples) {
         this.samples = samples;
     }
 
-    @Column(name="minValueMeter")
+    @Column(name = "minValueMeter")
     public String getMinValue() {
-        return minValue;
+        return this.minValue;
     }
 
-    public void setMinValue(String minValue) {
+    public void setMinValue(final String minValue) {
         this.minValue = minValue;
     }
-    
-    @Column(name="maxValueMeter")
+
+    @Column(name = "maxValueMeter")
     public String getMaxValue() {
-        return maxValue;
+        return this.maxValue;
+
     }
 
-    public void setMaxValue(String maxValue) {
+    public void setMaxValue(final String maxValue) {
         this.maxValue = maxValue;
     }
+
     @Temporal(TemporalType.TIMESTAMP)
     public Date getStopTime() {
-        return stopTime;
+        return this.stopTime;
     }
 
-    public void setStopTime(Date stopTime) {
+    public void setStopTime(final Date stopTime) {
         this.stopTime = stopTime;
     }
+
     @Temporal(TemporalType.TIMESTAMP)
     public Date getExpiresTime() {
-        return expiresTime;
+        return this.expiresTime;
     }
 
-    public void setExpiresTime(Date expiresTime) {
+    public void setExpiresTime(final Date expiresTime) {
         this.expiresTime = expiresTime;
     }
 }

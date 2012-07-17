@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -52,7 +53,7 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
 
     // unidirectional
     // oneToOne until shareable volume support is added
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     public Volume getVolume() {
         return this.volume;
     }

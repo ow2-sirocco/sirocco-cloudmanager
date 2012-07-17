@@ -129,4 +129,13 @@ public class Address extends CloudEntity implements Serializable {
         this.resource = resource;
     }
 
+    public void clone(final Address a) {
+        a.setMask(this.getMask());
+        a.setIp(this.getIp());
+        a.setHostName(this.getHostName());
+        a.setProtocol(this.getProtocol());
+        a.setDefaultGateway(this.getDefaultGateway());
+        a.setAllocation(this.getAllocation());
+        a.setDns(this.getDns());
+    }
 }

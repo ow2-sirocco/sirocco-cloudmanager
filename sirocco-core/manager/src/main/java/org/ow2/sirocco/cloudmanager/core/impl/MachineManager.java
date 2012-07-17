@@ -1266,7 +1266,7 @@ public class MachineManager implements IMachineManager {
         deleted.setCloudProviderAccount(null);
 
         /**
-         * TODO: CHECK what to do with the volumes? Should they be deleted?
+         * TODO: CHECK what to do with the volumes created for this machine?
          */
         List<MachineVolume> volColl = deleted.getVolumes();
         List<MachineDisk> diskColl = deleted.getDisks();
@@ -1278,18 +1278,19 @@ public class MachineManager implements IMachineManager {
             for (MachineVolume mv : volColl) {
                 mv.setVolume(null);
                 mv.setState(MachineVolume.State.DELETED);
-                // this.em.remove(mv);
             }
         }
 
         if (diskColl != null) {
             for (MachineDisk disk : diskColl) {
                 disk.setState(MachineDisk.State.DELETED);
-                // this.em.remove(disk);
+
             }
         }
 
         deleted.setState(State.DELETED);
+        // TODO WAIT CYRIL:
+        // this.systemManager.handleStateChangeOfSystemEntity(deleted);
         this.em.flush();
     }
 
@@ -1319,22 +1320,25 @@ public class MachineManager implements IMachineManager {
      * Create network interface entities
      */
     private void createNetworkInterfaces(final Machine persisted, final Machine created) {
+        MachineManager.logger.info("createNetworkInterfaces " + persisted.getId());
         List<MachineNetworkInterface> nics = created.getNetworkInterfaces();
         if (nics == null) {
             return;
         }
+        MachineManager.logger.info("createNetworkInterfaces machine " + persisted.getId() + " has nics " + nics.size());
         for (MachineNetworkInterface nic : nics) {
             // TODO we ignore network and port returned by connectors
             nic.setNetwork(null);
             nic.setNetworkPort(null);
 
             List<Address> addresses = nic.getAddresses();
+            MachineManager.logger.info(" createNetworkInterfaces has addresses " + addresses.size());
             for (Address address : addresses) {
                 address.setNetwork(null);
                 address.setResource(null);
                 this.em.persist(address);
             }
-
+            MachineManager.logger.info("createNetworkInterfaces persist nic ");
             this.em.persist(nic);
             persisted.addNetworkInterface(nic);
         }
@@ -2224,6 +2228,114 @@ public class MachineManager implements IMachineManager {
         CloudProviderException {
         return UtilsForManagers.getCollectionItemList("MachineNetworkInterface", this.em, this.getUser().getUsername(), first,
             last, filters, attributes, false, "Machine", "networkInterfaces", machineId);
+    }
+
+    /**
+     * Methods used by system manager when a system is created, deleted or
+     * operations such as stop and start are performed.
+     */
+
+    @Override
+    public void persistMachineInSystem(final Machine machine) throws CloudProviderException {
+
+        // new unknown machine
+        if (machine.getId() != null) {
+            throw new CloudProviderException(" Machine " + machine.getId() + " already persisted ");
+        }
+
+        /**
+         * MachineNetworkInterface, MachineVolume, MachineDisk are persisted in
+         * cascade
+         */
+        List<MachineNetworkInterface> nics = machine.getNetworkInterfaces();
+        if (nics != null && nics.size() > 0) {
+
+            for (MachineNetworkInterface nic : nics) {
+                if (nic.getId() != null) {
+                    MachineManager.logger.info(" persistMachineInSystem strange interface is persisted entity " + nic.getId());
+                }
+                if (nic.getAddresses() != null) {
+                    nic.getAddresses().size();
+                    for (Address addr : nic.getAddresses()) {
+                        if (addr.getId() != null) {
+                            MachineManager.logger.info(" persistMachineInSystem strange address is a persisted entity "
+                                + addr.getIp() + " " + addr.getId());
+                        }
+                    }
+                }
+            }
+        }
+
+        this.em.persist(machine);
+        this.em.flush();
+
+        nics = machine.getNetworkInterfaces();
+        if (nics != null && nics.size() > 0) {
+
+            for (MachineNetworkInterface nic : nics) {
+
+                if (nic.getAddresses() != null) {
+                    nic.getAddresses().size();
+                    List<Address> addresses = nic.getAddresses();
+                    for (Address addr : addresses) {
+                        addr.setResource(machine);
+                    }
+                }
+            }
+        }
+
+        this.em.merge(machine);
+        this.em.flush();
+
+    }
+
+    @Override
+    public void deleteMachineInSystem(final Machine machine) throws CloudProviderException {
+
+        if (machine.getId() == null) {
+            throw new CloudProviderException(" Deleting a machine not persisted yet ");
+        }
+
+        /** Delete MachineNetworkInterface */
+        List<MachineNetworkInterface> nics = machine.getNetworkInterfaces();
+        for (MachineNetworkInterface nic : nics) {
+            MachineManager.logger.info("deleteMachineInSystem delete nic " + nic.getId());
+            // TODO no need to null
+            List<Address> addrs = nic.getAddresses();
+            for (Address addr : addrs) {
+                addr.setNetwork(null);
+                addr.setResource(null);
+            }
+            nic.setNetwork(null);
+            nic.setNetworkPort(null);
+            this.em.remove(nic);
+        }
+        machine.setNetworkInterfaces(null);
+        /** MachineDisk will get removed when Machine is really deleted */
+        List<MachineDisk> disks = machine.getDisks();
+        for (MachineDisk disk : disks) {
+            this.em.remove(disk);
+        }
+        machine.setDisks(null);
+        List<MachineVolume> volumes = machine.getVolumes();
+        for (MachineVolume volume : volumes) {
+            volume.setVolume(null);
+            this.em.remove(volume);
+        }
+        machine.setState(Machine.State.DELETED);
+        this.em.merge(machine);
+        this.em.flush();
+    }
+
+    @Override
+    public void updateMachineInSystem(final Machine machine) throws CloudProviderException {
+
+        if (machine.getId() == null) {
+            throw new CloudProviderException(" Updating a machine not persisted yet ");
+        }
+        this.em.merge(machine);
+        this.em.flush();
+
     }
 
 }

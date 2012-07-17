@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -111,7 +112,7 @@ public class Machine extends CloudResource implements Serializable {
         this.memory = memory;
     }
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
     public List<MachineDisk> getDisks() {
         return this.disks;
@@ -127,7 +128,7 @@ public class Machine extends CloudResource implements Serializable {
         }
     }
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
@@ -149,7 +150,7 @@ public class Machine extends CloudResource implements Serializable {
         this.volumes = volumes;
     }
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "machine_id", referencedColumnName = "id")
     public List<MachineNetworkInterface> getNetworkInterfaces() {

@@ -233,4 +233,12 @@ public interface IMachineManager extends IJobListener {
     Job updateNetworkInterfaceAttributesInMachine(String machineId, String nicId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
 
+    //
+    // For system management
+    //
+    void persistMachineInSystem(Machine machine) throws CloudProviderException;
+
+    void deleteMachineInSystem(Machine machine) throws CloudProviderException;
+
+    void updateMachineInSystem(Machine machine) throws CloudProviderException;
 }
