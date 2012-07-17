@@ -62,7 +62,7 @@ public class CimiSelectTest {
     }
 
     /**
-     * Test for {@link CimiSelect#dispatchAttributesValues(Object)}.
+     * Test for {@link CimiSelect#copyBeanAttributes(Object)}.
      */
     @Test
     public void testDispatchAttributesValues() {
@@ -84,7 +84,7 @@ public class CimiSelectTest {
         image.setName("imageNameValue");
         image.setDescription("imageDescriptionValue");
 
-        dispatched = cimiSelect.dispatchAttributesValues(image);
+        dispatched = cimiSelect.copyBeanAttributes(image);
 
         Assert.assertEquals(2, dispatched.size());
         Assert.assertEquals("imageNameValue", dispatched.get("name"));
@@ -95,7 +95,7 @@ public class CimiSelectTest {
         MachineConfiguration config = new MachineConfiguration();
         config.setName("configNameValue");
 
-        dispatched = cimiSelect.dispatchAttributesValues(config);
+        dispatched = cimiSelect.copyBeanAttributes(config);
         Assert.assertEquals(1, dispatched.size());
         Assert.assertEquals("configNameValue", dispatched.get("name"));
     }

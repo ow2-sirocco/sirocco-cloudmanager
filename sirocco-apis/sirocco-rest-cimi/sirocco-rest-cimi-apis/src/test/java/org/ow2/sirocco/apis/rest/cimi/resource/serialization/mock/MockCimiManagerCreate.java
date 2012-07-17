@@ -67,8 +67,8 @@ public class MockCimiManagerCreate extends MockCimiManager {
             context.getResponse().putHeader(Constants.HEADER_CIMI_JOB_URI, cimiJob.getId());
             context.getResponse().putHeader(
                 Constants.HEADER_LOCATION,
-                PathHelper.makeHref(context.getRequest().getBaseUri(), this.extractPathname(context.getRequest().getPath()),
-                    cimiJob.getTargetResource().getHref()));
+                PathHelper.makeHref(context.getRequest().getBaseUri(),
+                    PathHelper.extractPathname(context.getRequest().getPath()), cimiJob.getTargetResource().getHref()));
             context.getResponse().setStatus(Status.ACCEPTED);
         } catch (ComparisonFailure e) {
             // Build assert error

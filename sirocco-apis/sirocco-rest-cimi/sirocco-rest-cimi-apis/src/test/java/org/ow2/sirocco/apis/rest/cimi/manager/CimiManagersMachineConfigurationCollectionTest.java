@@ -37,6 +37,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfiguration
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiFilter;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiIntegerParam;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
@@ -78,10 +80,13 @@ public class CimiManagersMachineConfigurationCollectionTest {
 
         this.request = new CimiRequest();
         this.request.setBaseUri("/");
-        RequestParams header = new RequestParams();
-        header.setCimiSelect(new CimiSelect());
-        header.setCimiExpand(new CimiExpand());
-        this.request.setParams(header);
+        RequestParams params = new RequestParams();
+        params.setCimiSelect(new CimiSelect());
+        params.setCimiExpand(new CimiExpand());
+        params.setCimiFilter(new CimiFilter());
+        params.setCimiFirst(new CimiIntegerParam());
+        params.setCimiLast(new CimiIntegerParam());
+        this.request.setParams(params);
 
         this.response = new CimiResponse();
         this.context = new CimiContextImpl(this.request, this.response);
@@ -124,27 +129,26 @@ public class CimiManagersMachineConfigurationCollectionTest {
     }
 
     // FIXME Adapt to the last CIMI specification
-    // @Test
-    // public void testReadWithCimiSelectAttributes() throws Exception {
-    //
-    // List<MachineConfiguration> list = new ArrayList<MachineConfiguration>();
-    // EasyMock.expect(
-    // this.service.getMachineConfigurations(EasyMock.eq(Arrays.asList(new
-    // String[] {"operations"})),
-    // EasyMock.eq((String) null))).andReturn(list);
-    // EasyMock.replay(this.service);
-    //
-    // this.request.getHeader().getCimiSelect().setSelects(new String[]
-    // {"operations"});
-    // this.managerReadCollection.execute(this.context);
-    //
-    // Assert.assertEquals(200, this.response.getStatus());
-    // Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH,
-    // ((CimiMachineConfigurationCollection)
-    // this.response.getCimiData()).getId());
-    //
-    // EasyMock.verify(this.service);
-    // }
+    @Test
+    public void testReadWithCimiSelectAttributes() throws Exception {
+
+        List<MachineConfiguration> list = new ArrayList<MachineConfiguration>();
+        // EasyMock.expect(
+        // this.service.getMachineConfigurations(EasyMock.eq(Arrays.asList(new
+        // String[] {"operations"})),
+        // EasyMock.eq((String) null))).andReturn(list);
+        EasyMock.replay(this.service);
+
+        // this.request.getHeader().getCimiSelect().setSelects(new String[]
+        // {"operations"});
+        this.managerReadCollection.execute(this.context);
+
+        Assert.assertEquals(200, this.response.getStatus());
+        Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH,
+            ((CimiMachineConfigurationCollection) this.response.getCimiData()).getId());
+
+        EasyMock.verify(this.service);
+    }
 
     // FIXME Adapt to the last CIMI specification
     // @Test

@@ -25,6 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.resource.serialization.mock;
 
 import org.ow2.sirocco.apis.rest.cimi.builder.CimiResourceBuilderHelper;
+import org.ow2.sirocco.apis.rest.cimi.converter.PathHelper;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.PathType;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
@@ -38,7 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.MethodType;
 public abstract class MockCimiManager implements CimiManager {
 
     protected CimiData buildEntity(final CimiRequest request) {
-        String pathname = this.extractPathname(request.getPath());
+        String pathname = PathHelper.extractPathname(request.getPath());
         PathType type = PathType.valueOfPath(pathname);
         return this.buildResource(request, type);
     }
@@ -271,14 +272,4 @@ public abstract class MockCimiManager implements CimiManager {
         return cimi;
     }
 
-    protected String extractPathname(final String path) {
-        String pathname = null;
-        int index = path.indexOf('/');
-        if (index > -1) {
-            pathname = path.substring(0, index);
-        } else {
-            pathname = path;
-        }
-        return pathname;
-    }
 }
