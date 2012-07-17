@@ -55,11 +55,11 @@ public class CimiManagerReadJob extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Job out = null;
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.getJobById(context.getRequest().getId());
         } else {
-            out = this.manager.getJobAttributes(context.getRequest().getId(), select.getAttributes());
+            out = this.manager.getJobAttributes(context.getRequest().getId(), select.getValues());
         }
         return out;
     }

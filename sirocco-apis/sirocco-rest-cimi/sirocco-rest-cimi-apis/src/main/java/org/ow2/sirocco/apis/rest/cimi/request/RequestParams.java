@@ -28,7 +28,7 @@ import java.io.Serializable;
 
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertVersion;
 
-public class RequestHeader implements Serializable {
+public class RequestParams implements Serializable {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -36,6 +36,12 @@ public class RequestHeader implements Serializable {
     private CimiSelect cimiSelect;
 
     private CimiExpand cimiExpand;
+
+    private CimiFilter cimiFilter;
+
+    private CimiIntegerParam cimiFirst;
+
+    private CimiIntegerParam cimiLast;
 
     @AssertVersion
     private String version;
@@ -68,6 +74,48 @@ public class RequestHeader implements Serializable {
      */
     public void setCimiExpand(final CimiExpand cimiExpand) {
         this.cimiExpand = cimiExpand;
+    }
+
+    /**
+     * @return the cimiFilter
+     */
+    public CimiFilter getCimiFilter() {
+        return this.cimiFilter;
+    }
+
+    /**
+     * @param cimiFilter the cimiFilter to set
+     */
+    public void setCimiFilter(final CimiFilter cimiFilter) {
+        this.cimiFilter = cimiFilter;
+    }
+
+    /**
+     * @return the cimiFirst
+     */
+    public CimiIntegerParam getCimiFirst() {
+        return this.cimiFirst;
+    }
+
+    /**
+     * @param cimiFirst the cimiFirst to set
+     */
+    public void setCimiFirst(final CimiIntegerParam cimiFirst) {
+        this.cimiFirst = cimiFirst;
+    }
+
+    /**
+     * @return the cimiLast
+     */
+    public CimiIntegerParam getCimiLast() {
+        return this.cimiLast;
+    }
+
+    /**
+     * @param cimiLast the cimiLast to set
+     */
+    public void setCimiLast(final CimiIntegerParam cimiLast) {
+        this.cimiLast = cimiLast;
     }
 
     public void setVersion(final String version) {

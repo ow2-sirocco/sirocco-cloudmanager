@@ -43,7 +43,7 @@ public class RequestHelper {
     public static CimiRequest buildRequest(final RestResourceAbstract.JaxRsRequestInfos infos, final IdRequest ids,
         final CimiData cimiData) {
         CimiRequest request = new CimiRequest();
-        request.setHeader(RequestHelper.buildRequestHeader(infos));
+        request.setParams(RequestHelper.buildRequestHeader(infos));
         request.setIds(ids);
         request.setCimiData(cimiData);
         request.setBaseUri(infos.getUriInfo().getBaseUri().toString());
@@ -52,8 +52,8 @@ public class RequestHelper {
         return request;
     }
 
-    private static RequestHeader buildRequestHeader(final RestResourceAbstract.JaxRsRequestInfos infos) {
-        RequestHeader requestHeader = new RequestHeader();
+    private static RequestParams buildRequestHeader(final RestResourceAbstract.JaxRsRequestInfos infos) {
+        RequestParams requestHeader = new RequestParams();
         List<String> versions = infos.getHeaders().getRequestHeader(Constants.HEADER_CIMI_VERSION);
         if ((null != versions) && (versions.size() > 0)) {
             requestHeader.setVersion(versions.get(0));
@@ -61,9 +61,14 @@ public class RequestHelper {
 
         requestHeader.setCimiSelect(new CimiSelect(RequestHelper.transformQueryParamToList(Constants.PARAM_CIMI_SELECT, infos
             .getUriInfo().getQueryParameters())));
-
         requestHeader.setCimiExpand(new CimiExpand(RequestHelper.transformQueryParamToList(Constants.PARAM_CIMI_EXPAND, infos
             .getUriInfo().getQueryParameters())));
+        requestHeader.setCimiFilter(new CimiFilter(RequestHelper.transformQueryParamToList(Constants.PARAM_CIMI_FILTER, infos
+            .getUriInfo().getQueryParameters())));
+        requestHeader.setCimiFirst(new CimiIntegerParam(RequestHelper.transformQueryParamToString(Constants.PARAM_CIMI_FIRST,
+            infos.getUriInfo().getQueryParameters())));
+        requestHeader.setCimiLast(new CimiIntegerParam(RequestHelper.transformQueryParamToString(Constants.PARAM_CIMI_LAST,
+            infos.getUriInfo().getQueryParameters())));
 
         List<String> siroccoInfoTestsId = infos.getHeaders().getRequestHeader(Constants.HEADER_SIROCCO_INFO_TEST_ID);
         if ((null != siroccoInfoTestsId) && (siroccoInfoTestsId.size() > 0)) {
@@ -75,9 +80,19 @@ public class RequestHelper {
 
     private static List<String> transformQueryParamToList(final String paramName,
         final MultivaluedMap<String, String> queryParameters) {
-        List<String> listSelect = new ArrayList<String>();
-        listSelect = queryParameters.get(paramName);
-        return listSelect;
+        List<String> params = new ArrayList<String>();
+        params = queryParameters.get(paramName);
+        return params;
+    }
+
+    private static String transformQueryParamToString(final String paramName,
+        final MultivaluedMap<String, String> queryParameters) {
+        List<String> params = RequestHelper.transformQueryParamToList(paramName, queryParameters);
+        String param = null;
+        if ((null != params) && (params.size() > 0)) {
+            param = params.get(0);
+        }
+        return param;
     }
 
 }

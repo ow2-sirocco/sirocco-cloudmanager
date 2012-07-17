@@ -30,21 +30,30 @@ public abstract class Constants {
     public static final String VERSION_DMTF_CIMI = "1.0";
 
     /** Parameter name in Query String : select. */
-    public static final String PARAM_CIMI_SELECT = "select";
+    public static final String PARAM_CIMI_SELECT = "$select";
 
     /** Parameter name in Query String : expand. */
-    public static final String PARAM_CIMI_EXPAND = "expand";
+    public static final String PARAM_CIMI_EXPAND = "$expand";
+
+    /** Parameter name in Query String : first. */
+    public static final String PARAM_CIMI_FIRST = "$first";
+
+    /** Parameter name in Query String : last. */
+    public static final String PARAM_CIMI_LAST = "$last";
+
+    /** Parameter name in Query String : filter. */
+    public static final String PARAM_CIMI_FILTER = "$filter";
 
     /** Parameter name in Header : CIMI-Specification-Version. */
     public static final String HEADER_CIMI_VERSION = "CIMI-Specification-Version";
-
-    /** Parameter name in Header : SIROCCO-INFO-TEST-ID. */
-    public static final String HEADER_SIROCCO_INFO_TEST_ID = "SIROCCO-INFO-TEST-ID";
 
     /** Parameter name in Header : CIMI-Job-URI. */
     public static final String HEADER_CIMI_JOB_URI = "CIMI-Job-URI";
 
     /** Parameter name in Header : Location. */
     public static final String HEADER_LOCATION = "Location";
+
+    /** Parameter name in Header : SIROCCO-INFO-TEST-ID. */
+    public static final String HEADER_SIROCCO_INFO_TEST_ID = "SIROCCO-INFO-TEST-ID";
 
 }

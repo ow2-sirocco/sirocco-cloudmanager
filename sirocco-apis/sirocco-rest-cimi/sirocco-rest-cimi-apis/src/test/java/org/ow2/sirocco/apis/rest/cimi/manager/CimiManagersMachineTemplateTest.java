@@ -44,7 +44,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.IdRequest;
-import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
+import org.ow2.sirocco.apis.rest.cimi.request.RequestParams;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
@@ -95,9 +95,9 @@ public class CimiManagersMachineTemplateTest {
 
         this.request = new CimiRequest();
         this.request.setBaseUri("/");
-        RequestHeader header = new RequestHeader();
+        RequestParams header = new RequestParams();
         header.setCimiSelect(new CimiSelect());
-        this.request.setHeader(header);
+        this.request.setParams(header);
 
         this.response = new CimiResponse();
         this.context = new CimiContextImpl(this.request, this.response);
@@ -223,7 +223,7 @@ public class CimiManagersMachineTemplateTest {
         cimi.setDescription("fooDescription");
         this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
-        this.request.getHeader().getCimiSelect().setSelects(new String[] {"name", "description"});
+        this.request.getParams().getCimiSelect().setInitialValues(new String[] {"name", "description"});
 
         this.managerUpdate.execute(this.context);
 

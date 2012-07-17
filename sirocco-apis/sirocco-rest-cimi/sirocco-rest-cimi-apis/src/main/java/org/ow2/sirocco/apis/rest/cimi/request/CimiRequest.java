@@ -37,7 +37,7 @@ public class CimiRequest implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** Parameters of the request */
-    private RequestHeader header;
+    private RequestParams params;
 
     /** IDs of the request */
     private IdRequest idRequest = new IdRequest();
@@ -59,17 +59,17 @@ public class CimiRequest implements Serializable {
      * 
      * @return The parameters
      */
-    public RequestHeader getHeader() {
-        return this.header;
+    public RequestParams getParams() {
+        return this.params;
     }
 
     /**
      * Set the parameters of the request.
      * 
-     * @param header Parameters of the request
+     * @param params Parameters of the request
      */
-    public void setHeader(final RequestHeader header) {
-        this.header = header;
+    public void setParams(final RequestParams params) {
+        this.params = params;
     }
 
     /**

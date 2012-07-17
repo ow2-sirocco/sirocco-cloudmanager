@@ -51,7 +51,7 @@ public class CimiManagerUpdateJob extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             this.manager.updateJob((Job) dataService);
         } else {

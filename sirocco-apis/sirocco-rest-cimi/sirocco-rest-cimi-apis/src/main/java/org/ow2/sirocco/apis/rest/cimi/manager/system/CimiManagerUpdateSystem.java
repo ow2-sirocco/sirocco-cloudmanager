@@ -28,6 +28,7 @@ import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -51,13 +52,12 @@ public class CimiManagerUpdateSystem extends CimiManagerUpdateAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
-            // FIXME out = this.manager.updateSystem((System) dataService);
+            out = this.manager.updateSystem((System) dataService);
         } else {
-            // FIXME out =
-            // this.manager.updateSystemAttributes(context.getRequest().getId(),
-            // select.dispatchAttributesValues(dataService));
+            out = this.manager.updateAttributesInSystem(context.getRequest().getId(),
+                select.dispatchAttributesValues(dataService));
         }
         return out;
     }

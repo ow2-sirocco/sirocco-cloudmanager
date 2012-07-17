@@ -41,7 +41,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
-import org.ow2.sirocco.apis.rest.cimi.request.RequestHeader;
+import org.ow2.sirocco.apis.rest.cimi.request.RequestParams;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -61,10 +61,10 @@ public class MonitoringConverterTest {
 
         this.request = new CimiRequest();
         this.request.setBaseUri("http://www.test.org/");
-        RequestHeader header = new RequestHeader();
+        RequestParams header = new RequestParams();
         header.setCimiSelect(new CimiSelect());
         header.setCimiExpand(new CimiExpand());
-        this.request.setHeader(header);
+        this.request.setParams(header);
 
         this.context = new CimiContextImpl(this.request, new CimiResponse());
     }

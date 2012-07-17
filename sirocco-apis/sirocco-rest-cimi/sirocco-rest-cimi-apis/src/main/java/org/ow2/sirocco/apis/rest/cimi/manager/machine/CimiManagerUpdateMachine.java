@@ -52,7 +52,7 @@ public class CimiManagerUpdateMachine extends CimiManagerUpdateAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out;
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.updateMachine((Machine) dataService);
         } else {

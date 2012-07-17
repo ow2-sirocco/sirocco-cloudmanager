@@ -59,11 +59,11 @@ public class CimiManagerReadVolumeImageCollection extends CimiManagerReadAbstrac
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.getVolumeImages();
         } else {
-            QueryResult<VolumeImage> results = this.manager.getVolumeImages(-1, -1, null, select.getAttributes());
+            QueryResult<VolumeImage> results = this.manager.getVolumeImages(-1, -1, null, select.getValues());
             out = results.getItems();
             // TODO First, Last, Filter
         }

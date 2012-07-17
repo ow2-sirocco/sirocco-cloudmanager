@@ -59,12 +59,12 @@ public class CimiManagerReadVolumeConfigurationCollection extends CimiManagerRea
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.getVolumeConfigurations();
         } else {
             QueryResult<VolumeConfiguration> results = this.manager.getVolumeConfigurations(-1, -1, null,
-                select.getAttributes());
+                select.getValues());
             out = results.getItems();
             // TODO First, Last, Filter
         }

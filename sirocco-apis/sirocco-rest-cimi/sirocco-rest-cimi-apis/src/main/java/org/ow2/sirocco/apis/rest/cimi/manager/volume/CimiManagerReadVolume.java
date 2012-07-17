@@ -55,11 +55,11 @@ public class CimiManagerReadVolume extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Volume out = null;
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.getVolumeById(context.getRequest().getId());
         } else {
-            out = this.manager.getVolumeAttributes(context.getRequest().getId(), select.getAttributes());
+            out = this.manager.getVolumeAttributes(context.getRequest().getId(), select.getValues());
         }
         return out;
     }

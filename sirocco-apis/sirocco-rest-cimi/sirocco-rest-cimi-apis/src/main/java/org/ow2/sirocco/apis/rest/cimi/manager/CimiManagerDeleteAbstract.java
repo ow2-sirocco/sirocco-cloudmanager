@@ -41,7 +41,7 @@ public abstract class CimiManagerDeleteAbstract extends CimiManagerAbstract {
      */
     @Override
     protected boolean validate(final CimiContext context) throws Exception {
-        return CimiValidatorHelper.getInstance().validate(context, context.getRequest().getHeader());
+        return CimiValidatorHelper.getInstance().validate(context, context.getRequest().getParams());
     }
 
     /**

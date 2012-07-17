@@ -29,14 +29,14 @@ import java.util.List;
 /**
  * Utility class to manage CIMI Expand expression in the QueryString.
  */
-public class CimiExpand extends CimiFilter {
+public class CimiFilter extends CimiStringParams {
 
     private static final long serialVersionUID = 1L;
 
     /**
      * Default constructor.
      */
-    public CimiExpand() {
+    public CimiFilter() {
         super();
     }
 
@@ -45,7 +45,7 @@ public class CimiExpand extends CimiFilter {
      * 
      * @param initialValue The initial value
      */
-    public CimiExpand(final List<String> initialValues) {
+    public CimiFilter(final List<String> initialValues) {
         super(initialValues);
     }
 
@@ -54,7 +54,7 @@ public class CimiExpand extends CimiFilter {
      * 
      * @param initialValues The initial values
      */
-    public CimiExpand(final String initialValue) {
+    public CimiFilter(final String initialValue) {
         super(initialValue);
     }
 
@@ -63,22 +63,21 @@ public class CimiExpand extends CimiFilter {
      * 
      * @param initialValues The initial values
      */
-    public CimiExpand(final String[] initialValues) {
+    public CimiFilter(final String[] initialValues) {
         super(initialValues);
     }
 
     /**
      * {@inheritDoc}
      * <p>
-     * Detect Wildcard all "*".
+     * Split by comma and remove duplicate.
      * </p>
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiFilter#prepare()
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiParam#prepare()
      */
     @Override
     protected void prepare() {
-        super.prepare();
-        this.prepareWildCardAll();
+        this.prepareToSplit();
     }
 
 }

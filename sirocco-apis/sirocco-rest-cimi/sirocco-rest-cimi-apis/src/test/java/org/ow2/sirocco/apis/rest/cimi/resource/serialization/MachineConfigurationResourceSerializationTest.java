@@ -34,7 +34,7 @@ import net.javacrumbs.jsonunit.JsonAssert;
 
 import org.custommonkey.xmlunit.XMLAssert;
 import org.junit.Test;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiStringParams;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.json.JsonLocator;
 import org.ow2.sirocco.apis.rest.cimi.resource.serialization.xml.XmlLocator;
 import org.ow2.sirocco.apis.rest.cimi.utils.Constants;
@@ -237,7 +237,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
 
         // JSON : id = 3, expand
         clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .queryParam(Constants.PARAM_CIMI_EXPAND, CimiExpand.EXPAND_ALL).accept(MediaType.APPLICATION_JSON_TYPE)
+            .queryParam(Constants.PARAM_CIMI_EXPAND, CimiStringParams.ALL).accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).get(ClientResponse.class);
 
@@ -322,7 +322,7 @@ public class MachineConfigurationResourceSerializationTest extends Serialization
 
         // XML : id = 3, expand
         clientResponse = this.resource().path(ConstantsPath.MACHINE_CONFIGURATION)
-            .queryParam(Constants.PARAM_CIMI_EXPAND, CimiExpand.EXPAND_ALL).accept(MediaType.APPLICATION_XML_TYPE)
+            .queryParam(Constants.PARAM_CIMI_EXPAND, CimiStringParams.ALL).accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
             .header(Constants.HEADER_SIROCCO_INFO_TEST_ID, 3).get(ClientResponse.class);
 

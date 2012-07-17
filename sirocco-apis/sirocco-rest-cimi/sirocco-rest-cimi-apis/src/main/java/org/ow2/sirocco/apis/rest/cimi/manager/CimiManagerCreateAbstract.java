@@ -39,7 +39,7 @@ public abstract class CimiManagerCreateAbstract extends CimiManagerAbstract {
      */
     @Override
     protected boolean validate(final CimiContext context) throws Exception {
-        boolean valid = CimiValidatorHelper.getInstance().validate(context, context.getRequest().getHeader());
+        boolean valid = CimiValidatorHelper.getInstance().validate(context, context.getRequest().getParams());
         if (valid) {
             if (null == context.getRequest().getCimiData()) {
                 valid = false;

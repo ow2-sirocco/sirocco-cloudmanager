@@ -259,7 +259,7 @@ public class CimiContextImpl implements CimiContext {
             case VolumeImageCollection:
             case VolumeTemplateCollection:
             case VolumeVolumeImageCollection:
-                expand = this.getRequest().getHeader().getCimiExpand().hasExpandAll();
+                expand = this.getRequest().getParams().getCimiExpand().hasAll();
                 break;
             default:
                 break;
@@ -411,6 +411,37 @@ public class CimiContextImpl implements CimiContext {
             throw new ConfigurationException("Associate class not found in configuration for " + klass.getName());
         }
         return cimi;
+    }
+
+    /**
+     * Indicator of the presence of a CIMI parameters for reading collections :
+     * First, Last, Filter or Select.
+     * 
+     * @return True if a parameter used by reading collections is present.
+     */
+    public boolean hasParamsForReadingCollection() {
+        boolean has = false;
+        if ((false == this.getRequest().getParams().getCimiFirst().isEmpty())) {
+            has = true;
+        } else if ((false == this.getRequest().getParams().getCimiLast().isEmpty())) {
+            has = true;
+        } else if ((false == this.getRequest().getParams().getCimiFilter().isEmpty())) {
+            has = true;
+        } else if ((false == this.getRequest().getParams().getCimiSelect().isEmpty())) {
+            has = true;
+        }
+        return has;
+    }
+
+    /**
+     * Indicator of the presence of a CIMI parameters for reading (or updating)
+     * partial resource : Select.
+     * 
+     * @return True if a parameter used by reading (or updating) partial
+     *         resource is present.
+     */
+    public boolean hasParamSelect() {
+        return (false == this.getRequest().getParams().getCimiSelect().isEmpty());
     }
 
     /**

@@ -55,11 +55,11 @@ public class CimiManagerReadMachineImage extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         MachineImage out = null;
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.getMachineImageById(context.getRequest().getId());
         } else {
-            out = this.manager.getMachineImageAttributes(context.getRequest().getId(), select.getAttributes());
+            out = this.manager.getMachineImageAttributes(context.getRequest().getId(), select.getValues());
         }
         return out;
     }

@@ -51,7 +51,7 @@ public class CimiManagerUpdateCredentialTemplate extends CimiManagerUpdateAbstra
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             this.manager.updateCredentialsTemplate((CredentialsTemplate) dataService);
         } else {

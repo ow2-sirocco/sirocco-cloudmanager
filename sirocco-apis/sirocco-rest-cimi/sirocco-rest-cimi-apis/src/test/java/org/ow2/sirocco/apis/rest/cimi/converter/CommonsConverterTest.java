@@ -155,7 +155,7 @@ public class CommonsConverterTest {
 
         // Empty Cimi -> Service
         service = (DiskTemplate) this.context.convertToService(new CimiDiskConfiguration());
-        Assert.assertNotNull(service.getCapacity());
+        Assert.assertNull(service.getCapacity());
         Assert.assertNull(service.getFormat());
         Assert.assertNull(service.getInitialLocation());
 

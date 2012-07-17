@@ -59,11 +59,11 @@ public class CimiManagerReadCredentialCollection extends CimiManagerReadAbstract
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.getCredentials();
         } else {
-            QueryResult<Credentials> results = this.manager.getCredentials(-1, -1, null, select.getAttributes());
+            QueryResult<Credentials> results = this.manager.getCredentials(-1, -1, null, select.getValues());
             out = results.getItems();
             // TODO First, Last, Filter
         }

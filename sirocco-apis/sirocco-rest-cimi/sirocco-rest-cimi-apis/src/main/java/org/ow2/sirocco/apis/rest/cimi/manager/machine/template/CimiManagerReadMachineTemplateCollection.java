@@ -59,11 +59,11 @@ public class CimiManagerReadMachineTemplateCollection extends CimiManagerReadAbs
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = context.getRequest().getHeader().getCimiSelect();
+        CimiSelect select = context.getRequest().getParams().getCimiSelect();
         if (true == select.isEmpty()) {
             out = this.manager.getMachineTemplates();
         } else {
-            QueryResult<MachineTemplate> results = this.manager.getMachineTemplates(-1, -1, null, select.getAttributes());
+            QueryResult<MachineTemplate> results = this.manager.getMachineTemplates(-1, -1, null, select.getValues());
             out = results.getItems();
             // TODO First, Last, Filter
         }
