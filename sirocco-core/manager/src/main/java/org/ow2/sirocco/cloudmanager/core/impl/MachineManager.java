@@ -1076,11 +1076,6 @@ public class MachineManager implements IMachineManager {
 
         for (MachineVolumeTemplate mvt : volumeTemplates) {
 
-            if (mvt.getInitialLocation() == null) {
-                // ignore this entry
-                continue;
-            }
-
             VolumeTemplate vt = mvt.getVolumeTemplate();
             if ((vt == null) || (vt.getId() == null)) {
                 // ignore this entry
@@ -1114,11 +1109,6 @@ public class MachineManager implements IMachineManager {
 
         for (MachineVolume mv : volumes) {
 
-            if (mv.getInitialLocation() == null) {
-                // ignore this entry
-                continue;
-            }
-
             Volume v = mv.getVolume();
             if ((v == null) || (v.getId() == null)) {
                 // ignore this entry
@@ -1147,7 +1137,7 @@ public class MachineManager implements IMachineManager {
         List<MachineTemplateNetworkInterface> list = mt.getNetworkInterfaces();
         for (MachineTemplateNetworkInterface nic : list) {
             this.em.persist(nic);
-            mt.addNetworkInterface(nic);
+            // mt.addNetworkInterface(nic);
         }
     }
 
