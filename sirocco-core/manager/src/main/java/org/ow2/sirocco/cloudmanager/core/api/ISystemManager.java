@@ -41,7 +41,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 /**
  * System management operations
  */
-public interface ISystemManager extends IJobListener {
+public interface ISystemManager extends IJobListener, IEntityStateListener {
 
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.SystemManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager@Remote";
 
@@ -68,11 +68,12 @@ public interface ISystemManager extends IJobListener {
 
     CloudCollectionItem getEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException;
 
-    List<? extends CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType)
-        throws CloudProviderException;
+    List<? extends CloudCollectionItem> getEntityListFromSystem(final String systemId,
+        final Class<? extends CloudCollectionItem> entityType) throws CloudProviderException;
 
-    QueryResult<CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType, int first,
-        int last, List<String> filters, List<String> attributes) throws CloudProviderException;
+    QueryResult<CloudCollectionItem> getEntityListFromSystem(final String systemId,
+        final Class<? extends CloudCollectionItem> entityType, int first, int last, List<String> filters,
+        List<String> attributes) throws CloudProviderException;
 
     // management of SystemTemplate map
     boolean addComponentDescriptorToSystemTemplate(ComponentDescriptor componentDescriptor, String systemTemplateId)
@@ -110,5 +111,4 @@ public interface ISystemManager extends IJobListener {
 
     QueryResult<SystemTemplate> getSystemTemplates(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
-
 }

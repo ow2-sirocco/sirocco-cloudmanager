@@ -179,7 +179,7 @@ public class CloudProviderManagerTest extends SiroccoTester {
                 // lockedID=jobManager.lock(jo.getId().toString());
                 System.out.println("1-job " + this.jo.getId().toString() + " locked with ID " + lockedID + "!");
                 this.jo = CloudProviderManagerTest.this.jobManager.getJobById(this.jo.getId().toString());
-                System.out.println("1-job date " + this.jo.getLockedTime());
+                // System.out.println("1-job date " + this.jo.getLockedTime());
             } catch (Exception e) {
 
                 System.out.println("1-job " + this.jo.getId().toString() + " not locked!");
@@ -220,8 +220,9 @@ public class CloudProviderManagerTest extends SiroccoTester {
         try {
             // lockedID=jobManager.lock(j.getId().toString());
             j = this.jobManager.getJobById(j.getId().toString());
-            System.out.println("2-job " + j.getId().toString() + " locked with ID " + lockedID + "!and date "
-                + j.getLockedTime());
+            // System.out.println("2-job " + j.getId().toString() +
+            // " locked with ID " + lockedID + "!and date "
+            // + j.getLockedTime());
         } catch (Exception e) {
 
             System.out.println("2-job " + j.getId().toString() + " not locked!");

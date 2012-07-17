@@ -35,8 +35,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -49,25 +47,6 @@ public class Job extends CloudEntity implements Serializable {
     public static enum Status {
         RUNNING, SUCCESS, FAILED, CANCELLED
     };
-
-    /**
-     * locked is used to prevent concurrent handling of events that are related
-     * to a same parent Job
-     */
-    private boolean locked;
-
-    /**
-     * lockedTime is used to know when a lock was set, and then to be able to
-     * unlock after some time (configurable) to prevent Job events to be blocked
-     * forever
-     */
-    private Date lockedTime;
-
-    /**
-     * lockedID is used to be sure that only the locker thread has the right to
-     * unlock a Job
-     */
-    private String lockedID;
 
     private CloudProviderLocation location;
 
@@ -206,31 +185,6 @@ public class Job extends CloudEntity implements Serializable {
 
     public void setAffectedEntities(final List<CloudResource> affectedEntities) {
         this.affectedEntities = affectedEntities;
-    }
-
-    public boolean getLocked() {
-        return this.locked;
-    }
-
-    public void setLocked(final boolean locked) {
-        this.locked = locked;
-    }
-
-    @Temporal(TemporalType.TIMESTAMP)
-    public Date getLockedTime() {
-        return this.lockedTime;
-    }
-
-    public void setLockedTime(final Date lockedTime) {
-        this.lockedTime = lockedTime;
-    }
-
-    public String getLockedID() {
-        return this.lockedID;
-    }
-
-    public void setLockedID(final String lockedID) {
-        this.lockedID = lockedID;
     }
 
 }

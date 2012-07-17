@@ -52,7 +52,7 @@ public class System extends CloudResource implements Serializable {
     private CloudProviderLocation location;
 
     public static enum State {
-        CREATING, CREATED, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, MIXED, DELETING, DELETED, ERROR
+        CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, MIXED, DELETING, DELETED, ERROR
     }
 
     private List<SystemCredentials> credentials;
