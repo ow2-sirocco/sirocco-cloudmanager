@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,15 +54,11 @@ public class CimiManagerReadCredential extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Credentials out = null;
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamSelect()) {
             out = this.manager.getCredentialsById(context.getRequest().getId());
         } else {
             // FIXME
             throw new UnsupportedOperationException();
-            // out =
-            // this.manager.getCredentialsAttributes(context.getRequest().getId(),
-            // select.getAttributes());
         }
         return out;
     }

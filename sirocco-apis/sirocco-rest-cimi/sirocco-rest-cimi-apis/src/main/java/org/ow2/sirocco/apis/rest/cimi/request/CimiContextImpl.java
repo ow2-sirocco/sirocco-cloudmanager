@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.configuration.AppConfig;
 import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigFactory;
@@ -414,11 +415,11 @@ public class CimiContextImpl implements CimiContext {
     }
 
     /**
-     * Indicator of the presence of a CIMI parameters for reading collections :
-     * First, Last, Filter or Select.
+     * {@inheritDoc}
      * 
-     * @return True if a parameter used by reading collections is present.
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#hasParamsForReadingCollection()
      */
+    @Override
     public boolean hasParamsForReadingCollection() {
         boolean has = false;
         if ((false == this.getRequest().getParams().getCimiFirst().isEmpty())) {
@@ -434,14 +435,63 @@ public class CimiContextImpl implements CimiContext {
     }
 
     /**
-     * Indicator of the presence of a CIMI parameters for reading (or updating)
-     * partial resource : Select.
+     * {@inheritDoc}
      * 
-     * @return True if a parameter used by reading (or updating) partial
-     *         resource is present.
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#hasParamSelect()
      */
+    @Override
     public boolean hasParamSelect() {
         return (false == this.getRequest().getParams().getCimiSelect().isEmpty());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#valueOfFirst()
+     */
+    @Override
+    public int valueOfFirst() {
+        return this.getRequest().getParams().getCimiFirst().getInt();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#valueOfLast()
+     */
+    @Override
+    public int valueOfLast() {
+        return this.getRequest().getParams().getCimiLast().getInt();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#valuesOfFilter()
+     */
+    @Override
+    public List<String> valuesOfFilter() {
+        return this.getRequest().getParams().getCimiFilter().getValues();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#valuesOfSelect()
+     */
+    @Override
+    public List<String> valuesOfSelect() {
+        return this.getRequest().getParams().getCimiSelect().getValues();
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#copyBeanAttributesOfSelect(java.lang.Object)
+     */
+    @Override
+    public Map<String, Object> copyBeanAttributesOfSelect(final Object object) {
+        return this.getRequest().getParams().getCimiSelect().copyBeanAttributes(object);
     }
 
     /**

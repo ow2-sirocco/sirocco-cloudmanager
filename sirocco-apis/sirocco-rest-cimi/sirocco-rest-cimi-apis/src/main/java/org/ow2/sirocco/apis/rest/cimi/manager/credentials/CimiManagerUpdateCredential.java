@@ -26,7 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.credentials;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,12 +50,11 @@ public class CimiManagerUpdateCredential extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamSelect()) {
             this.manager.updateCredentials((Credentials) dataService);
         } else {
-            this.manager
-                .updateCredentialsAttributes(context.getRequest().getId(), select.dispatchAttributesValues(dataService));
+            this.manager.updateCredentialsAttributes(context.getRequest().getId(),
+                context.copyBeanAttributesOfSelect(dataService));
         }
         return null;
     }

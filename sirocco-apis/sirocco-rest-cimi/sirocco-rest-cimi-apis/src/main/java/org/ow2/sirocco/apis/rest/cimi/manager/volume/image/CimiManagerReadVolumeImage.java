@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,13 +54,11 @@ public class CimiManagerReadVolumeImage extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         VolumeImage out = null;
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamSelect()) {
             out = this.manager.getVolumeImageById(context.getRequest().getId());
         } else {
-            // FIXME out =
-            // this.manager.getVolumeImageAttributes(context.getRequest().getId(),
-            // select.getAttributes());
+            // FIXME
+            throw new UnsupportedOperationException();
         }
         return out;
     }

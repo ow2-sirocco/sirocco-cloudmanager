@@ -93,7 +93,8 @@ public class CimiSelect extends CimiExpand {
     }
 
     /**
-     * Dispatch the values of bean with the attributes found in the CimiSelect.
+     * Copy the values of bean in the map with the attributes found in the
+     * CimiSelect.
      * <p>
      * If a attribute name is not found in bean, it is not copied in map.
      * </p>
@@ -101,7 +102,7 @@ public class CimiSelect extends CimiExpand {
      * @param bean The bean where are the values
      * @return A map with the attribute name and his value
      */
-    public Map<String, Object> dispatchAttributesValues(final Object bean) {
+    public Map<String, Object> copyBeanAttributes(final Object bean) {
         Map<String, Object> attrValues = new HashMap<String, Object>();
         Object value;
         if (false == this.isEmpty()) {

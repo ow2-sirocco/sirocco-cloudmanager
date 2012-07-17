@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -54,13 +53,11 @@ public class CimiManagerReadSystem extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamSelect()) {
             out = this.manager.getSystemById(context.getRequest().getId());
         } else {
-            // FIXME out =
-            // this.manager.getSystemAttributes(context.getRequest().getId(),
-            // select.getAttributes());
+            // FIXME
+            throw new UnsupportedOperationException();
         }
         return out;
     }

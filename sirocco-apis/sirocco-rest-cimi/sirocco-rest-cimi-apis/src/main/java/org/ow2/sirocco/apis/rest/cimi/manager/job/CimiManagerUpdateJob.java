@@ -26,7 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.job;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,11 +50,10 @@ public class CimiManagerUpdateJob extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamSelect()) {
             this.manager.updateJob((Job) dataService);
         } else {
-            this.manager.updateJobAttributes(context.getRequest().getId(), select.dispatchAttributesValues(dataService));
+            this.manager.updateJobAttributes(context.getRequest().getId(), context.copyBeanAttributesOfSelect(dataService));
         }
         return null;
     }

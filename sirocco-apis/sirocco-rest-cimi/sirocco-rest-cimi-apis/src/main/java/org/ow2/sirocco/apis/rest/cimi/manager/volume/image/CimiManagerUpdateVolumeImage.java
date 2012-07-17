@@ -26,7 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.volume.image;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +50,13 @@ public class CimiManagerUpdateVolumeImage extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
-            this.manager.updateVolumeImage((VolumeImage) dataService);
+        Object out;
+        if (false == context.hasParamSelect()) {
+            out = this.manager.updateVolumeImage((VolumeImage) dataService);
         } else {
-            this.manager.updateVolumeImageAttributes(context.getRequest().getId(),
-                select.dispatchAttributesValues(dataService));
+            out = this.manager.updateVolumeImageAttributes(context.getRequest().getId(),
+                context.copyBeanAttributesOfSelect(dataService));
         }
-        return null;
+        return out;
     }
 }

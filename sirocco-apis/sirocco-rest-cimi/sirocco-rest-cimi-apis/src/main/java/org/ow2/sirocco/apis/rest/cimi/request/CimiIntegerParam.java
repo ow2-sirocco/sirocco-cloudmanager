@@ -97,7 +97,7 @@ public class CimiIntegerParam extends CimiParam {
     public int getInt() {
         int intValue = -1;
         if (null != this.value) {
-
+            intValue = this.value.intValue();
         }
         return intValue;
     }

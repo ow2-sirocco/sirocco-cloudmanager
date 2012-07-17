@@ -32,10 +32,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -59,13 +57,12 @@ public class CimiManagerReadJobCollection extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamsForReadingCollection()) {
             out = this.manager.getJobs();
         } else {
-            QueryResult<Job> results = this.manager.getJobs(-1, -1, null, select.getValues());
+            QueryResult<?> results = this.manager.getJobs(context.valueOfFirst(), context.valueOfLast(),
+                context.valuesOfFilter(), context.valuesOfSelect());
             out = results.getItems();
-            // TODO First, Last, Filter
         }
         return out;
     }

@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,15 +54,11 @@ public class CimiManagerReadMachineConfiguration extends CimiManagerReadAbstract
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         MachineConfiguration out = null;
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamSelect()) {
             out = this.manager.getMachineConfigurationById(context.getRequest().getId());
         } else {
             // FIXME
             throw new UnsupportedOperationException();
-            // out =
-            // this.manager.getMachineConfigurationAttributes(context.getRequest().getId(),
-            // select.getAttributes());
         }
         return out;
     }

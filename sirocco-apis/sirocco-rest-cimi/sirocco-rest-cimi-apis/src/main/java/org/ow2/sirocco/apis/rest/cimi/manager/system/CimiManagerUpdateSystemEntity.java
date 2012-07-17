@@ -50,6 +50,13 @@ public class CimiManagerUpdateSystemEntity extends CimiManagerUpdateAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        return this.manager.updateEntityInSystem(context.getRequest().getIdParent(), (CloudCollectionItem) dataService);
+        Object out = null;
+        if (false == context.hasParamSelect()) {
+            out = this.manager.updateEntityInSystem(context.getRequest().getIdParent(), (CloudCollectionItem) dataService);
+        } else {
+            out = this.manager.updateEntityAttributesInSystem(context.getRequest().getIdParent(), context.getRequest().getId(),
+                dataService.getClass().getName(), context.copyBeanAttributesOfSelect(dataService));
+        }
+        return out;
     }
 }

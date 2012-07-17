@@ -29,7 +29,6 @@ import javax.ws.rs.core.Response;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,11 +54,10 @@ public class CimiManagerReadVolume extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Volume out = null;
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamSelect()) {
             out = this.manager.getVolumeById(context.getRequest().getId());
         } else {
-            out = this.manager.getVolumeAttributes(context.getRequest().getId(), select.getValues());
+            out = this.manager.getVolumeAttributes(context.getRequest().getId(), context.valuesOfSelect());
         }
         return out;
     }

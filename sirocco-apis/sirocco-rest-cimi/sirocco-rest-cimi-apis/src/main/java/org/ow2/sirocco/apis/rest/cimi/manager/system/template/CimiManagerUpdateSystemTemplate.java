@@ -26,7 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.system.template;
 
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerUpdateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,12 +51,11 @@ public class CimiManagerUpdateSystemTemplate extends CimiManagerUpdateAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamSelect()) {
             out = this.manager.updateSystemTemplate((SystemTemplate) dataService);
         } else {
             out = this.manager.updateAttributesInSystemTemplate(context.getRequest().getId(),
-                select.dispatchAttributesValues(dataService));
+                context.copyBeanAttributesOfSelect(dataService));
         }
         return out;
     }

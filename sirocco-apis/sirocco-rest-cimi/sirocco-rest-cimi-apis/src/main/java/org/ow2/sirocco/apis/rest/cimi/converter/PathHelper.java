@@ -24,6 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.regex.Pattern;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 /**
@@ -104,4 +107,42 @@ public class PathHelper {
         return Integer.valueOf(PathHelper.extractIdString(href));
     }
 
+    /**
+     * Extract the pathname with a complete path.
+     * 
+     * @param path The complete path
+     * @return The pathname
+     */
+    public static String extractPathname(final String path) {
+        String pathname = null;
+        int index = path.lastIndexOf('/');
+        if (index > -1) {
+            pathname = path.substring(0, index);
+        } else {
+            pathname = path;
+        }
+        return pathname;
+    }
+
+    /**
+     * Find the ExchangeType with the path of the REST request.
+     * 
+     * @param baseUri The base URI of the current REST server
+     * @param path The path of the REST request
+     * @return The ExchangeType found or null
+     */
+    public static ExchangeType findExchangeType(final String baseUri, final String path) {
+        ExchangeType typeFound = null;
+        String regex;
+        Pattern pattern;
+        for (ExchangeType type : ExchangeType.values()) {
+            regex = type.makeHrefPattern(baseUri);
+            pattern = Pattern.compile(regex);
+            if (true == pattern.matcher(path).matches()) {
+                typeFound = type;
+                break;
+            }
+        }
+        return typeFound;
+    }
 }

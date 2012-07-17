@@ -25,6 +25,8 @@
 package org.ow2.sirocco.apis.rest.cimi.request;
 
 import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigFactory;
 import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigurationException;
@@ -204,5 +206,62 @@ public interface CimiContext extends Serializable {
      * @see ConfigFactory
      */
     Class<? extends CimiResource> findAssociate(Class<? extends Resource> service);
+
+    /**
+     * Indicator of the presence of a CIMI parameters for reading collections :
+     * First, Last, Filter or Select.
+     * 
+     * @return True if a parameter used by reading collections is present.
+     */
+    boolean hasParamsForReadingCollection();
+
+    /**
+     * Indicator of the presence of a CIMI parameters for reading (or updating)
+     * partial resource : Select.
+     * 
+     * @return True if a parameter used by reading (or updating) partial
+     *         resource is present.
+     */
+    boolean hasParamSelect();
+
+    /**
+     * Get the value of the parameter CIMI First.
+     * 
+     * @return The value
+     */
+    int valueOfFirst();
+
+    /**
+     * Get the value of the parameter CIMI Last.
+     * 
+     * @return The value
+     */
+    int valueOfLast();
+
+    /**
+     * Get the value of the parameter CIMI Filter.
+     * 
+     * @return The value
+     */
+    List<String> valuesOfFilter();
+
+    /**
+     * Get the value of the parameter CIMI Select.
+     * 
+     * @return The value
+     */
+    List<String> valuesOfSelect();
+
+    /**
+     * Copy the values of bean in the map with the attributes found in the
+     * CimiSelect.
+     * <p>
+     * If a attribute name is not found in bean, it is not copied in map.
+     * </p>
+     * 
+     * @param bean The bean where are the values
+     * @return A map with the attribute name and his value
+     */
+    Map<String, Object> copyBeanAttributesOfSelect(final Object object);
 
 }

@@ -33,6 +33,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollecti
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -56,8 +58,14 @@ public class CimiManagerReadSystemSystemCollection extends CimiManagerReadAbstra
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        // FIXME out =
-        // this.manager.getSystemSystems(context.getRequest().getIdParent());
+        if (false == context.hasParamsForReadingCollection()) {
+            out = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(), SystemSystem.class.getName());
+        } else {
+            QueryResult<?> result = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(),
+                SystemSystem.class.getName(), context.valueOfFirst(), context.valueOfLast(), context.valuesOfFilter(),
+                context.valuesOfSelect());
+            out = result.getItems();
+        }
         return out;
     }
 

@@ -33,6 +33,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollect
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -56,7 +57,13 @@ public class CimiManagerReadMachineVolumeCollection extends CimiManagerReadAbstr
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        out = this.manager.getMachineVolumes(context.getRequest().getIdParent());
+        if (false == context.hasParamsForReadingCollection()) {
+            out = this.manager.getMachineVolumes(context.getRequest().getIdParent());
+        } else {
+            QueryResult<?> results = this.manager.getMachineVolumes(context.getRequest().getIdParent(), context.valueOfFirst(),
+                context.valueOfLast(), context.valuesOfFilter(), context.valuesOfSelect());
+            out = results.getItems();
+        }
         return out;
     }
 

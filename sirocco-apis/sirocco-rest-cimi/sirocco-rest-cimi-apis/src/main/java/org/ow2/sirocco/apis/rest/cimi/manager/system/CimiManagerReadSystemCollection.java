@@ -32,8 +32,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -57,14 +57,12 @@ public class CimiManagerReadSystemCollection extends CimiManagerReadAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
-        CimiSelect select = context.getRequest().getParams().getCimiSelect();
-        if (true == select.isEmpty()) {
+        if (false == context.hasParamsForReadingCollection()) {
             out = this.manager.getSystems();
         } else {
-            // FIXME QueryResult<System> results = this.manager.getSystems(-1,
-            // -1, null, select.getAttributes());
-            // FIXME out = results.getItems();
-            // TODO First, Last, Filter
+            QueryResult<?> results = this.manager.getSystems(context.valueOfFirst(), context.valueOfLast(),
+                context.valuesOfFilter(), context.valuesOfSelect());
+            out = results.getItems();
         }
         return out;
     }
