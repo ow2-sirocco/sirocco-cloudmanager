@@ -385,11 +385,13 @@ public class MachineManager implements IMachineManager {
                 continue;
             }
             MachineVolume mv = new MachineVolume();
-            mv.setVolume(mvsrc.getVolume());
+            mv.setVolume(null);
             mv.setInitialLocation(mvsrc.getInitialLocation());
             mv.setState(MachineVolume.State.PENDING);
             this.em.persist(mv);
+            mv.setVolume(mvsrc.getVolume());
             m.addMachineVolume(mv);
+            this.em.flush();
         }
     }
 
@@ -2243,10 +2245,16 @@ public class MachineManager implements IMachineManager {
             throw new CloudProviderException(" Machine " + machine.getId() + " already persisted ");
         }
 
-        /**
-         * MachineNetworkInterface, MachineVolume, MachineDisk are persisted in
-         * cascade
-         */
+        List<MachineVolume> vols = machine.getVolumes();
+        if (vols != null) {
+            for (MachineVolume v : vols) {
+                Volume volume = v.getVolume();
+                if (volume.getId() == null) {
+                    this.em.persist(volume);
+                }
+            }
+            this.em.flush();
+        }
         List<MachineNetworkInterface> nics = machine.getNetworkInterfaces();
         if (nics != null && nics.size() > 0) {
 

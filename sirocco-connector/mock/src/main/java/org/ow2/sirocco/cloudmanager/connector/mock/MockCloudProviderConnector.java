@@ -44,6 +44,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
@@ -270,7 +271,17 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             for (MachineTemplateNetworkInterface networkInterface : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
                 MachineNetworkInterface newNetIntf = new MachineNetworkInterface();
                 // TODO
-                newNetIntf.setAddresses(networkInterface.getAddresses());
+                if (networkInterface.getAddresses() != null) {
+                    List<Address> addrs = new ArrayList<Address>();
+                    for (Address a : networkInterface.getAddresses()) {
+                        Address new_a = new Address();
+                        a.clone(new_a);
+                        new_a.setNetwork(a.getNetwork());
+                        addrs.add(new_a);
+                    }
+                    newNetIntf.setAddresses(addrs);
+
+                }
 
                 newNetIntf.setMacAddress("00:11:22:33:44:55");
 
