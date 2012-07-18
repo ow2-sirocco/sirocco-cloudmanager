@@ -66,7 +66,7 @@ public class CimiManagersMachineImageCollectionTest {
 
     @Autowired
     @Qualifier("CimiManagerReadMachineImageCollection")
-    private CimiManager managerReadCollection;
+    private CimiManager manager;
 
     private CimiRequest request;
 
@@ -115,7 +115,7 @@ public class CimiManagersMachineImageCollectionTest {
         EasyMock.expect(this.service.getMachineImages()).andReturn(list);
         EasyMock.replay(this.service);
 
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH,
@@ -138,7 +138,7 @@ public class CimiManagersMachineImageCollectionTest {
         EasyMock.replay(this.service);
 
         this.request.getParams().getCimiSelect().setInitialValues(new String[] {"operations"});
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH,
@@ -157,7 +157,7 @@ public class CimiManagersMachineImageCollectionTest {
         EasyMock.replay(this.service);
 
         this.request.getParams().getCimiFilter().setInitialValues(new String[] {"filterOne,filterTwo"});
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH,
@@ -175,7 +175,7 @@ public class CimiManagersMachineImageCollectionTest {
         EasyMock.replay(this.service);
 
         this.request.getParams().getCimiFirst().setInitialValue("1");
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH,
@@ -193,7 +193,7 @@ public class CimiManagersMachineImageCollectionTest {
         EasyMock.replay(this.service);
 
         this.request.getParams().getCimiLast().setInitialValue("50");
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH,
@@ -215,7 +215,7 @@ public class CimiManagersMachineImageCollectionTest {
         this.request.getParams().getCimiLast().setInitialValue("100");
         this.request.getParams().getCimiFilter().setInitialValues(new String[] {"filterOne,filterTwo"});
         this.request.getParams().getCimiSelect().setInitialValues(new String[] {"selectOne, selectTwo"});
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH,

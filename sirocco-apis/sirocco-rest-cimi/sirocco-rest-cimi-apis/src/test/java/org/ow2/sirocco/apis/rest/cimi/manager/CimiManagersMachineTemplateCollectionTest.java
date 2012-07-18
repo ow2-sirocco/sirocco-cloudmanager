@@ -25,6 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.easymock.EasyMock;
@@ -45,6 +46,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestParams;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -128,19 +130,19 @@ public class CimiManagersMachineTemplateCollectionTest {
         EasyMock.verify(this.service);
     }
 
-    // FIXME Adapt to the last CIMI specification
     @Test
-    public void testReadWithCimiSelectAttributes() throws Exception {
-
-        List<MachineTemplate> list = new ArrayList<MachineTemplate>();
-        // EasyMock.expect(
-        // this.service.getMachineTemplates(EasyMock.eq(Arrays.asList(new
-        // String[] {"operations"})),
-        // EasyMock.eq((String) null))).andReturn(list);
+    public void testReadWithFirstLastFilterSelect() throws Exception {
+        QueryResult<MachineTemplate> results = new QueryResult<MachineTemplate>(0, new ArrayList<MachineTemplate>());
+        EasyMock.expect(
+            this.service.getMachineTemplates(EasyMock.eq(9), EasyMock.eq(99),
+                EasyMock.eq(Arrays.asList(new String[] {"filterOne", "filterTwo"})),
+                EasyMock.eq(Arrays.asList(new String[] {"selectOne", "selectTwo"})))).andReturn(results);
         EasyMock.replay(this.service);
 
-        // this.request.getHeader().getCimiSelect().setSelects(new String[]
-        // {"operations"});
+        this.request.getParams().getCimiFirst().setInitialValue("10");
+        this.request.getParams().getCimiLast().setInitialValue("100");
+        this.request.getParams().getCimiFilter().setInitialValues(new String[] {"filterOne,filterTwo"});
+        this.request.getParams().getCimiSelect().setInitialValues(new String[] {"selectOne, selectTwo"});
         this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
@@ -150,38 +152,4 @@ public class CimiManagersMachineTemplateCollectionTest {
         EasyMock.verify(this.service);
     }
 
-    // FIXME Adapt to the last CIMI specification
-    // @Test
-    // public void testReadWithCimiSelectArrays() throws Exception {
-    // MachineTemplate item;
-    // List<MachineTemplate> list = new ArrayList<MachineTemplate>();
-    // for (int i = 0; i < 23; i++) {
-    // item = new MachineTemplate();
-    // item.setId(i + 13);
-    // list.add(item);
-    // }
-    //
-    // EasyMock.expect(
-    // this.service.getMachineTemplates(EasyMock.eq(1), EasyMock.eq(23),
-    // EasyMock.eq(Arrays.asList(new String[]
-    // {"machineImages"})))).andReturn(list);
-    // EasyMock.replay(this.service);
-    //
-    // this.request.getHeader().getCimiSelect().setSelects(new String[]
-    // {"machineImages[1-23]"});
-    // this.manager.execute(this.context);
-    //
-    // Assert.assertEquals(200, this.response.getStatus());
-    // Assert.assertEquals(ConstantsPath.MACHINE_TEMPLATE_PATH,
-    // ((CimiMachineTemplateCollection) this.response.getCimiData()).getId());
-    // CimiMachineTemplateCollection cimiCollect =
-    // (CimiMachineTemplateCollection) this.response.getCimiData();
-    // Assert.assertNotNull(cimiCollect.getArray());
-    // Assert.assertEquals(23, cimiCollect.getArray().length);
-    // for (int i = 0; i < cimiCollect.getArray().length; i++) {
-    // Assert.assertEquals(ConstantsPath.MACHINE_TEMPLATE_PATH + "/" + (i + 13),
-    // cimiCollect.getArray()[i].getHref());
-    // }
-    // EasyMock.verify(this.service);
-    // }
 }

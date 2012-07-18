@@ -25,6 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.easymock.EasyMock;
@@ -45,6 +46,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestParams;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -64,7 +66,7 @@ public class CimiManagersMachineConfigurationCollectionTest {
 
     @Autowired
     @Qualifier("CimiManagerReadMachineConfigurationCollection")
-    private CimiManager managerReadCollection;
+    private CimiManager manager;
 
     private CimiRequest request;
 
@@ -114,7 +116,7 @@ public class CimiManagersMachineConfigurationCollectionTest {
         EasyMock.expect(this.service.getMachineConfigurations()).andReturn(list);
         EasyMock.replay(this.service);
 
-        this.managerReadCollection.execute(this.context);
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH,
@@ -128,20 +130,21 @@ public class CimiManagersMachineConfigurationCollectionTest {
         EasyMock.verify(this.service);
     }
 
-    // FIXME Adapt to the last CIMI specification
     @Test
-    public void testReadWithCimiSelectAttributes() throws Exception {
-
-        List<MachineConfiguration> list = new ArrayList<MachineConfiguration>();
-        // EasyMock.expect(
-        // this.service.getMachineConfigurations(EasyMock.eq(Arrays.asList(new
-        // String[] {"operations"})),
-        // EasyMock.eq((String) null))).andReturn(list);
+    public void testReadWithFirstLastFilterSelect() throws Exception {
+        QueryResult<MachineConfiguration> results = new QueryResult<MachineConfiguration>(0,
+            new ArrayList<MachineConfiguration>());
+        EasyMock.expect(
+            this.service.getMachineConfigurations(EasyMock.eq(9), EasyMock.eq(99),
+                EasyMock.eq(Arrays.asList(new String[] {"filterOne", "filterTwo"})),
+                EasyMock.eq(Arrays.asList(new String[] {"selectOne", "selectTwo"})))).andReturn(results);
         EasyMock.replay(this.service);
 
-        // this.request.getHeader().getCimiSelect().setSelects(new String[]
-        // {"operations"});
-        this.managerReadCollection.execute(this.context);
+        this.request.getParams().getCimiFirst().setInitialValue("10");
+        this.request.getParams().getCimiLast().setInitialValue("100");
+        this.request.getParams().getCimiFilter().setInitialValues(new String[] {"filterOne,filterTwo"});
+        this.request.getParams().getCimiSelect().setInitialValues(new String[] {"selectOne, selectTwo"});
+        this.manager.execute(this.context);
 
         Assert.assertEquals(200, this.response.getStatus());
         Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH,
@@ -149,40 +152,4 @@ public class CimiManagersMachineConfigurationCollectionTest {
 
         EasyMock.verify(this.service);
     }
-
-    // FIXME Adapt to the last CIMI specification
-    // @Test
-    // public void testReadWithCimiSelectArrays() throws Exception {
-    // MachineConfiguration machine;
-    // List<MachineConfiguration> list = new ArrayList<MachineConfiguration>();
-    // for (int i = 0; i < 7; i++) {
-    // machine = new MachineConfiguration();
-    // machine.setId(i + 13);
-    // list.add(machine);
-    // }
-    //
-    // EasyMock.expect(
-    // this.service.getMachineConfigurations(EasyMock.eq(1), EasyMock.eq(23),
-    // EasyMock.eq(Arrays.asList(new String[]
-    // {"machineConfigurations"})))).andReturn(list);
-    // EasyMock.replay(this.service);
-    //
-    // this.request.getHeader().getCimiSelect().setSelects(new String[]
-    // {"machineConfigurations[1-23]"});
-    // this.managerReadCollection.execute(this.context);
-    //
-    // Assert.assertEquals(200, this.response.getStatus());
-    // Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH,
-    // ((CimiMachineConfigurationCollection)
-    // this.response.getCimiData()).getId());
-    // CimiMachineConfigurationCollection cimiCollect =
-    // (CimiMachineConfigurationCollection) this.response.getCimiData();
-    // Assert.assertNotNull(cimiCollect.getArray());
-    // Assert.assertEquals(7, cimiCollect.getArray().length);
-    // for (int i = 0; i < cimiCollect.getArray().length; i++) {
-    // Assert.assertEquals(ConstantsPath.MACHINE_CONFIGURATION_PATH + "/" + (i +
-    // 13), cimiCollect.getArray()[i].getHref());
-    // }
-    // EasyMock.verify(this.service);
-    // }
 }
