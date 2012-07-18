@@ -24,13 +24,13 @@
  */
 package org.ow2.sirocco.cloudmanager.core.api;
 
-import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 /**
  * Entities event handling (now essentially for System state update)
  */
 public interface IEntityStateListener {
 
-    void handleEntityStateChange(String entityType, String entityId) throws CloudProviderException;
+    void handleEntityStateChange(Class<? extends CloudResource> entityType, String entityId);
 
 }

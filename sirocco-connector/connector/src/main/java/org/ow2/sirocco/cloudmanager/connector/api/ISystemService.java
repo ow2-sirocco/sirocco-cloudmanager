@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.connector.api;
 
 import java.util.List;
+import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -34,18 +35,18 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 
 public interface ISystemService {
     Job createSystem(SystemCreate systemCreate) throws ConnectorException;
-    
+
     Job deleteSystem(String systemId) throws ConnectorException;
 
-    Job startSystem(String systemId) throws ConnectorException;
+    Job startSystem(String systemId, Map<String, String> properties) throws ConnectorException;
 
-    Job stopSystem(String systemId) throws ConnectorException;
+    Job stopSystem(String systemId, boolean force, Map<String, String> properties) throws ConnectorException;
 
-    Job restartSystem(String systemId) throws ConnectorException;
+    Job restartSystem(String systemId, boolean force, Map<String, String> properties) throws ConnectorException;
 
-    Job pauseSystem(String systemId) throws ConnectorException;
+    Job pauseSystem(String systemId, Map<String, String> properties) throws ConnectorException;
 
-    Job suspendSystem(String systemId) throws ConnectorException;
+    Job suspendSystem(String systemId, Map<String, String> properties) throws ConnectorException;
 
     System getSystem(String systemId) throws ConnectorException;
 

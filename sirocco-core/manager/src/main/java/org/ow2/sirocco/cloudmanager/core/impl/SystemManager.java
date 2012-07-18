@@ -61,6 +61,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.core.api.exception.BadStateException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
@@ -111,6 +112,12 @@ public class SystemManager implements ISystemManager {
     private static String START_ACTION = "system start";
 
     private static String STOP_ACTION = "system stop";
+
+    private static String SUSPEND_ACTION = "system suspend";
+
+    private static String PAUSE_ACTION = "system pause";
+
+    private static String RESTART_ACTION = "system restart";
 
     private static String DELETE_ACTION = "system delete";
 
@@ -454,7 +461,7 @@ public class SystemManager implements ISystemManager {
             // has this system any nested job?
             List<Job> nestedJobs = parentJob.getNestedJobs();
             if (nestedJobs != null && nestedJobs.size() == 0) {
-                // no job handling, job finised instantly and system in mixed
+                // no job handling, job finished instantly and system in mixed
                 // state
                 parentJob.setStatus(Status.SUCCESS);
                 system.setState(State.MIXED);
@@ -799,7 +806,12 @@ public class SystemManager implements ISystemManager {
 
     @Override
     public Job startSystem(final String systemId) throws CloudProviderException {
+        return this.startSystem(systemId, new HashMap<String, String>());
 
+    }
+
+    @Override
+    public Job startSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
         Job parentJob = null;
 
         System s = this.getSystemById(systemId);
@@ -807,7 +819,7 @@ public class SystemManager implements ISystemManager {
         ICloudProviderConnector connector = this.getConnector(s);
 
         if (this.isSystemSupportedInConnector(connector)) {
-            parentJob = this.doService(systemId, "start", SystemManager.START_ACTION);
+            parentJob = this.doService(systemId, "start", SystemManager.START_ACTION, properties);
         } else {
             // implementation for system not supported by underlying connector
             s.setState(State.STARTING);
@@ -818,24 +830,16 @@ public class SystemManager implements ISystemManager {
             this.em.flush();
 
             for (SystemMachine m : s.getMachines()) {
-                Job j = this.machineManager.startMachine(m.getResource().getId().toString());
-                j.setParentJob(parentJob);
-            }
-            for (SystemVolume v : s.getVolumes()) {
-                // Job j=volumeManager..startVolume(v.getId().toString());
-                // j.setParentJob(parentJob);
+                try {
+                    Job j = this.machineManager.startMachine(m.getResource().getId().toString(), properties);
+                    j.setParentJob(parentJob);
+                } catch (BadStateException e) {
+                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
+                }
             }
             for (SystemSystem sy : s.getSystems()) {
-                Job j = this.startSystem(sy.getResource().getId().toString());
+                Job j = this.startSystem(sy.getResource().getId().toString(), properties);
                 j.setParentJob(parentJob);
-            }
-            for (SystemNetwork n : s.getNetworks()) {
-                Job j = this.networkManager.startNetwork(n.getResource().getId().toString());
-                j.setParentJob(parentJob);
-            }
-            for (SystemCredentials c : s.getCredentials()) {
-                // Job j=volumeManager..startVolume(v.getId().toString());
-                // j.setParentJob(parentJob);
             }
         }
         return parentJob;
@@ -843,6 +847,12 @@ public class SystemManager implements ISystemManager {
 
     @Override
     public Job stopSystem(final String systemId) throws CloudProviderException {
+        return this.stopSystem(systemId, false, new HashMap<String, String>());
+    }
+
+    @Override
+    public Job stopSystem(final String systemId, final boolean force, final Map<String, String> properties)
+        throws CloudProviderException {
         Job parentJob = null;
 
         System s = this.getSystemById(systemId);
@@ -850,7 +860,7 @@ public class SystemManager implements ISystemManager {
         ICloudProviderConnector connector = this.getConnector(s);
 
         if (this.isSystemSupportedInConnector(connector)) {
-            parentJob = this.doService(systemId, "stop", SystemManager.STOP_ACTION);
+            parentJob = this.doService(systemId, "stop", SystemManager.STOP_ACTION, properties);
         } else {
             // implementation for system not supported by underlying connector
             s.setState(State.STOPPING);
@@ -861,24 +871,122 @@ public class SystemManager implements ISystemManager {
             this.em.flush();
 
             for (SystemMachine m : s.getMachines()) {
-                Job j = this.machineManager.stopMachine(m.getResource().getId().toString());
-                j.setParentJob(parentJob);
-            }
-            for (SystemVolume v : s.getVolumes()) {
-                // Job j=volumeManager..startVolume(v.getId().toString());
-                // j.setParentJob(parentJob);
+                try {
+                    Job j = this.machineManager.stopMachine(m.getResource().getId().toString(), force, properties);
+                    j.setParentJob(parentJob);
+                } catch (BadStateException e) {
+                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
+                }
             }
             for (SystemSystem sy : s.getSystems()) {
-                Job j = this.stopSystem(sy.getResource().getId().toString());
+                Job j = this.stopSystem(sy.getResource().getId().toString(), force, properties);
                 j.setParentJob(parentJob);
             }
-            for (SystemNetwork n : s.getNetworks()) {
-                Job j = this.networkManager.stopNetwork(n.getResource().getId().toString());
+        }
+        return parentJob;
+    }
+
+    @Override
+    public Job suspendSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
+        Job parentJob = null;
+
+        System s = this.getSystemById(systemId);
+
+        ICloudProviderConnector connector = this.getConnector(s);
+
+        if (this.isSystemSupportedInConnector(connector)) {
+            parentJob = this.doService(systemId, "suspend", SystemManager.SUSPEND_ACTION, properties);
+        } else {
+            // implementation for system not supported by underlying connector
+            s.setState(State.SUSPENDING);
+            // creation of main system job
+            parentJob = this.createJob("suspend", s);
+            this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.SUSPEND_ACTION);
+            this.em.persist(parentJob);
+            this.em.flush();
+
+            for (SystemMachine m : s.getMachines()) {
+                try {
+                    Job j = this.machineManager.suspendMachine(m.getResource().getId().toString(), properties);
+                    j.setParentJob(parentJob);
+                } catch (BadStateException e) {
+                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
+                }
+            }
+            for (SystemSystem sy : s.getSystems()) {
+                Job j = this.suspendSystem(sy.getResource().getId().toString(), properties);
                 j.setParentJob(parentJob);
             }
-            for (SystemCredentials c : s.getCredentials()) {
-                // Job j=volumeManager..startVolume(v.getId().toString());
-                // j.setParentJob(parentJob);
+        }
+        return parentJob;
+    }
+
+    @Override
+    public Job pauseSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
+        Job parentJob = null;
+
+        System s = this.getSystemById(systemId);
+
+        ICloudProviderConnector connector = this.getConnector(s);
+
+        if (this.isSystemSupportedInConnector(connector)) {
+            parentJob = this.doService(systemId, "pause", SystemManager.PAUSE_ACTION, properties);
+        } else {
+            // implementation for system not supported by underlying connector
+            s.setState(State.PAUSING);
+            // creation of main system job
+            parentJob = this.createJob("pause", s);
+            this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.PAUSE_ACTION);
+            this.em.persist(parentJob);
+            this.em.flush();
+
+            for (SystemMachine m : s.getMachines()) {
+                try {
+                    Job j = this.machineManager.pauseMachine(m.getResource().getId().toString(), properties);
+                    j.setParentJob(parentJob);
+                } catch (BadStateException e) {
+                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
+                }
+            }
+            for (SystemSystem sy : s.getSystems()) {
+                Job j = this.pauseSystem(sy.getResource().getId().toString(), properties);
+                j.setParentJob(parentJob);
+            }
+        }
+        return parentJob;
+    }
+
+    @Override
+    public Job restartSystem(final String systemId, final boolean force, final Map<String, String> properties)
+        throws CloudProviderException {
+        Job parentJob = null;
+
+        System s = this.getSystemById(systemId);
+
+        ICloudProviderConnector connector = this.getConnector(s);
+
+        if (this.isSystemSupportedInConnector(connector)) {
+            parentJob = this.doService(systemId, "restart", SystemManager.RESTART_ACTION, properties);
+        } else {
+            // implementation for system not supported by underlying connector
+            s.setState(State.STARTING);
+            // creation of main system job
+            parentJob = this.createJob("restart", s);
+            this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.RESTART_ACTION);
+            this.em.persist(parentJob);
+            this.em.flush();
+
+            for (SystemMachine m : s.getMachines()) {
+                try {
+                    Job j = this.machineManager.restartMachine(m.getResource().getId().toString(), force, properties);
+                    j.setParentJob(parentJob);
+                } catch (BadStateException e) {
+                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
+                }
+            }
+            for (SystemSystem sy : s.getSystems()) {
+                Job j = this.restartSystem(sy.getResource().getId().toString(), force, properties);
+                j.setParentJob(parentJob);
             }
         }
         return parentJob;
@@ -893,7 +1001,7 @@ public class SystemManager implements ISystemManager {
         ICloudProviderConnector connector = this.getConnector(s);
 
         if (this.isSystemSupportedInConnector(connector)) {
-            parentJob = this.doService(systemId, "delete", SystemManager.DELETE_ACTION);
+            parentJob = this.doService(systemId, "delete", SystemManager.DELETE_ACTION, null);
         } else {
             // implementation for system not supported by underlying connector
             s.setState(State.DELETING);
@@ -933,8 +1041,8 @@ public class SystemManager implements ISystemManager {
 
     // private methods
 
-    private Job doService(final String systemId, final String basicAction, final String detailedAction)
-        throws CloudProviderException {
+    private Job doService(final String systemId, final String basicAction, final String detailedAction,
+        final Map<String, String> properties, final Object... params) throws CloudProviderException {
 
         System s = this.getSystemById(systemId);
 
@@ -954,12 +1062,26 @@ public class SystemManager implements ISystemManager {
         Job j;
         try {
             if (detailedAction.equals(SystemManager.START_ACTION)) {
-                j = connector.getSystemService().startSystem(s.getProviderAssignedId());
+                j = connector.getSystemService().startSystem(s.getProviderAssignedId(), properties);
                 s.setState(System.State.STARTING);
                 j.setParentJob(parentJob);
             } else if (detailedAction.equals(SystemManager.STOP_ACTION)) {
-                j = connector.getSystemService().stopSystem(s.getProviderAssignedId());
+                boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
+                j = connector.getSystemService().stopSystem(s.getProviderAssignedId(), force, properties);
                 s.setState(System.State.STOPPING);
+                j.setParentJob(parentJob);
+            } else if (detailedAction.equals(SystemManager.SUSPEND_ACTION)) {
+                j = connector.getSystemService().suspendSystem(s.getProviderAssignedId(), properties);
+                s.setState(System.State.SUSPENDING);
+                j.setParentJob(parentJob);
+            } else if (detailedAction.equals(SystemManager.PAUSE_ACTION)) {
+                j = connector.getSystemService().pauseSystem(s.getProviderAssignedId(), properties);
+                s.setState(System.State.PAUSING);
+                j.setParentJob(parentJob);
+            } else if (detailedAction.equals(SystemManager.RESTART_ACTION)) {
+                boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
+                j = connector.getSystemService().restartSystem(s.getProviderAssignedId(), force, properties);
+                s.setState(System.State.STARTING);
                 j.setParentJob(parentJob);
             } else if (detailedAction.equals(SystemManager.DELETE_ACTION)) {
                 j = connector.getSystemService().deleteSystem(s.getProviderAssignedId());
@@ -1444,8 +1566,10 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public void handleEntityStateChange(final String entityType, final String entityId) throws CloudProviderException {
+    public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId) {
         // TODO Auto-generated method stub
+        // updateSystemStatus();
+        SystemManager.logger.info("todo: update system state - " + entityType.getName() + " - " + entityId);
 
     }
 
@@ -1486,20 +1610,28 @@ public class SystemManager implements ISystemManager {
             switch (firstState) {
             case STARTED:
                 sysState = System.State.STARTED;
+                break;
             case STARTING:
                 sysState = System.State.STARTING;
+                break;
             case STOPPED:
                 sysState = System.State.STOPPED;
+                break;
             case STOPPING:
                 sysState = System.State.STOPPING;
+                break;
             case SUSPENDED:
                 sysState = System.State.SUSPENDED;
+                break;
             case SUSPENDING:
                 sysState = System.State.SUSPENDING;
+                break;
             case PAUSED:
                 sysState = System.State.PAUSED;
+                break;
             case PAUSING:
                 sysState = System.State.PAUSING;
+                break;
             }
 
             if (sysState != null) {
@@ -1528,19 +1660,6 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job pauseSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Job restartSystem(final String systemId, final boolean force, final Map<String, String> properties)
-        throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
     public Job exportSystemTemplate(final String systemTemplateId, final String format, final String destination,
         final Map<String, String> properties) throws CloudProviderException {
         // TODO Auto-generated method stub
@@ -1553,21 +1672,4 @@ public class SystemManager implements ISystemManager {
         return null;
     }
 
-    @Override
-    public Job startSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Job stopSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Job suspendSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

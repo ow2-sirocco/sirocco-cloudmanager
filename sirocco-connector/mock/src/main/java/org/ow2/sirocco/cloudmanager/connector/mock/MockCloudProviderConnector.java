@@ -340,7 +340,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
-    public synchronized Job stopMachine(final String machineId) throws ConnectorException {
+    public synchronized Job stopMachine(final String machineId, final boolean force) throws ConnectorException {
         MockCloudProviderConnector.logger.info("Stopping machine with providerAssignedId " + machineId);
         final Machine machine = this.machines.get(machineId);
         if (machine == null) {
@@ -688,48 +688,48 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     // private utility methods for System services (start,stop,etc)
 
-    private boolean serviceSystem(final List<? extends CloudCollectionItem> l, final SystemAction action)
-        throws ConnectorException {
+    private boolean serviceSystem(final List<? extends CloudCollectionItem> l, final SystemAction action, final boolean force,
+        final Map<String, String> properties) throws ConnectorException {
         boolean failedCancelled = false;
         IJobManager jobManager = this.mockCloudProviderConnectorFactory.getJobManager();
         for (CloudCollectionItem m : l) {
             // warning:job returned by createXXX is a copy!
             Job j = jobManager.getJobById(this
-                .callSystemService(m.getResource(), action, m.getResource().getProviderAssignedId().toString())
-                .getProviderAssignedId().toString());
+                .callSystemService(m.getResource(), action, m.getResource().getProviderAssignedId().toString(), force,
+                    properties).getProviderAssignedId().toString());
             failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
         }
         return failedCancelled;
     }
 
-    private Job callSystemService(final CloudResource ce, final SystemAction action, final String providerId)
-        throws ConnectorException {
+    private Job callSystemService(final CloudResource ce, final SystemAction action, final String providerId,
+        final boolean force, final Map<String, String> properties) throws ConnectorException {
         if (ce.getClass().equals(Machine.class)) {
             switch (action) {
             case START:
                 return this.startMachine(providerId);
             case STOP:
-                return this.stopMachine(providerId);
+                return this.stopMachine(providerId, force);
             case SUSPEND:
                 return this.suspendMachine(providerId);
             case PAUSE:
                 return this.pauseMachine(providerId);
             case RESTART:
-                return this.restartMachine(providerId, false);
+                return this.restartMachine(providerId, force);
             }
         }
         if (ce.getClass().equals(System.class)) {
             switch (action) {
             case START:
-                return this.startSystem(providerId);
+                return this.startSystem(providerId, properties);
             case STOP:
-                return this.stopSystem(providerId);
+                return this.stopSystem(providerId, force, properties);
             case SUSPEND:
-                return this.suspendSystem(providerId);
+                return this.suspendSystem(providerId, properties);
             case PAUSE:
-                return this.pauseSystem(providerId);
+                return this.pauseSystem(providerId, properties);
             case RESTART:
-                return this.restartSystem(providerId);
+                return this.restartSystem(providerId, force, properties);
             }
         }
         if (ce.getClass().equals(Network.class)) {
@@ -817,7 +817,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     private static final long maxJobTimeInSeconds = 600;
 
     private Job doSystemService(final String systemId, final System.State temporaryState, final SystemAction action,
-        final List<System.State> forbiddenStates) throws ConnectorException {
+        final List<System.State> forbiddenStates, final boolean force, final Map<String, String> properties)
+        throws ConnectorException {
         MockCloudProviderConnector.logger.info(action + " system with providerAssignedId " + systemId);
         final System system = this.systems.get(systemId);
         if (system == null) {
@@ -831,9 +832,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         boolean failedCancelled = false;
 
-        failedCancelled |= this.serviceSystem(system.getMachines(), action);
-        failedCancelled |= this.serviceSystem(system.getSystems(), action);
-        failedCancelled |= this.serviceSystem(system.getNetworks(), action);
+        failedCancelled |= this.serviceSystem(system.getMachines(), action, force, properties);
+        failedCancelled |= this.serviceSystem(system.getSystems(), action, force, properties);
+        failedCancelled |= this.serviceSystem(system.getNetworks(), action, force, properties);
 
         if (failedCancelled) {
             // one or more jobs are failed or cancelled, so all is in error
@@ -843,33 +844,35 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
-    public Job startSystem(final String systemId) throws ConnectorException {
+    public Job startSystem(final String systemId, final Map<String, String> properties) throws ConnectorException {
         return this.doSystemService(systemId, System.State.STARTING, SystemAction.START,
-            MockCloudProviderConnector.forbiddenSystemStartActions);
+            MockCloudProviderConnector.forbiddenSystemStartActions, false, properties);
     }
 
     @Override
-    public Job stopSystem(final String systemId) throws ConnectorException {
+    public Job stopSystem(final String systemId, final boolean force, final Map<String, String> properties)
+        throws ConnectorException {
         return this.doSystemService(systemId, System.State.STOPPING, SystemAction.STOP,
-            MockCloudProviderConnector.forbiddenSystemStopActions);
+            MockCloudProviderConnector.forbiddenSystemStopActions, force, properties);
     }
 
     @Override
-    public Job restartSystem(final String systemId) throws ConnectorException {
+    public Job restartSystem(final String systemId, final boolean force, final Map<String, String> properties)
+        throws ConnectorException {
         return this.doSystemService(systemId, System.State.STARTING, SystemAction.RESTART,
-            MockCloudProviderConnector.forbiddenSystemRestartActions);
+            MockCloudProviderConnector.forbiddenSystemRestartActions, force, properties);
     }
 
     @Override
-    public Job pauseSystem(final String systemId) throws ConnectorException {
+    public Job pauseSystem(final String systemId, final Map<String, String> properties) throws ConnectorException {
         return this.doSystemService(systemId, System.State.PAUSING, SystemAction.PAUSE,
-            MockCloudProviderConnector.forbiddenSystemPauseActions);
+            MockCloudProviderConnector.forbiddenSystemPauseActions, false, properties);
     }
 
     @Override
-    public Job suspendSystem(final String systemId) throws ConnectorException {
+    public Job suspendSystem(final String systemId, final Map<String, String> properties) throws ConnectorException {
         return this.doSystemService(systemId, System.State.SUSPENDING, SystemAction.SUSPEND,
-            MockCloudProviderConnector.forbiddenSystemSuspendActions);
+            MockCloudProviderConnector.forbiddenSystemSuspendActions, false, properties);
     }
 
     @Override

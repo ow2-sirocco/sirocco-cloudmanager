@@ -114,7 +114,7 @@ public interface ISystemManager extends IJobListener, IEntityStateListener {
 
     Job startSystem(String systemId, Map<String, String> properties) throws CloudProviderException;
 
-    Job stopSystem(String systemId, Map<String, String> properties) throws CloudProviderException;
+    Job stopSystem(String systemId, boolean force, Map<String, String> properties) throws CloudProviderException;
 
     Job suspendSystem(String systemId, Map<String, String> properties) throws CloudProviderException;
 

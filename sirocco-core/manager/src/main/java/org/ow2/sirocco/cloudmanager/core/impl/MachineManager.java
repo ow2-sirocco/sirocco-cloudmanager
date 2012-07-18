@@ -56,9 +56,11 @@ import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.core.api.exception.BadStateException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
@@ -110,6 +112,9 @@ public class MachineManager implements IMachineManager {
 
     @EJB
     private IVolumeManager volumeManager;
+
+    @EJB
+    private ISystemManager systemManager;
 
     @EJB
     private IJobManager jobManager;
@@ -558,7 +563,7 @@ public class MachineManager implements IMachineManager {
         Set<String> actions = m.getOperations();
 
         if (actions.contains(action) == false) {
-            throw new InvalidRequestException(" Cannot " + action + "  machine at state " + m.getState());
+            throw new BadStateException(" Cannot " + action + "  machine at state " + m.getState());
         }
 
         return m;
@@ -597,15 +602,15 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public Job stopMachine(final String machineId, final Map<String, String> properties) throws ResourceNotFoundException,
-        CloudProviderException {
-        return this.doService(machineId, "stop");
+    public Job stopMachine(final String machineId, final boolean force, final Map<String, String> properties)
+        throws ResourceNotFoundException, CloudProviderException {
+        return this.doService(machineId, "stop", force);
     }
 
     @Override
     public Job restartMachine(final String machineId, final boolean force, final Map<String, String> properties)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.doService(machineId, "restart");
+        return this.doService(machineId, "restart", force);
     }
 
     @Override
@@ -638,7 +643,8 @@ public class MachineManager implements IMachineManager {
                 j = computeService.startMachine(m.getProviderAssignedId());
                 m.setState(Machine.State.STARTING);
             } else if (action.equals("stop")) {
-                j = computeService.stopMachine(m.getProviderAssignedId());
+                boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
+                j = computeService.stopMachine(m.getProviderAssignedId(), force);
                 m.setState(Machine.State.STOPPING);
             } else if (action.equals("suspend")) {
                 j = computeService.suspendMachine(m.getProviderAssignedId());
@@ -1321,8 +1327,7 @@ public class MachineManager implements IMachineManager {
         }
 
         deleted.setState(State.DELETED);
-        // TODO WAIT CYRIL:
-        // this.systemManager.handleStateChangeOfSystemEntity(deleted);
+        this.systemManager.handleEntityStateChange(deleted.getClass(), deleted.getId().toString());
         this.em.flush();
     }
 
@@ -1706,6 +1711,7 @@ public class MachineManager implements IMachineManager {
 
             if (updated != null) {
                 mpersisted.setState(updated.getState());
+                this.systemManager.handleEntityStateChange(mpersisted.getClass(), mpersisted.getId().toString());
             }
         }
         String op = notification.getAction();

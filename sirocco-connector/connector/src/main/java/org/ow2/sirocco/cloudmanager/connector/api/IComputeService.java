@@ -36,7 +36,7 @@ public interface IComputeService {
 
     Job startMachine(final String machineId) throws ConnectorException;
 
-    Job stopMachine(final String machineId) throws ConnectorException;
+    Job stopMachine(final String machineId, boolean force) throws ConnectorException;
 
     Job suspendMachine(final String machineId) throws ConnectorException;
 
