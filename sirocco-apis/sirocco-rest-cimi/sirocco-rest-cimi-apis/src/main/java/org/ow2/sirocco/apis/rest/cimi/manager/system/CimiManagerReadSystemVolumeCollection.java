@@ -59,10 +59,10 @@ public class CimiManagerReadSystemVolumeCollection extends CimiManagerReadAbstra
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
         if (false == context.hasParamsForReadingCollection()) {
-            out = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(), SystemVolume.class.getName());
+            out = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(), SystemVolume.class);
         } else {
             QueryResult<?> result = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(),
-                SystemVolume.class.getName(), context.valueOfFirst(), context.valueOfLast(), context.valuesOfFilter(),
+                SystemVolume.class, context.valueOfFirst(), context.valueOfLast(), context.valuesOfFilter(),
                 context.valuesOfSelect());
             out = result.getItems();
         }

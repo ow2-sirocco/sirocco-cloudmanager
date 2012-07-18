@@ -59,10 +59,10 @@ public class CimiManagerReadSystemCredentialCollection extends CimiManagerReadAb
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
         if (false == context.hasParamsForReadingCollection()) {
-            out = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(), SystemCredentials.class.getName());
+            out = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(), SystemCredentials.class);
         } else {
             QueryResult<?> result = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(),
-                SystemCredentials.class.getName(), context.valueOfFirst(), context.valueOfLast(), context.valuesOfFilter(),
+                SystemCredentials.class, context.valueOfFirst(), context.valueOfLast(), context.valuesOfFilter(),
                 context.valuesOfSelect());
             out = result.getItems();
         }

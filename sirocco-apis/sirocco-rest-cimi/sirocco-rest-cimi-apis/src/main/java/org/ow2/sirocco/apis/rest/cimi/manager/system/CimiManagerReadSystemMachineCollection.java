@@ -59,10 +59,10 @@ public class CimiManagerReadSystemMachineCollection extends CimiManagerReadAbstr
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
         if (false == context.hasParamsForReadingCollection()) {
-            out = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(), SystemMachine.class.getName());
+            out = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(), SystemMachine.class);
         } else {
             QueryResult<?> result = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(),
-                SystemMachine.class.getName(), context.valueOfFirst(), context.valueOfLast(), context.valuesOfFilter(),
+                SystemMachine.class, context.valueOfFirst(), context.valueOfLast(), context.valuesOfFilter(),
                 context.valuesOfSelect());
             out = result.getItems();
         }
