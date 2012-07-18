@@ -439,7 +439,7 @@ public class MachineManager implements IMachineManager {
 
         m.setName(machineCreate.getName());
         m.setDescription(machineCreate.getDescription());
-        m.setProperties(machineCreate.getProperties());
+        m.setProperties(new HashMap<String, String>(machineCreate.getProperties()));
 
         m.setState(Machine.State.CREATING);
         m.setUser(this.getUser());

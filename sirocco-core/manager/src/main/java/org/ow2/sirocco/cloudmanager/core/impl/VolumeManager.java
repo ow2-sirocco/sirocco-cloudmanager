@@ -1,6 +1,7 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -142,7 +143,7 @@ public class VolumeManager implements IVolumeManager {
         volume.setBootable(false);
         volume.setName(volumeCreate.getName());
         volume.setDescription(volumeCreate.getDescription());
-        volume.setProperties(volumeCreate.getProperties());
+        volume.setProperties(new HashMap<String, String>(volumeCreate.getProperties()));
         volume.setUser(user);
 
         if (providerJob.getStatus() == Job.Status.RUNNING) {

@@ -2,6 +2,7 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -138,7 +139,7 @@ public class NetworkManager implements INetworkManager {
         Network network = new Network();
         network.setName(networkCreate.getName());
         network.setDescription(networkCreate.getDescription());
-        network.setProperties(networkCreate.getProperties());
+        network.setProperties(new HashMap<String, String>(networkCreate.getProperties()));
         network.setUser(user);
 
         network.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
@@ -496,7 +497,7 @@ public class NetworkManager implements INetworkManager {
         NetworkPort networkPort = new NetworkPort();
         networkPort.setName(networkPortCreate.getName());
         networkPort.setDescription(networkPortCreate.getDescription());
-        networkPort.setProperties(networkPortCreate.getProperties());
+        networkPort.setProperties(new HashMap<String, String>(networkPortCreate.getProperties()));
         networkPort.setUser(user);
 
         networkPort.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
@@ -925,7 +926,7 @@ public class NetworkManager implements INetworkManager {
         ForwardingGroup forwardingGroup = new ForwardingGroup();
         forwardingGroup.setName(forwardingGroupCreate.getName());
         forwardingGroup.setDescription(forwardingGroupCreate.getDescription());
-        forwardingGroup.setProperties(forwardingGroupCreate.getProperties());
+        forwardingGroup.setProperties(new HashMap<String, String>(forwardingGroupCreate.getProperties()));
         forwardingGroup.setUser(user);
 
         forwardingGroup.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());

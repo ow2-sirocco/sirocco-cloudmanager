@@ -207,7 +207,7 @@ public class SystemManager implements ISystemManager {
         system.setDescription(systemCreate.getDescription());
         system.setLocation(null);
         system.setName(systemCreate.getName());
-        system.setProperties(systemCreate.getProperties());
+        system.setProperties(new HashMap<String, String>(systemCreate.getProperties()));
         system.setState(State.CREATING);
         system.setUser(this.getUser());
         this.em.persist(system);
@@ -240,7 +240,7 @@ public class SystemManager implements ISystemManager {
                     CredentialsTemplate ct = (CredentialsTemplate) cd.getComponentTemplate();
                     cc.setCredentialTemplate(ct);
                     cc.setDescription(cd.getDescription());
-                    cc.setProperties(cd.getProperties());
+                    cc.setProperties(new HashMap<String, String>(cd.getProperties()));
 
                     // no job for credentials!
                     Credentials c = this.credentialsManager.createCredentials(cc);
@@ -327,9 +327,11 @@ public class SystemManager implements ISystemManager {
                         MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
                         mc.setMachineTemplate(mt);
                         mc.setDescription(cd.getDescription());
-                        Map<String, String> props = cd.getProperties();
-                        if (props == null) {
+                        Map<String, String> props;
+                        if (cd.getProperties() == null) {
                             props = new HashMap<String, String>();
+                        } else {
+                            props = new HashMap<String, String>(cd.getProperties());
                         }
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
                         if (placement.getLocation() != null) {
@@ -359,9 +361,11 @@ public class SystemManager implements ISystemManager {
                         VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
                         vc.setVolumeTemplate(vt);
                         vc.setDescription(cd.getDescription());
-                        Map<String, String> props = cd.getProperties();
-                        if (props == null) {
+                        Map<String, String> props;
+                        if (cd.getProperties() == null) {
                             props = new HashMap<String, String>();
+                        } else {
+                            props = new HashMap<String, String>(cd.getProperties());
                         }
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
                         if (placement.getLocation() != null) {
@@ -391,9 +395,11 @@ public class SystemManager implements ISystemManager {
                         SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
                         sc.setSystemTemplate(st);
                         sc.setDescription(cd.getDescription());
-                        Map<String, String> props = cd.getProperties();
-                        if (props == null) {
+                        Map<String, String> props = null;
+                        if (cd.getProperties() == null) {
                             props = new HashMap<String, String>();
+                        } else {
+                            props = new HashMap<String, String>(cd.getProperties());
                         }
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
                         if (placement.getLocation() != null) {
@@ -423,9 +429,11 @@ public class SystemManager implements ISystemManager {
                         NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
                         nc.setNetworkTemplate(nt);
                         nc.setDescription(cd.getDescription());
-                        Map<String, String> props = cd.getProperties();
-                        if (props == null) {
+                        Map<String, String> props = null;
+                        if (cd.getProperties() == null) {
                             props = new HashMap<String, String>();
+                        } else {
+                            props = new HashMap<String, String>(cd.getProperties());
                         }
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
                         if (placement.getLocation() != null) {
@@ -445,7 +453,7 @@ public class SystemManager implements ISystemManager {
             }
             // has this system any nested job?
             List<Job> nestedJobs = parentJob.getNestedJobs();
-            if (nestedJobs.size() == 0) {
+            if (nestedJobs != null && nestedJobs.size() == 0) {
                 // no job handling, job finised instantly and system in mixed
                 // state
                 parentJob.setStatus(Status.SUCCESS);
