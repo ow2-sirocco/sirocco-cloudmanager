@@ -1505,4 +1505,61 @@ public class SystemManager implements ISystemManager {
             }
         }
     }
+
+    @Override
+    public Job exportSystem(final String systemId, final String format, final String destination,
+        final Map<String, String> properties) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job importSystem(final String source, final Map<String, String> properties) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job pauseSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job restartSystem(final String systemId, final boolean force, final Map<String, String> properties)
+        throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job exportSystemTemplate(final String systemTemplateId, final String format, final String destination,
+        final Map<String, String> properties) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job importSystemTemplate(final String source, final Map<String, String> properties) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job startSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job stopSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job suspendSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

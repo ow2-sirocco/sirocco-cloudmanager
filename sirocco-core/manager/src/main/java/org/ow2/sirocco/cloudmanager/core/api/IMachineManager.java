@@ -57,6 +57,21 @@ public interface IMachineManager extends IJobListener {
     /**
      * Operations on Machine
      */
+    Job startMachine(final String machineId, Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    Job stopMachine(final String machineId, Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    Job suspendMachine(final String machineId, Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    Job restartMachine(final String machineId, boolean force, Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    Job pauseMachine(final String machineId, Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException;
+
     Job startMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
     Job stopMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;

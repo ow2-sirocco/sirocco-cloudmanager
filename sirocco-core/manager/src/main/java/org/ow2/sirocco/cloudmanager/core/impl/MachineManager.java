@@ -590,6 +590,36 @@ public class MachineManager implements IMachineManager {
         return this.doService(machineId, "pause");
     }
 
+    @Override
+    public Job startMachine(final String machineId, final Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException {
+        return this.doService(machineId, "start");
+    }
+
+    @Override
+    public Job stopMachine(final String machineId, final Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException {
+        return this.doService(machineId, "stop");
+    }
+
+    @Override
+    public Job restartMachine(final String machineId, final boolean force, final Map<String, String> properties)
+        throws ResourceNotFoundException, CloudProviderException {
+        return this.doService(machineId, "restart");
+    }
+
+    @Override
+    public Job pauseMachine(final String machineId, final Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException {
+        return this.doService(machineId, "pause");
+    }
+
+    @Override
+    public Job suspendMachine(final String machineId, final Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException {
+        return this.doService(machineId, "suspend");
+    }
+
     private Job doService(final String machineId, final String action, final Object... params) throws CloudProviderException {
 
         Job j;

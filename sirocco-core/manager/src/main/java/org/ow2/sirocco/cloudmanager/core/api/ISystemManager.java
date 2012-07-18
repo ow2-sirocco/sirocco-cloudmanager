@@ -111,4 +111,25 @@ public interface ISystemManager extends IJobListener, IEntityStateListener {
 
     QueryResult<SystemTemplate> getSystemTemplates(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
+
+    Job startSystem(String systemId, Map<String, String> properties) throws CloudProviderException;
+
+    Job stopSystem(String systemId, Map<String, String> properties) throws CloudProviderException;
+
+    Job suspendSystem(String systemId, Map<String, String> properties) throws CloudProviderException;
+
+    Job pauseSystem(String systemId, Map<String, String> properties) throws CloudProviderException;
+
+    Job restartSystem(String systemId, boolean force, Map<String, String> properties) throws CloudProviderException;
+
+    Job exportSystem(String systemId, String format, String destination, Map<String, String> properties)
+        throws CloudProviderException;
+
+    Job importSystem(String source, Map<String, String> properties) throws CloudProviderException;
+
+    Job exportSystemTemplate(String systemTemplateId, String format, String destination, Map<String, String> properties)
+        throws CloudProviderException;
+
+    Job importSystemTemplate(String source, Map<String, String> properties) throws CloudProviderException;
+
 }
