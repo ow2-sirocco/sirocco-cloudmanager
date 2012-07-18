@@ -214,7 +214,8 @@ public class SystemManager implements ISystemManager {
         system.setDescription(systemCreate.getDescription());
         system.setLocation(null);
         system.setName(systemCreate.getName());
-        system.setProperties(new HashMap<String, String>(systemCreate.getProperties()));
+        system.setProperties(systemCreate.getProperties() == null ? new HashMap<String, String>()
+            : new HashMap<String, String>(systemCreate.getProperties()));
         system.setState(State.CREATING);
         system.setUser(this.getUser());
         this.em.persist(system);
@@ -247,7 +248,8 @@ public class SystemManager implements ISystemManager {
                     CredentialsTemplate ct = (CredentialsTemplate) cd.getComponentTemplate();
                     cc.setCredentialTemplate(ct);
                     cc.setDescription(cd.getDescription());
-                    cc.setProperties(new HashMap<String, String>(cd.getProperties()));
+                    cc.setProperties(cd.getProperties() == null ? new HashMap<String, String>() : new HashMap<String, String>(
+                        cd.getProperties()));
 
                     // no job for credentials!
                     Credentials c = this.credentialsManager.createCredentials(cc);

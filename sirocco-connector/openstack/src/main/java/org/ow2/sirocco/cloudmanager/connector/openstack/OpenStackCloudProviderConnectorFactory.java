@@ -548,7 +548,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
         }
 
         @Override
-        public Job stopMachine(final String machineId) throws ConnectorException {
+        public Job stopMachine(final String machineId, final boolean force) throws ConnectorException {
             throw new ConnectorException("unsupported operation");
         }
 

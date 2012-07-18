@@ -143,7 +143,8 @@ public class VolumeManager implements IVolumeManager {
         volume.setBootable(false);
         volume.setName(volumeCreate.getName());
         volume.setDescription(volumeCreate.getDescription());
-        volume.setProperties(new HashMap<String, String>(volumeCreate.getProperties()));
+        volume.setProperties(volumeCreate.getProperties() == null ? new HashMap<String, String>()
+            : new HashMap<String, String>(volumeCreate.getProperties()));
         volume.setUser(user);
 
         if (providerJob.getStatus() == Job.Status.RUNNING) {

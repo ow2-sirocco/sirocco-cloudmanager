@@ -139,7 +139,8 @@ public class NetworkManager implements INetworkManager {
         Network network = new Network();
         network.setName(networkCreate.getName());
         network.setDescription(networkCreate.getDescription());
-        network.setProperties(new HashMap<String, String>(networkCreate.getProperties()));
+        network.setProperties(networkCreate.getProperties() == null ? new HashMap<String, String>()
+            : new HashMap<String, String>(networkCreate.getProperties()));
         network.setUser(user);
 
         network.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
@@ -497,7 +498,8 @@ public class NetworkManager implements INetworkManager {
         NetworkPort networkPort = new NetworkPort();
         networkPort.setName(networkPortCreate.getName());
         networkPort.setDescription(networkPortCreate.getDescription());
-        networkPort.setProperties(new HashMap<String, String>(networkPortCreate.getProperties()));
+        networkPort.setProperties(networkPortCreate.getProperties() == null ? new HashMap<String, String>()
+            : new HashMap<String, String>(networkPortCreate.getProperties()));
         networkPort.setUser(user);
 
         networkPort.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
@@ -926,7 +928,8 @@ public class NetworkManager implements INetworkManager {
         ForwardingGroup forwardingGroup = new ForwardingGroup();
         forwardingGroup.setName(forwardingGroupCreate.getName());
         forwardingGroup.setDescription(forwardingGroupCreate.getDescription());
-        forwardingGroup.setProperties(new HashMap<String, String>(forwardingGroupCreate.getProperties()));
+        forwardingGroup.setProperties(forwardingGroupCreate.getProperties() == null ? new HashMap<String, String>()
+            : new HashMap<String, String>(forwardingGroupCreate.getProperties()));
         forwardingGroup.setUser(user);
 
         forwardingGroup.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
