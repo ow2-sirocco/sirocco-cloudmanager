@@ -251,7 +251,7 @@ public class CloudProviderConnectorTest {
                 Assert.assertEquals(Machine.State.STARTED, machine.getState());
             } else {
                 System.out.println("Stopping machine " + machineId);
-                job = computeService.stopMachine(machineId);
+                job = computeService.stopMachine(machineId,false);
                 this.waitForJobCompletion(job);
                 machine = computeService.getMachine(machineId);
                 Assert.assertEquals(Machine.State.STOPPED, machine.getState());
