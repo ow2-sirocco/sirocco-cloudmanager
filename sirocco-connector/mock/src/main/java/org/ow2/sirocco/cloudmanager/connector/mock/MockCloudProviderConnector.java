@@ -251,7 +251,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         MockCloudProviderConnector.logger.info("Creating machine with providerAssignedId " + machineProviderAssignedId);
         machine.setName(machineCreate.getName());
         machine.setDescription(machineCreate.getDescription());
-        machine.setProperties(machineCreate.getProperties());
+        machine.setProperties(new HashMap<String, String>(machineCreate.getProperties()));
         machine.setState(Machine.State.CREATING);
         machine.setCpu(machineCreate.getMachineTemplate().getMachineConfiguration().getCpu());
         machine.setMemory(machineCreate.getMachineTemplate().getMachineConfiguration().getMemory());
