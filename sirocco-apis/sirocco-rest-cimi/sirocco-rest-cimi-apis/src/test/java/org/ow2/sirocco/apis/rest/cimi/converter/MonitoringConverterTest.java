@@ -230,4 +230,70 @@ public class MonitoringConverterTest {
         Assert.assertNull(cimi.getArray()[1].getId());
         Assert.assertNull(cimi.getArray()[1].getName());
     }
+
+    @Test
+    public void testCimiJobCollectionExpand() throws Exception {
+        CimiJobCollection cimi;
+        List<Job> service;
+
+        // Full Service -> Cimi
+        Job Job1 = new Job();
+        Job1.setId(1);
+        Job1.setName("nameOne");
+        Job Job2 = new Job();
+        Job2.setId(2);
+        Job2.setName("nameTwo");
+        Job Job3 = new Job();
+        Job3.setId(3);
+        Job3.setName("nameThree");
+
+        service = new ArrayList<Job>();
+        service.add(Job1);
+        service.add(Job2);
+        service.add(Job3);
+
+        // expand = *
+        this.request.getParams().setCimiExpand(new CimiExpand("*"));
+        cimi = (CimiJobCollection) this.context.convertToCimi(service, CimiJobCollection.class);
+        Assert.assertEquals(3, cimi.getArray().length);
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/1", cimi.getArray()[0].getHref());
+        Assert.assertEquals(cimi.getArray()[0].getHref(), cimi.getArray()[0].getId());
+        Assert.assertEquals("nameOne", cimi.getArray()[0].getName());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/2", cimi.getArray()[1].getHref());
+        Assert.assertEquals(cimi.getArray()[1].getHref(), cimi.getArray()[1].getId());
+        Assert.assertEquals("nameTwo", cimi.getArray()[1].getName());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/3", cimi.getArray()[2].getHref());
+        Assert.assertEquals(cimi.getArray()[2].getHref(), cimi.getArray()[2].getId());
+        Assert.assertEquals("nameThree", cimi.getArray()[2].getName());
+
+        // expand = jobs
+        this.request.getParams().setCimiExpand(new CimiExpand("jobs"));
+
+        cimi = (CimiJobCollection) this.context.convertToCimi(service, CimiJobCollection.class);
+        Assert.assertEquals(3, cimi.getArray().length);
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/1", cimi.getArray()[0].getHref());
+        Assert.assertEquals(cimi.getArray()[0].getHref(), cimi.getArray()[0].getId());
+        Assert.assertEquals("nameOne", cimi.getArray()[0].getName());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/2", cimi.getArray()[1].getHref());
+        Assert.assertEquals(cimi.getArray()[1].getHref(), cimi.getArray()[1].getId());
+        Assert.assertEquals("nameTwo", cimi.getArray()[1].getName());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/3", cimi.getArray()[2].getHref());
+        Assert.assertEquals(cimi.getArray()[2].getHref(), cimi.getArray()[2].getId());
+        Assert.assertEquals("nameThree", cimi.getArray()[2].getName());
+
+        // expand = foo
+        this.request.getParams().setCimiExpand(new CimiExpand("foo"));
+
+        cimi = (CimiJobCollection) this.context.convertToCimi(service, CimiJobCollection.class);
+        Assert.assertEquals(3, cimi.getArray().length);
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/1", cimi.getArray()[0].getHref());
+        Assert.assertNull(cimi.getArray()[0].getId());
+        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/2", cimi.getArray()[1].getHref());
+        Assert.assertNull(cimi.getArray()[1].getId());
+        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/3", cimi.getArray()[2].getHref());
+        Assert.assertNull(cimi.getArray()[2].getId());
+        Assert.assertNull(cimi.getArray()[2].getName());
+    }
 }

@@ -260,7 +260,27 @@ public class CimiContextImpl implements CimiContext {
             case VolumeImageCollection:
             case VolumeTemplateCollection:
             case VolumeVolumeImageCollection:
+                // All expanded ?
                 expand = this.getRequest().getParams().getCimiExpand().hasAll();
+                if (false == expand) {
+                    // Get types and names of root
+                    Map<ExchangeType, String> typeNames = this.findReferenceNames(this.getRootConverting());
+                    if (null != typeNames) {
+                        // Expand only if type is found and name of type is in
+                        // parameter
+                        if (true == typeNames.containsKey(typeCurrent)) {
+                            String nameCurent = typeNames.get(typeCurrent);
+                            List<String> expandParams = this.getRequest().getParams().getCimiExpand().getValues();
+                            if (null != expandParams) {
+                                for (String param : expandParams) {
+                                    if (true == nameCurent.equalsIgnoreCase(param)) {
+                                        expand = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
                 break;
             default:
                 break;
@@ -551,4 +571,19 @@ public class CimiContextImpl implements CimiContext {
         return type;
     }
 
+    /**
+     * Find all names of referenced resources in the given class.
+     * 
+     * @param klass The class where find referenced names
+     * @return All referenced names with the type or null if not found
+     */
+    @SuppressWarnings("unchecked")
+    protected Map<ExchangeType, String> findReferenceNames(final Class<?> klass) {
+        Map<ExchangeType, String> names = null;
+        ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
+        if (null != item) {
+            names = (Map<ExchangeType, String>) item.getData(ConfigFactory.NAMES);
+        }
+        return names;
+    }
 }
