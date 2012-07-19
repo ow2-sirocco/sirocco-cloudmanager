@@ -336,7 +336,7 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * 
      * @param volumeConfigurations The value
      */
-    public void setVolumeConfigurations(final CimiVolumeConfigurationCollection volumeConfigurations) {
+    public void setVolumeConfigs(final CimiVolumeConfigurationCollection volumeConfigurations) {
         this.volumeConfigurations = volumeConfigurations;
     }
 

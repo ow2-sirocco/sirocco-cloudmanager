@@ -136,7 +136,7 @@ public class CloudEntryPointConverter extends ObjectCommonConverter {
             dataCimi.setSystemTemplates((CimiSystemTemplateCollection) context.convertNextCimi(
                 dataService.getSystemTemplates(), CimiSystemTemplateCollection.class));
 
-            dataCimi.setVolumeConfigurations((CimiVolumeConfigurationCollection) context.convertNextCimi(
+            dataCimi.setVolumeConfigs((CimiVolumeConfigurationCollection) context.convertNextCimi(
                 dataService.getVolumeConfigurations(), CimiVolumeConfigurationCollection.class));
             dataCimi.setVolumeImages((CimiVolumeImageCollection) context.convertNextCimi(dataService.getVolumeImages(),
                 CimiVolumeImageCollection.class));
