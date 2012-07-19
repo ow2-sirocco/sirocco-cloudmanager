@@ -1370,11 +1370,13 @@ public class MachineManager implements IMachineManager {
             nic.setNetworkPort(null);
 
             List<Address> addresses = nic.getAddresses();
-            MachineManager.logger.info(" createNetworkInterfaces has addresses " + addresses.size());
-            for (Address address : addresses) {
-                address.setNetwork(null);
-                address.setResource(null);
-                this.em.persist(address);
+            if (addresses != null) {
+                MachineManager.logger.info(" createNetworkInterfaces has addresses " + addresses.size());
+                for (Address address : addresses) {
+                    address.setNetwork(null);
+                    address.setResource(null);
+                    this.em.persist(address);
+                }
             }
             MachineManager.logger.info("createNetworkInterfaces persist nic ");
             this.em.persist(nic);
