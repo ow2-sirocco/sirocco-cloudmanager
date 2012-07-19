@@ -70,6 +70,11 @@ public class CimiMachineTemplateNetworkInterface implements CimiData {
     private String state;
 
     /**
+     * Field "networkType".
+     */
+    private String networkType;
+
+    /**
      * Field "mtu".
      */
     private Integer mtu;
@@ -187,6 +192,24 @@ public class CimiMachineTemplateNetworkInterface implements CimiData {
      */
     public void setMtu(final Integer mtu) {
         this.mtu = mtu;
+    }
+
+    /**
+     * Return the value of field "networkType".
+     * 
+     * @return The value
+     */
+    public String getNetworkType() {
+        return this.networkType;
+    }
+
+    /**
+     * Set the value of field "networkType".
+     * 
+     * @param networkType The value
+     */
+    public void setNetworkType(final String networkType) {
+        this.networkType = networkType;
     }
 
     /**

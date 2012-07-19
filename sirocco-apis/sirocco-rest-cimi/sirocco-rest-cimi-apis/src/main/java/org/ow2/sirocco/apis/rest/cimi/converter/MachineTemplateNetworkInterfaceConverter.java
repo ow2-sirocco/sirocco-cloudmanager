@@ -115,6 +115,7 @@ public class MachineTemplateNetworkInterfaceConverter extends ObjectCommonConver
         }
         dataCimi.setMtu(dataService.getMtu());
         // TODO Network, NetworkPort
+        dataCimi.setNetworkType(ConverterHelper.toString(dataService.getNetworkType()));
         dataCimi.setState(ConverterHelper.toString(dataService.getState()));
     }
 
@@ -130,6 +131,7 @@ public class MachineTemplateNetworkInterfaceConverter extends ObjectCommonConver
         // this.fill(context, dataCimi, dataService);
         dataService.setMtu(dataCimi.getMtu());
         // TODO Network, NetworkPort
+        dataService.setNetworkType(ConverterHelper.toNetworkType(dataCimi.getNetworkType()));
         dataService.setState(ConverterHelper.toMachineTemplateNetworkInterfaceState(dataCimi.getState()));
 
         // Next read-only
