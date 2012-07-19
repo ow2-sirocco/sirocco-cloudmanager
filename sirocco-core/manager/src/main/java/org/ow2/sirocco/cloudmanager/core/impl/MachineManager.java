@@ -1663,6 +1663,7 @@ public class MachineManager implements IMachineManager {
                 + notification.getStatus());
             if (notification.getStatus() == Job.Status.SUCCESS) {
                 mv.setState(MachineVolume.State.DETACHED);
+                mv.getVolume().setAttachment(null);
                 mv.setVolume(null);
                 // this.em.remove(mv);
 
@@ -1898,6 +1899,7 @@ public class MachineManager implements IMachineManager {
             MachineManager.logger.info(" Attached volume " + volumeId + " to machine " + m.getId());
             this.em.persist(mv);
             m.addMachineVolume(mv);
+            mv.setOwner(m);
             this.em.flush();
         }
         // TODO check
@@ -1906,6 +1908,7 @@ public class MachineManager implements IMachineManager {
 
         Job persisted = this.createJob(m, affected, "add", j.getStatus(), null);
         persisted.setProviderAssignedId(j.getProviderAssignedId());
+        persisted.setDescription("Volume attachment");
         this.updateJob(persisted);
         MachineManager.logger.info(" Add volume " + volumeId + " to machine " + m.getId() + " job state "
             + persisted.getStatus());
@@ -1916,7 +1919,7 @@ public class MachineManager implements IMachineManager {
         CloudProviderException, InvalidRequestException {
 
         Volume volume = machineVolume.getVolume();
-        if ((machineId == null) || (volume == null) || (machineVolume.getInitialLocation() == null)) {
+        if ((machineId == null) || (volume == null)) {
             throw new InvalidRequestException(" null arguments ");
         }
         MachineManager.logger.info(" Add volume " + machineVolume.getVolume().getId() + " to machine " + machineId);
@@ -1990,6 +1993,7 @@ public class MachineManager implements IMachineManager {
 
         Job persisted = this.createJob(m, affectedEntities, "delete", j.getStatus(), null);
         persisted.setProviderAssignedId(j.getProviderAssignedId());
+        persisted.setDescription("Volume detachment");
         this.updateJob(persisted);
         return persisted;
     }

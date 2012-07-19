@@ -30,6 +30,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 @Entity
@@ -42,6 +43,8 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
 
     private String initialLocation;
 
+    private Machine owner;
+
     private Volume volume;
 
     public static enum State {
@@ -49,6 +52,15 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
     }
 
     private State state;
+
+    @ManyToOne
+    public Machine getOwner() {
+        return this.owner;
+    }
+
+    public void setOwner(final Machine owner) {
+        this.owner = owner;
+    }
 
     // unidirectional
     // oneToOne until shareable volume support is added

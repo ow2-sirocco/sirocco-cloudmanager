@@ -26,8 +26,6 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import javax.persistence.Entity;
@@ -38,6 +36,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -66,6 +65,8 @@ public class Volume extends CloudResource implements Serializable {
     private List<VolumeVolumeImage> images;
 
     private CloudProviderAccount cloudProviderAccount;
+
+    private MachineVolume attachment;
 
     public Volume() {
     }
@@ -128,6 +129,15 @@ public class Volume extends CloudResource implements Serializable {
 
     public void setLocation(final CloudProviderLocation location) {
         this.location = location;
+    }
+
+    @OneToOne(mappedBy = "volume")
+    public MachineVolume getAttachment() {
+        return this.attachment;
+    }
+
+    public void setAttachment(final MachineVolume attachment) {
+        this.attachment = attachment;
     }
 
     @Override

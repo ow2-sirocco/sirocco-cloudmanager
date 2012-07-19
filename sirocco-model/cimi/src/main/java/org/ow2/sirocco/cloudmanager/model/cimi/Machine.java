@@ -128,7 +128,7 @@ public class Machine extends CloudResource implements Serializable {
         }
     }
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
+    @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
