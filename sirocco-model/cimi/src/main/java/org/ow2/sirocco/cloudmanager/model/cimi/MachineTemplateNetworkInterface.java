@@ -35,6 +35,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+
 @Entity
 public class MachineTemplateNetworkInterface extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -84,6 +87,7 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
     }
 
     @OneToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     public List<Address> getAddresses() {
         return this.addresses;
     }
