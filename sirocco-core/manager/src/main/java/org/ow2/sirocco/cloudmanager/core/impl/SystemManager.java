@@ -1578,7 +1578,7 @@ public class SystemManager implements ISystemManager {
         try {
             obj = (CloudCollectionItem) this.em
                 .createQuery("FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId")
-                .setParameter("resourceId", entityId).getSingleResult();
+                .setParameter("resourceId", new Integer(entityId)).getSingleResult();
         } catch (NoResultException e) {
             obj = null;
         }
