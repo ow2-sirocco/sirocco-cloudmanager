@@ -157,6 +157,7 @@ public class VolumeManager implements IVolumeManager {
             Job job = new Job();
             job.setTargetEntity(volume);
             job.setCreated(new Date());
+            job.setDescription("Volume creation");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
             job.setStatus(providerJob.getStatus());
             job.setAction(providerJob.getAction());
@@ -185,6 +186,7 @@ public class VolumeManager implements IVolumeManager {
             Job job = new Job();
             job.setTargetEntity(volume);
             job.setCreated(new Date());
+            job.setDescription("Volume creation");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
             job.setStatus(providerJob.getStatus());
             job.setAction(providerJob.getAction());
@@ -482,6 +484,7 @@ public class VolumeManager implements IVolumeManager {
             Job job = new Job();
             job.setTargetEntity(volume);
             job.setCreated(new Date());
+            job.setDescription("Volume deletion");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
             job.setStatus(providerJob.getStatus());
             job.setAction(providerJob.getAction());
@@ -505,6 +508,7 @@ public class VolumeManager implements IVolumeManager {
             Job job = new Job();
             job.setTargetEntity(volume);
             job.setCreated(new Date());
+            job.setDescription("Volume deletion");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
             job.setStatus(providerJob.getStatus());
             job.setAction(providerJob.getAction());
@@ -763,6 +767,7 @@ public class VolumeManager implements IVolumeManager {
         Job job = new Job();
         job.setTargetEntity(volumeImage);
         job.setCreated(new Date());
+        job.setDescription("VolumeImage creation");
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
         job.setStatus(providerJob.getStatus());
         job.setAction(providerJob.getAction());
@@ -854,6 +859,7 @@ public class VolumeManager implements IVolumeManager {
         Job job = new Job();
         job.setTargetEntity(volumeImage);
         job.setCreated(new Date());
+        job.setDescription("VolumeImage deletion");
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
         job.setStatus(providerJob.getStatus());
         job.setAction(providerJob.getAction());
