@@ -126,11 +126,6 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
     private CimiSystemTemplateCollection systemTemplates;
 
     /**
-     * Field "jobTime".
-     */
-    private Integer jobTime;
-
-    /**
      * Default constructor.
      */
     public CimiCloudEntryPoint() {
@@ -228,26 +223,6 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      */
     public void setJobs(final CimiJobCollection jobs) {
         this.jobs = jobs;
-    }
-
-    /**
-     * Return the value of field "jobTime".
-     * 
-     * @return The value
-     */
-    @Deprecated
-    public Integer getJobTime() {
-        return this.jobTime;
-    }
-
-    /**
-     * Set the value of field "jobTime".
-     * 
-     * @param jobTime The value
-     */
-    @Deprecated
-    public void setJobTime(final Integer jobTime) {
-        this.jobTime = jobTime;
     }
 
     /**

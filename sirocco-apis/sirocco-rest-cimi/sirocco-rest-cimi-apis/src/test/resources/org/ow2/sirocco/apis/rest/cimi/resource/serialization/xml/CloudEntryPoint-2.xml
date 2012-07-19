@@ -13,7 +13,6 @@
 	<baseURI>baseUriValue_2</baseURI>
 	<credentials href="hrefValue_2" />
 	<credentialTemplates href="hrefValue_2" />
-	<jobTime>2</jobTime>
 	<jobs href="hrefValue_2" />
 	<machineConfigs href="hrefValue_2" />
 	<machineImages href="hrefValue_2" />

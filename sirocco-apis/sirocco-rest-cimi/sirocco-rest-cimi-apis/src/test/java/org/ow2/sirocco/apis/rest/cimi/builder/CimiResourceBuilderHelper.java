@@ -188,12 +188,11 @@ public class CimiResourceBuilderHelper {
         cimi.setCredentials(CimiResourceBuilderHelper.buildCimiCredentialCollection(id, false, false));
         cimi.setCredentialTemplates(CimiResourceBuilderHelper.buildCimiCredentialTemplateCollection(id, false, false));
         cimi.setJobs(CimiResourceBuilderHelper.buildCimiJobCollection(id, false, false));
-        cimi.setJobTime(id);
         cimi.setMachines(CimiResourceBuilderHelper.buildCimiMachineCollection(id, false, false));
         cimi.setMachineConfigs(CimiResourceBuilderHelper.buildCimiMachineConfigurationCollection(id, false, false));
         cimi.setMachineImages(CimiResourceBuilderHelper.buildCimiMachineImageCollection(id, false, false));
         cimi.setMachineTemplates(CimiResourceBuilderHelper.buildCimiMachineTemplateCollection(id, false, false));
-        // TODO Volume, NetworkInterface, ...
+        // TODO Volume, NetworkInterface, System, ...
         return cimi;
     }
 

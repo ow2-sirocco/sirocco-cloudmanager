@@ -32,7 +32,6 @@
 	"machineTemplates":{
 		"href":"hrefValue_2"
 	},
-	"jobTime":2,
 	"operations":[
 		{
 			"rel":"relValue_2_0",

@@ -83,7 +83,6 @@ public class CloudEntryPointConverterTest {
         Assert.assertNull(cimi.getCredentials());
         Assert.assertNull(cimi.getCredentialTemplates());
         Assert.assertNull(cimi.getJobs());
-        Assert.assertNull(cimi.getJobTime());
         Assert.assertNull(cimi.getMachineConfigs());
         Assert.assertNull(cimi.getMachineImages());
         Assert.assertNull(cimi.getMachines());
