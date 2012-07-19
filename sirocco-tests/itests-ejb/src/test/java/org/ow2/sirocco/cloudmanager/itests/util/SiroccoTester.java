@@ -54,7 +54,7 @@ public class SiroccoTester {
      */
     protected static final int INITIALIZE_TIMEOUT = 30;
 
-    protected static final int ASYNC_OPERATION_WAIT_TIME_IN_SECONDS = 30;
+    protected static final int ASYNC_OPERATION_WAIT_TIME_IN_SECONDS = 1300;
 
     protected IRemoteMachineManager machineManager;
 
@@ -124,7 +124,7 @@ public class SiroccoTester {
     public void tearDown() throws Exception {
     }
 
-    protected void waitForJobCompletion(Job job) throws Exception {
+    protected Job.Status waitForJobCompletion(Job job) throws Exception {
         int counter = SiroccoTester.ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         String jobId = job.getId().toString();
         while (true) {
@@ -137,6 +137,7 @@ public class SiroccoTester {
                 throw new Exception("Machine operation time out");
             }
         }
+        return job.getStatus();
     }
 
     private MachineConfiguration buildMachineConfiguration(final String name, final String description, final int numCpus,

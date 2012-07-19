@@ -35,6 +35,7 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.ow2.sirocco.cloudmanager.connector.api.BadStateException;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
@@ -322,7 +323,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             throw new ConnectorException("Machine " + machineId + " doesn't exist");
         }
         if (machine.getState() == State.CREATING || machine.getState() == State.STARTED || machine.getState() == State.DELETING) {
-            throw new ConnectorException("Illegal operation");
+            throw new BadStateException("Illegal operation");
         }
         machine.setState(State.STARTING);
 
@@ -349,7 +350,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         if (machine.getState() == State.CREATING || machine.getState() == State.STOPPED || machine.getState() == State.PAUSING
             || machine.getState() == State.PAUSED || machine.getState() == State.SUSPENDING
             || machine.getState() == State.SUSPENDED || machine.getState() == State.DELETING) {
-            throw new ConnectorException("Illegal operation");
+            throw new BadStateException("Illegal operation");
         }
         machine.setState(State.STOPPING);
 
@@ -377,7 +378,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             || machine.getState() == State.PAUSING || machine.getState() == State.PAUSED
             || machine.getState() == State.SUSPENDING || machine.getState() == State.SUSPENDED
             || machine.getState() == State.DELETING) {
-            throw new ConnectorException("Illegal operation");
+            throw new BadStateException("Illegal operation");
         }
         machine.setState(State.SUSPENDING);
 
@@ -423,7 +424,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             || machine.getState() == State.PAUSING || machine.getState() == State.PAUSED
             || machine.getState() == State.SUSPENDING || machine.getState() == State.SUSPENDED
             || machine.getState() == State.DELETING) {
-            throw new ConnectorException("Illegal operation");
+            throw new BadStateException("Illegal operation");
         }
         machine.setState(State.PAUSING);
 
@@ -491,6 +492,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private boolean waitForJob(final Job j, final long maxTimeSecond) {
         long time = 0;
+        if (j == null) {
+            return true;
+        }
         while (j.getStatus().equals(Job.Status.RUNNING)) {
             try {
                 time++;
@@ -704,47 +708,55 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private Job callSystemService(final CloudResource ce, final SystemAction action, final String providerId,
         final boolean force, final Map<String, String> properties) throws ConnectorException {
-        if (ce.getClass().equals(Machine.class)) {
-            switch (action) {
-            case START:
-                return this.startMachine(providerId);
-            case STOP:
-                return this.stopMachine(providerId, force);
-            case SUSPEND:
-                return this.suspendMachine(providerId);
-            case PAUSE:
-                return this.pauseMachine(providerId);
-            case RESTART:
-                return this.restartMachine(providerId, force);
+        try {
+            if (ce.getClass().equals(Machine.class)) {
+                switch (action) {
+                case START:
+                    return this.startMachine(providerId);
+                case STOP:
+                    return this.stopMachine(providerId, force);
+                case SUSPEND:
+                    return this.suspendMachine(providerId);
+                case PAUSE:
+                    return this.pauseMachine(providerId);
+                case RESTART:
+                    return this.restartMachine(providerId, force);
+                }
             }
-        }
-        if (ce.getClass().equals(System.class)) {
-            switch (action) {
-            case START:
-                return this.startSystem(providerId, properties);
-            case STOP:
-                return this.stopSystem(providerId, force, properties);
-            case SUSPEND:
-                return this.suspendSystem(providerId, properties);
-            case PAUSE:
-                return this.pauseSystem(providerId, properties);
-            case RESTART:
-                return this.restartSystem(providerId, force, properties);
+            if (ce.getClass().equals(System.class)) {
+                switch (action) {
+                case START:
+                    return this.startSystem(providerId, properties);
+                case STOP:
+                    return this.stopSystem(providerId, force, properties);
+                case SUSPEND:
+                    return this.suspendSystem(providerId, properties);
+                case PAUSE:
+                    return this.pauseSystem(providerId, properties);
+                case RESTART:
+                    return this.restartSystem(providerId, force, properties);
+                }
             }
-        }
-        if (ce.getClass().equals(Network.class)) {
-            switch (action) {
-            case START:
-                return this.startNetwork(providerId);
-            case STOP:
-                return this.stopNetwork(providerId);
-                // case SUSPEND:
-                // return this.suspendNetwork(providerId);
-                // case PAUSE:
-                // return this.pauseNetwork(providerId);
-                // case RESTART:
-                // return this.restartNetwork(providerId);
+            if (ce.getClass().equals(Network.class)) {
+                switch (action) {
+                case START:
+                    return this.startNetwork(providerId);
+                case STOP:
+                    return this.stopNetwork(providerId);
+                    // case SUSPEND:
+                    // return this.suspendNetwork(providerId);
+                    // case PAUSE:
+                    // return this.pauseNetwork(providerId);
+                    // case RESTART:
+                    // return this.restartNetwork(providerId);
+                }
             }
+        } catch (BadStateException e) {
+            // do nothing, return dummy job
+            Job j = new Job();
+            j.setProviderAssignedId("666");
+            j.setName("dummy job");
+            return j;
         }
         throw new ConnectorException("Illegal Operation");
     }
@@ -825,7 +837,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             throw new ConnectorException("System " + systemId + " doesn't exist");
         }
         if (forbiddenStates.contains(system.getState())) {
-            throw new ConnectorException("Illegal operation");
+            throw new BadStateException("Illegal operation");
         }
 
         system.setState(temporaryState);

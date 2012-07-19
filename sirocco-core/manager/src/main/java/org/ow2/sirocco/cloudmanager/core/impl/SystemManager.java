@@ -1570,8 +1570,6 @@ public class SystemManager implements ISystemManager {
 
     @Override
     public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId) {
-        // TODO Auto-generated method stub
-        // updateSystemStatus();
         // getting system attachement if any
         SystemManager.logger.info("updating system state - " + entityType.getName() + " - " + entityId);
         CloudCollectionItem obj = null;
@@ -1600,7 +1598,7 @@ public class SystemManager implements ISystemManager {
             sys = null;
         }
         // bug:collection not attached to any system collection, stopping all
-        if (obj == null) {
+        if (sys == null) {
             SystemManager.logger.warn(" collection not in any system - " + obj.getId());
             return;
         }
@@ -1611,6 +1609,8 @@ public class SystemManager implements ISystemManager {
         } catch (CloudProviderException e) {
             SystemManager.logger.warn(" system status update failed for system " + sys.getId());
         }
+
+        // TODO: delete systemXXX if deleted event
 
     }
 

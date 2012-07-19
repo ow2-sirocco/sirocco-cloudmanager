@@ -165,20 +165,8 @@ public class SystemManagerTest extends SiroccoTester {
         // systemTemplate1=systemManager.createSystemTemplate(systemTemplate1);
 
         Job j = this.systemManager.createSystem(systemCreate1);
-        String jobId = j.getId().toString();
+        Assert.assertEquals(this.waitForJobCompletion(j), Job.Status.SUCCESS);
         String systemId = j.getTargetEntity().getId().toString();
-        int counter = SystemManagerTest.JOB_DELAY;
-        while (true) {
-            j = this.jobManager.getJobById(jobId);
-            if (j.getStatus() != Job.Status.RUNNING) {
-                break;
-            }
-            Thread.sleep(1000);
-            if (counter-- == 0) {
-                throw new Exception("system operation time out");
-            }
-        }
-        Assert.assertEquals(j.getStatus(), Job.Status.SUCCESS);
 
         // verif
         org.ow2.sirocco.cloudmanager.model.cimi.system.System sv1 = this.systemManager.getSystemById(systemId);
@@ -211,22 +199,8 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals(s2.getDescription(), "desc-comp3");
         Assert.assertEquals(s2.getMachines().size(), 3);
 
-        j = this.systemManager.startSystem(systemId);
-        jobId = j.getId().toString();
-        counter = SystemManagerTest.JOB_DELAY;
-
-        while (true) {
-            j = this.jobManager.getJobById(jobId);
-            if (j.getStatus() != Job.Status.RUNNING) {
-                break;
-            }
-            Thread.sleep(1000);
-            if (counter-- == 0) {
-                throw new Exception("system operation time out");
-            }
-        }
-
-        Assert.assertEquals(j.getStatus(), Job.Status.SUCCESS);
+        // start system
+        Assert.assertEquals(this.waitForJobCompletion(this.systemManager.startSystem(systemId)), Job.Status.SUCCESS);
 
         sv1 = this.systemManager.getSystemById(systemId);
         Assert.assertEquals(sv1.getState(), System.State.STARTED);
@@ -243,21 +217,18 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals(((Machine) s2.getMachines().get(1).getResource()).getState(), Machine.State.STARTED);
         Assert.assertEquals(((Machine) s2.getMachines().get(2).getResource()).getState(), Machine.State.STARTED);
 
-        j = this.systemManager.stopSystem(systemId);
-        jobId = j.getId().toString();
-        counter = SystemManagerTest.JOB_DELAY;
-        while (true) {
-            j = this.jobManager.getJobById(jobId);
-            if (j.getStatus() != Job.Status.RUNNING) {
-                break;
-            }
-            Thread.sleep(1000);
-            if (counter-- == 0) {
-                throw new Exception("system operation time out");
-            }
-        }
+        // playing directly with machines
+        Machine mm = (Machine) s2.getMachines().get(1).getResource();
 
-        Assert.assertEquals(j.getStatus(), Job.Status.SUCCESS);
+        Assert.assertEquals(this.waitForJobCompletion(this.machineManager.pauseMachine(mm.getId().toString())),
+            Job.Status.SUCCESS);
+        // refreshing system
+        s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getResource().getId().toString());
+        // system state to mixed?
+        Assert.assertEquals(s2.getState(), System.State.MIXED);
+
+        // stop system
+        Assert.assertEquals(this.waitForJobCompletion(this.systemManager.stopSystem(systemId)), Job.Status.SUCCESS);
 
         sv1 = this.systemManager.getSystemById(systemId);
         Assert.assertEquals(sv1.getState(), System.State.STOPPED);
@@ -271,7 +242,7 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals(((Machine) s1.getMachines().get(2).getResource()).getState(), Machine.State.STOPPED);
         s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getResource().getId().toString());
         Assert.assertEquals(((Machine) s2.getMachines().get(0).getResource()).getState(), Machine.State.STOPPED);
-        Assert.assertEquals(((Machine) s2.getMachines().get(1).getResource()).getState(), Machine.State.STOPPED);
+        Assert.assertEquals(((Machine) s2.getMachines().get(1).getResource()).getState(), Machine.State.PAUSED);
         Assert.assertEquals(((Machine) s2.getMachines().get(2).getResource()).getState(), Machine.State.STOPPED);
 
         // some manipulations
@@ -284,20 +255,7 @@ public class SystemManagerTest extends SiroccoTester {
         // Assert.assertEquals(sv1.getMachines().size(), 1);
         // Assert.assertEquals(sv1.getSystems().size(), 1);
 
-        j = this.systemManager.deleteSystem(systemId);
-        jobId = j.getId().toString();
-        counter = SystemManagerTest.JOB_DELAY;
-        while (true) {
-            j = this.jobManager.getJobById(jobId);
-            if (j.getStatus() != Job.Status.RUNNING) {
-                break;
-            }
-            Thread.sleep(1000);
-            if (counter-- == 0) {
-                throw new Exception("system operation time out");
-            }
-        }
-        Assert.assertEquals(j.getStatus(), Job.Status.SUCCESS);
+        Assert.assertEquals(this.waitForJobCompletion(this.systemManager.deleteSystem(systemId)), Job.Status.SUCCESS);
 
         try {
             sv1 = this.systemManager.getSystemById(systemId);
