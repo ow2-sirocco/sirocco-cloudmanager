@@ -316,6 +316,9 @@ public class CommonsConverterTest {
             this.request.setIds(new IdRequest());
 
             switch (type) {
+            case Action:
+                service = null;
+                break;
             case Address:
                 service = new Address();
                 ((Identifiable) service).setId(11);
@@ -390,9 +393,6 @@ public class CommonsConverterTest {
                 service = new Machine();
                 ((Identifiable) service).setId(11);
                 cimiClass = CimiMachine.class;
-                break;
-            case MachineAction:
-                service = null;
                 break;
             case MachineCollection:
                 service = new ArrayList<Machine>();

@@ -34,6 +34,8 @@ import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
  */
 public enum ExchangeType {
     /** */
+    Action(),
+    /** */
     Address(PathType.Address), AddressCollection(PathType.Address, false), AddressCreate(PathType.Address),
     /** */
     AddressTemplate(PathType.AddressTemplate), AddressTemplateCollection(PathType.AddressTemplate, false),
@@ -50,7 +52,7 @@ public enum ExchangeType {
     /** */
     Machine(PathType.Machine), MachineCollection(PathType.Machine, false),
     /** */
-    MachineCreate(PathType.Machine), MachineAction(PathType.Machine),
+    MachineCreate(PathType.Machine),
     /** */
     MachineConfiguration(PathType.MachineConfiguration), MachineConfigurationCollection(PathType.MachineConfiguration, false),
     /** */
@@ -105,6 +107,11 @@ public enum ExchangeType {
      * substitute type.
      */
     ExchangeType substituteType;
+
+    /** Constructor. */
+    private ExchangeType() {
+        this.idInReference = true;
+    }
 
     /** Constructor. */
     private ExchangeType(final PathType pathType) {

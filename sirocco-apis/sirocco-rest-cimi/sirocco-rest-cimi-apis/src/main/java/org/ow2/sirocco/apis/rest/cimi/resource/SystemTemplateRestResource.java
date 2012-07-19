@@ -35,6 +35,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiActionImport;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -44,8 +47,6 @@ import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-// FIXME SystemTemplate Actions : import, export !!!
 
 /**
  * System Template REST resource.
@@ -71,6 +72,10 @@ public class SystemTemplateRestResource extends RestResourceAbstract {
     @Autowired
     @Qualifier("CimiManagerReadSystemTemplateCollection")
     private CimiManager cimiManagerReadSystemTemplateCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerActionSystemTemplate")
+    private CimiManager cimiManagerActionSystemTemplate;
 
     @Autowired
     @Qualifier("CimiManagerDeleteSystemTemplate")
@@ -128,15 +133,61 @@ public class SystemTemplateRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Create a system template.
+     * Create a system template or send action on collection.
      * 
      * @return The REST response
      */
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response create(final CimiSystemTemplate cimiData) {
+    public Response createOrActionOnCollection(final CimiData cimiData) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
-        this.cimiManagerCreateSystemTemplate.execute(context);
+        if (cimiData instanceof CimiActionImport) {
+            this.cimiManagerActionSystemTemplate.execute(context);
+        } else {
+            this.cimiManagerCreateSystemTemplate.execute(context);
+        }
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    // /**
+    // * Create a system template.
+    // *
+    // * @return The REST response
+    // */
+    // @POST
+    // @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    // public Response create(final CimiSystemTemplate cimiData) {
+    // CimiContext context =
+    // ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
+    // this.cimiManagerCreateSystemTemplate.execute(context);
+    // return ResponseHelper.buildResponse(context.getResponse());
+    // }
+    //
+    // /**
+    // * Actions on system template collection.
+    // *
+    // * @return The REST response
+    // */
+    // @POST
+    // @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    // public Response actionCollection(final CimiActionImport cimiData) {
+    // CimiContext context =
+    // ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
+    // this.cimiManagerActionSystemTemplate.execute(context);
+    // return ResponseHelper.buildResponse(context.getResponse());
+    // }
+
+    /**
+     * Actions on system template.
+     * 
+     * @return The REST response
+     */
+    @POST
+    @Path("/{id}")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response action(@PathParam("id") final String id, final CimiAction cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), id, cimiData);
+        this.cimiManagerActionSystemTemplate.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
 

@@ -28,11 +28,28 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
  * Enumeration of actions used.
  */
 public enum ActionType {
-
-    START("start"), STOP("stop"), RESTART("restart"), PAUSE("pause"), SUSPEND("suspend"), CAPTURE("capture");
+    /** */
+    START("start", new ExchangeType[] {ExchangeType.Machine, ExchangeType.System}),
+    /** */
+    STOP("stop", new ExchangeType[] {ExchangeType.Machine, ExchangeType.System}),
+    /** */
+    RESTART("restart", new ExchangeType[] {ExchangeType.Machine, ExchangeType.System}),
+    /** */
+    PAUSE("pause", new ExchangeType[] {ExchangeType.Machine, ExchangeType.System}),
+    /** */
+    SUSPEND("suspend", new ExchangeType[] {ExchangeType.Machine, ExchangeType.System}),
+    /** */
+    CAPTURE("capture", new ExchangeType[] {ExchangeType.Machine}),
+    /** */
+    EXPORT("export", new ExchangeType[] {ExchangeType.System, ExchangeType.SystemTemplate}),
+    /** */
+    IMPORT("import", new ExchangeType[] {ExchangeType.System, ExchangeType.SystemTemplate});
 
     /** The action pathname. */
     String pathname;
+
+    /** The type who uses the action. */
+    ExchangeType[] usedBy;
 
     /** URI action. */
     public static final String BASE_PATH = "http://www.dmtf.org/cimi/action/";
@@ -40,6 +57,12 @@ public enum ActionType {
     /** Constructor. */
     private ActionType(final String pathname) {
         this.pathname = pathname;
+    }
+
+    /** Constructor. */
+    private ActionType(final String pathname, final ExchangeType[] usedBy) {
+        this.pathname = pathname;
+        this.usedBy = usedBy;
     }
 
     /**
@@ -58,6 +81,15 @@ public enum ActionType {
      */
     public String getPath() {
         return ActionType.BASE_PATH + this.pathname;
+    }
+
+    /**
+     * Get the types who uses the action.
+     * 
+     * @return The types
+     */
+    public ExchangeType[] getUsedBy() {
+        return this.usedBy;
     }
 
     /**

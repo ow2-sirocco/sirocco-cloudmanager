@@ -22,30 +22,31 @@
  * $Id$
  *
  */
-package org.ow2.sirocco.apis.rest.cimi.manager.machine;
+package org.ow2.sirocco.apis.rest.cimi.manager.system.template;
 
 import javax.validation.groups.Default;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiActionImport;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Manage ACTION request of Machine.
+ * Manage ACTION request of SystemTemplate.
  */
-@Component("CimiManagerActionMachine")
-public class CimiManagerActionMachine extends CimiManagerAbstract {
+@Component("CimiManagerActionSystemTemplate")
+public class CimiManagerActionSystemTemplate extends CimiManagerAbstract {
 
     @Autowired
-    @Qualifier("IMachineManager")
-    private IMachineManager manager;
+    @Qualifier("ISystemManager")
+    private ISystemManager manager;
 
     /**
      * {@inheritDoc}
@@ -89,20 +90,12 @@ public class CimiManagerActionMachine extends CimiManagerAbstract {
         CimiAction cimiAction = (CimiAction) context.getRequest().getCimiData();
         ActionType type = ActionType.findPath(cimiAction.getAction());
         switch (type) {
-        case START:
-            out = this.manager.startMachine(context.getRequest().getId(), cimiAction.getProperties());
+        case EXPORT:
+            out = this.manager.exportSystemTemplate(context.getRequest().getId(), cimiAction.getFormat(),
+                cimiAction.getDestination(), cimiAction.getProperties());
             break;
-        case STOP:
-            out = this.manager.stopMachine(context.getRequest().getId(), cimiAction.isForce(), cimiAction.getProperties());
-            break;
-        case RESTART:
-            out = this.manager.restartMachine(context.getRequest().getId(), cimiAction.isForce(), cimiAction.getProperties());
-            break;
-        case PAUSE:
-            out = this.manager.pauseMachine(context.getRequest().getId(), cimiAction.getProperties());
-            break;
-        case SUSPEND:
-            out = this.manager.suspendMachine(context.getRequest().getId(), cimiAction.getProperties());
+        case IMPORT:
+            out = this.manager.importSystemTemplate(((CimiActionImport) cimiAction).getSource(), cimiAction.getProperties());
             break;
         default:
             throw new UnsupportedOperationException();

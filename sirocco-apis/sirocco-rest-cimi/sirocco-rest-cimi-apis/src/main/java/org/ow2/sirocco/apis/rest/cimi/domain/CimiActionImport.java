@@ -24,26 +24,43 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import java.io.Serializable;
+import javax.validation.constraints.NotNull;
+import javax.xml.bind.annotation.XmlRootElement;
 
-/**
- * Interface for the resource exchanged between the customer and the producer.
- */
-public interface CimiExchange extends Serializable {
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 
-    ExchangeType getExchangeType();
-
-    /**
-     * Get the URI of resource.
-     * 
-     * @return
-     */
-    String getResourceURI();
+@XmlRootElement(name = "Action")
+@JsonSerialize(include = Inclusion.NON_NULL)
+public class CimiActionImport extends CimiAction {
 
     /**
-     * Set the URI of resource.
-     * 
-     * @param resourceURI
+     * Serial number
      */
-    void setResourceURI(final String resourceURI);
+    private static final long serialVersionUID = 1L;
+
+    /**
+     * Field source.
+     */
+    @NotNull(groups = GroupWrite.class)
+    private String source;
+
+    /**
+     * Return the source of import action.
+     * 
+     * @return The export source
+     */
+    public String getSource() {
+        return this.source;
+    }
+
+    /**
+     * Set the value of the field source
+     * 
+     * @param source the value
+     */
+    public void setSource(final String source) {
+        this.source = source;
+    }
 }

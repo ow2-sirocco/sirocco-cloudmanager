@@ -296,6 +296,10 @@ public class ConfigFactory {
         Map<String, ExchangeType> associatedNames;
 
         switch (type) {
+        case Action:
+            item = new ItemConfig(CimiAction.class, ExchangeType.Action);
+            break;
+            
         case Address:
             item = new ItemConfig(CimiAddress.class, ExchangeType.Address);
             item.putData(ConfigFactory.CONVERTER, new AddressConverter());
@@ -391,10 +395,6 @@ public class ConfigFactory {
         case Machine:
             item = new ItemConfig(CimiMachine.class, ExchangeType.Machine);
             item.putData(ConfigFactory.CONVERTER, new MachineConverter());
-            break;
-
-        case MachineAction:
-            item = new ItemConfig(CimiAction.class, ExchangeType.MachineAction);
             break;
 
         case MachineCollection:
@@ -762,7 +762,7 @@ public class ConfigFactory {
         case Disk:
         case Job:
         case Machine:
-        case MachineAction:
+        case Action:
         case MachineConfiguration:
         case MachineCreate:
         case MachineImage:

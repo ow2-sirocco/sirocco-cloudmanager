@@ -67,20 +67,6 @@ public interface CimiResource extends CimiData, CimiExchange {
     void setHref(final String href);
 
     /**
-     * Get the URI of resource.
-     * 
-     * @return
-     */
-    String getResourceURI();
-
-    /**
-     * Set the URI of resource.
-     * 
-     * @param resourceURI
-     */
-    void setResourceURI(final String resourceURI);
-
-    /**
      * Flag indicating whether the contents of the resource has a reference.
      * 
      * @return True if the resource has a reference

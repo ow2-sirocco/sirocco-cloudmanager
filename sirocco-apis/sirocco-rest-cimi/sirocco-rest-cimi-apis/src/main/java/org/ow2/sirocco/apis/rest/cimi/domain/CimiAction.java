@@ -25,15 +25,20 @@
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertActionPath;
 
+/**
+ * Class to exchange all actions without validation.
+ */
 @XmlRootElement(name = "Action")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiAction extends CimiCommon {
+public class CimiAction extends CimiCommonResourceUriAbstract {
 
     /**
      * Serial number
@@ -41,10 +46,30 @@ public class CimiAction extends CimiCommon {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field action
+     * Field action.
      */
     @AssertActionPath(groups = GroupWrite.class)
     private String action;
+
+    /**
+     * Field force.
+     */
+    private boolean force;
+
+    /**
+     * Field format.
+     */
+    private String format;
+
+    /**
+     * Field destination.
+     */
+    private String destination;
+
+    /**
+     * Field image.
+     */
+    private String image;
 
     /**
      * Return the action of action.
@@ -62,6 +87,90 @@ public class CimiAction extends CimiCommon {
      */
     public void setAction(final String action) {
         this.action = action;
+    }
+
+    /**
+     * Return true if the action is forced.
+     * 
+     * @return True if forced action
+     */
+    public boolean isForce() {
+        return this.force;
+    }
+
+    /**
+     * Set the value of the field force
+     * 
+     * @param force the value
+     */
+    public void setForce(final boolean force) {
+        this.force = force;
+    }
+
+    /**
+     * Return the format of export action.
+     * 
+     * @return The export format
+     */
+    public String getFormat() {
+        return this.format;
+    }
+
+    /**
+     * Set the value of the field format
+     * 
+     * @param format the value
+     */
+    public void setFormat(final String format) {
+        this.format = format;
+    }
+
+    /**
+     * Return the destination of export action.
+     * 
+     * @return The export destination
+     */
+    public String getDestination() {
+        return this.destination;
+    }
+
+    /**
+     * Set the value of the field destination
+     * 
+     * @param destination the value
+     */
+    public void setDestination(final String destination) {
+        this.destination = destination;
+    }
+
+    /**
+     * Return the image of restore action.
+     * 
+     * @return The export image
+     */
+    public String getImage() {
+        return this.image;
+    }
+
+    /**
+     * Set the value of the field image
+     * 
+     * @param image the value
+     */
+    public void setImage(final String image) {
+        this.image = image;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange#getExchangeType()
+     */
+    @Override
+    @XmlTransient
+    @JsonIgnore
+    public ExchangeType getExchangeType() {
+        return ExchangeType.Action;
     }
 
 }

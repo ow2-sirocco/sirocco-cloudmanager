@@ -41,7 +41,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
  */
 @XmlRootElement(name = "MachineCreate")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiMachineCreate extends CimiCommon implements CimiExchange {
+public class CimiMachineCreate extends CimiCommonResourceUriAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;

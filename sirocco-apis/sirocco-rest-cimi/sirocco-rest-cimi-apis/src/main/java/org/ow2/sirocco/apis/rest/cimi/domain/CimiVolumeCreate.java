@@ -39,7 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
  */
 @XmlRootElement(name = "VolumeCreate")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiVolumeCreate extends CimiCommon implements CimiExchange {
+public class CimiVolumeCreate extends CimiCommonResourceUriAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;

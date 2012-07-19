@@ -28,6 +28,7 @@ import javax.validation.groups.Default;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiActionImport;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
@@ -40,7 +41,6 @@ import org.springframework.stereotype.Component;
 /**
  * Manage ACTION request of System.
  */
-// TODO Check system actions with spec
 @Component("CimiManagerActionSystem")
 public class CimiManagerActionSystem extends CimiManagerAbstract {
 
@@ -91,10 +91,26 @@ public class CimiManagerActionSystem extends CimiManagerAbstract {
         ActionType type = ActionType.findPath(cimiAction.getAction());
         switch (type) {
         case START:
-            out = this.manager.startSystem(context.getRequest().getId());
+            out = this.manager.startSystem(context.getRequest().getId(), cimiAction.getProperties());
             break;
         case STOP:
-            out = this.manager.stopSystem(context.getRequest().getId());
+            out = this.manager.stopSystem(context.getRequest().getId(), cimiAction.isForce(), cimiAction.getProperties());
+            break;
+        case RESTART:
+            out = this.manager.restartSystem(context.getRequest().getId(), cimiAction.isForce(), cimiAction.getProperties());
+            break;
+        case PAUSE:
+            out = this.manager.pauseSystem(context.getRequest().getId(), cimiAction.getProperties());
+            break;
+        case SUSPEND:
+            out = this.manager.suspendSystem(context.getRequest().getId(), cimiAction.getProperties());
+            break;
+        case EXPORT:
+            out = this.manager.exportSystem(context.getRequest().getId(), cimiAction.getFormat(), cimiAction.getDestination(),
+                cimiAction.getProperties());
+            break;
+        case IMPORT:
+            out = this.manager.importSystem(((CimiActionImport) cimiAction).getSource(), cimiAction.getProperties());
             break;
         default:
             throw new UnsupportedOperationException();

@@ -170,6 +170,9 @@ public class WritingResourceValidatorTest {
     private CimiResource newResource(final ExchangeType type) {
         CimiResource cimi = null;
         switch (type) {
+        case Action:
+            cimi = null;
+            break;
         case Address:
             cimi = new CimiAddress();
             break;
@@ -217,9 +220,6 @@ public class WritingResourceValidatorTest {
             break;
         case Machine:
             cimi = new CimiMachine();
-            break;
-        case MachineAction:
-            cimi = null;
             break;
         case MachineCollection:
             cimi = new CimiMachineCollection();

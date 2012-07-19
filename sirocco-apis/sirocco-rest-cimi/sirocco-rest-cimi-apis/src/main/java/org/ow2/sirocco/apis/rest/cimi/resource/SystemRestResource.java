@@ -36,8 +36,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiActionImport;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
@@ -170,17 +171,49 @@ public class SystemRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Create a system.
+     * Create a system or send action on collection.
      * 
      * @return The REST response
      */
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response create(final CimiSystemCreate cimiData) {
+    public Response createOrActionOnCollection(final CimiData cimiData) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
-        this.cimiManagerCreateSystem.execute(context);
+        if (cimiData instanceof CimiActionImport) {
+            this.cimiManagerActionSystem.execute(context);
+        } else {
+            this.cimiManagerCreateSystem.execute(context);
+        }
         return ResponseHelper.buildResponse(context.getResponse());
     }
+
+    // /**
+    // * Create a system.
+    // *
+    // * @return The REST response
+    // */
+    // @POST
+    // @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    // public Response create(final CimiSystemCreate cimiData) {
+    // CimiContext context =
+    // ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
+    // this.cimiManagerCreateSystem.execute(context);
+    // return ResponseHelper.buildResponse(context.getResponse());
+    // }
+    //
+    // /**
+    // * Actions on system collection.
+    // *
+    // * @return The REST response
+    // */
+    // @POST
+    // @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    // public Response actionCollection(final CimiActionImport cimiData) {
+    // CimiContext context =
+    // ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
+    // this.cimiManagerActionSystem.execute(context);
+    // return ResponseHelper.buildResponse(context.getResponse());
+    // }
 
     /**
      * Actions on system.
