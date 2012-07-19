@@ -39,6 +39,7 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.Query;
@@ -1571,7 +1572,45 @@ public class SystemManager implements ISystemManager {
     public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId) {
         // TODO Auto-generated method stub
         // updateSystemStatus();
-        SystemManager.logger.info("todo: update system state - " + entityType.getName() + " - " + entityId);
+        // getting system attachement if any
+        SystemManager.logger.info("updating system state - " + entityType.getName() + " - " + entityId);
+        CloudCollectionItem obj = null;
+        try {
+            obj = (CloudCollectionItem) this.em
+                .createQuery("FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId")
+                .setParameter("resourceId", entityId).getSingleResult();
+        } catch (NoResultException e) {
+            obj = null;
+        }
+        // object not attached to any systemXXX collection, stopping all
+        if (obj == null) {
+            SystemManager.logger.info(" object not in any system - " + entityId);
+            return;
+        }
+        // object in a system collection
+        System sys = null;
+        try {
+            sys = (System) this.em
+                .createQuery(
+                    "FROM "
+                        + System.class.getName()
+                        + " v WHERE :resource member of v.machines or :resource member of v.systems or :resource member of v.volumes or :resource member of v.networks")
+                .setParameter("resource", obj).getSingleResult();
+        } catch (NoResultException e) {
+            sys = null;
+        }
+        // bug:collection not attached to any system collection, stopping all
+        if (obj == null) {
+            SystemManager.logger.warn(" collection not in any system - " + obj.getId());
+            return;
+        }
+
+        // updating system status
+        try {
+            this.updateSystemStatus(sys.getId().toString());
+        } catch (CloudProviderException e) {
+            SystemManager.logger.warn(" system status update failed for system " + sys.getId());
+        }
 
     }
 
