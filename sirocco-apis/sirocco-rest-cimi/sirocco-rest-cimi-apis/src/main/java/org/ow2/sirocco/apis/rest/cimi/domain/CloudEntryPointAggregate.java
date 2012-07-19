@@ -38,6 +38,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 
 /**
  * Aggregation of CloudEntryPoint to add all items necesary for CIMI.
@@ -107,6 +109,16 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * Field "volumeImages".
      */
     private List<VolumeImage> volumeImages;
+
+    /**
+     * Field "systems".
+     */
+    private List<System> systems;
+
+    /**
+     * Field "systemTemplates".
+     */
+    private List<SystemTemplate> systemTemplates;
 
     /**
      * Parameterized constructor.
@@ -339,6 +351,42 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      */
     public void setVolumeTemplates(final List<VolumeTemplate> volumeTemplates) {
         this.volumeTemplates = volumeTemplates;
+    }
+
+    /**
+     * Return the value of field "systems".
+     * 
+     * @return The value
+     */
+    public List<System> getSystems() {
+        return this.systems;
+    }
+
+    /**
+     * Set the value of field "systems".
+     * 
+     * @param systems The value
+     */
+    public void setSystems(final List<System> systems) {
+        this.systems = systems;
+    }
+
+    /**
+     * Return the value of field "systemTemplates".
+     * 
+     * @return The value
+     */
+    public List<SystemTemplate> getSystemTemplates() {
+        return this.systemTemplates;
+    }
+
+    /**
+     * Set the value of field "systemTemplates".
+     * 
+     * @param systemTemplates The value
+     */
+    public void setSystemTemplates(final List<SystemTemplate> systemTemplates) {
+        this.systemTemplates = systemTemplates;
     }
 
 }

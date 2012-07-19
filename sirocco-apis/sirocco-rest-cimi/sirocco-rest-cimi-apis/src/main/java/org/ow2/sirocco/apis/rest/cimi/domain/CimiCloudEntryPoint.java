@@ -37,6 +37,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeImageCollection;
@@ -112,6 +114,16 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * Field "volumeTemplates".
      */
     private CimiVolumeTemplateCollection volumeTemplates;
+
+    /**
+     * Field "systems".
+     */
+    private CimiSystemCollection systems;
+
+    /**
+     * Field "systemTemplates".
+     */
+    private CimiSystemTemplateCollection systemTemplates;
 
     /**
      * Field "jobTime".
@@ -315,7 +327,7 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiVolumeConfigurationCollection getVolumeConfigurations() {
+    public CimiVolumeConfigurationCollection getVolumeConfigs() {
         return this.volumeConfigurations;
     }
 
@@ -380,6 +392,42 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      */
     public void setVolumeTemplates(final CimiVolumeTemplateCollection volumeTemplates) {
         this.volumeTemplates = volumeTemplates;
+    }
+
+    /**
+     * Return the value of field "systems".
+     * 
+     * @return The value
+     */
+    public CimiSystemCollection getSystems() {
+        return this.systems;
+    }
+
+    /**
+     * Set the value of field "systems".
+     * 
+     * @param systems The value
+     */
+    public void setSystems(final CimiSystemCollection systems) {
+        this.systems = systems;
+    }
+
+    /**
+     * Return the value of field "systemTemplates".
+     * 
+     * @return The value
+     */
+    public CimiSystemTemplateCollection getSystemTemplates() {
+        return this.systemTemplates;
+    }
+
+    /**
+     * Set the value of field "systemTemplates".
+     * 
+     * @param systemTemplates The value
+     */
+    public void setSystemTemplates(final CimiSystemTemplateCollection systemTemplates) {
+        this.systemTemplates = systemTemplates;
     }
 
 }

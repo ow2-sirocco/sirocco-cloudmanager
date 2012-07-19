@@ -37,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -68,6 +69,10 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
     @Qualifier("IVolumeManager")
     private IVolumeManager volumeManager;
 
+    @Autowired
+    @Qualifier("ISystemManager")
+    private ISystemManager systemManager;
+
     /**
      * {@inheritDoc}
      * 
@@ -88,6 +93,9 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
         out.setMachines(this.machineManager.getMachines());
         out.setMachineTemplates(this.machineManager.getMachineTemplates());
 
+        out.setSystems(this.systemManager.getSystems());
+        out.setSystemTemplates(this.systemManager.getSystemTemplates());
+
         out.setVolumeConfigurations(this.volumeManager.getVolumeConfigurations());
         out.setVolumeImages(this.volumeManager.getVolumeImages());
         out.setVolumes(this.volumeManager.getVolumes());
@@ -95,8 +103,8 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
 
         // TODO Others resources :
         // resourceMetadata
-        // systems
-        // systemTemplates
+        // systems OK
+        // systemTemplates OK
         // machines OK
         // machineTemplates OK
         // machineConfigs OK

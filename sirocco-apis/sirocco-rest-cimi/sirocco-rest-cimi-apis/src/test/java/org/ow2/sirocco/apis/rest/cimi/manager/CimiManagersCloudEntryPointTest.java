@@ -46,6 +46,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
@@ -59,6 +60,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
@@ -86,6 +89,10 @@ public class CimiManagersCloudEntryPointTest {
     @Autowired
     @Qualifier("IMachineImageManager")
     private IMachineImageManager serviceMachineImage;
+
+    @Autowired
+    @Qualifier("ISystemManager")
+    private ISystemManager serviceSystem;
 
     @Autowired
     @Qualifier("IVolumeManager")
@@ -127,11 +134,12 @@ public class CimiManagersCloudEntryPointTest {
         EasyMock.reset(this.serviceJob);
         EasyMock.reset(this.serviceMachine);
         EasyMock.reset(this.serviceMachineImage);
+        EasyMock.reset(this.serviceSystem);
         EasyMock.reset(this.serviceVolume);
     }
 
     @Test
-    // TODO Others resources : Volumes, ...
+    // TODO Others resources : Network, ...
     public void testRead() throws Exception {
         CloudEntryPoint cloud = new CloudEntryPoint();
         cloud.setId(10);
@@ -146,6 +154,9 @@ public class CimiManagersCloudEntryPointTest {
         List<MachineTemplate> machineTemplateCollection = new ArrayList<MachineTemplate>();
         List<MachineConfiguration> machineConfigurationCollection = new ArrayList<MachineConfiguration>();
         List<MachineImage> machineImageCollection = new ArrayList<MachineImage>();
+        // Systems
+        List<System> systemCollection = new ArrayList<System>();
+        List<SystemTemplate> systemTemplateCollection = new ArrayList<SystemTemplate>();
         // Volumes
         List<Volume> volumeCollection = new ArrayList<Volume>();
         List<VolumeTemplate> volumeTemplateCollection = new ArrayList<VolumeTemplate>();
@@ -167,6 +178,10 @@ public class CimiManagersCloudEntryPointTest {
 
         EasyMock.expect(this.serviceMachineImage.getMachineImages()).andReturn(machineImageCollection);
         EasyMock.replay(this.serviceMachineImage);
+
+        EasyMock.expect(this.serviceSystem.getSystems()).andReturn(systemCollection);
+        EasyMock.expect(this.serviceSystem.getSystemTemplates()).andReturn(systemTemplateCollection);
+        EasyMock.replay(this.serviceSystem);
 
         EasyMock.expect(this.serviceVolume.getVolumes()).andReturn(volumeCollection);
         EasyMock.expect(this.serviceVolume.getVolumeTemplates()).andReturn(volumeTemplateCollection);
@@ -192,8 +207,11 @@ public class CimiManagersCloudEntryPointTest {
         Assert.assertEquals(ConstantsPath.MACHINE_IMAGE_PATH, cimiCloud.getMachineImages().getHref());
         Assert.assertEquals(ConstantsPath.MACHINE_TEMPLATE_PATH, cimiCloud.getMachineTemplates().getHref());
 
+        Assert.assertEquals(ConstantsPath.SYSTEM_PATH, cimiCloud.getSystems().getHref());
+        Assert.assertEquals(ConstantsPath.SYSTEM_TEMPLATE_PATH, cimiCloud.getSystemTemplates().getHref());
+
         Assert.assertEquals(ConstantsPath.VOLUME_PATH, cimiCloud.getVolumes().getHref());
-        Assert.assertEquals(ConstantsPath.VOLUME_CONFIGURATION_PATH, cimiCloud.getVolumeConfigurations().getHref());
+        Assert.assertEquals(ConstantsPath.VOLUME_CONFIGURATION_PATH, cimiCloud.getVolumeConfigs().getHref());
         Assert.assertEquals(ConstantsPath.VOLUME_IMAGE_PATH, cimiCloud.getVolumeImages().getHref());
         Assert.assertEquals(ConstantsPath.VOLUME_TEMPLATE_PATH, cimiCloud.getVolumeTemplates().getHref());
 
@@ -201,6 +219,7 @@ public class CimiManagersCloudEntryPointTest {
         EasyMock.verify(this.serviceJob);
         EasyMock.verify(this.serviceMachine);
         EasyMock.verify(this.serviceMachineImage);
+        EasyMock.verify(this.serviceSystem);
         EasyMock.verify(this.serviceVolume);
     }
 
