@@ -34,7 +34,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
  * 
  * @author ycas7461
  */
-public interface ICloudProvider {
+public interface ICloudProviderResource {
 
     // location
     CloudProviderLocation getLocation();

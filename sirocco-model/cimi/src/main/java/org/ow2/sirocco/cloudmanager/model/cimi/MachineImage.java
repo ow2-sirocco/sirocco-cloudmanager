@@ -37,7 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @Entity
-public class MachineImage extends CloudResource implements Serializable, ICloudProvider {
+public class MachineImage extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
     private CloudProviderLocation location;

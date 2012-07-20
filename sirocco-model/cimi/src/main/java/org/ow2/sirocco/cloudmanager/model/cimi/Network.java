@@ -41,7 +41,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_NETWORK_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM Network n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
-public class Network extends CloudResource implements Serializable, ICloudProvider {
+public class Network extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
     public static final String GET_NETWORK_BY_PROVIDER_ASSIGNED_ID = "GET_NETWORK_BY_PROVIDER_ASSIGNED_ID";

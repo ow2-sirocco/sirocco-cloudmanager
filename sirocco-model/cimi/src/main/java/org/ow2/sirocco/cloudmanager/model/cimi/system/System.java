@@ -40,13 +40,13 @@ import javax.persistence.Table;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.ICloudProvider;
+import org.ow2.sirocco.cloudmanager.model.cimi.ICloudProviderResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @Entity
 @Table(name = "SYSTEMINSTANCE")
-public class System extends CloudResource implements Serializable, ICloudProvider {
+public class System extends CloudResource implements Serializable, ICloudProviderResource {
 
     private static final long serialVersionUID = 1L;
 

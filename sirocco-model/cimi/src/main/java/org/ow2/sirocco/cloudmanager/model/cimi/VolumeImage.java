@@ -39,7 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM VolumeImage v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
-public class VolumeImage extends CloudResource implements Serializable, ICloudProvider {
+public class VolumeImage extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
     public static final String GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID = "GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID";
