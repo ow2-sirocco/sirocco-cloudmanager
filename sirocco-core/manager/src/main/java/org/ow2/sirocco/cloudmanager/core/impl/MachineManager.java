@@ -340,6 +340,11 @@ public class MachineManager implements IMachineManager {
             MachineManager.logger.info(" creating new volume for machine ");
 
             VolumeCreate volumeCreate = new VolumeCreate();
+            volumeCreate.setProperties(new HashMap<String, String>());
+            volumeCreate.getProperties().put("provider", m.getCloudProviderAccount().getCloudProvider().getCloudProviderType());
+            if (m.getLocation() != null) {
+                volumeCreate.getProperties().put("location", m.getLocation().getCountryName());
+            }
             // TODO
             volumeCreate.setName("internal");
             volumeCreate.setVolumeTemplate(mvt.getVolumeTemplate());
@@ -1562,6 +1567,7 @@ public class MachineManager implements IMachineManager {
                     affected.add(mv.getVolume());
                     MachineManager.logger.info("machineCreationContinuation create job for attachment ");
                     Job child = this.createJob(m, affected, "add", j.getStatus(), job);
+                    child.setDescription("Volume attachment");
                     child.setProviderAssignedId(j.getProviderAssignedId());
                     this.updateJob(child);
                     newJobs.add(child);

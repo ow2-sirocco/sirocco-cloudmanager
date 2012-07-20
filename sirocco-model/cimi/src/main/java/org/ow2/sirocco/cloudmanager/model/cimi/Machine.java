@@ -137,11 +137,13 @@ public class Machine extends CloudResource implements Serializable {
     public void addMachineVolume(final MachineVolume mv) {
         if (!this.getVolumes().contains(mv)) {
             this.getVolumes().add(mv);
+            mv.setOwner(this);
         }
     }
 
     public void removeMachineVolume(final MachineVolume mv) {
         if (this.getVolumes().contains(mv)) {
+            mv.setOwner(null);
             this.getVolumes().remove(mv);
         }
     }
