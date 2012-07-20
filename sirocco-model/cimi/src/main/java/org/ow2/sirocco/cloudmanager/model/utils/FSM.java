@@ -33,6 +33,11 @@ import java.util.Set;
 
 public class FSM<S, A> implements Serializable {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+
     private final HashMap<S, StateEntry> states = new HashMap<S, StateEntry>();;
 
     private final StateEntry initialState;
@@ -84,6 +89,11 @@ public class FSM<S, A> implements Serializable {
     }
 
     private class StateEntry implements Serializable {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
         public S state;
 
         public HashMap<A, S> nextStates = new HashMap<A, S>();
