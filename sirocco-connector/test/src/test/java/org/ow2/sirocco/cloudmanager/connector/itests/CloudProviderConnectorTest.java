@@ -50,6 +50,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
@@ -236,8 +237,11 @@ public class CloudProviderConnectorTest {
         for (MachineNetworkInterface netInterface : machine.getNetworkInterfaces()) {
             System.out.print("\t Network " + netInterface.getNetworkType() + " addresses=");
             if (netInterface.getAddresses() != null) {
-                for (Address addr : netInterface.getAddresses()) {
-                    System.out.print(addr.getIp() + " ");
+                for (MachineNetworkInterfaceAddress addr : netInterface.getAddresses()) {
+                    Address address = addr.getAddress();
+                    if (address != null) {
+                        System.out.print(address.getIp() + " ");
+                    }
                 }
             }
             System.out.println();
@@ -251,7 +255,7 @@ public class CloudProviderConnectorTest {
                 Assert.assertEquals(Machine.State.STARTED, machine.getState());
             } else {
                 System.out.println("Stopping machine " + machineId);
-                job = computeService.stopMachine(machineId,false);
+                job = computeService.stopMachine(machineId, false);
                 this.waitForJobCompletion(job);
                 machine = computeService.getMachine(machineId);
                 Assert.assertEquals(Machine.State.STOPPED, machine.getState());
