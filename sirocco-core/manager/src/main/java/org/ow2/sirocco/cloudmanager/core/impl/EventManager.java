@@ -25,24 +25,16 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceContextType;
-import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IEventManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteEventManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
@@ -57,83 +49,98 @@ import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 public class EventManager implements IEventManager {
 
     @Override
-    public EventLogTemplate createEventLogTemplate(EventLogTemplate eventLogTemplate) throws CloudProviderException,
+    public EventLogTemplate createEventLogTemplate(final EventLogTemplate eventLogTemplate) throws CloudProviderException,
         ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void updateEventLogTemplate(EventLogTemplate eventLogTemplate) throws CloudProviderException,
+    public void updateEventLogTemplate(final EventLogTemplate eventLogTemplate) throws CloudProviderException,
         InvalidRequestException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public EventLogTemplate getEventLogTemplateById(String eventLogTemplateId) throws CloudProviderException,
+    public EventLogTemplate getEventLogTemplateById(final String eventLogTemplateId) throws CloudProviderException,
         ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void deleteEventLogTemplate(String EventLogTemplateId) throws ResourceNotFoundException, CloudProviderException {
+    public void deleteEventLogTemplate(final String EventLogTemplateId) throws ResourceNotFoundException,
+        CloudProviderException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public void updateEventLogTemplateAttributes(String eventLogTemplateId, Map<String, Object> attributes)
+    public void updateEventLogTemplateAttributes(final String eventLogTemplateId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public List<EventLogTemplate> getEventLogTemplates(List<String> attributes, String filterExpression)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<EventLogTemplate> getEventLogTemplates(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public EventLog createEventLog(EventLogCreate eventLogCreate) throws CloudProviderException {
+    public QueryResult<EventLog> getEventLog(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void deleteEventLog(String eventLogId) throws CloudProviderException, ResourceNotFoundException {
+    public QueryResult<Event> getEvents(final String eventLogId, final int first, final int last, final List<String> filter,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
-        
+        return null;
     }
 
     @Override
-    public void updateEventLog(String eventLogId, Map<String, Object> attributes) throws ResourceNotFoundException,
+    public EventLog createEventLog(final EventLogCreate eventLogCreate) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteEventLog(final String eventLogId) throws CloudProviderException, ResourceNotFoundException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateEventLog(final String eventLogId, final Map<String, Object> attributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public List<Event> getEvents(String eventLogId) throws CloudProviderException {
+    public List<Event> getEvents(final String eventLogId) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Event getEvent(String eventLogId, String eventId) throws CloudProviderException, ResourceNotFoundException {
+    public Event getEvent(final String eventLogId, final String eventId) throws CloudProviderException,
+        ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void deleteEvent(String eventLogId, String eventId) throws CloudProviderException, ResourceNotFoundException {
+    public void deleteEvent(final String eventLogId, final String eventId) throws CloudProviderException,
+        ResourceNotFoundException {
         // TODO Auto-generated method stub
-        
+
     }
-    
+
 }
-
-

@@ -58,7 +58,7 @@ public interface IEventManager {
     void updateEventLogTemplateAttributes(String eventLogTemplateId, Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-    List<EventLogTemplate> getEventLogTemplates(List<String> attributes, String filterExpression)
+    QueryResult<EventLogTemplate> getEventLogTemplates(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
     
     /** EventLog operations */
@@ -69,8 +69,12 @@ public interface IEventManager {
     void updateEventLog(String eventLogId, Map<String, Object> attributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
     
-    List<Event> getEvents(String eventLogId) throws CloudProviderException;
+    QueryResult<EventLog> getEventLog(int first, int last, List<String> filters, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
     
+    List<Event> getEvents(String eventLogId) throws CloudProviderException;
+    QueryResult<Event> getEvents(String eventLogId, int first, int last, List<String> filter, List<String> attributes)
+        throws InvalidRequestException, CloudProviderException;
     Event getEvent(String eventLogId, String eventId) throws CloudProviderException, ResourceNotFoundException;
     
     void deleteEvent(String eventLogId, String eventId) throws CloudProviderException, ResourceNotFoundException;

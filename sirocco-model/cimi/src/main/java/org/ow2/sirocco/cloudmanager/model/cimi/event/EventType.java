@@ -37,19 +37,21 @@ import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
-// TODO No inheritance for embeddable 
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class EventType implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected Integer id;
-    
-    // TODO what is this?
-    private String          resName;
-    private CloudResource   resource;
-    private String          detail;
-    
+
+    private String resName;
+
+    private String resType;
+
+    private CloudResource resource;
+
+    private String detail;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
@@ -61,25 +63,36 @@ public abstract class EventType implements Serializable {
     }
 
     public String getResName() {
-        return resName;
+        return this.resName;
     }
-    public void setResName(String resName) {
+
+    public void setResName(final String resName) {
         this.resName = resName;
     }
-    
+
     @OneToOne
     public CloudResource getResource() {
-        return resource;
+        return this.resource;
     }
-    
-    public void setResource(CloudResource resource) {
+
+    public void setResource(final CloudResource resource) {
         this.resource = resource;
     }
+
     public String getDetail() {
-        return detail;
+        return this.detail;
     }
-    public void setDetail(String detail) {
+
+    public void setDetail(final String detail) {
         this.detail = detail;
     }
-    
+
+    public String getResType() {
+        return this.resType;
+    }
+
+    public void setResType(final String resType) {
+        this.resType = resType;
+    }
+
 }

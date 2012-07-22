@@ -51,6 +51,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
@@ -373,8 +374,11 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
                 cimiAddress.setHostName(runningInstance.getPrivateDnsName());
                 cimiAddress.setResource(this.cimiPrivateNetwork);
 
-                List<org.ow2.sirocco.cloudmanager.model.cimi.Address> cimiAddresses = new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.Address>();
-                cimiAddresses.add(cimiAddress);
+                List<org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress> cimiAddresses = new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress>();
+                MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+                entry.setAddress(cimiAddress);
+
+                cimiAddresses.add(entry);
                 MachineNetworkInterface privateNic = new MachineNetworkInterface();
                 privateNic.setAddresses(cimiAddresses);
                 privateNic.setNetworkType(Network.Type.PRIVATE);
@@ -390,8 +394,10 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
                 cimiAddress.setHostName(runningInstance.getDnsName());
                 cimiAddress.setResource(this.cimiPublicNetwork);
 
-                List<org.ow2.sirocco.cloudmanager.model.cimi.Address> cimiAddresses = new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.Address>();
-                cimiAddresses.add(cimiAddress);
+                List<MachineNetworkInterfaceAddress> cimiAddresses = new ArrayList<MachineNetworkInterfaceAddress>();
+                MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+                entry.setAddress(cimiAddress);
+                cimiAddresses.add(entry);
                 MachineNetworkInterface publicNic = new MachineNetworkInterface();
                 publicNic.setAddresses(cimiAddresses);
                 publicNic.setNetworkType(Network.Type.PUBLIC);

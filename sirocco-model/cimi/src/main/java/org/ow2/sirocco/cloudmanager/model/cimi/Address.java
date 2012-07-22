@@ -30,6 +30,7 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 @Entity
 public class Address extends CloudEntity implements Serializable {
@@ -129,6 +130,7 @@ public class Address extends CloudEntity implements Serializable {
         this.resource = resource;
     }
 
+    @Transient
     public void clone(final Address a) {
         a.setMask(this.getMask());
         a.setIp(this.getIp());
@@ -137,5 +139,23 @@ public class Address extends CloudEntity implements Serializable {
         a.setDefaultGateway(this.getDefaultGateway());
         a.setAllocation(this.getAllocation());
         a.setDns(this.getDns());
+    }
+
+    @Transient
+    public boolean validate() {
+        boolean ok = true;
+        if (this.getAllocation() == null) {
+            return false;
+        }
+        if (!this.getAllocation().equals("static") && !this.getAllocation().equals("dynamic")) {
+            return false;
+        }
+        if (this.getAllocation().equals("static")) {
+            if (this.getIp() == null) {
+                return false;
+            }
+            // TODO
+        }
+        return ok;
     }
 }

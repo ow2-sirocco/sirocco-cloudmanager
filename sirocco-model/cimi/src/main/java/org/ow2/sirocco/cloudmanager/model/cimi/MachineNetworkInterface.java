@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -47,7 +48,7 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
         ACTIVE, PASSIVE
     }
 
-    private List<Address> addresses;
+    private List<MachineNetworkInterfaceAddress> addresses;
 
     @ManyToOne
     private Network network;
@@ -62,6 +63,12 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
     private Network.Type networkType;
 
     private String macAddress;
+
+    public MachineNetworkInterface() {
+        super();
+        this.addresses = new ArrayList<MachineNetworkInterfaceAddress>();
+        ;
+    }
 
     @Enumerated(EnumType.STRING)
     public InterfaceState getState() {
@@ -88,14 +95,26 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
         return this.networkPort;
     }
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @LazyCollection(LazyCollectionOption.FALSE)
-    public List<Address> getAddresses() {
+    public List<MachineNetworkInterfaceAddress> getAddresses() {
         return this.addresses;
     }
 
-    public void setAddresses(final List<Address> addresses) {
+    public void setAddresses(final List<MachineNetworkInterfaceAddress> addresses) {
         this.addresses = addresses;
+    }
+
+    public void addMachineNetworkInterfaceAddress(final MachineNetworkInterfaceAddress addr) {
+        if (!this.getAddresses().contains(addr)) {
+            this.getAddresses().add(addr);
+        }
+    }
+
+    public void removeMachineNetworkInterfaceAddress(final MachineNetworkInterfaceAddress addr) {
+        if (this.getAddresses().contains(addr)) {
+            this.getAddresses().remove(addr);
+        }
     }
 
     @ManyToOne

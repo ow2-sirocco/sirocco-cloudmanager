@@ -39,6 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 
@@ -246,6 +247,17 @@ public interface IMachineManager extends IJobListener {
         CloudProviderException, InvalidRequestException;
 
     Job updateNetworkInterfaceAttributesInMachine(String machineId, String nicId, Map<String, Object> updatedAttributes)
+        throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
+
+    QueryResult<MachineNetworkInterfaceAddress> getMachineNetworkInterfaceAddresses(final String machineId, final String nicId,
+        int first, int last, List<String> filters, List<String> attributes) throws InvalidRequestException,
+        CloudProviderException;
+
+    Job addAddressToMachineNetworkInterface(final String machineId, final String nicId,
+        MachineNetworkInterfaceAddress addressEntry) throws ResourceNotFoundException, CloudProviderException,
+        InvalidRequestException;
+
+    Job removeAddressFromMachineNetworkInterface(final String machineId, final String nicId, final String addressEntryId)
         throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
 
     //

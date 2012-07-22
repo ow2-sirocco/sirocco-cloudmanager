@@ -59,6 +59,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
@@ -165,7 +166,7 @@ public class CimiPrimerScenarioTest {
      */
     @Before
     public void setUp() throws Exception {
-        System.out.println("CimiPrimerScenarioTest : setUp ");
+
         this.setUpDatabase();
         this.connectToCloudManager();
         User user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", CimiPrimerScenarioTest.USER_NAME, "232908Ivry");
@@ -233,6 +234,7 @@ public class CimiPrimerScenarioTest {
         image.setDescription("Windows XP with Service Pack 2");
         image.setImageLocation("http://ow2.org/sirocco/data/1234");
         Job job = this.machineImageManager.createMachineImage(image);
+        System.out.println(" initDatabase wait for job " + job.getId());
         this.waitForJobCompletion(job);
 
         image.setName("Win7");
@@ -445,11 +447,11 @@ public class CimiPrimerScenarioTest {
         return machineId;
     }
 
-    public String createMachineWithPreExistingVolumes() throws Exception {
+    public String createMachineWithPreExistingVolumes(final int loop) throws Exception {
         /**
          * Retrieve the list of Machine Images
          */
-        System.out.println("createMachineWithPreExistingVolumes ");
+        System.out.println("createMachineWithPreExistingVolumes " + loop);
 
         List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
         for (MachineImage image : machineImages) {
@@ -489,12 +491,12 @@ public class CimiPrimerScenarioTest {
          */
 
         CredentialsTemplate credentialsTemplate = new CredentialsTemplate();
-        credentialsTemplate.setUserName("JoeSmith");
-        credentialsTemplate.setPassword("letmein");
+        credentialsTemplate.setUserName("JoeSmith" + loop);
+        credentialsTemplate.setPassword("letmein" + loop);
         CredentialsCreate credentialsCreate = new CredentialsCreate();
         credentialsCreate.setCredentialTemplate(credentialsTemplate);
-        credentialsCreate.setName("Default");
-        credentialsCreate.setDescription("Default User");
+        credentialsCreate.setName("Default" + loop);
+        credentialsCreate.setDescription("Default User" + loop);
         Credentials credentials = this.credManager.createCredentials(credentialsCreate);
 
         System.out.println("New Credentials id=" + credentials.getId());
@@ -502,15 +504,19 @@ public class CimiPrimerScenarioTest {
         /**
          * Create a new volume
          */
-        Volume v = this.createVolume("testVolumeAttach");
-        System.out.println(" createMachineWithPreExistingVolumes created volume " + v.getId().toString());
+        Volume v1 = this.createVolume("testVolumeAttach1" + loop);
+        Assert.assertNotNull(v1.getId().toString());
+        System.out.println(" createMachineWithPreExistingVolumes created volume " + v1.getId().toString());
+        Volume v2 = this.createVolume("testVolumeAttach2" + loop);
+        Assert.assertNotNull(v2.getId().toString());
+
         /**
          * Create a new Machine
          */
 
         MachineCreate machineCreate = new MachineCreate();
-        machineCreate.setName("myMachine1");
-        machineCreate.setDescription("My very first machine");
+        machineCreate.setName("myMachine1" + loop);
+        machineCreate.setDescription("My very first machine " + loop);
 
         MachineTemplate machineTemplate = new MachineTemplate();
 
@@ -519,10 +525,15 @@ public class CimiPrimerScenarioTest {
         machineTemplate.setCredentials(credentials);
 
         ArrayList<MachineVolume> vtItems = new ArrayList<MachineVolume>();
-        MachineVolume mv = new MachineVolume();
-        mv.setVolume(v);
-        mv.setInitialLocation("/dev/sda");
-        vtItems.add(mv);
+        MachineVolume mv1 = new MachineVolume();
+        mv1.setVolume(v1);
+        mv1.setInitialLocation("/dev/sda1" + loop);
+        vtItems.add(mv1);
+
+        MachineVolume mv2 = new MachineVolume();
+        mv2.setVolume(v2);
+        mv2.setInitialLocation("/dev/sda2" + loop);
+        vtItems.add(mv2);
         machineTemplate.setVolumes(vtItems);
 
         List<MachineVolumeTemplate> vtColl = new ArrayList<MachineVolumeTemplate>();
@@ -536,6 +547,137 @@ public class CimiPrimerScenarioTest {
         String machineId = job.getTargetEntity().getId().toString();
         System.out.println(" createMachineWithPreExistingVolumes : new machine id " + machineId + " with job " + job.getId());
         this.waitForJobCompletion(job);
+
+        Machine m = this.machineManager.getMachineById(machineId);
+        Assert.assertNotNull(m.getVolumes());
+        Assert.assertEquals(2, m.getVolumes().size());
+
+        int input = v1.getId() + v2.getId();
+        int output = m.getVolumes().get(0).getVolume().getId() + m.getVolumes().get(1).getVolume().getId();
+        Assert.assertEquals(input, output);
+        input = v1.getId() * v2.getId();
+        output = m.getVolumes().get(0).getVolume().getId() * m.getVolumes().get(1).getVolume().getId();
+        Assert.assertEquals(input, output);
+        return machineId;
+    }
+
+    public String createMachineWithNewVolumesAndNetworks(final int loop) throws Exception {
+        /**
+         * Retrieve the list of Machine Images
+         */
+
+        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
+        for (MachineImage image : machineImages) {
+            System.out.println("MachineImage id=" + image.getId());
+        }
+
+        /**
+         * Choose a Machine Image (first one)
+         */
+
+        MachineImage image = this.machineImageManager.getMachineImageById(machineImages.get(0).getId().toString());
+        System.out.println("MachineImage [id=" + image.getId() + ", name=" + image.getName() + ", description="
+            + image.getDescription() + ", created=" + image.getCreated() + ", location=" + image.getImageLocation() + "]");
+
+        /**
+         * Retrieve the list of Machine Configurations
+         */
+
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        for (MachineConfiguration machineConfig : machineConfigs) {
+            System.out.println("MachineConfiguration id=" + machineConfig.getId());
+        }
+
+        /**
+         * Choose a Machine Configuration (first one)
+         */
+
+        MachineConfiguration machineConfig = this.machineManager.getMachineConfigurationById(machineConfigs.get(0).getId()
+            .toString());
+        System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
+            + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
+            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
+            + "]");
+
+        /**
+         * Create a new Credentials entity
+         */
+
+        CredentialsTemplate credentialsTemplate = new CredentialsTemplate();
+        credentialsTemplate.setUserName("JoeSmith" + loop);
+        credentialsTemplate.setPassword("letmein" + loop);
+        CredentialsCreate credentialsCreate = new CredentialsCreate();
+        credentialsCreate.setCredentialTemplate(credentialsTemplate);
+        credentialsCreate.setName("Default" + loop);
+        credentialsCreate.setDescription("Default User" + loop);
+        Credentials credentials = this.credManager.createCredentials(credentialsCreate);
+
+        System.out.println("New Credentials id=" + credentials.getId());
+
+        /**
+         * Create a new Machine
+         */
+
+        MachineCreate machineCreate = new MachineCreate();
+        machineCreate.setName("myMachine1" + loop);
+        machineCreate.setDescription("Testing with machine" + loop);
+
+        MachineTemplate machineTemplate = new MachineTemplate();
+
+        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineImage(image);
+        machineTemplate.setCredentials(credentials);
+
+        List<MachineVolume> volColl = new ArrayList<MachineVolume>();
+
+        machineTemplate.setVolumes(volColl);
+
+        ArrayList<MachineVolumeTemplate> vtItems = new ArrayList<MachineVolumeTemplate>();
+        MachineVolumeTemplate mvt1 = new MachineVolumeTemplate();
+        VolumeTemplate vt1 = this.createVolumeTemplate("dummy1" + loop);
+
+        mvt1.setVolumeTemplate(vt1);
+        mvt1.setInitialLocation("/dev/sda1" + loop);
+        vtItems.add(mvt1);
+        MachineVolumeTemplate mvt2 = new MachineVolumeTemplate();
+        VolumeTemplate vt2 = this.createVolumeTemplate("dummy2" + loop);
+
+        mvt2.setVolumeTemplate(vt2);
+        mvt2.setInitialLocation("/dev/sda2" + loop);
+        vtItems.add(mvt2);
+        machineTemplate.setVolumeTemplates(vtItems);
+
+        MachineTemplateNetworkInterface mtnic = null;
+
+        for (int i = 0; i < 2; i++) {
+            mtnic = new MachineTemplateNetworkInterface();
+            mtnic.setState(MachineTemplateNetworkInterface.InterfaceState.ACTIVE);
+            List<Address> addresses = new ArrayList<Address>();
+            Address addr = new Address();
+            String ip = "AA.BB.CC.D" + i + loop;
+
+            if (i == 0) {
+                addr.setAllocation("static");
+            } else {
+                addr.setAllocation("dynamic");
+            }
+            addr.setIp(ip);
+            addr.setDns("162.99.11.1" + i + loop);
+            addresses.add(addr);
+            mtnic.setAddresses(addresses);
+            machineTemplate.addNetworkInterface(mtnic);
+        }
+
+        machineCreate.setMachineTemplate(machineTemplate);
+        System.out.println("createMachineWithNewVolumesAndNetworks create machine ");
+        Job job = this.machineManager.createMachine(machineCreate);
+        String machineId = job.getTargetEntity().getId().toString();
+        System.out.println("createMachineWithNewVolumes wait for job completion ");
+        this.waitForJobCompletion(job);
+        Machine m = this.machineManager.getMachineById(machineId);
+        Assert.assertNotNull(m.getVolumes());
+        Assert.assertEquals(2, m.getVolumes().size());
+
         return machineId;
     }
 
@@ -648,11 +790,19 @@ public class CimiPrimerScenarioTest {
             .toString());
         System.out.println(smallVolumeConfig);
 
-        VolumeTemplate volumeTemplate = new VolumeTemplate();
-        volumeTemplate.setVolumeConfig(smallVolumeConfig);
-        System.out.println("CreateVolumeTemplate return");
+        VolumeTemplate inVolumeTemplate = new VolumeTemplate();
+        inVolumeTemplate.setVolumeConfig(smallVolumeConfig);
 
-        return volumeTemplate;
+        VolumeTemplate outVolumeTemplate = this.volumeManager.createVolumeTemplate(inVolumeTemplate);
+        Assert.assertNotNull(outVolumeTemplate);
+        Assert.assertNotNull(outVolumeTemplate.getId());
+        Assert.assertNotNull(outVolumeTemplate.getVolumeConfig());
+        Assert.assertEquals(smallVolumeConfig.getId(), outVolumeTemplate.getVolumeConfig().getId());
+
+        Assert.assertEquals(inVolumeTemplate.getName(), outVolumeTemplate.getName());
+        Assert.assertEquals(inVolumeTemplate.getDescription(), outVolumeTemplate.getDescription());
+        return outVolumeTemplate;
+
     }
 
     public Volume createVolume(final String name) throws Exception {
@@ -688,7 +838,7 @@ public class CimiPrimerScenarioTest {
         Job job = this.volumeManager.createVolume(volumeCreate);
 
         volumeId = job.getTargetEntity().getId().toString();
-        System.out.println(" testScenarioTwo: wait for volume creation completion ");
+        System.out.println(" createVolume: wait for volume creation completion ");
         this.waitForJobCompletion(job);
 
         /**
@@ -861,7 +1011,7 @@ public class CimiPrimerScenarioTest {
         System.out.println(" test machinetemplate create");
         this.testMachineTemplateCreate();
         System.out.println(" test machine create with volumes ");
-        String machineId = this.createMachineWithPreExistingVolumes();
+        String machineId = this.createMachineWithPreExistingVolumes(1);
 
         /**
          * Query the Machine
@@ -888,7 +1038,7 @@ public class CimiPrimerScenarioTest {
         System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
             + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
             + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
-            + machine.getNetworkInterfaces() + "]");
+            + machine.getNetworkInterfaces() + ", volumes=" + machine.getVolumes() + "]");
 
         /**
          * Stop the Machine
@@ -924,11 +1074,10 @@ public class CimiPrimerScenarioTest {
 
         }
         List<MachineVolume> attached = machine.getVolumes();
-        if (attached == null) {
-            System.out.println("no volumes for machine " + machineId);
-        } else {
-            System.out.println(" machine " + machineId + " has " + attached.size() + " volumes ");
-        }
+        Assert.assertNotNull(attached);
+
+        System.out.println(" machine " + machineId + " has " + attached.size() + " volumes ");
+
         /** delete machine without detaching volumes */
         boolean caught = false;
         Job deleteJob = null;
@@ -943,17 +1092,49 @@ public class CimiPrimerScenarioTest {
 
             System.out.println(" Machine deletion failed correct behaviour " + caught + " exception ");
             /** detach volumes first */
+            Volume reattached = null;
             for (MachineVolume volume : attached) {
-
+                reattached = volume.getVolume();
                 deleteJob = this.machineManager.removeVolumeFromMachine(machineId, volume.getId().toString());
                 this.waitForJobCompletion(deleteJob);
                 System.out.println("detach of volume " + volume.getVolume().getId() + " terminated ");
             }
-            System.out.println(" delete machine now that volumes are detached " + machineId);
+            System.out.println(" reattach one of the volumes " + machineId + " " + reattached.getId());
+            Machine mm1 = this.machineManager.getMachineById(machineId);
+            Assert.assertEquals(0, mm1.getVolumes().size());
+            /** reattach one of the volumes */
+            if (reattached != null) {
+                System.out.println("reattach volume " + reattached.getId());
+                MachineVolume mv = new MachineVolume();
+                mv.setVolume(reattached);
+                mv.setInitialLocation("/idontcare");
+                Job reattachJob = this.machineManager.addVolumeToMachine(machineId, mv);
+                if (reattachJob.getStatus() != Job.Status.FAILED) {
+                    this.waitForJobCompletion(deleteJob);
 
-            deleteJob = this.machineManager.deleteMachine(machineId);
+                    Machine mm = this.machineManager.getMachineById(machineId);
+                    List<MachineVolume> mvs = mm.getVolumes();
 
+                    MachineVolume toremove = null;
+                    for (MachineVolume temp : mvs) {
+                        if (temp.getVolume().getId().equals(reattached.getId())) {
+                            toremove = temp;
+                        }
+                    }
+                    Assert.assertNotNull(toremove);
+                    /** detach this volume now */
+                    Job detachJob = this.machineManager.removeVolumeFromMachine(machineId, toremove.getId().toString());
+                    if (detachJob.getStatus().equals(Job.Status.FAILED)) {
+                        throw new Exception(" detach of reattached volume failed " + machineId);
+                    }
+                    this.waitForJobCompletion(detachJob);
+                } else {
+                    System.out.println(" Reattach of volume " + reattached.getId() + " to machine " + machineId + " failed ");
+                }
+            }
         }
+
+        deleteJob = this.machineManager.deleteMachine(machineId);
 
         if (deleteJob.getStatus() == Job.Status.RUNNING) {
             System.out.println(" testScenarioThree : wait for deletion of machine " + machineId);
@@ -1029,4 +1210,93 @@ public class CimiPrimerScenarioTest {
             + machine.getNetworkInterfaces() + "]");
 
     }
+
+    @Test
+    public void testScenarioFive() throws Exception {
+        this.initDatabase();
+        /**
+         * Retrieve the CEP
+         */
+        System.out.println("testScenarioFive with volume creation during machine create ");
+        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
+        System.out.println(" test machinetemplate create");
+        this.testMachineTemplateCreate();
+        System.out.println(" test machine create with volumes ");
+        String machineId = this.createMachineWithNewVolumesAndNetworks(1);
+
+        /**
+         * Query the Machine
+         */
+
+        Machine machine = this.machineManager.getMachineById(machineId);
+        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
+            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
+            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
+            + machine.getNetworkInterfaces() + ", volumes=" + machine.getVolumes() + "]");
+
+        /**
+         * Start the Machine
+         */
+
+        Job job = this.machineManager.startMachine(machineId);
+        this.waitForJobCompletion(job);
+
+        /**
+         * Query the Machine to verify if it started
+         */
+
+        machine = this.machineManager.getMachineById(machineId);
+        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
+            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
+            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
+            + machine.getNetworkInterfaces() + ", volumes=" + machine.getVolumes() + "]");
+
+        System.out.println("Machine id=" + machine.getId() + " volumes " + machine.getVolumes());
+
+        /**
+         * Stop the Machine
+         */
+
+        job = this.machineManager.stopMachine(machineId);
+        this.waitForJobCompletion(job);
+
+        /**
+         * Update the Machine's name and description
+         */
+        Map<String, Object> attributeToUpdate = new HashMap<String, Object>();
+        attributeToUpdate.put("name", "Cool Demo #1");
+        attributeToUpdate.put("description", null);
+        job = this.machineManager.updateMachineAttributes(machineId, attributeToUpdate);
+        this.waitForJobCompletion(job);
+
+        machine = this.machineManager.getMachineById(machineId);
+        System.out.println("Machine [id=" + machine.getId() + ", name=" + machine.getName() + ", description="
+            + machine.getDescription() + ", " + machine.getCreated() + ", state=" + machine.getState() + ", "
+            + machine.getCpu() + ", memory=" + machine.getMemory() + ", disks=" + machine.getDisks() + ", networkInterfaces="
+            + machine.getNetworkInterfaces() + "]");
+
+        List<MachineVolume> volumes = machine.getVolumes();
+
+        for (MachineVolume mv : volumes) {
+
+            Job deleteJob = this.machineManager.removeVolumeFromMachine(machineId, mv.getId().toString());
+            System.out.println(" testScenarioFive status detach of volume " + mv.getId() + " job status = "
+                + deleteJob.getStatus());
+            this.waitForJobCompletion(deleteJob);
+
+        }
+        machine = this.machineManager.getMachineById(machineId);
+        volumes = machine.getVolumes();
+        Assert.assertEquals(0, volumes.size());
+
+        Job deleteJob = this.machineManager.deleteMachine(machineId);
+
+        if (deleteJob.getStatus() == Job.Status.RUNNING) {
+            System.out.println(" testScenarioFive : wait for deletion of machine " + machineId);
+            this.waitForJobCompletion(deleteJob);
+        } else {
+            System.out.println("Machine deletion completed " + machineId);
+        }
+    }
+
 }

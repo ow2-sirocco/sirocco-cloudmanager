@@ -48,7 +48,7 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
     private Volume volume;
 
     public static enum State {
-        PENDING, ATTACHING, ATTACHED, DETACHING, DETACHED, DELETED, ERROR
+        PENDING, ATTACHING, ATTACHED, DETACHING, DELETED, ERROR
     }
 
     private State state;

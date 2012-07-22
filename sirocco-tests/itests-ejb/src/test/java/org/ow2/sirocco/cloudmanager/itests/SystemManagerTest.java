@@ -97,6 +97,7 @@ public class SystemManagerTest extends SiroccoTester {
             Address addr = new Address();
             String ip = "AA.BB.CC.D" + i;
             addr.setIp(ip);
+            addr.setAllocation("static");
             addresses.add(addr);
             mtnic.setAddresses(addresses);
             machineTemplate.addNetworkInterface(mtnic);

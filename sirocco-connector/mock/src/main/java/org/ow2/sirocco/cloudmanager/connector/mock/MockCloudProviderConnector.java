@@ -60,6 +60,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface.InterfaceState;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
@@ -275,12 +276,15 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 MachineNetworkInterface newNetIntf = new MachineNetworkInterface();
                 // TODO
                 if (networkInterface.getAddresses() != null) {
-                    List<Address> addrs = new ArrayList<Address>();
+                    List<MachineNetworkInterfaceAddress> addrs = new ArrayList<MachineNetworkInterfaceAddress>();
                     for (Address a : networkInterface.getAddresses()) {
+                        MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+
                         Address new_a = new Address();
                         a.clone(new_a);
                         new_a.setNetwork(a.getNetwork());
-                        addrs.add(new_a);
+                        entry.setAddress(new_a);
+                        addrs.add(entry);
                     }
                     newNetIntf.setAddresses(addrs);
 
