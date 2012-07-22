@@ -77,6 +77,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
@@ -343,17 +344,17 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
             machine.setNetworkInterfaces(nics);
             MachineNetworkInterface privateNic = new MachineNetworkInterface();
-            privateNic.setAddresses(new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.Address>());
+            privateNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
             privateNic.setNetworkType(Network.Type.PRIVATE);
             MachineNetworkInterface publicNic = new MachineNetworkInterface();
-            publicNic.setAddresses(new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.Address>());
+            publicNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
             publicNic.setNetworkType(Network.Type.PUBLIC);
 
             for (String networkType : server.getAddresses().keySet()) {
                 Collection<Address> addresses = server.getAddresses().get(networkType);
                 Network cimiNetwork = (networkType.equalsIgnoreCase("private") ? OpenStackCloudProviderConnector.this.cimiPrivateNetwork
                     : OpenStackCloudProviderConnector.this.cimiPublicNetwork);
-                List<org.ow2.sirocco.cloudmanager.model.cimi.Address> cimiAddresses = null;
+                List<MachineNetworkInterfaceAddress> cimiAddresses = null;
                 if (cimiNetwork == this.cimiPrivateNetwork) {
                     cimiAddresses = privateNic.getAddresses();
                 }
@@ -367,7 +368,9 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                     cimiAddress.setAllocation("dynamic");
                     cimiAddress.setProtocol("IPv4");
                     cimiAddress.setResource(cimiNetwork);
-                    cimiAddresses.add(cimiAddress);
+                    MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+                    entry.setAddress(cimiAddress);
+                    cimiAddresses.add(entry);
                 }
             }
 
