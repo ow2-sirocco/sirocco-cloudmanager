@@ -599,7 +599,22 @@ public class SystemManager implements ISystemManager {
         if (UtilsForManagers.getCloudResourceById(this.em, entity.getResource().getId().toString()) == null) {
             throw new CloudProviderException("nonexisting resource linked to this SystemEntity");
         }
-        this.em.persist(entity);
+
+        // persist only systemXXX
+        if (entity.getId() == null) {
+            if (entity.getResource().getId() == null) {
+                throw new CloudProviderException("CloudCollectionItem must own an existing resource");
+            } else {
+                CloudResource resTmp = this.em.merge(entity.getResource());
+                entity.setResource(null);
+                this.em.persist(entity);
+                this.em.flush();
+                entity.setResource(resTmp);
+            }
+        } else {
+            // nothing to do, systemXXX already persisted (!?)
+        }
+
         String jobAction = null;
         if (entity instanceof SystemMachine) {
             s.getMachines().add((SystemMachine) entity);

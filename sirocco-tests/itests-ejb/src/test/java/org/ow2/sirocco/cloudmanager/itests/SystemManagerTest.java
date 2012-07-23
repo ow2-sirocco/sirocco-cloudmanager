@@ -31,6 +31,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 
 @SuppressWarnings("unused")
 public class SystemManagerTest extends SiroccoTester {
@@ -55,16 +56,11 @@ public class SystemManagerTest extends SiroccoTester {
 
     }
 
-    @Test
-    public void testSystemManager() throws Exception {
+    MachineTemplate createMachineTemplate() throws Exception {
 
-        // User user = userManager.createUser("Jeanne", "Calmant",
-        // "jeanne.calmant@vieux.com", "jeanne.calmant", "titigrosminet");
-
-        // creating machine template
-        MachineTemplate machineTemplate = new MachineTemplate();
         MachineManagerTest machineTest = new MachineManagerTest();
 
+        MachineTemplate machineTemplate = new MachineTemplate();
         MachineConfiguration in_c = machineTest.initMachineConfiguration();
         MachineConfiguration out_c = this.machineManager.createMachineConfiguration(in_c);
 
@@ -80,7 +76,6 @@ public class SystemManagerTest extends SiroccoTester {
 
         machineTemplate.setCredentials(out_cr);
 
-        this.initDatabase();
         Volume v = this.createVolume("testVolumeAttach");
 
         ArrayList<MachineVolume> vtItems = new ArrayList<MachineVolume>();
@@ -107,6 +102,26 @@ public class SystemManagerTest extends SiroccoTester {
             machineTemplate.addNetworkInterface(mtnic);
         }
 
+        return machineTemplate;
+
+    }
+
+    @Test
+    public void testSystemManager() throws Exception {
+
+        // User user = userManager.createUser("Jeanne", "Calmant",
+        // "jeanne.calmant@vieux.com", "jeanne.calmant", "titigrosminet");
+
+        this.initDatabase();
+
+        // creating machine template
+
+        MachineManagerTest machineTest = new MachineManagerTest();
+        VolumeManagerTest volumeTest = new VolumeManagerTest();
+
+        MachineTemplate machineTemplate1 = this.createMachineTemplate();
+        MachineTemplate machineTemplate2 = this.createMachineTemplate();
+
         // machineTemplate=machineManager.createMachineTemplate(machineTemplate);
 
         ComponentDescriptor component1 = new ComponentDescriptor();
@@ -117,7 +132,7 @@ public class SystemManagerTest extends SiroccoTester {
         HashMap<String, String> map1 = new HashMap<String, String>();
         map1.put("testProp", "testPropValue");
         component1.setProperties(map1);
-        component1.setComponentTemplate(machineTemplate);
+        component1.setComponentTemplate(machineTemplate1);
 
         ComponentDescriptor component2 = new ComponentDescriptor();
         component2.setName("MaMachineBisque");
@@ -127,7 +142,7 @@ public class SystemManagerTest extends SiroccoTester {
         HashMap<String, String> map2 = new HashMap<String, String>();
         map2.put("testProp", "testPropValue2");
         component2.setProperties(map2);
-        component2.setComponentTemplate(machineTemplate);
+        component2.setComponentTemplate(machineTemplate2);
 
         HashSet<ComponentDescriptor> componentDescriptors1 = new HashSet<ComponentDescriptor>();
 
@@ -262,12 +277,31 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals("systemTemplateTest1", systemTemplate1_2.getName());
         Assert.assertEquals(this.user.getId(), systemTemplate1_2.getUser().getId());
         Iterator<ComponentDescriptor> it = systemTemplate1_2.getComponentDescriptors().iterator();
-        Assert.assertEquals("MaMachine", it.next().getName());
-        Assert.assertEquals("MonSystemeBisque", it.next().getName());
+        int tot = 0;
+        while (it.hasNext()) {
+            ComponentDescriptor cd = it.next();
+            if ("MaMachine".equals(cd.getName())) {
+                tot++;
+            }
+            if ("MonSystemeBisque".equals(cd.getName())) {
+                tot++;
+            }
+        }
+        Assert.assertEquals(2, tot);
 
         List<SystemTemplate> sts = this.systemManager.getSystemTemplates();
         Assert.assertEquals(3, sts.size());
 
+        Volume vc = this.createVolume("testVolumeAddSys");
+        SystemVolume sysVol = new SystemVolume();
+        sysVol.setResource(vc);
+
+        Assert.assertEquals(Job.Status.SUCCESS,
+            this.waitForJobCompletion(this.systemManager.addEntityToSystem(s2.getId().toString(), sysVol)));
+        // refreshing system
+        s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getResource().getId().toString());
+
+        Assert.assertEquals("testVolumeAddSys", s2.getVolumes().iterator().next().getResource().getName());
         //
 
         // stop system

@@ -280,8 +280,8 @@ public class UtilsForManagers {
      */
     public static CloudResource getCloudResourceById(final EntityManager em, final String resourceId)
         throws CloudProviderException {
-        CloudResource obj = (CloudResource) em.createQuery("FROM " + CloudResource.class.getName() + " WHERE v.id=:idd")
-            .setParameter("idd", resourceId).getSingleResult();
+        CloudResource obj = (CloudResource) em.createQuery("FROM " + CloudResource.class.getName() + " v WHERE v.id=:idd")
+            .setParameter("idd", new Integer(resourceId)).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
         }

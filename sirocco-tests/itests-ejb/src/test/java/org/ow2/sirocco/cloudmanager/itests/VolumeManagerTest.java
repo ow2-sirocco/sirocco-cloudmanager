@@ -262,7 +262,7 @@ public class VolumeManagerTest {
         return outVolumeConfiguration;
     }
 
-    VolumeTemplate createVolumeTemplate() throws Exception {
+    public VolumeTemplate createVolumeTemplate() throws Exception {
         VolumeTemplate inVolumeTemplate = new VolumeTemplate();
         inVolumeTemplate.setName("myVolumeTemplate" + this.counterVolumeTemplate++);
         inVolumeTemplate.setDescription("a volume template");
