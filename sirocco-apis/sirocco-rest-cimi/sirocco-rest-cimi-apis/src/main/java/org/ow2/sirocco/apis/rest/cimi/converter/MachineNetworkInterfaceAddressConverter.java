@@ -27,7 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Address;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -35,7 +35,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Address;
  * Converted classes:
  * <ul>
  * <li>CIMI model: {@link CimiMachineNetworkInterfaceAddress}</li>
- * <li>Service model: {@link Address}</li>
+ * <li>Service model: {@link MachineNetworkInterfaceAddress}</li>
  * </ul>
  * </p>
  */
@@ -61,7 +61,7 @@ public class MachineNetworkInterfaceAddressConverter extends ObjectCommonConvert
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (Address) dataService, (CimiMachineNetworkInterfaceAddress) dataCimi);
+        this.doCopyToCimi(context, (MachineNetworkInterfaceAddress) dataService, (CimiMachineNetworkInterfaceAddress) dataCimi);
     }
 
     /**
@@ -72,7 +72,7 @@ public class MachineNetworkInterfaceAddressConverter extends ObjectCommonConvert
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Address service = new Address();
+        MachineNetworkInterfaceAddress service = new MachineNetworkInterfaceAddress();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -86,7 +86,7 @@ public class MachineNetworkInterfaceAddressConverter extends ObjectCommonConvert
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        // Nothing to do : Address is read-only
+        // Nothing to do : MachineNetworkInterfaceAddress is read-only
     }
 
     /**
@@ -96,11 +96,11 @@ public class MachineNetworkInterfaceAddressConverter extends ObjectCommonConvert
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final CimiContext context, final Address dataService,
+    protected void doCopyToCimi(final CimiContext context, final MachineNetworkInterfaceAddress dataService,
         final CimiMachineNetworkInterfaceAddress dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setAddress((CimiAddress) context.convertNextCimi(dataService, CimiAddress.class));
+            dataCimi.setAddress((CimiAddress) context.convertNextCimi(dataService.getAddress(), CimiAddress.class));
         }
     }
 
@@ -112,7 +112,7 @@ public class MachineNetworkInterfaceAddressConverter extends ObjectCommonConvert
      * @param dataService Destination Service object
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineNetworkInterfaceAddress dataCimi,
-        final Address dataService) {
-        // Nothing to do : Address is read-only
+        final MachineNetworkInterfaceAddress dataService) {
+        // Nothing to do : MachineNetworkInterfaceAddress is read-only
     }
 }

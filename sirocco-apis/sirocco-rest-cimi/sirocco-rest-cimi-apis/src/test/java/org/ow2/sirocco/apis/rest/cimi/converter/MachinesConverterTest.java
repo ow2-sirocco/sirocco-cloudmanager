@@ -478,16 +478,16 @@ public class MachinesConverterTest {
         cimi = (CimiMachine) this.context.convertToCimi(service, CimiMachine.class);
         // Assert.assertEquals(3, cimi.getDisks().getCollection().size());
 
-        Writer strWriter;
-        ObjectMapper mapper = new ObjectMapper();
-        JAXBContext context = JAXBContext.newInstance(CimiMachine.class);
-        Marshaller m = context.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-        strWriter = new StringWriter();
-        mapper.writeValue(strWriter, cimi);
-        System.out.println(strWriter.toString());
-        m.marshal(cimi, System.out);
+        // Writer strWriter;
+        // ObjectMapper mapper = new ObjectMapper();
+        // JAXBContext context = JAXBContext.newInstance(CimiMachine.class);
+        // Marshaller m = context.createMarshaller();
+        // m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        //
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimi);
+        // System.out.println(strWriter.toString());
+        // m.marshal(cimi, System.out);
     }
 
     @Test

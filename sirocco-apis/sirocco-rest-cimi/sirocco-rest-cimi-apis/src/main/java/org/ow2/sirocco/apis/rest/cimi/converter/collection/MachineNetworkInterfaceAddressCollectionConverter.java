@@ -29,7 +29,7 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Address;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -38,7 +38,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Address;
  * Converted classes:
  * <ul>
  * <li>CIMI model: {@link CimiMachineNetworkInterfaceAddressCollection}</li>
- * <li>Service model: {@link List<Address>}</li>
+ * <li>Service model: {@link List<MachineNetworkInterfaceAddress>}</li>
  * </ul>
  * </p>
  */
@@ -77,7 +77,7 @@ public class MachineNetworkInterfaceAddressCollectionConverter extends Collectio
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        List<Address> service = new ArrayList<Address>();
+        List<MachineNetworkInterfaceAddress> service = new ArrayList<MachineNetworkInterfaceAddress>();
         this.copyToService(context, dataCimi, service);
         return service;
     }

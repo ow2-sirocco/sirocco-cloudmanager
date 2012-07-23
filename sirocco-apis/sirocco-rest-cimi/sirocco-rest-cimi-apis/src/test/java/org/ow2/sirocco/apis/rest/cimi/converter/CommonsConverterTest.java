@@ -24,18 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -118,6 +112,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
@@ -439,14 +434,14 @@ public class CommonsConverterTest {
                 this.request.setIds(new IdRequest(null, "999"));
                 break;
             case MachineNetworkInterfaceAddress:
-                service = new Address();
-                ((Address) service).setId(111);
+                service = new MachineNetworkInterfaceAddress();
+                ((MachineNetworkInterfaceAddress) service).setId(111);
                 cimiClass = CimiMachineNetworkInterfaceAddress.class;
                 // Add id grandparent and parent in request
                 this.request.setIds(new IdRequest(null, "999", "7777"));
                 break;
             case MachineNetworkInterfaceAddressCollection:
-                service = new ArrayList<Address>();
+                service = new ArrayList<MachineNetworkInterfaceAddress>();
                 cimiClass = CimiMachineNetworkInterfaceAddressCollection.class;
                 // Add id grandparent and parent in request
                 this.request.setIds(new IdRequest(null, "999", "7777"));
@@ -655,11 +650,12 @@ public class CommonsConverterTest {
     public void testIdParentHierarchy() throws Exception {
         CimiMachine cimi;
 
-        Writer strWriter;
-        ObjectMapper mapper = new ObjectMapper();
-        JAXBContext context = JAXBContext.newInstance(CimiMachine.class);
-        Marshaller m = context.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        // Prepare serialized trace
+        // Writer strWriter;
+        // ObjectMapper mapper = new ObjectMapper();
+        // JAXBContext context = JAXBContext.newInstance(CimiMachine.class);
+        // Marshaller m = context.createMarshaller();
+        // m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
         // Force ALL expand
         this.context.setConvertedExpand(true);
@@ -679,20 +675,24 @@ public class CommonsConverterTest {
         sMachine.getNetworkInterfaces().add(new MachineNetworkInterface());
         sMachine.getNetworkInterfaces().get(0).setId(7111);
 
-        sMachine.getNetworkInterfaces().get(0).setAddresses(new ArrayList<Address>());
-        sMachine.getNetworkInterfaces().get(0).getAddresses().add(new Address());
-        sMachine.getNetworkInterfaces().get(0).getAddresses().get(0).setId(71117111);
-        sMachine.getNetworkInterfaces().get(0).getAddresses().add(new Address());
-        sMachine.getNetworkInterfaces().get(0).getAddresses().get(1).setId(71117222);
+        sMachine.getNetworkInterfaces().get(0).setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
+        sMachine.getNetworkInterfaces().get(0).getAddresses().add(new MachineNetworkInterfaceAddress());
+        sMachine.getNetworkInterfaces().get(0).getAddresses().get(0).setId(711191);
+        sMachine.getNetworkInterfaces().get(0).getAddresses().get(0).setAddress(new Address());
+        sMachine.getNetworkInterfaces().get(0).getAddresses().get(0).getAddress().setId(7111911);
+        sMachine.getNetworkInterfaces().get(0).getAddresses().add(new MachineNetworkInterfaceAddress());
+        sMachine.getNetworkInterfaces().get(0).getAddresses().get(1).setId(711192);
+        sMachine.getNetworkInterfaces().get(0).getAddresses().get(1).setAddress(new Address());
+        sMachine.getNetworkInterfaces().get(0).getAddresses().get(1).getAddress().setId(7111921);
 
         // Convert
         cimi = (CimiMachine) this.context.convertToCimi(sMachine, CimiMachine.class);
 
         // Serialized trace
-        strWriter = new StringWriter();
-        mapper.writeValue(strWriter, cimi);
-        java.lang.System.out.println(strWriter.toString());
-        m.marshal(cimi, java.lang.System.out);
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimi);
+        // java.lang.System.out.println(strWriter.toString());
+        // m.marshal(cimi, java.lang.System.out);
 
         // Machine
         Assert.assertEquals("in " + cimi.getExchangeType(), ExchangeType.Machine.makeHref(this.request.getBaseUri(), "9999"),
@@ -708,12 +708,16 @@ public class CommonsConverterTest {
         Assert.assertEquals("in " + ExchangeType.MachineNetworkInterface,
             ExchangeType.MachineNetworkInterface.makeHref(this.request.getBaseUri(), "9999", "7111"), cimi
                 .getNetworkInterfaces().getCollection().get(0).getHref());
-        // MachineNetworkInterfaceAddress
+        // MachineNetworkInterfaceAddress and inner Address
         Assert.assertEquals("in " + ExchangeType.MachineNetworkInterfaceAddress,
-            ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "71117111"), cimi
+            ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "711191"), cimi
                 .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(0).getHref());
+        Assert.assertEquals("in " + ExchangeType.Address, ExchangeType.Address.makeHref(this.request.getBaseUri(), "7111911"),
+            cimi.getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(0).getAddress().getHref());
         Assert.assertEquals("in " + ExchangeType.MachineNetworkInterfaceAddress,
-            ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "71117222"), cimi
+            ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "711192"), cimi
                 .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(1).getHref());
+        Assert.assertEquals("in " + ExchangeType.Address, ExchangeType.Address.makeHref(this.request.getBaseUri(), "7111921"),
+            cimi.getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(1).getAddress().getHref());
     }
 }

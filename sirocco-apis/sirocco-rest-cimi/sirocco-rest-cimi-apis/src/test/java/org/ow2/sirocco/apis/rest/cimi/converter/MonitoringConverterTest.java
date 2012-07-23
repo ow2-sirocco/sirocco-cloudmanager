@@ -24,17 +24,11 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
-import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -259,11 +253,12 @@ public class MonitoringConverterTest {
         service.add(Job2);
         service.add(Job3);
 
-        Writer strWriter;
-        ObjectMapper mapper = new ObjectMapper();
-        JAXBContext context = JAXBContext.newInstance(CimiJobCollectionRoot.class);
-        Marshaller m = context.createMarshaller();
-        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        // Writer strWriter;
+        // ObjectMapper mapper = new ObjectMapper();
+        // JAXBContext context =
+        // JAXBContext.newInstance(CimiJobCollectionRoot.class);
+        // Marshaller m = context.createMarshaller();
+        // m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
         // expand = *
         this.request.getParams().setCimiExpand(new CimiExpand("*"));
@@ -279,10 +274,10 @@ public class MonitoringConverterTest {
         Assert.assertEquals(cimi.getArray()[2].getHref(), cimi.getArray()[2].getId());
         Assert.assertEquals("nameThree", cimi.getArray()[2].getName());
 
-        strWriter = new StringWriter();
-        mapper.writeValue(strWriter, cimi);
-        System.out.println(strWriter.toString());
-        m.marshal(cimi, System.out);
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimi);
+        // System.out.println(strWriter.toString());
+        // m.marshal(cimi, System.out);
 
         // expand = jobs
         this.request.getParams().setCimiExpand(new CimiExpand("jobs"));
@@ -299,10 +294,10 @@ public class MonitoringConverterTest {
         Assert.assertEquals(cimi.getArray()[2].getHref(), cimi.getArray()[2].getId());
         Assert.assertEquals("nameThree", cimi.getArray()[2].getName());
 
-        strWriter = new StringWriter();
-        mapper.writeValue(strWriter, cimi);
-        System.out.println(strWriter.toString());
-        m.marshal(cimi, System.out);
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimi);
+        // System.out.println(strWriter.toString());
+        // m.marshal(cimi, System.out);
 
         // expand = foo
         this.request.getParams().setCimiExpand(new CimiExpand("foo"));
@@ -319,10 +314,10 @@ public class MonitoringConverterTest {
         Assert.assertNull(cimi.getArray()[2].getId());
         Assert.assertNull(cimi.getArray()[2].getName());
 
-        strWriter = new StringWriter();
-        mapper.writeValue(strWriter, cimi);
-        System.out.println(strWriter.toString());
-        m.marshal(cimi, System.out);
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimi);
+        // System.out.println(strWriter.toString());
+        // m.marshal(cimi, System.out);
 
     }
 }
