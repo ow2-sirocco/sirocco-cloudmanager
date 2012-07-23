@@ -226,7 +226,7 @@ public class MachineManager implements IMachineManager {
         }
         List<MachineVolumeTemplate> vts = mt.getVolumeTemplates();
         if (vts == null) {
-            throw new InvalidRequestException("VolumeTemplates array null");
+            return;
         }
         if (vts.size() == 0) {
             return;
