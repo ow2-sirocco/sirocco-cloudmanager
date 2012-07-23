@@ -3,6 +3,7 @@ package org.ow2.sirocco.cloudmanager.itests;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 
 import org.junit.After;
@@ -28,12 +29,15 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 
 @SuppressWarnings("unused")
 public class SystemManagerTest extends SiroccoTester {
 
     static final int JOB_DELAY = 1300;
+
+    User user = null;
 
     @Override
     @Before
@@ -43,11 +47,11 @@ public class SystemManagerTest extends SiroccoTester {
         this.connectToCloudManager();
 
         // change password that is not validated by user manager
-        User user = this.userManager.createUser("Jeanne", "Calmant", "jeanne.calmant@vieux.com", "ANONYMOUS", "titigrosminet");
+        this.user = this.userManager.createUser("Jeanne", "Calmant", "jeanne.calmant@vieux.com", "ANONYMOUS", "titigrosminet");
         CloudProvider provider = this.cloudProviderManager.createCloudProvider("mock", "mock");
         CloudProviderAccount account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(),
             "ignored", "machinetest");
-        this.cloudProviderManager.addCloudProviderAccountToUser(user.getId().toString(), account.getId().toString());
+        this.cloudProviderManager.addCloudProviderAccountToUser(this.user.getId().toString(), account.getId().toString());
 
     }
 
@@ -166,85 +170,123 @@ public class SystemManagerTest extends SiroccoTester {
         // systemTemplate1=systemManager.createSystemTemplate(systemTemplate1);
 
         Job j = this.systemManager.createSystem(systemCreate1);
-        Assert.assertEquals(this.waitForJobCompletion(j), Job.Status.SUCCESS);
+        Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(j));
         String systemId = j.getTargetEntity().getId().toString();
 
         // verif
         org.ow2.sirocco.cloudmanager.model.cimi.system.System sv1 = this.systemManager.getSystemById(systemId);
 
-        Assert.assertEquals(sv1.getName(), "systemTest1");
-        Assert.assertEquals(sv1.getDescription(), "descr-sc1");
+        Assert.assertEquals("systemTest1", sv1.getName());
+        Assert.assertEquals("descr-sc1", sv1.getDescription());
 
-        Assert.assertEquals(sv1.getMachines().size(), 2);
-        Assert.assertEquals(sv1.getMachines().get(0).getResource().getName(), "MaMachine0");
-        Assert.assertEquals(sv1.getMachines().get(0).getResource().getDescription(), "desc-comp");
+        Assert.assertEquals(2, sv1.getMachines().size());
+        Assert.assertEquals("MaMachine0", sv1.getMachines().get(0).getResource().getName());
+        Assert.assertEquals("desc-comp", sv1.getMachines().get(0).getResource().getDescription());
         // Assert.assertEquals(sv1.getMachines().get(0).getCpu().getCpuSpeedUnit(),Cpu.Frequency.GIGA);
-        Assert.assertEquals(sv1.getMachines().get(1).getResource().getName(), "MaMachine1");
-        Assert.assertEquals(sv1.getMachines().get(1).getResource().getDescription(), "desc-comp");
+        Assert.assertEquals("MaMachine1", sv1.getMachines().get(1).getResource().getName());
+        Assert.assertEquals("desc-comp", sv1.getMachines().get(1).getResource().getDescription());
 
-        Assert.assertEquals(sv1.getSystems().size(), 2);
+        Assert.assertEquals(2, sv1.getSystems().size());
         org.ow2.sirocco.cloudmanager.model.cimi.system.System s1 = this.systemManager.getSystemById(sv1.getSystems().get(0)
             .getResource().getId().toString());
-        Assert.assertEquals(s1.getName(), "MonSystemeBisque0");
-        Assert.assertEquals(s1.getDescription(), "desc-comp3");
-        Assert.assertEquals(s1.getMachines().size(), 3);
-        Assert.assertEquals(s1.getMachines().get(0).getResource().getName(), "MaMachineBisque0");
-        Assert.assertEquals(s1.getMachines().get(0).getResource().getDescription(), "desc-comp2");
-        Assert.assertEquals(s1.getMachines().get(1).getResource().getName(), "MaMachineBisque1");
-        Assert.assertEquals(s1.getMachines().get(1).getResource().getDescription(), "desc-comp2");
-        Assert.assertEquals(s1.getMachines().get(2).getResource().getName(), "MaMachineBisque2");
-        Assert.assertEquals(s1.getMachines().get(2).getResource().getDescription(), "desc-comp2");
+        Assert.assertEquals("MonSystemeBisque0", s1.getName());
+        Assert.assertEquals("desc-comp3", s1.getDescription());
+        Assert.assertEquals(3, s1.getMachines().size());
+        Assert.assertEquals("MaMachineBisque0", s1.getMachines().get(0).getResource().getName());
+        Assert.assertEquals("desc-comp2", s1.getMachines().get(0).getResource().getDescription());
+        Assert.assertEquals("MaMachineBisque1", s1.getMachines().get(1).getResource().getName());
+        Assert.assertEquals("desc-comp2", s1.getMachines().get(1).getResource().getDescription());
+        Assert.assertEquals("MaMachineBisque2", s1.getMachines().get(2).getResource().getName());
+        Assert.assertEquals("desc-comp2", s1.getMachines().get(2).getResource().getDescription());
         org.ow2.sirocco.cloudmanager.model.cimi.system.System s2 = this.systemManager.getSystemById(sv1.getSystems().get(1)
             .getResource().getId().toString());
-        Assert.assertEquals(s2.getName(), "MonSystemeBisque1");
-        Assert.assertEquals(s2.getDescription(), "desc-comp3");
-        Assert.assertEquals(s2.getMachines().size(), 3);
+        Assert.assertEquals("MonSystemeBisque1", s2.getName());
+        Assert.assertEquals("desc-comp3", s2.getDescription());
+        Assert.assertEquals(3, s2.getMachines().size());
 
         // start system
-        Assert.assertEquals(this.waitForJobCompletion(this.systemManager.startSystem(systemId)), Job.Status.SUCCESS);
+        Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.startSystem(systemId)));
 
         sv1 = this.systemManager.getSystemById(systemId);
-        Assert.assertEquals(sv1.getState(), System.State.STARTED);
-        Assert.assertEquals(((System) sv1.getSystems().get(0).getResource()).getState(), System.State.STARTED);
-        Assert.assertEquals(((System) sv1.getSystems().get(1).getResource()).getState(), System.State.STARTED);
-        Assert.assertEquals(((Machine) sv1.getMachines().get(0).getResource()).getState(), Machine.State.STARTED);
-        Assert.assertEquals(((Machine) sv1.getMachines().get(1).getResource()).getState(), Machine.State.STARTED);
+        Assert.assertEquals(System.State.STARTED, sv1.getState());
+        Assert.assertEquals(System.State.STARTED, ((System) sv1.getSystems().get(0).getResource()).getState());
+        Assert.assertEquals(System.State.STARTED, ((System) sv1.getSystems().get(1).getResource()).getState());
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) sv1.getMachines().get(0).getResource()).getState());
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) sv1.getMachines().get(1).getResource()).getState());
         s1 = this.systemManager.getSystemById(sv1.getSystems().get(0).getResource().getId().toString());
-        Assert.assertEquals(((Machine) s1.getMachines().get(0).getResource()).getState(), Machine.State.STARTED);
-        Assert.assertEquals(((Machine) s1.getMachines().get(1).getResource()).getState(), Machine.State.STARTED);
-        Assert.assertEquals(((Machine) s1.getMachines().get(2).getResource()).getState(), Machine.State.STARTED);
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) s1.getMachines().get(0).getResource()).getState());
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) s1.getMachines().get(1).getResource()).getState());
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) s1.getMachines().get(2).getResource()).getState());
         s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getResource().getId().toString());
-        Assert.assertEquals(((Machine) s2.getMachines().get(0).getResource()).getState(), Machine.State.STARTED);
-        Assert.assertEquals(((Machine) s2.getMachines().get(1).getResource()).getState(), Machine.State.STARTED);
-        Assert.assertEquals(((Machine) s2.getMachines().get(2).getResource()).getState(), Machine.State.STARTED);
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) s2.getMachines().get(0).getResource()).getState());
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) s2.getMachines().get(1).getResource()).getState());
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) s2.getMachines().get(2).getResource()).getState());
 
         // playing directly with machines
         Machine mm = (Machine) s2.getMachines().get(1).getResource();
 
-        Assert.assertEquals(this.waitForJobCompletion(this.machineManager.pauseMachine(mm.getId().toString())),
-            Job.Status.SUCCESS);
+        Assert.assertEquals(Job.Status.SUCCESS,
+            this.waitForJobCompletion(this.machineManager.pauseMachine(mm.getId().toString())));
         // refreshing system
         s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getResource().getId().toString());
         // system state to mixed?
         Assert.assertEquals(s2.getState(), System.State.MIXED);
 
+        // gets
+        @SuppressWarnings("unchecked")
+        List<SystemMachine> sms = (List<SystemMachine>) this.systemManager.getEntityListFromSystem(s2.getId().toString(),
+            SystemMachine.class);
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) sms.get(0).getResource()).getState());
+        Assert.assertEquals(Machine.State.PAUSED, ((Machine) sms.get(1).getResource()).getState());
+        Assert.assertEquals(Machine.State.STARTED, ((Machine) sms.get(2).getResource()).getState());
+
+        List<System> ls = this.systemManager.getSystems();
+        Assert.assertEquals(3, ls.size());
+        Assert.assertEquals("systemTest1", ls.get(0).getName());
+        Assert.assertEquals("MonSystemeBisque0", ls.get(1).getName());
+        Assert.assertEquals("MonSystemeBisque1", ls.get(2).getName());
+
+        List<SystemTemplate> sts1 = this.systemManager.getSystemTemplates();
+        Assert.assertEquals(0, sts1.size());
+
+        SystemTemplate systemTemplate1_1 = this.systemManager.createSystemTemplate(systemTemplate1);
+
+        List<SystemTemplate> sts2 = this.systemManager.getSystemTemplates();
+        Assert.assertEquals(2, sts2.size());
+
+        SystemTemplate systemTemplate2_1 = this.systemManager.createSystemTemplate(systemTemplate2);
+        Assert.assertEquals("systemTemplateTest1", systemTemplate1_1.getName());
+        Assert.assertEquals("systemTemplateTest2", systemTemplate2_1.getName());
+
+        SystemTemplate systemTemplate1_2 = this.systemManager.getSystemTemplateById(systemTemplate1_1.getId().toString());
+        Assert.assertEquals("systemTemplateTest1", systemTemplate1_2.getName());
+        Assert.assertEquals(this.user.getId(), systemTemplate1_2.getUser().getId());
+        Iterator<ComponentDescriptor> it = systemTemplate1_2.getComponentDescriptors().iterator();
+        Assert.assertEquals("MaMachine", it.next().getName());
+        Assert.assertEquals("MonSystemeBisque", it.next().getName());
+
+        List<SystemTemplate> sts = this.systemManager.getSystemTemplates();
+        Assert.assertEquals(3, sts.size());
+
+        //
+
         // stop system
-        Assert.assertEquals(this.waitForJobCompletion(this.systemManager.stopSystem(systemId)), Job.Status.SUCCESS);
+        Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.stopSystem(systemId)));
 
         sv1 = this.systemManager.getSystemById(systemId);
-        Assert.assertEquals(sv1.getState(), System.State.STOPPED);
-        Assert.assertEquals(((System) sv1.getSystems().get(0).getResource()).getState(), System.State.STOPPED);
-        Assert.assertEquals(((System) sv1.getSystems().get(1).getResource()).getState(), System.State.STOPPED);
-        Assert.assertEquals(((Machine) sv1.getMachines().get(0).getResource()).getState(), Machine.State.STOPPED);
-        Assert.assertEquals(((Machine) sv1.getMachines().get(1).getResource()).getState(), Machine.State.STOPPED);
+        Assert.assertEquals(System.State.STOPPED, sv1.getState());
+        Assert.assertEquals(System.State.STOPPED, ((System) sv1.getSystems().get(0).getResource()).getState());
+        Assert.assertEquals(System.State.STOPPED, ((System) sv1.getSystems().get(1).getResource()).getState());
+        Assert.assertEquals(Machine.State.STOPPED, ((Machine) sv1.getMachines().get(0).getResource()).getState());
+        Assert.assertEquals(Machine.State.STOPPED, ((Machine) sv1.getMachines().get(1).getResource()).getState());
         s1 = this.systemManager.getSystemById(sv1.getSystems().get(0).getResource().getId().toString());
-        Assert.assertEquals(((Machine) s1.getMachines().get(0).getResource()).getState(), Machine.State.STOPPED);
-        Assert.assertEquals(((Machine) s1.getMachines().get(1).getResource()).getState(), Machine.State.STOPPED);
-        Assert.assertEquals(((Machine) s1.getMachines().get(2).getResource()).getState(), Machine.State.STOPPED);
+        Assert.assertEquals(Machine.State.STOPPED, ((Machine) s1.getMachines().get(0).getResource()).getState());
+        Assert.assertEquals(Machine.State.STOPPED, ((Machine) s1.getMachines().get(1).getResource()).getState());
+        Assert.assertEquals(Machine.State.STOPPED, ((Machine) s1.getMachines().get(2).getResource()).getState());
         s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getResource().getId().toString());
-        Assert.assertEquals(((Machine) s2.getMachines().get(0).getResource()).getState(), Machine.State.STOPPED);
-        Assert.assertEquals(((Machine) s2.getMachines().get(1).getResource()).getState(), Machine.State.PAUSED);
-        Assert.assertEquals(((Machine) s2.getMachines().get(2).getResource()).getState(), Machine.State.STOPPED);
+        Assert.assertEquals(Machine.State.STOPPED, ((Machine) s2.getMachines().get(0).getResource()).getState());
+        Assert.assertEquals(Machine.State.PAUSED, ((Machine) s2.getMachines().get(1).getResource()).getState());
+        Assert.assertEquals(Machine.State.STOPPED, ((Machine) s2.getMachines().get(2).getResource()).getState());
 
         // some manipulations
         // this.systemManager.removeMachineFromSystem(sv1.getMachines().get(1).getId().toString(),
@@ -256,7 +298,7 @@ public class SystemManagerTest extends SiroccoTester {
         // Assert.assertEquals(sv1.getMachines().size(), 1);
         // Assert.assertEquals(sv1.getSystems().size(), 1);
 
-        Assert.assertEquals(this.waitForJobCompletion(this.systemManager.deleteSystem(systemId)), Job.Status.SUCCESS);
+        Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.deleteSystem(systemId)));
 
         try {
             sv1 = this.systemManager.getSystemById(systemId);

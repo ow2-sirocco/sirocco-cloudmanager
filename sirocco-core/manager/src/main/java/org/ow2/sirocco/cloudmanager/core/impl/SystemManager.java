@@ -70,6 +70,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableExcepti
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -498,6 +499,28 @@ public class SystemManager implements ISystemManager {
                 // no id, will be persisted as jpa entity
                 cd.setUser(this.getUser());
                 cd.setCreated(new Date());
+                CloudTemplate ct = cd.getComponentTemplate();
+                if ("".equals(ct.getId()) || cd.getId() == null) {
+                    // no id, the template is new: calling manager
+                    // createTemplate for each one
+
+                    if (ct instanceof SystemTemplate) {
+                        // recursive calls
+                        this.createSystemTemplate((SystemTemplate) ct);
+                    }
+                    if (ct instanceof VolumeTemplate) {
+                        this.volumeManager.createVolumeTemplate((VolumeTemplate) ct);
+                    }
+                    if (ct instanceof NetworkTemplate) {
+                        this.networkManager.createNetworkTemplate((NetworkTemplate) ct);
+                    }
+                    if (ct instanceof MachineTemplate) {
+                        this.machineManager.createMachineTemplate((MachineTemplate) ct);
+                    }
+                    if (ct instanceof CredentialsTemplate) {
+                        this.credentialsManager.createCredentialsTemplate((CredentialsTemplate) ct);
+                    }
+                }
             }
         }
 

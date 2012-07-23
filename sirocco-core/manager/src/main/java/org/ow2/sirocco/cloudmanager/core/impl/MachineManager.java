@@ -55,6 +55,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -115,6 +116,9 @@ public class MachineManager implements IMachineManager {
 
     @EJB
     private ISystemManager systemManager;
+
+    @EJB
+    private INetworkManager networkManager;
 
     @EJB
     private IJobManager jobManager;
@@ -1080,8 +1084,16 @@ public class MachineManager implements IMachineManager {
                     }
                 }
             }
+            for (Address addr : nic.getAddresses()) {
+                // persist new addresses
+                if ("".equals(addr.getId()) || addr.getId() == null) {
+                    this.em.persist(addr);
+                }
+            }
+            this.em.flush();
             this.em.persist(nic);
         }
+        this.em.flush();
     }
 
     /**
