@@ -276,11 +276,15 @@ public class ConfigFactory {
     protected List<ItemConfig> buildExchangeItems() {
         List<ItemConfig> items = new ArrayList<ItemConfig>();
         ItemConfig item = null;
+        ItemConfig itemCollectionRoot = null;
         for (ExchangeType type : ExchangeType.values()) {
-            items.add(this.buildExchangeItem(type));
-            item = this.buildExchangeItemCollectionRoot(type);
-            if (null != item) {
-                items.add(item);
+            item = this.buildExchangeItem(type);
+            items.add(item);
+            itemCollectionRoot = this.buildExchangeItemCollectionRoot(type);
+            if (null != itemCollectionRoot) {
+                // Add names data
+                itemCollectionRoot.putData(ConfigFactory.NAMES, item.getData(ConfigFactory.NAMES));
+                items.add(itemCollectionRoot);
             }
         }
         return items;
@@ -404,6 +408,11 @@ public class ConfigFactory {
         case Machine:
             item = new ItemConfig(CimiMachine.class, ExchangeType.Machine);
             item.putData(ConfigFactory.CONVERTER, new MachineConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.DiskCollection, "disks");
+            referenceNames.put(ExchangeType.MachineVolumeCollection, "volumes");
+            referenceNames.put(ExchangeType.MachineNetworkInterfaceCollection, "networkInterfaces");
             break;
 
         case MachineCollection:

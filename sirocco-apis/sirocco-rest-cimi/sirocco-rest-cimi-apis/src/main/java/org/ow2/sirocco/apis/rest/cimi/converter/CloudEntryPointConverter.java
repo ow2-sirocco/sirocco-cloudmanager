@@ -112,7 +112,7 @@ public class CloudEntryPointConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final CloudEntryPointAggregate dataService,
         final CimiCloudEntryPoint dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if ((true == context.mustBeExpanded(dataCimi)) || (true == context.mustBeReferenced(dataCimi))) {
+        if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setBaseURI(context.getRequest().getBaseUri());
 
             dataCimi.setCredentials((CimiCredentialCollection) context.convertNextCimi(dataService.getCredentials(),

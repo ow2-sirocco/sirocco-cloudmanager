@@ -198,6 +198,22 @@ public interface CimiContext extends Serializable {
     void setConvertedWriteOnly(boolean convertedWriteOnly);
 
     /**
+     * Returns true if the converters must process the expanded data when
+     * convert service data to CIMI data.
+     * 
+     * @return True if must convert with expanded data.
+     */
+    boolean isConvertedExpand();
+
+    /**
+     * Set the indicator to process the conversion of expanded data when convert
+     * service data to CIMI data.
+     * 
+     * @param convertedExpand True to convert with expanded data
+     */
+    void setConvertedExpand(boolean convertedExpand);
+
+    /**
      * Find a CIMI class associate to a service class.
      * 
      * @param service The service class

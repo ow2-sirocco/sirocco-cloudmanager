@@ -99,8 +99,10 @@ public class MachineVolumeConverter extends ObjectCommonConverter {
      */
     protected void doCopyToCimi(final CimiContext context, final MachineVolume dataService, final CimiMachineVolume dataCimi) {
         this.fill(context, dataService, dataCimi);
-        dataCimi.setInitialLocation(dataService.getInitialLocation());
-        dataCimi.setVolume((CimiVolume) context.convertNextCimi(dataService.getVolume(), CimiVolume.class));
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi.setInitialLocation(dataService.getInitialLocation());
+            dataCimi.setVolume((CimiVolume) context.convertNextCimi(dataService.getVolume(), CimiVolume.class));
+        }
     }
 
     /**

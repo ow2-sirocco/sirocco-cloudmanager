@@ -24,12 +24,18 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -649,52 +655,65 @@ public class CommonsConverterTest {
     public void testIdParentHierarchy() throws Exception {
         CimiMachine cimi;
 
+        Writer strWriter;
+        ObjectMapper mapper = new ObjectMapper();
+        JAXBContext context = JAXBContext.newInstance(CimiMachine.class);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        // Force ALL expand
+        this.context.setConvertedExpand(true);
+
+        // Builds resources for a machine
         Machine sMachine = new Machine();
         sMachine.setId(9999);
         sMachine.setDisks(new ArrayList<MachineDisk>());
+        sMachine.getDisks().add(new MachineDisk());
+        sMachine.getDisks().get(0).setId(111);
+        sMachine.getDisks().add(new MachineDisk());
+        sMachine.getDisks().get(1).setId(222);
+        sMachine.getDisks().add(new MachineDisk());
+        sMachine.getDisks().get(2).setId(333);
+
         sMachine.setNetworkInterfaces(new ArrayList<MachineNetworkInterface>());
+        sMachine.getNetworkInterfaces().add(new MachineNetworkInterface());
+        sMachine.getNetworkInterfaces().get(0).setId(7111);
 
-        MachineDisk sDiskOne = new MachineDisk();
-        sDiskOne.setId(111);
-        sMachine.getDisks().add(sDiskOne);
-        MachineDisk sDiskTwo = new MachineDisk();
-        sDiskTwo.setId(222);
-        sMachine.getDisks().add(sDiskTwo);
-        MachineDisk sDiskThree = new MachineDisk();
-        sDiskThree.setId(333);
-        sMachine.getDisks().add(sDiskThree);
+        sMachine.getNetworkInterfaces().get(0).setAddresses(new ArrayList<Address>());
+        sMachine.getNetworkInterfaces().get(0).getAddresses().add(new Address());
+        sMachine.getNetworkInterfaces().get(0).getAddresses().get(0).setId(71117111);
+        sMachine.getNetworkInterfaces().get(0).getAddresses().add(new Address());
+        sMachine.getNetworkInterfaces().get(0).getAddresses().get(1).setId(71117222);
 
-        MachineNetworkInterface sNetworkOne = new MachineNetworkInterface();
-        sNetworkOne.setId(7111);
-        sMachine.getNetworkInterfaces().add(sNetworkOne);
-
-        sNetworkOne.setAddresses(new ArrayList<Address>());
-        Address sAddressOneOne = new Address();
-        sAddressOneOne.setId(777111);
-        sNetworkOne.getAddresses().add(sAddressOneOne);
-
+        // Convert
         cimi = (CimiMachine) this.context.convertToCimi(sMachine, CimiMachine.class);
+
+        // Serialized trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        java.lang.System.out.println(strWriter.toString());
+        m.marshal(cimi, java.lang.System.out);
 
         // Machine
         Assert.assertEquals("in " + cimi.getExchangeType(), ExchangeType.Machine.makeHref(this.request.getBaseUri(), "9999"),
             cimi.getId());
-
         // MachineDisk
         Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "111"),
-            cimi.getDisks().getCollection().get(0).getId());
+            cimi.getDisks().getCollection().get(0).getHref());
         Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "222"),
-            cimi.getDisks().getCollection().get(1).getId());
+            cimi.getDisks().getCollection().get(1).getHref());
         Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "333"),
-            cimi.getDisks().getCollection().get(2).getId());
-
+            cimi.getDisks().getCollection().get(2).getHref());
         // MachineNetworkInterface
         Assert.assertEquals("in " + ExchangeType.MachineNetworkInterface,
             ExchangeType.MachineNetworkInterface.makeHref(this.request.getBaseUri(), "9999", "7111"), cimi
-                .getNetworkInterfaces().getCollection().get(0).getId());
-
+                .getNetworkInterfaces().getCollection().get(0).getHref());
         // MachineNetworkInterfaceAddress
         Assert.assertEquals("in " + ExchangeType.MachineNetworkInterfaceAddress,
-            ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "777111"), cimi
-                .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(0).getId());
+            ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "71117111"), cimi
+                .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(0).getHref());
+        Assert.assertEquals("in " + ExchangeType.MachineNetworkInterfaceAddress,
+            ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "71117222"), cimi
+                .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(1).getHref());
     }
 }

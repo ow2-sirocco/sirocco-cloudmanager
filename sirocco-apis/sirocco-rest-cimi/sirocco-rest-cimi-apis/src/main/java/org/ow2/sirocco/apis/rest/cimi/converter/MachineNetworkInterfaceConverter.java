@@ -99,16 +99,18 @@ public class MachineNetworkInterfaceConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final MachineNetworkInterface dataService,
         final CimiMachineNetworkInterface dataCimi) {
         this.fill(context, dataService, dataCimi);
-        dataCimi.setAddresses((CimiMachineNetworkInterfaceAddressCollection) context.convertNextCimi(
-            dataService.getAddresses(), CimiMachineNetworkInterfaceAddressCollection.class));
-        dataCimi.setMacAddress(dataService.getMacAddress());
-        dataCimi.setMtu(dataService.getMtu());
-        // TODO Network, NetworkPort
-        // dataCimi.setNetwork((CimiNetwork)
-        // context.convertNextCimi(dataService.getNetwork(),
-        // CimiNetwork.class));
-        dataCimi.setNetworkType(ConverterHelper.toString(dataService.getNetworkType()));
-        dataCimi.setState(ConverterHelper.toString(dataService.getState()));
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi.setAddresses((CimiMachineNetworkInterfaceAddressCollection) context.convertNextCimi(
+                dataService.getAddresses(), CimiMachineNetworkInterfaceAddressCollection.class));
+            dataCimi.setMacAddress(dataService.getMacAddress());
+            dataCimi.setMtu(dataService.getMtu());
+            // TODO Network, NetworkPort
+            // dataCimi.setNetwork((CimiNetwork)
+            // context.convertNextCimi(dataService.getNetwork(),
+            // CimiNetwork.class));
+            dataCimi.setNetworkType(ConverterHelper.toString(dataService.getNetworkType()));
+            dataCimi.setState(ConverterHelper.toString(dataService.getState()));
+        }
     }
 
     /**

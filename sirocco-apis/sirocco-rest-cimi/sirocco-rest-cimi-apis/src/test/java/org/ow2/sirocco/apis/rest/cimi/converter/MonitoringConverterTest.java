@@ -24,17 +24,24 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
@@ -61,10 +68,10 @@ public class MonitoringConverterTest {
 
         this.request = new CimiRequest();
         this.request.setBaseUri("http://www.test.org/");
-        RequestParams header = new RequestParams();
-        header.setCimiSelect(new CimiSelect());
-        header.setCimiExpand(new CimiExpand());
-        this.request.setParams(header);
+        RequestParams params = new RequestParams();
+        params.setCimiSelect(new CimiSelect());
+        params.setCimiExpand(new CimiExpand());
+        this.request.setParams(params);
 
         this.context = new CimiContextImpl(this.request, new CimiResponse());
     }
@@ -232,8 +239,8 @@ public class MonitoringConverterTest {
     }
 
     @Test
-    public void testCimiJobCollectionExpand() throws Exception {
-        CimiJobCollection cimi;
+    public void testCimiJobCollectionRootExpand() throws Exception {
+        CimiJobCollectionRoot cimi;
         List<Job> service;
 
         // Full Service -> Cimi
@@ -252,9 +259,15 @@ public class MonitoringConverterTest {
         service.add(Job2);
         service.add(Job3);
 
+        Writer strWriter;
+        ObjectMapper mapper = new ObjectMapper();
+        JAXBContext context = JAXBContext.newInstance(CimiJobCollectionRoot.class);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
         // expand = *
         this.request.getParams().setCimiExpand(new CimiExpand("*"));
-        cimi = (CimiJobCollection) this.context.convertToCimi(service, CimiJobCollection.class);
+        cimi = (CimiJobCollectionRoot) this.context.convertToCimi(service, CimiJobCollectionRoot.class);
         Assert.assertEquals(3, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/1", cimi.getArray()[0].getHref());
         Assert.assertEquals(cimi.getArray()[0].getHref(), cimi.getArray()[0].getId());
@@ -265,11 +278,16 @@ public class MonitoringConverterTest {
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/3", cimi.getArray()[2].getHref());
         Assert.assertEquals(cimi.getArray()[2].getHref(), cimi.getArray()[2].getId());
         Assert.assertEquals("nameThree", cimi.getArray()[2].getName());
+
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        System.out.println(strWriter.toString());
+        m.marshal(cimi, System.out);
 
         // expand = jobs
         this.request.getParams().setCimiExpand(new CimiExpand("jobs"));
 
-        cimi = (CimiJobCollection) this.context.convertToCimi(service, CimiJobCollection.class);
+        cimi = (CimiJobCollectionRoot) this.context.convertToCimi(service, CimiJobCollectionRoot.class);
         Assert.assertEquals(3, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/1", cimi.getArray()[0].getHref());
         Assert.assertEquals(cimi.getArray()[0].getHref(), cimi.getArray()[0].getId());
@@ -281,10 +299,15 @@ public class MonitoringConverterTest {
         Assert.assertEquals(cimi.getArray()[2].getHref(), cimi.getArray()[2].getId());
         Assert.assertEquals("nameThree", cimi.getArray()[2].getName());
 
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        System.out.println(strWriter.toString());
+        m.marshal(cimi, System.out);
+
         // expand = foo
         this.request.getParams().setCimiExpand(new CimiExpand("foo"));
 
-        cimi = (CimiJobCollection) this.context.convertToCimi(service, CimiJobCollection.class);
+        cimi = (CimiJobCollectionRoot) this.context.convertToCimi(service, CimiJobCollectionRoot.class);
         Assert.assertEquals(3, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/1", cimi.getArray()[0].getHref());
         Assert.assertNull(cimi.getArray()[0].getId());
@@ -295,5 +318,11 @@ public class MonitoringConverterTest {
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/3", cimi.getArray()[2].getHref());
         Assert.assertNull(cimi.getArray()[2].getId());
         Assert.assertNull(cimi.getArray()[2].getName());
+
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        System.out.println(strWriter.toString());
+        m.marshal(cimi, System.out);
+
     }
 }

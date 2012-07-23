@@ -24,10 +24,16 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -51,10 +57,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateColle
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
-import org.ow2.sirocco.apis.rest.cimi.request.CimiStringParams;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiStringParams;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestParams;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
@@ -393,6 +399,7 @@ public class MachinesConverterTest {
     public void testCimiMachine() throws Exception {
         CimiMachine cimi;
         Machine service;
+        MachineDisk machineDisk;
 
         // Empty Cimi -> Service
         service = (Machine) this.context.convertToService(new CimiMachine());
@@ -450,13 +457,161 @@ public class MachinesConverterTest {
 
         // Full Service -> Cimi : with MachineDisks
         service = new Machine();
+        service.setId(7);
         service.setDisks(new ArrayList<MachineDisk>());
-        service.getDisks().add(new MachineDisk());
-        service.getDisks().add(new MachineDisk());
-        service.getDisks().add(new MachineDisk());
+        machineDisk = new MachineDisk();
+        machineDisk.setId(111);
+        machineDisk.setCapacity(111);
+        machineDisk.setName("Disk111");
+        service.getDisks().add(machineDisk);
+        machineDisk = new MachineDisk();
+        machineDisk.setId(222);
+        machineDisk.setCapacity(222);
+        machineDisk.setName("Disk222");
+        service.getDisks().add(machineDisk);
+        machineDisk = new MachineDisk();
+        machineDisk.setId(333);
+        machineDisk.setCapacity(333);
+        machineDisk.setName("Disk333");
+        service.getDisks().add(machineDisk);
 
         cimi = (CimiMachine) this.context.convertToCimi(service, CimiMachine.class);
+        // Assert.assertEquals(3, cimi.getDisks().getCollection().size());
+
+        Writer strWriter;
+        ObjectMapper mapper = new ObjectMapper();
+        JAXBContext context = JAXBContext.newInstance(CimiMachine.class);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        System.out.println(strWriter.toString());
+        m.marshal(cimi, System.out);
+    }
+
+    @Test
+    public void testCimiMachineExpand() throws Exception {
+        CimiMachine cimi;
+        Machine service;
+        MachineDisk machineDisk;
+        MachineVolume machineVolume;
+
+        // Writer strWriter;
+        // ObjectMapper mapper = new ObjectMapper();
+        // JAXBContext context = JAXBContext.newInstance(CimiMachine.class);
+        // Marshaller m = context.createMarshaller();
+        // m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        // Build Service Machine
+        service = new Machine();
+        service.setId(7);
+
+        service.setDisks(new ArrayList<MachineDisk>());
+        machineDisk = new MachineDisk();
+        machineDisk.setId(111);
+        machineDisk.setCapacity(111);
+        machineDisk.setName("Disk111");
+        service.getDisks().add(machineDisk);
+        machineDisk = new MachineDisk();
+        machineDisk.setId(222);
+        machineDisk.setCapacity(222);
+        machineDisk.setName("Disk222");
+        service.getDisks().add(machineDisk);
+        machineDisk = new MachineDisk();
+        machineDisk.setId(333);
+        machineDisk.setCapacity(333);
+        machineDisk.setName("Disk333");
+        service.getDisks().add(machineDisk);
+
+        service.setVolumes(new ArrayList<MachineVolume>());
+        machineVolume = new MachineVolume();
+        machineVolume.setId(1119);
+        machineVolume.setInitialLocation("InitialLoc1119");
+        machineVolume.setName("Volume1119");
+        service.getVolumes().add(machineVolume);
+        machineVolume = new MachineVolume();
+        machineVolume.setId(2229);
+        machineVolume.setInitialLocation("InitialLoc2229");
+        machineVolume.setName("Volume2229");
+        service.getVolumes().add(machineVolume);
+
+        // no expand
+        this.request.getParams().setCimiExpand(new CimiExpand());
+        cimi = (CimiMachine) this.context.convertToCimi(service, CimiMachine.class);
+        Assert.assertNotNull(cimi.getDisks().getHref());
+        Assert.assertNull(cimi.getDisks().getId());
+
+        Assert.assertNotNull(cimi.getVolumes().getHref());
+        Assert.assertNull(cimi.getVolumes().getId());
+
+        Assert.assertNotNull(cimi.getNetworkInterfaces().getHref());
+        Assert.assertNull(cimi.getNetworkInterfaces().getId());
+
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimi);
+        // System.out.println(strWriter.toString());
+        // m.marshal(cimi, System.out);
+
+        // expand = *
+        this.request.getParams().setCimiExpand(new CimiExpand("*"));
+        cimi = (CimiMachine) this.context.convertToCimi(service, CimiMachine.class);
+        Assert.assertNotNull(cimi.getDisks().getHref());
+        Assert.assertNotNull(cimi.getDisks().getId());
         Assert.assertEquals(3, cimi.getDisks().getCollection().size());
+        Assert.assertNotNull(cimi.getDisks().getCollection().get(0).getHref());
+        Assert.assertNull(cimi.getDisks().getCollection().get(0).getId());
+
+        Assert.assertNotNull(cimi.getVolumes().getHref());
+        Assert.assertNotNull(cimi.getVolumes().getId());
+        Assert.assertEquals(2, cimi.getVolumes().getCollection().size());
+        Assert.assertNotNull(cimi.getVolumes().getCollection().get(0).getHref());
+        Assert.assertNull(cimi.getVolumes().getCollection().get(0).getId());
+
+        Assert.assertNotNull(cimi.getNetworkInterfaces().getHref());
+        Assert.assertNotNull(cimi.getNetworkInterfaces().getId());
+
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimi);
+        // System.out.println(strWriter.toString());
+        // m.marshal(cimi, System.out);
+
+        // expand = volumes
+        this.request.getParams().setCimiExpand(new CimiExpand("volumes"));
+        cimi = (CimiMachine) this.context.convertToCimi(service, CimiMachine.class);
+        Assert.assertNotNull(cimi.getDisks().getHref());
+        Assert.assertNull(cimi.getDisks().getId());
+
+        Assert.assertNotNull(cimi.getVolumes().getHref());
+        Assert.assertNotNull(cimi.getVolumes().getId());
+        Assert.assertEquals(2, cimi.getVolumes().getCollection().size());
+
+        Assert.assertNotNull(cimi.getNetworkInterfaces().getHref());
+        Assert.assertNull(cimi.getNetworkInterfaces().getId());
+
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimi);
+        // System.out.println(strWriter.toString());
+        // m.marshal(cimi, System.out);
+
+        // expand = disks
+        this.request.getParams().setCimiExpand(new CimiExpand("disks"));
+        cimi = (CimiMachine) this.context.convertToCimi(service, CimiMachine.class);
+        Assert.assertNotNull(cimi.getDisks().getHref());
+        Assert.assertNotNull(cimi.getDisks().getId());
+        Assert.assertEquals(3, cimi.getDisks().getCollection().size());
+
+        Assert.assertNotNull(cimi.getVolumes().getHref());
+        Assert.assertNull(cimi.getVolumes().getId());
+
+        Assert.assertNotNull(cimi.getNetworkInterfaces().getHref());
+        Assert.assertNull(cimi.getNetworkInterfaces().getId());
+
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimi);
+        // System.out.println(strWriter.toString());
+        // m.marshal(cimi, System.out);
+
     }
 
     @Test
@@ -624,8 +779,11 @@ public class MachinesConverterTest {
         // Full Service -> Cimi : without arrays
         service = new MachineTemplate();
         service.setCredentials(new Credentials());
+        service.getCredentials().setId(10);
         service.setMachineConfiguration(new MachineConfiguration());
+        service.getMachineConfiguration().setId(11);
         service.setMachineImage(new MachineImage());
+        service.getMachineImage().setId(12);
 
         cimi = (CimiMachineTemplate) this.context.convertToCimi(service, CimiMachineTemplate.class);
         Assert.assertEquals(CimiCredential.class, cimi.getCredential().getClass());
@@ -653,7 +811,7 @@ public class MachinesConverterTest {
 
         // Full Service -> Cimi : with MachineVolume
         service = new MachineTemplate();
-        service.setId(1);
+        service.setId(10);
         service.setVolumes(new ArrayList<MachineVolume>());
         MachineVolume mv1 = new MachineVolume();
         mv1.setId(11);
@@ -670,7 +828,20 @@ public class MachinesConverterTest {
         mv2.getVolume().setName("name_2");
         service.getVolumes().add(mv2);
 
+        // expand = *
+        this.request.getParams().setCimiExpand(new CimiExpand("*"));
         cimi = (CimiMachineTemplate) this.context.convertToCimi(service, CimiMachineTemplate.class);
+        Writer strWriter;
+        ObjectMapper mapper = new ObjectMapper();
+        JAXBContext context = JAXBContext.newInstance(CimiMachineTemplate.class);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        System.out.println(strWriter.toString());
+        m.marshal(cimi, System.out);
+
         Assert.assertNotNull(cimi.getVolumes());
         Assert.assertEquals(2, cimi.getVolumes().length);
         Assert.assertEquals("initialLocation_1", cimi.getVolumes()[0].getInitialLocation());
@@ -680,6 +851,7 @@ public class MachinesConverterTest {
 
         // Full Cimi -> Service : with MachineVolumeTemplate
         cimi = new CimiMachineTemplate();
+        service.setId(10);
         CimiMachineTemplateVolumeTemplate cimiMTVT_1 = new CimiMachineTemplateVolumeTemplate();
         cimiMTVT_1.setInitialLocation("initialLocation_1");
         cimiMTVT_1.setName("name_1");
@@ -698,15 +870,18 @@ public class MachinesConverterTest {
 
         // Full Service -> Cimi : with MachineVolumeTemplate
         service = new MachineTemplate();
+        service.setId(10);
         service.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
         MachineVolumeTemplate mvt1 = new MachineVolumeTemplate();
         mvt1.setInitialLocation("initialLocation_1");
         mvt1.setVolumeTemplate(new VolumeTemplate());
+        mvt1.getVolumeTemplate().setId(111);
         mvt1.getVolumeTemplate().setName("name_1");
         service.getVolumeTemplates().add(mvt1);
         MachineVolumeTemplate mvt2 = new MachineVolumeTemplate();
         mvt2.setInitialLocation("initialLocation_2");
         mvt2.setVolumeTemplate(new VolumeTemplate());
+        mvt2.getVolumeTemplate().setId(121);
         mvt2.getVolumeTemplate().setName("name_2");
         service.getVolumeTemplates().add(mvt2);
 

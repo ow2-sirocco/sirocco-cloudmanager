@@ -58,6 +58,9 @@ public class CimiContextImpl implements CimiContext {
     /** Indicator to force the write-only conversion */
     private boolean convertedWriteOnly;
 
+    /** Indicator to force the expand conversion */
+    private boolean convertedExpand;
+
     /** The stack of CIMI classes used during conversion */
     private LinkedList<Class<?>> stackConvertedCimiClass;
 
@@ -77,6 +80,7 @@ public class CimiContextImpl implements CimiContext {
         this.stackConvertedCimiClass = new LinkedList<Class<?>>();
         this.stackConvertedIdService = new LinkedList<Integer>();
         this.convertedWriteOnly = false;
+        this.convertedExpand = false;
     }
 
     /**
@@ -230,44 +234,28 @@ public class CimiContextImpl implements CimiContext {
      */
     @Override
     public boolean mustBeExpanded(final CimiResource resource) {
-        boolean expand = true;
-        ExchangeType typeCurrent = this.getType(resource);
-        ExchangeType typeRoot = this.getType(this.getRootConverting());
-        if (typeRoot != typeCurrent) {
-            switch (typeRoot) {
-            case AddressCollection:
-            case AddressTemplateCollection:
-            case CloudEntryPoint:
-            case CredentialCollection:
-            case CredentialTemplateCollection:
-            case DiskCollection:
-            case JobCollection:
-            case MachineCollection:
-            case MachineConfigurationCollection:
-            case MachineImageCollection:
-            case MachineNetworkInterfaceAddressCollection:
-            case MachineNetworkInterfaceCollection:
-            case MachineTemplateCollection:
-            case MachineVolumeCollection:
-            case SystemCollection:
-            case SystemCredentialCollection:
-            case SystemMachineCollection:
-            case SystemSystemCollection:
-            case SystemTemplateCollection:
-            case SystemVolumeCollection:
-            case VolumeCollection:
-            case VolumeConfigurationCollection:
-            case VolumeImageCollection:
-            case VolumeTemplateCollection:
-            case VolumeVolumeImageCollection:
+        boolean expand = false;
+        expand = this.isConvertedExpand();
+
+        if (false == expand) {
+            int sizeStack = this.stackConvertedCimiClass.size();
+            switch (sizeStack) {
+            // CimiResource is root
+            case 1:
+                expand = true;
+                break;
+            // CimiResource is a child of root
+            case 2:
                 // All expanded ?
                 expand = this.getRequest().getParams().getCimiExpand().hasAll();
                 if (false == expand) {
-                    // Get types and names of root
+                    // Get referenced types and names of root
                     Map<ExchangeType, String> typeNames = this.findReferenceNames(this.getRootConverting());
                     if (null != typeNames) {
-                        // Expand only if type is found and name of type is in
-                        // parameter
+                        // Expand only if type is found and name of type is a
+                        // value
+                        // of expand parameter
+                        ExchangeType typeCurrent = this.getType(resource);
                         if (true == typeNames.containsKey(typeCurrent)) {
                             String nameCurent = typeNames.get(typeCurrent);
                             List<String> expandParams = this.getRequest().getParams().getCimiExpand().getValues();
@@ -275,6 +263,7 @@ public class CimiContextImpl implements CimiContext {
                                 for (String param : expandParams) {
                                     if (true == nameCurent.equalsIgnoreCase(param)) {
                                         expand = true;
+                                        break;
                                     }
                                 }
                             }
@@ -282,7 +271,9 @@ public class CimiContextImpl implements CimiContext {
                     }
                 }
                 break;
+            // CimiResource is a grandchild of root
             default:
+                expand = false;
                 break;
             }
         }
@@ -298,40 +289,10 @@ public class CimiContextImpl implements CimiContext {
     @Override
     public boolean mustBeReferenced(final CimiResource resource) {
         boolean reference = false;
-        ExchangeType typeCurrent = this.getType(resource);
-        ExchangeType typeRoot = this.getType(this.getRootConverting());
-        if (typeRoot != typeCurrent) {
-            switch (typeRoot) {
-            case AddressCollection:
-            case AddressTemplateCollection:
-            case CloudEntryPoint:
-            case CredentialCollection:
-            case CredentialTemplateCollection:
-            case DiskCollection:
-            case JobCollection:
-            case MachineCollection:
-            case MachineConfigurationCollection:
-            case MachineImageCollection:
-            case MachineNetworkInterfaceAddressCollection:
-            case MachineNetworkInterfaceCollection:
-            case MachineTemplateCollection:
-            case MachineVolumeCollection:
-            case SystemCollection:
-            case SystemCredentialCollection:
-            case SystemMachineCollection:
-            case SystemSystemCollection:
-            case SystemTemplateCollection:
-            case SystemVolumeCollection:
-            case VolumeCollection:
-            case VolumeConfigurationCollection:
-            case VolumeImageCollection:
-            case VolumeTemplateCollection:
-            case VolumeVolumeImageCollection:
-                reference = true;
-                break;
-            default:
-                break;
-            }
+
+        // All referenced except the root
+        if (this.stackConvertedCimiClass.size() > 1) {
+            reference = true;
         }
         return reference;
     }
@@ -414,6 +375,26 @@ public class CimiContextImpl implements CimiContext {
     @Override
     public void setConvertedWriteOnly(final boolean convertedWriteOnly) {
         this.convertedWriteOnly = convertedWriteOnly;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#isConvertedExpand()
+     */
+    @Override
+    public boolean isConvertedExpand() {
+        return this.convertedExpand;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#setConvertedExpand(boolean)
+     */
+    @Override
+    public void setConvertedExpand(final boolean convertedExpand) {
+        this.convertedExpand = convertedExpand;
     }
 
     /**

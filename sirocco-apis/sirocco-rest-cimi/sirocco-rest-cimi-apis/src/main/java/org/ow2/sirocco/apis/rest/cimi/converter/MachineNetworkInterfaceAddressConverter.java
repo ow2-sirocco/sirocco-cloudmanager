@@ -99,7 +99,9 @@ public class MachineNetworkInterfaceAddressConverter extends ObjectCommonConvert
     protected void doCopyToCimi(final CimiContext context, final Address dataService,
         final CimiMachineNetworkInterfaceAddress dataCimi) {
         this.fill(context, dataService, dataCimi);
-        dataCimi.setAddress((CimiAddress) context.convertNextCimi(dataService, CimiAddress.class));
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi.setAddress((CimiAddress) context.convertNextCimi(dataService, CimiAddress.class));
+        }
     }
 
     /**

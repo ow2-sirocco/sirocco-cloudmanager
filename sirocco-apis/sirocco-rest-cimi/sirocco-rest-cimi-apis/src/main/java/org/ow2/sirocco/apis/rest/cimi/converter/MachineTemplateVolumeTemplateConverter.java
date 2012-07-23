@@ -99,8 +99,10 @@ public class MachineTemplateVolumeTemplateConverter extends VolumeTemplateConver
      */
     protected void doCopyToCimi(final CimiContext context, final MachineVolumeTemplate dataService,
         final CimiMachineTemplateVolumeTemplate dataCimi) {
-        dataCimi.setInitialLocation(dataService.getInitialLocation());
         this.doCopyToCimi(context, dataService.getVolumeTemplate(), dataCimi);
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi.setInitialLocation(dataService.getInitialLocation());
+        }
     }
 
     /**

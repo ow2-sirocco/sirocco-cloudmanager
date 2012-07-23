@@ -97,8 +97,10 @@ public class MachineDiskConverter extends ObjectCommonConverter {
      */
     protected void doCopyToCimi(final CimiContext context, final MachineDisk dataService, final CimiMachineDisk dataCimi) {
         this.fill(context, dataService, dataCimi);
-        dataCimi.setCapacity(dataService.getCapacity());
-        dataCimi.setInitialLocation(dataService.getInitialLocation());
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi.setCapacity(dataService.getCapacity());
+            dataCimi.setInitialLocation(dataService.getInitialLocation());
+        }
     }
 
     /**
