@@ -281,9 +281,6 @@ public class SystemManager implements ISystemManager {
         SystemManager.logger.info("cpa id: " + placement.getAccount().getId());
         system.setCloudProviderAccount(placement.getAccount());
         system.setLocation(placement.getLocation());
-        Set<System> sett = placement.getAccount().getSystems();
-        sett.add(system);
-        placement.getAccount().setSystems(sett);
 
         this.em.flush();
 
@@ -298,6 +295,8 @@ public class SystemManager implements ISystemManager {
             }
             // job returned by connector is a copy of the real connector job
             // so we can directly persist it
+            job.setDescription("System creation");
+            job.setUser(this.getUser());
             this.em.persist(job);
 
             system.setProviderAssignedId(job.getTargetEntity().getProviderAssignedId());
@@ -500,7 +499,7 @@ public class SystemManager implements ISystemManager {
                 cd.setUser(this.getUser());
                 cd.setCreated(new Date());
                 CloudTemplate ct = cd.getComponentTemplate();
-                if ("".equals(ct.getId()) || cd.getId() == null) {
+                if ("".equals(ct.getId()) || ct.getId() == null) {
                     // no id, the template is new: calling manager
                     // createTemplate for each one
 
