@@ -111,7 +111,7 @@ public class CloudProvider implements Serializable {
         this.endpoint = endPoint;
     }
 
-    @OneToMany(mappedBy = "cloudProvider")
+    @OneToMany(mappedBy = "cloudProvider", fetch = FetchType.EAGER)
     public Set<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
     }
