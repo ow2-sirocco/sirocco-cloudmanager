@@ -257,7 +257,7 @@ public class JobManager implements IJobManager {
         if (providerJob.getProviderAssignedId() == null) {
             JobManager.logger.warn("providerJob ProviderAssignedId is null");
         }
-        JobManager.logger.info(" getting persisted job from provider job of providerAssignedId "
+        JobManager.logger.debug(" getting persisted job from provider job of providerAssignedId "
             + providerJob.getProviderAssignedId());
         try {
             job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
@@ -271,7 +271,7 @@ public class JobManager implements IJobManager {
             JobManager.logger.warn("job is null");
         }
 
-        JobManager.logger.info(" got persisted job " + job.getId());
+        JobManager.logger.debug(" got persisted job " + job.getId());
         return job.getId().toString();
     }
 

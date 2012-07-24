@@ -310,7 +310,7 @@ public class SystemManagerTest extends SiroccoTester {
         sv1 = this.systemManager.getSystemById(systemId);
         Assert.assertEquals(System.State.STOPPED, sv1.getState());
         Assert.assertEquals(System.State.STOPPED, ((System) sv1.getSystems().get(0).getResource()).getState());
-        Assert.assertEquals(System.State.STOPPED, ((System) sv1.getSystems().get(1).getResource()).getState());
+        Assert.assertEquals(System.State.MIXED, ((System) sv1.getSystems().get(1).getResource()).getState());
         Assert.assertEquals(Machine.State.STOPPED, ((Machine) sv1.getMachines().get(0).getResource()).getState());
         Assert.assertEquals(Machine.State.STOPPED, ((Machine) sv1.getMachines().get(1).getResource()).getState());
         s1 = this.systemManager.getSystemById(sv1.getSystems().get(0).getResource().getId().toString());

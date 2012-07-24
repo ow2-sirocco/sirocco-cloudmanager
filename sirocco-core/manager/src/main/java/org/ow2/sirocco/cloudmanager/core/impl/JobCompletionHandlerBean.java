@@ -85,14 +85,15 @@ public class JobCompletionHandlerBean implements MessageListener {
                 this.jobManager.handleWorkflowEvent(providerJob);
             } catch (Exception e) {
                 this.ctx.setRollbackOnly();
-                JobCompletionHandlerBean.logger.warn("JobCompletion message rollbacked - " + e.getMessage(), e);
+                // JobCompletionHandlerBean.logger.warn("JobCompletion message rollbacked - "
+                // + e.getMessage(), e);
 
                 try {
                     // not possible to set a redelevery time in Joram/Jonas
                     Thread.sleep(JobCompletionHandlerBean.JMS_REDELIVERY_DELAY
                         + (long) Math.floor(Math.random() * JobCompletionHandlerBean.JMS_REDELIVERY_DELAY));
                 } catch (InterruptedException e1) {
-                    e1.printStackTrace();
+                    // e1.printStackTrace();
                 }
             }
         }

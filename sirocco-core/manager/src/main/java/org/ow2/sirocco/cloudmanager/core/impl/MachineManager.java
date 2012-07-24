@@ -588,6 +588,9 @@ public class MachineManager implements IMachineManager {
                 throw new ServiceUnavailableException("Unsupported operation action " + action + " on machine id "
                     + m.getProviderAssignedId() + " " + m.getId());
             }
+        } catch (org.ow2.sirocco.cloudmanager.connector.api.BadStateException e) {
+            throw new BadStateException(e.getMessage() + " action " + action + " machine id " + m.getProviderAssignedId() + " "
+                + m.getId());
         } catch (ConnectorException e) {
             throw new ServiceUnavailableException(e.getMessage() + " action " + action + " machine id "
                 + m.getProviderAssignedId() + " " + m.getId());

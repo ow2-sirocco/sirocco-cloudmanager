@@ -1011,7 +1011,7 @@ public class SystemManager implements ISystemManager {
                     Job j = this.machineManager.stopMachine(m.getResource().getId().toString(), force, properties);
                     j.setParentJob(parentJob);
                 } catch (BadStateException e) {
-                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
+                    SystemManager.logger.info("bad state exception:" + e.getMessage());
                 }
             }
             for (SystemSystem sy : s.getSystems()) {
@@ -1719,7 +1719,7 @@ public class SystemManager implements ISystemManager {
     @Override
     public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId) {
         // getting system attachement if any
-        SystemManager.logger.info("updating system state - " + entityType.getName() + " - " + entityId);
+        SystemManager.logger.debug("updating system state - " + entityType.getName() + " - " + entityId);
         CloudCollectionItem obj = null;
         try {
             obj = (CloudCollectionItem) this.em
