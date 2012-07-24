@@ -162,8 +162,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public ISystemService getSystemService() throws ConnectorException {
-        // throw new ConnectorException();
-        return this;
+        throw new ConnectorException();
+        // return this;
     }
 
     @Override
@@ -691,7 +691,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             system.setState(System.State.ERROR);
         }
 
-        return this.simulateProviderTask(system, SystemAction.CREATE, failedCancelled);
+        return this.simulateProviderTask(system, SystemAction.ADD, failedCancelled);
     }
 
     // private utility methods for System services (start,stop,etc)
@@ -787,7 +787,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 case SUSPEND:
                     ce.setState(System.State.SUSPENDED);
                     break;
-                case CREATE:
+                case ADD:
                     ce.setState(System.State.STOPPED);
                     MockCloudProviderConnector.this.systems.put(ce.getProviderAssignedId(), ce);
                     break;
@@ -806,11 +806,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             }
         };
         ListenableFuture<CloudResource> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
-        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(ce, null, action.name(), result);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(ce, null, action.name().toLowerCase(), result);
     }
 
     private static enum SystemAction {
-        START, STOP, PAUSE, SUSPEND, RESTART, CREATE, DELETE
+        START, STOP, PAUSE, SUSPEND, RESTART, ADD, DELETE
     }
 
     private static final List<System.State> forbiddenSystemStartActions = ImmutableList.of(System.State.CREATING,
