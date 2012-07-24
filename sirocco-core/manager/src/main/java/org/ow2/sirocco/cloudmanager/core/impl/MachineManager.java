@@ -1250,7 +1250,7 @@ public class MachineManager implements IMachineManager {
         this.em.flush();
 
         if (fromSystem == false) {
-            this.systemManager.handleEntityStateChange(deleted.getClass(), deleted.getId().toString());
+            this.systemManager.handleEntityStateChange(deleted.getClass(), deleted.getId().toString(), true);
         } else {
             this.em.merge(deleted);
         }
@@ -1647,7 +1647,7 @@ public class MachineManager implements IMachineManager {
 
             if (updated != null) {
                 mpersisted.setState(updated.getState());
-                this.systemManager.handleEntityStateChange(mpersisted.getClass(), mpersisted.getId().toString());
+                this.systemManager.handleEntityStateChange(mpersisted.getClass(), mpersisted.getId().toString(), false);
             }
         }
         String op = notification.getAction();

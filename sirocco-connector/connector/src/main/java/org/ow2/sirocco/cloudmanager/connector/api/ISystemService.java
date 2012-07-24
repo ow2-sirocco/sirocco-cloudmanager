@@ -53,4 +53,7 @@ public interface ISystemService {
     List<? extends CloudCollectionItem> getEntityListFromSystem(String systemId, String entityType) throws ConnectorException;
 
     Job removeEntityFromSystem(String systemId, String entityId) throws ConnectorException;
+
+    Job addEntityToSystem(final String systemId, final String entityId) throws ConnectorException;
+
 }

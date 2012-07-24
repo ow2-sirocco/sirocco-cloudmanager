@@ -332,6 +332,31 @@ public class SystemManagerTest extends SiroccoTester {
         // Assert.assertEquals(sv1.getMachines().size(), 1);
         // Assert.assertEquals(sv1.getSystems().size(), 1);
 
+        // detaching volumes from machines
+
+        sv1 = this.systemManager.getSystemById(systemId);
+        s1 = this.systemManager.getSystemById(sv1.getSystems().get(0).getResource().getId().toString());
+        s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getResource().getId().toString());
+
+        for (SystemMachine m : sv1.getMachines()) {
+            Machine ma = (Machine) m.getResource();
+            for (MachineVolume mv : ma.getVolumes()) {
+                this.machineManager.removeVolumeFromMachine(ma.getId().toString(), mv.getId().toString());
+            }
+        }
+        for (SystemMachine m : s1.getMachines()) {
+            Machine ma = (Machine) m.getResource();
+            for (MachineVolume mv : ma.getVolumes()) {
+                this.machineManager.removeVolumeFromMachine(ma.getId().toString(), mv.getId().toString());
+            }
+        }
+        for (SystemMachine m : s2.getMachines()) {
+            Machine ma = (Machine) m.getResource();
+            for (MachineVolume mv : ma.getVolumes()) {
+                this.machineManager.removeVolumeFromMachine(ma.getId().toString(), mv.getId().toString());
+            }
+        }
+
         Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.deleteSystem(systemId)));
 
         try {

@@ -58,7 +58,7 @@ public class JobCompletionHandlerBean implements MessageListener {
 
     private static final String JMS_TOPIC_NAME = "JobCompletion";
 
-    private static final long JMS_REDELIVERY_DELAY = 1 * 1000;
+    private static final long JMS_REDELIVERY_DELAY = 1 * 3000;
 
     @EJB
     private IJobManager jobManager;
@@ -74,18 +74,19 @@ public class JobCompletionHandlerBean implements MessageListener {
             Object payload;
             try {
                 payload = objectMessage.getObject();
-                JobCompletionHandlerBean.logger.info("On topic JobCompletion: received " + payload);
+                JobCompletionHandlerBean.logger.debug("On topic JobCompletion: received " + payload);
             } catch (JMSException ex) {
                 JobCompletionHandlerBean.logger.error("Failed to extract from JMS message", ex);
                 return;
             }
             Job providerJob = (Job) payload;
+            String jobId = providerJob.getProviderAssignedId();
             // we call jobManager to deal with events
             try {
                 this.jobManager.handleWorkflowEvent(providerJob);
             } catch (Exception e) {
                 this.ctx.setRollbackOnly();
-                // JobCompletionHandlerBean.logger.warn("JobCompletion message rollbacked - "
+                JobCompletionHandlerBean.logger.warn("JobCompletion message rollbacked - " + jobId);
                 // + e.getMessage(), e);
 
                 try {
@@ -93,6 +94,7 @@ public class JobCompletionHandlerBean implements MessageListener {
                     Thread.sleep(JobCompletionHandlerBean.JMS_REDELIVERY_DELAY
                         + (long) Math.floor(Math.random() * JobCompletionHandlerBean.JMS_REDELIVERY_DELAY));
                 } catch (InterruptedException e1) {
+                    JobCompletionHandlerBean.logger.warn("InterruptedException! - " + jobId);
                     // e1.printStackTrace();
                 }
             }

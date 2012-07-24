@@ -343,12 +343,9 @@ public class SystemManager implements ISystemManager {
                         MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
                         mc.setMachineTemplate(mt);
                         mc.setDescription(cd.getDescription());
-                        Map<String, String> props;
-                        if (cd.getProperties() == null) {
-                            props = new HashMap<String, String>();
-                        } else {
-                            props = new HashMap<String, String>(cd.getProperties());
-                        }
+                        Map<String, String> props = cd.getProperties() == null ? new HashMap<String, String>()
+                            : new HashMap<String, String>(cd.getProperties());
+
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
                         if (placement.getLocation() != null) {
                             props.put("location", placement.getLocation().getCountryName());
@@ -377,12 +374,9 @@ public class SystemManager implements ISystemManager {
                         VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
                         vc.setVolumeTemplate(vt);
                         vc.setDescription(cd.getDescription());
-                        Map<String, String> props;
-                        if (cd.getProperties() == null) {
-                            props = new HashMap<String, String>();
-                        } else {
-                            props = new HashMap<String, String>(cd.getProperties());
-                        }
+                        Map<String, String> props = cd.getProperties() == null ? new HashMap<String, String>()
+                            : new HashMap<String, String>(cd.getProperties());
+
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
                         if (placement.getLocation() != null) {
                             props.put("location", placement.getLocation().getCountryName());
@@ -411,12 +405,9 @@ public class SystemManager implements ISystemManager {
                         SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
                         sc.setSystemTemplate(st);
                         sc.setDescription(cd.getDescription());
-                        Map<String, String> props = null;
-                        if (cd.getProperties() == null) {
-                            props = new HashMap<String, String>();
-                        } else {
-                            props = new HashMap<String, String>(cd.getProperties());
-                        }
+                        Map<String, String> props = cd.getProperties() == null ? new HashMap<String, String>()
+                            : new HashMap<String, String>(cd.getProperties());
+
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
                         if (placement.getLocation() != null) {
                             props.put("location", placement.getLocation().getCountryName());
@@ -430,6 +421,13 @@ public class SystemManager implements ISystemManager {
                         ss.setResource(j.getTargetEntity());
                         ss.setState(SystemSystem.State.NOT_AVAILABLE);
                         this.em.persist(ss);
+
+                        // special case: created system is in mixed state,
+                        // because it has no childs
+                        // =>parent system must be in mixed state as well
+                        if (((System) ss.getResource()).getState().equals(System.State.MIXED)) {
+                            system.setState(System.State.MIXED);
+                        }
                     }
                 }
                 if (cd.getComponentType() == ComponentType.NETWORK) {
@@ -445,12 +443,9 @@ public class SystemManager implements ISystemManager {
                         NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
                         nc.setNetworkTemplate(nt);
                         nc.setDescription(cd.getDescription());
-                        Map<String, String> props = null;
-                        if (cd.getProperties() == null) {
-                            props = new HashMap<String, String>();
-                        } else {
-                            props = new HashMap<String, String>(cd.getProperties());
-                        }
+                        Map<String, String> props = cd.getProperties() == null ? new HashMap<String, String>()
+                            : new HashMap<String, String>(cd.getProperties());
+
                         props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
                         if (placement.getLocation() != null) {
                             props.put("location", placement.getLocation().getCountryName());
@@ -467,7 +462,7 @@ public class SystemManager implements ISystemManager {
                     }
                 }
             }
-            // has this system any nested job?
+            // has this system any running job?
             List<Job> nestedJobs = parentJob.getNestedJobs();
             if (nestedJobs != null && nestedJobs.size() == 0) {
                 // no job handling, job finished instantly and system in mixed
@@ -683,7 +678,7 @@ public class SystemManager implements ISystemManager {
 
         ICloudProviderConnector connector = this.getConnector(s);
 
-        // connector or not connector?
+        // connector or not connector? that is the question!
         if (this.isSystemSupportedInConnector(connector)) {
             Job j;
             try {
@@ -699,30 +694,9 @@ public class SystemManager implements ISystemManager {
             this.em.persist(j);
 
         } else {
-            // doing all ourself
-            if (ce instanceof SystemMachine) {
-                Job j = this.machineManager.deleteMachine(ce.getResource().getId().toString());
-                j.setParentJob(parentJob);
-            } else if (ce instanceof SystemVolume) {
-                Job j = this.volumeManager.deleteVolume(ce.getResource().getId().toString());
-                j.setParentJob(parentJob);
-            } else if (ce instanceof SystemSystem) {
-                Job j = this.deleteSystem(ce.getResource().getId().toString());
-                j.setParentJob(parentJob);
-            } else if (ce instanceof SystemNetwork) {
-                Job j = this.networkManager.deleteNetwork(ce.getResource().getId().toString());
-                j.setParentJob(parentJob);
-            } else if (ce instanceof SystemCredentials) {
-                this.credentialsManager.deleteCredentials(ce.getResource().getId().toString());
-            } else {
-                throw new CloudProviderException("object type can't be owned by a system");
-            }
-
-            if (parentJob.getNestedJobs().size() == 0) {
-                // no child job=> doing all immediately
-                this.removeEntityFromSystem_Final(parentJob, s);
-                parentJob.setStatus(Job.Status.SUCCESS);
-            }
+            // no child job=> doing all immediately
+            this.removeEntityFromSystem_Final(parentJob, s);
+            parentJob.setStatus(Job.Status.SUCCESS);
 
         }
 
@@ -733,21 +707,6 @@ public class SystemManager implements ISystemManager {
         String entityId = this.getJobProperty(job, SystemManager.PROP_JOB_COLLECTION_ID);
         CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
         ce.setState(CloudCollectionItem.State.DELETED);
-
-        if (ce instanceof SystemMachine) {
-            s.getMachines().remove(ce);
-        } else if (ce instanceof SystemVolume) {
-            s.getVolumes().remove(ce);
-        } else if (ce instanceof SystemSystem) {
-            s.getSystems().remove(ce);
-        } else if (ce instanceof SystemNetwork) {
-            s.getNetworks().remove(ce);
-        } else if (ce instanceof SystemCredentials) {
-            s.getCredentials().remove(ce);
-        } else {
-            throw new CloudProviderException("object type can't be owned by a system");
-        }
-
         // deleting SystemXXX
         this.em.remove(ce);
     }
@@ -1717,7 +1676,8 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId) {
+    public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId,
+        final boolean deletion) {
         // getting system attachement if any
         SystemManager.logger.debug("updating system state - " + entityType.getName() + " - " + entityId);
         CloudCollectionItem obj = null;
@@ -1758,7 +1718,11 @@ public class SystemManager implements ISystemManager {
             SystemManager.logger.warn(" system status update failed for system " + sys.getId());
         }
 
-        // TODO: delete systemXXX if deleted event
+        // delete systemXXX if deleted event
+        if (deletion) {
+            obj.setState(CloudCollectionItem.State.DELETED);
+            this.em.remove(obj);
+        }
 
     }
 

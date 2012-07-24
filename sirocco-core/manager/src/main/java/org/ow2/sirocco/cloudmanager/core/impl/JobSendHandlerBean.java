@@ -32,8 +32,10 @@ import javax.ejb.MessageDriven;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
+
 import org.apache.log4j.Logger;
-import org.osgi.framework.*;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceReference;
 import org.ow2.easybeans.osgi.annotation.OSGiResource;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 
@@ -43,14 +45,12 @@ import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
  * can rely on an up-to-date database
  * 
  * @author ycas7461
- * 
  */
 @MessageDriven(activationConfig = {
-        @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-        @ActivationConfigProperty(propertyName = "destination", propertyValue = "JobEmission") })
+    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
+    @ActivationConfigProperty(propertyName = "destination", propertyValue = "JobEmission")})
 public class JobSendHandlerBean implements MessageListener {
-    private static Logger logger = Logger.getLogger(JobSendHandlerBean.class
-            .getName());
+    private static Logger logger = Logger.getLogger(JobSendHandlerBean.class.getName());
 
     private static final long JMS_REDELIVERY_DELAY = 5 * 1000;
 
@@ -61,34 +61,32 @@ public class JobSendHandlerBean implements MessageListener {
     BundleContext context;
 
     private IJobManager getJobManager() {
-        ServiceReference sr = context.getServiceReference(IJobManager.class.getName());
-        return (IJobManager) context.getService(sr);
+        ServiceReference sr = this.context.getServiceReference(IJobManager.class.getName());
+        return (IJobManager) this.context.getService(sr);
     }
 
     @Override
     public void onMessage(final Message msg) {
-        if (msg instanceof ObjectMessage) {            
+        if (msg instanceof ObjectMessage) {
 
             try {
                 ObjectMessage objectMessage = (ObjectMessage) msg;
-                
-                IJobManager jobM = getJobManager();
+
+                IJobManager jobM = this.getJobManager();
                 if (jobM == null) {
                     throw new Exception("JobManager is null");
                 }
-                
+
                 Object payload = objectMessage.getObject();
-                JobSendHandlerBean.logger.info("setting up Job completion listener");
+                JobSendHandlerBean.logger.debug("setting up Job completion listener");
                 jobM.setNotificationOnJobCompletion((String) payload);
             } catch (Exception e2) {
-                JobSendHandlerBean.logger
-                .warn("Exception "+e2.getMessage()+" - message rollback");
-                ctx.setRollbackOnly();
+                JobSendHandlerBean.logger.warn("Exception " + e2.getMessage() + " - message rollback");
+                this.ctx.setRollbackOnly();
                 try {
                     // not possible to set a redelevery time in Joram/Jonas
-                    Thread.sleep(JMS_REDELIVERY_DELAY
-                            + (long) Math.floor(Math.random()
-                                    * JMS_REDELIVERY_DELAY));
+                    Thread.sleep(JobSendHandlerBean.JMS_REDELIVERY_DELAY
+                        + (long) Math.floor(Math.random() * JobSendHandlerBean.JMS_REDELIVERY_DELAY));
                 } catch (InterruptedException e1) {
                     e1.printStackTrace();
                 }

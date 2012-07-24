@@ -702,61 +702,35 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     @Override
     public Job removeEntityFromSystem(final String systemId, final String entityId) throws ConnectorException {
 
-        IJobManager jobManager = this.mockCloudProviderConnectorFactory.getJobManager();
-
         System s = this.systems.get(systemId);
 
-        boolean failedCancelled = false;
         boolean entityFound = false;
 
         for (SystemMachine sm : s.getMachines()) {
             if (sm.getResource().getProviderAssignedId().equals(entityId)) {
-                // entity found!
                 entityFound = true;
-                Job j = jobManager.getJobById(this.deleteMachine(entityId).getProviderAssignedId().toString());
-                failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                if (failedCancelled) {
-                    throw new ConnectorException("job didn't finish, status:" + j.getStatus());
-                }
                 sm.setState(CloudCollectionItem.State.DELETED);
                 s.getMachines().remove(sm);
+                break;
             }
         }
         for (SystemVolume sm : s.getVolumes()) {
             if (sm.getResource().getProviderAssignedId().equals(entityId)) {
-                // entity found!
                 entityFound = true;
-                Job j = jobManager.getJobById(this.deleteVolume(entityId).getProviderAssignedId().toString());
-                failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                if (failedCancelled) {
-                    throw new ConnectorException("job didn't finish, status:" + j.getStatus());
-                }
                 sm.setState(CloudCollectionItem.State.DELETED);
                 s.getVolumes().remove(sm);
             }
         }
         for (SystemSystem sm : s.getSystems()) {
             if (sm.getResource().getProviderAssignedId().equals(entityId)) {
-                // entity found!
                 entityFound = true;
-                Job j = jobManager.getJobById(this.deleteSystem(entityId).getProviderAssignedId().toString());
-                failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                if (failedCancelled) {
-                    throw new ConnectorException("job didn't finish, status:" + j.getStatus());
-                }
                 sm.setState(CloudCollectionItem.State.DELETED);
                 s.getSystems().remove(sm);
             }
         }
         for (SystemNetwork sm : s.getNetworks()) {
             if (sm.getResource().getProviderAssignedId().equals(entityId)) {
-                // entity found!
                 entityFound = true;
-                Job j = jobManager.getJobById(this.deleteNetwork(entityId).getProviderAssignedId().toString());
-                failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                if (failedCancelled) {
-                    throw new ConnectorException("job didn't finish, status:" + j.getStatus());
-                }
                 sm.setState(CloudCollectionItem.State.DELETED);
                 s.getNetworks().remove(sm);
             }
@@ -767,6 +741,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         }
 
         return this.simulateProviderTask(s, SystemAction.ENTITY_REMOVE, false);
+    }
+
+    @Override
+    public Job addEntityToSystem(final String systemId, final String entityId) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     // private utility methods for System services (start,stop,etc)

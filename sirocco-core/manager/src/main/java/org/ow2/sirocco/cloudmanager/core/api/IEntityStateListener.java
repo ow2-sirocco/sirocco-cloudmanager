@@ -31,6 +31,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
  */
 public interface IEntityStateListener {
 
-    void handleEntityStateChange(Class<? extends CloudResource> entityType, String entityId);
+    void handleEntityStateChange(Class<? extends CloudResource> entityType, String entityId, boolean deletion);
 
 }
