@@ -26,10 +26,9 @@
 package org.ow2.sirocco.cloudmanager.model.cimi.system;
 
 import java.io.Serializable;
-import java.util.HashMap;
+
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
@@ -38,40 +37,46 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
 @Entity
 public class ComponentDescriptor extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     public static enum ComponentType {
-        SYSTEM,VOLUME,MACHINE,CREDENTIALS,NETWORK
+        SYSTEM, VOLUME, MACHINE, CREDENTIALS, NETWORK
     }
-    
+
     /**
      * Type of component to be instanciated
      */
     private ComponentType componentType;
+
     /**
      * Id of template entity to be used to instanciate the component
      */
     private CloudTemplate componentTemplate;
+
     private Integer componentQuantity;
-    
+
     public ComponentType getComponentType() {
-        return componentType;
+        return this.componentType;
     }
-    public void setComponentType(ComponentType type) {
+
+    public void setComponentType(final ComponentType type) {
         this.componentType = type;
     }
+
     public Integer getComponentQuantity() {
-        return componentQuantity;
+        return this.componentQuantity;
     }
-    public void setComponentQuantity(Integer quantity) {
+
+    public void setComponentQuantity(final Integer quantity) {
         this.componentQuantity = quantity;
     }
-    
-    @OneToOne
-    @JoinColumn(name="comp_desc_id")
+
+    @OneToOne(optional = true)
+    @JoinColumn(name = "comp_desc_id")
     public CloudTemplate getComponentTemplate() {
-        return componentTemplate;
+        return this.componentTemplate;
     }
-    public void setComponentTemplate(CloudTemplate componentTemplate) {
+
+    public void setComponentTemplate(final CloudTemplate componentTemplate) {
         this.componentTemplate = componentTemplate;
     }
 

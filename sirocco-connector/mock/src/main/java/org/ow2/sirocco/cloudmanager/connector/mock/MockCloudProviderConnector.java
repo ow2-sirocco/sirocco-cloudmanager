@@ -694,6 +694,81 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return this.simulateProviderTask(system, SystemAction.ADD, failedCancelled);
     }
 
+    /**
+     * remove an entity (systemMachine, systemVolume etc) from a system<br>
+     * <b><font color=red>Warning:the entityId is the provider id of <i>the
+     * underlying resource</i>, not the systemXXX one</font></b>
+     */
+    @Override
+    public Job removeEntityFromSystem(final String systemId, final String entityId) throws ConnectorException {
+
+        IJobManager jobManager = this.mockCloudProviderConnectorFactory.getJobManager();
+
+        System s = this.systems.get(systemId);
+
+        boolean failedCancelled = false;
+        boolean entityFound = false;
+
+        for (SystemMachine sm : s.getMachines()) {
+            if (sm.getResource().getProviderAssignedId().equals(entityId)) {
+                // entity found!
+                entityFound = true;
+                Job j = jobManager.getJobById(this.deleteMachine(entityId).getProviderAssignedId().toString());
+                failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
+                if (failedCancelled) {
+                    throw new ConnectorException("job didn't finish, status:" + j.getStatus());
+                }
+                sm.setState(CloudCollectionItem.State.DELETED);
+                s.getMachines().remove(sm);
+            }
+        }
+        for (SystemVolume sm : s.getVolumes()) {
+            if (sm.getResource().getProviderAssignedId().equals(entityId)) {
+                // entity found!
+                entityFound = true;
+                Job j = jobManager.getJobById(this.deleteVolume(entityId).getProviderAssignedId().toString());
+                failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
+                if (failedCancelled) {
+                    throw new ConnectorException("job didn't finish, status:" + j.getStatus());
+                }
+                sm.setState(CloudCollectionItem.State.DELETED);
+                s.getVolumes().remove(sm);
+            }
+        }
+        for (SystemSystem sm : s.getSystems()) {
+            if (sm.getResource().getProviderAssignedId().equals(entityId)) {
+                // entity found!
+                entityFound = true;
+                Job j = jobManager.getJobById(this.deleteSystem(entityId).getProviderAssignedId().toString());
+                failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
+                if (failedCancelled) {
+                    throw new ConnectorException("job didn't finish, status:" + j.getStatus());
+                }
+                sm.setState(CloudCollectionItem.State.DELETED);
+                s.getSystems().remove(sm);
+            }
+        }
+        for (SystemNetwork sm : s.getNetworks()) {
+            if (sm.getResource().getProviderAssignedId().equals(entityId)) {
+                // entity found!
+                entityFound = true;
+                Job j = jobManager.getJobById(this.deleteNetwork(entityId).getProviderAssignedId().toString());
+                failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
+                if (failedCancelled) {
+                    throw new ConnectorException("job didn't finish, status:" + j.getStatus());
+                }
+                sm.setState(CloudCollectionItem.State.DELETED);
+                s.getNetworks().remove(sm);
+            }
+        }
+
+        if (!entityFound) {
+            throw new ConnectorException("entity given " + entityId + " not found in system" + systemId);
+        }
+
+        return this.simulateProviderTask(s, SystemAction.ENTITY_REMOVE, false);
+    }
+
     // private utility methods for System services (start,stop,etc)
 
     private boolean serviceSystem(final List<? extends CloudCollectionItem> l, final SystemAction action, final boolean force,
@@ -795,6 +870,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     ce.setState(System.State.DELETED);
                     MockCloudProviderConnector.this.systems.remove(ce.getProviderAssignedId());
                     break;
+                case ENTITY_REMOVE:
+                    break;
                 default:
                     throw new Exception("action not implemented");
                 }
@@ -810,7 +887,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     private static enum SystemAction {
-        START, STOP, PAUSE, SUSPEND, RESTART, ADD, DELETE
+        START, STOP, PAUSE, SUSPEND, RESTART, ADD, DELETE, ENTITY_REMOVE
     }
 
     private static final List<System.State> forbiddenSystemStartActions = ImmutableList.of(System.State.CREATING,

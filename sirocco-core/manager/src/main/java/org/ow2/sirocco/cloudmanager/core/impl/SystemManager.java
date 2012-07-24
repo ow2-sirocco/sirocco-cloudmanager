@@ -123,6 +123,8 @@ public class SystemManager implements ISystemManager {
 
     private static String DELETE_ACTION = "system delete";
 
+    private static String REMOVE_ENTITY_ACTION = "removeEntityFromSystem";
+
     private static String ADD_MACHINE_ACTION = "addMachineToSystem";
 
     private static String REMOVE_MACHINE_ACTION = "removeMachineFromSystem";
@@ -158,6 +160,10 @@ public class SystemManager implements ISystemManager {
     private static String PROP_SYSTEM_SUPPORTED_IN_CONNECTOR = "_SystemSupportedInConnector";
 
     private static String PROP_JOB_DETAILED_ACTION = "_JobDetailedAction";
+
+    private static String PROP_JOB_DETAILED_SUB_ACTION = "_JobDetailedSubAction";
+
+    private static String PROP_JOB_COLLECTION_ID = "_JobCollectionId";
 
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
@@ -494,12 +500,13 @@ public class SystemManager implements ISystemManager {
         systemT.setCreated(new Date());
 
         for (ComponentDescriptor cd : systemT.getComponentDescriptors()) {
-            if ("".equals(cd.getId()) || cd.getId() == null) {
+            if (cd.getId() == null) {
                 // no id, will be persisted as jpa entity
                 cd.setUser(this.getUser());
                 cd.setCreated(new Date());
                 CloudTemplate ct = cd.getComponentTemplate();
-                if ("".equals(ct.getId()) || ct.getId() == null) {
+
+                if (ct.getId() == null) {
                     // no id, the template is new: calling manager
                     // createTemplate for each one
 
@@ -611,7 +618,7 @@ public class SystemManager implements ISystemManager {
                 entity.setResource(resTmp);
             }
         } else {
-            // nothing to do, systemXXX already persisted (!?)
+            throw new CloudProviderException("CloudCollectionItem must be new");
         }
 
         String jobAction = null;
@@ -646,48 +653,112 @@ public class SystemManager implements ISystemManager {
     @Override
     public Job removeEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException {
 
-        // should we delete linked resource? (Machine,etc)
-
         System s = this.getSystemById(systemId);
         CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
         if (ce == null || s == null) {
             throw new CloudProviderException("bad id given in parameter");
         }
+
+        // parent job
+        Job parentJob = this.createJob("delete", s);
+        this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.REMOVE_ENTITY_ACTION);
+        this.setJobProperty(parentJob, SystemManager.PROP_JOB_COLLECTION_ID, entityId);
+        this.em.persist(parentJob);
+
         String jobAction = null;
         if (ce instanceof SystemMachine) {
-            s.getMachines().remove(ce);
             jobAction = SystemManager.REMOVE_MACHINE_ACTION;
         } else if (ce instanceof SystemVolume) {
-            s.getVolumes().remove(ce);
             jobAction = SystemManager.REMOVE_VOLUME_ACTION;
         } else if (ce instanceof SystemSystem) {
-            s.getSystems().remove(ce);
             jobAction = SystemManager.REMOVE_SYSTEM_ACTION;
         } else if (ce instanceof SystemNetwork) {
-            s.getNetworks().remove(ce);
             jobAction = SystemManager.REMOVE_NETWORK_ACTION;
         } else if (ce instanceof SystemCredentials) {
-            s.getCredentials().remove(ce);
             jobAction = SystemManager.REMOVE_CREDENTIAL_ACTION;
         } else {
             throw new CloudProviderException("object type can't be owned by a system");
         }
-        // deleting SystemXXX
-        this.em.remove(ce);
+        this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_SUB_ACTION, jobAction);
 
-        // for system not supported by underlying connector
-        Job job = this.createJob("delete", s);
-        this.setJobProperty(job, SystemManager.PROP_JOB_DETAILED_ACTION, jobAction);
-        job.setStatus(Status.SUCCESS);// no call to connector
-        this.em.persist(job);
+        ICloudProviderConnector connector = this.getConnector(s);
 
-        return job;
+        // connector or not connector?
+        if (this.isSystemSupportedInConnector(connector)) {
+            Job j;
+            try {
+                j = connector.getSystemService().removeEntityFromSystem(s.getProviderAssignedId(),
+                    ce.getResource().getProviderAssignedId());
+            } catch (ConnectorException e) {
+                throw new ServiceUnavailableException(e.getMessage() + " action " + jobAction + " system id "
+                    + s.getProviderAssignedId() + " " + s.getId());
+            }
+
+            j.setParentJob(parentJob);
+            j.setUser(this.getUser());
+            this.em.persist(j);
+
+        } else {
+            // doing all ourself
+            if (ce instanceof SystemMachine) {
+                Job j = this.machineManager.deleteMachine(ce.getResource().getId().toString());
+                j.setParentJob(parentJob);
+            } else if (ce instanceof SystemVolume) {
+                Job j = this.volumeManager.deleteVolume(ce.getResource().getId().toString());
+                j.setParentJob(parentJob);
+            } else if (ce instanceof SystemSystem) {
+                Job j = this.deleteSystem(ce.getResource().getId().toString());
+                j.setParentJob(parentJob);
+            } else if (ce instanceof SystemNetwork) {
+                Job j = this.networkManager.deleteNetwork(ce.getResource().getId().toString());
+                j.setParentJob(parentJob);
+            } else if (ce instanceof SystemCredentials) {
+                this.credentialsManager.deleteCredentials(ce.getResource().getId().toString());
+            } else {
+                throw new CloudProviderException("object type can't be owned by a system");
+            }
+
+            if (parentJob.getNestedJobs().size() == 0) {
+                // no child job=> doing all immediately
+                this.removeEntityFromSystem_Final(parentJob, s);
+                parentJob.setStatus(Job.Status.SUCCESS);
+            }
+
+        }
+
+        return parentJob;
     }
 
+    private void removeEntityFromSystem_Final(final Job job, final System s) throws CloudProviderException {
+        String entityId = this.getJobProperty(job, SystemManager.PROP_JOB_COLLECTION_ID);
+        CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
+        ce.setState(CloudCollectionItem.State.DELETED);
+
+        if (ce instanceof SystemMachine) {
+            s.getMachines().remove(ce);
+        } else if (ce instanceof SystemVolume) {
+            s.getVolumes().remove(ce);
+        } else if (ce instanceof SystemSystem) {
+            s.getSystems().remove(ce);
+        } else if (ce instanceof SystemNetwork) {
+            s.getNetworks().remove(ce);
+        } else if (ce instanceof SystemCredentials) {
+            s.getCredentials().remove(ce);
+        } else {
+            throw new CloudProviderException("object type can't be owned by a system");
+        }
+
+        // deleting SystemXXX
+        this.em.remove(ce);
+    }
+
+    /**
+     * only used to update common attributes of SystemXXX<br>
+     * no update of linked resource
+     */
     @Override
     public Job updateEntityInSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException {
 
-        // should we update the linked resource?
         System s = this.getSystemById(systemId);
 
         if (entity == null || s == null) {
@@ -713,7 +784,6 @@ public class SystemManager implements ISystemManager {
         }
         this.em.merge(entity);
 
-        // for system not supported by underlying connector
         Job job = this.createJob("edit", s);
         this.setJobProperty(job, SystemManager.PROP_JOB_DETAILED_ACTION, jobAction);
         job.setStatus(Status.SUCCESS);// no call to connector
@@ -776,13 +846,44 @@ public class SystemManager implements ISystemManager {
     public boolean addComponentDescriptorToSystemTemplate(final ComponentDescriptor componentDescriptor,
         final String systemTemplateId) throws CloudProviderException {
         SystemTemplate s = this.getSystemTemplateById(systemTemplateId);
-        Set<ComponentDescriptor> descrs = s.getComponentDescriptors();
+        if (s == null) {
+            throw new CloudProviderException("bad systemTemplateId given (" + systemTemplateId + ")");
+        }
 
-        descrs.add(componentDescriptor);
+        if (componentDescriptor.getId() != null) {
+            throw new CloudProviderException("ComponentDescriptor must be new");
+        } else {
+            // new
+            if (componentDescriptor.getComponentTemplate().getId() == null) {
+                // template must exist
+                throw new CloudProviderException("ComponentDescriptor owned template must exist");
+            } else {
+                // existing template
+                Integer templateId = componentDescriptor.getComponentTemplate().getId();
+                componentDescriptor.setComponentTemplate(this.em.find(CloudTemplate.class, templateId));
+                componentDescriptor.setUser(this.getUser());
+                // validate componentDescriptor before persisting
+                if (componentDescriptor.getName() == null || "".equals(componentDescriptor.getName())) {
+                    throw new CloudProviderException("ComponentDescriptor name should not be void");
+                }
+                if (componentDescriptor.getComponentQuantity() == null) {
+                    throw new CloudProviderException("ComponentDescriptor quantity should not be void");
+                } else {
+                    if (componentDescriptor.getComponentQuantity() < 1) {
+                        throw new CloudProviderException("ComponentDescriptor quantity should be greater than 0");
+                    }
+                }
+                if (componentDescriptor.getProperties() == null) {
+                    componentDescriptor.setProperties(new HashMap<String, String>());
+                }
 
-        s.setComponentDescriptors(descrs);
+                // all is ok
+                this.em.persist(componentDescriptor);
+            }
+        }
 
-        this.em.persist(s);
+        // updating system list of descriptors
+        s.getComponentDescriptors().add(componentDescriptor);
 
         return true;
     }
@@ -800,11 +901,6 @@ public class SystemManager implements ISystemManager {
                 break;
             }
         }
-
-        s.setComponentDescriptors(descrs);
-
-        this.em.persist(s);
-
         return true;
     }
 
@@ -835,13 +931,13 @@ public class SystemManager implements ISystemManager {
     @Override
     public System updateSystem(final System system) throws CloudProviderException {
         // TODO Auto-generated method stub
-        return null;
+        throw new CloudProviderException("action not implemented");
     }
 
     @Override
     public SystemTemplate updateSystemTemplate(final SystemTemplate systemTemplate) throws CloudProviderException {
         // TODO Auto-generated method stub
-        return null;
+        throw new CloudProviderException("action not implemented");
     }
 
     @Override
@@ -1438,13 +1534,13 @@ public class SystemManager implements ISystemManager {
                 System managedSystem = (System) job.getTargetEntity();
                 CloudProviderAccount cpa = managedSystem.getCloudProviderAccount();
                 CloudProviderLocation location = managedSystem.getLocation();
-
-                // storing new objects owned by system by querying connector
+                // querying connector
                 ICloudProviderConnector connector = this.getCloudProviderConnector(cpa, location);
                 if (connector == null) {
                     throw new CloudProviderException("no connector found");
                 }
 
+                // which action?
                 String jobDetailedAction = this.getJobProperty(job, SystemManager.PROP_JOB_DETAILED_ACTION);
 
                 if (!jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
@@ -1463,15 +1559,24 @@ public class SystemManager implements ISystemManager {
                     managedSystem.setState(s.getState());
                     managedSystem.setSystems(s.getSystems());
                     managedSystem.setVolumes(s.getVolumes());
+
                 } else if (jobDetailedAction.equals(SystemManager.START_ACTION)
                     || jobDetailedAction.equals(SystemManager.STOP_ACTION)) {
+
                     this.updateSystemContentState(connector, s, jobDetailedAction);
                     // updating parent system state
                     ((System) job.getTargetEntity()).setState(s.getState());
+
                 } else if (jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
+
                     this.updateSystemContentState(connector, (System) job.getTargetEntity(), jobDetailedAction);
                     ((System) job.getTargetEntity()).setState(System.State.DELETED);
+
+                } else if (jobDetailedAction.equals(SystemManager.REMOVE_ENTITY_ACTION)) {
+                    // removing entity
+                    this.removeEntityFromSystem_Final(job, s);
                 }
+
                 this.relConnector(cpa, connector);
             } else {
                 // error
@@ -1501,6 +1606,7 @@ public class SystemManager implements ISystemManager {
 
             String jobDetailedAction = this.getJobProperty(job, SystemManager.PROP_JOB_DETAILED_ACTION);
 
+            // looking at child jobs status
             for (Job j : job.getNestedJobs()) {
                 if (j.getStatus().equals(Status.FAILED)) {
                     failed = true;
@@ -1584,6 +1690,11 @@ public class SystemManager implements ISystemManager {
                 job.setStatus(Status.SUCCESS);
                 System s = (System) job.getTargetEntity();
                 SystemManager.logger.info(" SystemHandler all jobs are successful " + job.getId().toString());
+
+                if (jobDetailedAction.equals(SystemManager.REMOVE_ENTITY_ACTION)) {
+                    // removing entity
+                    this.removeEntityFromSystem_Final(job, s);
+                }
 
                 if (!this.updateSystemStatus(s.getId().toString())) {
                     // no update, setting generic system state
