@@ -168,6 +168,7 @@ public class JobManager implements IJobManager, ManagedService {
         job.setTargetEntity(targetEntity);
         job.setAction(action);
         job.setIsCancellable(false);
+        job.setCreated(new Date());
         job.setStatus(Job.Status.RUNNING);
         List<CloudResource> affectedEntities = new ArrayList<CloudResource>();
         job.setAffectedEntities(affectedEntities);
@@ -195,6 +196,7 @@ public class JobManager implements IJobManager, ManagedService {
                                     interrupted = true;
                                     // retry until not interrupted
                                 } catch (ExecutionException ex) {
+                                    JobManager.logger.info("Job failed", ex.getCause());
                                     jobEntry.job.setStatusMessage(ex.getCause().getMessage());
                                     jobEntry.job.setStatus(Job.Status.FAILED);
                                     break;
