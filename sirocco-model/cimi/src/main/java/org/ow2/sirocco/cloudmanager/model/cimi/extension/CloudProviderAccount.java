@@ -26,7 +26,6 @@
 package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,14 +36,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.CollectionOfElements;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 
 @Entity
 public class CloudProviderAccount implements Serializable {
@@ -60,23 +53,9 @@ public class CloudProviderAccount implements Serializable {
 
     private Set<User> users;
 
-    private Set<Machine> machines;
-
-    private Set<System> systems;
-
-    private Set<Volume> volumes;
-
-    private Set<VolumeImage> volumeImages;
-
-    private Set<MachineImage> images;
-
     private CloudProvider cloudProvider;
 
     public CloudProviderAccount() {
-        this.machines = new HashSet<Machine>();
-        this.volumes = new HashSet<Volume>();
-        this.images = new HashSet<MachineImage>();
-        this.volumeImages = new HashSet<VolumeImage>();
     }
 
     @Id
@@ -114,41 +93,6 @@ public class CloudProviderAccount implements Serializable {
         return this.properties;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount")
-    public Set<Machine> getMachines() {
-        return this.machines;
-    }
-
-    public void setMachines(final Set<Machine> machines) {
-        this.machines = machines;
-    }
-
-    @OneToMany(mappedBy = "cloudProviderAccount")
-    public Set<Volume> getVolumes() {
-        return this.volumes;
-    }
-
-    public void setVolumes(final Set<Volume> volumes) {
-        this.volumes = volumes;
-    }
-
-    @OneToMany(mappedBy = "cloudProviderAccount")
-    public Set<MachineImage> getImages() {
-        return this.images;
-    }
-
-    public void setImages(final Set<MachineImage> images) {
-        this.images = images;
-    }
-
-    @OneToMany(mappedBy = "cloudProviderAccount")
-    public Set<VolumeImage> getVolumeImages() {
-        return this.volumeImages;
-    }
-
-    public void setVolumeImages(final Set<VolumeImage> volumeImages) {
-        this.volumeImages = volumeImages;
-    }
 
     @ManyToOne
     public CloudProvider getCloudProvider() {
@@ -168,13 +112,5 @@ public class CloudProviderAccount implements Serializable {
         this.users = users;
     }
 
-    @OneToMany(mappedBy = "cloudProviderAccount")
-    public Set<System> getSystems() {
-        return this.systems;
-    }
-
-    public void setSystems(final Set<System> systems) {
-        this.systems = systems;
-    }
 
 }
