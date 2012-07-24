@@ -24,7 +24,7 @@
 #
 
 
-Private-Package org.ow2.sirocco.cloudmanager.connector.amazon
+Private-Package org.ow2.sirocco.cloudmanager.connector.vcd
 
 Export-Package 
 
