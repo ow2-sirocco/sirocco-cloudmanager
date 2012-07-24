@@ -58,6 +58,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
@@ -71,6 +72,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
@@ -649,21 +652,25 @@ public class CimiPrimerScenarioTest {
 
         MachineTemplateNetworkInterface mtnic = null;
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 4; i++) {
             mtnic = new MachineTemplateNetworkInterface();
             mtnic.setState(MachineTemplateNetworkInterface.InterfaceState.ACTIVE);
             List<Address> addresses = new ArrayList<Address>();
-            Address addr = new Address();
-            String ip = "AA.BB.CC.D" + i + loop;
+            for (int j = 0; j < 3; j++) {
+                Address addr = new Address();
+                String ip = "AA.BB.CC.D" + i + loop;
 
-            if (i == 0) {
-                addr.setAllocation("static");
-            } else {
-                addr.setAllocation("dynamic");
+                if (j == 0) {
+                    addr.setAllocation("static");
+                } else {
+                    addr.setAllocation("dynamic");
+                }
+
+                addr.setIp(ip);
+                addr.setDns("162.99.11.1" + i + loop);
+                addresses.add(addr);
             }
-            addr.setIp(ip);
-            addr.setDns("162.99.11.1" + i + loop);
-            addresses.add(addr);
+
             mtnic.setAddresses(addresses);
             machineTemplate.addNetworkInterface(mtnic);
         }
@@ -677,7 +684,18 @@ public class CimiPrimerScenarioTest {
         Machine m = this.machineManager.getMachineById(machineId);
         Assert.assertNotNull(m.getVolumes());
         Assert.assertEquals(2, m.getVolumes().size());
-
+        List<MachineNetworkInterface> nics = m.getNetworkInterfaces();
+        Assert.assertEquals(4, nics.size());
+        System.out.println(" createMachineWithNewVolumes query address entries for one of " + nics.size()
+            + " network interfaces ");
+        QueryResult<MachineNetworkInterfaceAddress> addressEntries = this.machineManager.getMachineNetworkInterfaceAddresses(
+            machineId, nics.get(0).getId().toString(), -1, -1, null, null);
+        Assert.assertNotNull(addressEntries);
+        Assert.assertEquals(addressEntries.getItems().size(), 3);
+        Assert.assertEquals(addressEntries.getCount(), 3);
+        MachineNetworkInterfaceAddress aaa = addressEntries.getItems().get(0);
+        System.out.println("createMachineWithNewVolumesAndNetworks " + aaa.getAddress().getIp() + " "
+            + aaa.getAddress().getAllocation());
         return machineId;
     }
 

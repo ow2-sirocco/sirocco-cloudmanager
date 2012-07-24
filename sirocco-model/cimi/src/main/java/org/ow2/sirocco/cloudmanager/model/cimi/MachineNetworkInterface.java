@@ -33,9 +33,11 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.OrderBy;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -97,6 +99,8 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
     @LazyCollection(LazyCollectionOption.FALSE)
+    @OrderBy("id")
+    @JoinColumn(name = "machinenetworkinterface_id", referencedColumnName = "id")
     public List<MachineNetworkInterfaceAddress> getAddresses() {
         return this.addresses;
     }

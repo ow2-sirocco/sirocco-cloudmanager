@@ -1084,13 +1084,6 @@ public class MachineManager implements IMachineManager {
                     }
                 }
             }
-            for (Address addr : nic.getAddresses()) {
-                // persist new addresses
-                if ("".equals(addr.getId()) || addr.getId() == null) {
-                    this.em.persist(addr);
-                }
-            }
-            this.em.flush();
             this.em.persist(nic);
         }
         this.em.flush();
@@ -2293,8 +2286,24 @@ public class MachineManager implements IMachineManager {
     public QueryResult<MachineNetworkInterfaceAddress> getMachineNetworkInterfaceAddresses(final String machineId,
         final String nicId, final int first, final int last, final List<String> filters, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+
+        int count = 0;
+
+        Machine m = this.em.find(Machine.class, Integer.valueOf(machineId));
+        if (m == null || m.getState().equals(Machine.State.DELETED)) {
+            throw new InvalidRequestException(" Bad machine id ");
+        }
+        List<MachineNetworkInterface> nics = m.getNetworkInterfaces();
+        for (MachineNetworkInterface nic : nics) {
+            if (nic.getId().toString().equals(nicId)) {
+                List<MachineNetworkInterfaceAddress> addresses = nic.getAddresses();
+                count = addresses.size();
+
+                return new QueryResult<MachineNetworkInterfaceAddress>(count, addresses);
+            }
+        }
+        MachineManager.logger.info("getMachineNetworkInterface no interface addresss ");
+        throw new InvalidRequestException(" Bad network interface id ");
     }
 
     @Override
