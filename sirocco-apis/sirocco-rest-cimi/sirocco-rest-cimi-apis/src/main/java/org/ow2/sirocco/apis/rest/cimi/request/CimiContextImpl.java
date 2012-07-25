@@ -253,8 +253,7 @@ public class CimiContextImpl implements CimiContext {
                     Map<ExchangeType, String> typeNames = this.findReferenceNames(this.getRootConverting());
                     if (null != typeNames) {
                         // Expand only if type is found and name of type is a
-                        // value
-                        // of expand parameter
+                        // value of expand parameter
                         ExchangeType typeCurrent = this.getType(resource);
                         if (true == typeNames.containsKey(typeCurrent)) {
                             String nameCurent = typeNames.get(typeCurrent);

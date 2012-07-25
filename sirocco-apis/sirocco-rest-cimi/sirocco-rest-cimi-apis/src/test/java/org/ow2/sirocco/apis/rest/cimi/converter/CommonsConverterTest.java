@@ -24,12 +24,18 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+
+import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -126,11 +132,15 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Converters tests of common data.
  */
 public class CommonsConverterTest {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommonsConverterTest.class);
 
     private CimiRequest request;
 
@@ -651,11 +661,11 @@ public class CommonsConverterTest {
         CimiMachine cimi;
 
         // Prepare serialized trace
-        // Writer strWriter;
-        // ObjectMapper mapper = new ObjectMapper();
-        // JAXBContext context = JAXBContext.newInstance(CimiMachine.class);
-        // Marshaller m = context.createMarshaller();
-        // m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        Writer strWriter;
+        ObjectMapper mapper = new ObjectMapper();
+        JAXBContext context = JAXBContext.newInstance(CimiMachine.class);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
 
         // Force ALL expand
         this.context.setConvertedExpand(true);
@@ -688,11 +698,13 @@ public class CommonsConverterTest {
         // Convert
         cimi = (CimiMachine) this.context.convertToCimi(sMachine, CimiMachine.class);
 
-        // Serialized trace
-        // strWriter = new StringWriter();
-        // mapper.writeValue(strWriter, cimi);
-        // java.lang.System.out.println(strWriter.toString());
-        // m.marshal(cimi, java.lang.System.out);
+        // Trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        CommonsConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+        strWriter = new StringWriter();
+        m.marshal(cimi, strWriter);
+        CommonsConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
 
         // Machine
         Assert.assertEquals("in " + cimi.getExchangeType(), ExchangeType.Machine.makeHref(this.request.getBaseUri(), "9999"),
