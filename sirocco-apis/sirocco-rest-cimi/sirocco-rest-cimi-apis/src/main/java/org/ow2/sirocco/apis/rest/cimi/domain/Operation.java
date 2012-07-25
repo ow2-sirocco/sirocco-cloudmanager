@@ -27,7 +27,8 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 public enum Operation {
 
     // Actions
-    START("start"), STOP("stop"), RESTART("restart"), PAUSE("pause"), SUSPEND("suspend"), CAPTURE("capture"),
+    START("start"), STOP("stop"), RESTART("restart"), PAUSE("pause"), SUSPEND("suspend"), CAPTURE("capture"), IMPORT("import"), EXPORT(
+        "export"),
 
     // Operations
     ADD("add"), EDIT("edit"), DELETE("delete");
