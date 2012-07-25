@@ -39,6 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
@@ -50,8 +51,13 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
@@ -66,6 +72,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -418,6 +425,71 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
                 }
             }
 
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemCredential cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiSystemCredential cimiRef = (CimiSystemCredential) context
+                .convertToCimi(dataService, CimiSystemCredential.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemMachine cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiSystemMachine cimiRef = (CimiSystemMachine) context.convertToCimi(dataService, CimiSystemMachine.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemSystem cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiSystemSystem cimiRef = (CimiSystemSystem) context.convertToCimi(dataService, CimiSystemSystem.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemVolume cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiSystemVolume cimiRef = (CimiSystemVolume) context.convertToCimi(dataService, CimiSystemVolume.class);
+            this.merge(cimiRef, cimi);
         }
     }
 
@@ -848,6 +920,45 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
+     * Merge Machine resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiMachine cimiRef, final CimiMachine cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getCpu()) {
+                cimi.setCpu(cimiRef.getCpu());
+            }
+            if (null == cimi.getCpuArch()) {
+                cimi.setCpuArch(cimiRef.getCpuArch());
+            }
+            if (null == cimi.getMemory()) {
+                cimi.setMemory(cimiRef.getMemory());
+            }
+            if (null == cimi.getDisks()) {
+                cimi.setDisks(cimiRef.getDisks());
+            } else {
+                this.merge(cimiRef.getDisks(), cimi.getDisks());
+            }
+            if (null == cimi.getNetworkInterfaces()) {
+                cimi.setNetworkInterfaces(cimiRef.getNetworkInterfaces());
+            } else {
+                this.merge(cimiRef.getNetworkInterfaces(), cimi.getNetworkInterfaces());
+            }
+            if (null == cimi.getVolumes()) {
+                cimi.setVolumes(cimiRef.getVolumes());
+            } else {
+                this.merge(cimiRef.getVolumes(), cimi.getVolumes());
+            }
+            if (null == cimi.getState()) {
+                cimi.setState(cimiRef.getState());
+            }
+        }
+    }
+
+    /**
      * Merge machine disk data.
      * 
      * @param cimiRef Source to merge
@@ -907,6 +1018,109 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             // TODO and check Network, NetworkPort, ...
 
             // Read-only : Addresses
+        }
+    }
+
+    /**
+     * Merge System resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystem cimiRef, final CimiSystem cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getCredentials()) {
+                cimi.setCredentials(cimiRef.getCredentials());
+            } else {
+                this.merge(cimiRef.getCredentials(), cimi.getCredentials());
+            }
+            if (null == cimi.getMachines()) {
+                cimi.setMachines(cimiRef.getMachines());
+            } else {
+                this.merge(cimiRef.getMachines(), cimi.getMachines());
+            }
+            if (null == cimi.getSystems()) {
+                cimi.setSystems(cimiRef.getSystems());
+            } else {
+                this.merge(cimiRef.getSystems(), cimi.getSystems());
+            }
+            if (null == cimi.getVolumes()) {
+                cimi.setVolumes(cimiRef.getVolumes());
+            } else {
+                this.merge(cimiRef.getVolumes(), cimi.getVolumes());
+            }
+            if (null == cimi.getState()) {
+                cimi.setState(cimiRef.getState());
+            }
+        }
+    }
+
+    /**
+     * Merge system credential data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystemCredential cimiRef, final CimiSystemCredential cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getCredential()) {
+                cimi.setCredential(cimiRef.getCredential());
+            } else {
+                this.merge(cimiRef.getCredential(), cimi.getCredential());
+            }
+        }
+    }
+
+    /**
+     * Merge system machine data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystemMachine cimiRef, final CimiSystemMachine cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getMachine()) {
+                cimi.setMachine(cimiRef.getMachine());
+            } else {
+                this.merge(cimiRef.getMachine(), cimi.getMachine());
+            }
+        }
+    }
+
+    /**
+     * Merge system system data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystemSystem cimiRef, final CimiSystemSystem cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getSystem()) {
+                cimi.setSystem(cimiRef.getSystem());
+            } else {
+                this.merge(cimiRef.getSystem(), cimi.getSystem());
+            }
+        }
+    }
+
+    /**
+     * Merge system volume data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystemVolume cimiRef, final CimiSystemVolume cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getVolume()) {
+                cimi.setVolume(cimiRef.getVolume());
+            } else {
+                this.merge(cimiRef.getVolume(), cimi.getVolume());
+            }
         }
     }
 

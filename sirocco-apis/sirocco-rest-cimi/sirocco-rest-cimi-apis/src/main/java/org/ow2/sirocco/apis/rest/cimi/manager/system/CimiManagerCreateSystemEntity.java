@@ -24,7 +24,13 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.system;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
+import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
@@ -37,6 +43,10 @@ import org.springframework.stereotype.Component;
  */
 @Component("CimiManagerCreateSystemEntity")
 public class CimiManagerCreateSystemEntity extends CimiManagerCreateAbstract {
+
+    @Autowired
+    @Qualifier("MergeReferenceHelper")
+    private MergeReferenceHelper mergeReference;
 
     @Autowired
     @Qualifier("ISystemManager")
@@ -53,4 +63,22 @@ public class CimiManagerCreateSystemEntity extends CimiManagerCreateAbstract {
         return this.manager.addEntityToSystem(context.getRequest().getIdParent(), (CloudCollectionItem) dataService);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#beforeConvertToDataService(org.ow2.sirocco.apis.rest.cimi.request.CimiContext)
+     */
+    @Override
+    protected void beforeConvertToDataService(final CimiContext context) throws Exception {
+        CimiData toMerge = context.getRequest().getCimiData();
+        if (toMerge instanceof CimiSystemCredential) {
+            this.mergeReference.merge(context, (CimiSystemCredential) toMerge);
+        } else if (toMerge instanceof CimiSystemMachine) {
+            this.mergeReference.merge(context, (CimiSystemMachine) toMerge);
+        } else if (toMerge instanceof CimiSystemSystem) {
+            this.mergeReference.merge(context, (CimiSystemSystem) toMerge);
+        } else if (toMerge instanceof CimiSystemVolume) {
+            this.mergeReference.merge(context, (CimiSystemVolume) toMerge);
+        }
+    }
 }

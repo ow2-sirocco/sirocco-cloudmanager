@@ -35,7 +35,11 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
@@ -197,6 +201,42 @@ public interface MergeReferenceHelper {
      * @throws Exception If error in call service
      */
     void merge(CimiContext context, CimiSystemCreate cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    void merge(CimiContext context, CimiSystemCredential cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    void merge(CimiContext context, CimiSystemMachine cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    void merge(CimiContext context, CimiSystemSystem cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    void merge(CimiContext context, CimiSystemVolume cimi) throws Exception;
 
     /**
      * Merge the reference of a resource only if necessary.
