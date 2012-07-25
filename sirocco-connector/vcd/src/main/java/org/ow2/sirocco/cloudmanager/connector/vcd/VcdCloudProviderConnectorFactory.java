@@ -40,6 +40,7 @@ import javax.xml.bind.JAXBElement;
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
+import org.apache.felix.ipojo.annotations.ServiceProperty;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
@@ -107,6 +108,8 @@ import com.vmware.vcloud.sdk.constants.Version;
 public class VcdCloudProviderConnectorFactory implements ICloudProviderConnectorFactory {
     private static Log logger = LogFactory.getLog(VcdCloudProviderConnectorFactory.class);
 
+    public static final String CLOUD_PROVIDER_TYPE = "vcd";
+
     private static int DEFAULT_WAIT_TIME_IN_MILLISECONDS = 600000;
 
     private static final int THREADPOOL_SIZE = 10;
@@ -115,6 +118,9 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
     @Requires
     private IJobManager jobManager;
+
+    @ServiceProperty(name = ICloudProviderConnectorFactory.CLOUD_PROVIDER_TYPE_PROPERTY, value = VcdCloudProviderConnectorFactory.CLOUD_PROVIDER_TYPE)
+    private String cloudProviderType;
 
     public VcdCloudProviderConnectorFactory() {
 
