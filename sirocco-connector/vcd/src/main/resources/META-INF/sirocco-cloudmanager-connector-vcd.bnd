@@ -23,11 +23,14 @@
 #
 #
 
+Embed-Dependency *;artifactId=vcloud-java-sdk,*;artifactId=commons-io,*;artifactId=commons-codec,*;artifactId=amqp-client,*;artifactId=commons-logging,*;artifactId=httpclient,*;artifactId=httpcore
 
 Private-Package org.ow2.sirocco.cloudmanager.connector.vcd
 
 Export-Package 
 
-Import-Package  *
+Import-Package  !org.apache.avalon.framework.*,!com.ibm.uvm.*,!com.sun.*,!sun.*,!javax.*,org.apache.log;resolution:=optional,*
+
+DynamicImport-Package: *
 
 
