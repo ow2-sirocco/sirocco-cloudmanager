@@ -88,6 +88,18 @@ public class CimiSystemTemplate extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Add a list of "componentDescriptors".
+     * 
+     * @param toAddComponents The list to add
+     */
+    public void addAllComponentDescriptors(final List<CimiComponentDescriptor> toAddComponents) {
+        if (null == this.componentDescriptors) {
+            this.componentDescriptors = new CimiComponentDescriptorArray();
+        }
+        this.componentDescriptors.addAll(toAddComponents);
+    }
+
+    /**
      * Return the value of field "componentDescriptors".
      * 
      * @return The value

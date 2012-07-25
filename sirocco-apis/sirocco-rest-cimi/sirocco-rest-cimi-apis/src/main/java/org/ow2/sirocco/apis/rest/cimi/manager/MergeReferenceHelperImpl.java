@@ -26,14 +26,18 @@ package org.ow2.sirocco.apis.rest.cimi.manager;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigurationException;
 import org.ow2.sirocco.apis.rest.cimi.converter.PathHelper;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiComponentDescriptor;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
@@ -46,16 +50,21 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -69,6 +78,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -99,6 +110,10 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Autowired
     @Qualifier("IVolumeManager")
     private IVolumeManager managerVolume;
+
+    @Autowired
+    @Qualifier("ISystemManager")
+    private ISystemManager managerSystem;
 
     /**
      * {@inheritDoc}
@@ -275,36 +290,6 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
-     * Merge the reference of a resource only if necessary.
-     * 
-     * @param context The working context
-     * @param cimi The resource with values or reference
-     * @throws Exception If error in call service
-     */
-    protected void merge(final CimiContext context, final CimiMachineTemplateVolume cimi) throws Exception {
-        if (true == cimi.hasReference()) {
-            Volume dataService = this.managerVolume.getVolumeById(PathHelper.extractIdString(cimi.getHref()));
-            CimiVolume cimiRef = (CimiVolume) context.convertToCimi(dataService, CimiVolume.class);
-            this.merge(cimiRef, cimi);
-        }
-    }
-
-    /**
-     * Merge the reference of a resource only if necessary.
-     * 
-     * @param context The working context
-     * @param cimi The resource with values or reference
-     * @throws Exception If error in call service
-     */
-    protected void merge(final CimiContext context, final CimiMachineTemplateVolumeTemplate cimi) throws Exception {
-        if (true == cimi.hasReference()) {
-            VolumeTemplate dataService = this.managerVolume.getVolumeTemplateById(PathHelper.extractIdString(cimi.getHref()));
-            CimiVolumeTemplate cimiRef = (CimiVolumeTemplate) context.convertToCimi(dataService, CimiVolumeTemplate.class);
-            this.merge(cimiRef, cimi);
-        }
-    }
-
-    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
@@ -370,6 +355,165 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiVolumeVolumeImage cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            VolumeVolumeImage dataService = this.managerVolume.getVolumeImageFromVolume(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiVolumeVolumeImage cimiRef = (CimiVolumeVolumeImage) context.convertToCimi(dataService,
+                CimiVolumeVolumeImage.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemCreate cimi) throws Exception {
+        this.merge(context, cimi.getSystemTemplate());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemTemplate cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            SystemTemplate dataService = this.managerSystem.getSystemTemplateById(PathHelper.extractIdString(cimi.getHref()));
+            CimiSystemTemplate cimiRef = (CimiSystemTemplate) context.convertToCimi(dataService, CimiSystemTemplate.class);
+            this.merge(cimiRef, cimi);
+        } else {
+            if (null != cimi.getListComponentDescriptors()) {
+                Map<ExchangeType, CimiComponentDescriptor> mapComponents = this.makeMapComponents(cimi);
+                for (Entry<ExchangeType, CimiComponentDescriptor> entry : mapComponents.entrySet()) {
+                    switch (entry.getKey()) {
+                    case CredentialTemplate:
+                        this.merge(context, entry.getValue().getCredentialTemplate());
+                        break;
+                    case MachineTemplate:
+                        this.merge(context, entry.getValue().getMachineTemplate());
+                        break;
+                    case SystemTemplate:
+                        this.merge(context, entry.getValue().getSystemTemplate());
+                        break;
+                    case VolumeTemplate:
+                        this.merge(context, entry.getValue().getVolumeTemplate());
+                        break;
+                    default:
+                        throw new ConfigurationException("This type [" + entry.getKey().toString()
+                            + "] is unknown. Merging is impossible.");
+                    }
+                }
+            }
+
+        }
+    }
+
+    /**
+     * Make a map by ExchangeType and ComponentDescriptors with all components
+     * of SystemTemplate.
+     * 
+     * @param cimi The SystemTemplate
+     * @return The map
+     */
+    protected Map<ExchangeType, CimiComponentDescriptor> makeMapComponents(final CimiSystemTemplate cimi) {
+        Map<ExchangeType, CimiComponentDescriptor> map = new HashMap<ExchangeType, CimiComponentDescriptor>();
+        if (null != cimi.getListComponentDescriptors()) {
+            for (CimiComponentDescriptor cimiComponent : cimi.getListComponentDescriptors()) {
+                map.put(cimiComponent.getComponent().getExchangeType(), cimiComponent);
+            }
+        }
+        return map;
+    }
+
+    /**
+     * Merge SystemTemplate resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystemTemplate cimiRef, final CimiSystemTemplate cimi) {
+        if (null != cimiRef) {
+            CimiComponentDescriptor component;
+            CimiComponentDescriptor componentRef;
+            List<CimiComponentDescriptor> toAdd = new ArrayList<CimiComponentDescriptor>();
+
+            // Merge common data
+            this.mergeObjectCommon(cimiRef, cimi);
+            // Make maps to identify componenent with his ExchangeType
+            Map<ExchangeType, CimiComponentDescriptor> mapComponents = this.makeMapComponents(cimi);
+            Map<ExchangeType, CimiComponentDescriptor> mapRefComponents = this.makeMapComponents(cimiRef);
+            // For each ExchangeType possible : stores the new references in a
+            // list and merges the others
+            for (ExchangeType type : CimiComponentDescriptor.TYPE_DESCRIPTORS) {
+                component = mapComponents.get(type);
+                componentRef = mapRefComponents.get(type);
+                if (null == component) {
+                    if (null != componentRef) {
+                        toAdd.add(componentRef);
+                    }
+                } else {
+                    this.merge(componentRef, component);
+                }
+            }
+            // Add the new references
+            cimi.addAllComponentDescriptors(toAdd);
+        }
+    }
+
+    /**
+     * Merge CimiComponentDescriptor data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiComponentDescriptor cimiRef, final CimiComponentDescriptor cimi) {
+        if (null != cimiRef) {
+            this.mergeDataCommon(cimiRef, cimi);
+            if (null == cimi.getQuantity()) {
+                cimi.setQuantity(cimiRef.getQuantity());
+            }
+            if (null == cimi.getType()) {
+                cimi.setType(cimiRef.getType());
+            }
+            if (null == cimi.getComponent()) {
+                cimi.setComponent(cimiRef.getComponent());
+            } else {
+                for (ExchangeType type : CimiComponentDescriptor.TYPE_DESCRIPTORS) {
+                    switch (type) {
+                    case CredentialTemplate:
+                        this.merge(cimiRef.getCredentialTemplate(), cimi.getCredentialTemplate());
+                        break;
+                    case MachineTemplate:
+                        this.merge(cimiRef.getMachineTemplate(), cimi.getMachineTemplate());
+                        break;
+                    case SystemTemplate:
+                        this.merge(cimiRef.getSystemTemplate(), cimi.getSystemTemplate());
+                        break;
+                    case VolumeTemplate:
+                        this.merge(cimiRef.getVolumeTemplate(), cimi.getVolumeTemplate());
+                        break;
+                    default:
+                        throw new ConfigurationException("This type is unknown : " + type.toString());
+                    }
+                }
+            }
+        }
+    }
+
+    /**
      * Merge MachineTemplate resource data.
      * 
      * @param cimiRef Source to merge
@@ -377,7 +521,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiMachineTemplate cimiRef, final CimiMachineTemplate cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getCredential()) {
                 cimi.setCredential(cimiRef.getCredential());
             } else {
@@ -408,6 +552,36 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    protected void merge(final CimiContext context, final CimiMachineTemplateVolume cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            Volume dataService = this.managerVolume.getVolumeById(PathHelper.extractIdString(cimi.getHref()));
+            CimiVolume cimiRef = (CimiVolume) context.convertToCimi(dataService, CimiVolume.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    protected void merge(final CimiContext context, final CimiMachineTemplateVolumeTemplate cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            VolumeTemplate dataService = this.managerVolume.getVolumeTemplateById(PathHelper.extractIdString(cimi.getHref()));
+            CimiVolumeTemplate cimiRef = (CimiVolumeTemplate) context.convertToCimi(dataService, CimiVolumeTemplate.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
      * Merge Volume resource data.
      * 
      * @param cimiRef Source to merge
@@ -415,7 +589,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiVolume cimiRef, final CimiVolume cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getBootable()) {
                 cimi.setBootable(cimiRef.getBootable());
             }
@@ -444,7 +618,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiVolumeConfiguration cimiRef, final CimiVolumeConfiguration cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getCapacity()) {
                 cimi.setCapacity(cimiRef.getCapacity());
             }
@@ -465,7 +639,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiVolumeImage cimiRef, final CimiVolumeImage cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getBootable()) {
                 cimi.setBootable(cimiRef.getBootable());
             }
@@ -479,6 +653,23 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
+     * Merge VolumeVolumeImage resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiVolumeVolumeImage cimiRef, final CimiVolumeVolumeImage cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getVolumeImage()) {
+                cimi.setVolumeImage(cimiRef.getVolumeImage());
+            } else {
+                this.merge(cimiRef.getVolumeImage(), cimi.getVolumeImage());
+            }
+        }
+    }
+
+    /**
      * Merge VolumeTemplate resource data.
      * 
      * @param cimiRef Source to merge
@@ -486,7 +677,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiVolumeTemplate cimiRef, final CimiVolumeTemplate cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getVolumeConfig()) {
                 cimi.setVolumeConfig(cimiRef.getVolumeConfig());
             } else {
@@ -551,7 +742,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiCredential cimiRef, final CimiCredential cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getKey()) {
                 cimi.setKey(cimiRef.getKey());
             }
@@ -572,7 +763,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiMachineImage cimiRef, final CimiMachineImage cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getImageLocation()) {
                 cimi.setImageLocation(cimiRef.getImageLocation());
             }
@@ -587,7 +778,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiMachineConfiguration cimiRef, final CimiMachineConfiguration cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getCpu()) {
                 cimi.setCpu(cimiRef.getCpu());
             }
@@ -617,10 +808,23 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      * @param cimiRef Source to merge
      * @param cimi Merged destination
      */
-    protected void mergeCommon(final CimiObjectCommon cimiRef, final CimiObjectCommon cimi) {
+    protected void mergeObjectCommon(final CimiObjectCommon cimiRef, final CimiObjectCommon cimi) {
+        this.mergeDataCommon(cimiRef, cimi);
         if (null == cimi.getId()) {
             cimi.setId(cimiRef.getId());
         }
+        if (null == cimi.getResourceURI()) {
+            cimi.setResourceURI(cimiRef.getResourceURI());
+        }
+    }
+
+    /**
+     * Merge common data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void mergeDataCommon(final CimiDataCommon cimiRef, final CimiDataCommon cimi) {
         if (null == cimi.getDescription()) {
             cimi.setDescription(cimiRef.getDescription());
         }
@@ -641,9 +845,6 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
                 }
             }
         }
-        if (null == cimi.getResourceURI()) {
-            cimi.setResourceURI(cimiRef.getResourceURI());
-        }
     }
 
     /**
@@ -654,7 +855,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiMachineDisk cimiRef, final CimiMachineDisk cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getCapacity()) {
                 cimi.setCapacity(cimiRef.getCapacity());
             }
@@ -672,7 +873,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiMachineVolume cimiRef, final CimiMachineVolume cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getInitialLocation()) {
                 cimi.setInitialLocation(cimiRef.getInitialLocation());
             }
@@ -692,7 +893,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiMachineNetworkInterface cimiRef, final CimiMachineNetworkInterface cimi) {
         if (null != cimiRef) {
-            this.mergeCommon(cimiRef, cimi);
+            this.mergeObjectCommon(cimiRef, cimi);
 
             if (null == cimi.getMacAddress()) {
                 cimi.setMacAddress(cimiRef.getMacAddress());

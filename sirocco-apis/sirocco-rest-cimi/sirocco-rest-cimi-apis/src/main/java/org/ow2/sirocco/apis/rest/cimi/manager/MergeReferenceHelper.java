@@ -34,10 +34,13 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 
 /**
@@ -175,5 +178,32 @@ public interface MergeReferenceHelper {
      * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
+    void merge(CimiContext context, CimiVolumeVolumeImage cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
     void merge(CimiContext context, CimiVolumeTemplate cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    void merge(CimiContext context, CimiSystemCreate cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    void merge(CimiContext context, CimiSystemTemplate cimi) throws Exception;
 }

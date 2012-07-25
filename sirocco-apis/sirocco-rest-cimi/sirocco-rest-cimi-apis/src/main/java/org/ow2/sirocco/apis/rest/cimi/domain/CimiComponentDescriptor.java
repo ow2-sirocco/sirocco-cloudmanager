@@ -44,6 +44,10 @@ public class CimiComponentDescriptor extends CimiCommon {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
+    /** Array of all types of descriptor. */
+    public static final ExchangeType[] TYPE_DESCRIPTORS = {ExchangeType.CredentialTemplate, ExchangeType.MachineTemplate,
+        ExchangeType.SystemTemplate, ExchangeType.VolumeTemplate};
+
     /**
      * Field "type".
      */
@@ -129,7 +133,7 @@ public class CimiComponentDescriptor extends CimiCommon {
      * 
      * @return The value
      */
-    public CimiCredentialTemplate getCredentialsTemplate() {
+    public CimiCredentialTemplate getCredentialTemplate() {
         CimiCredentialTemplate template = null;
         if (this.component instanceof CimiCredentialTemplate) {
             template = (CimiCredentialTemplate) this.component;
