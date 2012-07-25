@@ -30,14 +30,13 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkNetworkPortCollection;
 
 /**
- * Class Network.
+ * Class NetworkPort.
  */
-@XmlRootElement(name = "Network")
+@XmlRootElement(name = "NetworkPort")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiNetwork extends CimiObjectCommonAbstract {
+public class CimiNetworkPort extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -45,20 +44,14 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
     /** Field "state". */
     private String state;
 
-    /** Field "networkType". */
-    private String networkType;
+    /** Field "network". */
+    private CimiNetwork network;
 
-    /** Field "mtu". */
-    private Integer mtu;
+    /** Field "portType". */
+    private String portType;
 
     /** Field "classOfService". */
     private String classOfService;
-
-    /** Field "networkPorts". */
-    private CimiNetworkNetworkPortCollection networkPorts;
-
-    /** Field "forwardingGroup". */
-    private CimiForwardingGroup forwardingGroup;
 
     /** Field "eventLog". */
     private CimiEventLog eventLog;
@@ -66,7 +59,7 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
     /**
      * Default constructor.
      */
-    public CimiNetwork() {
+    public CimiNetworkPort() {
         super();
     }
 
@@ -75,7 +68,7 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
      * 
      * @param href The reference
      */
-    public CimiNetwork(final String href) {
+    public CimiNetworkPort(final String href) {
         super(href);
     }
 
@@ -98,39 +91,39 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
     }
 
     /**
-     * Return the value of field "networkType".
+     * Return the value of field "network".
      * 
      * @return The value
      */
-    public String getNetworkType() {
-        return this.networkType;
+    public CimiNetwork getNetwork() {
+        return this.network;
     }
 
     /**
-     * Set the value of field "networkType".
+     * Set the value of field "network".
      * 
-     * @param networkType The value
+     * @param network The value
      */
-    public void setNetworkType(final String networkType) {
-        this.networkType = networkType;
+    public void setNetwork(final CimiNetwork network) {
+        this.network = network;
     }
 
     /**
-     * Return the value of field "mtu".
+     * Return the value of field "portType".
      * 
      * @return The value
      */
-    public Integer getMtu() {
-        return this.mtu;
+    public String getPortType() {
+        return this.portType;
     }
 
     /**
-     * Set the value of field "mtu".
+     * Set the value of field "portType".
      * 
-     * @param mtu The value
+     * @param portType The value
      */
-    public void setMtu(final Integer mtu) {
-        this.mtu = mtu;
+    public void setPortType(final String portType) {
+        this.portType = portType;
     }
 
     /**
@@ -149,42 +142,6 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
      */
     public void setClassOfService(final String classOfService) {
         this.classOfService = classOfService;
-    }
-
-    /**
-     * Return the value of field "networkPorts".
-     * 
-     * @return The value
-     */
-    public CimiNetworkNetworkPortCollection getNetworkPorts() {
-        return this.networkPorts;
-    }
-
-    /**
-     * Set the value of field "networkPorts".
-     * 
-     * @param networkPorts The value
-     */
-    public void setNetworkPorts(final CimiNetworkNetworkPortCollection networkPorts) {
-        this.networkPorts = networkPorts;
-    }
-
-    /**
-     * Return the value of field "forwardingGroup".
-     * 
-     * @return The value
-     */
-    public CimiForwardingGroup getForwardingGroup() {
-        return this.forwardingGroup;
-    }
-
-    /**
-     * Set the value of field "forwardingGroup".
-     * 
-     * @param forwardingGroup The value
-     */
-    public void setForwardingGroup(final CimiForwardingGroup forwardingGroup) {
-        this.forwardingGroup = forwardingGroup;
     }
 
     /**

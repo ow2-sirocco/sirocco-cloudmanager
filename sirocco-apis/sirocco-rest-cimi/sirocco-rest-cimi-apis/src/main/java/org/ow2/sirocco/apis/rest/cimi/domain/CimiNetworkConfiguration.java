@@ -30,20 +30,16 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkNetworkPortCollection;
 
 /**
- * Class Network.
+ * Class NetworkConfiguration.
  */
-@XmlRootElement(name = "Network")
+@XmlRootElement(name = "NetworkConfiguration")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiNetwork extends CimiObjectCommonAbstract {
+public class CimiNetworkConfiguration extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
-
-    /** Field "state". */
-    private String state;
 
     /** Field "networkType". */
     private String networkType;
@@ -54,19 +50,10 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
     /** Field "classOfService". */
     private String classOfService;
 
-    /** Field "networkPorts". */
-    private CimiNetworkNetworkPortCollection networkPorts;
-
-    /** Field "forwardingGroup". */
-    private CimiForwardingGroup forwardingGroup;
-
-    /** Field "eventLog". */
-    private CimiEventLog eventLog;
-
     /**
      * Default constructor.
      */
-    public CimiNetwork() {
+    public CimiNetworkConfiguration() {
         super();
     }
 
@@ -75,26 +62,8 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
      * 
      * @param href The reference
      */
-    public CimiNetwork(final String href) {
+    public CimiNetworkConfiguration(final String href) {
         super(href);
-    }
-
-    /**
-     * Return the value of field "state".
-     * 
-     * @return The value
-     */
-    public String getState() {
-        return this.state;
-    }
-
-    /**
-     * Set the value of field "state".
-     * 
-     * @param state The value
-     */
-    public void setState(final String state) {
-        this.state = state;
     }
 
     /**
@@ -149,60 +118,6 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
      */
     public void setClassOfService(final String classOfService) {
         this.classOfService = classOfService;
-    }
-
-    /**
-     * Return the value of field "networkPorts".
-     * 
-     * @return The value
-     */
-    public CimiNetworkNetworkPortCollection getNetworkPorts() {
-        return this.networkPorts;
-    }
-
-    /**
-     * Set the value of field "networkPorts".
-     * 
-     * @param networkPorts The value
-     */
-    public void setNetworkPorts(final CimiNetworkNetworkPortCollection networkPorts) {
-        this.networkPorts = networkPorts;
-    }
-
-    /**
-     * Return the value of field "forwardingGroup".
-     * 
-     * @return The value
-     */
-    public CimiForwardingGroup getForwardingGroup() {
-        return this.forwardingGroup;
-    }
-
-    /**
-     * Set the value of field "forwardingGroup".
-     * 
-     * @param forwardingGroup The value
-     */
-    public void setForwardingGroup(final CimiForwardingGroup forwardingGroup) {
-        this.forwardingGroup = forwardingGroup;
-    }
-
-    /**
-     * Return the value of field "eventLog".
-     * 
-     * @return The value
-     */
-    public CimiEventLog getEventLog() {
-        return this.eventLog;
-    }
-
-    /**
-     * Set the value of field "eventLog".
-     * 
-     * @param eventLog The value
-     */
-    public void setEventLog(final CimiEventLog eventLog) {
-        this.eventLog = eventLog;
     }
 
     /**
