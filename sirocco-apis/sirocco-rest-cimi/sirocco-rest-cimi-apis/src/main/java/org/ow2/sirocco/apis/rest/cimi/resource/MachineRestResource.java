@@ -40,6 +40,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -133,6 +134,26 @@ public class MachineRestResource extends RestResourceAbstract {
     private CimiManager cimiManagerUpdateMachineNetworkInterface;
 
     @Autowired
+    @Qualifier("CimiManagerReadMachineNetworkInterfaceAddress")
+    private CimiManager cimiManagerReadMachineNetworkInterfaceAddress;
+
+    @Autowired
+    @Qualifier("CimiManagerReadMachineNetworkInterfaceAddressCollection")
+    private CimiManager cimiManagerReadMachineNetworkInterfaceAddressCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerCreateMachineNetworkInterfaceAddress")
+    private CimiManager cimiManagerCreateMachineNetworkInterfaceAddress;
+
+    @Autowired
+    @Qualifier("CimiManagerDeleteMachineNetworkInterfaceAddress")
+    private CimiManager cimiManagerDeleteMachineNetworkInterfaceAddress;
+
+    @Autowired
+    @Qualifier("CimiManagerUpdateMachineNetworkInterfaceAddress")
+    private CimiManager cimiManagerUpdateMachineNetworkInterfaceAddress;
+
+    @Autowired
     @Qualifier("CimiManagerReadMachineVolume")
     private CimiManager cimiManagerReadMachineVolume;
 
@@ -184,6 +205,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * Update a machine.
      * 
      * @param id The ID of machine to update
+     * @param cimiData Data to update
      * @return The REST response
      */
     @PUT
@@ -198,6 +220,7 @@ public class MachineRestResource extends RestResourceAbstract {
     /**
      * Create a machine.
      * 
+     * @param cimiData Data to create
      * @return The REST response
      */
     @POST
@@ -272,6 +295,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * 
      * @param idParent ID machine
      * @param id ID disk to update
+     * @param cimiData Data to update
      * @return The REST response
      */
     @PUT
@@ -288,6 +312,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * Create a disk of a machine.
      * 
      * @param idParent ID machine
+     * @param cimiData Data to create
      * @return The REST response
      */
     @POST
@@ -350,6 +375,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * 
      * @param idParent ID machine
      * @param id ID volume to update
+     * @param cimiData Data to update
      * @return The REST response
      */
     @PUT
@@ -366,6 +392,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * Create a volume of a machine.
      * 
      * @param idParent ID machine
+     * @param cimiData Data to create
      * @return The REST response
      */
     @POST
@@ -428,6 +455,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * 
      * @param idParent ID machine
      * @param id ID networkInterface to update
+     * @param cimiData Data to update
      * @return The REST response
      */
     @PUT
@@ -444,6 +472,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * Create a networkInterface of a machine.
      * 
      * @param idParent ID machine
+     * @param cimiData Data to create
      * @return The REST response
      */
     @POST
@@ -468,6 +497,101 @@ public class MachineRestResource extends RestResourceAbstract {
     public Response deleteNetworkInterface(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
         this.cimiManagerDeleteMachineNetworkInterface.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a collection of addresses of a networkInterface of a machine.
+     * 
+     * @param idGrandParent ID machine
+     * @param idParent ID networkInterface in machine
+     * @return
+     */
+    @GET
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readAddresses(@PathParam("idGrandParent") final String idGrandParent,
+        @PathParam("idParent") final String idParent) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent,
+            idGrandParent));
+        this.cimiManagerReadMachineNetworkInterfaceAddressCollection.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a address of a networkInterface of a machine.
+     * 
+     * @param idGrandParent ID machine
+     * @param idParent ID networkInterface in machine
+     * @param id ID address to read
+     * @return The REST response
+     */
+    @GET
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readAddress(@PathParam("idGrandParent") final String idGrandParent,
+        @PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(),
+            new IdRequest(id, idParent, idGrandParent));
+        this.cimiManagerReadMachineNetworkInterfaceAddress.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Create a address of a networkInterface of a machine.
+     * 
+     * @param idGrandParent ID machine
+     * @param idParent ID networkInterface in machine
+     * @param cimiData Data to create
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH)
+    public Response createAddress(@PathParam("idGrandParent") final String idGrandParent,
+        @PathParam("idParent") final String idParent, final CimiMachineNetworkInterfaceAddress cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent,
+            idGrandParent), cimiData);
+        this.cimiManagerCreateMachineNetworkInterfaceAddress.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Delete a address of a networkInterface of a machine.
+     * 
+     * @param idGrandParent ID machine
+     * @param idParent ID networkInterface in machine
+     * @param id ID address to delete
+     * @return The REST response
+     */
+    @DELETE
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
+    public Response deleteAddress(@PathParam("idGrandParent") final String idGrandParent,
+        @PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(),
+            new IdRequest(id, idParent, idGrandParent));
+        this.cimiManagerDeleteMachineNetworkInterfaceAddress.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Update a address of a networkInterface of a machine.
+     * 
+     * @param idGrandParent ID machine
+     * @param idParent ID networkInterface in machine
+     * @param id ID address to update
+     * @param cimiData Data to update
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
+    public Response updateAddress(@PathParam("idGrandParent") final String idGrandParent,
+        @PathParam("idParent") final String idParent, @PathParam("id") final String id,
+        final CimiMachineNetworkInterfaceAddress cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(),
+            new IdRequest(id, idParent, idGrandParent), cimiData);
+        this.cimiManagerUpdateMachineNetworkInterfaceAddress.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
 
