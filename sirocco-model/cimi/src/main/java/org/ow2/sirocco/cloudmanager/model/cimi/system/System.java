@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi.system;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
@@ -36,6 +37,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
@@ -43,6 +45,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ICloudProviderResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
 @Table(name = "SYSTEMINSTANCE")
@@ -69,6 +72,9 @@ public class System extends CloudResource implements Serializable, ICloudProvide
     private List<SystemNetwork> networks;
 
     private CloudProviderAccount cloudProviderAccount;
+
+    @Transient
+    private static transient FSM<System.State, String> fsm = System.initFSM();
 
     public System() {
     }
@@ -153,6 +159,73 @@ public class System extends CloudResource implements Serializable, ICloudProvide
 
     public void setNetworks(final List<SystemNetwork> networks) {
         this.networks = networks;
+    }
+
+    @Transient
+    public Set<String> getOperations() {
+        Set<String> operations = System.fsm.getActionsAtState(this.state);
+        operations.remove(new String("internal"));
+        return operations;
+    }
+
+    private static FSM<System.State, String> initFSM() {
+        System.fsm = new FSM<System.State, String>(State.CREATING);
+        System.fsm.addAction(State.CREATING, "delete", State.DELETING);
+        System.fsm.addAction(State.CREATING, "delete", State.ERROR);
+        System.fsm.addAction(State.CREATING, "internal", State.STOPPED);
+        System.fsm.addAction(State.CREATING, "internal", State.ERROR);
+        System.fsm.addAction(State.ERROR, "start", State.STARTING);
+        System.fsm.addAction(State.ERROR, "stop", State.STOPPING);
+        System.fsm.addAction(State.ERROR, "restart", State.STARTING);
+        System.fsm.addAction(State.ERROR, "delete", State.DELETING);
+
+        System.fsm.addAction(State.STOPPED, "start", State.STARTING);
+        System.fsm.addAction(State.STOPPED, "delete", State.DELETING);
+        System.fsm.addAction(State.STOPPED, "restart", State.STARTING);
+
+        System.fsm.addAction(State.STARTING, "internal", State.STARTED);
+        System.fsm.addAction(State.STARTING, "start", State.STARTING);
+        System.fsm.addAction(State.STARTING, "restart", State.STARTING);
+        System.fsm.addAction(State.STARTING, "delete", State.DELETING);
+        System.fsm.addAction(State.STARTING, "stop", State.STOPPING);
+
+        System.fsm.addAction(State.STARTED, "restart", State.STARTING);
+        System.fsm.addAction(State.STARTED, "stop", State.STOPPING);
+        System.fsm.addAction(State.STARTED, "delete", State.DELETING);
+        System.fsm.addAction(State.STARTED, "pause", State.PAUSING);
+        System.fsm.addAction(State.STARTED, "suspend", State.SUSPENDING);
+
+        System.fsm.addAction(State.STOPPING, "internal", State.STOPPED);
+        System.fsm.addAction(State.STOPPING, "start", State.STARTING);
+        System.fsm.addAction(State.STOPPING, "restart", State.STARTING);
+        System.fsm.addAction(State.STOPPING, "delete", State.DELETING);
+
+        System.fsm.addAction(State.STOPPED, "start", State.STARTING);
+        System.fsm.addAction(State.STOPPED, "restart", State.STARTING);
+        System.fsm.addAction(State.STOPPED, "delete", State.DELETING);
+
+        System.fsm.addAction(State.PAUSING, "internal", State.PAUSED);
+        System.fsm.addAction(State.PAUSING, "start", State.STARTING);
+        System.fsm.addAction(State.PAUSING, "restart", State.STARTING);
+        System.fsm.addAction(State.PAUSING, "delete", State.DELETING);
+
+        System.fsm.addAction(State.PAUSED, "start", State.STARTING);
+        System.fsm.addAction(State.PAUSED, "restart", State.STARTING);
+        System.fsm.addAction(State.PAUSED, "stop", State.STOPPING);
+        System.fsm.addAction(State.PAUSED, "delete", State.DELETING);
+
+        System.fsm.addAction(State.SUSPENDING, "start", State.STARTING);
+        System.fsm.addAction(State.SUSPENDING, "restart", State.STARTING);
+        System.fsm.addAction(State.SUSPENDING, "delete", State.DELETING);
+        System.fsm.addAction(State.SUSPENDING, "internal", State.SUSPENDED);
+
+        System.fsm.addAction(State.SUSPENDED, "start", State.STARTING);
+        System.fsm.addAction(State.SUSPENDED, "restart", State.STARTING);
+        System.fsm.addAction(State.SUSPENDED, "delete", State.DELETING);
+
+        System.fsm.addAction(State.DELETING, "delete", State.DELETING);
+        System.fsm.addAction(State.DELETING, "internal", State.DELETED);
+        return System.fsm;
     }
 
 }
