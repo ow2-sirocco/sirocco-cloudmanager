@@ -462,7 +462,6 @@ public class MachineManager implements IMachineManager {
         if (m.getVolumes() != null) {
             m.getVolumes().size();
         }
-        m.initFSM();
     }
 
     @Override
@@ -494,7 +493,6 @@ public class MachineManager implements IMachineManager {
         if (m == null) {
             throw new ResourceNotFoundException("Machine " + machineId + " not found");
         }
-        m.initFSM();
         Set<String> actions = m.getOperations();
         if (actions.contains(action) == false) {
             throw new BadStateException(" Cannot " + action + "  machine at state " + m.getState());

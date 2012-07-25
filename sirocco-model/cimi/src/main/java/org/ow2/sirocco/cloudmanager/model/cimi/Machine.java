@@ -79,7 +79,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     private CloudProviderAccount cloudProviderAccount;
 
     @Transient
-    private transient FSM<Machine.State, String> fsm;
+    private static transient FSM<Machine.State, String> fsm = Machine.initFSM();
 
     public Machine() {
         this.networkInterfaces = new ArrayList<MachineNetworkInterface>();
@@ -182,74 +182,75 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
      * Ideally: create and persist an FSM per entity per provider. Machines
      * should then refer appropriate FSM.
      */
-    public void initFSM() {
-        this.fsm = new FSM<Machine.State, String>(State.CREATING);
-        this.fsm.addAction(State.CREATING, "delete", State.DELETING);
-        this.fsm.addAction(State.CREATING, "delete", State.ERROR);
-        this.fsm.addAction(State.CREATING, "internal", State.STOPPED);
-        this.fsm.addAction(State.CREATING, "internal", State.ERROR);
-        this.fsm.addAction(State.ERROR, "start", State.STARTING);
-        this.fsm.addAction(State.ERROR, "stop", State.STOPPING);
-        this.fsm.addAction(State.ERROR, "restart", State.STARTING);
-        this.fsm.addAction(State.ERROR, "delete", State.DELETING);
+    private static FSM<Machine.State, String> initFSM() {
+        Machine.fsm = new FSM<Machine.State, String>(State.CREATING);
+        Machine.fsm.addAction(State.CREATING, "delete", State.DELETING);
+        Machine.fsm.addAction(State.CREATING, "delete", State.ERROR);
+        Machine.fsm.addAction(State.CREATING, "internal", State.STOPPED);
+        Machine.fsm.addAction(State.CREATING, "internal", State.ERROR);
+        Machine.fsm.addAction(State.ERROR, "start", State.STARTING);
+        Machine.fsm.addAction(State.ERROR, "stop", State.STOPPING);
+        Machine.fsm.addAction(State.ERROR, "restart", State.STARTING);
+        Machine.fsm.addAction(State.ERROR, "delete", State.DELETING);
 
-        this.fsm.addAction(State.STOPPED, "start", State.STARTING);
-        this.fsm.addAction(State.STOPPED, "delete", State.DELETING);
-        this.fsm.addAction(State.STOPPED, "capture", State.STOPPED);
-        this.fsm.addAction(State.STOPPED, "restart", State.STARTING);
+        Machine.fsm.addAction(State.STOPPED, "start", State.STARTING);
+        Machine.fsm.addAction(State.STOPPED, "delete", State.DELETING);
+        Machine.fsm.addAction(State.STOPPED, "capture", State.STOPPED);
+        Machine.fsm.addAction(State.STOPPED, "restart", State.STARTING);
 
-        this.fsm.addAction(State.STARTING, "internal", State.STARTED);
-        this.fsm.addAction(State.STARTING, "start", State.STARTING);
-        this.fsm.addAction(State.STARTING, "restart", State.STARTING);
-        this.fsm.addAction(State.STARTING, "delete", State.DELETING);
-        this.fsm.addAction(State.STARTING, "stop", State.STOPPING);
+        Machine.fsm.addAction(State.STARTING, "internal", State.STARTED);
+        Machine.fsm.addAction(State.STARTING, "start", State.STARTING);
+        Machine.fsm.addAction(State.STARTING, "restart", State.STARTING);
+        Machine.fsm.addAction(State.STARTING, "delete", State.DELETING);
+        Machine.fsm.addAction(State.STARTING, "stop", State.STOPPING);
 
-        this.fsm.addAction(State.STARTED, "restart", State.STARTING);
-        this.fsm.addAction(State.STARTED, "stop", State.STOPPING);
-        this.fsm.addAction(State.STARTED, "delete", State.DELETING);
-        this.fsm.addAction(State.STARTED, "capture", State.STARTED);
-        this.fsm.addAction(State.STARTED, "pause", State.PAUSING);
-        this.fsm.addAction(State.STARTED, "suspend", State.SUSPENDING);
+        Machine.fsm.addAction(State.STARTED, "restart", State.STARTING);
+        Machine.fsm.addAction(State.STARTED, "stop", State.STOPPING);
+        Machine.fsm.addAction(State.STARTED, "delete", State.DELETING);
+        Machine.fsm.addAction(State.STARTED, "capture", State.STARTED);
+        Machine.fsm.addAction(State.STARTED, "pause", State.PAUSING);
+        Machine.fsm.addAction(State.STARTED, "suspend", State.SUSPENDING);
 
-        this.fsm.addAction(State.STOPPING, "internal", State.STOPPED);
-        this.fsm.addAction(State.STOPPING, "start", State.STARTING);
-        this.fsm.addAction(State.STOPPING, "restart", State.STARTING);
-        this.fsm.addAction(State.STOPPING, "delete", State.DELETING);
+        Machine.fsm.addAction(State.STOPPING, "internal", State.STOPPED);
+        Machine.fsm.addAction(State.STOPPING, "start", State.STARTING);
+        Machine.fsm.addAction(State.STOPPING, "restart", State.STARTING);
+        Machine.fsm.addAction(State.STOPPING, "delete", State.DELETING);
 
-        this.fsm.addAction(State.STOPPED, "start", State.STARTING);
-        this.fsm.addAction(State.STOPPED, "restart", State.STARTING);
-        this.fsm.addAction(State.STOPPED, "capture", State.STOPPED);
-        this.fsm.addAction(State.STOPPED, "delete", State.DELETING);
+        Machine.fsm.addAction(State.STOPPED, "start", State.STARTING);
+        Machine.fsm.addAction(State.STOPPED, "restart", State.STARTING);
+        Machine.fsm.addAction(State.STOPPED, "capture", State.STOPPED);
+        Machine.fsm.addAction(State.STOPPED, "delete", State.DELETING);
 
-        this.fsm.addAction(State.PAUSING, "internal", State.PAUSED);
-        this.fsm.addAction(State.PAUSING, "start", State.STARTING);
-        this.fsm.addAction(State.PAUSING, "restart", State.STARTING);
-        this.fsm.addAction(State.PAUSING, "delete", State.DELETING);
+        Machine.fsm.addAction(State.PAUSING, "internal", State.PAUSED);
+        Machine.fsm.addAction(State.PAUSING, "start", State.STARTING);
+        Machine.fsm.addAction(State.PAUSING, "restart", State.STARTING);
+        Machine.fsm.addAction(State.PAUSING, "delete", State.DELETING);
 
-        this.fsm.addAction(State.PAUSED, "start", State.STARTING);
-        this.fsm.addAction(State.PAUSED, "capture", State.PAUSED);
-        this.fsm.addAction(State.PAUSED, "restart", State.STARTING);
-        this.fsm.addAction(State.PAUSED, "stop", State.STOPPING);
-        this.fsm.addAction(State.PAUSED, "delete", State.DELETING);
+        Machine.fsm.addAction(State.PAUSED, "start", State.STARTING);
+        Machine.fsm.addAction(State.PAUSED, "capture", State.PAUSED);
+        Machine.fsm.addAction(State.PAUSED, "restart", State.STARTING);
+        Machine.fsm.addAction(State.PAUSED, "stop", State.STOPPING);
+        Machine.fsm.addAction(State.PAUSED, "delete", State.DELETING);
 
-        this.fsm.addAction(State.SUSPENDING, "start", State.STARTING);
-        this.fsm.addAction(State.SUSPENDING, "restart", State.STARTING);
-        this.fsm.addAction(State.SUSPENDING, "delete", State.DELETING);
-        this.fsm.addAction(State.SUSPENDING, "internal", State.SUSPENDED);
+        Machine.fsm.addAction(State.SUSPENDING, "start", State.STARTING);
+        Machine.fsm.addAction(State.SUSPENDING, "restart", State.STARTING);
+        Machine.fsm.addAction(State.SUSPENDING, "delete", State.DELETING);
+        Machine.fsm.addAction(State.SUSPENDING, "internal", State.SUSPENDED);
 
-        this.fsm.addAction(State.SUSPENDED, "start", State.STARTING);
-        this.fsm.addAction(State.SUSPENDED, "restart", State.STARTING);
-        this.fsm.addAction(State.SUSPENDED, "capture", State.SUSPENDED);
-        this.fsm.addAction(State.SUSPENDED, "delete", State.DELETING);
+        Machine.fsm.addAction(State.SUSPENDED, "start", State.STARTING);
+        Machine.fsm.addAction(State.SUSPENDED, "restart", State.STARTING);
+        Machine.fsm.addAction(State.SUSPENDED, "capture", State.SUSPENDED);
+        Machine.fsm.addAction(State.SUSPENDED, "delete", State.DELETING);
 
-        this.fsm.addAction(State.DELETING, "delete", State.DELETING);
-        this.fsm.addAction(State.DELETING, "internal", State.DELETED);
+        Machine.fsm.addAction(State.DELETING, "delete", State.DELETING);
+        Machine.fsm.addAction(State.DELETING, "internal", State.DELETED);
+        return Machine.fsm;
     }
 
     /** get operations allowed in this state */
     @Transient
     public Set<String> getOperations() {
-        Set<String> operations = this.fsm.getActionsAtState(this.state);
+        Set<String> operations = Machine.fsm.getActionsAtState(this.state);
         operations.remove(new String("internal"));
         return operations;
     }
