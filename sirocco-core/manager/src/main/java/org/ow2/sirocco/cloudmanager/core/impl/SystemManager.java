@@ -297,6 +297,7 @@ public class SystemManager implements ISystemManager {
             try {
                 job = connector.getSystemService().createSystem(systemCreate);
             } catch (ConnectorException e) {
+                SystemManager.logger.info("system creation failed", e);
                 throw new CloudProviderException("system creation failed");
             }
             // job returned by connector is a copy of the real connector job
@@ -1322,6 +1323,7 @@ public class SystemManager implements ISystemManager {
         try {
             return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
         } catch (ConnectorException e) {
+            SystemManager.logger.info("Connector error", e);
             throw new CloudProviderException(e.getMessage());
         }
     }
@@ -1360,39 +1362,47 @@ public class SystemManager implements ISystemManager {
         List<SystemNetwork> networks = providerSystem.getNetworks();
 
         // creating and adding objects
-        for (SystemNetwork sn : networks) {
-            sn.getNetwork().setUser(user);
-            sn.getNetwork().setCloudProviderAccount(account);
-            sn.getNetwork().setLocation(location);
-            this.em.persist(sn);
+        if (networks != null) {
+            for (SystemNetwork sn : networks) {
+                sn.getNetwork().setUser(user);
+                sn.getNetwork().setCloudProviderAccount(account);
+                sn.getNetwork().setLocation(location);
+                this.em.persist(sn);
+            }
         }
         this.em.flush();
-        for (SystemVolume sv : volumes) {
-            sv.getVolume().setUser(user);
-            sv.getVolume().setCloudProviderAccount(account);
-            sv.getVolume().setLocation(location);
-            this.em.persist(sv);
+        if (volumes != null) {
+            for (SystemVolume sv : volumes) {
+                sv.getVolume().setUser(user);
+                sv.getVolume().setCloudProviderAccount(account);
+                sv.getVolume().setLocation(location);
+                this.em.persist(sv);
+            }
         }
         this.em.flush();
-        for (SystemMachine sm : machines) {
-            Machine mach = sm.getMachine();
-            mach.setUser(user);
-            mach.setCloudProviderAccount(account);
-            mach.setLocation(location);
-            mach.setCreated(new Date());
+        if (machines != null) {
+            for (SystemMachine sm : machines) {
+                Machine mach = sm.getMachine();
+                mach.setUser(user);
+                mach.setCloudProviderAccount(account);
+                mach.setLocation(location);
+                mach.setCreated(new Date());
 
-            this.machineManager.persistMachineInSystem(mach);
-            this.em.flush();
-            this.em.persist(sm);
+                this.machineManager.persistMachineInSystem(mach);
+                this.em.flush();
+                this.em.persist(sm);
 
+            }
         }
         this.em.flush();
-        for (SystemSystem ss : systems) {
-            ss.getSystem().setCloudProviderAccount(account);
-            ss.getSystem().setLocation(location);
-            ss.getSystem().setUser(user);
-            this.persistSystemContent((System) ss.getResource(), user, account, location);
-            this.em.persist(ss);
+        if (systems != null) {
+            for (SystemSystem ss : systems) {
+                ss.getSystem().setCloudProviderAccount(account);
+                ss.getSystem().setLocation(location);
+                ss.getSystem().setUser(user);
+                this.persistSystemContent((System) ss.getResource(), user, account, location);
+                this.em.persist(ss);
+            }
         }
         this.em.flush();
     }
@@ -1417,40 +1427,48 @@ public class SystemManager implements ISystemManager {
 
         // syncing objects status
 
-        for (SystemMachine sn : machines) {
-            Machine lmanaged = (Machine) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                .getProviderAssignedId());
-            lmanaged.setState(((Machine) sn.getResource()).getState());
-            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                // lmanaged.setState(Machine.State.DELETED);
-                this.machineManager.deleteMachineInSystem(lmanaged);
+        if (machines != null) {
+            for (SystemMachine sn : machines) {
+                Machine lmanaged = (Machine) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+                    .getProviderAssignedId());
+                lmanaged.setState(((Machine) sn.getResource()).getState());
+                if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+                    // lmanaged.setState(Machine.State.DELETED);
+                    this.machineManager.deleteMachineInSystem(lmanaged);
+                }
             }
         }
 
-        for (SystemVolume sn : volumes) {
-            Volume lmanaged = (Volume) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                .getProviderAssignedId());
-            lmanaged.setState(((Volume) sn.getResource()).getState());
-            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                lmanaged.setState(Volume.State.DELETED);
+        if (volumes != null) {
+            for (SystemVolume sn : volumes) {
+                Volume lmanaged = (Volume) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+                    .getProviderAssignedId());
+                lmanaged.setState(((Volume) sn.getResource()).getState());
+                if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+                    lmanaged.setState(Volume.State.DELETED);
+                }
             }
         }
-        for (SystemNetwork sn : networks) {
-            Network lmanaged = (Network) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                .getProviderAssignedId());
-            lmanaged.setState(((Network) sn.getResource()).getState());
-            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                lmanaged.setState(Network.State.DELETED);
+        if (networks != null) {
+            for (SystemNetwork sn : networks) {
+                Network lmanaged = (Network) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+                    .getProviderAssignedId());
+                lmanaged.setState(((Network) sn.getResource()).getState());
+                if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+                    lmanaged.setState(Network.State.DELETED);
+                }
             }
         }
-        for (SystemSystem sn : systems) {
-            // recursion rules!
-            this.updateSystemContentState(connector, (System) sn.getResource(), jobAction);
-            System lmanaged = (System) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                .getProviderAssignedId());
-            lmanaged.setState(((System) sn.getResource()).getState());
-            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                lmanaged.setState(System.State.DELETED);
+        if (systems != null) {
+            for (SystemSystem sn : systems) {
+                // recursion rules!
+                this.updateSystemContentState(connector, (System) sn.getResource(), jobAction);
+                System lmanaged = (System) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+                    .getProviderAssignedId());
+                lmanaged.setState(((System) sn.getResource()).getState());
+                if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+                    lmanaged.setState(System.State.DELETED);
+                }
             }
         }
     }
