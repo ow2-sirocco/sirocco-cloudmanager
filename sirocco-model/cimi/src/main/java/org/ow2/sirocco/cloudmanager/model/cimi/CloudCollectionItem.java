@@ -26,6 +26,8 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
@@ -55,6 +57,7 @@ public abstract class CloudCollectionItem extends CloudEntity {
         this.resource = resource;
     }
 
+    @Enumerated(EnumType.STRING)
     public State getState() {
         return this.state;
     }
