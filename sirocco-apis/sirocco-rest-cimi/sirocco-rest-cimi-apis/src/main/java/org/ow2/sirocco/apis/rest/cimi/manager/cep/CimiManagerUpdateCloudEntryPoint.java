@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 @Component("CimiManagerUpdateCloudEntryPoint")
 public class CimiManagerUpdateCloudEntryPoint extends CimiManagerUpdateAbstract {
 
-    // FIXME Not Implemented in EJB
+    // XXX Not Implemented in EJB
     // @Autowired
     // @Qualifier("IMachineManager")
     // private IMachineManager manager;
@@ -47,7 +47,7 @@ public class CimiManagerUpdateCloudEntryPoint extends CimiManagerUpdateAbstract 
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        // FIXME Not Implemented in EJB
+        // XXX Not Implemented in EJB
         throw new UnsupportedOperationException();
     }
 
@@ -61,7 +61,7 @@ public class CimiManagerUpdateCloudEntryPoint extends CimiManagerUpdateAbstract 
      */
     @Override
     protected Object convertToDataService(final CimiContext context) throws Exception {
-        // FIXME Not Implemented in EJB
+        // XXX Not Implemented in EJB
         return null;
     }
 
