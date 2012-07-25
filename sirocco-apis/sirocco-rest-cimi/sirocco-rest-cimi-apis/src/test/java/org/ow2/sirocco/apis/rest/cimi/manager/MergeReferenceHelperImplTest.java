@@ -56,7 +56,7 @@ public class MergeReferenceHelperImplTest {
 
     /**
      * Test method for
-     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#mergeCommon(org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon, org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon)}
+     * {@link org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelperImpl#mergeObjectCommon(org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon, org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon)}
      * .
      */
     @Test
@@ -74,7 +74,7 @@ public class MergeReferenceHelperImplTest {
         cimiRef.setName("refName");
         cimiRef.setDescription("refDescription");
 
-        merger.mergeCommon(cimiRef, cimi);
+        merger.mergeObjectCommon(cimiRef, cimi);
 
         Assert.assertEquals("/456", cimi.getId());
         Assert.assertEquals("refName", cimi.getName());
@@ -91,7 +91,7 @@ public class MergeReferenceHelperImplTest {
         cimiRef.setName("refName");
         cimiRef.setDescription("refDescription");
 
-        merger.mergeCommon(cimiRef, cimi);
+        merger.mergeObjectCommon(cimiRef, cimi);
 
         Assert.assertEquals("/456", cimi.getId());
         Assert.assertEquals("name", cimi.getName());
@@ -104,7 +104,7 @@ public class MergeReferenceHelperImplTest {
         cimiRef = new MyCimiObjectCommon();
         cimiRef.setProperties(refProps);
 
-        merger.mergeCommon(cimiRef, cimi);
+        merger.mergeObjectCommon(cimiRef, cimi);
 
         Assert.assertNull(cimi.getProperties());
 
@@ -118,7 +118,7 @@ public class MergeReferenceHelperImplTest {
         cimiRef = new MyCimiObjectCommon();
         cimiRef.setProperties(refProps);
 
-        merger.mergeCommon(cimiRef, cimi);
+        merger.mergeObjectCommon(cimiRef, cimi);
 
         Assert.assertEquals(3, cimi.getProperties().size());
         Assert.assertEquals("refValueOne", cimi.getProperties().get("refKeyOne"));
@@ -142,7 +142,7 @@ public class MergeReferenceHelperImplTest {
         cimiRef.setId("/456");
         cimiRef.setProperties(refProps);
 
-        merger.mergeCommon(cimiRef, cimi);
+        merger.mergeObjectCommon(cimiRef, cimi);
 
         Assert.assertEquals(5, cimi.getProperties().size());
         Assert.assertEquals("valueOne", cimi.getProperties().get("keyOne"));
