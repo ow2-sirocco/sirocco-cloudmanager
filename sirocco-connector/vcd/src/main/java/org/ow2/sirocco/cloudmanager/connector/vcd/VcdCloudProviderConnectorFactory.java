@@ -658,6 +658,11 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         @Override
         public Job removeEntityFromSystem(final String systemId, final String entityId) throws ConnectorException {
+            throw new ConnectorException("unsupported operation");
+        }
+
+        @Override
+        public Job addEntityToSystem(final String systemId, final String entityId) throws ConnectorException {
             // TODO
             throw new ConnectorException("unsupported operation");
         }
