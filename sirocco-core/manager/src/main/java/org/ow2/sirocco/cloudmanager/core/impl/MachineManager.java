@@ -1246,12 +1246,8 @@ public class MachineManager implements IMachineManager {
         }
         deleted.setState(State.DELETED);
         this.em.flush();
+        this.systemManager.handleEntityStateChange(deleted.getClass(), deleted.getId().toString(), true);
 
-        if (fromSystem == false) {
-            this.systemManager.handleEntityStateChange(deleted.getClass(), deleted.getId().toString(), true);
-        } else {
-            this.em.merge(deleted);
-        }
     }
 
     /**

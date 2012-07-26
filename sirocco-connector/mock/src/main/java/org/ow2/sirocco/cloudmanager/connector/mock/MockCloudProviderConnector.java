@@ -162,8 +162,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public ISystemService getSystemService() throws ConnectorException {
-        throw new ConnectorException();
-        // return this;
+        return this;
     }
 
     @Override
@@ -601,6 +600,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemMachine sm = new SystemMachine();
+                        sm.setState(SystemMachine.State.AVAILABLE);
                         sm.setResource(j.getTargetEntity());
                         system.getMachines().add(sm);
                     }
@@ -627,6 +627,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemVolume sv = new SystemVolume();
+                        sv.setState(SystemVolume.State.AVAILABLE);
                         sv.setResource(j.getTargetEntity());
                         system.getVolumes().add(sv);
                     }
@@ -653,6 +654,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemSystem ss = new SystemSystem();
+                        ss.setState(SystemSystem.State.AVAILABLE);
                         ss.setResource(j.getTargetEntity());
                         system.getSystems().add(ss);
                     }
@@ -679,6 +681,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
                     if (j.getStatus().equals(Status.SUCCESS)) {
                         SystemNetwork sn = new SystemNetwork();
+                        sn.setState(SystemNetwork.State.AVAILABLE);
                         sn.setResource(j.getTargetEntity());
                         system.getNetworks().add(sn);
                     }

@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -82,6 +83,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.SiroccoConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
@@ -202,13 +204,111 @@ public class SystemManager implements ISystemManager {
 
     private boolean isSystemSupportedInConnector(final ICloudProviderConnector connector) {
         boolean isSystemSupportedInConnector = false;
-        try {
-            ISystemService sysServ = connector.getSystemService();
-            isSystemSupportedInConnector = true;
-        } catch (ConnectorException e1) {
-            isSystemSupportedInConnector = false;
+
+        if (connector.getClass().getName().equals("org.ow2.sirocco.cloudmanager.connector.mock.MockCloudProviderConnector")) {
+            try {
+                if ((Boolean) this.getConfiguration("mockConnectorImplementsSystem")) {
+                    isSystemSupportedInConnector = true;
+                } else {
+                    isSystemSupportedInConnector = false;
+                }
+            } catch (CloudProviderException e) {
+                SystemManager.logger.warn("no parameter found for mockConnectorImplementsSystem");
+                isSystemSupportedInConnector = false;
+            }
+        } else {
+            try {
+                ISystemService sysServ = connector.getSystemService();
+                isSystemSupportedInConnector = true;
+            } catch (ConnectorException e1) {
+                isSystemSupportedInConnector = false;
+            }
         }
+
         return isSystemSupportedInConnector;
+
+    }
+
+    @Override
+    public void setConfiguration(final String paramName, final Object paramValue) throws CloudProviderException {
+
+        SiroccoConfiguration config = null;
+        try {
+            config = (SiroccoConfiguration) this.em.createQuery("FROM " + SiroccoConfiguration.class.getName())
+                .getSingleResult();
+        } catch (NoResultException e) {
+            config = null;
+        }
+
+        if (config == null) {
+            config = new SiroccoConfiguration();
+            this.em.persist(config);
+            this.em.flush();
+        }
+        if (paramName.equals("mockConnectorImplementsSystem") && paramValue instanceof Boolean) {
+            config.setMockConnectorImplementsSystem((Boolean) paramValue);
+        } else {
+            throw new CloudProviderException("no parameter found for " + paramName);
+        }
+
+    }
+
+    @Override
+    public Object getConfiguration(final String paramName) throws CloudProviderException {
+
+        SiroccoConfiguration config = null;
+        try {
+            config = (SiroccoConfiguration) this.em.createQuery("FROM " + SiroccoConfiguration.class.getName())
+                .getSingleResult();
+        } catch (NoResultException e) {
+            config = null;
+        }
+
+        if (config == null) {
+            config = new SiroccoConfiguration();
+            this.em.persist(config);
+            this.em.flush();
+        }
+        if (paramName.equals("mockConnectorImplementsSystem")) {
+            return config.isMockConnectorImplementsSystem();
+        } else {
+            throw new CloudProviderException("no parameter found for " + paramName);
+        }
+
+    }
+
+    private CloudCollectionItem createCollection(final Class<? extends CloudCollectionItem> entityType,
+        final CloudResource resource, final org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem.State state)
+        throws CloudProviderException {
+
+        CloudCollectionItem sc = null;
+        try {
+            sc = entityType.newInstance();
+        } catch (InstantiationException e) {
+            new CloudProviderException("InstantiationException in createCollection for type " + entityType);
+        } catch (IllegalAccessException e) {
+            new CloudProviderException("IllegalAccessException in createCollection for type " + entityType);
+        }
+        sc.setResource(resource);
+        sc.setState(state);
+        sc.setCreated(new Date());
+        sc.setUser(this.getUser());
+        sc.setProperties(new HashMap<String, String>());
+        return sc;
+    }
+
+    private CloudCollectionItem updateCollectionFromProvider(final CloudCollectionItem providerEntity,
+        final CloudResource resource, final org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem.State state)
+        throws CloudProviderException {
+
+        CloudCollectionItem sc = providerEntity;
+
+        sc.setResource(resource);
+        sc.setState(state);
+        sc.setCreated(new Date());
+        sc.setUser(this.getUser());
+        sc.setProperties(new HashMap<String, String>());
+        return sc;
     }
 
     @Override
@@ -261,9 +361,8 @@ public class SystemManager implements ISystemManager {
 
                     // no job for credentials!
                     Credentials c = this.credentialsManager.createCredentials(cc);
-                    SystemCredentials sc = new SystemCredentials();
-                    sc.setResource(c);
-                    sc.setState(SystemCredentials.State.AVAILABLE);
+                    SystemCredentials sc = (SystemCredentials) this.createCollection(SystemCredentials.class, c,
+                        SystemCredentials.State.AVAILABLE);
                     this.em.persist(sc);
                     system.getCredentials().add(sc);
                 }
@@ -356,9 +455,8 @@ public class SystemManager implements ISystemManager {
                         Job j = this.machineManager.createMachine(mc);
                         j.setParentJob(parentJob);
 
-                        SystemMachine sc = new SystemMachine();
-                        sc.setResource(j.getTargetEntity());
-                        sc.setState(SystemMachine.State.NOT_AVAILABLE);
+                        SystemMachine sc = (SystemMachine) this.createCollection(SystemMachine.class, j.getTargetEntity(),
+                            SystemMachine.State.NOT_AVAILABLE);
                         this.em.persist(sc);
                     }
                 }
@@ -387,9 +485,8 @@ public class SystemManager implements ISystemManager {
                         Job j = this.volumeManager.createVolume(vc);
                         j.setParentJob(parentJob);
 
-                        SystemVolume sc = new SystemVolume();
-                        sc.setResource(j.getTargetEntity());
-                        sc.setState(SystemVolume.State.NOT_AVAILABLE);
+                        SystemVolume sc = (SystemVolume) this.createCollection(SystemVolume.class, j.getTargetEntity(),
+                            SystemVolume.State.NOT_AVAILABLE);
                         this.em.persist(sc);
                     }
                 }
@@ -418,9 +515,8 @@ public class SystemManager implements ISystemManager {
                         Job j = this.createSystem(sc);
                         j.setParentJob(parentJob);
 
-                        SystemSystem ss = new SystemSystem();
-                        ss.setResource(j.getTargetEntity());
-                        ss.setState(SystemSystem.State.NOT_AVAILABLE);
+                        SystemSystem ss = (SystemSystem) this.createCollection(SystemSystem.class, j.getTargetEntity(),
+                            SystemSystem.State.NOT_AVAILABLE);
                         this.em.persist(ss);
 
                         // special case: created system is in mixed state,
@@ -456,9 +552,8 @@ public class SystemManager implements ISystemManager {
                         Job j = this.networkManager.createNetwork(nc);
                         j.setParentJob(parentJob);
 
-                        SystemNetwork sc = new SystemNetwork();
-                        sc.setResource(j.getTargetEntity());
-                        sc.setState(SystemNetwork.State.NOT_AVAILABLE);
+                        SystemNetwork sc = (SystemNetwork) this.createCollection(SystemNetwork.class, j.getTargetEntity(),
+                            SystemNetwork.State.NOT_AVAILABLE);
                         this.em.persist(sc);
                     }
                 }
@@ -708,8 +803,24 @@ public class SystemManager implements ISystemManager {
         String entityId = this.getJobProperty(job, SystemManager.PROP_JOB_COLLECTION_ID);
         CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
         ce.setState(CloudCollectionItem.State.DELETED);
+        this.removeItemFromSystemCollection(s, ce);
         // deleting SystemXXX
-        this.em.remove(ce);
+        // this.em.remove(ce);
+    }
+
+    private void removeItemFromSystemCollection(final System s, final CloudCollectionItem ce) {
+
+        if (ce instanceof SystemMachine) {
+            s.getMachines().remove(ce);
+        } else if (ce instanceof SystemVolume) {
+            s.getVolumes().remove(ce);
+        } else if (ce instanceof SystemNetwork) {
+            s.getNetworks().remove(ce);
+        } else if (ce instanceof SystemCredentials) {
+            s.getCredentials().remove(ce);
+        } else if (ce instanceof SystemSystem) {
+            s.getSystems().remove(ce);
+        }
     }
 
     /**
@@ -1356,28 +1467,35 @@ public class SystemManager implements ISystemManager {
         final CloudProviderLocation location) throws CloudProviderException {
         // getting system owned object lists from connector
         System s = providerSystem;
-        List<SystemMachine> machines = providerSystem.getMachines();
-        List<SystemVolume> volumes = providerSystem.getVolumes();
-        List<SystemSystem> systems = providerSystem.getSystems();
-        List<SystemNetwork> networks = providerSystem.getNetworks();
+        List<SystemMachine> machines = providerSystem.getMachines() == null ? new ArrayList<SystemMachine>() : providerSystem
+            .getMachines();
+        List<SystemVolume> volumes = providerSystem.getVolumes() == null ? new ArrayList<SystemVolume>() : providerSystem
+            .getVolumes();
+        List<SystemSystem> systems = providerSystem.getSystems() == null ? new ArrayList<SystemSystem>() : providerSystem
+            .getSystems();
+        List<SystemNetwork> networks = providerSystem.getNetworks() == null ? new ArrayList<SystemNetwork>() : providerSystem
+            .getNetworks();
 
         // creating and adding objects
-        if (networks != null) {
-            for (SystemNetwork sn : networks) {
-                sn.getNetwork().setUser(user);
-                sn.getNetwork().setCloudProviderAccount(account);
-                sn.getNetwork().setLocation(location);
-                this.em.persist(sn);
-            }
+        for (SystemNetwork sn : networks) {
+            sn.getNetwork().setUser(user);
+            sn.getNetwork().setCloudProviderAccount(account);
+            sn.getNetwork().setLocation(location);
+            // TODO: replace with dedicated method from related manager!
+            this.em.persist(sn.getResource());
+            this.updateCollectionFromProvider(sn, sn.getResource(), SystemNetwork.State.AVAILABLE);
+            this.em.persist(sn);
         }
         this.em.flush();
-        if (volumes != null) {
-            for (SystemVolume sv : volumes) {
-                sv.getVolume().setUser(user);
-                sv.getVolume().setCloudProviderAccount(account);
-                sv.getVolume().setLocation(location);
-                this.em.persist(sv);
-            }
+
+        for (SystemVolume sv : volumes) {
+            sv.getVolume().setUser(user);
+            sv.getVolume().setCloudProviderAccount(account);
+            sv.getVolume().setLocation(location);
+            // TODO: replace with dedicated method from related manager!
+            this.em.persist(sv.getResource());
+            this.updateCollectionFromProvider(sv, sv.getResource(), SystemVolume.State.AVAILABLE);
+            this.em.persist(sv);
         }
         this.em.flush();
         if (machines != null) {
@@ -1389,20 +1507,21 @@ public class SystemManager implements ISystemManager {
                 mach.setCreated(new Date());
 
                 this.machineManager.persistMachineInSystem(mach);
-                this.em.flush();
+                this.updateCollectionFromProvider(sm, sm.getResource(), SystemMachine.State.AVAILABLE);
                 this.em.persist(sm);
-
             }
         }
         this.em.flush();
-        if (systems != null) {
-            for (SystemSystem ss : systems) {
-                ss.getSystem().setCloudProviderAccount(account);
-                ss.getSystem().setLocation(location);
-                ss.getSystem().setUser(user);
-                this.persistSystemContent((System) ss.getResource(), user, account, location);
-                this.em.persist(ss);
-            }
+
+        for (SystemSystem ss : systems) {
+            ss.getSystem().setCloudProviderAccount(account);
+            ss.getSystem().setLocation(location);
+            ss.getSystem().setUser(user);
+            this.persistSystemContent((System) ss.getResource(), user, account, location);
+            this.em.persist(ss.getResource());
+            this.updateCollectionFromProvider(ss, ss.getResource(), SystemSystem.State.AVAILABLE);
+            this.em.persist(ss);
+            this.em.flush();
         }
         this.em.flush();
     }
@@ -1420,55 +1539,60 @@ public class SystemManager implements ISystemManager {
         final String jobAction) throws CloudProviderException {
         // getting system owned object lists from connector
         System s = providerSystem;
-        List<SystemMachine> machines = providerSystem.getMachines();
-        List<SystemVolume> volumes = providerSystem.getVolumes();
-        List<SystemSystem> systems = providerSystem.getSystems();
-        List<SystemNetwork> networks = providerSystem.getNetworks();
+
+        List<SystemMachine> machines = new ArrayList<SystemMachine>(
+            providerSystem.getMachines() == null ? new ArrayList<SystemMachine>() : providerSystem.getMachines());
+        List<SystemVolume> volumes = new ArrayList<SystemVolume>(
+            providerSystem.getVolumes() == null ? new ArrayList<SystemVolume>() : providerSystem.getVolumes());
+        List<SystemSystem> systems = new ArrayList<SystemSystem>(
+            providerSystem.getSystems() == null ? new ArrayList<SystemSystem>() : providerSystem.getSystems());
+        List<SystemNetwork> networks = new ArrayList<SystemNetwork>(
+            providerSystem.getNetworks() == null ? new ArrayList<SystemNetwork>() : providerSystem.getNetworks());
 
         // syncing objects status
 
-        if (machines != null) {
-            for (SystemMachine sn : machines) {
-                Machine lmanaged = (Machine) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                    .getProviderAssignedId());
+        for (SystemMachine sn : machines) {
+            Machine lmanaged = (Machine) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+                .getProviderAssignedId());
+            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+                // lmanaged.setState(Machine.State.DELETED);
+                this.machineManager.deleteMachineInSystem(lmanaged);
+            } else {
                 lmanaged.setState(((Machine) sn.getResource()).getState());
-                if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                    // lmanaged.setState(Machine.State.DELETED);
-                    this.machineManager.deleteMachineInSystem(lmanaged);
-                }
             }
         }
 
-        if (volumes != null) {
-            for (SystemVolume sn : volumes) {
-                Volume lmanaged = (Volume) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                    .getProviderAssignedId());
+        for (SystemVolume sn : volumes) {
+            Volume lmanaged = (Volume) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+                .getProviderAssignedId());
+            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+                lmanaged.setState(Volume.State.DELETED);
+            } else {
                 lmanaged.setState(((Volume) sn.getResource()).getState());
-                if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                    lmanaged.setState(Volume.State.DELETED);
-                }
             }
         }
-        if (networks != null) {
-            for (SystemNetwork sn : networks) {
-                Network lmanaged = (Network) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                    .getProviderAssignedId());
+
+        for (SystemNetwork sn : networks) {
+            Network lmanaged = (Network) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+                .getProviderAssignedId());
+            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+                lmanaged.setState(Network.State.DELETED);
+            } else {
                 lmanaged.setState(((Network) sn.getResource()).getState());
-                if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                    lmanaged.setState(Network.State.DELETED);
-                }
             }
         }
-        if (systems != null) {
-            for (SystemSystem sn : systems) {
-                // recursion rules!
-                this.updateSystemContentState(connector, (System) sn.getResource(), jobAction);
-                System lmanaged = (System) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                    .getProviderAssignedId());
+
+        for (SystemSystem sn : systems) {
+            // recursion rules!
+            this.updateSystemContentState(connector, (System) sn.getResource(), jobAction);
+            System lmanaged = (System) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+                .getProviderAssignedId());
+            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+                lmanaged.setState(System.State.DELETED);
+                sn.setState(SystemSystem.State.DELETED);
+                this.removeItemFromSystemCollection(s, sn);
+            } else {
                 lmanaged.setState(((System) sn.getResource()).getState());
-                if (jobAction.equals(SystemManager.DELETE_ACTION)) {
-                    lmanaged.setState(System.State.DELETED);
-                }
             }
         }
     }
@@ -1553,6 +1677,11 @@ public class SystemManager implements ISystemManager {
                     // removing entity
                     this.removeEntityFromSystem_Final(job, s);
                 }
+
+                if (!jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
+                    this.updateSystemStatus(managedSystem.getId().toString());
+                }
+                ;
 
                 this.relConnector(cpa, connector);
             } else {
@@ -1673,19 +1802,20 @@ public class SystemManager implements ISystemManager {
                     this.removeEntityFromSystem_Final(job, s);
                 }
 
-                if (!this.updateSystemStatus(s.getId().toString())) {
-                    // no update, setting generic system state
-                    if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                        s.setState(State.STOPPED);
-                    }
-                    if (jobDetailedAction.equals(SystemManager.START_ACTION)) {
-                        s.setState(State.STARTED);
-                    }
-                    if (jobDetailedAction.equals(SystemManager.STOP_ACTION)) {
-                        s.setState(State.STOPPED);
-                    }
-                    if (jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
-                        s.setState(System.State.DELETED);
+                if (jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
+                    s.setState(System.State.DELETED);
+                } else {
+                    if (!this.updateSystemStatus(s.getId().toString())) {
+                        // no update, setting generic system state
+                        if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
+                            s.setState(State.STOPPED);
+                        }
+                        if (jobDetailedAction.equals(SystemManager.START_ACTION)) {
+                            s.setState(State.STARTED);
+                        }
+                        if (jobDetailedAction.equals(SystemManager.STOP_ACTION)) {
+                            s.setState(State.STOPPED);
+                        }
                     }
                 }
             }
@@ -1696,8 +1826,9 @@ public class SystemManager implements ISystemManager {
     @Override
     public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId,
         final boolean deletion) {
+
         // getting system attachement if any
-        SystemManager.logger.debug("updating system state - " + entityType.getName() + " - " + entityId);
+        SystemManager.logger.info("updating system state - " + entityType.getName() + " - " + entityId);
         CloudCollectionItem obj = null;
         try {
             obj = (CloudCollectionItem) this.em
@@ -1729,17 +1860,19 @@ public class SystemManager implements ISystemManager {
             return;
         }
 
+        // delete systemXXX if deleted event
+        if (deletion) {
+            obj.setState(CloudCollectionItem.State.DELETED);
+            this.removeItemFromSystemCollection(sys, obj);
+            // this.em.remove(obj);
+            return;
+        }
+
         // updating system status
         try {
             this.updateSystemStatus(sys.getId().toString());
         } catch (CloudProviderException e) {
             SystemManager.logger.warn(" system status update failed for system " + sys.getId());
-        }
-
-        // delete systemXXX if deleted event
-        if (deletion) {
-            obj.setState(CloudCollectionItem.State.DELETED);
-            this.em.remove(obj);
         }
 
     }
@@ -1762,6 +1895,10 @@ public class SystemManager implements ISystemManager {
             // no machine => mixed
             s.setState(State.MIXED);
             return true;
+        }
+        // update subsystems recursively...enjoy ;)
+        for (SystemSystem ss : s.getSystems()) {
+            this.updateSystemStatus(ss.getResource().getId().toString());
         }
 
         for (SystemMachine sn : s.getMachines()) {

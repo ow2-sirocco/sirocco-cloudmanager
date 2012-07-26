@@ -132,4 +132,8 @@ public interface ISystemManager extends IJobListener, IEntityStateListener {
 
     Job importSystemTemplate(String source, Map<String, String> properties) throws CloudProviderException;
 
+    void setConfiguration(String paramName, Object paramValue) throws CloudProviderException;
+
+    Object getConfiguration(String paramName) throws CloudProviderException;
+
 }

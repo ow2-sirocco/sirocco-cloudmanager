@@ -114,6 +114,19 @@ public class SystemManagerTest extends SiroccoTester {
 
         this.initDatabase();
 
+        // setting connector use for system
+        this.systemManager.setConfiguration("mockConnectorImplementsSystem", true);
+
+        this._testSystemManager();
+
+        // setting no connector use for system
+        this.systemManager.setConfiguration("mockConnectorImplementsSystem", false);
+
+        this._testSystemManager();
+
+    }
+
+    public void _testSystemManager() throws Exception {
         // creating machine template
 
         MachineManagerTest machineTest = new MachineManagerTest();
@@ -262,12 +275,12 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals("MonSystemeBisque1", ls.get(2).getName());
 
         List<SystemTemplate> sts1 = this.systemManager.getSystemTemplates();
-        Assert.assertEquals(0, sts1.size());
+        int nbTemplates = sts1.size();
 
         SystemTemplate systemTemplate1_1 = this.systemManager.createSystemTemplate(systemTemplate1);
 
         List<SystemTemplate> sts2 = this.systemManager.getSystemTemplates();
-        Assert.assertEquals(2, sts2.size());
+        Assert.assertEquals(nbTemplates + 2, sts2.size());
 
         SystemTemplate systemTemplate2_1 = this.systemManager.createSystemTemplate(systemTemplate2);
         Assert.assertEquals("systemTemplateTest1", systemTemplate1_1.getName());
@@ -290,7 +303,7 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals(2, tot);
 
         List<SystemTemplate> sts = this.systemManager.getSystemTemplates();
-        Assert.assertEquals(3, sts.size());
+        Assert.assertEquals(nbTemplates + 3, sts.size());
 
         Volume vc = this.createVolume("testVolumeAddSys");
         SystemVolume sysVol = new SystemVolume();
@@ -365,7 +378,6 @@ public class SystemManagerTest extends SiroccoTester {
             sv1 = null;
         }
         Assert.assertNull(sv1);
-
     }
 
     class bob extends Thread {
