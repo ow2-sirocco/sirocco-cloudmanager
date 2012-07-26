@@ -1804,6 +1804,7 @@ public class SystemManager implements ISystemManager {
 
                 if (jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
                     s.setState(System.State.DELETED);
+                    this.handleEntityStateChange(System.class, s.getId().toString(), true);
                 } else {
                     if (!this.updateSystemStatus(s.getId().toString())) {
                         // no update, setting generic system state
