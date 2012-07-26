@@ -132,7 +132,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     public void merge(final CimiContext context, final CimiMachineImage cimi) throws Exception {
         if (true == cimi.hasReference()) {
             MachineImage dataService = this.managerMachineImage.getMachineImageById(PathHelper.extractIdString(cimi.getHref()));
-            CimiMachineImage cimiRef = (CimiMachineImage) context.convertToCimi(dataService, CimiMachineImage.class);
+            CimiMachineImage cimiRef = (CimiMachineImage) context.convertToFullCimi(dataService, CimiMachineImage.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -148,7 +148,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             MachineConfiguration dataService = this.managerMachine.getMachineConfigurationById(PathHelper.extractIdString(cimi
                 .getHref()));
-            CimiMachineConfiguration cimiRef = (CimiMachineConfiguration) context.convertToCimi(dataService,
+            CimiMachineConfiguration cimiRef = (CimiMachineConfiguration) context.convertToFullCimi(dataService,
                 CimiMachineConfiguration.class);
             this.merge(cimiRef, cimi);
         }
@@ -176,7 +176,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             CredentialsTemplate dataService = this.managerCredentials.getCredentialsTemplateById(PathHelper
                 .extractIdString(cimi.getHref()));
-            CimiCredentialTemplate cimiRef = (CimiCredentialTemplate) context.convertToCimi(dataService,
+            CimiCredentialTemplate cimiRef = (CimiCredentialTemplate) context.convertToFullCimi(dataService,
                 CimiCredentialTemplate.class);
             this.merge(cimiRef, cimi);
         }
@@ -192,7 +192,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     public void merge(final CimiContext context, final CimiCredential cimi) throws Exception {
         if (true == cimi.hasReference()) {
             Credentials dataService = this.managerCredentials.getCredentialsById(PathHelper.extractIdString(cimi.getHref()));
-            CimiCredential cimiRef = (CimiCredential) context.convertToCimi(dataService, CimiCredential.class);
+            CimiCredential cimiRef = (CimiCredential) context.convertToFullCimi(dataService, CimiCredential.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -219,7 +219,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             MachineDisk dataService = this.managerMachine.getDiskFromMachine(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
-            CimiMachineDisk cimiRef = (CimiMachineDisk) context.convertToCimi(dataService, CimiMachineDisk.class);
+            CimiMachineDisk cimiRef = (CimiMachineDisk) context.convertToFullCimi(dataService, CimiMachineDisk.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -235,7 +235,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             MachineVolume dataService = this.managerMachine.getVolumeFromMachine(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
-            CimiMachineVolume cimiRef = (CimiMachineVolume) context.convertToCimi(dataService, CimiMachineVolume.class);
+            CimiMachineVolume cimiRef = (CimiMachineVolume) context.convertToFullCimi(dataService, CimiMachineVolume.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -251,7 +251,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             MachineNetworkInterface dataService = this.managerMachine.getNetworkInterfaceFromMachine(context.getRequest()
                 .getIdParent(), PathHelper.extractIdString(cimi.getHref()));
-            CimiMachineNetworkInterface cimiRef = (CimiMachineNetworkInterface) context.convertToCimi(dataService,
+            CimiMachineNetworkInterface cimiRef = (CimiMachineNetworkInterface) context.convertToFullCimi(dataService,
                 CimiMachineNetworkInterface.class);
             this.merge(cimiRef, cimi);
         }
@@ -269,7 +269,8 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             MachineTemplate dataService = this.managerMachine
                 .getMachineTemplateById(PathHelper.extractIdString(cimi.getHref()));
-            CimiMachineTemplate cimiRef = (CimiMachineTemplate) context.convertToCimi(dataService, CimiMachineTemplate.class);
+            CimiMachineTemplate cimiRef = (CimiMachineTemplate) context.convertToFullCimi(dataService,
+                CimiMachineTemplate.class);
             this.merge(cimiRef, cimi);
         } else {
             if (null != cimi.getCredential()) {
@@ -318,7 +319,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             VolumeConfiguration dataService = this.managerVolume.getVolumeConfigurationById(PathHelper.extractIdString(cimi
                 .getHref()));
-            CimiVolumeConfiguration cimiRef = (CimiVolumeConfiguration) context.convertToCimi(dataService,
+            CimiVolumeConfiguration cimiRef = (CimiVolumeConfiguration) context.convertToFullCimi(dataService,
                 CimiVolumeConfiguration.class);
             this.merge(cimiRef, cimi);
         }
@@ -334,7 +335,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     public void merge(final CimiContext context, final CimiVolumeImage cimi) throws Exception {
         if (true == cimi.hasReference()) {
             VolumeImage dataService = this.managerVolume.getVolumeImageById(PathHelper.extractIdString(cimi.getHref()));
-            CimiVolumeImage cimiRef = (CimiVolumeImage) context.convertToCimi(dataService, CimiVolumeImage.class);
+            CimiVolumeImage cimiRef = (CimiVolumeImage) context.convertToFullCimi(dataService, CimiVolumeImage.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -349,7 +350,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     public void merge(final CimiContext context, final CimiVolumeTemplate cimi) throws Exception {
         if (true == cimi.hasReference()) {
             VolumeTemplate dataService = this.managerVolume.getVolumeTemplateById(PathHelper.extractIdString(cimi.getHref()));
-            CimiVolumeTemplate cimiRef = (CimiVolumeTemplate) context.convertToCimi(dataService, CimiVolumeTemplate.class);
+            CimiVolumeTemplate cimiRef = (CimiVolumeTemplate) context.convertToFullCimi(dataService, CimiVolumeTemplate.class);
             this.merge(cimiRef, cimi);
         } else {
             if (null != cimi.getVolumeConfig()) {
@@ -372,7 +373,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             VolumeVolumeImage dataService = this.managerVolume.getVolumeImageFromVolume(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
-            CimiVolumeVolumeImage cimiRef = (CimiVolumeVolumeImage) context.convertToCimi(dataService,
+            CimiVolumeVolumeImage cimiRef = (CimiVolumeVolumeImage) context.convertToFullCimi(dataService,
                 CimiVolumeVolumeImage.class);
             this.merge(cimiRef, cimi);
         }
@@ -399,7 +400,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     public void merge(final CimiContext context, final CimiSystemTemplate cimi) throws Exception {
         if (true == cimi.hasReference()) {
             SystemTemplate dataService = this.managerSystem.getSystemTemplateById(PathHelper.extractIdString(cimi.getHref()));
-            CimiSystemTemplate cimiRef = (CimiSystemTemplate) context.convertToCimi(dataService, CimiSystemTemplate.class);
+            CimiSystemTemplate cimiRef = (CimiSystemTemplate) context.convertToFullCimi(dataService, CimiSystemTemplate.class);
             this.merge(cimiRef, cimi);
         } else {
             if (null != cimi.getListComponentDescriptors()) {
@@ -439,8 +440,8 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
-            CimiSystemCredential cimiRef = (CimiSystemCredential) context
-                .convertToCimi(dataService, CimiSystemCredential.class);
+            CimiSystemCredential cimiRef = (CimiSystemCredential) context.convertToFullCimi(dataService,
+                CimiSystemCredential.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -456,7 +457,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
-            CimiSystemMachine cimiRef = (CimiSystemMachine) context.convertToCimi(dataService, CimiSystemMachine.class);
+            CimiSystemMachine cimiRef = (CimiSystemMachine) context.convertToFullCimi(dataService, CimiSystemMachine.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -472,7 +473,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
-            CimiSystemSystem cimiRef = (CimiSystemSystem) context.convertToCimi(dataService, CimiSystemSystem.class);
+            CimiSystemSystem cimiRef = (CimiSystemSystem) context.convertToFullCimi(dataService, CimiSystemSystem.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -488,7 +489,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         if (true == cimi.hasReference()) {
             CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
                 PathHelper.extractIdString(cimi.getHref()));
-            CimiSystemVolume cimiRef = (CimiSystemVolume) context.convertToCimi(dataService, CimiSystemVolume.class);
+            CimiSystemVolume cimiRef = (CimiSystemVolume) context.convertToFullCimi(dataService, CimiSystemVolume.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -633,7 +634,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     protected void merge(final CimiContext context, final CimiMachineTemplateVolume cimi) throws Exception {
         if (true == cimi.hasReference()) {
             Volume dataService = this.managerVolume.getVolumeById(PathHelper.extractIdString(cimi.getHref()));
-            CimiVolume cimiRef = (CimiVolume) context.convertToCimi(dataService, CimiVolume.class);
+            CimiVolume cimiRef = (CimiVolume) context.convertToFullCimi(dataService, CimiVolume.class);
             this.merge(cimiRef, cimi);
         }
     }
@@ -648,7 +649,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     protected void merge(final CimiContext context, final CimiMachineTemplateVolumeTemplate cimi) throws Exception {
         if (true == cimi.hasReference()) {
             VolumeTemplate dataService = this.managerVolume.getVolumeTemplateById(PathHelper.extractIdString(cimi.getHref()));
-            CimiVolumeTemplate cimiRef = (CimiVolumeTemplate) context.convertToCimi(dataService, CimiVolumeTemplate.class);
+            CimiVolumeTemplate cimiRef = (CimiVolumeTemplate) context.convertToFullCimi(dataService, CimiVolumeTemplate.class);
             this.merge(cimiRef, cimi);
         }
     }

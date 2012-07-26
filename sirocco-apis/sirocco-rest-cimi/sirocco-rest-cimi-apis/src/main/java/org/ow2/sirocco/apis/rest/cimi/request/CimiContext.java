@@ -74,6 +74,20 @@ public interface CimiContext extends Serializable {
     Object convertToCimi(Object service, Class<?> cimiAssociate);
 
     /**
+     * Convert a service root object to a full CIMI root object.
+     * <p>
+     * Full CIMI object because this method forces to convert "write only" data
+     * and to expand all data.
+     * </p>
+     * 
+     * @param service The service instance to convert
+     * @param cimiAssociate The CIMI class associate to the service class
+     * @return A CIMI instance converted
+     * @see #convertToCimi(Object, Class)
+     */
+    Object convertToFullCimi(Object service, Class<?> cimiAssociate);
+
+    /**
      * Convert a service root object to a CIMI root object.
      * <p>
      * Before the convert, finds the CIMI Resource class associate to the Cloud

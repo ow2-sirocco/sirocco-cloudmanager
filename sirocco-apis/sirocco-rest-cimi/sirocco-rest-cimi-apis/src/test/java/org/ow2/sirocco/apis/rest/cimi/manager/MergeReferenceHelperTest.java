@@ -41,6 +41,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContextImpl;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiExpand;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
@@ -95,9 +96,10 @@ public class MergeReferenceHelperTest {
 
         this.request = new CimiRequest();
         this.request.setBaseUri("/");
-        RequestParams header = new RequestParams();
-        header.setCimiSelect(new CimiSelect());
-        this.request.setParams(header);
+        RequestParams params = new RequestParams();
+        params.setCimiSelect(new CimiSelect());
+        params.setCimiExpand(new CimiExpand());
+        this.request.setParams(params);
 
         this.response = new CimiResponse();
         this.context = new CimiContextImpl(this.request, this.response);
@@ -365,6 +367,10 @@ public class MergeReferenceHelperTest {
         referenceConfiguration.setName("refNameConfiguration");
         referenceConfiguration.setDescription("refDescriptionConfiguration");
 
+        reference.setCredentials(referenceCredentials);
+        reference.setMachineConfiguration(referenceConfiguration);
+        reference.setMachineImage(referenceImage);
+
         // ---------------------------------------------------
         // Only by value : template
         EasyMock.replay(this.serviceCredentials);
@@ -394,6 +400,7 @@ public class MergeReferenceHelperTest {
         this.helper.merge(this.context, cimi);
 
         Assert.assertEquals("refName", cimi.getName());
+        Assert.assertEquals("refNameConfiguration", cimi.getMachineConfig().getName());
 
         EasyMock.verify(this.serviceCredentials);
         EasyMock.verify(this.serviceMachine);
