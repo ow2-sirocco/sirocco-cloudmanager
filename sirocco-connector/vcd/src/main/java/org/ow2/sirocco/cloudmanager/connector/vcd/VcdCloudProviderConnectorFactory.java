@@ -65,7 +65,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
 
@@ -344,6 +348,10 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             } catch (VCloudException e) {
                 throw new ConnectorException(e);
             }
+            system.setVolumes(new ArrayList<SystemVolume>());
+            system.setNetworks(new ArrayList<SystemNetwork>());
+            system.setSystems(new ArrayList<SystemSystem>());
+            system.setCredentials(new ArrayList<SystemCredentials>());
         }
 
         @Override
@@ -669,7 +677,6 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         @Override
         public Job addEntityToSystem(final String systemId, final String entityId) throws ConnectorException {
-            // TODO
             throw new ConnectorException("unsupported operation");
         }
 
