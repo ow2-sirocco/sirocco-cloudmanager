@@ -32,6 +32,7 @@ import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
@@ -944,6 +945,12 @@ public class VolumeManager implements IVolumeManager {
         j.setStatus(Status.SUCCESS);
         this.em.persist(j);
         return j;
+    }
+
+    @Override
+    public Job addVolumeImageToVolume(final String volumeId, final VolumeVolumeImage volumeVolumeImage)
+        throws ResourceNotFoundException, CloudProviderException, InvalidRequestException {
+        throw new ServiceUnavailableException("Unsupported operation");
     }
 
     @Override

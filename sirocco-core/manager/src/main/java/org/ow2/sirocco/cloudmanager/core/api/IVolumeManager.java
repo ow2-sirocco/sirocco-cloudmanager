@@ -328,6 +328,9 @@ public interface IVolumeManager extends IJobListener {
     Job removeVolumeImageFromVolume(String volumeId, String volumeVolumeImageId) throws ResourceNotFoundException,
         CloudProviderException;
 
+    Job addVolumeImageToVolume(final String volumeId, VolumeVolumeImage volumeVolumeImage) throws ResourceNotFoundException,
+        CloudProviderException, InvalidRequestException;
+
     void updateVolumeImageInVolume(String volumeId, VolumeVolumeImage volumeVolumeImage) throws ResourceNotFoundException,
         CloudProviderException;
 
