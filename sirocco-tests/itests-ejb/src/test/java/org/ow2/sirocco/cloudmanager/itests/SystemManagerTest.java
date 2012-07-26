@@ -107,10 +107,7 @@ public class SystemManagerTest extends SiroccoTester {
     }
 
     @Test
-    public void testSystemManager() throws Exception {
-
-        // User user = userManager.createUser("Jeanne", "Calmant",
-        // "jeanne.calmant@vieux.com", "jeanne.calmant", "titigrosminet");
+    public void testSystemManagerConnector() throws Exception {
 
         this.initDatabase();
 
@@ -118,6 +115,15 @@ public class SystemManagerTest extends SiroccoTester {
         this.systemManager.setConfiguration("mockConnectorImplementsSystem", true);
 
         this._testSystemManager();
+    }
+
+    @Test
+    public void testSystemManagerStandalone() throws Exception {
+
+        // User user = userManager.createUser("Jeanne", "Calmant",
+        // "jeanne.calmant@vieux.com", "jeanne.calmant", "titigrosminet");
+
+        this.initDatabase();
 
         // setting no connector use for system
         this.systemManager.setConfiguration("mockConnectorImplementsSystem", false);
