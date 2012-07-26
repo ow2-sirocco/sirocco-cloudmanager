@@ -249,6 +249,9 @@ public interface IMachineManager extends IJobListener {
     Job updateNetworkInterfaceAttributesInMachine(String machineId, String nicId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
 
+    List<MachineNetworkInterfaceAddress> getMachineNetworkInterfaceAddresses(final String machineId, final String nicId)
+        throws InvalidRequestException, CloudProviderException;
+
     QueryResult<MachineNetworkInterfaceAddress> getMachineNetworkInterfaceAddresses(final String machineId, final String nicId,
         int first, int last, List<String> filters, List<String> attributes) throws InvalidRequestException,
         CloudProviderException;
@@ -259,6 +262,9 @@ public interface IMachineManager extends IJobListener {
 
     Job removeAddressFromMachineNetworkInterface(final String machineId, final String nicId, final String addressEntryId)
         throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
+
+    Job updateMachineNetworkInterfaceAddress(final String machineId, final String nicId,
+        final MachineNetworkInterfaceAddress addressEntry) throws InvalidRequestException, CloudProviderException;
 
     //
     // For system management

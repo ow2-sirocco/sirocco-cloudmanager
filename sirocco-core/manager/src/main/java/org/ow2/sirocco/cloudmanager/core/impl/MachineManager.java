@@ -2284,8 +2284,6 @@ public class MachineManager implements IMachineManager {
         final String nicId, final int first, final int last, final List<String> filters, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
 
-        int count = 0;
-
         Machine m = this.em.find(Machine.class, Integer.valueOf(machineId));
         if (m == null || m.getState().equals(Machine.State.DELETED)) {
             throw new InvalidRequestException(" Bad machine id ");
@@ -2294,9 +2292,10 @@ public class MachineManager implements IMachineManager {
         for (MachineNetworkInterface nic : nics) {
             if (nic.getId().toString().equals(nicId)) {
                 List<MachineNetworkInterfaceAddress> addresses = nic.getAddresses();
-                count = addresses.size();
-
-                return new QueryResult<MachineNetworkInterfaceAddress>(count, addresses);
+                if (nic.getAddresses() == null) {
+                    return new QueryResult<MachineNetworkInterfaceAddress>(0, new ArrayList<MachineNetworkInterfaceAddress>());
+                }
+                return new QueryResult<MachineNetworkInterfaceAddress>(addresses.size(), addresses);
             }
         }
         MachineManager.logger.info("getMachineNetworkInterface no interface addresss ");
@@ -2316,6 +2315,20 @@ public class MachineManager implements IMachineManager {
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         throw new InvalidRequestException(" Address cannot be removed from a created machine ");
+    }
+
+    @Override
+    public List<MachineNetworkInterfaceAddress> getMachineNetworkInterfaceAddresses(final String machineId, final String nicId)
+        throws InvalidRequestException, CloudProviderException {
+        QueryResult<MachineNetworkInterfaceAddress> result = this.getMachineNetworkInterfaceAddresses(machineId, nicId, -1, -1,
+            null, null);
+        return result.getItems();
+    }
+
+    @Override
+    public Job updateMachineNetworkInterfaceAddress(final String machineId, final String nicId,
+        final MachineNetworkInterfaceAddress addressEntry) throws InvalidRequestException, CloudProviderException {
+        throw new InvalidRequestException(" Address entry cannot be updated ");
     }
 
 }
