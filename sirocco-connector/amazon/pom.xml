@@ -73,7 +73,6 @@
 				</executions>
 			</plugin>
 
-
 		</plugins>
 	</build>
 
@@ -82,18 +81,21 @@
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<version>1.4.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.ipojo.annotations</artifactId>
 			<version>1.6.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-connector-api</artifactId>
 			<version>0.5.2-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -125,6 +127,7 @@
 			<groupId>org.ow2.util</groupId>
 			<artifactId>util-log</artifactId>
 			<version>1.0.25</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.persistence</groupId>
@@ -132,6 +135,7 @@
 			<version>1.0</version>
 			<scope>provided</scope>
 		</dependency>
+
 	</dependencies>
 
 </project>
