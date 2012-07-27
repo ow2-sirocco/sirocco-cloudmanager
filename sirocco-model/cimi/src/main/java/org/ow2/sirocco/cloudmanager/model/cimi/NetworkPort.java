@@ -34,11 +34,14 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_NETWORKPORT_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM NetworkPort n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class NetworkPort extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
@@ -70,6 +73,7 @@ public class NetworkPort extends CloudResource implements Serializable, ICloudPr
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -79,6 +83,7 @@ public class NetworkPort extends CloudResource implements Serializable, ICloudPr
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudProviderLocation getLocation() {
         return this.location;
     }
@@ -88,6 +93,7 @@ public class NetworkPort extends CloudResource implements Serializable, ICloudPr
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Network getNetwork() {
         return this.network;
     }

@@ -32,92 +32,97 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CollectionOfElements;
-
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MeterConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    
-    protected List<String>    associatedTo;
-    
+
+    protected List<String> associatedTo;
+
     // TODO just a string
-    
-    protected String          aspect;
-    
-    protected String          units;
-    
-    protected Integer         sampleInterval;
-    
+
+    protected String aspect;
+
+    protected String units;
+
+    protected Integer sampleInterval;
+
     public static enum TimeScope {
         POINT, INTERVAL
     }
-    
-    protected TimeScope       timeScope;
-    
+
+    protected TimeScope timeScope;
+
     public static enum IntervalDuration {
         HOURLY, DAILY, WEEKLY, MONTHLY, YEARLY
     }
-    
-    protected IntervalDuration    intervalDuration;
-    
-    protected boolean             isContinuous;
+
+    protected IntervalDuration intervalDuration;
+
+    protected boolean isContinuous;
 
     @CollectionOfElements
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<String> getAssociatedTo() {
-        return associatedTo;
+        return this.associatedTo;
     }
 
-    public void setAssociatedTo(List<String> associatedTo) {
+    public void setAssociatedTo(final List<String> associatedTo) {
         this.associatedTo = associatedTo;
     }
 
     public String getAspect() {
-        return aspect;
+        return this.aspect;
     }
 
-    public void setAspect(String aspect) {
+    public void setAspect(final String aspect) {
         this.aspect = aspect;
     }
 
     public String getUnits() {
-        return units;
+        return this.units;
     }
 
-    public void setUnits(String units) {
+    public void setUnits(final String units) {
         this.units = units;
     }
 
     public Integer getSampleInterval() {
-        return sampleInterval;
+        return this.sampleInterval;
     }
 
-    public void setSampleInterval(Integer sampleInterval) {
+    public void setSampleInterval(final Integer sampleInterval) {
         this.sampleInterval = sampleInterval;
     }
+
     @Enumerated(EnumType.STRING)
     public TimeScope getTimeScope() {
-        return timeScope;
+        return this.timeScope;
     }
 
-    public void setTimeScope(TimeScope timeScope) {
+    public void setTimeScope(final TimeScope timeScope) {
         this.timeScope = timeScope;
     }
+
     @Enumerated(EnumType.STRING)
     public IntervalDuration getIntervalDuration() {
-        return intervalDuration;
+        return this.intervalDuration;
     }
 
-    public void setIntervalDuration(IntervalDuration intervalDuration) {
+    public void setIntervalDuration(final IntervalDuration intervalDuration) {
         this.intervalDuration = intervalDuration;
     }
 
     public boolean isContinuous() {
-        return isContinuous;
+        return this.isContinuous;
     }
 
-    public void setContinuous(boolean isContinuous) {
+    public void setContinuous(final boolean isContinuous) {
         this.isContinuous = isContinuous;
     }
 }

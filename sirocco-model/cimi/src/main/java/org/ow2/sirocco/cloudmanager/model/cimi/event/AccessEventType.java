@@ -29,31 +29,34 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AccessEventType extends EventType implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     // Must be a valid operation on the associated resource type
     private String operation;
-    
+
     // TODO what is this?
     private String initiator;
 
     public String getOperation() {
-        return operation;
+        return this.operation;
     }
 
-    public void setOperation(String operation) {
+    public void setOperation(final String operation) {
         this.operation = operation;
     }
 
     public String getInitiator() {
-        return initiator;
+        return this.initiator;
     }
 
-    public void setInitiator(String initiator) {
+    public void setInitiator(final String initiator) {
         this.initiator = initiator;
     }
-    
-    
+
 }

@@ -30,7 +30,11 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AddressTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -108,6 +112,7 @@ public class AddressTemplate extends CloudEntity implements Serializable {
 
     // TODO check this
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Network getNetwork() {
         return this.network;
     }

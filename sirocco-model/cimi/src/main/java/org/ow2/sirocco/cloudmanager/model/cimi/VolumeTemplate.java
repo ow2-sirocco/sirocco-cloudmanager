@@ -30,7 +30,11 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class VolumeTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -39,6 +43,7 @@ public class VolumeTemplate extends CloudTemplate implements Serializable {
     private VolumeImage volumeImage;
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public VolumeConfiguration getVolumeConfig() {
         return this.volumeConfig;
     }
@@ -48,6 +53,7 @@ public class VolumeTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public VolumeImage getVolumeImage() {
         return this.volumeImage;
     }

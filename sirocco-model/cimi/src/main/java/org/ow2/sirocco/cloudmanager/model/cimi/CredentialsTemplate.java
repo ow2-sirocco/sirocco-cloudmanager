@@ -29,7 +29,11 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CredentialsTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 

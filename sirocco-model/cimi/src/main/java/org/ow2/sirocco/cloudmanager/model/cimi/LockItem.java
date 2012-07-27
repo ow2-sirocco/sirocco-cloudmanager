@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -38,76 +39,82 @@ import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
-@Table(uniqueConstraints = { @UniqueConstraint(columnNames = {"lockedObjectId", "lockedObjectType"})})
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"lockedObjectId", "lockedObjectType"})})
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class LockItem implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    
     private Integer id;
-    
+
     /**
      * id of locked object
      */
     private String lockedObjectId;
-    
+
     /**
-     * type of locked object. the {lockedObjectType,lockedObjectId} couple is unique
+     * type of locked object. the {lockedObjectType,lockedObjectId} couple is
+     * unique
      */
     private String lockedObjectType;
 
     /**
-     * lockedTime is used to know when a lock was set, and then to be able to unlock after some time (configurable) to prevent objects to be locked forever 
+     * lockedTime is used to know when a lock was set, and then to be able to
+     * unlock after some time (configurable) to prevent objects to be locked
+     * forever
      */
     private Date lockedTime;
-    
+
     protected long versionNum;
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
         return this.id;
     }
-    
+
     public void setId(final Integer id) {
         this.id = id;
     }
-    
+
     @Version
-    @Column(name="OPTLOCK")    
+    @Column(name = "OPTLOCK")
     protected long getVersionNum() {
-        return versionNum;
+        return this.versionNum;
     }
 
-    protected void setVersionNum(long versionNum) {
+    protected void setVersionNum(final long versionNum) {
         this.versionNum = versionNum;
     }
 
     public LockItem() {
     }
-    
+
     @Temporal(TemporalType.TIMESTAMP)
     public Date getLockedTime() {
-        return lockedTime;
+        return this.lockedTime;
     }
 
-    public void setLockedTime(Date lockedTime) {
+    public void setLockedTime(final Date lockedTime) {
         this.lockedTime = lockedTime;
     }
 
     public String getLockedObjectId() {
-        return lockedObjectId;
+        return this.lockedObjectId;
     }
 
-    public void setLockedObjectId(String lockedObjectId) {
+    public void setLockedObjectId(final String lockedObjectId) {
         this.lockedObjectId = lockedObjectId;
     }
 
     public String getLockedObjectType() {
-        return lockedObjectType;
+        return this.lockedObjectType;
     }
 
-    public void setLockedObjectType(String lockedObjectType) {
+    public void setLockedObjectType(final String lockedObjectType) {
         this.lockedObjectType = lockedObjectType;
     }
 

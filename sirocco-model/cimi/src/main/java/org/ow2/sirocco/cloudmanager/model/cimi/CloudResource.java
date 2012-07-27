@@ -44,12 +44,15 @@ import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CloudResource implements Serializable, Resource {
     private static final long serialVersionUID = 1L;
@@ -149,6 +152,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @CollectionOfElements(fetch = FetchType.EAGER)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Map<String, String> getProperties() {
         return this.properties;
     }
@@ -172,6 +176,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @OneToMany(mappedBy = "targetEntity")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<Job> getWorkingJobs() {
         return this.workingJobs;
     }
@@ -181,6 +186,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public User getUser() {
         return this.user;
     }
@@ -190,6 +196,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @OneToMany(mappedBy = "targetResource")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<Meter> getMeters() {
         return this.meters;
     }
@@ -199,6 +206,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @OneToOne(mappedBy = "targetResource")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public EventLog getEventLog() {
         return this.eventLog;
     }

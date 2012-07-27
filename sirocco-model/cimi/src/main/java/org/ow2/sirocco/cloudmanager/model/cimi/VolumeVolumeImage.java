@@ -32,7 +32,11 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class VolumeVolumeImage extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -54,6 +58,7 @@ public class VolumeVolumeImage extends CloudEntity implements Serializable {
     }
 
     @OneToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public VolumeImage getVolumeImage() {
         return this.volumeImage;
     }

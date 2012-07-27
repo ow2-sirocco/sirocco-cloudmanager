@@ -36,11 +36,14 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Job extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -101,6 +104,7 @@ public class Job extends CloudEntity implements Serializable {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudResource getTargetEntity() {
         return this.targetEntity;
     }
@@ -134,6 +138,7 @@ public class Job extends CloudEntity implements Serializable {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Job getParentJob() {
         return this.parentJob;
     }
@@ -160,6 +165,7 @@ public class Job extends CloudEntity implements Serializable {
 
     @OneToMany(mappedBy = "parentJob")
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<Job> getNestedJobs() {
         return this.nestedJobs;
     }
@@ -169,6 +175,7 @@ public class Job extends CloudEntity implements Serializable {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudProviderLocation getLocation() {
         return this.location;
     }
@@ -179,6 +186,7 @@ public class Job extends CloudEntity implements Serializable {
 
     @ManyToMany
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<CloudResource> getAffectedEntities() {
         return this.affectedEntities;
     }

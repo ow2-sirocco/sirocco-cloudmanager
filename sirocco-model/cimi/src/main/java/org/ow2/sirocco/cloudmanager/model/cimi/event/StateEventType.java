@@ -29,26 +29,33 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StateEventType extends EventType implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     // Should be one of the valid states of the corresponding CloudResource
-    private String  state;
-    private String  previousState;
-    
+    private String state;
+
+    private String previousState;
+
     public String getState() {
-        return state;
+        return this.state;
     }
-    public void setState(String state) {
+
+    public void setState(final String state) {
         this.state = state;
     }
+
     public String getPreviousState() {
-        return previousState;
+        return this.previousState;
     }
-    public void setPreviousState(String previousState) {
+
+    public void setPreviousState(final String previousState) {
         this.previousState = previousState;
     }
-    
-    
+
 }

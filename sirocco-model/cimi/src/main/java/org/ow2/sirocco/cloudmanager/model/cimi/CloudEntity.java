@@ -38,10 +38,13 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @MappedSuperclass
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public abstract class CloudEntity implements Serializable, Resource {
 
     private static final long serialVersionUID = 1L;
@@ -130,6 +133,7 @@ public abstract class CloudEntity implements Serializable, Resource {
     }
 
     @CollectionOfElements(fetch = FetchType.EAGER)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Map<String, String> getProperties() {
         return this.properties;
     }
@@ -153,6 +157,7 @@ public abstract class CloudEntity implements Serializable, Resource {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public User getUser() {
         return this.user;
     }

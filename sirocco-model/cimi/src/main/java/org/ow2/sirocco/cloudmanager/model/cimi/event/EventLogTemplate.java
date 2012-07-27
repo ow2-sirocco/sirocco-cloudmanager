@@ -30,33 +30,40 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EventLogTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    @OneToOne
-    private CloudResource   targetResource;
+    private CloudResource targetResource;
 
     public static enum Persistence {
         YEARLY, MONTHLY, WEEKLY, DAILY, HOURLY
     }
-    private Persistence     persistence;
-    
+
+    private Persistence persistence;
+
     @OneToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudResource getTargetResource() {
-        return targetResource;
+        return this.targetResource;
     }
-    public void setTargetResource(CloudResource targetResource) {
+
+    public void setTargetResource(final CloudResource targetResource) {
         this.targetResource = targetResource;
     }
+
     public Persistence getPersistence() {
-        return persistence;
+        return this.persistence;
     }
-    public void setPersistence(Persistence persistence) {
+
+    public void setPersistence(final Persistence persistence) {
         this.persistence = persistence;
     }
-  
+
 }

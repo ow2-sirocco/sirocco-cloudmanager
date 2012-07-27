@@ -37,9 +37,12 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class CloudProviderAccount implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -89,12 +92,13 @@ public class CloudProviderAccount implements Serializable {
     }
 
     @CollectionOfElements(fetch = FetchType.EAGER)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Map<String, String> getProperties() {
         return this.properties;
     }
 
-
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudProvider getCloudProvider() {
         return this.cloudProvider;
     }
@@ -104,6 +108,7 @@ public class CloudProviderAccount implements Serializable {
     }
 
     @ManyToMany
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<User> getUsers() {
         return this.users;
     }
@@ -111,6 +116,5 @@ public class CloudProviderAccount implements Serializable {
     public void setUsers(final Set<User> users) {
         this.users = users;
     }
-
 
 }

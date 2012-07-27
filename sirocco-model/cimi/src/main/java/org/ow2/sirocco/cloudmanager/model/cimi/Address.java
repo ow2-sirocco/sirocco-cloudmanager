@@ -32,7 +32,11 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Address extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -112,6 +116,7 @@ public class Address extends CloudEntity implements Serializable {
 
     // TODO check this
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Network getNetwork() {
         return this.network;
     }
@@ -122,6 +127,7 @@ public class Address extends CloudEntity implements Serializable {
 
     // TODO check this
     @OneToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudResource getResource() {
         return this.resource;
     }

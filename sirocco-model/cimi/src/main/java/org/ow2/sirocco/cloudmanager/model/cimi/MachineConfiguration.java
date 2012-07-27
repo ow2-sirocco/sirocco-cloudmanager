@@ -30,11 +30,14 @@ import java.util.List;
 
 import javax.persistence.Entity;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CollectionOfElements;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MachineConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -62,6 +65,7 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
 
     @CollectionOfElements
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<DiskTemplate> getDiskTemplates() {
         return this.diskTemplates;
     }

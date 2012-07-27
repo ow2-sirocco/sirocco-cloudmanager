@@ -29,20 +29,23 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ModelEventType extends EventType implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     // TODO kind of modification reported (create/update/delete)??
     private String modelchange;
 
     public String getModelChange() {
-        return modelchange;
+        return this.modelchange;
     }
 
-    public void setModelChange(String modelchange) {
+    public void setModelChange(final String modelchange) {
         this.modelchange = modelchange;
     }
-    
-    
+
 }

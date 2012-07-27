@@ -38,7 +38,11 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -136,6 +140,7 @@ public class User implements Serializable {
     }
 
     @ManyToMany(mappedBy = "users")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
     }

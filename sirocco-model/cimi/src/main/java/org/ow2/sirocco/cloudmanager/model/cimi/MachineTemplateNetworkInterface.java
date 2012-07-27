@@ -33,12 +33,14 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MachineTemplateNetworkInterface extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -46,13 +48,10 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
         ACTIVE, PASSIVE
     }
 
-    @OneToMany
     private List<Address> addresses;
 
-    @ManyToOne
     private Network network;
 
-    @OneToOne
     private NetworkPort networkPort;
 
     private InterfaceState state;
@@ -88,6 +87,7 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
 
     @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<Address> getAddresses() {
         return this.addresses;
     }
@@ -97,6 +97,7 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Network getNetwork() {
         return this.network;
     }

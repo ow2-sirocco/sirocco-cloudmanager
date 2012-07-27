@@ -31,7 +31,11 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MachineNetworkInterfaceAddress extends CloudEntity implements Serializable, Identifiable {
 
     private static final long serialVersionUID = 1L;
@@ -53,6 +57,7 @@ public class MachineNetworkInterfaceAddress extends CloudEntity implements Seria
     }
 
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.REMOVE})
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Address getAddress() {
         return this.address;
     }

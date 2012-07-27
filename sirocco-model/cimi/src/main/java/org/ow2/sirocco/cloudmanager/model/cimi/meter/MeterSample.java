@@ -32,30 +32,33 @@ import javax.persistence.Entity;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MeterSample extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    
-    protected Date      timestamp;
-    
-    private String      value;
+
+    protected Date timestamp;
+
+    private String value;
 
     @Temporal(TemporalType.TIMESTAMP)
     public Date getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(final Date timestamp) {
         this.timestamp = timestamp;
     }
 
     public String getValue() {
-        return value;
+        return this.value;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 }

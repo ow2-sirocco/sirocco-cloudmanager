@@ -34,10 +34,13 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MachineTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -63,6 +66,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public MachineConfiguration getMachineConfiguration() {
         return this.machineConfiguration;
     }
@@ -72,6 +76,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public MachineImage getMachineImage() {
         return this.machineImage;
     }
@@ -81,6 +86,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Credentials getCredentials() {
         return this.credentials;
     }
@@ -91,6 +97,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
@@ -113,6 +120,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<MachineVolumeTemplate> getVolumeTemplates() {
         return this.volumeTemplates;
     }
@@ -136,6 +144,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<MachineTemplateNetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }

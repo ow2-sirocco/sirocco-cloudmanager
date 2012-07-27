@@ -30,7 +30,11 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class NetworkPortTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -39,6 +43,7 @@ public class NetworkPortTemplate extends CloudEntity implements Serializable {
     private NetworkPortConfiguration networkPortConfig;
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public NetworkPortConfiguration getNetworkPortConfig() {
         return this.networkPortConfig;
     }
@@ -48,6 +53,7 @@ public class NetworkPortTemplate extends CloudEntity implements Serializable {
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Network getNetwork() {
         return this.network;
     }

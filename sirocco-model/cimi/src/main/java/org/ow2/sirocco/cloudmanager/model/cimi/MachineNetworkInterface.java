@@ -36,13 +36,15 @@ import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MachineNetworkInterface extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -52,10 +54,8 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
 
     private List<MachineNetworkInterfaceAddress> addresses;
 
-    @ManyToOne
     private Network network;
 
-    @OneToOne
     private NetworkPort networkPort;
 
     private InterfaceState state;
@@ -101,6 +101,7 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
     @LazyCollection(LazyCollectionOption.FALSE)
     @OrderBy("id")
     @JoinColumn(name = "machinenetworkinterface_id", referencedColumnName = "id")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<MachineNetworkInterfaceAddress> getAddresses() {
         return this.addresses;
     }
@@ -122,6 +123,7 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Network getNetwork() {
         return this.network;
     }

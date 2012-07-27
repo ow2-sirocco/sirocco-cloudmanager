@@ -32,9 +32,12 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class SystemTemplate extends CloudTemplate {
     private static final long serialVersionUID = 1L;
 
@@ -42,6 +45,7 @@ public class SystemTemplate extends CloudTemplate {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "system_temp_id")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public Set<ComponentDescriptor> getComponentDescriptors() {
         return this.componentDescriptors;
     }

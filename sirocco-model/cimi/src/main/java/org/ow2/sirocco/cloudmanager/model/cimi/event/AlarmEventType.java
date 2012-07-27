@@ -29,20 +29,22 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AlarmEventType extends EventType implements Serializable {
     private static final long serialVersionUID = 1L;
-    
-    private String  code;
+
+    private String code;
 
     public String getCode() {
-        return code;
+        return this.code;
     }
 
-    public void setCode(String code) {
+    public void setCode(final String code) {
         this.code = code;
     }
-   
-    
-    
+
 }

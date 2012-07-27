@@ -28,10 +28,13 @@ package org.ow2.sirocco.cloudmanager.model.cimi.system;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class SystemVolume extends CloudCollectionItem {
     private static final long serialVersionUID = 1L;
 

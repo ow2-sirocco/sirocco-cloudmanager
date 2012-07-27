@@ -32,77 +32,82 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Event extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected Date      timestamp;
-    
-    protected String    type;
-    
-    
+    protected Date timestamp;
+
+    protected String type;
+
     protected EventType content;
-    
+
     public static enum Outcome {
         PENDING, UNKNOWN, STATUS, SUCCESS, WARNING, FAILURE
     }
-    protected Outcome    outcome;
-    
+
+    protected Outcome outcome;
+
     public static enum Severity {
         CRITICAL, HIGH, MEDIUM, LOW
     }
-    protected Severity  severity;
-    
-    protected String    contact;
-    
+
+    protected Severity severity;
+
+    protected String contact;
+
     public Date getTimestamp() {
-        return timestamp;
+        return this.timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(final Date timestamp) {
         this.timestamp = timestamp;
     }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
-    public void setType(String type) {
+    public void setType(final String type) {
         this.type = type;
     }
 
-    @OneToOne(cascade=CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public EventType getContent() {
-        return content;
+        return this.content;
     }
 
-    public void setContent(EventType content) {
+    public void setContent(final EventType content) {
         this.content = content;
     }
 
     public Outcome getOutcome() {
-        return outcome;
+        return this.outcome;
     }
 
-    public void setOutcome(Outcome outcome) {
+    public void setOutcome(final Outcome outcome) {
         this.outcome = outcome;
     }
 
     public Severity getSeverity() {
-        return severity;
+        return this.severity;
     }
 
-    public void setSeverity(Severity severity) {
+    public void setSeverity(final Severity severity) {
         this.severity = severity;
     }
 
     public String getContact() {
-        return contact;
+        return this.contact;
     }
 
-    public void setContact(String contact) {
+    public void setContact(final String contact) {
         this.contact = contact;
     }
 

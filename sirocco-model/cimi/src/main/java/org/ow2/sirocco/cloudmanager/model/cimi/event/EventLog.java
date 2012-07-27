@@ -25,8 +25,8 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi.event;
 
-import java.util.List;
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embedded;
@@ -34,58 +34,61 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EventLog extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private CloudResource targetResource;
-    
-    @OneToMany
-    private List<Event>    events;
- 
+
+    private List<Event> events;
+
     private EventLogTemplate.Persistence persistence;
-    
+
     @Embedded
     private EventLogSummary summary;
 
     // TODO check
     @OneToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudResource getTargetResource() {
-        return targetResource;
+        return this.targetResource;
     }
 
-    public void setTargetResource(CloudResource targetResource) {
+    public void setTargetResource(final CloudResource targetResource) {
         this.targetResource = targetResource;
     }
 
-    @OneToMany(cascade=CascadeType.ALL)
+    @OneToMany(cascade = CascadeType.ALL)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<Event> getEvents() {
-        return events;
+        return this.events;
     }
 
-    public void setEvents(List<Event> events) {
+    public void setEvents(final List<Event> events) {
         this.events = events;
     }
 
     public EventLogTemplate.Persistence getPersistence() {
-        return persistence;
+        return this.persistence;
     }
 
-    public void setPersistence(EventLogTemplate.Persistence persistence) {
+    public void setPersistence(final EventLogTemplate.Persistence persistence) {
         this.persistence = persistence;
     }
 
     @Embedded
     public EventLogSummary getSummary() {
-        return summary;
+        return this.summary;
     }
 
-    public void setSummary(EventLogSummary summary) {
+    public void setSummary(final EventLogSummary summary) {
         this.summary = summary;
     }
-    
-    
+
 }

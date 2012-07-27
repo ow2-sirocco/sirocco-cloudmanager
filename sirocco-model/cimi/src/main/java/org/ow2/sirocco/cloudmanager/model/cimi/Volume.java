@@ -38,11 +38,14 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM Volume v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class Volume extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
@@ -105,6 +108,7 @@ public class Volume extends CloudResource implements Serializable, ICloudProvide
     }
 
     @OneToMany(fetch = FetchType.EAGER)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<VolumeVolumeImage> getImages() {
         return this.images;
     }
@@ -114,6 +118,7 @@ public class Volume extends CloudResource implements Serializable, ICloudProvide
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -123,6 +128,7 @@ public class Volume extends CloudResource implements Serializable, ICloudProvide
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudProviderLocation getLocation() {
         return this.location;
     }
@@ -132,6 +138,7 @@ public class Volume extends CloudResource implements Serializable, ICloudProvide
     }
 
     @OneToOne(mappedBy = "volume")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public MachineVolume getAttachment() {
         return this.attachment;
     }

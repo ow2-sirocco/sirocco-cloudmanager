@@ -41,6 +41,8 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -48,6 +50,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
 public class Machine extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
@@ -66,14 +69,10 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     private Integer memory;
 
-    @OneToMany
     private List<MachineVolume> volumes;
 
-    @OneToMany
     private List<MachineDisk> disks;
 
-    @OneToMany
-    @JoinColumn(name = "machine_id", referencedColumnName = "id")
     private List<MachineNetworkInterface> networkInterfaces;
 
     private CloudProviderAccount cloudProviderAccount;
@@ -114,6 +113,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<MachineDisk> getDisks() {
         return this.disks;
     }
@@ -130,6 +130,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
@@ -155,6 +156,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "machine_id", referencedColumnName = "id")
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public List<MachineNetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
@@ -170,6 +172,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -256,6 +259,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     }
 
     @ManyToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public CloudProviderLocation getLocation() {
         return this.location;
     }

@@ -26,18 +26,24 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+
 import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToOne;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToOne;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MachineVolumeTemplate implements Serializable, Identifiable {
 
     private static final long serialVersionUID = 1L;
+
     private Integer id;
+
     private String initialLocation;
 
     private VolumeTemplate volumeTemplate;
@@ -48,25 +54,26 @@ public class MachineVolumeTemplate implements Serializable, Identifiable {
         return this.id;
     }
 
-    public void setId(Integer id) {
+    public void setId(final Integer id) {
         this.id = id;
     }
 
     // TODO unidirectional
     @OneToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     public VolumeTemplate getVolumeTemplate() {
-        return volumeTemplate;
+        return this.volumeTemplate;
     }
 
-    public void setVolumeTemplate(VolumeTemplate volumeTemplate) {
+    public void setVolumeTemplate(final VolumeTemplate volumeTemplate) {
         this.volumeTemplate = volumeTemplate;
     }
 
     public String getInitialLocation() {
-        return initialLocation;
+        return this.initialLocation;
     }
 
-    public void setInitialLocation(String initialLocation) {
+    public void setInitialLocation(final String initialLocation) {
         this.initialLocation = initialLocation;
     }
 

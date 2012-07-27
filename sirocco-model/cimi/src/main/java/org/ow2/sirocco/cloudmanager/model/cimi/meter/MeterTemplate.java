@@ -29,34 +29,35 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
-
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 @Entity
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class MeterTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     // Unidirectional
-    protected CloudResource         targetResource;
-    
-    protected MeterConfiguration    meterConfiguration;
+    protected CloudResource targetResource;
+
+    protected MeterConfiguration meterConfiguration;
 
     public MeterConfiguration getMeterConfiguration() {
-        return meterConfiguration;
+        return this.meterConfiguration;
     }
 
-    public void setMeterConfiguration(MeterConfiguration meterConfiguration) {
+    public void setMeterConfiguration(final MeterConfiguration meterConfiguration) {
         this.meterConfiguration = meterConfiguration;
     }
 
     public CloudResource getTargetResource() {
-        return targetResource;
+        return this.targetResource;
     }
 
-    public void setTargetResource(CloudResource targetResource) {
+    public void setTargetResource(final CloudResource targetResource) {
         this.targetResource = targetResource;
     }
-    
-    
+
 }
