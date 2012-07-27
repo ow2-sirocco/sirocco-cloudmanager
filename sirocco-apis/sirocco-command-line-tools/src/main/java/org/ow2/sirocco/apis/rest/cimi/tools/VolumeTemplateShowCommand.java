@@ -55,6 +55,9 @@ public class VolumeTemplateShowCommand implements Command {
         table.addCell("id");
         table.addCell(volumeTemplate.getId());
 
+        table.addCell("name");
+        table.addCell(volumeTemplate.getName());
+
         table.addCell("description");
         table.addCell(volumeTemplate.getDescription());
 
