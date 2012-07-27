@@ -23,6 +23,10 @@ import org.apache.log4j.Logger;
 import org.hibernate.proxy.HibernateProxy;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.util.FilterExpressionParser;
+import org.ow2.sirocco.cloudmanager.core.util.ParseException;
+import org.ow2.sirocco.cloudmanager.core.util.TokenMgrError;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
@@ -177,9 +181,24 @@ public class UtilsForManagers {
 
     }
 
+    private static String generateFilterClause(final List<String> filters, final String variableName) throws ParseException {
+        StringBuffer jpqlFilterClause = new StringBuffer();
+        if (filters != null) {
+            for (String filter : filters) {
+                FilterExpressionParser parser = new FilterExpressionParser(filter, variableName);
+                parser.parse();
+                if (jpqlFilterClause.length() > 0) {
+                    jpqlFilterClause.append(" AND ");
+                }
+                jpqlFilterClause.append(parser.getQuery());
+            }
+        }
+        return jpqlFilterClause.toString();
+    }
+
     public static <E> QueryResult<E> getEntityList(final String entityType, final EntityManager em, final String username,
         final int first, final int last, final List<String> filters, final List<String> attributes,
-        final boolean verifyDeletedState) {
+        final boolean verifyDeletedState) throws InvalidRequestException {
         StringBuffer whereClauseSB = new StringBuffer();
         if (username != null) {
             whereClauseSB.append(" v.user.username=:username ");
@@ -190,29 +209,49 @@ public class UtilsForManagers {
             }
             whereClauseSB.append(" v.state<>'DELETED' ");
         }
-        String whereClause = whereClauseSB.toString();
-        int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + entityType + " v WHERE " + whereClause)
-            .setParameter("username", username).getSingleResult()).intValue();
-        Query query = em.createQuery("FROM " + entityType + " v WHERE " + whereClause + " ORDER BY v.id").setParameter(
-            "username", username);
-        if (first != -1) {
-            query.setFirstResult(first);
-        }
-        if (last != -1) {
-            if (first != -1) {
-                query.setMaxResults(last - first + 1);
-            } else {
-                query.setMaxResults(last + 1);
+        if (filters != null) {
+            String filterClause;
+            try {
+                filterClause = UtilsForManagers.generateFilterClause(filters, "v");
+            } catch (ParseException ex) {
+                throw new InvalidRequestException("Parsing error in filter expression " + ex.getMessage());
+            } catch (TokenMgrError ex) {
+                throw new InvalidRequestException(ex.getMessage());
+            }
+            if (!filterClause.isEmpty()) {
+                if (whereClauseSB.length() > 0) {
+                    whereClauseSB.append(" AND ");
+                }
+                whereClauseSB.append(filterClause);
             }
         }
-        List<E> items = query.getResultList();
-        return new QueryResult<E>(count, items);
+        String whereClause = whereClauseSB.toString();
+        try {
+            int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + entityType + " v WHERE " + whereClause)
+                .setParameter("username", username).getSingleResult()).intValue();
+            Query query = em.createQuery("FROM " + entityType + " v WHERE " + whereClause + " ORDER BY v.id").setParameter(
+                "username", username);
+            if (first != -1) {
+                query.setFirstResult(first);
+            }
+            if (last != -1) {
+                if (first != -1) {
+                    query.setMaxResults(last - first + 1);
+                } else {
+                    query.setMaxResults(last + 1);
+                }
+            }
+            List<E> items = query.getResultList();
+            return new QueryResult<E>(count, items);
+        } catch (IllegalArgumentException ex) {
+            throw new InvalidRequestException(ex.getMessage());
+        }
     }
 
     public static <E> QueryResult<E> getCollectionItemList(final String entityType, final EntityManager em,
         final String username, final int first, final int last, final List<String> filters, final List<String> attributes,
         final boolean verifyDeletedState, final String containerType, final String containerAttributeName,
-        final String containerId) {
+        final String containerId) throws InvalidRequestException {
         StringBuffer whereClauseSB = new StringBuffer();
         if (username != null) {
             whereClauseSB.append(" v.user.username=:username ");
@@ -227,28 +266,49 @@ public class UtilsForManagers {
             whereClauseSB.append(" AND ");
         }
         whereClauseSB.append("v.id=:cid ");
+        if (filters != null) {
+            String filterClause;
+            try {
+                filterClause = UtilsForManagers.generateFilterClause(filters, "vv");
+            } catch (ParseException ex) {
+                throw new InvalidRequestException("Parsing error in filter expression " + ex.getMessage());
+            } catch (TokenMgrError ex) {
+                throw new InvalidRequestException(ex.getMessage());
+            }
+            if (!filterClause.isEmpty()) {
+                if (whereClauseSB.length() > 0) {
+                    whereClauseSB.append(" AND ");
+                }
+                whereClauseSB.append(filterClause);
+            }
+        }
+
         String whereClause = whereClauseSB.toString();
         String queryExpression = "SELECT COUNT(vv) FROM " + entityType + " vv, " + containerType + " v WHERE vv MEMBER OF v."
             + containerAttributeName + " AND " + whereClause;
-        int count = ((Number) em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(containerId))
-            .setParameter("username", username).getSingleResult()).intValue();
-        queryExpression = "SELECT vv FROM " + entityType + " vv, " + containerType + " v WHERE vv MEMBER OF v."
-            + containerAttributeName + " AND " + whereClause + " ORDER BY vv.id";
-        Query query = em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(containerId))
-            .setParameter("username", username);
+        try {
+            int count = ((Number) em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(containerId))
+                .setParameter("username", username).getSingleResult()).intValue();
+            queryExpression = "SELECT vv FROM " + entityType + " vv, " + containerType + " v WHERE vv MEMBER OF v."
+                + containerAttributeName + " AND " + whereClause + " ORDER BY vv.id";
+            Query query = em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(containerId))
+                .setParameter("username", username);
 
-        if (first != -1) {
-            query.setFirstResult(first);
-        }
-        if (last != -1) {
             if (first != -1) {
-                query.setMaxResults(last - first + 1);
-            } else {
-                query.setMaxResults(last + 1);
+                query.setFirstResult(first);
             }
+            if (last != -1) {
+                if (first != -1) {
+                    query.setMaxResults(last - first + 1);
+                } else {
+                    query.setMaxResults(last + 1);
+                }
+            }
+            List<E> items = query.getResultList();
+            return new QueryResult<E>(count, items);
+        } catch (IllegalArgumentException ex) {
+            throw new InvalidRequestException(ex.getMessage());
         }
-        List<E> items = query.getResultList();
-        return new QueryResult<E>(count, items);
     }
 
     /**

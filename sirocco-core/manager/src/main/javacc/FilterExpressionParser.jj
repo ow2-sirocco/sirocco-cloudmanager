@@ -1,0 +1,218 @@
+PARSER_BEGIN(FilterExpressionParser)
+
+package org.ow2.sirocco.cloudmanager.core.util;
+
+import java.lang.StringBuffer;
+import java.io.StringReader;
+import java.io.Reader;
+
+public class FilterExpressionParser {
+    
+    private StringBuffer jpqlQuery;  // internal SQL representation.
+    private String variableName;
+    
+    public FilterExpressionParser(String s, String variableName) 
+    {
+        this((Reader)(new StringReader(s))); 
+        jpqlQuery = new StringBuffer(); 
+        this.variableName=variableName;
+    }
+    
+    public String getQuery()
+    {
+        return jpqlQuery.toString();
+    }
+       
+    public static void main(String args[])
+    {
+        try
+        {
+                String query = args[0];
+                FilterExpressionParser parser = new FilterExpressionParser(query,"p");
+                parser.parse();
+                System.out.println("\nJPQL Query: " + parser.getQuery());
+        }
+        catch(Exception e)
+        {
+                e.printStackTrace();
+        }
+    }
+}
+PARSER_END(FilterExpressionParser) 
+
+SKIP :                              
+{
+    " "
+    | "\t"
+    | "\r"
+    | "\n"
+
+}
+
+
+TOKEN: 
+{
+      <AND: "and">
+   |  <OR:  "or">
+   |  <LPAREN: "(">
+   |  <RPAREN: ")">
+   |  <EQUALS: "=">
+   |  <NOTEQUAL: "!=">
+   |  <GT: ">">
+   |  <LT: "<">
+   |  <GE: ">=">
+   |  <LE: "<=">
+   |  <PROPERTY: "property">
+   |  <LBRACKET: "[">
+   |  <RBRACKET: "]">
+}
+
+TOKEN : 
+{
+        < STRING : (["A"-"Z","a"-"z"])(["A"-"Z","a"-"z","0"-"9"])* >
+|       < SINGLE_QUOTED_STRING: "\'" (~["\'"])+ "\'" >
+|       < DOUBLE_QUOTED_STRING: "\"" (~["\""])+ "\"" >
+|	< INTEGER : (["0"-"9"])+  >
+}
+
+
+/** 
+ *  Top level
+ */
+void parse() :
+{
+}
+{
+    expression()   <EOF>
+              {
+		jpqlQuery.insert(0,"(");
+		jpqlQuery.append(")");
+              }
+}
+
+void expression() :
+{
+}
+{            queryTerm()    
+            (
+              ( <AND>
+                { jpqlQuery.append(" AND "); }
+               | <OR> 
+                { jpqlQuery.append(" OR "); }
+              ) 
+              queryTerm() )*
+}
+
+void queryTerm() :
+{
+        Token tAttribute, tComparator, tComparand;
+        String sComparand;
+}
+{
+        compTerm()
+        |
+        <LPAREN> 
+        { jpqlQuery.append("("); }
+        expression() 
+        <RPAREN>        
+        { jpqlQuery.append(")"); }
+}
+
+
+void compTerm() :
+{
+}
+{
+	attrValueCompTerm()
+	|
+	valueAttrCompTerm()
+	|
+	propExpr()
+}
+
+void attrValueCompTerm() :
+{
+        Token tAttribute, tComparator, tComparand;
+}
+{
+        ( 
+		tAttribute=<STRING> 
+        )
+        
+        ( tComparator=<EQUALS> | tComparator=<NOTEQUAL> | tComparator=<GT> | tComparator=<GE> | tComparator=<LT> | tComparator=<LE> )
+        
+        ( 
+          tComparand=<SINGLE_QUOTED_STRING>
+          |  tComparand=<DOUBLE_QUOTED_STRING>
+	  |  tComparand=<INTEGER>
+        )
+        
+        { 
+                jpqlQuery.append(" ").append(variableName).append(".").append(tAttribute.image).append(" ").append(tComparator.image);
+                jpqlQuery.append(" ").append(tComparand.image).append(" ");
+        }
+}
+
+
+void valueAttrCompTerm() :
+{
+        Token tAttribute, tComparator, tComparand;
+}
+{
+        ( 
+          tComparand=<SINGLE_QUOTED_STRING>  
+          | tComparand=<DOUBLE_QUOTED_STRING>
+	  | tComparand=<INTEGER>
+        )
+        
+        ( tComparator=<EQUALS> | tComparator=<NOTEQUAL> | tComparator=<GT> | tComparator=<GE> | tComparator=<LT> | tComparator=<LE> )
+        
+        ( 
+		tAttribute=<STRING> 
+        )
+        
+        { 
+                jpqlQuery.append(" ").append(tComparand.image);
+                jpqlQuery.append(" ").append(tComparator.image).append(" ").append(variableName).append(".").append(tAttribute.image).append(" ");
+        }
+}
+
+void propExpr() :
+{
+        Token tPropKey, tComparator, tComparand;
+}
+{
+        
+		<PROPERTY> <LBRACKET>
+		  ( 
+          tPropKey=<SINGLE_QUOTED_STRING>
+          |  tPropKey=<DOUBLE_QUOTED_STRING>
+          )
+		<RBRACKET>
+        
+        
+        ( tComparator=<EQUALS> | tComparator=<NOTEQUAL> | tComparator=<GT> | tComparator=<GE> | tComparator=<LT> | tComparator=<LE> )
+        
+        ( 
+          tComparand=<SINGLE_QUOTED_STRING>
+          |  tComparand=<DOUBLE_QUOTED_STRING>
+        )
+        
+        { 
+                jpqlQuery.append(" ").append(variableName).append(".properties[").append(tPropKey.image).append("] ").append(tComparator.image);
+                jpqlQuery.append(" ").append(tComparand.image).append(" ");
+        }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
