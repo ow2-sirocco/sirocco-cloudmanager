@@ -29,20 +29,17 @@ import java.util.List;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
 import org.ow2.sirocco.apis.rest.cimi.sdk.Job;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineCreate;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.sdk.System;
+import org.ow2.sirocco.apis.rest.cimi.sdk.SystemCreate;
+import org.ow2.sirocco.apis.rest.cimi.sdk.SystemTemplate;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "create machine")
-public class MachineCreateCommand implements Command {
+@Parameters(commandDescription = "create system")
+public class SystemCreateCommand implements Command {
     @Parameter(names = "-template", description = "id of the template", required = true)
     private String templateId;
-
-    @Parameter(names = "-userData", description = "user data", required = false)
-    private String userData;
 
     @Parameter(names = "-name", description = "name of the template", required = false)
     private String name;
@@ -55,24 +52,22 @@ public class MachineCreateCommand implements Command {
 
     @Override
     public String getName() {
-        return "machine-create";
+        return "system-create";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        MachineCreate machineCreate = new MachineCreate();
-        MachineTemplate machineTemplate = new MachineTemplate(cimiClient, this.templateId);
-        machineTemplate.setUserData(this.userData);
-        machineCreate.setMachineTemplate(machineTemplate);
-        machineCreate.setName(this.name);
-        machineCreate.setDescription(this.description);
+        SystemCreate systemCreate = new SystemCreate();
+        systemCreate.setSystemTemplate(new SystemTemplate(cimiClient, this.templateId));
+        systemCreate.setName(this.name);
+        systemCreate.setDescription(this.description);
         if (this.properties != null) {
             for (int i = 0; i < this.properties.size() / 2; i++) {
-                machineCreate.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
+                systemCreate.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
             }
         }
-        Job job = Machine.createMachine(cimiClient, machineCreate);
-        System.out.println("Machine " + job.getTargetResourceRef() + " being created");
+        Job job = System.createSystem(cimiClient, systemCreate);
+        java.lang.System.out.println("System " + job.getTargetResourceRef() + " being created");
 
         JobListCommand.printJob(job);
 

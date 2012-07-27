@@ -24,13 +24,16 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
+import org.ow2.sirocco.apis.rest.cimi.sdk.Credential;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineImage;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.sdk.NetworkInterface;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -52,6 +55,12 @@ public class MachineTemplateCreateCommand implements Command {
     @Parameter(names = "-image", description = "machine image id", required = true)
     private String machineImageId;
 
+    @Parameter(names = "-cred", description = "credential id", required = false)
+    private String credentialId;
+
+    @Parameter(names = "-nic", description = "network interface", required = false)
+    private List<String> nicTypes;
+
     @Override
     public String getName() {
         return "machinetemplate-create";
@@ -71,6 +80,18 @@ public class MachineTemplateCreateCommand implements Command {
         machineTemplate.setMachineConfig(machineConfig);
         MachineImage machineImage = new MachineImage(cimiClient, this.machineImageId);
         machineTemplate.setMachineImage(machineImage);
+        List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
+        if (this.nicTypes != null) {
+            for (String nicType : this.nicTypes) {
+                nics.add(new NetworkInterface(NetworkInterface.Type.valueOf(nicType), ""));
+            }
+        }
+        machineTemplate.setNetworkInterface(nics);
+
+        if (this.credentialId != null) {
+            Credential cred = new Credential(cimiClient, this.credentialId);
+            machineTemplate.setCredential(cred);
+        }
 
         machineTemplate = MachineTemplate.createMachineTemplate(cimiClient, machineTemplate);
 

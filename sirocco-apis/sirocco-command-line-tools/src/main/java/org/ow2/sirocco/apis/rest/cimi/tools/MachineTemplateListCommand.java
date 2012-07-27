@@ -54,7 +54,8 @@ public class MachineTemplateListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<MachineTemplate> machineTemplates = MachineTemplate.getMachineTemplates(cimiClient);
+        List<MachineTemplate> machineTemplates = MachineTemplate.getMachineTemplates(cimiClient, this.first, this.last,
+            this.filter);
 
         Table table = new Table(3);
         table.addCell("ID");

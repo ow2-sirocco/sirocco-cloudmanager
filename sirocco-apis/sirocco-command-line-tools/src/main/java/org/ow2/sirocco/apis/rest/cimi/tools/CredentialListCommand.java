@@ -54,7 +54,7 @@ public class CredentialListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<Credential> creds = Credential.getCredentials(cimiClient);
+        List<Credential> creds = Credential.getCredentials(cimiClient, this.first, this.last, this.filter);
 
         Table table = new Table(4);
         table.addCell("ID");

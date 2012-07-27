@@ -25,8 +25,6 @@
 
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
-import java.util.List;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -34,18 +32,30 @@ import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
+import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "list cloud providers")
-public class CloudProviderListCommand implements Command {
-    public static String COMMAND_NAME = "cloud-provider-list";
+@Parameters(commandDescription = "create cloud provider location")
+public class CloudProviderLocationCreateCommand implements Command {
+    public static String COMMAND_NAME = "cloud-provider-location-create";
+
+    @Parameter(names = "-iso3166-1", description = "country code", required = true)
+    private String iso3166_1;
+
+    @Parameter(names = "-iso3166-2", description = "region code", required = false)
+    private String iso3166_2;
+
+    @Parameter(names = "-country", description = "country name", required = false)
+    private String countryName;
+
+    @Parameter(names = "-region", description = "region name", required = false)
+    private String stateName;
 
     @Override
     public String getName() {
-        return CloudProviderListCommand.COMMAND_NAME;
+        return CloudProviderLocationCreateCommand.COMMAND_NAME;
     }
 
     @Override
@@ -54,26 +64,26 @@ public class CloudProviderListCommand implements Command {
         IRemoteCloudProviderManager cloudProviderManager = (IRemoteCloudProviderManager) context
             .lookup(ICloudProviderManager.EJB_JNDI_NAME);
 
-        List<CloudProvider> providers = cloudProviderManager.getCloudProviders();
+        CloudProviderLocation location = new CloudProviderLocation();
+        location.setIso3166_1(this.iso3166_1);
+        location.setIso3166_2(this.iso3166_2);
+        location.setCountryName(this.countryName);
+        location.setStateName(this.stateName);
+
+        location = cloudProviderManager.createCloudProviderLocation(location);
 
         Table table = new Table(5);
-        table.addCell("Cloud Provider ID");
-        table.addCell("Type");
-        table.addCell("Endpoint");
-        table.addCell("Description");
-        table.addCell("Locations");
+        table.addCell("Cloud Provider Location ID");
+        table.addCell("iso3166_1");
+        table.addCell("iso3166_2");
+        table.addCell("Country");
+        table.addCell("Region");
 
-        for (CloudProvider provider : providers) {
-            table.addCell(provider.getId().toString());
-            table.addCell(provider.getCloudProviderType());
-            table.addCell(provider.getEndpoint());
-            table.addCell(provider.getDescription());
-            StringBuffer sb = new StringBuffer();
-            for (CloudProviderLocation loc : provider.getCloudProviderLocations()) {
-                sb.append(loc.getCountryName() + " ");
-            }
-            table.addCell(sb.toString());
-        }
+        table.addCell(location.getId().toString());
+        table.addCell(location.getIso3166_1());
+        table.addCell(location.getIso3166_2());
+        table.addCell(location.getCountryName());
+        table.addCell(location.getStateName());
 
         System.out.println(table.render());
     }

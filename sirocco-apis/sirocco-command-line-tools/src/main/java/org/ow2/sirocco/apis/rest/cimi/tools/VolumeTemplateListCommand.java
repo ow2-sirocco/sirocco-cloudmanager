@@ -54,7 +54,8 @@ public class VolumeTemplateListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<VolumeTemplate> volumeTemplates = VolumeTemplate.getVolumeTemplates(cimiClient);
+        List<VolumeTemplate> volumeTemplates = VolumeTemplate
+            .getVolumeTemplates(cimiClient, this.first, this.last, this.filter);
 
         Table table = new Table(3);
         table.addCell("ID");

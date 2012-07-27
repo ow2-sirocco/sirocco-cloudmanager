@@ -24,47 +24,61 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.util.Map;
+
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.sdk.SystemTemplate;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "show volume config")
-public class VolumeConfigShowCommand implements Command {
-    @Parameter(names = "-id", description = "id of the volume config", required = true)
-    private String volumeConfigId;
+@Parameters(commandDescription = "show system template")
+public class SystemTemplateShowCommand implements Command {
+    @Parameter(names = "-id", description = "id of the system template", required = true)
+    private String systemTemplateId;
 
     @Override
     public String getName() {
-        return "volumeconfig-show";
+        return "systemtemplate-show";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        VolumeConfiguration volumeConfig = VolumeConfiguration.getVolumeConfigurationByReference(cimiClient,
-            this.volumeConfigId);
+        SystemTemplate systemTemplate = SystemTemplate.getSystemTemplateByReference(cimiClient, this.systemTemplateId);
 
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");
 
         table.addCell("id");
-        table.addCell(volumeConfig.getId());
+        table.addCell(systemTemplate.getId());
 
         table.addCell("name");
-        table.addCell(volumeConfig.getName());
+        table.addCell(systemTemplate.getName());
+
         table.addCell("description");
-        table.addCell(volumeConfig.getDescription());
-        table.addCell("capacity (KB)");
-        table.addCell(Integer.toString(volumeConfig.getCapacity()));
-        table.addCell("format");
-        table.addCell(volumeConfig.getFormat());
-        table.addCell("type");
-        table.addCell(volumeConfig.getType());
+        table.addCell(systemTemplate.getDescription());
+
+        table.addCell("created");
+        table.addCell(systemTemplate.getCreated().toString());
+        table.addCell("updated");
+        if (systemTemplate.getUpdated() != null) {
+            table.addCell(systemTemplate.getUpdated().toString());
+        } else {
+            table.addCell("");
+        }
+        table.addCell("properties");
+        StringBuffer sb = new StringBuffer();
+        if (systemTemplate.getProperties() != null) {
+            for (Map.Entry<String, String> prop : systemTemplate.getProperties().entrySet()) {
+                sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+            }
+        }
+        table.addCell(sb.toString());
 
         System.out.println(table.render());
     }
+
 }

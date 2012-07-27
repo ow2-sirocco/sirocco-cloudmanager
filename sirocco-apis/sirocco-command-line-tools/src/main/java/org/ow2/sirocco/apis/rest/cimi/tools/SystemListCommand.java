@@ -29,14 +29,14 @@ import java.util.List;
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.sdk.System;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "list machine config")
-public class MachineConfigListCommand implements Command {
-    public static String COMMAND_NAME = "machineconfig-list";
+@Parameters(commandDescription = "list systems")
+public class SystemListCommand implements Command {
+    public static String COMMAND_NAME = "system-list";
 
     @Parameter(names = "-first", description = "First index of entity to return")
     private Integer first = -1;
@@ -49,39 +49,25 @@ public class MachineConfigListCommand implements Command {
 
     @Override
     public String getName() {
-        return MachineConfigListCommand.COMMAND_NAME;
+        return SystemListCommand.COMMAND_NAME;
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<MachineConfiguration> machineConfigs = MachineConfiguration.getMachineConfigurations(cimiClient, this.first,
-            this.last, this.filter);
+        List<System> systems = System.getSystems(cimiClient, this.first, this.last, this.filter);
 
-        Table table = new Table(6);
+        Table table = new Table(4);
         table.addCell("ID");
         table.addCell("Name");
         table.addCell("Description");
-        table.addCell("Cpu");
-        table.addCell("Memory (KB)");
-        table.addCell("Disks (KB)");
+        table.addCell("State");
 
-        for (MachineConfiguration machineConfig : machineConfigs) {
-            table.addCell(machineConfig.getId());
-            table.addCell(machineConfig.getName());
-            table.addCell(machineConfig.getDescription());
-            table.addCell(Integer.toString(machineConfig.getCpu()));
-            table.addCell(Integer.toString(machineConfig.getMemory()));
-
-            StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < machineConfig.getDisks().length; i++) {
-                if (i > 0) {
-                    sb.append(", ");
-                }
-                sb.append(machineConfig.getDisks()[i].capacity);
-            }
-            table.addCell((sb.toString()));
+        for (System system : systems) {
+            table.addCell(system.getId());
+            table.addCell(system.getName());
+            table.addCell(system.getDescription());
+            table.addCell(system.getState().toString());
         }
-        System.out.println(table.render());
-
+        java.lang.System.out.println(table.render());
     }
 }

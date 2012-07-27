@@ -34,18 +34,17 @@ import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "list cloud providers")
-public class CloudProviderListCommand implements Command {
-    public static String COMMAND_NAME = "cloud-provider-list";
+@Parameters(commandDescription = "list cloud provider locations")
+public class CloudProviderLocationListCommand implements Command {
+    public static String COMMAND_NAME = "cloud-provider-location-list";
 
     @Override
     public String getName() {
-        return CloudProviderListCommand.COMMAND_NAME;
+        return CloudProviderLocationListCommand.COMMAND_NAME;
     }
 
     @Override
@@ -54,25 +53,21 @@ public class CloudProviderListCommand implements Command {
         IRemoteCloudProviderManager cloudProviderManager = (IRemoteCloudProviderManager) context
             .lookup(ICloudProviderManager.EJB_JNDI_NAME);
 
-        List<CloudProvider> providers = cloudProviderManager.getCloudProviders();
+        List<CloudProviderLocation> locations = cloudProviderManager.getCloudProviderLocations();
 
         Table table = new Table(5);
-        table.addCell("Cloud Provider ID");
-        table.addCell("Type");
-        table.addCell("Endpoint");
-        table.addCell("Description");
-        table.addCell("Locations");
+        table.addCell("Cloud Provider Location ID");
+        table.addCell("iso3166_1");
+        table.addCell("iso3166_2");
+        table.addCell("Country");
+        table.addCell("Region");
 
-        for (CloudProvider provider : providers) {
-            table.addCell(provider.getId().toString());
-            table.addCell(provider.getCloudProviderType());
-            table.addCell(provider.getEndpoint());
-            table.addCell(provider.getDescription());
-            StringBuffer sb = new StringBuffer();
-            for (CloudProviderLocation loc : provider.getCloudProviderLocations()) {
-                sb.append(loc.getCountryName() + " ");
-            }
-            table.addCell(sb.toString());
+        for (CloudProviderLocation location : locations) {
+            table.addCell(location.getId().toString());
+            table.addCell(location.getIso3166_1());
+            table.addCell(location.getIso3166_2());
+            table.addCell(location.getCountryName());
+            table.addCell(location.getStateName());
         }
 
         System.out.println(table.render());

@@ -30,6 +30,7 @@ import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.sdk.NetworkInterface;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -55,6 +56,9 @@ public class MachineTemplateShowCommand implements Command {
         table.addCell("id");
         table.addCell(machineTemplate.getId());
 
+        table.addCell("name");
+        table.addCell(machineTemplate.getName());
+
         table.addCell("description");
         table.addCell(machineTemplate.getDescription());
 
@@ -63,6 +67,23 @@ public class MachineTemplateShowCommand implements Command {
 
         table.addCell("machine image id");
         table.addCell(machineTemplate.getMachineImage().getId());
+
+        table.addCell("credential id");
+        if (machineTemplate.getCredential() != null) {
+            table.addCell(machineTemplate.getCredential().getId());
+        } else {
+            table.addCell("");
+        }
+
+        table.addCell("Network Interfaces");
+        StringBuffer sb = new StringBuffer();
+        if (machineTemplate.getNetworkInterface() != null) {
+            int i = 0;
+            for (NetworkInterface nic : machineTemplate.getNetworkInterface()) {
+                sb.append("NIC#" + (i++) + ": " + nic.getType() + "  ");
+            }
+        }
+        table.addCell(sb.toString());
 
         table.addCell("created");
         table.addCell(machineTemplate.getCreated().toString());
@@ -73,7 +94,7 @@ public class MachineTemplateShowCommand implements Command {
             table.addCell("");
         }
         table.addCell("properties");
-        StringBuffer sb = new StringBuffer();
+        sb = new StringBuffer();
         if (machineTemplate.getProperties() != null) {
             for (Map.Entry<String, String> prop : machineTemplate.getProperties().entrySet()) {
                 sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");

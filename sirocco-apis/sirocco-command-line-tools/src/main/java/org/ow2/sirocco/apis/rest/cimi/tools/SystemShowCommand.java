@@ -24,47 +24,61 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.util.Map;
+
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.sdk.System;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "show volume config")
-public class VolumeConfigShowCommand implements Command {
-    @Parameter(names = "-id", description = "id of the volume config", required = true)
-    private String volumeConfigId;
+@Parameters(commandDescription = "show system")
+public class SystemShowCommand implements Command {
+    @Parameter(names = "-id", description = "id of the system", required = true)
+    private String systemId;
 
     @Override
     public String getName() {
-        return "volumeconfig-show";
+        return "system-show";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        VolumeConfiguration volumeConfig = VolumeConfiguration.getVolumeConfigurationByReference(cimiClient,
-            this.volumeConfigId);
+        System system = System.getSystemByReference(cimiClient, this.systemId);
 
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");
 
         table.addCell("id");
-        table.addCell(volumeConfig.getId());
+        table.addCell(system.getId());
 
         table.addCell("name");
-        table.addCell(volumeConfig.getName());
+        table.addCell(system.getName());
         table.addCell("description");
-        table.addCell(volumeConfig.getDescription());
-        table.addCell("capacity (KB)");
-        table.addCell(Integer.toString(volumeConfig.getCapacity()));
-        table.addCell("format");
-        table.addCell(volumeConfig.getFormat());
-        table.addCell("type");
-        table.addCell(volumeConfig.getType());
+        table.addCell(system.getDescription());
+        table.addCell("status");
+        table.addCell(system.getState().toString());
+        table.addCell("created");
+        table.addCell(system.getCreated().toString());
+        table.addCell("updated");
+        if (system.getUpdated() != null) {
+            table.addCell(system.getUpdated().toString());
+        } else {
+            table.addCell("");
+        }
+        table.addCell("properties");
+        StringBuffer sb = new StringBuffer();
+        if (system.getProperties() != null) {
+            for (Map.Entry<String, String> prop : system.getProperties().entrySet()) {
+                sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+            }
+        }
+        table.addCell(sb.toString());
 
-        System.out.println(table.render());
+        java.lang.System.out.println(table.render());
     }
+
 }

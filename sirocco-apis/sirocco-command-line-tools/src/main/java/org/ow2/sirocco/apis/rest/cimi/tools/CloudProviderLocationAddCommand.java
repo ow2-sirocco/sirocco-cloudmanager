@@ -25,27 +25,29 @@
 
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
-import java.util.List;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
-import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
+import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "list cloud providers")
-public class CloudProviderListCommand implements Command {
-    public static String COMMAND_NAME = "cloud-provider-list";
+@Parameters(commandDescription = "add location to cloud provider")
+public class CloudProviderLocationAddCommand implements Command {
+    public static String COMMAND_NAME = "cloud-provider-location-add";
+
+    @Parameter(names = "-provider", description = "provider id", required = true)
+    private String cloudProviderId;
+
+    @Parameter(names = "-location", description = "location id", required = true)
+    private String locationId;
 
     @Override
     public String getName() {
-        return CloudProviderListCommand.COMMAND_NAME;
+        return CloudProviderLocationAddCommand.COMMAND_NAME;
     }
 
     @Override
@@ -54,27 +56,7 @@ public class CloudProviderListCommand implements Command {
         IRemoteCloudProviderManager cloudProviderManager = (IRemoteCloudProviderManager) context
             .lookup(ICloudProviderManager.EJB_JNDI_NAME);
 
-        List<CloudProvider> providers = cloudProviderManager.getCloudProviders();
+        cloudProviderManager.addLocationToCloudProvider(this.cloudProviderId, this.locationId);
 
-        Table table = new Table(5);
-        table.addCell("Cloud Provider ID");
-        table.addCell("Type");
-        table.addCell("Endpoint");
-        table.addCell("Description");
-        table.addCell("Locations");
-
-        for (CloudProvider provider : providers) {
-            table.addCell(provider.getId().toString());
-            table.addCell(provider.getCloudProviderType());
-            table.addCell(provider.getEndpoint());
-            table.addCell(provider.getDescription());
-            StringBuffer sb = new StringBuffer();
-            for (CloudProviderLocation loc : provider.getCloudProviderLocations()) {
-                sb.append(loc.getCountryName() + " ");
-            }
-            table.addCell(sb.toString());
-        }
-
-        System.out.println(table.render());
     }
 }

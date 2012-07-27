@@ -55,6 +55,8 @@ public class CredentialShowCommand implements Command {
         table.addCell("id");
         table.addCell(cred.getId());
 
+        table.addCell("name");
+        table.addCell(cred.getName());
         table.addCell("description");
         table.addCell(cred.getDescription());
         table.addCell("public key");

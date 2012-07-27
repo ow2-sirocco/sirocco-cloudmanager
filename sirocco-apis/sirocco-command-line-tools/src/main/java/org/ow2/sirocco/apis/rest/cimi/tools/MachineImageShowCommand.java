@@ -55,6 +55,8 @@ public class MachineImageShowCommand implements Command {
         table.addCell("id");
         table.addCell(machineImage.getId());
 
+        table.addCell("name");
+        table.addCell(machineImage.getName());
         table.addCell("description");
         table.addCell(machineImage.getDescription());
         table.addCell("status");

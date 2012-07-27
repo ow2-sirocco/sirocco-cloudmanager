@@ -44,8 +44,8 @@ public class Client {
     @Parameter(names = "-debug", description = "turn on debug mode", required = false)
     private boolean debug;
 
-    @Parameter(names = "-mediaType", description = "media type: json or xml", required = false)
-    private String mediaType;
+    @Parameter(names = "-xml", description = "xml serialization", required = false)
+    private boolean xml;
 
     private static Command commands[] = {new MachineCreateCommand(), new MachineShowCommand(), new MachineListCommand(),
         new MachineDeleteCommand(), new MachineStartCommand(), new MachineStopCommand(), new MachineImageCreateCommand(),
@@ -57,7 +57,9 @@ public class Client {
         new VolumeConfigCreateCommand(), new VolumeConfigShowCommand(), new VolumeConfigListCommand(),
         new VolumeConfigDeleteCommand(), new VolumeTemplateCreateCommand(), new VolumeTemplateShowCommand(),
         new VolumeTemplateListCommand(), new VolumeTemplateDeleteCommand(), new VolumeCreateCommand(), new VolumeShowCommand(),
-        new VolumeListCommand(), new VolumeDeleteCommand()};
+        new VolumeListCommand(), new VolumeDeleteCommand(), new SystemCreateCommand(), new SystemDeleteCommand(),
+        new SystemListCommand(), new SystemShowCommand(), new SystemStartCommand(), new SystemStopCommand(),
+        new SystemTemplateListCommand(), new SystemTemplateShowCommand()};
 
     private Client(final String[] args) {
         String userName = System.getenv(Client.SIROCCO_USERNAME_ENV_NAME);
@@ -82,11 +84,22 @@ public class Client {
             jCommander.addCommand(command.getName(), command);
         }
 
+        String commandName = null;
         try {
             jCommander.parse(args);
-            String commandName = jCommander.getParsedCommand();
+            commandName = jCommander.getParsedCommand();
             if (commandName == null) {
-                this.printUsageAndExit(jCommander);
+                // find command name if any
+                for (String s : args) {
+                    if (!s.startsWith("-")) {
+                        commandName = s;
+                        break;
+                    }
+                }
+                if (commandName != null && jCommander.getCommands().get(commandName) == null) {
+                    commandName = null;
+                }
+                this.printUsageAndExit(jCommander, commandName);
             }
             Command command = (Command) jCommander.getCommands().get(commandName).getObjects().get(0);
 
@@ -94,18 +107,26 @@ public class Client {
             if (this.debug) {
                 options.setDebug(true);
             }
-            if (this.mediaType != null) {
-                if (this.mediaType.equals("xml")) {
-                    options.setMediaType(MediaType.APPLICATION_XML_TYPE);
-                } else if (this.mediaType.equals("json")) {
-                    options.setMediaType(MediaType.APPLICATION_JSON_TYPE);
-                }
+            if (this.xml) {
+                options.setMediaType(MediaType.APPLICATION_XML_TYPE);
+            } else {
+                options.setMediaType(MediaType.APPLICATION_JSON_TYPE);
             }
             CimiClient cimiClient = CimiClient.login(endpointUrl, userName, password, options);
 
             command.execute(cimiClient);
         } catch (ParameterException ex) {
-            this.printUsageAndExit(jCommander);
+            // find command name if any
+            for (String s : args) {
+                if (!s.startsWith("-")) {
+                    commandName = s;
+                    break;
+                }
+            }
+            if (commandName != null && jCommander.getCommands().get(commandName) == null) {
+                commandName = null;
+            }
+            this.printUsageAndExit(jCommander, commandName);
         } catch (CimiException ex) {
             System.out.println("Request failed: " + ex.getMessage());
             System.exit(1);
@@ -116,9 +137,13 @@ public class Client {
 
     }
 
-    private void printUsageAndExit(final JCommander jCommander) {
+    private void printUsageAndExit(final JCommander jCommander, final String commandName) {
         StringBuilder sb = new StringBuilder();
-        jCommander.usage(sb);
+        if (commandName != null) {
+            jCommander.usage(commandName, sb);
+        } else {
+            jCommander.usage(sb);
+        }
         System.out.println(sb.toString().replaceFirst("<main class>", "sirocco"));
         System.exit(1);
     }

@@ -36,7 +36,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "add cloud provider account to user")
-public class CloudProviderAccountAdd implements Command {
+public class CloudProviderAccountAddCommand implements Command {
     public static String COMMAND_NAME = "cloud-provider-account-add";
 
     @Parameter(names = "-account", description = "account id", required = true)
@@ -47,7 +47,7 @@ public class CloudProviderAccountAdd implements Command {
 
     @Override
     public String getName() {
-        return CloudProviderAccountAdd.COMMAND_NAME;
+        return CloudProviderAccountAddCommand.COMMAND_NAME;
     }
 
     @Override
