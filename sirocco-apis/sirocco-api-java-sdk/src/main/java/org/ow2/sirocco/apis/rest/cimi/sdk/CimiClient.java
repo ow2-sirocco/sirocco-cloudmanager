@@ -43,6 +43,14 @@ import com.sun.jersey.core.util.Base64;
 public class CimiClient {
     public static final MediaType DEFAULT_MEDIA_TYPE = MediaType.APPLICATION_JSON_TYPE;
 
+    private static final String CIMI_QUERY_EXPAND_KEYWORD = "$expand";
+
+    private static final String CIMI_QUERY_FILTER_KEYWORD = "$filter";
+
+    private static final String CIMI_QUERY_FIRST_KEYWORD = "$first";
+
+    private static final String CIMI_QUERY_LAST_KEYWORD = "$last";
+
     public static class Options {
         private boolean debug;
 
@@ -120,7 +128,7 @@ public class CimiClient {
     }
 
     String getVolumeConfigurationsPath() {
-        return this.cloudEntryPoint.getVolumeConfigurations().getHref();
+        return this.cloudEntryPoint.getVolumeConfigs().getHref();
     }
 
     String getCredentialsPath() {
@@ -133,6 +141,14 @@ public class CimiClient {
 
     String getJobsPath() {
         return this.cloudEntryPoint.getJobs().getHref();
+    }
+
+    String getSystemsPath() {
+        return this.cloudEntryPoint.getSystems().getHref();
+    }
+
+    String getSystemTemplatesPath() {
+        return this.cloudEntryPoint.getSystemTemplates().getHref();
     }
 
     private String encodeBasicAuthentication(final String userName, final String password) {
@@ -204,8 +220,21 @@ public class CimiClient {
         return new CimiClient(cimiEndpointUrl, userName, password, options);
     }
 
-    <U> U getRequest(final String path, final Class<U> clazz) throws CimiException {
-        WebResource service = this.webResource.path(path).queryParam("expand", "*");
+    <U> U getRequest(final String path, final Class<U> clazz, final int first, final int last,
+        final String... filterExpressions) throws CimiException {
+        WebResource service = this.webResource.path(path);// .queryParam(CimiClient.CIMI_QUERY_EXPAND_KEYWORD,
+                                                          // "*");
+        for (String filterExpression : filterExpressions) {
+            if (filterExpression != null) {
+                service = service.queryParam(CimiClient.CIMI_QUERY_FILTER_KEYWORD, filterExpression);
+            }
+        }
+        if (first != -1) {
+            service = service.queryParam(CimiClient.CIMI_QUERY_FIRST_KEYWORD, Integer.toString(first));
+        }
+        if (last != -1) {
+            service = service.queryParam(CimiClient.CIMI_QUERY_LAST_KEYWORD, Integer.toString(last));
+        }
         ClientResponse response = this.authentication(service, this.userName, this.password).accept(this.mediaType)
             .get(ClientResponse.class);
         this.handleResponseStatus(response);
@@ -238,7 +267,7 @@ public class CimiClient {
 
     <U extends CimiObjectCommonAbstract> U getCimiObjectByReference(final String ref, final Class<U> clazz)
         throws CimiException {
-        return this.getRequest(this.extractPath(ref), clazz);
+        return this.getRequest(this.extractPath(ref), clazz, -1, -1);
     }
 
 }

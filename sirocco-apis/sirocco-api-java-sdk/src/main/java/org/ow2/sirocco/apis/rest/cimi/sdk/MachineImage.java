@@ -30,8 +30,9 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class MachineImage extends Resource<CimiMachineImage> {
@@ -50,7 +51,6 @@ public class MachineImage extends Resource<CimiMachineImage> {
     public MachineImage(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiMachineImage());
         this.cimiObject.setHref(id);
-        this.cimiObject.setId(id);
     }
 
     MachineImage(final CimiClient cimiClient, final CimiMachineImage cimiMachineImage) {
@@ -96,9 +96,11 @@ public class MachineImage extends Resource<CimiMachineImage> {
         return new Job(client, cimiObject);
     }
 
-    public static List<MachineImage> getMachineImages(final CimiClient client) throws CimiException {
+    public static List<MachineImage> getMachineImages(final CimiClient client, final int first, final int last,
+        final String... filterExpression) throws CimiException {
         CimiMachineImageCollection machineImagesCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getMachineImages().getHref()), CimiMachineImageCollection.class);
+            client.extractPath(client.cloudEntryPoint.getMachineImages().getHref()), CimiMachineImageCollectionRoot.class,
+            first, last, filterExpression);
 
         List<MachineImage> result = new ArrayList<MachineImage>();
 

@@ -30,7 +30,8 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class Volume extends Resource<CimiVolume> {
@@ -41,7 +42,6 @@ public class Volume extends Resource<CimiVolume> {
     public Volume(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiVolume());
         this.cimiObject.setHref(id);
-        this.cimiObject.setId(id);
     }
 
     Volume(final CimiClient cimiClient, final CimiVolume cimiVolume) {
@@ -86,9 +86,11 @@ public class Volume extends Resource<CimiVolume> {
         return new Job(client, cimiObject);
     }
 
-    public static List<Volume> getVolumes(final CimiClient client) throws CimiException {
+    public static List<Volume> getVolumes(final CimiClient client, final int first, final int last,
+        final String... filterExpression) throws CimiException {
         CimiVolumeCollection volumeCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getVolumes().getHref()), CimiVolumeCollection.class);
+            client.extractPath(client.cloudEntryPoint.getVolumes().getHref()), CimiVolumeCollectionRoot.class, first, last,
+            filterExpression);
         List<Volume> result = new ArrayList<Volume>();
 
         if (volumeCollection.getCollection() != null) {

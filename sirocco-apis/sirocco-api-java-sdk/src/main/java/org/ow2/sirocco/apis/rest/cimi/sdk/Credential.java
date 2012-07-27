@@ -28,23 +28,23 @@ package org.ow2.sirocco.apis.rest.cimi.sdk;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentials;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialsCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
-public class Credential extends Resource<CimiCredentials> {
+public class Credential extends Resource<CimiCredential> {
 
     public Credential() {
-        super(null, new CimiCredentials());
+        super(null, new CimiCredential());
     }
 
     public Credential(final CimiClient cimiClient, final String id) {
-        super(cimiClient, new CimiCredentials());
+        super(cimiClient, new CimiCredential());
         this.cimiObject.setHref(id);
-        this.cimiObject.setId(id);
     }
 
-    Credential(final CimiClient cimiClient, final CimiCredentials cimiObject) {
+    Credential(final CimiClient cimiClient, final CimiCredential cimiObject) {
         super(cimiClient, cimiObject);
     }
 
@@ -82,19 +82,21 @@ public class Credential extends Resource<CimiCredentials> {
 
     public static Credential createCredential(final CimiClient client, final CredentialCreate credentialCreate)
         throws CimiException {
-        CimiCredentials cimiObject = client.postRequest(ConstantsPath.CREDENTIAL_PATH, credentialCreate.cimiCredentialsCreate,
-            CimiCredentials.class);
+        CimiCredential cimiObject = client.postRequest(ConstantsPath.CREDENTIAL_PATH, credentialCreate.cimiCredentialsCreate,
+            CimiCredential.class);
         return new Credential(client, cimiObject);
     }
 
-    public static List<Credential> getCredentials(final CimiClient client) throws CimiException {
-        CimiCredentialsCollection credentialCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getCredentials().getHref()), CimiCredentialsCollection.class);
+    public static List<Credential> getCredentials(final CimiClient client, final int first, final int last,
+        final String... filterExpression) throws CimiException {
+        CimiCredentialCollection credentialCollection = client.getRequest(
+            client.extractPath(client.cloudEntryPoint.getCredentials().getHref()), CimiCredentialCollectionRoot.class, first,
+            last, filterExpression);
 
         List<Credential> result = new ArrayList<Credential>();
 
         if (credentialCollection.getCollection() != null) {
-            for (CimiCredentials cimiCrdential : credentialCollection.getCollection().getArray()) {
+            for (CimiCredential cimiCrdential : credentialCollection.getCollection().getArray()) {
                 result.add(new Credential(client, cimiCrdential));
             }
         }
@@ -102,12 +104,12 @@ public class Credential extends Resource<CimiCredentials> {
     }
 
     public static Credential getCredentialByReference(final CimiClient client, final String ref) throws CimiException {
-        return new Credential(client, client.getCimiObjectByReference(ref, CimiCredentials.class));
+        return new Credential(client, client.getCimiObjectByReference(ref, CimiCredential.class));
     }
 
     public static Credential getCredentialById(final CimiClient client, final String id) throws CimiException {
         String path = client.getCredentialsPath() + "/" + id;
-        return new Credential(client, client.getCimiObjectByReference(path, CimiCredentials.class));
+        return new Credential(client, client.getCimiObjectByReference(path, CimiCredential.class));
     }
 
 }

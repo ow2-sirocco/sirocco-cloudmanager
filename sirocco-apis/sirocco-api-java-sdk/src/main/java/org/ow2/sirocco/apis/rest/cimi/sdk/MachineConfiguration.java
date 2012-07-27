@@ -30,7 +30,8 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
@@ -57,7 +58,6 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
     public MachineConfiguration(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiMachineConfiguration());
         this.cimiObject.setHref(id);
-        this.cimiObject.setId(id);
     }
 
     MachineConfiguration(final CimiClient cimiClient, final CimiMachineConfiguration cimiObject) {
@@ -118,9 +118,11 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
         return new MachineConfiguration(client, cimiObject);
     }
 
-    public static List<MachineConfiguration> getMachineConfigurations(final CimiClient client) throws CimiException {
+    public static List<MachineConfiguration> getMachineConfigurations(final CimiClient client, final int first, final int last,
+        final String... filterExpression) throws CimiException {
         CimiMachineConfigurationCollection machineConfigCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getMachineConfigs().getHref()), CimiMachineConfigurationCollection.class);
+            client.extractPath(client.cloudEntryPoint.getMachineConfigs().getHref()),
+            CimiMachineConfigurationCollectionRoot.class, first, last, filterExpression);
 
         List<MachineConfiguration> result = new ArrayList<MachineConfiguration>();
 

@@ -30,8 +30,9 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeImageCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeImageCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class VolumeImage extends Resource<CimiVolumeImage> {
@@ -46,7 +47,6 @@ public class VolumeImage extends Resource<CimiVolumeImage> {
     public VolumeImage(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiVolumeImage());
         this.cimiObject.setHref(id);
-        this.cimiObject.setId(id);
     }
 
     VolumeImage(final CimiClient cimiClient, final CimiVolumeImage cimiVolumeImage) {
@@ -92,9 +92,11 @@ public class VolumeImage extends Resource<CimiVolumeImage> {
         return new Job(client, cimiObject);
     }
 
-    public static List<VolumeImage> getVolumeImages(final CimiClient client) throws CimiException {
+    public static List<VolumeImage> getVolumeImages(final CimiClient client, final int first, final int last,
+        final String... filterExpression) throws CimiException {
         CimiVolumeImageCollection volumeImagesCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getVolumeImages().getHref()), CimiVolumeImageCollection.class);
+            client.extractPath(client.cloudEntryPoint.getVolumeImages().getHref()), CimiVolumeImageCollectionRoot.class, first,
+            last, filterExpression);
 
         List<VolumeImage> result = new ArrayList<VolumeImage>();
 

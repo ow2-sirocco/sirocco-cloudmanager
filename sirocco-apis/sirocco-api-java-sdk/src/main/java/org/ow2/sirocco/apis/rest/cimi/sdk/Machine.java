@@ -32,9 +32,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Machine.NetworkInterface.Type;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class Machine extends Resource<CimiMachine> {
@@ -42,34 +43,9 @@ public class Machine extends Resource<CimiMachine> {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
     }
 
-    public static class NetworkInterface {
-        public static enum Type {
-            PUBLIC, PRIVATE
-        }
-
-        private final Type type;
-
-        private final String ip;
-
-        public Type getType() {
-            return this.type;
-        }
-
-        public String getIp() {
-            return this.ip;
-        }
-
-        public NetworkInterface(final Type type, final String ip) {
-            super();
-            this.type = type;
-            this.ip = ip;
-        }
-    }
-
     public Machine(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiMachine());
         this.cimiObject.setHref(id);
-        this.cimiObject.setId(id);
     }
 
     Machine(final CimiClient cimiClient, final CimiMachine cimiMachine) {
@@ -94,13 +70,17 @@ public class Machine extends Resource<CimiMachine> {
 
     public List<NetworkInterface> getNetworkInterface() {
         List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
-        for (CimiMachineNetworkInterface cimiNic : this.cimiObject.getNetworkInterfaces().getArray()) {
-            String ip = "";
-            if (cimiNic.getAddresses().getArray().length > 0) {
-                ip = cimiNic.getAddresses().getArray()[0].getAddress().getIp();
+        if (this.cimiObject.getNetworkInterfaces().getArray() != null) {
+            for (CimiMachineNetworkInterface cimiNic : this.cimiObject.getNetworkInterfaces().getArray()) {
+                String ip = "";
+                if (cimiNic.getAddresses().getArray() != null && cimiNic.getAddresses().getArray().length > 0) {
+                    ip = cimiNic.getAddresses().getArray()[0].getAddress().getIp();
+                }
+                NetworkInterface nic = new NetworkInterface(
+                    cimiNic.getNetworkType().equalsIgnoreCase("public") ? NetworkInterface.Type.PUBLIC
+                        : NetworkInterface.Type.PRIVATE, ip);
+                nics.add(nic);
             }
-            NetworkInterface nic = new NetworkInterface(Type.PUBLIC, ip);
-            nics.add(nic);
         }
         return nics;
     }
@@ -129,9 +109,11 @@ public class Machine extends Resource<CimiMachine> {
         return new Job(client, cimiObject);
     }
 
-    public static List<Machine> getMachines(final CimiClient client) throws CimiException {
+    public static List<Machine> getMachines(final CimiClient client, final int first, final int last,
+        final String... filterExpression) throws CimiException {
         CimiMachineCollection machinesCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getMachines().getHref()), CimiMachineCollection.class);
+            client.extractPath(client.cloudEntryPoint.getMachines().getHref()), CimiMachineCollectionRoot.class, first, last,
+            filterExpression);
         List<Machine> result = new ArrayList<Machine>();
 
         if (machinesCollection.getCollection() != null) {
@@ -143,7 +125,12 @@ public class Machine extends Resource<CimiMachine> {
     }
 
     public static Machine getMachineByReference(final CimiClient client, final String ref) throws CimiException {
-        return new Machine(client, client.getCimiObjectByReference(ref, CimiMachine.class));
+        Machine result = new Machine(client, client.getCimiObjectByReference(ref, CimiMachine.class));
+        String machineNicsRef = result.cimiObject.getNetworkInterfaces().getHref();
+        CimiMachineNetworkInterfaceCollectionRoot nics = client.getRequest(client.extractPath(machineNicsRef),
+            CimiMachineNetworkInterfaceCollectionRoot.class, -1, -1);
+        result.cimiObject.getNetworkInterfaces().setArray(nics.getArray());
+        return result;
     }
 
     public static Machine getMachineById(final CimiClient client, final String id) throws Exception {

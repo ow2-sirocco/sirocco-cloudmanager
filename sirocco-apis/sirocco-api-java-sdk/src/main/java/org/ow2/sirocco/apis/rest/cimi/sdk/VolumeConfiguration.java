@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeConfigurationCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class VolumeConfiguration extends Resource<CimiVolumeConfiguration> {
@@ -41,7 +42,6 @@ public class VolumeConfiguration extends Resource<CimiVolumeConfiguration> {
     public VolumeConfiguration(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiVolumeConfiguration());
         this.cimiObject.setHref(id);
-        this.cimiObject.setId(id);
     }
 
     VolumeConfiguration(final CimiClient cimiClient, final CimiVolumeConfiguration cimiObject) {
@@ -83,10 +83,11 @@ public class VolumeConfiguration extends Resource<CimiVolumeConfiguration> {
         return new VolumeConfiguration(client, cimiObject);
     }
 
-    public static List<VolumeConfiguration> getVolumeConfigurations(final CimiClient client) throws CimiException {
+    public static List<VolumeConfiguration> getVolumeConfigurations(final CimiClient client, final int first, final int last,
+        final String... filterExpression) throws CimiException {
         CimiVolumeConfigurationCollection volumeConfigCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getVolumeConfigurations().getHref()),
-            CimiVolumeConfigurationCollection.class);
+            client.extractPath(client.cloudEntryPoint.getVolumeConfigs().getHref()),
+            CimiVolumeConfigurationCollectionRoot.class, first, last, filterExpression);
 
         List<VolumeConfiguration> result = new ArrayList<VolumeConfiguration>();
 

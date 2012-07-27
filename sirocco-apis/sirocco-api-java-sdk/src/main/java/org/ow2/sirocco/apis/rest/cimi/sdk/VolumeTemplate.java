@@ -29,7 +29,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeTemplateCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class VolumeTemplate extends Resource<CimiVolumeTemplate> {
@@ -44,7 +45,6 @@ public class VolumeTemplate extends Resource<CimiVolumeTemplate> {
     public VolumeTemplate(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiVolumeTemplate());
         this.cimiObject.setHref(id);
-        this.cimiObject.setId(id);
     }
 
     public VolumeTemplate(final CimiClient cimiClient, final CimiVolumeTemplate cimiObject) {
@@ -82,9 +82,11 @@ public class VolumeTemplate extends Resource<CimiVolumeTemplate> {
         return new VolumeTemplate(client, cimiObject);
     }
 
-    public static List<VolumeTemplate> getVolumeTemplates(final CimiClient client) throws CimiException {
+    public static List<VolumeTemplate> getVolumeTemplates(final CimiClient client, final int first, final int last,
+        final String... filterExpression) throws CimiException {
         CimiVolumeTemplateCollection volumeTemplateCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getVolumeTemplates().getHref()), CimiVolumeTemplateCollection.class);
+            client.extractPath(client.cloudEntryPoint.getVolumeTemplates().getHref()), CimiVolumeTemplateCollectionRoot.class,
+            first, last, filterExpression);
 
         List<VolumeTemplate> result = new ArrayList<VolumeTemplate>();
 

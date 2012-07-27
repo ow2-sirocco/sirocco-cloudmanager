@@ -32,8 +32,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollectionRoot;
 
 public class Job extends Resource<CimiJob> {
     public static enum Status {
@@ -49,11 +49,16 @@ public class Job extends Resource<CimiJob> {
     }
 
     public String getTargetResourceRef() {
-        return this.cimiObject.getTargetResource();
+        return this.cimiObject.getTargetResource().getHref();
     }
 
     public String[] getAffectedResourceRefs() {
-        return this.cimiObject.getAffectedResources();
+        String result[] = new String[this.cimiObject.getAffectedResources() != null ? this.cimiObject.getAffectedResources().length
+            : 0];
+        for (int i = 0; i < result.length; i++) {
+            result[i] = this.cimiObject.getAffectedResources()[i].getHref();
+        }
+        return result;
     }
 
     public String getAction() {
@@ -82,27 +87,31 @@ public class Job extends Resource<CimiJob> {
 
     public void waitForCompletion(final long time, final TimeUnit unit) throws CimiException, TimeoutException,
         InterruptedException {
-        long endTime = System.nanoTime() + unit.toNanos(time);
+        long endTime = java.lang.System.nanoTime() + unit.toNanos(time);
         while (true) {
             if (this.getStatus() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
             this.cimiObject = this.cimiClient.getCimiObjectByReference(this.getId(), CimiJob.class);
-            if (System.nanoTime() > endTime) {
+            if (java.lang.System.nanoTime() > endTime) {
                 throw new TimeoutException();
             }
         }
     }
 
-    public static List<Job> getJobs(final CimiClient client) throws CimiException {
-        CimiJobCollection jobCollection = client.getRequest(client.extractPath(client.cloudEntryPoint.getJobs().getHref()),
-            CimiJobCollection.class);
+    public static List<Job> getJobs(final CimiClient client, final int first, final int last, final String... filterExpression)
+        throws CimiException {
+        org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection jobCollection = client.getRequest(
+            client.extractPath(client.cloudEntryPoint.getJobs().getHref()), CimiJobCollectionRoot.class, first, last,
+            filterExpression);
 
         List<Job> result = new ArrayList<Job>();
 
-        for (CimiJob cimiJob : jobCollection.getCollection().getArray()) {
-            result.add(new Job(client, cimiJob));
+        if (jobCollection.getCollection() != null) {
+            for (CimiJob cimiJob : jobCollection.getCollection().getArray()) {
+                result.add(new Job(client, cimiJob));
+            }
         }
         return result;
     }

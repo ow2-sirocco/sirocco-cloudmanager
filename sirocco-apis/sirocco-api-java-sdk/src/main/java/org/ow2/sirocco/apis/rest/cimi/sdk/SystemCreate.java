@@ -28,55 +28,55 @@ package org.ow2.sirocco.apis.rest.cimi.sdk;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
 
-public class CredentialCreate {
-    CimiCredentialCreate cimiCredentialsCreate;
+public class SystemCreate {
+    CimiSystemCreate cimiSystemCreate;
 
-    private CredentialTemplate credentialTemplate;
+    private SystemTemplate systemTemplate;
 
-    public CredentialCreate() {
-        this.cimiCredentialsCreate = new CimiCredentialCreate();
+    public SystemCreate() {
+        this.cimiSystemCreate = new CimiSystemCreate();
     }
 
     public String getName() {
-        return this.cimiCredentialsCreate.getName();
+        return this.cimiSystemCreate.getName();
     }
 
     public void setName(final String name) {
-        this.cimiCredentialsCreate.setName(name);
+        this.cimiSystemCreate.setName(name);
     }
 
     public String getDescription() {
-        return this.cimiCredentialsCreate.getDescription();
+        return this.cimiSystemCreate.getDescription();
     }
 
     public void setDescription(final String description) {
-        this.cimiCredentialsCreate.setDescription(description);
+        this.cimiSystemCreate.setDescription(description);
     }
 
     public Map<String, String> getProperties() {
-        return this.cimiCredentialsCreate.getProperties();
+        return this.cimiSystemCreate.getProperties();
     }
 
     public void setProperties(final Map<String, String> properties) {
-        this.cimiCredentialsCreate.setProperties(properties);
+        this.cimiSystemCreate.setProperties(properties);
     }
 
     public void addProperty(final String key, final String value) {
-        if (this.cimiCredentialsCreate.getProperties() == null) {
-            this.cimiCredentialsCreate.setProperties(new HashMap<String, String>());
+        if (this.cimiSystemCreate.getProperties() == null) {
+            this.cimiSystemCreate.setProperties(new HashMap<String, String>());
         }
-        this.cimiCredentialsCreate.getProperties().put(key, value);
+        this.cimiSystemCreate.getProperties().put(key, value);
     }
 
-    public CredentialTemplate getCredentialTemplate() {
-        return this.credentialTemplate;
+    public SystemTemplate getSystemTemplate() {
+        return this.systemTemplate;
     }
 
-    public void setCredentialTemplate(final CredentialTemplate credentialTemplate) {
-        this.credentialTemplate = credentialTemplate;
-        this.cimiCredentialsCreate.setCredentialTemplate(credentialTemplate.cimiObject);
+    public void setSystemTemplate(final SystemTemplate systemTemplate) {
+        this.systemTemplate = systemTemplate;
+        this.cimiSystemCreate.setSystemTemplate(systemTemplate.cimiObject);
     }
 
 }
