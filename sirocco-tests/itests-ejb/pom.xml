@@ -325,7 +325,7 @@
 										</jonasbase>
 
 
-										<copy todir="${jonas.base}/deploy">
+										<copy todir="${jonas.base}/deploy" overwrite="true">
 											<fileset dir="src/sirocco-config/deploy" />
 										</copy>
 										<replace file="${jonas.base}/deploy/datasource.xml" token="@db.url@" value="${database.url}" />
