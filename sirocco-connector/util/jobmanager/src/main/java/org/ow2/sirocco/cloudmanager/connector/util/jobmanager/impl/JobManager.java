@@ -40,7 +40,11 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import javax.jms.Connection;
+import javax.jms.ConnectionFactory;
+import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
+import javax.jms.Queue;
 import javax.jms.Session;
 import javax.jms.Topic;
 import javax.jms.TopicConnection;
@@ -269,10 +273,30 @@ public class JobManager implements IJobManager, ManagedService {
         try {
             JobManager.logger.info("SENDING EVENT JobCompletion action=" + job.getAction() + " target="
                 + job.getTargetEntity().getClass() + " id=" + job.getTargetEntity().getProviderAssignedId());
-            this.emitMessage(job);
+            JobManager.emitQueueMessage(job, JobManager.JMS_TOPIC_NAME);
         } catch (Exception ex) {
             JobManager.logger.error("Failed to emit message", ex);
         }
+    }
+
+    private static void emitQueueMessage(final Serializable payload, final String queueName) throws Exception {
+        InitialContext ctx = new InitialContext();
+        ConnectionFactory cf = (ConnectionFactory) ctx.lookup("QCF");
+        Queue queue = (Queue) ctx.lookup(queueName);
+        Connection conn = cf.createConnection();
+
+        Session sess = conn.createSession(true, Session.AUTO_ACKNOWLEDGE);
+
+        MessageProducer mp = sess.createProducer(queue);
+
+        ObjectMessage msg = sess.createObjectMessage();
+        // msg.setLongProperty("scheduleDate", System.currentTimeMillis() +
+        // 5000);
+        msg.setObject(payload);
+        mp.send(msg);
+
+        sess.close();
+        conn.close();
     }
 
     private void emitMessage(final Serializable payload) throws Exception {

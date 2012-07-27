@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated Mon Nov 07 11:47:30 CET 2011 by JOnAS. -->
+<deployment-plan xmlns="http://jonas.ow2.org/ns/deployment-plan/1.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:m2="http://jonas.ow2.org/ns/deployment-plan/maven2/1.0"
+  xmlns:url="http://jonas.ow2.org/ns/deployment-plan/url/1.0"
+  xsi:schemaLocation="http://jonas.ow2.org/ns/deployment-plan/1.0 http://jonas.ow2.org/ns/deployment-plan/1.0/deployment-plan-1.0.xsd
+                      http://jonas.ow2.org/ns/deployment-plan/maven2/1.0 http://jonas.ow2.org/ns/deployment-plan/maven2-deployment-plan-1.0.xsd"
+  atomic="false" id="joram">
+
+  <deployment id="org.objectweb.joram:a3-common:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>a3-common</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="org.objectweb.joram:a3-rt:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>a3-rt</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="org.objectweb.joram:jcup:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>jcup</m2:artifactId>
+    <m2:version>5.3.1</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="org.objectweb.joram:jndi-shared:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>jndi-shared</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="org.objectweb.joram:jndi-server:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>jndi-server</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="org.objectweb.joram:joram-shared:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>joram-shared</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+
+  <deployment id="org.objectweb.joram:joram-mom-core:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>joram-mom-core</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  
+    <deployment id="org.objectweb.joram:joram-mom-extensions-scheduler:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+      <m2:groupId>org.objectweb.joram</m2:groupId>
+      <m2:artifactId>joram-mom-extensions-scheduler</m2:artifactId>
+      <m2:version>5.5.0</m2:version>
+      <m2:type>jar</m2:type>
+  </deployment>
+
+  <deployment id="org.objectweb.joram:jndi-client:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>jndi-client</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="org.objectweb.joram:joram-client-jms:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>joram-client-jms</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="org.objectweb.joram:joram-client-jca:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>joram-client-jca</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="org.ow2.jonas:jonas-audit-jms:jar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.ow2.jonas</m2:groupId>
+    <m2:artifactId>jonas-audit-jms</m2:artifactId>
+    <m2:version>5.2.2</m2:version>
+    <m2:type>jar</m2:type>
+  </deployment>
+  <deployment id="org.objectweb.joram:joram-jca-jonas:rar" xsi:type="m2:maven2-deploymentType" reloadable="false" start="true" reference="true" startlevel="1" starttransient="true">
+    <m2:groupId>org.objectweb.joram</m2:groupId>
+    <m2:artifactId>joram-jca-jonas</m2:artifactId>
+    <m2:version>5.5.0</m2:version>
+    <m2:type>rar</m2:type>
+  </deployment>
+
+</deployment-plan>

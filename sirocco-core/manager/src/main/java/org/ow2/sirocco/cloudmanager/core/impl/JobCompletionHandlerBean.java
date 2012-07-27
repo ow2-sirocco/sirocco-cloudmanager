@@ -32,6 +32,8 @@ import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
 import javax.ejb.EJBContext;
 import javax.ejb.MessageDriven;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.MessageListener;
@@ -46,10 +48,11 @@ import javax.naming.InitialContext;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
+import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 
 @MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
+    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
     @ActivationConfigProperty(propertyName = "destination", propertyValue = "JobCompletion")})
 public class JobCompletionHandlerBean implements MessageListener {
     private static Logger logger = Logger.getLogger(JobCompletionHandlerBean.class.getName());
@@ -67,10 +70,21 @@ public class JobCompletionHandlerBean implements MessageListener {
     private EJBContext ctx;
 
     @Override
-    // @dTransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public void onMessage(final Message msg) {
         if (msg instanceof ObjectMessage) {
             ObjectMessage objectMessage = (ObjectMessage) msg;
+            Long counter = new Long(0);
+            try {
+                counter = objectMessage.getLongProperty("deliveriesCounter");
+            } catch (JMSException e1) {
+                JobCompletionHandlerBean.logger.warn("Failed to extract deliveriesCounter from JMS message", e1);
+            } catch (NumberFormatException e1) {
+                counter = new Long(0);
+            }
+            if (counter == null) {
+                counter = new Long(0);
+            }
             Object payload;
             try {
                 payload = objectMessage.getObject();
@@ -85,18 +99,32 @@ public class JobCompletionHandlerBean implements MessageListener {
             try {
                 this.jobManager.handleWorkflowEvent(providerJob);
             } catch (Exception e) {
-                this.ctx.setRollbackOnly();
-                JobCompletionHandlerBean.logger.warn("JobCompletion message rollbacked - " + jobId);
+                // this.ctx.setRollbackOnly();
+                JobCompletionHandlerBean.logger.warn("JobCompletion message rollbacked " + counter + " times - " + jobId);
                 // + e.getMessage(), e);
 
-                try {
+                // reemiting message with delay, and counter updated
+                if (counter < 50) {
+                    try {
+                        UtilsForManagers.emitJobCompletionMessage(((ObjectMessage) msg).getObject(), this.ctx, 6000,
+                            counter + 1);
+                    } catch (JMSException e2) {
+                        JobCompletionHandlerBean.logger.warn("JobCompletion message resend exception - " + jobId);
+                    } catch (Exception e2) {
+                        JobCompletionHandlerBean.logger.warn("JobCompletion message resend exception - " + jobId);
+                    }
+                } else {
+                    JobCompletionHandlerBean.logger.error("JobCompletion message dropped (too many times rollbacked)");
+                }
+
+                /*try {
                     // not possible to set a redelevery time in Joram/Jonas
                     Thread.sleep(JobCompletionHandlerBean.JMS_REDELIVERY_DELAY
                         + (long) Math.floor(Math.random() * JobCompletionHandlerBean.JMS_REDELIVERY_DELAY));
                 } catch (InterruptedException e1) {
                     JobCompletionHandlerBean.logger.warn("InterruptedException! - " + jobId);
                     // e1.printStackTrace();
-                }
+                }*/
             }
         }
     }

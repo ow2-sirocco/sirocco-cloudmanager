@@ -108,7 +108,12 @@ public class UtilsForManagers {
      * @throws Exception
      */
     public static void emitJobListenerMessage(final Serializable payload, final EJBContext ctx) throws Exception {
-        UtilsForManagers.emitJMSMessage(payload, ctx, "JobEmission");
+        UtilsForManagers.emitJMSMessage(payload, ctx, "JobEmission", 0, 0);
+    }
+
+    public static void emitJobCompletionMessage(final Serializable payload, final EJBContext ctx, final long delayMillis,
+        final long deliveriesCounter) throws Exception {
+        UtilsForManagers.emitJMSMessage(payload, ctx, "JobCompletion", delayMillis, deliveriesCounter);
     }
 
     /**
@@ -119,8 +124,8 @@ public class UtilsForManagers {
      * @param queueName
      * @throws Exception
      */
-    public static void emitJMSMessage(final Serializable payload, final EJBContext ctx, final String queueName)
-        throws Exception {
+    public static void emitJMSMessage(final Serializable payload, final EJBContext ctx, final String queueName,
+        final long delayMillis, final long deliveriesCounter) throws Exception {
         ConnectionFactory cf = (ConnectionFactory) ctx.lookup("QCF");
         Queue queue = (Queue) ctx.lookup(queueName);
         Connection conn = cf.createConnection();
@@ -130,6 +135,11 @@ public class UtilsForManagers {
         MessageProducer mp = sess.createProducer(queue);
 
         ObjectMessage msg = sess.createObjectMessage();
+        if (delayMillis > 0) {
+            msg.setLongProperty("scheduleDate", System.currentTimeMillis() + delayMillis);
+        }
+        msg.setLongProperty("deliveriesCounter", deliveriesCounter);
+
         msg.setObject(payload);
         mp.send(msg);
 
