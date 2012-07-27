@@ -236,9 +236,9 @@ public class CreatingResourceValidatorTest {
     public void testCimiMachineTemplate() throws Exception {
         CimiMachineTemplate cimi;
 
-        // KO empty
+        // OK empty !!!
         cimi = new CimiMachineTemplate();
-        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // OK by values
         cimi = new CimiMachineTemplate();

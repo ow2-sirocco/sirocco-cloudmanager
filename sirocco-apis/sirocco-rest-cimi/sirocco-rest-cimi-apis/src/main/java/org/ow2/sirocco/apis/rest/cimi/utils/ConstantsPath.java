@@ -52,6 +52,26 @@ public abstract class ConstantsPath {
 
     public static final String DISK_PATH = "/" + ConstantsPath.DISK;
 
+    public static final String EVENT = "events";
+
+    public static final String EVENT_PATH = "/" + ConstantsPath.EVENT;
+
+    public static final String EVENT_LOG = "eventLogs";
+
+    public static final String EVENT_LOG_PATH = "/" + ConstantsPath.EVENT_LOG;
+
+    public static final String EVENT_LOG_TEMPLATE = "eventLogTemplates";
+
+    public static final String EVENT_LOG_TEMPLATE_PATH = "/" + ConstantsPath.EVENT_LOG_TEMPLATE;
+
+    public static final String FORWARDING_GROUP = "forwardingGroups";
+
+    public static final String FORWARDING_GROUP_PATH = "/" + ConstantsPath.FORWARDING_GROUP;
+
+    public static final String FORWARDING_GROUP_TEMPLATE = "forwardingGroupTemplates";
+
+    public static final String FORWARDING_GROUP_TEMPLATE_PATH = "/" + ConstantsPath.FORWARDING_GROUP_TEMPLATE;
+
     public static final String JOB = "jobs";
 
     public static final String JOB_PATH = "/" + ConstantsPath.JOB;
@@ -76,9 +96,29 @@ public abstract class ConstantsPath {
 
     public static final String NETWORK_PATH = "/" + ConstantsPath.NETWORK;
 
+    public static final String NETWORK_CONFIGURATION = "networkConfigs";
+
+    public static final String NETWORK_CONFIGURATION_PATH = "/" + ConstantsPath.NETWORK_CONFIGURATION;
+
     public static final String NETWORK_TEMPLATE = "networkTemplates";
 
     public static final String NETWORK_TEMPLATE_PATH = "/" + ConstantsPath.NETWORK_TEMPLATE;
+
+    public static final String NETWORK_INTERFACE = "networkInterfaces";
+
+    public static final String NETWORK_INTERFACE_PATH = "/" + ConstantsPath.NETWORK_INTERFACE;
+
+    public static final String NETWORK_PORT = "networkPorts";
+
+    public static final String NETWORK_PORT_PATH = "/" + ConstantsPath.NETWORK_PORT;
+
+    public static final String NETWORK_PORT_CONFIGURATION = "networkPortConfigs";
+
+    public static final String NETWORK_PORT_CONFIGURATION_PATH = "/" + ConstantsPath.NETWORK_CONFIGURATION;
+
+    public static final String NETWORK_PORT_TEMPLATE = "networkPortTemplates";
+
+    public static final String NETWORK_PORT_TEMPLATE_PATH = "/" + ConstantsPath.NETWORK_PORT_TEMPLATE;
 
     public static final String SYSTEM = "systems";
 

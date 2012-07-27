@@ -42,7 +42,12 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    /** Field "state". */
+    /**
+     * Field "state".
+     * <p>
+     * Read only
+     * </p>
+     */
     private String state;
 
     /** Field "networkType". */
@@ -54,13 +59,28 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
     /** Field "classOfService". */
     private String classOfService;
 
-    /** Field "networkPorts". */
+    /**
+     * Field "networkPorts".
+     * <p>
+     * Read only
+     * </p>
+     */
     private CimiNetworkNetworkPortCollection networkPorts;
 
-    /** Field "forwardingGroup". */
+    /**
+     * Field "forwardingGroup".
+     * <p>
+     * Read only
+     * </p>
+     */
     private CimiForwardingGroup forwardingGroup;
 
-    /** Field "eventLog". */
+    /**
+     * Field "eventLog".
+     * <p>
+     * Read only
+     * </p>
+     */
     private CimiEventLog eventLog;
 
     /**
@@ -212,8 +232,16 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getClassOfService());
+        has = has || (null != this.getMtu());
+        has = has || (null != this.getNetworkType());
+        // Next read-only
+        // has = has || (null != this.getForwardingGroup());
+        // has = has || (null != this.getEventLog());
+        // has = has || (null != this.getNetworkPorts());
+        // has = has || (null != this.getState());
+        return has;
     }
 
     /**
@@ -225,8 +253,7 @@ public class CimiNetwork extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.Network;
     }
 
 }

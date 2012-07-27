@@ -44,7 +44,11 @@ public class CimiMachineNetworkInterface extends CimiObjectCommonAbstract {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "addresses".
+     * Field "addresses"
+     * <p>
+     * Read only
+     * </p>
+     * .
      */
     private CimiMachineNetworkInterfaceAddressCollection addresses;
 
@@ -57,9 +61,8 @@ public class CimiMachineNetworkInterface extends CimiObjectCommonAbstract {
     /**
      * Field "networkPort".
      */
-    // TODO networkPort
-    // @ValidChild
-    // private CimiNetworkPort networkPort;
+    @ValidChild
+    private CimiNetworkPort networkPort;
 
     /**
      * Field "state".
@@ -122,6 +125,24 @@ public class CimiMachineNetworkInterface extends CimiObjectCommonAbstract {
      */
     public void setNetwork(final CimiNetwork network) {
         this.network = network;
+    }
+
+    /**
+     * Return the value of field "networkPort".
+     * 
+     * @return The value
+     */
+    public CimiNetworkPort getNetworkPort() {
+        return this.networkPort;
+    }
+
+    /**
+     * Set the value of field "networkPort".
+     * 
+     * @param networkPort The value
+     */
+    public void setNetworkPort(final CimiNetworkPort networkPort) {
+        this.networkPort = networkPort;
     }
 
     /**
@@ -204,15 +225,14 @@ public class CimiMachineNetworkInterface extends CimiObjectCommonAbstract {
     @Override
     public boolean hasValues() {
         boolean has = super.hasValues();
-        // Next read-only
-        // has = has || (null != this.getAddresses());
         has = has || (null != this.getMtu());
         has = has || (null != this.getMacAddress());
         has = has || (null != this.getNetwork());
-        // TODO NetworkPort
-        // has = has || (null != this.getNetworkPort());
+        has = has || (null != this.getNetworkPort());
         has = has || (null != this.getNetworkType());
         has = has || (null != this.getState());
+        // Next read-only
+        // has = has || (null != this.getAddresses());
         return has;
     }
 

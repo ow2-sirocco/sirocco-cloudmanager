@@ -30,7 +30,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 
 /**
  * Class VolumeVolumeImage.
@@ -45,7 +44,6 @@ public class CimiVolumeVolumeImage extends CimiObjectCommonAbstract {
     /**
      * Field "volumeImage".
      */
-    @ValidChild
     private CimiVolumeImage volumeImage;
 
     /**

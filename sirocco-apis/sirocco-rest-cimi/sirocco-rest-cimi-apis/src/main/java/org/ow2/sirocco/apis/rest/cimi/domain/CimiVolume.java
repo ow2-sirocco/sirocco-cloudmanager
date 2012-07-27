@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.Valid;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -32,14 +31,10 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeVolumeImageCollection;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
-import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
-import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class Volume.
  */
-// FIXME images, meters, eventLog
 @XmlRootElement(name = "Volume")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiVolume extends CimiObjectCommonAbstract {
@@ -49,18 +44,23 @@ public class CimiVolume extends CimiObjectCommonAbstract {
 
     /**
      * Field "state".
+     * <p>
+     * Read only
+     * </p>
      */
     private String state;
 
     /**
      * Field "type".
+     * <p>
+     * Read only
+     * </p>
      */
     private String type;
 
     /**
      * Field "capacity".
      */
-    @Valid
     private Integer capacity;
 
     /**
@@ -70,10 +70,19 @@ public class CimiVolume extends CimiObjectCommonAbstract {
 
     /**
      * Field "images".
+     * <p>
+     * Read only
+     * </p>
      */
-    @ValidChild
-    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiVolumeVolumeImageCollection images;
+
+    /**
+     * Field "eventLog".
+     * <p>
+     * Read only
+     * </p>
+     */
+    private CimiEventLog eventLog;
 
     /**
      * Default constructor.
@@ -173,6 +182,24 @@ public class CimiVolume extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Return the value of field "eventLog".
+     * 
+     * @return The value
+     */
+    public CimiEventLog getEventLog() {
+        return this.eventLog;
+    }
+
+    /**
+     * Set the value of field "eventLog".
+     * 
+     * @param eventLog The value
+     */
+    public void setEventLog(final CimiEventLog eventLog) {
+        this.eventLog = eventLog;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
@@ -182,7 +209,11 @@ public class CimiVolume extends CimiObjectCommonAbstract {
         boolean has = super.hasValues();
         has = has || (null != this.getBootable());
         has = has || (null != this.getCapacity());
-        has = has || (null != this.getImages());
+        // Next read-only
+        // has = has || (null != this.getImages());
+        // has = has || (null != this.getEventLog());
+        // has = has || (null != this.getState());
+        // has = has || (null != this.getType());
         return has;
     }
 

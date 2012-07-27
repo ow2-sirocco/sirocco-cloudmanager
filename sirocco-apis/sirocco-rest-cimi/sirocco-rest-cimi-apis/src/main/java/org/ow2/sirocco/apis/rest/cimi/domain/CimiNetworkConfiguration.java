@@ -127,8 +127,11 @@ public class CimiNetworkConfiguration extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getClassOfService());
+        has = has || (null != this.getMtu());
+        has = has || (null != this.getNetworkType());
+        return has;
     }
 
     /**
@@ -140,8 +143,7 @@ public class CimiNetworkConfiguration extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.NetworkConfiguration;
     }
 
 }

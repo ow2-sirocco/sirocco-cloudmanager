@@ -47,6 +47,11 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEvent;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
@@ -58,11 +63,18 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
@@ -77,6 +89,11 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
@@ -86,9 +103,17 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterf
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkNetworkPortCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemVolumeCollection;
@@ -111,6 +136,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -122,13 +149,23 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.Event;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
@@ -351,7 +388,6 @@ public class CommonsConverterTest {
                 service = new ArrayList<AddressTemplate>();
                 cimiClass = CimiAddressTemplateCollection.class;
                 break;
-
             case CloudEntryPoint:
                 service = new CloudEntryPointAggregate(new CloudEntryPoint());
                 ((Identifiable) service).setId(11);
@@ -388,6 +424,90 @@ public class CommonsConverterTest {
             case DiskCollection:
                 service = new ArrayList<MachineDisk>();
                 cimiClass = CimiMachineDiskCollection.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case Event:
+                service = new Event();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiEvent.class;
+                break;
+            case EventCollection:
+                service = new ArrayList<Event>();
+                cimiClass = CimiEventCollection.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case EventLog:
+                service = new EventLog();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiEventLog.class;
+                break;
+            case EventLogCollection:
+                service = new ArrayList<EventLog>();
+                cimiClass = CimiEventLogCollection.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case EventLogCreate:
+                service = null;
+                break;
+            case EventLogEvent:
+                // FIXME EventLogEvent
+                // service = new EventLogEvent();
+                // ((Identifiable) service).setId(11);
+                // cimiClass = CimiEventLogEvent.class;
+                service = null;
+                break;
+            case EventLogEventCollection:
+                // FIXME EventLogEvent
+                // service = new ArrayList<EventLogEvent>();
+                // cimiClass = CimiEventLogEventCollection.class;
+                // // Add idParent in request
+                // this.request.setIds(new IdRequest(null, "999"));
+                service = null;
+                break;
+            case EventLogTemplate:
+                service = new EventLogTemplate();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiEventLogTemplate.class;
+                break;
+            case EventLogTemplateCollection:
+                service = new ArrayList<EventLogTemplate>();
+                cimiClass = CimiEventLogTemplateCollection.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case ForwardingGroup:
+                service = new ForwardingGroup();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiForwardingGroup.class;
+                break;
+            case ForwardingGroupCollection:
+                service = new ArrayList<ForwardingGroup>();
+                cimiClass = CimiForwardingGroupCollection.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case ForwardingGroupCreate:
+                service = null;
+                break;
+            case ForwardingGroupNetwork:
+                // FIXME ForwardingGroupNetwork
+                service = null;
+                break;
+            case ForwardingGroupNetworkCollection:
+                // FIXME ForwardingGroupNetwork
+                service = null;
+                break;
+            case ForwardingGroupTemplate:
+                service = new ForwardingGroupTemplate();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiForwardingGroupTemplate.class;
+                break;
+            case ForwardingGroupTemplateCollection:
+                service = new ArrayList<ForwardingGroupTemplate>();
+                cimiClass = CimiForwardingGroupTemplateCollection.class;
                 // Add idParent in request
                 this.request.setIds(new IdRequest(null, "999"));
                 break;
@@ -489,6 +609,72 @@ public class CommonsConverterTest {
                 cimiClass = CimiMachineVolumeCollection.class;
                 // Add idParent in request
                 this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case Network:
+                service = new Network();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiNetwork.class;
+                break;
+            case NetworkCollection:
+                service = new ArrayList<Network>();
+                cimiClass = CimiNetworkCollection.class;
+                break;
+            case NetworkConfiguration:
+                service = new NetworkConfiguration();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiNetworkConfiguration.class;
+                break;
+            case NetworkConfigurationCollection:
+                service = new ArrayList<NetworkConfiguration>();
+                cimiClass = CimiNetworkConfigurationCollection.class;
+                break;
+            case NetworkCreate:
+                service = null;
+                break;
+            case NetworkNetworkPortCollection:
+                service = new ArrayList<NetworkPort>();
+                cimiClass = CimiNetworkNetworkPortCollection.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case NetworkTemplate:
+                service = new NetworkTemplate();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiNetworkTemplate.class;
+                break;
+            case NetworkTemplateCollection:
+                service = new ArrayList<NetworkTemplate>();
+                cimiClass = CimiNetworkTemplateCollection.class;
+                break;
+            case NetworkPort:
+                service = new NetworkPort();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiNetworkPort.class;
+                break;
+            case NetworkPortCollection:
+                service = new ArrayList<NetworkPort>();
+                cimiClass = CimiNetworkPortCollection.class;
+                break;
+            case NetworkPortConfiguration:
+                service = new NetworkPortConfiguration();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiNetworkPortConfiguration.class;
+                break;
+            case NetworkPortConfigurationCollection:
+                service = new ArrayList<NetworkPortConfiguration>();
+                cimiClass = CimiNetworkPortConfigurationCollection.class;
+                break;
+            case NetworkPortCreate:
+                service = null;
+                break;
+            case NetworkPortTemplate:
+                service = new NetworkPortTemplate();
+                ((Identifiable) service).setId(11);
+                cimiClass = CimiNetworkPortTemplate.class;
+                break;
+            case NetworkPortTemplateCollection:
+                service = new ArrayList<NetworkPortTemplate>();
+                cimiClass = CimiNetworkPortTemplateCollection.class;
                 break;
             case Volume:
                 service = new Volume();
@@ -614,6 +800,70 @@ public class CommonsConverterTest {
                 cimiClass = CimiSystemVolumeCollection.class;
                 // Add idParent in request
                 this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case SystemAddress:
+                // FIXME SystemAddress
+                service = null;
+                // service = new SystemAddress();
+                // ((Identifiable) service).setId(111);
+                // cimiClass = CimiSystemAddress.class;
+                // // Add idParent in request
+                // this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case SystemAddressCollection:
+                // FIXME SystemAddress
+                service = null;
+                // service = new ArrayList<SystemAddress>();
+                // cimiClass = CimiSystemAddressCollection.class;
+                // // Add idParent in request
+                // this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case SystemForwardingGroup:
+                // FIXME SystemForwardingGroup
+                service = null;
+                // service = new SystemForwardingGroup();
+                // ((Identifiable) service).setId(111);
+                // cimiClass = CimiSystemForwardingGroup.class;
+                // // Add idParent in request
+                // this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case SystemForwardingGroupCollection:
+                // FIXME SystemForwardingGroup
+                service = null;
+                // service = new ArrayList<SystemForwardingGroup>();
+                // cimiClass = CimiSystemForwardingGroupCollection.class;
+                // // Add idParent in request
+                // this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case SystemNetwork:
+                service = new SystemNetwork();
+                ((Identifiable) service).setId(111);
+                cimiClass = CimiSystemNetwork.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case SystemNetworkCollection:
+                service = new ArrayList<SystemNetwork>();
+                cimiClass = CimiSystemNetworkCollection.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case SystemNetworkPort:
+                // FIXME SystemNetworkPort
+                service = null;
+                // service = new SystemNetworkPort();
+                // ((Identifiable) service).setId(111);
+                // cimiClass = CimiSystemNetworkPort.class;
+                // // Add idParent in request
+                // this.request.setIds(new IdRequest(null, "999"));
+                break;
+            case SystemNetworkPortCollection:
+                // FIXME SystemNetworkPort
+                service = null;
+                // service = new ArrayList<SystemNetworkPort>();
+                // cimiClass = CimiSystemNetworkPortCollection.class;
+                // // Add idParent in request
+                // this.request.setIds(new IdRequest(null, "999"));
                 break;
             default:
                 Assert.fail(type.name());

@@ -127,8 +127,11 @@ public class CimiNetworkTemplate extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getEventLogTemplate());
+        has = has || (null != this.getForwardingGroup());
+        has = has || (null != this.getNetworkConfig());
+        return has;
     }
 
     /**
@@ -140,8 +143,7 @@ public class CimiNetworkTemplate extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.NetworkTemplate;
     }
 
 }

@@ -32,50 +32,46 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class NetworkNetworkPort.
+ * Class SystemNetwork.
  */
-@XmlRootElement(name = "NetworkNetworkPort")
+@XmlRootElement(name = "SystemNetwork")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiNetworkNetworkPort extends CimiObjectCommonAbstract {
+public class CimiSystemNetwork extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    /** Field "networkPort". */
-    private CimiNetworkPort networkPort;
+    /**
+     * Field "network".
+     * <p>
+     * Read only
+     * </p>
+     */
+    private CimiNetwork network;
 
     /**
      * Default constructor.
      */
-    public CimiNetworkNetworkPort() {
+    public CimiSystemNetwork() {
         super();
     }
 
     /**
-     * Parameterized constructor.
-     * 
-     * @param href The reference
-     */
-    public CimiNetworkNetworkPort(final String href) {
-        super(href);
-    }
-
-    /**
-     * Return the value of field "networkPort".
+     * Return the value of field "network".
      * 
      * @return The value
      */
-    public CimiNetworkPort getNetworkPort() {
-        return this.networkPort;
+    public CimiNetwork getNetwork() {
+        return this.network;
     }
 
     /**
-     * Set the value of field "networkPort".
+     * Set the value of field "network".
      * 
-     * @param networkPort The value
+     * @param network The value
      */
-    public void setNetworkPort(final CimiNetworkPort networkPort) {
-        this.networkPort = networkPort;
+    public void setNetwork(final CimiNetwork network) {
+        this.network = network;
     }
 
     /**
@@ -85,8 +81,10 @@ public class CimiNetworkNetworkPort extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        // Next read only
+        // has = has || (null != this.getNetwork());
+        return has;
     }
 
     /**
@@ -98,8 +96,7 @@ public class CimiNetworkNetworkPort extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.SystemNetwork;
     }
 
 }

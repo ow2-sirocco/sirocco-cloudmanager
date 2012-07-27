@@ -42,7 +42,12 @@ public class CimiForwardingGroup extends CimiObjectCommonAbstract {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    /** Field "networks". */
+    /**
+     * Field "networks".
+     * <p>
+     * Read only
+     * </p>
+     */
     private CimiForwardingGroupNetworkCollection networks;
 
     /**
@@ -86,8 +91,10 @@ public class CimiForwardingGroup extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        // Next read-only
+        // has = has || (null != this.getNetworks());
+        return has;
     }
 
     /**
@@ -99,8 +106,7 @@ public class CimiForwardingGroup extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.ForwardingGroup;
     }
 
 }

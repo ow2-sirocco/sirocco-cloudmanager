@@ -24,12 +24,15 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 
 /**
  * Class NetworkPortTemplate.
@@ -42,12 +45,17 @@ public class CimiNetworkPortTemplate extends CimiObjectCommonAbstract {
     private static final long serialVersionUID = 1L;
 
     /** Field "network". */
+    @ValidChild
+    @NotNull(groups = {GroupCreateByValue.class})
     private CimiNetwork network;
 
     /** Field "networkPortConfig". */
+    @ValidChild
+    @NotNull(groups = {GroupCreateByValue.class})
     private CimiNetworkPortConfiguration networkPortConfig;
 
     /** Field "eventLogTemplate". */
+    @ValidChild
     private CimiEventLogTemplate eventLogTemplate;
 
     /**
@@ -127,8 +135,11 @@ public class CimiNetworkPortTemplate extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getEventLogTemplate());
+        has = has || (null != this.getNetwork());
+        has = has || (null != this.getNetworkPortConfig());
+        return has;
     }
 
     /**
@@ -140,8 +151,7 @@ public class CimiNetworkPortTemplate extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.NetworkPortTemplate;
     }
 
 }

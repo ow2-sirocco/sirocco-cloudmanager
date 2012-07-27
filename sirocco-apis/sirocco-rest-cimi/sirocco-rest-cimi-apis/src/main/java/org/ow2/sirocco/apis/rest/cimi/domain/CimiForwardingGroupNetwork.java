@@ -85,8 +85,10 @@ public class CimiForwardingGroupNetwork extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        // Next read-only
+        // has = has || (null != this.getNetwork());
+        return has;
     }
 
     /**
@@ -98,8 +100,7 @@ public class CimiForwardingGroupNetwork extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.ForwardingGroupNetwork;
     }
 
 }

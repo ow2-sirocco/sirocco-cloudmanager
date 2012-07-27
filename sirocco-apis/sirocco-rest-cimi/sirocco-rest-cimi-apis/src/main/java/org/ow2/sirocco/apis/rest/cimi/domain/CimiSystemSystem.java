@@ -30,7 +30,6 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 
 /**
  * Class SystemSystem.
@@ -44,8 +43,10 @@ public class CimiSystemSystem extends CimiObjectCommonAbstract {
 
     /**
      * Field "system".
+     * <p>
+     * Read only
+     * </p>
      */
-    @ValidChild
     private CimiSystem system;
 
     /**
@@ -81,7 +82,8 @@ public class CimiSystemSystem extends CimiObjectCommonAbstract {
     @Override
     public boolean hasValues() {
         boolean has = super.hasValues();
-        has = has || (null != this.getSystem());
+        // Next read only
+        // has = has || (null != this.getSystem());
         return has;
     }
 

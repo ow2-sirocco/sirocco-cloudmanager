@@ -26,7 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -35,7 +34,6 @@ import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
 import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
@@ -54,14 +52,12 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * Field "machineConfig".
      */
     @ValidChild
-    @NotNull(groups = GroupCreateByValue.class)
     private CimiMachineConfiguration machineConfig;
 
     /**
      * Field "machineImage".
      */
     @ValidChild
-    @NotNull(groups = GroupCreateByValue.class)
     private CimiMachineImage machineImage;
 
     /**
@@ -100,6 +96,12 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
      * Field "userData".
      */
     private String userData;
+
+    /**
+     * Field "eventLogTemplate".
+     */
+    @ValidChild
+    private CimiEventLogTemplate eventLogTemplate;
 
     /**
      * Default constructor.
@@ -370,6 +372,24 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Return the value of field "eventLogTemplate".
+     * 
+     * @return The value
+     */
+    public CimiEventLogTemplate getEventLogTemplate() {
+        return this.eventLogTemplate;
+    }
+
+    /**
+     * Set the value of field "eventLogTemplate".
+     * 
+     * @param eventLogTemplate The value
+     */
+    public void setEventLogTemplate(final CimiEventLogTemplate eventLogTemplate) {
+        this.eventLogTemplate = eventLogTemplate;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
@@ -385,6 +405,7 @@ public class CimiMachineTemplate extends CimiObjectCommonAbstract {
         has = has || (null != this.getUserData());
         has = has || (null != this.getListVolumes());
         has = has || (null != this.getListVolumeTemplates());
+        has = has || (null != this.getEventLogTemplate());
         return has;
     }
 

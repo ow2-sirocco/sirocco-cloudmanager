@@ -80,9 +80,7 @@ public class CimiForwardingGroupCollection extends CimiCollectionAbstract<CimiFo
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO
-        // return ExchangeType.ForwardingGroupCollection;
-        return null;
+        return ExchangeType.ForwardingGroupCollection;
     }
 
     /**

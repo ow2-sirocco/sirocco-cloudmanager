@@ -47,7 +47,11 @@ public class CimiMachineTemplateNetworkInterface implements CimiData {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Field "addresses".
+     * Field "addresses"
+     * <p>
+     * Read only
+     * </p>
+     * .
      */
     private CimiAddressArray addresses;
 
@@ -60,9 +64,8 @@ public class CimiMachineTemplateNetworkInterface implements CimiData {
     /**
      * Field "networkPort".
      */
-    // TODO networkPort
-    // @ValidChild
-    // private CimiNetworkPort networkPort;
+    @ValidChild
+    private CimiNetworkPort networkPort;
 
     /**
      * Field "state".
@@ -156,6 +159,24 @@ public class CimiMachineTemplateNetworkInterface implements CimiData {
      */
     public void setNetwork(final CimiNetwork network) {
         this.network = network;
+    }
+
+    /**
+     * Return the value of field "networkPort".
+     * 
+     * @return The value
+     */
+    public CimiNetworkPort getNetworkPort() {
+        return this.networkPort;
+    }
+
+    /**
+     * Set the value of field "networkPort".
+     * 
+     * @param networkPort The value
+     */
+    public void setNetworkPort(final CimiNetworkPort networkPort) {
+        this.networkPort = networkPort;
     }
 
     /**

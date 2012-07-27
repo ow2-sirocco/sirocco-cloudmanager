@@ -50,6 +50,7 @@ public class JacksonConfigurator implements ContextResolver<ObjectMapper> {
      */
     public JacksonConfigurator() {
         this.mapper.configure(SerializationConfig.Feature.WRITE_DATES_AS_TIMESTAMPS, false);
+        this.mapper.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
 
         DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
         dateFormat.setTimeZone(TimeZone.getTimeZone("Zulu"));

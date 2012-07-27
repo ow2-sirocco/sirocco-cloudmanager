@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -58,7 +57,6 @@ public class CimiVolumeConfiguration extends CimiObjectCommonAbstract {
     /**
      * Field "capacity".
      */
-    @Valid
     @NotNull(groups = {GroupCreateByValue.class})
     private Integer capacity;
 

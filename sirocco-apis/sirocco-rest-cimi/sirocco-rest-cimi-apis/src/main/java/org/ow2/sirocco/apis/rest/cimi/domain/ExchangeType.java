@@ -36,7 +36,9 @@ public enum ExchangeType {
     /** */
     Action(),
     /** */
-    Address(PathType.Address), AddressCollection(PathType.Address, false), AddressCreate(PathType.Address),
+    Address(PathType.Address), AddressCollection(PathType.Address, false),
+    /** */
+    AddressCreate(PathType.Address),
     /** */
     AddressTemplate(PathType.AddressTemplate), AddressTemplateCollection(PathType.AddressTemplate, false),
     /** */
@@ -47,6 +49,26 @@ public enum ExchangeType {
     CredentialTemplate(PathType.CredentialTemplate), CredentialTemplateCollection(PathType.CredentialTemplate, false),
     /** */
     Disk(PathType.MachineDisk), DiskCollection(PathType.MachineDisk, false),
+    /** */
+    Event(PathType.Event), EventCollection(PathType.Event, false),
+    /** */
+    EventLog(PathType.EventLog), EventLogCollection(PathType.EventLog, false),
+    /** */
+    EventLogCreate(PathType.EventLog),
+    /** */
+    EventLogEvent(PathType.EventLogEvent), EventLogEventCollection(PathType.EventLogEvent, false),
+    /** */
+    EventLogTemplate(PathType.EventLogTemplate), EventLogTemplateCollection(PathType.EventLogTemplate, false),
+    /** */
+    ForwardingGroup(PathType.ForwardingGroup), ForwardingGroupCollection(PathType.ForwardingGroup, false),
+    /** */
+    ForwardingGroupCreate(PathType.ForwardingGroup),
+    /** */
+    ForwardingGroupNetwork(PathType.ForwardingGroupNetwork), ForwardingGroupNetworkCollection(PathType.ForwardingGroupNetwork,
+        false),
+    /** */
+    ForwardingGroupTemplate(PathType.ForwardingGroupTemplate), ForwardingGroupTemplateCollection(
+        PathType.ForwardingGroupTemplate, false),
     /** */
     Job(PathType.Job), JobCollection(PathType.Job, false),
     /** */
@@ -68,6 +90,25 @@ public enum ExchangeType {
     /** */
     MachineVolume(PathType.MachineVolume), MachineVolumeCollection(PathType.MachineVolume, false),
     /** */
+    Network(PathType.Network), NetworkCollection(PathType.Network, false),
+    /** */
+    NetworkCreate(PathType.Network),
+    /** */
+    NetworkNetworkPortCollection(PathType.NetworkNetworkPort, false),
+    /** */
+    NetworkConfiguration(PathType.NetworkConfiguration), NetworkConfigurationCollection(PathType.NetworkConfiguration, false),
+    /** */
+    NetworkTemplate(PathType.NetworkTemplate), NetworkTemplateCollection(PathType.NetworkTemplate, false),
+    /** */
+    NetworkPort(PathType.NetworkPort), NetworkPortCollection(PathType.NetworkPort, false),
+    /** */
+    NetworkPortCreate(PathType.NetworkPort),
+    /** */
+    NetworkPortConfiguration(PathType.NetworkPortConfiguration), NetworkPortConfigurationCollection(
+        PathType.NetworkPortConfiguration, false),
+    /** */
+    NetworkPortTemplate(PathType.NetworkPortTemplate), NetworkPortTemplateCollection(PathType.NetworkPortTemplate, false),
+    /** */
     System(PathType.System), SystemCollection(PathType.System, false),
     /** */
     SystemCreate(PathType.System),
@@ -77,6 +118,15 @@ public enum ExchangeType {
     SystemMachine(PathType.SystemMachine), SystemMachineCollection(PathType.SystemMachine, false),
     /** */
     SystemSystem(PathType.SystemSystem), SystemSystemCollection(PathType.SystemSystem, false),
+    /** */
+    SystemNetwork(PathType.SystemNetwork), SystemNetworkCollection(PathType.SystemNetwork, false),
+    /** */
+    SystemNetworkPort(PathType.SystemNetworkPort), SystemNetworkPortCollection(PathType.SystemNetworkPort, false),
+    /** */
+    SystemAddress(PathType.SystemAddress), SystemAddressCollection(PathType.SystemAddress, false),
+    /** */
+    SystemForwardingGroup(PathType.SystemForwardingGroup), SystemForwardingGroupCollection(PathType.SystemForwardingGroup,
+        false),
     /** */
     SystemVolume(PathType.SystemVolume), SystemVolumeCollection(PathType.SystemVolume, false),
     /** */

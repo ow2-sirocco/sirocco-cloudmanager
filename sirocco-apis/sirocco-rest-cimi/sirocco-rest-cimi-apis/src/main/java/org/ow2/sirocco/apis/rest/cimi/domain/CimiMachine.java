@@ -46,6 +46,9 @@ public class CimiMachine extends CimiObjectCommonAbstract {
 
     /**
      * Field "state".
+     * <p>
+     * Read only
+     * </p>
      */
     private String state;
 
@@ -56,6 +59,9 @@ public class CimiMachine extends CimiObjectCommonAbstract {
 
     /**
      * Field "cpuArch".
+     * <p>
+     * Read only
+     * </p>
      */
     private String cpuArch;
 
@@ -66,18 +72,35 @@ public class CimiMachine extends CimiObjectCommonAbstract {
 
     /**
      * Field "disks".
+     * <p>
+     * Read only
+     * </p>
      */
     private CimiMachineDiskCollection disks;
 
     /**
      * Field "volumes".
+     * <p>
+     * Read only
+     * </p>
      */
     private CimiMachineVolumeCollection volumes;
 
     /**
      * Field "networkInterfaces".
+     * <p>
+     * Read only
+     * </p>
      */
     private CimiMachineNetworkInterfaceCollection networkInterfaces;
+
+    /**
+     * Field "eventLog".
+     * <p>
+     * Read only
+     * </p>
+     */
+    private CimiEventLog eventLog;
 
     /**
      * Default constructor.
@@ -222,6 +245,24 @@ public class CimiMachine extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Return the value of field "eventLog".
+     * 
+     * @return The value
+     */
+    public CimiEventLog getEventLog() {
+        return this.eventLog;
+    }
+
+    /**
+     * Set the value of field "eventLog".
+     * 
+     * @param eventLog The value
+     */
+    public void setEventLog(final CimiEventLog eventLog) {
+        this.eventLog = eventLog;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
@@ -238,6 +279,7 @@ public class CimiMachine extends CimiObjectCommonAbstract {
         // has = has || (null != this.getDisks());
         // has = has || (null != this.getNetworkInterfaces());
         // has = has || (null != this.getVolumes());
+        // has = has || (null != this.getEventLog());
         return has;
     }
 

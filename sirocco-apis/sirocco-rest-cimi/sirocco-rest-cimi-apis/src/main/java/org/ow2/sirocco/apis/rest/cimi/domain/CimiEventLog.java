@@ -77,8 +77,7 @@ public class CimiEventLog extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.EventLog;
     }
 
 }

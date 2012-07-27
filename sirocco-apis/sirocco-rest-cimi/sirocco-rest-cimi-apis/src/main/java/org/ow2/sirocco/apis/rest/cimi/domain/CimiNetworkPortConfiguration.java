@@ -24,12 +24,14 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 
 /**
  * Class NetworkPortConfiguration.
@@ -42,9 +44,11 @@ public class CimiNetworkPortConfiguration extends CimiObjectCommonAbstract {
     private static final long serialVersionUID = 1L;
 
     /** Field "portType". */
+    @NotNull(groups = {GroupCreateByValue.class})
     private String portType;
 
     /** Field "classOfService". */
+    @NotNull(groups = {GroupCreateByValue.class})
     private String classOfService;
 
     /**
@@ -106,8 +110,10 @@ public class CimiNetworkPortConfiguration extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getClassOfService());
+        has = has || (null != this.getPortType());
+        return has;
     }
 
     /**
@@ -119,8 +125,7 @@ public class CimiNetworkPortConfiguration extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.NetworkPortConfiguration;
     }
 
 }

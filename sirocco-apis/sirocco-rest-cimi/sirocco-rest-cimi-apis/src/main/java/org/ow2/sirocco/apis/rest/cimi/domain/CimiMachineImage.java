@@ -51,6 +51,11 @@ public class CimiMachineImage extends CimiObjectCommonAbstract {
     private String state;
 
     /**
+     * Field "type".
+     */
+    private String type;
+
+    /**
      * Field "imageLocation".
      */
     @Valid
@@ -82,11 +87,6 @@ public class CimiMachineImage extends CimiObjectCommonAbstract {
         super();
         this.imageLocation = imageLocation;
     }
-
-    /**
-     * Field "type".
-     */
-    private String type;
 
     /**
      * Return the value of field "state".

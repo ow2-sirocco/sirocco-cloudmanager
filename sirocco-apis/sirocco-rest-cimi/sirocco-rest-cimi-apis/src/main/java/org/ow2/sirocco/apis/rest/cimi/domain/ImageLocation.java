@@ -32,7 +32,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 /**
  * Class ImageLocation.
  */
-@XmlRootElement(name = "imageLocation")
+@XmlRootElement(name = "ImageLocation")
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class ImageLocation extends Reference {
 

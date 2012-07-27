@@ -79,9 +79,7 @@ public class CimiNetworkTemplateCollection extends CimiCollectionAbstract<CimiNe
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO
-        // return ExchangeType.NetworkTemplateCollection;
-        return null;
+        return ExchangeType.NetworkTemplateCollection;
     }
 
     /**

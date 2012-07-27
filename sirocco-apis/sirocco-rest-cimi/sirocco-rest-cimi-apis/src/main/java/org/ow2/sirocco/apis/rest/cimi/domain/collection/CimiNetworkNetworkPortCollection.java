@@ -34,16 +34,16 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiArrayAbstract;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkNetworkPort;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 
 /**
- * Collection of NetworkNetworkPort.
+ * Collection of NetworkPort in Network.
  */
 
 @XmlRootElement
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<CimiNetworkNetworkPort> {
+public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<CimiNetworkPort> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -54,9 +54,9 @@ public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<Cim
      * @see org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollectionAbstract#getArray()
      */
     @Override
-    @XmlElement(name = "NetworkNetworkPort")
-    @JsonProperty(value = "networkNetworkPorts")
-    public CimiNetworkNetworkPort[] getArray() {
+    @XmlElement(name = "NetworkPort")
+    @JsonProperty(value = "networkPorts")
+    public CimiNetworkPort[] getArray() {
         return super.getArray();
     }
 
@@ -66,8 +66,8 @@ public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<Cim
      * @see org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollectionAbstract#setArray(E[])
      */
     @Override
-    @JsonProperty(value = "networkNetworkPorts")
-    public void setArray(final CimiNetworkNetworkPort[] items) {
+    @JsonProperty(value = "networkPorts")
+    public void setArray(final CimiNetworkPort[] items) {
         super.setArray(items);
     }
 
@@ -80,9 +80,7 @@ public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<Cim
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO
-        // return ExchangeType.NetworkNetworkPortCollection;
-        return null;
+        return ExchangeType.NetworkNetworkPortCollection;
     }
 
     /**
@@ -91,7 +89,7 @@ public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<Cim
      * @see org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollection#newCollection()
      */
     @Override
-    public CimiArray<CimiNetworkNetworkPort> newCollection() {
+    public CimiArray<CimiNetworkPort> newCollection() {
         return new CimiNetworkNetworkPortArray();
     }
 
@@ -103,21 +101,21 @@ public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<Cim
     @Override
     @XmlTransient
     @JsonIgnore
-    public Class<CimiNetworkNetworkPort> getItemClass() {
-        return CimiNetworkNetworkPort.class;
+    public Class<CimiNetworkPort> getItemClass() {
+        return CimiNetworkPort.class;
     }
 
     /**
      * Concrete class of the collection.
      */
-    public class CimiNetworkNetworkPortArray extends CimiArrayAbstract<CimiNetworkNetworkPort> {
+    public class CimiNetworkNetworkPortArray extends CimiArrayAbstract<CimiNetworkPort> {
 
         /** Serial number */
         private static final long serialVersionUID = 1L;
 
         @Override
-        public CimiNetworkNetworkPort[] newEmptyArraySized() {
-            return new CimiNetworkNetworkPort[this.size()];
+        public CimiNetworkPort[] newEmptyArraySized() {
+            return new CimiNetworkPort[this.size()];
         }
     }
 }

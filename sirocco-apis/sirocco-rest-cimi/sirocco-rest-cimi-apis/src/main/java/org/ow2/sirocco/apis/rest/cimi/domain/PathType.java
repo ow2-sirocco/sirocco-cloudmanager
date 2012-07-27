@@ -44,6 +44,20 @@ public enum PathType {
     /** */
     CredentialTemplate(ConstantsPath.CREDENTIAL_TEMPLATE),
     /** */
+    Event(ConstantsPath.EVENT),
+    /** */
+    EventLog(ConstantsPath.EVENT_LOG),
+    /** */
+    EventLogEvent(ConstantsPath.EVENT, EventLog),
+    /** */
+    EventLogTemplate(ConstantsPath.EVENT_LOG_TEMPLATE),
+    /** */
+    ForwardingGroup(ConstantsPath.FORWARDING_GROUP),
+    /** */
+    ForwardingGroupNetwork(ConstantsPath.NETWORK, ForwardingGroup),
+    /** */
+    ForwardingGroupTemplate(ConstantsPath.FORWARDING_GROUP_TEMPLATE),
+    /** */
     Job(ConstantsPath.JOB),
     /** */
     Machine(ConstantsPath.MACHINE),
@@ -56,7 +70,7 @@ public enum PathType {
     /** */
     MachineDisk(ConstantsPath.DISK, Machine),
     /** */
-    MachineNetworkInterface(ConstantsPath.NETWORK, Machine),
+    MachineNetworkInterface(ConstantsPath.NETWORK_INTERFACE, Machine),
     /** */
     MachineNetworkInterfaceAddress(ConstantsPath.ADDRESS, MachineNetworkInterface),
     /** */
@@ -64,7 +78,17 @@ public enum PathType {
     /** */
     Network(ConstantsPath.NETWORK),
     /** */
+    NetworkNetworkPort(ConstantsPath.NETWORK_PORT, Network),
+    /** */
+    NetworkConfiguration(ConstantsPath.NETWORK_CONFIGURATION),
+    /** */
     NetworkTemplate(ConstantsPath.NETWORK_TEMPLATE),
+    /** */
+    NetworkPort(ConstantsPath.NETWORK_PORT),
+    /** */
+    NetworkPortConfiguration(ConstantsPath.NETWORK_PORT_CONFIGURATION),
+    /** */
+    NetworkPortTemplate(ConstantsPath.NETWORK_PORT_TEMPLATE),
     /** */
     System(ConstantsPath.SYSTEM),
     /** */
@@ -75,6 +99,14 @@ public enum PathType {
     SystemSystem(ConstantsPath.SYSTEM, System),
     /** */
     SystemVolume(ConstantsPath.VOLUME, System),
+    /** */
+    SystemAddress(ConstantsPath.ADDRESS, System),
+    /** */
+    SystemNetwork(ConstantsPath.NETWORK, System),
+    /** */
+    SystemNetworkPort(ConstantsPath.NETWORK_PORT, System),
+    /** */
+    SystemForwardingGroup(ConstantsPath.FORWARDING_GROUP, System),
     /** */
     SystemTemplate(ConstantsPath.SYSTEM_TEMPLATE),
     /** */

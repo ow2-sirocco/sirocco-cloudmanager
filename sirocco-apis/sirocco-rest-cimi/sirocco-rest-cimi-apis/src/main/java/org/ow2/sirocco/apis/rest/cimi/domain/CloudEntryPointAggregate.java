@@ -44,7 +44,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 /**
  * Aggregation of CloudEntryPoint to add all items necesary for CIMI.
  */
-// TODO Others resources : Network, Meter, ...
+// TODO Others resources : Network, Event, ...
 public class CloudEntryPointAggregate extends CloudEntryPoint {
 
     /** Serial. */
@@ -64,11 +64,6 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * Field "Jobs".
      */
     private List<Job> jobs;
-
-    /**
-     * Field "jobTime".
-     */
-    private Integer jobTime;
 
     /**
      * Field "machineConfigs".
@@ -189,24 +184,6 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      */
     public void setJobs(final List<Job> jobs) {
         this.jobs = jobs;
-    }
-
-    /**
-     * Return the value of field "jobTime".
-     * 
-     * @return The value
-     */
-    public Integer getJobTime() {
-        return this.jobTime;
-    }
-
-    /**
-     * Set the value of field "jobTime".
-     * 
-     * @param jobTime The value
-     */
-    public void setJobTime(final Integer jobTime) {
-        this.jobTime = jobTime;
     }
 
     /**

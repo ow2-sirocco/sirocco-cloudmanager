@@ -25,9 +25,13 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -104,10 +108,9 @@ public class MachineNetworkInterfaceConverter extends ObjectCommonConverter {
                 dataService.getAddresses(), CimiMachineNetworkInterfaceAddressCollection.class));
             dataCimi.setMacAddress(dataService.getMacAddress());
             dataCimi.setMtu(dataService.getMtu());
-            // TODO Network, NetworkPort
-            // dataCimi.setNetwork((CimiNetwork)
-            // context.convertNextCimi(dataService.getNetwork(),
-            // CimiNetwork.class));
+            dataCimi.setNetwork((CimiNetwork) context.convertNextCimi(dataService.getNetwork(), CimiNetwork.class));
+            dataCimi.setNetworkPort((CimiNetworkPort) context.convertNextCimi(dataService.getNetworkPort(),
+                CimiNetworkPort.class));
             dataCimi.setNetworkType(ConverterHelper.toString(dataService.getNetworkType()));
             dataCimi.setState(ConverterHelper.toString(dataService.getState()));
         }
@@ -125,12 +128,8 @@ public class MachineNetworkInterfaceConverter extends ObjectCommonConverter {
         this.fill(context, dataCimi, dataService);
         dataService.setMacAddress(dataCimi.getMacAddress());
         dataService.setMtu(dataCimi.getMtu());
-        // TODO Network, NetworkPort
-        // dataService.setNetwork((Network)
-        // context.convertNextService(dataCimi.getNetwork()));
-        // dataService.setNetworkPort((NetworkPort)
-        // context.convertNextService(dataCimi.getNetworkPort()));
-
+        dataService.setNetwork((Network) context.convertNextService(dataCimi.getNetwork()));
+        dataService.setNetworkPort((NetworkPort) context.convertNextService(dataCimi.getNetworkPort()));
         dataService.setNetworkType(ConverterHelper.toNetworkType(dataCimi.getNetworkType()));
         dataService.setState(ConverterHelper.toMachineNetworkInterfaceState(dataCimi.getState()));
 

@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
 
 /**
  * Class NetworkPort.
@@ -41,10 +42,16 @@ public class CimiNetworkPort extends CimiObjectCommonAbstract {
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
-    /** Field "state". */
+    /**
+     * Field "state".
+     * <p>
+     * Read only
+     * </p>
+     */
     private String state;
 
     /** Field "network". */
+    @ValidChild
     private CimiNetwork network;
 
     /** Field "portType". */
@@ -53,7 +60,12 @@ public class CimiNetworkPort extends CimiObjectCommonAbstract {
     /** Field "classOfService". */
     private String classOfService;
 
-    /** Field "eventLog". */
+    /**
+     * Field "eventLog".
+     * <p>
+     * Read only
+     * </p>
+     */
     private CimiEventLog eventLog;
 
     /**
@@ -169,8 +181,14 @@ public class CimiNetworkPort extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getClassOfService());
+        has = has || (null != this.getNetwork());
+        has = has || (null != this.getPortType());
+        // Next read-only
+        // has = has || (null != this.getEventLog());
+        // has = has || (null != this.getState());
+        return has;
     }
 
     /**
@@ -182,8 +200,7 @@ public class CimiNetworkPort extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.NetworkPort;
     }
 
 }

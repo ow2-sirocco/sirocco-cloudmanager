@@ -38,6 +38,15 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CredentialConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.CredentialTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.DiskConfigurationConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.EventConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.EventLogConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.EventLogCreateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.EventLogEventConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.EventLogTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.ForwardingGroupConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.ForwardingGroupCreateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.ForwardingGroupNetworkConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.ForwardingGroupTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.JobConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineConverter;
@@ -51,10 +60,22 @@ import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateNetworkInterfaceC
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineTemplateVolumeTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.NetworkConfigurationConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.NetworkConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.NetworkCreateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortConfigurationConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortCreateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.NetworkTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.SystemAddressConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemCredentialConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.SystemForwardingGroupConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemMachineConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.SystemNetworkConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.SystemNetworkPortConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemSystemConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemVolumeConverter;
@@ -72,6 +93,20 @@ import org.ow2.sirocco.apis.rest.cimi.converter.collection.CredentialCollectionC
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.CredentialCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.CredentialTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.CredentialTemplateCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogEventCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogEventCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogTemplateCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.ForwardingGroupCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.ForwardingGroupCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.ForwardingGroupNetworkCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.ForwardingGroupNetworkCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.ForwardingGroupTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.ForwardingGroupTemplateCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.JobCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.JobCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineCollectionConverter;
@@ -90,12 +125,34 @@ import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineTemplateCollec
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineTemplateCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineVolumeCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.MachineVolumeCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkConfigurationCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkConfigurationCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkNetworkPortCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkNetworkPortCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkPortCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkPortCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkPortConfigurationCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkPortConfigurationCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkPortTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkPortTemplateCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkTemplateCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkTemplateCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemAddressCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemAddressCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCredentialCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCredentialCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemForwardingGroupCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemForwardingGroupCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemMachineCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemMachineCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemNetworkCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemNetworkCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemNetworkPortCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemNetworkPortCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemSystemCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemSystemCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemTemplateCollectionConverter;
@@ -123,7 +180,16 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEvent;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogEvent;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
@@ -138,10 +204,21 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
@@ -160,6 +237,20 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogEventCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogEventCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogTemplateCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupNetworkCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupTemplateCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
@@ -178,12 +269,34 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateColle
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkConfigurationCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkNetworkPortCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkNetworkPortCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortConfigurationCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortTemplateCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkTemplateCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemAddressCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemForwardingGroupCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemForwardingGroupCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkPortCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkPortCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
@@ -340,7 +453,6 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new CloudEntryPointConverter());
             referenceNames = new HashMap<ExchangeType, String>();
             item.putData(ConfigFactory.NAMES, referenceNames);
-            // TODO
             referenceNames.put(ExchangeType.SystemCollection, "systems");
             referenceNames.put(ExchangeType.SystemTemplateCollection, "systemTemplates");
             referenceNames.put(ExchangeType.MachineCollection, "machines");
@@ -353,34 +465,20 @@ public class ConfigFactory {
             referenceNames.put(ExchangeType.VolumeTemplateCollection, "volumeTemplates");
             referenceNames.put(ExchangeType.VolumeConfigurationCollection, "volumeConfigs");
             referenceNames.put(ExchangeType.VolumeImageCollection, "volumeImages");
-            // referenceNames.put(ExchangeType.NetworkCollection, "networks");
-            // referenceNames.put(ExchangeType.NetworkTemplateCollection,
-            // "networkTemplates");
-            // referenceNames.put(ExchangeType.NetworkConfigurationCollection,
-            // "networkConfigs");
-            // referenceNames.put(ExchangeType.NetworkPortCollection,
-            // "networkPorts");
-            // referenceNames.put(ExchangeType.NetworkPortTemplateCollection,
-            // "networkPortTemplates");
-            // referenceNames.put(ExchangeType.NetworkPortConfigCollection,
-            // "networkPortConfigs");
+            referenceNames.put(ExchangeType.NetworkCollection, "networks");
+            referenceNames.put(ExchangeType.NetworkTemplateCollection, "networkTemplates");
+            referenceNames.put(ExchangeType.NetworkConfigurationCollection, "networkConfigs");
+            referenceNames.put(ExchangeType.NetworkPortCollection, "networkPorts");
+            referenceNames.put(ExchangeType.NetworkPortTemplateCollection, "networkPortTemplates");
+            referenceNames.put(ExchangeType.NetworkPortConfigurationCollection, "networkPortConfigs");
             referenceNames.put(ExchangeType.AddressCollection, "addresses");
             referenceNames.put(ExchangeType.AddressTemplateCollection, "addressTemplates");
-            // referenceNames.put(ExchangeType.ForwardingGroupCollection,
-            // "forwardingGroups");
-            // referenceNames.put(ExchangeType.ForwardingGroupTemplateCollection,
-            // "forwardingGroupTemplates");
+            referenceNames.put(ExchangeType.ForwardingGroupCollection, "forwardingGroups");
+            referenceNames.put(ExchangeType.ForwardingGroupTemplateCollection, "forwardingGroupTemplates");
             referenceNames.put(ExchangeType.JobCollection, "jobs");
-            // referenceNames.put(ExchangeType.MeterCollection, "meters");
-            // referenceNames.put(ExchangeType.MeterTemplateCollection,
-            // "meterTemplates");
-            // referenceNames.put(ExchangeType.MeterConfigurationCollection,
-            // "meterConfigs");
-            // referenceNames.put(ExchangeType.EventLogCollection, "eventLogs");
-            // referenceNames.put(ExchangeType.EventLogTemplateCollection,
-            // "eventLogTemplates");
-            // referenceNames.put(ExchangeType.EventCollection, "events");
-
+            referenceNames.put(ExchangeType.EventLogCollection, "eventLogs");
+            referenceNames.put(ExchangeType.EventLogTemplateCollection, "eventLogTemplates");
+            referenceNames.put(ExchangeType.EventCollection, "events");
             break;
 
         case Credential:
@@ -425,6 +523,123 @@ public class ConfigFactory {
             referenceNames = new HashMap<ExchangeType, String>();
             item.putData(ConfigFactory.NAMES, referenceNames);
             referenceNames.put(ExchangeType.Disk, "disks");
+            break;
+
+        case Event:
+            item = new ItemConfig(CimiEvent.class, ExchangeType.Event);
+            item.putData(ConfigFactory.CONVERTER, new EventConverter());
+            break;
+
+        case EventCollection:
+            item = new ItemConfig(CimiEventCollection.class, ExchangeType.EventCollection);
+            item.putData(ConfigFactory.CONVERTER, new EventCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.Event, "events");
+            break;
+
+        case EventLog:
+            item = new ItemConfig(CimiEventLog.class, ExchangeType.EventLog);
+            item.putData(ConfigFactory.CONVERTER, new EventLogConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.EventLogEventCollection, "events");
+            break;
+
+        case EventLogCollection:
+            item = new ItemConfig(CimiEventLogCollection.class, ExchangeType.EventLogCollection);
+            item.putData(ConfigFactory.CONVERTER, new EventLogCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.EventLog, "eventLogs");
+            break;
+
+        case EventLogCreate:
+            item = new ItemConfig(CimiEventLogCreate.class, ExchangeType.EventLogCreate);
+            item.putData(ConfigFactory.CONVERTER, new EventLogCreateConverter());
+            break;
+
+        case EventLogEvent:
+            item = new ItemConfig(CimiEventLogEvent.class, ExchangeType.EventLogEvent);
+            item.putData(ConfigFactory.CONVERTER, new EventLogEventConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.Event, "volumeImage");
+            break;
+
+        case EventLogEventCollection:
+            item = new ItemConfig(CimiEventLogEventCollection.class, ExchangeType.EventLogEventCollection);
+            item.putData(ConfigFactory.CONVERTER, new EventLogEventCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.EventLogEvent, "events");
+            break;
+
+        case EventLogTemplate:
+            item = new ItemConfig(CimiEventLogTemplate.class, ExchangeType.EventLogTemplate);
+            item.putData(ConfigFactory.CONVERTER, new EventLogTemplateConverter());
+            break;
+
+        case EventLogTemplateCollection:
+            item = new ItemConfig(CimiEventLogTemplateCollection.class, ExchangeType.EventLogTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new EventLogTemplateCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.EventLogTemplate, "eventLogTemplates");
+            break;
+
+        case ForwardingGroup:
+            item = new ItemConfig(CimiForwardingGroup.class, ExchangeType.ForwardingGroup);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.ForwardingGroupNetworkCollection, "images");
+            referenceNames.put(ExchangeType.EventLog, "eventLog");
+            break;
+
+        case ForwardingGroupCollection:
+            item = new ItemConfig(CimiForwardingGroupCollection.class, ExchangeType.ForwardingGroupCollection);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.ForwardingGroup, "forwardingGroups");
+            break;
+
+        case ForwardingGroupCreate:
+            item = new ItemConfig(CimiForwardingGroupCreate.class, ExchangeType.ForwardingGroupCreate);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupCreateConverter());
+            break;
+
+        case ForwardingGroupNetwork:
+            item = new ItemConfig(CimiForwardingGroupNetwork.class, ExchangeType.ForwardingGroupNetwork);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupNetworkConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.Network, "network");
+            break;
+
+        case ForwardingGroupNetworkCollection:
+            item = new ItemConfig(CimiForwardingGroupNetworkCollection.class, ExchangeType.ForwardingGroupNetworkCollection);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupNetworkCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.ForwardingGroupNetwork, "forwardingGroupNetworks");
+            break;
+
+        case ForwardingGroupTemplate:
+            item = new ItemConfig(CimiForwardingGroupTemplate.class, ExchangeType.ForwardingGroupTemplate);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupTemplateConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.ForwardingGroupNetwork, "networks");
+            break;
+
+        case ForwardingGroupTemplateCollection:
+            item = new ItemConfig(CimiForwardingGroupTemplateCollection.class, ExchangeType.ForwardingGroupTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupTemplateCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.ForwardingGroupTemplate, "forwardingGroupTemplates");
             break;
 
         case Job:
@@ -507,8 +722,8 @@ public class ConfigFactory {
             referenceNames = new HashMap<ExchangeType, String>();
             item.putData(ConfigFactory.NAMES, referenceNames);
             referenceNames.put(ExchangeType.MachineNetworkInterfaceAddressCollection, "addresses");
-            // referenceNames.put(ExchangeType.Network, "network");
-            // referenceNames.put(ExchangeType.NetworkPort, "networkPort");
+            referenceNames.put(ExchangeType.Network, "network");
+            referenceNames.put(ExchangeType.NetworkPort, "networkPort");
             break;
 
         case MachineNetworkInterfaceAddress:
@@ -536,11 +751,9 @@ public class ConfigFactory {
             referenceNames.put(ExchangeType.Volume, "volume");
             referenceNames.put(ExchangeType.VolumeTemplate, "volumeTemplate");
             referenceNames.put(ExchangeType.Address, "address");
-            // referenceNames.put(ExchangeType.Network, "network");
-            // referenceNames.put(ExchangeType.NetworkPort, "networkPort");
-            // referenceNames.put(ExchangeType.MeterTemplate, "meterTemplate");
-            // referenceNames.put(ExchangeType.eventLogTemplate,
-            // "eventLogTemplate");
+            referenceNames.put(ExchangeType.Network, "network");
+            referenceNames.put(ExchangeType.NetworkPort, "networkPort");
+            referenceNames.put(ExchangeType.EventLogTemplate, "eventLogTemplate");
             break;
 
         case MachineTemplateCollection:
@@ -577,13 +790,128 @@ public class ConfigFactory {
             referenceNames.put(ExchangeType.MachineVolume, "volumes");
             break;
 
+        case Network:
+            item = new ItemConfig(CimiNetwork.class, ExchangeType.Network);
+            item.putData(ConfigFactory.CONVERTER, new NetworkConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkNetworkPortCollection, "networkPorts");
+            referenceNames.put(ExchangeType.ForwardingGroup, "forwardingGroup");
+            referenceNames.put(ExchangeType.EventLog, "eventLog");
+            break;
+
+        case NetworkCollection:
+            item = new ItemConfig(CimiNetworkCollection.class, ExchangeType.NetworkCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.Network, "networks");
+            break;
+
+        case NetworkConfiguration:
+            item = new ItemConfig(CimiNetworkConfiguration.class, ExchangeType.NetworkConfiguration);
+            item.putData(ConfigFactory.CONVERTER, new NetworkConfigurationConverter());
+            break;
+
+        case NetworkConfigurationCollection:
+            item = new ItemConfig(CimiNetworkConfigurationCollection.class, ExchangeType.NetworkConfigurationCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkConfigurationCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkConfiguration, "networkConfigurations");
+            break;
+
+        case NetworkCreate:
+            item = new ItemConfig(CimiNetworkCreate.class, ExchangeType.NetworkCreate);
+            item.putData(ConfigFactory.CONVERTER, new NetworkCreateConverter());
+            break;
+
+        case NetworkNetworkPortCollection:
+            item = new ItemConfig(CimiNetworkNetworkPortCollection.class, ExchangeType.NetworkNetworkPortCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkNetworkPortCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkPort, "networkPorts");
+            break;
+
+        case NetworkTemplate:
+            item = new ItemConfig(CimiNetworkTemplate.class, ExchangeType.NetworkTemplate);
+            item.putData(ConfigFactory.CONVERTER, new NetworkTemplateConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkConfiguration, "networkConfig");
+            referenceNames.put(ExchangeType.ForwardingGroup, "forwardingGroup");
+            referenceNames.put(ExchangeType.EventLogTemplate, "eventLogTemplate");
+            break;
+
+        case NetworkTemplateCollection:
+            item = new ItemConfig(CimiNetworkTemplateCollection.class, ExchangeType.NetworkTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkTemplateCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkTemplate, "networkTemplates");
+            break;
+
+        case NetworkPort:
+            item = new ItemConfig(CimiNetworkPort.class, ExchangeType.NetworkPort);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.Network, "network");
+            referenceNames.put(ExchangeType.EventLog, "eventLog");
+            break;
+
+        case NetworkPortCollection:
+            item = new ItemConfig(CimiNetworkPortCollection.class, ExchangeType.NetworkPortCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkPort, "networkPorts");
+            break;
+
+        case NetworkPortConfiguration:
+            item = new ItemConfig(CimiNetworkPortConfiguration.class, ExchangeType.NetworkPortConfiguration);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortConfigurationConverter());
+            break;
+
+        case NetworkPortConfigurationCollection:
+            item = new ItemConfig(CimiNetworkPortConfigurationCollection.class, ExchangeType.NetworkPortConfigurationCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortConfigurationCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkPortConfiguration, "networkPortConfigurations");
+            break;
+
+        case NetworkPortCreate:
+            item = new ItemConfig(CimiNetworkPortCreate.class, ExchangeType.NetworkPortCreate);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortCreateConverter());
+            break;
+
+        case NetworkPortTemplate:
+            item = new ItemConfig(CimiNetworkPortTemplate.class, ExchangeType.NetworkPortTemplate);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortTemplateConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.Network, "network");
+            referenceNames.put(ExchangeType.NetworkPortConfiguration, "networkPortConfig");
+            referenceNames.put(ExchangeType.EventLogTemplate, "eventLogTemplate");
+            break;
+
+        case NetworkPortTemplateCollection:
+            item = new ItemConfig(CimiNetworkPortTemplateCollection.class, ExchangeType.NetworkPortTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortTemplateCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkPortTemplate, "networkPortTemplates");
+            break;
+
         case Volume:
             item = new ItemConfig(CimiVolume.class, ExchangeType.Volume);
             item.putData(ConfigFactory.CONVERTER, new VolumeConverter());
             referenceNames = new HashMap<ExchangeType, String>();
             item.putData(ConfigFactory.NAMES, referenceNames);
             referenceNames.put(ExchangeType.VolumeVolumeImageCollection, "images");
-            // referenceNames.put(ExchangeType.EventLog, "eventLog");
+            referenceNames.put(ExchangeType.EventLog, "eventLog");
             break;
 
         case VolumeCollection:
@@ -632,8 +960,7 @@ public class ConfigFactory {
             item.putData(ConfigFactory.NAMES, referenceNames);
             referenceNames.put(ExchangeType.VolumeConfiguration, "volumeConfig");
             referenceNames.put(ExchangeType.VolumeImage, "volumeImage");
-            // referenceNames.put(ExchangeType.EventLogTemplate,
-            // "eventLogTemplate");
+            referenceNames.put(ExchangeType.EventLogTemplate, "eventLogTemplate");
             break;
 
         case VolumeTemplateCollection:
@@ -669,18 +996,29 @@ public class ConfigFactory {
             referenceNames.put(ExchangeType.SystemMachineCollection, "machines");
             referenceNames.put(ExchangeType.SystemCredentialCollection, "credentials");
             referenceNames.put(ExchangeType.SystemVolumeCollection, "volumes");
-            // TODO
-            // referenceNames.put(ExchangeType.SystemNetworkCollection,
-            // "networks");
-            // referenceNames.put(ExchangeType.SystemNetworkPortCollection,
-            // "networkPorts");
-            // referenceNames.put(ExchangeType.SystemAddresseCollection,
-            // "addresses");
-            // referenceNames.put(ExchangeType.SystemForwardingGroupCollection,
-            // "forwardingGroups");
+            referenceNames.put(ExchangeType.SystemNetworkCollection, "networks");
+            referenceNames.put(ExchangeType.SystemNetworkPortCollection, "networkPorts");
+            referenceNames.put(ExchangeType.SystemAddressCollection, "addresses");
+            referenceNames.put(ExchangeType.SystemForwardingGroupCollection, "forwardingGroups");
             // referenceNames.put(ExchangeType.MeterCollection, "meters");
-            // referenceNames.put(ExchangeType.EventLog, "eventLog");
+            referenceNames.put(ExchangeType.EventLog, "eventLog");
 
+            break;
+
+        case SystemAddress:
+            item = new ItemConfig(CimiSystemAddress.class, ExchangeType.SystemAddress);
+            item.putData(ConfigFactory.CONVERTER, new SystemAddressConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.Address, "address");
+            break;
+
+        case SystemAddressCollection:
+            item = new ItemConfig(CimiSystemAddressCollection.class, ExchangeType.SystemAddressCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemAddressCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.SystemAddress, "systemAddresss");
             break;
 
         case SystemCollection:
@@ -712,6 +1050,22 @@ public class ConfigFactory {
             referenceNames.put(ExchangeType.SystemCredential, "systemCredentials");
             break;
 
+        case SystemForwardingGroup:
+            item = new ItemConfig(CimiSystemForwardingGroup.class, ExchangeType.SystemForwardingGroup);
+            item.putData(ConfigFactory.CONVERTER, new SystemForwardingGroupConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.ForwardingGroup, "forwardingGroup");
+            break;
+
+        case SystemForwardingGroupCollection:
+            item = new ItemConfig(CimiSystemForwardingGroupCollection.class, ExchangeType.SystemForwardingGroupCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemForwardingGroupCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.SystemForwardingGroup, "systemForwardingGroups");
+            break;
+
         case SystemMachine:
             item = new ItemConfig(CimiSystemMachine.class, ExchangeType.SystemMachine);
             item.putData(ConfigFactory.CONVERTER, new SystemMachineConverter());
@@ -726,6 +1080,38 @@ public class ConfigFactory {
             referenceNames = new HashMap<ExchangeType, String>();
             item.putData(ConfigFactory.NAMES, referenceNames);
             referenceNames.put(ExchangeType.SystemMachine, "systemMachines");
+            break;
+
+        case SystemNetwork:
+            item = new ItemConfig(CimiSystemNetwork.class, ExchangeType.SystemNetwork);
+            item.putData(ConfigFactory.CONVERTER, new SystemNetworkConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.Network, "network");
+            break;
+
+        case SystemNetworkCollection:
+            item = new ItemConfig(CimiSystemNetworkCollection.class, ExchangeType.SystemNetworkCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemNetworkCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.SystemNetwork, "systemNetworks");
+            break;
+
+        case SystemNetworkPort:
+            item = new ItemConfig(CimiSystemNetworkPort.class, ExchangeType.SystemNetworkPort);
+            item.putData(ConfigFactory.CONVERTER, new SystemNetworkPortConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkPort, "networkPort");
+            break;
+
+        case SystemNetworkPortCollection:
+            item = new ItemConfig(CimiSystemNetworkPortCollection.class, ExchangeType.SystemNetworkPortCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemNetworkPortCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.SystemNetworkPort, "systemNetworkPorts");
             break;
 
         case SystemSystem:
@@ -815,6 +1201,42 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new MachineDiskCollectionRootConverter());
             break;
 
+        case EventCollection:
+            item = new ItemConfig(CimiEventCollectionRoot.class, ExchangeType.EventCollection);
+            item.putData(ConfigFactory.CONVERTER, new EventCollectionRootConverter());
+            break;
+
+        case EventLogCollection:
+            item = new ItemConfig(CimiEventLogCollectionRoot.class, ExchangeType.EventLogCollection);
+            item.putData(ConfigFactory.CONVERTER, new EventLogCollectionRootConverter());
+            break;
+
+        case EventLogEventCollection:
+            item = new ItemConfig(CimiEventLogEventCollectionRoot.class, ExchangeType.EventLogEventCollection);
+            item.putData(ConfigFactory.CONVERTER, new EventLogEventCollectionRootConverter());
+            break;
+
+        case EventLogTemplateCollection:
+            item = new ItemConfig(CimiEventLogTemplateCollectionRoot.class, ExchangeType.EventLogTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new EventLogTemplateCollectionRootConverter());
+            break;
+
+        case ForwardingGroupCollection:
+            item = new ItemConfig(CimiForwardingGroupCollectionRoot.class, ExchangeType.ForwardingGroupCollection);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupCollectionRootConverter());
+            break;
+
+        case ForwardingGroupNetworkCollection:
+            item = new ItemConfig(CimiForwardingGroupNetworkCollectionRoot.class, ExchangeType.ForwardingGroupNetworkCollection);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupNetworkCollectionRootConverter());
+            break;
+
+        case ForwardingGroupTemplateCollection:
+            item = new ItemConfig(CimiForwardingGroupTemplateCollectionRoot.class,
+                ExchangeType.ForwardingGroupTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new ForwardingGroupTemplateCollectionRootConverter());
+            break;
+
         case JobCollection:
             item = new ItemConfig(CimiJobCollectionRoot.class, ExchangeType.JobCollection);
             item.putData(ConfigFactory.CONVERTER, new JobCollectionRootConverter());
@@ -857,6 +1279,42 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new MachineVolumeCollectionRootConverter());
             break;
 
+        case NetworkCollection:
+            item = new ItemConfig(CimiNetworkCollectionRoot.class, ExchangeType.NetworkCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkCollectionRootConverter());
+            break;
+
+        case NetworkConfigurationCollection:
+            item = new ItemConfig(CimiNetworkConfigurationCollectionRoot.class, ExchangeType.NetworkConfigurationCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkConfigurationCollectionRootConverter());
+            break;
+
+        case NetworkNetworkPortCollection:
+            item = new ItemConfig(CimiNetworkNetworkPortCollectionRoot.class, ExchangeType.NetworkNetworkPortCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkNetworkPortCollectionRootConverter());
+            break;
+
+        case NetworkPortCollection:
+            item = new ItemConfig(CimiNetworkPortCollectionRoot.class, ExchangeType.NetworkPortCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortCollectionRootConverter());
+            break;
+
+        case NetworkPortConfigurationCollection:
+            item = new ItemConfig(CimiNetworkPortConfigurationCollectionRoot.class,
+                ExchangeType.NetworkPortConfigurationCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortConfigurationCollectionRootConverter());
+            break;
+
+        case NetworkPortTemplateCollection:
+            item = new ItemConfig(CimiNetworkPortTemplateCollectionRoot.class, ExchangeType.NetworkPortTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkPortTemplateCollectionRootConverter());
+            break;
+
+        case NetworkTemplateCollection:
+            item = new ItemConfig(CimiNetworkTemplateCollectionRoot.class, ExchangeType.NetworkTemplateCollection);
+            item.putData(ConfigFactory.CONVERTER, new NetworkTemplateCollectionRootConverter());
+            break;
+
         case VolumeCollection:
             item = new ItemConfig(CimiVolumeCollectionRoot.class, ExchangeType.VolumeCollection);
             item.putData(ConfigFactory.CONVERTER, new VolumeCollectionRootConverter());
@@ -887,14 +1345,34 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new SystemCollectionRootConverter());
             break;
 
+        case SystemAddressCollection:
+            item = new ItemConfig(CimiSystemAddressCollectionRoot.class, ExchangeType.SystemAddressCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemAddressCollectionRootConverter());
+            break;
+
         case SystemCredentialCollection:
             item = new ItemConfig(CimiSystemCredentialCollectionRoot.class, ExchangeType.SystemCredentialCollection);
             item.putData(ConfigFactory.CONVERTER, new SystemCredentialCollectionRootConverter());
             break;
 
+        case SystemForwardingGroupCollection:
+            item = new ItemConfig(CimiSystemForwardingGroupCollectionRoot.class, ExchangeType.SystemForwardingGroupCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemForwardingGroupCollectionRootConverter());
+            break;
+
         case SystemMachineCollection:
             item = new ItemConfig(CimiSystemMachineCollectionRoot.class, ExchangeType.SystemMachineCollection);
             item.putData(ConfigFactory.CONVERTER, new SystemMachineCollectionRootConverter());
+            break;
+
+        case SystemNetworkCollection:
+            item = new ItemConfig(CimiSystemNetworkCollectionRoot.class, ExchangeType.SystemNetworkCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemNetworkCollectionRootConverter());
+            break;
+
+        case SystemNetworkPortCollection:
+            item = new ItemConfig(CimiSystemNetworkPortCollectionRoot.class, ExchangeType.SystemNetworkPortCollection);
+            item.putData(ConfigFactory.CONVERTER, new SystemNetworkPortCollectionRootConverter());
             break;
 
         case SystemSystemCollection:
@@ -919,6 +1397,15 @@ public class ConfigFactory {
         case Credential:
         case CredentialCreate:
         case CredentialTemplate:
+        case Event:
+        case EventLog:
+        case EventLogCreate:
+        case EventLogEvent:
+        case EventLogTemplate:
+        case ForwardingGroup:
+        case ForwardingGroupCreate:
+        case ForwardingGroupNetwork:
+        case ForwardingGroupTemplate:
         case Disk:
         case Job:
         case Machine:
@@ -932,10 +1419,22 @@ public class ConfigFactory {
         case MachineTemplateVolume:
         case MachineTemplateVolumeTemplate:
         case MachineVolume:
+        case Network:
+        case NetworkConfiguration:
+        case NetworkCreate:
+        case NetworkPort:
+        case NetworkPortConfiguration:
+        case NetworkPortCreate:
+        case NetworkPortTemplate:
+        case NetworkTemplate:
         case System:
+        case SystemAddress:
         case SystemCreate:
         case SystemCredential:
+        case SystemForwardingGroup:
         case SystemMachine:
+        case SystemNetwork:
+        case SystemNetworkPort:
         case SystemSystem:
         case SystemTemplate:
         case SystemVolume:

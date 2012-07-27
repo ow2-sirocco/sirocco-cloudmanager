@@ -38,6 +38,13 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEvent;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogEvent;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
@@ -49,10 +56,20 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
@@ -67,6 +84,13 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogEventCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
@@ -76,9 +100,20 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterf
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkNetworkPortCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemForwardingGroupCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkPortCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemVolumeCollection;
@@ -212,6 +247,54 @@ public class WritingResourceValidatorTest {
         case DiskCollection:
             cimi = new CimiMachineDiskCollection();
             break;
+        case Event:
+            cimi = new CimiEvent();
+            break;
+        case EventCollection:
+            cimi = new CimiEventCollection();
+            break;
+        case EventLog:
+            cimi = new CimiEventLog();
+            break;
+        case EventLogCollection:
+            cimi = new CimiEventLogCollection();
+            break;
+        case EventLogCreate:
+            cimi = null;
+            break;
+        case EventLogEvent:
+            cimi = new CimiEventLogEvent();
+            break;
+        case EventLogEventCollection:
+            cimi = new CimiEventLogEventCollection();
+            break;
+        case EventLogTemplate:
+            cimi = new CimiEventLogTemplate();
+            break;
+        case EventLogTemplateCollection:
+            cimi = new CimiEventLogTemplateCollection();
+            break;
+        case ForwardingGroup:
+            cimi = new CimiForwardingGroup();
+            break;
+        case ForwardingGroupCollection:
+            cimi = new CimiForwardingGroupCollection();
+            break;
+        case ForwardingGroupCreate:
+            cimi = null;
+            break;
+        case ForwardingGroupNetwork:
+            cimi = new CimiForwardingGroupNetwork();
+            break;
+        case ForwardingGroupNetworkCollection:
+            cimi = new CimiForwardingGroupNetworkCollection();
+            break;
+        case ForwardingGroupTemplate:
+            cimi = new CimiForwardingGroupTemplate();
+            break;
+        case ForwardingGroupTemplateCollection:
+            cimi = new CimiForwardingGroupTemplateCollection();
+            break;
         case Job:
             cimi = new CimiJob();
             break;
@@ -268,6 +351,51 @@ public class WritingResourceValidatorTest {
             break;
         case MachineVolumeCollection:
             cimi = new CimiMachineVolumeCollection();
+            break;
+        case Network:
+            cimi = new CimiNetwork();
+            break;
+        case NetworkCollection:
+            cimi = new CimiNetworkCollection();
+            break;
+        case NetworkConfiguration:
+            cimi = new CimiNetworkConfiguration();
+            break;
+        case NetworkConfigurationCollection:
+            cimi = new CimiNetworkConfigurationCollection();
+            break;
+        case NetworkCreate:
+            cimi = null;
+            break;
+        case NetworkNetworkPortCollection:
+            cimi = new CimiNetworkNetworkPortCollection();
+            break;
+        case NetworkTemplate:
+            cimi = new CimiNetworkTemplate();
+            break;
+        case NetworkTemplateCollection:
+            cimi = new CimiNetworkTemplateCollection();
+            break;
+        case NetworkPort:
+            cimi = new CimiNetworkPort();
+            break;
+        case NetworkPortCollection:
+            cimi = new CimiNetworkPortCollection();
+            break;
+        case NetworkPortConfiguration:
+            cimi = new CimiNetworkPortConfiguration();
+            break;
+        case NetworkPortConfigurationCollection:
+            cimi = new CimiNetworkPortConfigurationCollection();
+            break;
+        case NetworkPortCreate:
+            cimi = null;
+            break;
+        case NetworkPortTemplate:
+            cimi = new CimiNetworkPortTemplate();
+            break;
+        case NetworkPortTemplateCollection:
+            cimi = new CimiNetworkPortTemplateCollection();
             break;
         case Volume:
             cimi = new CimiVolume();
@@ -334,6 +462,30 @@ public class WritingResourceValidatorTest {
             break;
         case SystemTemplateCollection:
             cimi = new CimiSystemTemplateCollection();
+            break;
+        case SystemAddress:
+            cimi = new CimiSystemAddress();
+            break;
+        case SystemAddressCollection:
+            cimi = new CimiSystemAddressCollection();
+            break;
+        case SystemForwardingGroup:
+            cimi = new CimiSystemForwardingGroup();
+            break;
+        case SystemForwardingGroupCollection:
+            cimi = new CimiSystemForwardingGroupCollection();
+            break;
+        case SystemNetwork:
+            cimi = new CimiSystemNetwork();
+            break;
+        case SystemNetworkCollection:
+            cimi = new CimiSystemNetworkCollection();
+            break;
+        case SystemNetworkPort:
+            cimi = new CimiSystemNetworkPort();
+            break;
+        case SystemNetworkPortCollection:
+            cimi = new CimiSystemNetworkPortCollection();
             break;
         case SystemVolume:
             cimi = new CimiSystemVolume();

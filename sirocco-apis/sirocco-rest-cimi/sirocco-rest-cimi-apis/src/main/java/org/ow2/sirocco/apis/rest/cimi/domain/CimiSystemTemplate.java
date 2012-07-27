@@ -56,6 +56,14 @@ public class CimiSystemTemplate extends CimiObjectCommonAbstract {
     private CimiComponentDescriptorArray componentDescriptors;
 
     /**
+     * Field "eventLogTemplate".
+     * <p>
+     * Read only
+     * </p>
+     */
+    private CimiEventLogTemplate eventLogTemplate;
+
+    /**
      * Default constructor.
      */
     public CimiSystemTemplate() {
@@ -129,6 +137,24 @@ public class CimiSystemTemplate extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Return the value of field "eventLogTemplate".
+     * 
+     * @return The value
+     */
+    public CimiEventLogTemplate getEventLogTemplate() {
+        return this.eventLogTemplate;
+    }
+
+    /**
+     * Set the value of field "eventLogTemplate".
+     * 
+     * @param eventLogTemplate The value
+     */
+    public void setEventLogTemplate(final CimiEventLogTemplate eventLogTemplate) {
+        this.eventLogTemplate = eventLogTemplate;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
@@ -137,6 +163,7 @@ public class CimiSystemTemplate extends CimiObjectCommonAbstract {
     public boolean hasValues() {
         boolean has = super.hasValues();
         has = has || (null != this.getComponentDescriptors());
+        has = has || (null != this.getEventLogTemplate());
         return has;
     }
 

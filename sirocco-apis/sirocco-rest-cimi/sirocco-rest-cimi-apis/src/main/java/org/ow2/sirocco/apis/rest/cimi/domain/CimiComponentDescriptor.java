@@ -45,12 +45,14 @@ public class CimiComponentDescriptor extends CimiCommon {
     private static final long serialVersionUID = 1L;
 
     /** Array of all types of descriptor. */
-    public static final ExchangeType[] TYPE_DESCRIPTORS = {ExchangeType.CredentialTemplate, ExchangeType.MachineTemplate,
-        ExchangeType.SystemTemplate, ExchangeType.VolumeTemplate};
+    public static final ExchangeType[] TYPE_DESCRIPTORS = {ExchangeType.SystemTemplate, ExchangeType.MachineTemplate,
+        ExchangeType.CredentialTemplate, ExchangeType.VolumeTemplate, ExchangeType.NetworkTemplate,
+        ExchangeType.NetworkPortTemplate, ExchangeType.AddressTemplate, ExchangeType.ForwardingGroupTemplate};
 
     /**
      * Field "type".
      */
+    @NotNull(groups = GroupCreateByValue.class)
     private String type;
 
     /**
@@ -214,6 +216,94 @@ public class CimiComponentDescriptor extends CimiCommon {
      */
     public void setVolumeTemplate(final CimiVolumeTemplate volumeTemplate) {
         this.component = volumeTemplate;
+    }
+
+    /**
+     * Return the value of field "networkTemplate".
+     * 
+     * @return The value
+     */
+    public CimiNetworkTemplate getNetworkTemplate() {
+        CimiNetworkTemplate template = null;
+        if (this.component instanceof CimiNetworkTemplate) {
+            template = (CimiNetworkTemplate) this.component;
+        }
+        return template;
+    }
+
+    /**
+     * Set the value of field "networkTemplate".
+     * 
+     * @param networkTemplate The value
+     */
+    public void setNetworkTemplate(final CimiNetworkTemplate networkTemplate) {
+        this.component = networkTemplate;
+    }
+
+    /**
+     * Return the value of field "networkPortTemplate".
+     * 
+     * @return The value
+     */
+    public CimiNetworkPortTemplate getNetworkPortTemplate() {
+        CimiNetworkPortTemplate template = null;
+        if (this.component instanceof CimiNetworkPortTemplate) {
+            template = (CimiNetworkPortTemplate) this.component;
+        }
+        return template;
+    }
+
+    /**
+     * Set the value of field "networkPortTemplate".
+     * 
+     * @param networkPortTemplate The value
+     */
+    public void setNetworkPortTemplate(final CimiNetworkPortTemplate networkPortTemplate) {
+        this.component = networkPortTemplate;
+    }
+
+    /**
+     * Return the value of field "addresseTemplate".
+     * 
+     * @return The value
+     */
+    public CimiAddressTemplate getAddressTemplate() {
+        CimiAddressTemplate template = null;
+        if (this.component instanceof CimiAddressTemplate) {
+            template = (CimiAddressTemplate) this.component;
+        }
+        return template;
+    }
+
+    /**
+     * Set the value of field "addresseTemplate".
+     * 
+     * @param addresseTemplate The value
+     */
+    public void setAddressTemplate(final CimiAddressTemplate addresseTemplate) {
+        this.component = addresseTemplate;
+    }
+
+    /**
+     * Return the value of field "forwardingGroupTemplate".
+     * 
+     * @return The value
+     */
+    public CimiForwardingGroupTemplate getForwardingGroupTemplate() {
+        CimiForwardingGroupTemplate template = null;
+        if (this.component instanceof CimiForwardingGroupTemplate) {
+            template = (CimiForwardingGroupTemplate) this.component;
+        }
+        return template;
+    }
+
+    /**
+     * Set the value of field "forwardingGroupTemplate".
+     * 
+     * @param forwardingGroupTemplate The value
+     */
+    public void setForwardingGroupTemplate(final CimiForwardingGroupTemplate forwardingGroupTemplate) {
+        this.component = forwardingGroupTemplate;
     }
 
 }

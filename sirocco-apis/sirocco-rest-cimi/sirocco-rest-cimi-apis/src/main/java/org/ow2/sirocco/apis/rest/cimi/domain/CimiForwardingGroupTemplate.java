@@ -24,13 +24,19 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import java.util.List;
+
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonProperty;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class ForwardingGroupTemplate.
@@ -43,7 +49,9 @@ public class CimiForwardingGroupTemplate extends CimiObjectCommonAbstract {
     private static final long serialVersionUID = 1L;
 
     /** Field "networks". */
-    private CimiNetworkCollection networks;
+    @ValidChild
+    @NotEmptyIfNotNull(groups = {GroupWrite.class})
+    private CimiForwardingGroupTemplateNetworkArray networks;
 
     /**
      * Default constructor.
@@ -66,7 +74,38 @@ public class CimiForwardingGroupTemplate extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiNetworkCollection getNetworks() {
+    @XmlElement(name = "network")
+    @JsonProperty(value = "networks")
+    public CimiNetwork[] getNetworks() {
+        CimiNetwork[] items = null;
+        if (null != this.networks) {
+            items = this.networks.getArray();
+        }
+        return items;
+    }
+
+    /**
+     * Set the value of field "networks".
+     * 
+     * @param networks The value
+     */
+    public void setNetworks(final CimiNetwork[] networks) {
+        if (null == networks) {
+            this.networks = null;
+        } else {
+            this.networks = new CimiForwardingGroupTemplateNetworkArray();
+            this.networks.setArray(networks);
+        }
+    }
+
+    /**
+     * Return the value of field "networks".
+     * 
+     * @return The value
+     */
+    @XmlTransient
+    @JsonIgnore
+    public List<CimiNetwork> getListNetworks() {
         return this.networks;
     }
 
@@ -75,8 +114,13 @@ public class CimiForwardingGroupTemplate extends CimiObjectCommonAbstract {
      * 
      * @param networks The value
      */
-    public void setNetworks(final CimiNetworkCollection networks) {
-        this.networks = networks;
+    public void setListNetworks(final List<CimiNetwork> networks) {
+        if (null == networks) {
+            this.networks = null;
+        } else {
+            this.networks = new CimiForwardingGroupTemplateNetworkArray();
+            this.networks.addAll(networks);
+        }
     }
 
     /**
@@ -86,8 +130,9 @@ public class CimiForwardingGroupTemplate extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getNetworks());
+        return has;
     }
 
     /**
@@ -99,8 +144,25 @@ public class CimiForwardingGroupTemplate extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        // TODO Auto-generated method stub
-        return null;
+        return ExchangeType.ForwardingGroupTemplate;
     }
 
+    /**
+     * Concrete class of the collection.
+     */
+    public class CimiForwardingGroupTemplateNetworkArray extends CimiArrayAbstract<CimiNetwork> {
+
+        /** Serial number */
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * {@inheritDoc}
+         * 
+         * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiArray#newEmptyArraySized()
+         */
+        @Override
+        public CimiNetwork[] newEmptyArraySized() {
+            return new CimiNetwork[this.size()];
+        }
+    }
 }

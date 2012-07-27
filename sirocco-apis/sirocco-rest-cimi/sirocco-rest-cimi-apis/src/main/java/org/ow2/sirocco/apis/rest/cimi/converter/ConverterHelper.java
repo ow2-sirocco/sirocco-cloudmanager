@@ -32,6 +32,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
@@ -148,6 +149,14 @@ public class ConverterHelper {
         return converted;
     }
 
+    public static String toString(final Network.State value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
+        }
+        return converted;
+    }
+
     public static String toString(final Network.Type value) {
         String converted = null;
         if (null != value) {
@@ -166,6 +175,14 @@ public class ConverterHelper {
                     break;
                 }
             }
+        }
+        return converted;
+    }
+
+    public static String toString(final NetworkPort.State value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
         }
         return converted;
     }

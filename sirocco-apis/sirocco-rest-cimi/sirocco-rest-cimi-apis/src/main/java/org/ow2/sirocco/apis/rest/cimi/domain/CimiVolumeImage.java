@@ -46,6 +46,9 @@ public class CimiVolumeImage extends CimiObjectCommonAbstract {
 
     /**
      * Field "state".
+     * <p>
+     * Read only
+     * </p>
      */
     private String state;
 
@@ -133,6 +136,8 @@ public class CimiVolumeImage extends CimiObjectCommonAbstract {
         boolean has = super.hasValues();
         has = has || (null != this.getBootable());
         has = has || (null != this.getImageLocation());
+        // Next read only
+        // has = has || (null != this.getState());
         return has;
     }
 

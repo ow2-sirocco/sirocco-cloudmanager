@@ -24,15 +24,15 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
-import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
  * Class VolumeTemplate.
@@ -48,15 +48,20 @@ public class CimiVolumeTemplate extends CimiObjectCommonAbstract {
      * Field "volumeConfig".
      */
     @ValidChild
-    @NotEmptyIfNotNull(groups = {GroupWrite.class})
+    @NotNull(groups = {GroupCreateByValue.class})
     private CimiVolumeConfiguration volumeConfig;
 
     /**
      * Field "volumeImage".
      */
     @ValidChild
-    @NotEmptyIfNotNull(groups = {GroupWrite.class})
     private CimiVolumeImage volumeImage;
+
+    /**
+     * Field "eventLogTemplate".
+     */
+    @ValidChild
+    private CimiEventLogTemplate eventLogTemplate;
 
     /**
      * Default constructor.
@@ -102,6 +107,24 @@ public class CimiVolumeTemplate extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Return the value of field "eventLogTemplate".
+     * 
+     * @return The value
+     */
+    public CimiEventLogTemplate getEventLogTemplate() {
+        return this.eventLogTemplate;
+    }
+
+    /**
+     * Set the value of field "eventLogTemplate".
+     * 
+     * @param eventLogTemplate The value
+     */
+    public void setEventLogTemplate(final CimiEventLogTemplate eventLogTemplate) {
+        this.eventLogTemplate = eventLogTemplate;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
@@ -111,6 +134,7 @@ public class CimiVolumeTemplate extends CimiObjectCommonAbstract {
         boolean has = super.hasValues();
         has = has || (null != this.getVolumeConfig());
         has = has || (null != this.getVolumeImage());
+        has = has || (null != this.getEventLogTemplate());
         return has;
     }
 
