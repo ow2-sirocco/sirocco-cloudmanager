@@ -44,7 +44,7 @@ import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @MappedSuperclass
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public abstract class CloudEntity implements Serializable, Resource {
 
     private static final long serialVersionUID = 1L;
@@ -65,13 +65,17 @@ public abstract class CloudEntity implements Serializable, Resource {
 
     protected String providerAssignedId;
 
-    /*
-     * protected long versionNum;
-     * @Version
-     * @Column(name="OPTLOCK") protected long getVersionNum() { return
-     * versionNum; } protected void setVersionNum(long versionNum) {
-     * this.versionNum = versionNum; }
-     */
+    /*protected long versionNum;
+
+    @Version
+    @Column(name = "OPTLOCK")
+    protected long getVersionNum() {
+        return this.versionNum;
+    }
+
+    protected void setVersionNum(final long versionNum) {
+        this.versionNum = versionNum;
+    }*/
 
     public String getProviderAssignedId() {
         return this.providerAssignedId;
@@ -133,7 +137,7 @@ public abstract class CloudEntity implements Serializable, Resource {
     }
 
     @CollectionOfElements(fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Map<String, String> getProperties() {
         return this.properties;
     }
@@ -157,7 +161,7 @@ public abstract class CloudEntity implements Serializable, Resource {
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public User getUser() {
         return this.user;
     }

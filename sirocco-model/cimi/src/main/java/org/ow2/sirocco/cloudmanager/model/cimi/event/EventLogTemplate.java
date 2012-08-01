@@ -36,7 +36,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class EventLogTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -49,7 +49,7 @@ public class EventLogTemplate extends CloudTemplate implements Serializable {
     private Persistence persistence;
 
     @OneToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudResource getTargetResource() {
         return this.targetResource;
     }

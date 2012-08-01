@@ -34,7 +34,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class VolumeTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +43,7 @@ public class VolumeTemplate extends CloudTemplate implements Serializable {
     private VolumeImage volumeImage;
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public VolumeConfiguration getVolumeConfig() {
         return this.volumeConfig;
     }
@@ -53,7 +53,7 @@ public class VolumeTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public VolumeImage getVolumeImage() {
         return this.volumeImage;
     }

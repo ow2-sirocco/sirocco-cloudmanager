@@ -50,7 +50,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
 public class Machine extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
@@ -113,7 +113,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineDisk> getDisks() {
         return this.disks;
     }
@@ -130,7 +130,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
@@ -156,7 +156,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "machine_id", referencedColumnName = "id")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineNetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
@@ -172,7 +172,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -259,7 +259,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderLocation getLocation() {
         return this.location;
     }

@@ -52,7 +52,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CloudResource implements Serializable, Resource {
     private static final long serialVersionUID = 1L;
@@ -84,13 +84,17 @@ public abstract class CloudResource implements Serializable, Resource {
 
     protected EventLog eventLog;
 
-    /*
-     * protected long versionNum;
-     * @Version
-     * @Column(name="OPTLOCK") protected long getVersionNum() { return
-     * versionNum; } protected void setVersionNum(long versionNum) {
-     * this.versionNum = versionNum; }
-     */
+    protected long versionNum;
+
+    /*@Version
+    @Column(name = "OPTLOCK")
+    protected long getVersionNum() {
+        return this.versionNum;
+    }
+
+    protected void setVersionNum(final long versionNum) {
+        this.versionNum = versionNum;
+    }*/
 
     public String getProviderAssignedId() {
         return this.providerAssignedId;
@@ -152,7 +156,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @CollectionOfElements(fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Map<String, String> getProperties() {
         return this.properties;
     }
@@ -176,7 +180,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @OneToMany(mappedBy = "targetEntity")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Set<Job> getWorkingJobs() {
         return this.workingJobs;
     }
@@ -186,7 +190,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public User getUser() {
         return this.user;
     }
@@ -196,7 +200,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @OneToMany(mappedBy = "targetResource")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<Meter> getMeters() {
         return this.meters;
     }
@@ -206,7 +210,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @OneToOne(mappedBy = "targetResource")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public EventLog getEventLog() {
         return this.eventLog;
     }

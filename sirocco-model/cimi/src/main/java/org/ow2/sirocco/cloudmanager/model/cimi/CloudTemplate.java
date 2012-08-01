@@ -35,7 +35,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CloudTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;

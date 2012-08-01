@@ -34,7 +34,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class NetworkTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +43,7 @@ public class NetworkTemplate extends CloudTemplate implements Serializable {
     private ForwardingGroup forwardingGroup;
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public NetworkConfiguration getNetworkConfig() {
         return this.networkConfig;
     }
@@ -53,7 +53,7 @@ public class NetworkTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public ForwardingGroup getForwardingGroup() {
         return this.forwardingGroup;
     }

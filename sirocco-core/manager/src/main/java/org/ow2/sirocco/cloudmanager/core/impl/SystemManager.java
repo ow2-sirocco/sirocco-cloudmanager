@@ -1711,22 +1711,28 @@ public class SystemManager implements ISystemManager {
             }
 
             String jobDetailedAction = this.getJobProperty(job, SystemManager.PROP_JOB_DETAILED_ACTION);
+            SystemManager.logger.info("jobDetailedAction: " + jobDetailedAction);
 
             // looking at child jobs status
             for (Job j : job.getNestedJobs()) {
                 if (j.getStatus().equals(Status.FAILED)) {
                     failed = true;
+                    SystemManager.logger.info(j.getId().toString() + " failed");
                 }
                 if (j.getStatus().equals(Status.CANCELLED)) {
                     cancelled = true;
+                    SystemManager.logger.info(j.getId().toString() + " cancelled");
                 }
                 if (j.getStatus().equals(Status.RUNNING)) {
                     running = true;
+                    SystemManager.logger.info(j.getId().toString() + " running");
                 }
                 if (j.getStatus().equals(Status.SUCCESS)) {
                     // update System in database if not already done
-                    if (!job.getProperties().containsKey(j.getId().toString())) {
-                        SystemManager.logger.info(" SystemHandler updating successful job " + job.getId() + " for main job "
+                    SystemManager.logger.info(job.getId().toString() + " containsKey " + j.getId().toString() + ":  "
+                        + job.getProperties().containsKey(j.getId().toString()));
+                    if (!(job.getProperties().containsKey(j.getId().toString()))) {
+                        SystemManager.logger.info(" SystemHandler updating successful job " + j.getId() + " for main job "
                             + job.getId().toString());
                         System s = (System) job.getTargetEntity();
 
@@ -1738,6 +1744,7 @@ public class SystemManager implements ISystemManager {
                                 s.getMachines().add(sc);
                             }
                             job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
+
                         }
                         if (j.getTargetEntity() instanceof Volume) {
                             if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
@@ -1766,61 +1773,65 @@ public class SystemManager implements ISystemManager {
                             }
                             job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
                         }
+
+                        SystemManager.logger.info(job.getId().toString() + " contains2Key " + j.getId().toString() + ":  "
+                            + job.getProperties().containsKey(j.getId().toString()));
                     }
                 }
+            }
 
-                if (failed) {
-                    // one or more jobs are failed, so all is failed
-                    job.setStatus(Status.FAILED);
-                    System s = (System) job.getTargetEntity();
-                    s.setState(State.ERROR);
-                    SystemManager.logger.info(" SystemHandler one or more jobs are failed " + job.getId().toString());
-                    return true;
-                }
-                if (cancelled) {
-                    // one or more jobs are cancelled, so all is cancelled
-                    job.setStatus(Status.CANCELLED);
-                    System s = (System) job.getTargetEntity();
-                    s.setState(State.ERROR);
-                    SystemManager.logger.info(" SystemHandler one or more jobs are cancelled " + job.getId().toString());
-                    return true;
-                }
-                if (running) {
-                    // one or more jobs are running, so all is running
-                    job.setStatus(Status.RUNNING);
-                    SystemManager.logger.info(" SystemHandler one or more jobs are running " + job.getId().toString());
-                    return true;
-                }
-
-                // job success
-                job.setStatus(Status.SUCCESS);
+            if (failed) {
+                // one or more jobs are failed, so all is failed
+                job.setStatus(Status.FAILED);
                 System s = (System) job.getTargetEntity();
-                SystemManager.logger.info(" SystemHandler all jobs are successful " + job.getId().toString());
+                s.setState(State.ERROR);
+                SystemManager.logger.info(" SystemHandler one or more jobs are failed " + job.getId().toString());
+                return true;
+            }
+            if (cancelled) {
+                // one or more jobs are cancelled, so all is cancelled
+                job.setStatus(Status.CANCELLED);
+                System s = (System) job.getTargetEntity();
+                s.setState(State.ERROR);
+                SystemManager.logger.info(" SystemHandler one or more jobs are cancelled " + job.getId().toString());
+                return true;
+            }
+            if (running) {
+                // one or more jobs are running, so all is running
+                job.setStatus(Status.RUNNING);
+                SystemManager.logger.info(" SystemHandler one or more jobs are running " + job.getId().toString());
+                return true;
+            }
 
-                if (jobDetailedAction.equals(SystemManager.REMOVE_ENTITY_ACTION)) {
-                    // removing entity
-                    this.removeEntityFromSystem_Final(job, s);
-                }
+            // job success
+            job.setStatus(Status.SUCCESS);
+            System s = (System) job.getTargetEntity();
+            SystemManager.logger.info(" SystemHandler all jobs are successful " + job.getId().toString());
 
-                if (jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
-                    s.setState(System.State.DELETED);
-                    this.handleEntityStateChange(System.class, s.getId().toString(), true);
-                } else {
-                    if (!this.updateSystemStatus(s.getId().toString())) {
-                        // no update, setting generic system state
-                        if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                            s.setState(State.STOPPED);
-                        }
-                        if (jobDetailedAction.equals(SystemManager.START_ACTION)) {
-                            s.setState(State.STARTED);
-                        }
-                        if (jobDetailedAction.equals(SystemManager.STOP_ACTION)) {
-                            s.setState(State.STOPPED);
-                        }
+            if (jobDetailedAction.equals(SystemManager.REMOVE_ENTITY_ACTION)) {
+                // removing entity
+                this.removeEntityFromSystem_Final(job, s);
+            }
+
+            if (jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
+                s.setState(System.State.DELETED);
+                this.handleEntityStateChange(System.class, s.getId().toString(), true);
+            } else {
+                if (!this.updateSystemStatus(s.getId().toString())) {
+                    // no update, setting generic system state
+                    if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
+                        s.setState(State.STOPPED);
+                    }
+                    if (jobDetailedAction.equals(SystemManager.START_ACTION)) {
+                        s.setState(State.STARTED);
+                    }
+                    if (jobDetailedAction.equals(SystemManager.STOP_ACTION)) {
+                        s.setState(State.STOPPED);
                     }
                 }
             }
         }
+
         return true;
     }
 

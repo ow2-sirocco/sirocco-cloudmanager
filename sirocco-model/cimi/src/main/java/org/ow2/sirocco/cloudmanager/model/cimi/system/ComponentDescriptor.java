@@ -37,7 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class ComponentDescriptor extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -75,7 +75,7 @@ public class ComponentDescriptor extends CloudEntity implements Serializable {
 
     @OneToOne(optional = true)
     @JoinColumn(name = "comp_desc_id")
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudTemplate getComponentTemplate() {
         return this.componentTemplate;
     }

@@ -48,6 +48,8 @@ import javax.naming.InitialContext;
 
 import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
+import org.ow2.sirocco.cloudmanager.core.api.ILockManager;
+import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 
@@ -65,6 +67,9 @@ public class JobCompletionHandlerBean implements MessageListener {
 
     @EJB
     private IJobManager jobManager;
+
+    @EJB
+    private ILockManager lockManager;
 
     @Resource
     private EJBContext ctx;
@@ -96,8 +101,14 @@ public class JobCompletionHandlerBean implements MessageListener {
             Job providerJob = (Job) payload;
             String jobId = providerJob.getProviderAssignedId();
             // we call jobManager to deal with events
+            String topmostid = "";
+            boolean locked = false;
             try {
+                topmostid = this.jobManager.getTopmostJobId(this.jobManager.getJobIdFromProvider(providerJob));
+                this.lockManager.lock(topmostid, Job.class.getCanonicalName());
+                locked = true;
                 this.jobManager.handleWorkflowEvent(providerJob);
+
             } catch (Exception e) {
                 // this.ctx.setRollbackOnly();
                 JobCompletionHandlerBean.logger.warn("JobCompletion message rollbacked " + counter + " times - " + jobId);
@@ -105,9 +116,10 @@ public class JobCompletionHandlerBean implements MessageListener {
 
                 // reemiting message with delay, and counter updated
                 if (counter < 50) {
+                    counter += 1;
                     try {
-                        UtilsForManagers.emitJobCompletionMessage(((ObjectMessage) msg).getObject(), this.ctx, 6000,
-                            counter + 1);
+                        UtilsForManagers.emitJobCompletionMessage(((ObjectMessage) msg).getObject(), this.ctx,
+                            Math.round(1000 * Math.pow(2., counter)), counter);
                     } catch (JMSException e2) {
                         JobCompletionHandlerBean.logger.warn("JobCompletion message resend exception - " + jobId);
                     } catch (Exception e2) {
@@ -115,6 +127,15 @@ public class JobCompletionHandlerBean implements MessageListener {
                     }
                 } else {
                     JobCompletionHandlerBean.logger.error("JobCompletion message dropped (too many times rollbacked)");
+                }
+
+                try {
+                    if (locked) {
+                        this.lockManager.unlockUntransacted(topmostid, Job.class.getCanonicalName());
+                    }
+                } catch (CloudProviderException ee) {
+                    // TODO Auto-generated catch block
+                    ee.printStackTrace();
                 }
 
                 /*try {

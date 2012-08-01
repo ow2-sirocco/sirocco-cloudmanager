@@ -44,7 +44,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"lockedObjectId", "lockedObjectType"})})
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.NONE)
 public class LockItem implements Serializable {
     private static final long serialVersionUID = 1L;
 

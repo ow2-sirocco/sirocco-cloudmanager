@@ -37,7 +37,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineVolume extends CloudResource implements Serializable, Identifiable {
 
     /**
@@ -58,7 +58,7 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
     private State state;
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Machine getOwner() {
         return this.owner;
     }
@@ -70,7 +70,7 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
     // unidirectional
     // oneToOne until shareable volume support is added
     @OneToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Volume getVolume() {
         return this.volume;
     }

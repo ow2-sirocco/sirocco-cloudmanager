@@ -114,6 +114,7 @@ public class SystemManagerTest extends SiroccoTester {
         // setting connector use for system
         this.systemManager.setConfiguration("mockConnectorImplementsSystem", true);
 
+        java.lang.System.out.println("testing systemManager using a connector");
         this._testSystemManager();
     }
 
@@ -128,6 +129,7 @@ public class SystemManagerTest extends SiroccoTester {
         // setting no connector use for system
         this.systemManager.setConfiguration("mockConnectorImplementsSystem", false);
 
+        java.lang.System.out.println("testing systemManager with no connector");
         this._testSystemManager();
 
     }
@@ -203,6 +205,7 @@ public class SystemManagerTest extends SiroccoTester {
 
         // systemTemplate1=systemManager.createSystemTemplate(systemTemplate1);
 
+        java.lang.System.out.println("creating a non trivial system");
         Job j = this.systemManager.createSystem(systemCreate1);
         Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(j));
         String systemId = j.getTargetEntity().getId().toString();
@@ -239,6 +242,7 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals(3, s2.getMachines().size());
 
         // start system
+        java.lang.System.out.println("start system");
         Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.startSystem(systemId)));
 
         sv1 = this.systemManager.getSystemById(systemId);
@@ -257,8 +261,10 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals(Machine.State.STARTED, ((Machine) s2.getMachines().get(2).getResource()).getState());
 
         // playing directly with machines
+        java.lang.System.out.println("playing directly with machines");
         Machine mm = (Machine) s2.getMachines().get(1).getResource();
 
+        java.lang.System.out.println("pausing machine");
         Assert.assertEquals(Job.Status.SUCCESS,
             this.waitForJobCompletion(this.machineManager.pauseMachine(mm.getId().toString())));
         // refreshing system
@@ -267,6 +273,7 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals(s2.getState(), System.State.MIXED);
 
         // gets
+        java.lang.System.out.println("testing gets");
         @SuppressWarnings("unchecked")
         List<SystemMachine> sms = (List<SystemMachine>) this.systemManager.getEntityListFromSystem(s2.getId().toString(),
             SystemMachine.class);
@@ -283,6 +290,7 @@ public class SystemManagerTest extends SiroccoTester {
         List<SystemTemplate> sts1 = this.systemManager.getSystemTemplates();
         int nbTemplates = sts1.size();
 
+        java.lang.System.out.println("testing create on system templates");
         SystemTemplate systemTemplate1_1 = this.systemManager.createSystemTemplate(systemTemplate1);
 
         List<SystemTemplate> sts2 = this.systemManager.getSystemTemplates();
@@ -292,6 +300,7 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals("systemTemplateTest1", systemTemplate1_1.getName());
         Assert.assertEquals("systemTemplateTest2", systemTemplate2_1.getName());
 
+        java.lang.System.out.println("testing gets on system templates");
         SystemTemplate systemTemplate1_2 = this.systemManager.getSystemTemplateById(systemTemplate1_1.getId().toString());
         Assert.assertEquals("systemTemplateTest1", systemTemplate1_2.getName());
         Assert.assertEquals(this.user.getId(), systemTemplate1_2.getUser().getId());
@@ -311,6 +320,7 @@ public class SystemManagerTest extends SiroccoTester {
         List<SystemTemplate> sts = this.systemManager.getSystemTemplates();
         Assert.assertEquals(nbTemplates + 3, sts.size());
 
+        java.lang.System.out.println("testing adding a new volume to a system");
         Volume vc = this.createVolume("testVolumeAddSys");
         SystemVolume sysVol = new SystemVolume();
         sysVol.setResource(vc);
@@ -324,6 +334,7 @@ public class SystemManagerTest extends SiroccoTester {
         //
 
         // stop system
+        java.lang.System.out.println("stop system");
         Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.stopSystem(systemId)));
 
         sv1 = this.systemManager.getSystemById(systemId);
@@ -353,6 +364,7 @@ public class SystemManagerTest extends SiroccoTester {
 
         // detaching volumes from machines
 
+        java.lang.System.out.println("detaching volumes from machines");
         sv1 = this.systemManager.getSystemById(systemId);
         s1 = this.systemManager.getSystemById(sv1.getSystems().get(0).getResource().getId().toString());
         s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getResource().getId().toString());
@@ -360,22 +372,26 @@ public class SystemManagerTest extends SiroccoTester {
         for (SystemMachine m : sv1.getMachines()) {
             Machine ma = (Machine) m.getResource();
             for (MachineVolume mv : ma.getVolumes()) {
-                this.machineManager.removeVolumeFromMachine(ma.getId().toString(), mv.getId().toString());
+                Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.machineManager.removeVolumeFromMachine(
+                    ma.getId().toString(), mv.getId().toString())));
             }
         }
         for (SystemMachine m : s1.getMachines()) {
             Machine ma = (Machine) m.getResource();
             for (MachineVolume mv : ma.getVolumes()) {
-                this.machineManager.removeVolumeFromMachine(ma.getId().toString(), mv.getId().toString());
+                Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.machineManager.removeVolumeFromMachine(
+                    ma.getId().toString(), mv.getId().toString())));
             }
         }
         for (SystemMachine m : s2.getMachines()) {
             Machine ma = (Machine) m.getResource();
             for (MachineVolume mv : ma.getVolumes()) {
-                this.machineManager.removeVolumeFromMachine(ma.getId().toString(), mv.getId().toString());
+                Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.machineManager.removeVolumeFromMachine(
+                    ma.getId().toString(), mv.getId().toString())));
             }
         }
 
+        java.lang.System.out.println("deleting entire system");
         Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.deleteSystem(systemId)));
 
         try {

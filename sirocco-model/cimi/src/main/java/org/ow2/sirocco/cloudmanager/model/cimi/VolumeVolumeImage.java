@@ -36,7 +36,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class VolumeVolumeImage extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -58,7 +58,7 @@ public class VolumeVolumeImage extends CloudEntity implements Serializable {
     }
 
     @OneToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public VolumeImage getVolumeImage() {
         return this.volumeImage;
     }

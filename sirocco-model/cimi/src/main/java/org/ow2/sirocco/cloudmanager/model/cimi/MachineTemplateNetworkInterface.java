@@ -40,7 +40,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineTemplateNetworkInterface extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -87,7 +87,7 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
 
     @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<Address> getAddresses() {
         return this.addresses;
     }
@@ -97,7 +97,7 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Network getNetwork() {
         return this.network;
     }

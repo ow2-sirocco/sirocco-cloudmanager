@@ -325,6 +325,13 @@
 										</jonasbase>
 
 
+										<copy todir="${jonas.base}/repositories/maven2-central/org/objectweb/joram/joram-mom-extensions-scheduler/5.5.0" overwrite="true">
+											<fileset dir="src/sirocco-config/repositories/maven2-central/org/objectweb/joram/joram-mom-extensions-scheduler/5.5.0" />
+										</copy>
+										<copy todir="${jonas.base}/repositories/maven2-internal/org/ow2/jonas/jonas-audit-jms/5.2.2" overwrite="true">
+											<fileset dir="src/sirocco-config/repositories/maven2-internal/org/ow2/jonas/jonas-audit-jms/5.2.2" />
+										</copy>										
+										
 										<copy todir="${jonas.base}/deploy" overwrite="true">
 											<fileset dir="src/sirocco-config/deploy" />
 										</copy>
@@ -433,6 +440,7 @@
 									<carol.port>${carol.port}</carol.port>
 									<java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
 								</systemProperties>
+								<timeout>240000</timeout>
 							</container>
 							<configuration>
 								<type>existing</type>

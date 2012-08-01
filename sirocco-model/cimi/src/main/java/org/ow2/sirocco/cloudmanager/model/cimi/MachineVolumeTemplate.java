@@ -37,7 +37,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineVolumeTemplate implements Serializable, Identifiable {
 
     private static final long serialVersionUID = 1L;
@@ -60,7 +60,7 @@ public class MachineVolumeTemplate implements Serializable, Identifiable {
 
     // TODO unidirectional
     @OneToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public VolumeTemplate getVolumeTemplate() {
         return this.volumeTemplate;
     }

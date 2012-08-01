@@ -40,7 +40,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class EventType implements Serializable {
     private static final long serialVersionUID = 1L;
@@ -74,7 +74,7 @@ public abstract class EventType implements Serializable {
     }
 
     @OneToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudResource getResource() {
         return this.resource;
     }

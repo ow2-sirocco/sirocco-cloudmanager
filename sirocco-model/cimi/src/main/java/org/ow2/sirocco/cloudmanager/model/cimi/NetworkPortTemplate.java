@@ -34,7 +34,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class NetworkPortTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -43,7 +43,7 @@ public class NetworkPortTemplate extends CloudEntity implements Serializable {
     private NetworkPortConfiguration networkPortConfig;
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public NetworkPortConfiguration getNetworkPortConfig() {
         return this.networkPortConfig;
     }
@@ -53,7 +53,7 @@ public class NetworkPortTemplate extends CloudEntity implements Serializable {
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Network getNetwork() {
         return this.network;
     }
