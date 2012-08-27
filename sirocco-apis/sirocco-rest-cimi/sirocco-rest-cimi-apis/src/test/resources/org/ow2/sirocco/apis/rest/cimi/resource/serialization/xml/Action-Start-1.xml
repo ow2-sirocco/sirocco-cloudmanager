@@ -3,5 +3,5 @@
 	<description>descriptionValue_1</description>
 	<name>nameValue_1</name>
 	<property key="keyProp_1_0">valueProp_1_0</property>
-	<action>http://www.dmtf.org/cimi/action/start</action>
+	<action>http://schemas.dmtf.org/cimi/1/action/start</action>
 </Action>

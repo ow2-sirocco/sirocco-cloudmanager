@@ -24,7 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.apis.rest.cimi.domain.TargetResource;
+import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
@@ -33,8 +38,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
+import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.Event;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 
@@ -211,6 +218,22 @@ public class ConverterHelper {
         return converted;
     }
 
+    public static String toString(final Event.Outcome value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
+        }
+        return converted;
+    }
+
+    public static String toString(final Event.Severity value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
+        }
+        return converted;
+    }
+
     /**
      * Convert a component type into CIMI type URI.
      * 
@@ -226,8 +249,8 @@ public class ConverterHelper {
                 converted = ExchangeType.Credential.getResourceURI();
             } else if (true == value.equals(ComponentType.MACHINE)) {
                 converted = ExchangeType.Machine.getResourceURI();
-                // } else if (true == value.equals(ComponentType.NETWORK)) {
-                // converted = ExchangeType.Network.getResourceURI();
+            } else if (true == value.equals(ComponentType.NETWORK)) {
+                converted = ExchangeType.Network.getResourceURI();
             } else if (true == value.equals(ComponentType.SYSTEM)) {
                 converted = ExchangeType.System.getResourceURI();
             } else if (true == value.equals(ComponentType.VOLUME)) {
@@ -255,12 +278,8 @@ public class ConverterHelper {
                 converted = ComponentType.CREDENTIALS;
             } else if (true == typeURI.equalsIgnoreCase(ExchangeType.Machine.getResourceURI())) {
                 converted = ComponentType.MACHINE;
-                // TODO
-                // } else if (true ==
-                // typeURI.equalsIgnoreCase(ExchangeType.Network.getResourceURI()))
-                // {
-                // converted = ComponentType.NETWORK;
-                // }
+            } else if (true == typeURI.equalsIgnoreCase(ExchangeType.Network.getResourceURI())) {
+                converted = ComponentType.NETWORK;
             } else if (true == typeURI.equalsIgnoreCase(ExchangeType.System.getResourceURI())) {
                 converted = ComponentType.SYSTEM;
             } else if (true == typeURI.equalsIgnoreCase(ExchangeType.Volume.getResourceURI())) {
@@ -272,4 +291,71 @@ public class ConverterHelper {
         return converted;
     }
 
+    /**
+     * Find the associated CIMI class in the configuration to build a target
+     * resource with the ID of an unknown service resource.
+     * 
+     * @param context The current context
+     * @param targetDataService The service resource
+     * @return The CIMI target
+     */
+    public static TargetResource buildTargetResource(final CimiContext context, final Resource targetDataService) {
+        TargetResource target = null;
+        if (null != targetDataService) {
+            target = new TargetResource(ConverterHelper.buildHrefTargetResource(context, targetDataService));
+        }
+        return target;
+    }
+
+    /**
+     * Find the associated CIMI class in the configuration to build a reference
+     * HREF with the ID of an unknown service resource.
+     * 
+     * @param context The current context
+     * @param targetDataService The service resource
+     * @return The CIMI HREF
+     */
+    protected static String buildHrefTargetResource(final CimiContext context, final Resource targetDataService) {
+        String href = null;
+        if (null != targetDataService) {
+            Class<? extends CimiResource> targetType = context.findAssociate(targetDataService.getClass());
+            href = context.makeHref(targetType, ConverterHelper.getTargetId(targetDataService).toString());
+        }
+        return href;
+    }
+
+    /**
+     * Get ID of an unknown service resource.
+     * 
+     * @param targetDataService The service resource
+     * @return Th service resource ID
+     */
+    protected static Integer getTargetId(final Resource targetDataService) {
+        Integer id = null;
+        if (true == CloudResource.class.isAssignableFrom(targetDataService.getClass())) {
+            id = ((CloudResource) targetDataService).getId();
+        } else {
+            id = ((CloudEntity) targetDataService).getId();
+        }
+        return id;
+    }
+
+    /**
+     * Build a resource URI for an unknown service resource.
+     * 
+     * @param context The current context
+     * @param targetDataService The service resource
+     * @return The CIMI resource URI
+     */
+    public static String buildResourceUri(final CimiContext context, final Resource targetDataService) {
+        String uri = null;
+        if (null != targetDataService) {
+            Class<? extends CimiResource> targetType = context.findAssociate(targetDataService.getClass());
+            ExchangeType type = context.getType(targetType);
+            if (null != type) {
+                uri = type.getResourceURI();
+            }
+        }
+        return uri;
+    }
 }

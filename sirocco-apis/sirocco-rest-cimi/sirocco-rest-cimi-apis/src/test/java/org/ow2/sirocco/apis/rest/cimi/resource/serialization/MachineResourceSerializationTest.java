@@ -625,7 +625,7 @@ public class MachineResourceSerializationTest extends SerializationTestBase {
         // XML : id = 1
         clientResponse = this.resource().path(ConstantsPath.MACHINE + "/1").accept(MediaType.APPLICATION_XML_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "Action-1.xml"), MediaType.APPLICATION_XML)
+            .entity(SerializationHelper.getResourceAsString(XmlLocator.class, "Action-Start-1.xml"), MediaType.APPLICATION_XML)
             .post(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
@@ -663,10 +663,13 @@ public class MachineResourceSerializationTest extends SerializationTestBase {
         MultivaluedMap<String, String> heardersResponse;
 
         // JSON : id = 1
-        clientResponse = this.resource().path(ConstantsPath.MACHINE + "/1").accept(MediaType.APPLICATION_JSON_TYPE)
+        clientResponse = this
+            .resource()
+            .path(ConstantsPath.MACHINE + "/1")
+            .accept(MediaType.APPLICATION_JSON_TYPE)
             .header(Constants.HEADER_CIMI_VERSION, Constants.VERSION_DMTF_CIMI)
-            .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "Action-1.json"), MediaType.APPLICATION_JSON)
-            .post(ClientResponse.class);
+            .entity(SerializationHelper.getResourceAsString(JsonLocator.class, "Action-Start-1.json"),
+                MediaType.APPLICATION_JSON).post(ClientResponse.class);
 
         statusResponse = clientResponse.getStatus();
         entityResponse = clientResponse.getEntity(String.class);

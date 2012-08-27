@@ -43,6 +43,10 @@ import org.ow2.sirocco.apis.rest.cimi.converter.EventLogConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EventLogCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EventLogEventConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EventLogTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.EventTypeAccessConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.EventTypeAlarmConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.EventTypeModelConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.EventTypeStateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.ForwardingGroupConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.ForwardingGroupCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.ForwardingGroupNetworkConverter;
@@ -185,6 +189,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogEvent;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventTypeAccess;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventTypeAlarm;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventTypeModel;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventTypeState;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupCreate;
@@ -333,6 +341,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.AccessEventType;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.AlarmEventType;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.Event;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.ModelEventType;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.StateEventType;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
@@ -1465,8 +1479,8 @@ public class ConfigFactory {
         items.add(this.makeAssociate(Address.class, CimiAddress.class));
         items.add(this.makeAssociate(AddressTemplate.class, CimiAddressTemplate.class));
         items.add(this.makeAssociate(CloudEntryPoint.class, CimiCloudEntryPoint.class));
-        // TODO ComponentDescriptor
-        // TODO Event
+        items.add(this.makeAssociate(ComponentDescriptor.class, CimiComponentDescriptor.class));
+        items.add(this.makeAssociate(Event.class, CimiEvent.class));
         // TODO EventLog
         // TODO ForwardingGroupTemplate
         items.add(this.makeAssociate(Job.class, CimiJob.class));
@@ -1511,6 +1525,12 @@ public class ConfigFactory {
         items.add(this.makeAssociate(Volume.class, CimiVolume.class));
         items.add(this.makeAssociate(VolumeImage.class, CimiVolumeImage.class));
 
+        // EventType
+        items.add(this.makeAssociate(AccessEventType.class, CimiEventTypeAccess.class));
+        items.add(this.makeAssociate(AlarmEventType.class, CimiEventTypeAlarm.class));
+        items.add(this.makeAssociate(ModelEventType.class, CimiEventTypeModel.class));
+        items.add(this.makeAssociate(StateEventType.class, CimiEventTypeState.class));
+
         return items;
     }
 
@@ -1546,6 +1566,20 @@ public class ConfigFactory {
 
         item = new ItemConfig(CimiComponentDescriptor.class);
         item.putData(ConfigFactory.CONVERTER, new ComponentDescriptorConverter());
+        items.add(item);
+
+        // EventType
+        item = new ItemConfig(CimiEventTypeAccess.class);
+        item.putData(ConfigFactory.CONVERTER, new EventTypeAccessConverter());
+        items.add(item);
+        item = new ItemConfig(CimiEventTypeAlarm.class);
+        item.putData(ConfigFactory.CONVERTER, new EventTypeAlarmConverter());
+        items.add(item);
+        item = new ItemConfig(CimiEventTypeModel.class);
+        item.putData(ConfigFactory.CONVERTER, new EventTypeModelConverter());
+        items.add(item);
+        item = new ItemConfig(CimiEventTypeState.class);
+        item.putData(ConfigFactory.CONVERTER, new EventTypeStateConverter());
         items.add(item);
 
         return items;

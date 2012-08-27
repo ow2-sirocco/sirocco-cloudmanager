@@ -112,30 +112,18 @@ public class JobConverter extends ObjectCommonConverter {
             dataCimi.setStatus(ConverterHelper.toString(dataService.getStatus()));
             dataCimi.setStatusMessage(dataService.getStatusMessage());
             dataCimi.setTimeOfStatusChange(dataService.getTimeOfStatusChange());
-            // dataCimi.setTargetResource(this.buildHrefTargetResource(context,
-            // dataService.getTargetEntity()));
-            if (null != dataService.getTargetEntity()) {
-                dataCimi.setTargetResource(new TargetResource(this.buildHrefTargetResource(context,
-                    dataService.getTargetEntity())));
-            }
-            // if ((null != dataService.getAffectedEntities()) &&
-            // (dataService.getAffectedEntities().size() > 0)) {
-            // List<String> list = new ArrayList<String>();
-            // for (CloudResource resource : dataService.getAffectedEntities())
-            // {
-            // list.add(this.buildHrefTargetResource(context, resource));
-            // }
-            // dataCimi.setAffectedResources(list.toArray(new
-            // String[list.size()]));
-            // }
+            dataCimi.setTargetResource(ConverterHelper.buildTargetResource(context, dataService.getTargetEntity()));
             if ((null != dataService.getAffectedEntities()) && (dataService.getAffectedEntities().size() > 0)) {
+                TargetResource target;
                 List<TargetResource> list = new ArrayList<TargetResource>();
                 for (CloudResource resource : dataService.getAffectedEntities()) {
-                    list.add(new TargetResource(this.buildHrefTargetResource(context, resource)));
+                    target = ConverterHelper.buildTargetResource(context, resource);
+                    if (null != target) {
+                        list.add(target);
+                    }
                 }
                 dataCimi.setAffectedResources(list.toArray(new TargetResource[list.size()]));
             }
-
             if (null != dataService.getParentJob()) {
                 dataCimi.setParentJob(new ParentJob(context.makeHref(dataCimi, dataService.getParentJob().getId().toString())));
             }

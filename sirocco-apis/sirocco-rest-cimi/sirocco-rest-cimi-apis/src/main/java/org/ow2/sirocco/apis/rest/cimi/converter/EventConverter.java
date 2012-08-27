@@ -25,6 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEvent;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.Event;
 
@@ -99,21 +100,15 @@ public class EventConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final Event dataService, final CimiEvent dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            // FIXME
-
-            // dataCimi.setCpu(dataService.getCpu());
-            // dataCimi.setMemory(dataService.getMemory());
-            // dataCimi.setDisks((CimiEventDiskCollection)
-            // context.convertNextCimi(dataService.getDisks(),
-            // CimiEventDiskCollection.class));
-            // dataCimi.setNetworkInterfaces((CimiEventNetworkInterfaceCollection)
-            // context.convertNextCimi(
-            // dataService.getNetworkInterfaces(),
-            // CimiEventNetworkInterfaceCollection.class));
-            // dataCimi.setState(ConverterHelper.toString(dataService.getState()));
-            // dataCimi.setVolumes((CimiEventVolumeCollection)
-            // context.convertNextCimi(dataService.getVolumes(),
-            // CimiEventVolumeCollection.class));
+            dataCimi.setContact(dataService.getContact());
+            if (null != dataService.getContent()) {
+                dataCimi.setContent((CimiEventType) context.convertNextCimi(dataService.getContent(),
+                    context.findAssociatedServiceClass(dataService.getContent().getClass())));
+                dataCimi.setType(dataCimi.getContent().getEventType().getPath());
+            }
+            dataCimi.setOutcome(ConverterHelper.toString(dataService.getOutcome()));
+            dataCimi.setSeverity(ConverterHelper.toString(dataService.getSeverity()));
+            dataCimi.setTimestamp(dataService.getTimestamp());
         }
     }
 
@@ -126,20 +121,6 @@ public class EventConverter extends ObjectCommonConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiEvent dataCimi, final Event dataService) {
         this.fill(context, dataCimi, dataService);
-        // FIXME
-
-        // dataService.setCpu(dataCimi.getCpu());
-        // dataService.setMemory(dataCimi.getMemory());
-
-        // Next Read only
-        // cpuArch ???
-        // dataService.setDisks((List<EventDisk>)
-        // context.convertNextService(dataCimi.getDisks()));
-        // dataService.setNetworkInterfaces((List<EventNetworkInterface>)
-        // context.convertNextService(dataCimi
-        // .getNetworkInterfaces()));
-        // dataService.setVolumes((List<EventVolume>)
-        // context.convertNextService(dataCimi.getVolumes()));
-        // dataService.setState(dataService.getState());
+        // All other data are read only
     }
 }

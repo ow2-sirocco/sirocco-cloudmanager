@@ -88,7 +88,7 @@ public class CimiManagerActionSystemTemplate extends CimiManagerAbstract {
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
         CimiAction cimiAction = (CimiAction) context.getRequest().getCimiData();
-        ActionType type = ActionType.findPath(cimiAction.getAction());
+        ActionType type = ActionType.findWithPath(cimiAction.getAction());
         switch (type) {
         case EXPORT:
             out = this.manager.exportSystemTemplate(context.getRequest().getId(), cimiAction.getFormat(),

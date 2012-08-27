@@ -87,16 +87,17 @@ public class CimiManagerActionMachine extends CimiManagerAbstract {
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
         CimiAction cimiAction = (CimiAction) context.getRequest().getCimiData();
-        ActionType type = ActionType.findPath(cimiAction.getAction());
+        ActionType type = ActionType.findWithPath(cimiAction.getAction());
         switch (type) {
         case START:
             out = this.manager.startMachine(context.getRequest().getId(), cimiAction.getProperties());
             break;
         case STOP:
-            out = this.manager.stopMachine(context.getRequest().getId(), cimiAction.isForce(), cimiAction.getProperties());
+            out = this.manager.stopMachine(context.getRequest().getId(), cimiAction.getIsForced(), cimiAction.getProperties());
             break;
         case RESTART:
-            out = this.manager.restartMachine(context.getRequest().getId(), cimiAction.isForce(), cimiAction.getProperties());
+            out = this.manager.restartMachine(context.getRequest().getId(), cimiAction.getIsForced(),
+                cimiAction.getProperties());
             break;
         case PAUSE:
             out = this.manager.pauseMachine(context.getRequest().getId(), cimiAction.getProperties());

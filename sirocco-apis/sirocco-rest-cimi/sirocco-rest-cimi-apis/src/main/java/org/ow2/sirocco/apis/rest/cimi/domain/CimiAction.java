@@ -54,7 +54,7 @@ public class CimiAction extends CimiCommonResourceUriAbstract {
     /**
      * Field force.
      */
-    private boolean force;
+    private Boolean force;
 
     /**
      * Field format.
@@ -90,11 +90,12 @@ public class CimiAction extends CimiCommonResourceUriAbstract {
     }
 
     /**
-     * Return true if the action is forced.
+     * Return if the action is forced or not.
      * 
-     * @return True if forced action
+     * @return True or False if forced action or not and null if this flag is
+     *         unknown
      */
-    public boolean isForce() {
+    public Boolean getForce() {
         return this.force;
     }
 
@@ -103,8 +104,24 @@ public class CimiAction extends CimiCommonResourceUriAbstract {
      * 
      * @param force the value
      */
-    public void setForce(final boolean force) {
+    public void setForce(final Boolean force) {
         this.force = force;
+    }
+
+    /**
+     * Return if the action is forced or not.
+     * 
+     * @return True or False if forced action or not and null if this flag is
+     *         unknown
+     */
+    @XmlTransient
+    @JsonIgnore
+    public boolean getIsForced() {
+        boolean forced = false;
+        if (null != this.getForce()) {
+            forced = this.getForce();
+        }
+        return forced;
     }
 
     /**

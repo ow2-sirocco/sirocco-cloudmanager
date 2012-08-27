@@ -25,10 +25,7 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
@@ -112,36 +109,4 @@ public abstract class ObjectCommonConverter extends CommonConverter implements C
         }
     }
 
-    /**
-     * Find the associated CIMI class in the configuration to build a reference
-     * HREF with the ID of an unknown service resource.
-     * 
-     * @param context The current context
-     * @param targetDataService The service resource
-     * @return The CIMI HREF
-     */
-    protected String buildHrefTargetResource(final CimiContext context, final Resource targetDataService) {
-        String href = null;
-        if (null != targetDataService) {
-            Class<? extends CimiResource> targetType = context.findAssociate(targetDataService.getClass());
-            href = context.makeHref(targetType, this.getTargetId(targetDataService).toString());
-        }
-        return href;
-    }
-
-    /**
-     * Get ID of an unknown service resource.
-     * 
-     * @param targetDataService The service resource
-     * @return Th service resource ID
-     */
-    protected Integer getTargetId(final Resource targetDataService) {
-        Integer id = null;
-        if (true == CloudResource.class.isAssignableFrom(targetDataService.getClass())) {
-            id = ((CloudResource) targetDataService).getId();
-        } else {
-            id = ((CloudEntity) targetDataService).getId();
-        }
-        return id;
-    }
 }

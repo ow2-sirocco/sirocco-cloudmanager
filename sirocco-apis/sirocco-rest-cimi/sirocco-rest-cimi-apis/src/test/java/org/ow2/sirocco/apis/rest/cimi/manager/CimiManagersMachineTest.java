@@ -177,11 +177,12 @@ public class CimiManagersMachineTest {
         job.setId(123);
         job.setTargetEntity(target);
 
-        EasyMock.expect(this.service.stopMachine("1", false, null)).andReturn(job);
+        EasyMock.expect(this.service.stopMachine("1", true, null)).andReturn(job);
         EasyMock.replay(this.service);
 
         CimiAction cimi = new CimiAction();
         cimi.setAction(ActionType.STOP.getPath());
+        cimi.setForce(true);
         this.request.setIds(new IdRequest("1"));
         this.request.setCimiData(cimi);
         this.managerAction.execute(this.context);

@@ -88,16 +88,17 @@ public class CimiManagerActionSystem extends CimiManagerAbstract {
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
         CimiAction cimiAction = (CimiAction) context.getRequest().getCimiData();
-        ActionType type = ActionType.findPath(cimiAction.getAction());
+        ActionType type = ActionType.findWithPath(cimiAction.getAction());
         switch (type) {
         case START:
             out = this.manager.startSystem(context.getRequest().getId(), cimiAction.getProperties());
             break;
         case STOP:
-            out = this.manager.stopSystem(context.getRequest().getId(), cimiAction.isForce(), cimiAction.getProperties());
+            out = this.manager.stopSystem(context.getRequest().getId(), cimiAction.getIsForced(), cimiAction.getProperties());
             break;
         case RESTART:
-            out = this.manager.restartSystem(context.getRequest().getId(), cimiAction.isForce(), cimiAction.getProperties());
+            out = this.manager
+                .restartSystem(context.getRequest().getId(), cimiAction.getIsForced(), cimiAction.getProperties());
             break;
         case PAUSE:
             out = this.manager.pauseSystem(context.getRequest().getId(), cimiAction.getProperties());

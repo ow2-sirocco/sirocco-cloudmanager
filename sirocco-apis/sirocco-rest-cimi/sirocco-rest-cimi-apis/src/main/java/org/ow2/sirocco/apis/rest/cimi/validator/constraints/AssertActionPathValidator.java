@@ -52,7 +52,7 @@ public class AssertActionPathValidator implements ConstraintValidator<AssertActi
     public boolean isValid(final String value, final ConstraintValidatorContext ctx) {
         boolean valid = false;
         if (value != null) {
-            ActionType type = ActionType.findPath(value);
+            ActionType type = ActionType.findWithPath(value);
             if (null != type) {
                 valid = true;
             }

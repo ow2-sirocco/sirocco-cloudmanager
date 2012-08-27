@@ -422,12 +422,22 @@ public class CimiContextImpl implements CimiContext {
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends CimiResource> findAssociate(final Class<? extends Resource> klass) {
-        Class<? extends CimiResource> cimi = null;
+        return (Class<? extends CimiResource>) this.findAssociatedServiceClass(klass);
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#findAssociatedServiceClass(java.lang.Class)
+     */
+    @Override
+    public Class<?> findAssociatedServiceClass(final Class<?> klass) {
+        Class<?> cimi = null;
         try {
             ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
-            cimi = (Class<? extends CimiResource>) item.getData(ConfigFactory.ASSOCIATE_TO);
+            cimi = (Class<?>) item.getData(ConfigFactory.ASSOCIATE_TO);
         } catch (Exception e) {
-            throw new ConfigurationException("Associate class not found in configuration for " + klass.getName());
+            throw new ConfigurationException("Associated class not found in configuration for " + klass.getName());
         }
         return cimi;
     }
@@ -513,6 +523,21 @@ public class CimiContextImpl implements CimiContext {
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#getType(java.lang.Class)
+     */
+    @Override
+    public ExchangeType getType(final Class<?> klass) {
+        ExchangeType type = null;
+        ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
+        if (null != item) {
+            type = item.getType();
+        }
+        return type;
+    }
+
+    /**
      * Returns the root class being converted.
      * 
      * @return The current root converting
@@ -550,21 +575,6 @@ public class CimiContextImpl implements CimiContext {
         ExchangeType type = null;
         if (null != exchange) {
             type = exchange.getExchangeType();
-        }
-        return type;
-    }
-
-    /**
-     * Get the exchange type for a instance.
-     * 
-     * @param klass A class
-     * @return The exchange type or null if the class is unknown
-     */
-    protected ExchangeType getType(final Class<?> klass) {
-        ExchangeType type = null;
-        ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
-        if (null != item) {
-            type = item.getType();
         }
         return type;
     }

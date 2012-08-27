@@ -24,12 +24,16 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import java.util.Date;
+
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.utils.CimiDateAdapter;
 
 /**
  * Class Event.
@@ -40,6 +44,18 @@ public class CimiEvent extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
+
+    protected String contact;
+
+    protected CimiEventType content;
+
+    protected String outcome;
+
+    protected String severity;
+
+    protected Date timestamp;
+
+    protected String type;
 
     /**
      * Default constructor.
@@ -57,15 +73,53 @@ public class CimiEvent extends CimiObjectCommonAbstract {
         super(href);
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
-     */
-    @Override
-    public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+    public String getContact() {
+        return this.contact;
+    }
+
+    public void setContact(final String contact) {
+        this.contact = contact;
+    }
+
+    public CimiEventType getContent() {
+        return this.content;
+    }
+
+    public void setContent(final CimiEventType content) {
+        this.content = content;
+    }
+
+    public String getOutcome() {
+        return this.outcome;
+    }
+
+    public void setOutcome(final String outcome) {
+        this.outcome = outcome;
+    }
+
+    public String getSeverity() {
+        return this.severity;
+    }
+
+    public void setSeverity(final String severity) {
+        this.severity = severity;
+    }
+
+    @XmlJavaTypeAdapter(CimiDateAdapter.class)
+    public Date getTimestamp() {
+        return this.timestamp;
+    }
+
+    public void setTimestamp(final Date timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(final String type) {
+        this.type = type;
     }
 
     /**

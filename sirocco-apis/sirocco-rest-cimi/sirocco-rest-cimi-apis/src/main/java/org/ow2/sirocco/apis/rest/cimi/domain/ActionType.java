@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
+import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+
 /**
  * Enumeration of actions used.
  */
@@ -52,7 +54,7 @@ public enum ActionType {
     ExchangeType[] usedBy;
 
     /** URI action. */
-    public static final String BASE_PATH = "http://www.dmtf.org/cimi/action/";
+    public static final String BASE_PATH = ConstantsPath.CIMI_XML_NAMESPACE + "/action/";
 
     /** Constructor. */
     private ActionType(final String pathname) {
@@ -95,7 +97,7 @@ public enum ActionType {
     /**
      * Find the action type with a given action string.
      * <p>
-     * The string to find can be a string enum or a complete actio path or a
+     * The string to find can be a string enum or a complete action path or a
      * pathname.
      * </p>
      * 
@@ -127,7 +129,7 @@ public enum ActionType {
      * @param toFind The action path to find
      * @return The action type or null if not found
      */
-    public static ActionType findPath(final String toFind) {
+    public static ActionType findWithPath(final String toFind) {
         ActionType action = null;
         for (ActionType value : ActionType.values()) {
             if (toFind.equals(value.getPath())) {

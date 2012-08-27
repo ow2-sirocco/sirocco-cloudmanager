@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
@@ -33,12 +34,15 @@ import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.Unmarshaller;
 
 import org.codehaus.jackson.map.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEvent;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollectionRoot;
@@ -49,10 +53,19 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiRequest;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiResponse;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestParams;
+import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.AccessEventType;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.AlarmEventType;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.Event;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.Event.Outcome;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.Event.Severity;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventType;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.ModelEventType;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.StateEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -338,5 +351,282 @@ public class MonitoringConverterTest {
         m.marshal(cimi, strWriter);
         MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
 
+    }
+
+    @Test
+    public void testCimiEvent() throws Exception {
+        CimiEvent cimi;
+        Event service;
+        EventType serviceEventType;
+        CloudResource targetResource;
+        Date timeStamp;
+
+        // Prepare Trace
+        Writer strWriter;
+        ObjectMapper mapper = new ObjectMapper();
+        JAXBContext context = JAXBContext.newInstance(CimiEvent.class);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        // --------------------------------------------
+        // Empty Service -> Cimi
+        // --------------------------------------------
+        // Convert
+        cimi = (CimiEvent) this.context.convertToCimi(new Event(), CimiEvent.class);
+        // Trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        MonitoringConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+        strWriter = new StringWriter();
+        m.marshal(cimi, strWriter);
+        MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+        // Verify
+        Assert.assertNull(cimi.getContact());
+        Assert.assertNull(cimi.getDescription());
+        Assert.assertNull(cimi.getOutcome());
+        Assert.assertNull(cimi.getSeverity());
+        Assert.assertNull(cimi.getType());
+        Assert.assertNull(cimi.getContent());
+        Assert.assertNull(cimi.getTimestamp());
+
+        // --------------------------------------------
+        // Full Service -> Cimi : Event Access
+        // --------------------------------------------
+
+        // Prepare Service
+        timeStamp = new Date();
+        targetResource = new Machine();
+        targetResource.setId(321);
+        serviceEventType = new AccessEventType();
+        ((AccessEventType) serviceEventType).setDetail("EventType_Detail");
+        ((AccessEventType) serviceEventType).setResName("EventType_ResName");
+        ((AccessEventType) serviceEventType).setResource(targetResource);
+        ((AccessEventType) serviceEventType).setInitiator("EventType_Initiator");
+        ((AccessEventType) serviceEventType).setOperation("EventType_Operation");
+
+        service = new Event();
+        service.setContact("Event_Contact");
+        service.setId(1);
+        service.setName("Event_Name");
+        service.setOutcome(Outcome.SUCCESS);
+        service.setSeverity(Severity.MEDIUM);
+        service.setTimestamp(timeStamp);
+        service.setContent(serviceEventType);
+
+        // Convert
+        cimi = (CimiEvent) this.context.convertToCimi(service, CimiEvent.class);
+        // Trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        MonitoringConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+
+        StringReader strReader = new StringReader(strWriter.toString());
+        CimiEvent cimiIn = mapper.readValue(strReader, CimiEvent.class);
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimiIn);
+        MonitoringConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+
+        strWriter = new StringWriter();
+        m.marshal(cimi, strWriter);
+        MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        Unmarshaller unm = context.createUnmarshaller();
+        strReader = new StringReader(strWriter.toString());
+        cimiIn = (CimiEvent) unm.unmarshal(strReader);
+        strWriter = new StringWriter();
+        m.marshal(cimiIn, strWriter);
+        MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Verify
+        Assert.assertEquals("Event_Contact", cimi.getContact());
+        Assert.assertEquals("SUCCESS", cimi.getOutcome());
+        Assert.assertEquals("MEDIUM", cimi.getSeverity());
+        Assert.assertEquals(timeStamp, cimi.getTimestamp());
+        Assert.assertEquals(ConstantsPath.CIMI_XML_NAMESPACE + "/event/access", cimi.getType());
+        Assert.assertEquals("EventType_Detail", cimi.getContent().getDetail());
+        Assert.assertEquals("EventType_ResName", cimi.getContent().getResName());
+        Assert.assertEquals(ExchangeType.Machine.getResourceURI(), cimi.getContent().getResType());
+        Assert.assertEquals(this.context.makeHref(CimiMachine.class, "321"), cimi.getContent().getResource().getHref());
+        Assert.assertEquals("EventType_Initiator", cimi.getContent().getInitiator());
+        Assert.assertEquals("EventType_Operation", cimi.getContent().getOperation());
+
+        // --------------------------------------------
+        // Full Service -> Cimi : Event Alarm
+        // --------------------------------------------
+
+        // Prepare Service
+        timeStamp = new Date();
+        targetResource = new Machine();
+        targetResource.setId(321);
+        serviceEventType = new AlarmEventType();
+        ((AlarmEventType) serviceEventType).setDetail("EventType_Detail");
+        ((AlarmEventType) serviceEventType).setResName("EventType_ResName");
+        ((AlarmEventType) serviceEventType).setResource(targetResource);
+        ((AlarmEventType) serviceEventType).setCode("EventType_Code");
+
+        service = new Event();
+        service.setContact("Event_Contact");
+        service.setId(1);
+        service.setName("Event_Name");
+        service.setOutcome(Outcome.SUCCESS);
+        service.setSeverity(Severity.MEDIUM);
+        service.setTimestamp(timeStamp);
+        service.setContent(serviceEventType);
+
+        // Convert
+        cimi = (CimiEvent) this.context.convertToCimi(service, CimiEvent.class);
+        // Trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        MonitoringConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+
+        // StringReader strReader = new StringReader(strWriter.toString());
+        // CimiEvent cimiIn = mapper.readValue(strReader, CimiEvent.class);
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimiIn);
+        // MonitoringConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+
+        strWriter = new StringWriter();
+        m.marshal(cimi, strWriter);
+        MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Unmarshaller unm = context.createUnmarshaller();
+        // strReader = new StringReader(strWriter.toString());
+        // cimiIn = (CimiEvent) unm.unmarshal(strReader);
+        // strWriter = new StringWriter();
+        // m.marshal(cimiIn, strWriter);
+        // MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Verify
+        Assert.assertEquals("Event_Contact", cimi.getContact());
+        Assert.assertEquals("SUCCESS", cimi.getOutcome());
+        Assert.assertEquals("MEDIUM", cimi.getSeverity());
+        Assert.assertEquals(timeStamp, cimi.getTimestamp());
+        Assert.assertEquals(ConstantsPath.CIMI_XML_NAMESPACE + "/event/alarm", cimi.getType());
+        Assert.assertEquals("EventType_Detail", cimi.getContent().getDetail());
+        Assert.assertEquals("EventType_ResName", cimi.getContent().getResName());
+        Assert.assertEquals(ExchangeType.Machine.getResourceURI(), cimi.getContent().getResType());
+        Assert.assertEquals(this.context.makeHref(CimiMachine.class, "321"), cimi.getContent().getResource().getHref());
+        Assert.assertEquals("EventType_Code", cimi.getContent().getCode());
+
+        // --------------------------------------------
+        // Full Service -> Cimi : Event Model
+        // --------------------------------------------
+
+        // Prepare Service
+        timeStamp = new Date();
+        targetResource = new Machine();
+        targetResource.setId(321);
+        serviceEventType = new ModelEventType();
+        ((ModelEventType) serviceEventType).setDetail("EventType_Detail");
+        ((ModelEventType) serviceEventType).setResName("EventType_ResName");
+        ((ModelEventType) serviceEventType).setResource(targetResource);
+        ((ModelEventType) serviceEventType).setModelChange("EventType_Change");
+
+        service = new Event();
+        service.setContact("Event_Contact");
+        service.setId(1);
+        service.setName("Event_Name");
+        service.setOutcome(Outcome.SUCCESS);
+        service.setSeverity(Severity.MEDIUM);
+        service.setTimestamp(timeStamp);
+        service.setContent(serviceEventType);
+
+        // Convert
+        cimi = (CimiEvent) this.context.convertToCimi(service, CimiEvent.class);
+        // Trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        MonitoringConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+
+        // StringReader strReader = new StringReader(strWriter.toString());
+        // CimiEvent cimiIn = mapper.readValue(strReader, CimiEvent.class);
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimiIn);
+        // MonitoringConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+
+        strWriter = new StringWriter();
+        m.marshal(cimi, strWriter);
+        MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Unmarshaller unm = context.createUnmarshaller();
+        // strReader = new StringReader(strWriter.toString());
+        // cimiIn = (CimiEvent) unm.unmarshal(strReader);
+        // strWriter = new StringWriter();
+        // m.marshal(cimiIn, strWriter);
+        // MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Verify
+        Assert.assertEquals("Event_Contact", cimi.getContact());
+        Assert.assertEquals("SUCCESS", cimi.getOutcome());
+        Assert.assertEquals("MEDIUM", cimi.getSeverity());
+        Assert.assertEquals(timeStamp, cimi.getTimestamp());
+        Assert.assertEquals(ConstantsPath.CIMI_XML_NAMESPACE + "/event/model", cimi.getType());
+        Assert.assertEquals("EventType_Detail", cimi.getContent().getDetail());
+        Assert.assertEquals("EventType_ResName", cimi.getContent().getResName());
+        Assert.assertEquals(ExchangeType.Machine.getResourceURI(), cimi.getContent().getResType());
+        Assert.assertEquals(this.context.makeHref(CimiMachine.class, "321"), cimi.getContent().getResource().getHref());
+        Assert.assertEquals("EventType_Change", cimi.getContent().getChange());
+
+        // --------------------------------------------
+        // Full Service -> Cimi : Event State
+        // --------------------------------------------
+
+        // Prepare Service
+        timeStamp = new Date();
+        targetResource = new Machine();
+        targetResource.setId(321);
+        serviceEventType = new StateEventType();
+        ((StateEventType) serviceEventType).setDetail("EventType_Detail");
+        ((StateEventType) serviceEventType).setResName("EventType_ResName");
+        ((StateEventType) serviceEventType).setResource(targetResource);
+        ((StateEventType) serviceEventType).setState("EventType_State");
+        ((StateEventType) serviceEventType).setPreviousState("EventType_Previous");
+
+        service = new Event();
+        service.setContact("Event_Contact");
+        service.setId(1);
+        service.setName("Event_Name");
+        service.setOutcome(Outcome.SUCCESS);
+        service.setSeverity(Severity.MEDIUM);
+        service.setTimestamp(timeStamp);
+        service.setContent(serviceEventType);
+
+        // Convert
+        cimi = (CimiEvent) this.context.convertToCimi(service, CimiEvent.class);
+        // Trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        MonitoringConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+
+        // StringReader strReader = new StringReader(strWriter.toString());
+        // CimiEvent cimiIn = mapper.readValue(strReader, CimiEvent.class);
+        // strWriter = new StringWriter();
+        // mapper.writeValue(strWriter, cimiIn);
+        // MonitoringConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+
+        strWriter = new StringWriter();
+        m.marshal(cimi, strWriter);
+        MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Unmarshaller unm = context.createUnmarshaller();
+        // strReader = new StringReader(strWriter.toString());
+        // cimiIn = (CimiEvent) unm.unmarshal(strReader);
+        // strWriter = new StringWriter();
+        // m.marshal(cimiIn, strWriter);
+        // MonitoringConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Verify
+        Assert.assertEquals("Event_Contact", cimi.getContact());
+        Assert.assertEquals("SUCCESS", cimi.getOutcome());
+        Assert.assertEquals("MEDIUM", cimi.getSeverity());
+        Assert.assertEquals(timeStamp, cimi.getTimestamp());
+        Assert.assertEquals(ConstantsPath.CIMI_XML_NAMESPACE + "/event/state", cimi.getType());
+        Assert.assertEquals("EventType_Detail", cimi.getContent().getDetail());
+        Assert.assertEquals("EventType_ResName", cimi.getContent().getResName());
+        Assert.assertEquals(ExchangeType.Machine.getResourceURI(), cimi.getContent().getResType());
+        Assert.assertEquals(this.context.makeHref(CimiMachine.class, "321"), cimi.getContent().getResource().getHref());
+        Assert.assertEquals("EventType_State", cimi.getContent().getState());
+        Assert.assertEquals("EventType_Previous", cimi.getContent().getPrevious());
     }
 }

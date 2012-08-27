@@ -24,23 +24,21 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventTypeModel;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.Address;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.ModelEventType;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiAddress}</li>
- * <li>Service model: {@link Address}</li>
+ * <li>CIMI model: {@link CimiEventTypeModel}</li>
+ * <li>Service model: {@link ModelEventType}</li>
  * </ul>
  * </p>
  */
-public class AddressConverter extends ObjectCommonConverter {
+public class EventTypeModelConverter extends EventTypeConverter {
 
     /**
      * {@inheritDoc}
@@ -50,7 +48,7 @@ public class AddressConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiAddress cimi = new CimiAddress();
+        CimiEventTypeModel cimi = new CimiEventTypeModel();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -63,7 +61,7 @@ public class AddressConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (Address) dataService, (CimiAddress) dataCimi);
+        this.doCopyToCimi(context, (ModelEventType) dataService, (CimiEventTypeModel) dataCimi);
     }
 
     /**
@@ -74,9 +72,8 @@ public class AddressConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        Address service = new Address();
-        this.copyToService(context, dataCimi, service);
-        return service;
+        // Unnecessary
+        return null;
     }
 
     /**
@@ -88,7 +85,7 @@ public class AddressConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiAddress) dataCimi, (Address) dataService);
+        // Unnecessary
     }
 
     /**
@@ -98,41 +95,8 @@ public class AddressConverter extends ObjectCommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final CimiContext context, final Address dataService, final CimiAddress dataCimi) {
+    protected void doCopyToCimi(final CimiContext context, final ModelEventType dataService, final CimiEventTypeModel dataCimi) {
         this.fill(context, dataService, dataCimi);
-        if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setAllocation(dataService.getAllocation());
-            dataCimi.setDefaultGateway(dataService.getDefaultGateway());
-            dataCimi.setDns(dataService.getDns());
-            dataCimi.setHostname(dataService.getHostName());
-            dataCimi.setIp(dataService.getIp());
-            dataCimi.setMask(dataService.getMask());
-            dataCimi.setNetwork((CimiNetwork) context.convertNextCimi(dataService.getNetwork(), CimiNetwork.class));
-            dataCimi.setProtocol(dataService.getProtocol());
-            dataCimi.setResource(ConverterHelper.buildTargetResource(context, dataService.getResource()));
-        }
-    }
-
-    /**
-     * Copy data from a CIMI object to a service object.
-     * 
-     * @param context The current context
-     * @param dataCimi Source CIMI object
-     * @param dataService Destination Service object
-     */
-    protected void doCopyToService(final CimiContext context, final CimiAddress dataCimi, final Address dataService) {
-        this.fill(context, dataCimi, dataService);
-        dataService.setDefaultGateway(dataCimi.getDefaultGateway());
-        dataService.setDns(dataCimi.getDns());
-        dataService.setHostName(dataCimi.getHostname());
-        dataService.setIp(dataCimi.getIp());
-        dataService.setMask(dataCimi.getMask());
-        dataService.setNetwork((Network) context.convertNextService(dataCimi.getNetwork()));
-        dataService.setProtocol(dataCimi.getProtocol());
-
-        // Next Read only
-        // dataService.setAllocation(dataCimi.getAllocation());
-        // dataService.setResource((CloudResource)
-        // context.convertNextService(dataCimi.getResource()));
+        dataCimi.setChange(dataService.getModelChange());
     }
 }

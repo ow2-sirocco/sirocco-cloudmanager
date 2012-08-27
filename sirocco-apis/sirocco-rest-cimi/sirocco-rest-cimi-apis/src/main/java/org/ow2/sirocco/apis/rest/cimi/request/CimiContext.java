@@ -32,6 +32,7 @@ import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigFactory;
 import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigurationException;
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
@@ -228,7 +229,7 @@ public interface CimiContext extends Serializable {
     void setConvertedExpand(boolean convertedExpand);
 
     /**
-     * Find a CIMI class associate to a service class.
+     * Find a CIMI class associated with a service class type "resource".
      * 
      * @param service The service class
      * @return The CIMI class found
@@ -236,6 +237,16 @@ public interface CimiContext extends Serializable {
      * @see ConfigFactory
      */
     Class<? extends CimiResource> findAssociate(Class<? extends Resource> service);
+
+    /**
+     * Find a CIMI class associated with any class of service.
+     * 
+     * @param service The service class
+     * @return The CIMI class found
+     * @throws ConfigurationException If associate CIMI class not found
+     * @see ConfigFactory
+     */
+    Class<?> findAssociatedServiceClass(Class<?> klass);
 
     /**
      * Indicator of the presence of a CIMI parameters for reading collections :
@@ -293,5 +304,13 @@ public interface CimiContext extends Serializable {
      * @return A map with the attribute name and his value
      */
     Map<String, Object> copyBeanAttributesOfSelect(final Object object);
+
+    /**
+     * Get the exchange type for a instance.
+     * 
+     * @param klass A class
+     * @return The exchange type or null if the class is unknown
+     */
+    ExchangeType getType(final Class<?> klass);
 
 }

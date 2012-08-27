@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogEventCollection;
 
 /**
  * Class EventLog.
@@ -40,6 +41,35 @@ public class CimiEventLog extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * Field "persistence".
+     */
+    private String persistence;
+
+    /**
+     * Field "targetResource".
+     * <p>
+     * Read only
+     * </p>
+     */
+    private TargetResource targetResource;
+
+    /**
+     * Field "events".
+     * <p>
+     * Read only
+     * </p>
+     */
+    private CimiEventLogEventCollection events;
+
+    /**
+     * Field "summary".
+     * <p>
+     * Read only
+     * </p>
+     */
+    private Summary summary;
 
     /**
      * Default constructor.
@@ -58,14 +88,87 @@ public class CimiEventLog extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Return the value of field "events".
+     * 
+     * @return The value
+     */
+    public CimiEventLogEventCollection getEvents() {
+        return this.events;
+    }
+
+    /**
+     * Set the value of field "events".
+     * 
+     * @param events The value
+     */
+    public void setEvents(final CimiEventLogEventCollection events) {
+        this.events = events;
+    }
+
+    /**
+     * Return the value of field "persistence".
+     * 
+     * @return The value
+     */
+    public String getPersistence() {
+        return this.persistence;
+    }
+
+    /**
+     * Set the value of field "persistence".
+     * 
+     * @param persistence The value
+     */
+    public void setPersistence(final String persistence) {
+        this.persistence = persistence;
+    }
+
+    /**
+     * Return the value of field "targetResource".
+     * 
+     * @return The value
+     */
+    public TargetResource getTargetResource() {
+        return this.targetResource;
+    }
+
+    /**
+     * Set the value of field "targetResource".
+     * 
+     * @param persistence The value
+     */
+    public void setTargetResource(final TargetResource targetResource) {
+        this.targetResource = targetResource;
+    }
+
+    /**
+     * Return the value of field "summary".
+     * 
+     * @return The value
+     */
+    public Summary getSummary() {
+        return this.summary;
+    }
+
+    /**
+     * Set the value of field "summary".
+     * 
+     * @param persistence The value
+     */
+    public void setSummary(final Summary summary) {
+        this.summary = summary;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getPersistence());
+        return has;
     }
 
     /**
