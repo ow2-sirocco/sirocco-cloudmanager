@@ -626,6 +626,11 @@ public class SystemManager implements ISystemManager {
         return systemT;
     }
 
+    @Override
+    public void deleteSystemTemplate(final String systemTemplateId) throws ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public List<System> getSystems() throws CloudProviderException {

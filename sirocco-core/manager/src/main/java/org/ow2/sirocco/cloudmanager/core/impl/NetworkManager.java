@@ -1,5 +1,6 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -39,11 +40,13 @@ import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkNetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
@@ -295,6 +298,41 @@ public class NetworkManager implements INetworkManager {
     @Override
     public Job deleteNetwork(final String networkId) throws ResourceNotFoundException, CloudProviderException {
         return this.performActionOnNetwork(networkId, "delete");
+    }
+
+    @Override
+    public Job addNetworkPortToNetwork(final String networkId, final NetworkPort networkPort) throws ResourceNotFoundException,
+        CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job removeNetworkPortFromNetwork(final String networkId, final String networkNetworkPortId)
+        throws ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public NetworkNetworkPort getNetworkPortFromNetwork(final String networkId, final String networkNetworkPortId)
+        throws ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<NetworkNetworkPort> getNetworkNetworkPorts(final String networkId) throws ResourceNotFoundException,
+        CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public QueryResult<NetworkNetworkPort> getNetworkNetworkPorts(final String networkId, final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     //
@@ -935,7 +973,16 @@ public class NetworkManager implements INetworkManager {
         forwardingGroup.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
         forwardingGroup.setCloudProviderAccount(defaultAccount);
 
-        forwardingGroup.setNetworks(forwardingGroupCreate.getForwardingGroupTemplate().getNetworks());
+        List<ForwardingGroupNetwork> networks = new ArrayList<ForwardingGroupNetwork>();
+        if (forwardingGroupCreate.getForwardingGroupTemplate().getNetworks() != null) {
+            for (Network net : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
+                ForwardingGroupNetwork forwardingGroupNetwork = new ForwardingGroupNetwork();
+                forwardingGroupNetwork.setNetwork(net);
+                this.em.persist(forwardingGroupNetwork);
+                networks.add(forwardingGroupNetwork);
+            }
+        }
+        forwardingGroup.setNetworks(networks);
 
         forwardingGroup.setState(ForwardingGroup.State.CREATING);
         this.em.persist(forwardingGroup);
@@ -1049,33 +1096,36 @@ public class NetworkManager implements INetworkManager {
         return job;
     }
 
-    private Job changeForwardingGroupMembership(final String forwardingGroupId, final String networkId, final String action)
+    @Override
+    public Job addNetworkToForwardingGroup(final String forwardingGroupId, final ForwardingGroupNetwork forwardingGroupNetwork)
         throws ResourceNotFoundException, CloudProviderException {
         ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
         if (forwardingGroup == null) {
             throw new ResourceNotFoundException("ForwardingGroup " + forwardingGroupId + " doesn't not exist");
         }
 
-        Network network = this.getNetworkById(networkId);
+        Network network = forwardingGroupNetwork.getNetwork();
         if (network == null) {
-            throw new ResourceNotFoundException("Network " + networkId + " doesn't not exist");
+            throw new ResourceNotFoundException("Network cannot be null");
         }
 
-        // delegates ForwardingGroup deletion to cloud provider connector
+        ForwardingGroupNetwork fgNetwork = new ForwardingGroupNetwork();
+        fgNetwork.setState(ForwardingGroupNetwork.State.ATTACHING);
+        fgNetwork.setNetwork(network);
+        this.em.persist(fgNetwork);
+        forwardingGroup.getNetworks().add(fgNetwork);
+        this.em.persist(forwardingGroup);
+
+        // delegates ForwardingGroup add to cloud provider connector
         ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount());
         Job providerJob = null;
 
         try {
             INetworkService networkService = connector.getNetworkService();
-            if (action.equals("add")) {
-                providerJob = networkService.addNetworkToForwardingGroup(forwardingGroup.getProviderAssignedId(),
-                    network.getProviderAssignedId());
-            } else if (action.equals("delete")) {
-                providerJob = networkService.removeNetworkFromForwardingGroup(forwardingGroup.getProviderAssignedId(),
-                    network.getProviderAssignedId());
-            }
+            providerJob = networkService.addNetworkToForwardingGroup(forwardingGroup.getProviderAssignedId(),
+                network.getProviderAssignedId());
         } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to " + action + " network from/to forwarding group: ", e);
+            NetworkManager.logger.error("Failed to add network to forwarding group: ", e);
             throw new CloudProviderException(e.getMessage());
         }
 
@@ -1103,15 +1153,58 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public Job addNetworkToForwardingGroup(final String forwardingGroupId, final String networkId)
+    public Job removeNetworkFromForwardingGroup(final String forwardingGroupId, final String fgNetworkId)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.changeForwardingGroupMembership(forwardingGroupId, networkId, "add");
-    }
+        ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
+        if (forwardingGroup == null) {
+            throw new ResourceNotFoundException("ForwardingGroup " + forwardingGroupId + " doesn't not exist");
+        }
 
-    @Override
-    public Job removeNetworkFromForwardingGroup(final String forwardingGroupId, final String networkId)
-        throws ResourceNotFoundException, CloudProviderException {
-        return this.changeForwardingGroupMembership(forwardingGroupId, networkId, "delete");
+        ForwardingGroupNetwork forwardingGroupNetwork = this.em
+            .find(ForwardingGroupNetwork.class, Integer.valueOf(fgNetworkId));
+        if (forwardingGroupNetwork == null) {
+            throw new ResourceNotFoundException();
+        }
+        if (!forwardingGroup.getNetworks().contains(forwardingGroupNetwork)) {
+            throw new ResourceNotFoundException();
+        }
+
+        forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.DETACHING);
+
+        // delegates ForwardingGroup deletion to cloud provider connector
+        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount());
+        Job providerJob = null;
+
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            providerJob = networkService.removeNetworkFromForwardingGroup(forwardingGroup.getProviderAssignedId(),
+                forwardingGroupNetwork.getNetwork().getProviderAssignedId());
+        } catch (ConnectorException e) {
+            NetworkManager.logger.error("Failed to remove network from forwarding group: ", e);
+            throw new CloudProviderException(e.getMessage());
+        }
+
+        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+            throw new CloudProviderException(providerJob.getStatusMessage());
+        }
+
+        Job job = new Job();
+        job.setTargetEntity(forwardingGroup);
+        job.setAffectedEntities(Collections.<CloudResource> singletonList(forwardingGroupNetwork.getNetwork()));
+        job.setCreated(new Date());
+        job.setProviderAssignedId(providerJob.getProviderAssignedId());
+        job.setStatus(providerJob.getStatus());
+        job.setAction(providerJob.getAction());
+        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
+        this.em.persist(job);
+        this.em.flush();
+
+        try {
+            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
+        } catch (Exception e) {
+            NetworkManager.logger.error("", e);
+        }
+        return job;
     }
 
     //
@@ -1479,9 +1572,21 @@ public class NetworkManager implements INetworkManager {
                 // add network to forwarding group
                 if (providerJob.getStatus() == Job.Status.SUCCESS) {
                     try {
-                        forwardingGroup.getNetworks().add(affectedNetwork);
-                        forwardingGroup.setUpdated(new Date());
-                        this.em.persist(forwardingGroup);
+                        ForwardingGroupNetwork forwardingGroupNetwork = null;
+                        for (ForwardingGroupNetwork net : forwardingGroup.getNetworks()) {
+                            if (net.getNetwork().getId() == affectedNetwork.getId()) {
+                                forwardingGroupNetwork = net;
+                                break;
+                            }
+                        }
+                        if (forwardingGroupNetwork != null) {
+                            forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.AVAILABLE);
+                            this.em.persist(forwardingGroupNetwork);
+                            forwardingGroup.setUpdated(new Date());
+                            this.em.persist(forwardingGroup);
+                        } else {
+                            NetworkManager.logger.error("Cannot find added network in ForwardingGroupNetwork)");
+                        }
                     } catch (Exception ex) {
                         NetworkManager.logger.error("Failed to add network to forwarding group " + forwardingGroup.getName(),
                             ex);
@@ -1498,7 +1603,7 @@ public class NetworkManager implements INetworkManager {
             if (affectedNetwork == null) {
                 if (providerJob.getStatus() == Job.Status.SUCCESS) {
                     forwardingGroup.setState(ForwardingGroup.State.DELETED);
-                    forwardingGroup.setNetworks(Collections.<Network> emptyList());
+                    forwardingGroup.setNetworks(Collections.<ForwardingGroupNetwork> emptyList());
                     this.em.persist(forwardingGroup);
                     this.em.flush();
                 } else if (providerJob.getStatus() == Job.Status.FAILED) {
@@ -1511,10 +1616,11 @@ public class NetworkManager implements INetworkManager {
                 // remove network from forwarding group
                 if (providerJob.getStatus() == Job.Status.SUCCESS) {
                     boolean found = false;
-                    for (Iterator<Network> it = forwardingGroup.getNetworks().iterator(); it.hasNext();) {
-                        Network net = it.next();
-                        if (net.getId() == affectedNetwork.getId()) {
+                    for (Iterator<ForwardingGroupNetwork> it = forwardingGroup.getNetworks().iterator(); it.hasNext();) {
+                        ForwardingGroupNetwork net = it.next();
+                        if (net.getNetwork().getId() == affectedNetwork.getId()) {
                             it.remove();
+                            this.em.remove(net);
                             found = true;
                             break;
                         }
@@ -1537,5 +1643,35 @@ public class NetworkManager implements INetworkManager {
         }
 
         return true;
+    }
+
+    @Override
+    public List<ForwardingGroupNetwork> getForwardingGroupNetworks(final String forwardingGroupId)
+        throws ResourceNotFoundException, CloudProviderException {
+        ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
+        return forwardingGroup.getNetworks();
+    }
+
+    @Override
+    public QueryResult<ForwardingGroupNetwork> getForwardingGroupNetworks(final String forwardingGroupId, final int first,
+        final int last, final List<String> filters, final List<String> attributes) throws InvalidRequestException,
+        CloudProviderException {
+        return UtilsForManagers.getCollectionItemList("ForwardingGroupNetwork", this.em, this.getUser().getUsername(), first,
+            last, filters, attributes, false, "ForwardingGroup", "networks", forwardingGroupId);
+    }
+
+    @Override
+    public ForwardingGroupNetwork getNetworkFromForwardingGroup(final String forwardingGroupId, final String fgNetworkId)
+        throws ResourceNotFoundException, CloudProviderException {
+        ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
+        ForwardingGroupNetwork forwardingGroupNetwork = this.em
+            .find(ForwardingGroupNetwork.class, Integer.valueOf(fgNetworkId));
+        if (forwardingGroupNetwork == null) {
+            throw new ResourceNotFoundException();
+        }
+        if (!forwardingGroup.getNetworks().contains(forwardingGroupNetwork)) {
+            throw new ResourceNotFoundException();
+        }
+        return forwardingGroupNetwork;
     }
 }

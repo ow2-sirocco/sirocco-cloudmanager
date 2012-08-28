@@ -37,11 +37,13 @@ import org.ow2.sirocco.cloudmanager.model.cimi.AddressCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkNetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
@@ -75,6 +77,20 @@ public interface INetworkManager {
         InvalidRequestException, CloudProviderException;
 
     Job deleteNetwork(String networkId) throws ResourceNotFoundException, CloudProviderException;
+
+    Job addNetworkPortToNetwork(String networkId, NetworkPort networkPort) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    Job removeNetworkPortFromNetwork(String networkId, String networkNetworkPortId) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    QueryResult<NetworkNetworkPort> getNetworkNetworkPorts(String networkId, int first, int last, List<String> filters,
+        List<String> attributes) throws InvalidRequestException, CloudProviderException;
+
+    List<NetworkNetworkPort> getNetworkNetworkPorts(String networkId) throws ResourceNotFoundException, CloudProviderException;
+
+    NetworkNetworkPort getNetworkPortFromNetwork(String networkId, String networkNetworkPortId)
+        throws ResourceNotFoundException, CloudProviderException;
 
     // NetworkConfiguration operations
 
@@ -244,11 +260,20 @@ public interface INetworkManager {
 
     Job deleteForwardingGroup(String forwardingGroupId) throws ResourceNotFoundException, CloudProviderException;
 
-    Job addNetworkToForwardingGroup(String forwardingGroupId, String networkId) throws ResourceNotFoundException,
-        CloudProviderException;
+    Job addNetworkToForwardingGroup(String forwardingGroupId, ForwardingGroupNetwork forwardingGroupNetwork)
+        throws ResourceNotFoundException, CloudProviderException;
 
     Job removeNetworkFromForwardingGroup(String forwardingGroupId, String networkId) throws ResourceNotFoundException,
         CloudProviderException;
+
+    QueryResult<ForwardingGroupNetwork> getForwardingGroupNetworks(String forwardingGroupId, int first, int last,
+        List<String> filters, List<String> attributes) throws InvalidRequestException, CloudProviderException;
+
+    List<ForwardingGroupNetwork> getForwardingGroupNetworks(String forwardingGroupId) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    ForwardingGroupNetwork getNetworkFromForwardingGroup(String forwardingGroupId, String networkId)
+        throws ResourceNotFoundException, CloudProviderException;
 
     // Address operations
 

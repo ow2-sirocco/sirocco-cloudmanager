@@ -82,6 +82,8 @@ public interface ISystemManager extends IJobListener, IEntityStateListener {
     boolean removeComponentDescriptorFromSystemTemplate(String componentDescriptorId, String systemTemplateId)
         throws CloudProviderException;
 
+    void deleteSystemTemplate(String systemTemplateId) throws ResourceNotFoundException, CloudProviderException;
+
     // management of component Descriptors
     System updateComponentDescriptor(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
 

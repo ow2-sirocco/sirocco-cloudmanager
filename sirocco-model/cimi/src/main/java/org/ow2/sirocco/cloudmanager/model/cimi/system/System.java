@@ -74,6 +74,10 @@ public class System extends CloudResource implements Serializable, ICloudProvide
 
     private List<SystemNetwork> networks;
 
+    private List<SystemNetworkPort> networkPorts;
+
+    private List<SystemForwardingGroup> forwardingGroups;
+
     private CloudProviderAccount cloudProviderAccount;
 
     @Transient
@@ -169,6 +173,28 @@ public class System extends CloudResource implements Serializable, ICloudProvide
 
     public void setNetworks(final List<SystemNetwork> networks) {
         this.networks = networks;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JoinColumn(name = "system_id")
+    public List<SystemNetworkPort> getNetworkPorts() {
+        return this.networkPorts;
+    }
+
+    public void setNetworkPorts(final List<SystemNetworkPort> networkPorts) {
+        this.networkPorts = networkPorts;
+    }
+
+    @OneToMany(cascade = CascadeType.ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JoinColumn(name = "system_id")
+    public List<SystemForwardingGroup> getForwardingGroups() {
+        return this.forwardingGroups;
+    }
+
+    public void setForwardingGroups(final List<SystemForwardingGroup> forwardingGroups) {
+        this.forwardingGroups = forwardingGroups;
     }
 
     @Transient

@@ -59,7 +59,7 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
 
     private State state;
 
-    private List<Network> networks;
+    private List<ForwardingGroupNetwork> networks;
 
     @Enumerated(EnumType.STRING)
     public State getState() {
@@ -72,11 +72,11 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
 
     @OneToMany
     @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    public List<Network> getNetworks() {
+    public List<ForwardingGroupNetwork> getNetworks() {
         return this.networks;
     }
 
-    public void setNetworks(final List<Network> networks) {
+    public void setNetworks(final List<ForwardingGroupNetwork> networks) {
         this.networks = networks;
     }
 
