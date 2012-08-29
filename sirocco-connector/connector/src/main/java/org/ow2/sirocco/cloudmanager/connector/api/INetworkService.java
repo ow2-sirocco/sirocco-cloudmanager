@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
@@ -72,7 +73,7 @@ public interface INetworkService {
 
     Job deleteForwardingGroup(String forwardingGroupId) throws ConnectorException;
 
-    Job addNetworkToForwardingGroup(String forwardingGroupId, String networkId) throws ConnectorException;
+    Job addNetworkToForwardingGroup(String forwardingGroupId, ForwardingGroupNetwork fgNetwork) throws ConnectorException;
 
     Job removeNetworkFromForwardingGroup(String forwardingGroupId, String networkId) throws ConnectorException;
 

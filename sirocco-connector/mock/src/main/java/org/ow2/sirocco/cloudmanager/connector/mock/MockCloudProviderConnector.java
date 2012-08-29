@@ -51,6 +51,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -1140,7 +1141,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 network.setState(Network.State.STARTED);
                 if (fg != null) {
-                    fg.getNetworks().add(network);
+                    ForwardingGroupNetwork fgNetwork = new ForwardingGroupNetwork();
+                    fgNetwork.setNetwork(network);
+                    fgNetwork.setState(ForwardingGroupNetwork.State.AVAILABLE);
+                    fg.getNetworks().add(fgNetwork);
                 }
                 return network;
             }
@@ -1340,7 +1344,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public Job createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws ConnectorException {
-        final List<Network> networksToAdd = new ArrayList<Network>();
+        final List<ForwardingGroupNetwork> networksToAdd = new ArrayList<ForwardingGroupNetwork>();
         if (forwardingGroupCreate.getForwardingGroupTemplate().getNetworks() != null) {
             for (Network net : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
                 String netId = net.getProviderAssignedId();
@@ -1348,13 +1352,16 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 if (providerNetwork == null) {
                     throw new ConnectorException("Unknown network with id " + netId);
                 }
-                networksToAdd.add(providerNetwork);
+                ForwardingGroupNetwork fgNetwork = new ForwardingGroupNetwork();
+                fgNetwork.setNetwork(providerNetwork);
+                fgNetwork.setState(ForwardingGroupNetwork.State.AVAILABLE);
+                networksToAdd.add(fgNetwork);
             }
         }
         final String forwardingGroupProviderAssignedId = UUID.randomUUID().toString();
         final ForwardingGroup forwardingGroup = new ForwardingGroup();
         forwardingGroup.setProviderAssignedId(forwardingGroupProviderAssignedId);
-        forwardingGroup.setNetworks(new ArrayList<Network>());
+        forwardingGroup.setNetworks(new ArrayList<ForwardingGroupNetwork>());
         this.forwardingGroups.put(forwardingGroupProviderAssignedId, forwardingGroup);
         forwardingGroup.setState(ForwardingGroup.State.CREATING);
 
@@ -1362,7 +1369,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             @Override
             public ForwardingGroup call() throws Exception {
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
-                forwardingGroup.getNetworks().addAll(networksToAdd);
+                forwardingGroup.setNetworks(networksToAdd);
                 forwardingGroup.setState(ForwardingGroup.State.AVAILABLE);
                 return forwardingGroup;
             }
@@ -1401,20 +1408,22 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
-    public Job addNetworkToForwardingGroup(final String forwardingGroupId, final String networkId) throws ConnectorException {
+    public Job addNetworkToForwardingGroup(final String forwardingGroupId, final ForwardingGroupNetwork fgNetwork)
+        throws ConnectorException {
         final ForwardingGroup forwardingGroup = this.forwardingGroups.get(forwardingGroupId);
         if (forwardingGroup == null) {
             throw new ConnectorException("NetworkPort " + forwardingGroupId + " doesn't exist");
         }
-        final Network network = this.networks.get(networkId);
+        final Network network = this.networks.get(fgNetwork.getNetwork().getProviderAssignedId());
         if (network == null) {
-            throw new ConnectorException("Unknown network with id=" + networkId);
+            throw new ConnectorException("Unknown network with id=" + fgNetwork.getNetwork().getProviderAssignedId());
         }
         final Callable<Void> attachTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
-                forwardingGroup.getNetworks().add(network);
+                fgNetwork.setState(ForwardingGroupNetwork.State.AVAILABLE);
+                forwardingGroup.getNetworks().add(fgNetwork);
                 MockCloudProviderConnector.logger.info("Added network to ForwardingGroup " + forwardingGroupId);
                 return null;
             }

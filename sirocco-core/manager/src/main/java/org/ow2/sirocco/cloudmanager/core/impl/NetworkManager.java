@@ -1123,7 +1123,7 @@ public class NetworkManager implements INetworkManager {
         try {
             INetworkService networkService = connector.getNetworkService();
             providerJob = networkService.addNetworkToForwardingGroup(forwardingGroup.getProviderAssignedId(),
-                network.getProviderAssignedId());
+                forwardingGroupNetwork);
         } catch (ConnectorException e) {
             NetworkManager.logger.error("Failed to add network to forwarding group: ", e);
             throw new CloudProviderException(e.getMessage());
