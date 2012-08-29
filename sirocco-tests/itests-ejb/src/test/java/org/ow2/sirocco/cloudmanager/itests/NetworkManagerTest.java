@@ -56,6 +56,7 @@ import org.ow2.sirocco.cloudmanager.itests.util.CustomDBUnitDeleteAllOperation;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -670,7 +671,9 @@ public class NetworkManagerTest {
 
         Network network1 = this.networkManager.getNetworkById(network1Id);
 
-        job = this.networkManager.addNetworkToForwardingGroup(forwardingGroupId, network1Id);
+        ForwardingGroupNetwork fgNetwork = new ForwardingGroupNetwork();
+        fgNetwork.setNetwork(network1);
+        job = this.networkManager.addNetworkToForwardingGroup(forwardingGroupId, fgNetwork);
         Assert.assertEquals("add", job.getAction());
         Assert.assertEquals(job.getTargetEntity().getId().toString(), forwardingGroupId);
         Assert.assertEquals(job.getAffectedEntities().get(0).getId().toString(), network1Id);
@@ -678,7 +681,8 @@ public class NetworkManagerTest {
         this.waitForJobCompletion(job);
         forwardingGroup = this.networkManager.getForwardingGroupById(forwardingGroupId);
         Assert.assertEquals(forwardingGroup.getNetworks().size(), 1);
-        Assert.assertEquals(forwardingGroup.getNetworks().get(0).getId().toString(), network1Id);
+        ForwardingGroupNetwork createdFgNetwork = forwardingGroup.getNetworks().get(0);
+        Assert.assertEquals(createdFgNetwork.getNetwork().getId().toString(), network1Id);
 
         // update: remove network
 
