@@ -26,15 +26,22 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.List;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemForwardingGroupCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkPortCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 
@@ -109,16 +116,27 @@ public class SystemConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final System dataService, final CimiSystem dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
+            // FIXME Adresses
+            // dataCimi.setAddresses((CimiSystemAddressCollection)
+            // context.convertNextCimi(dataService.getAddresses(),
+            // CimiSystemAddressCollection.class));
+            dataCimi.setForwardingGroups((CimiSystemForwardingGroupCollection) context.convertNextCimi(
+                dataService.getForwardingGroups(), CimiSystemForwardingGroupCollection.class));
             dataCimi.setCredentials((CimiSystemCredentialCollection) context.convertNextCimi(dataService.getCredentials(),
                 CimiSystemCredentialCollection.class));
+            dataCimi.setEventLog((CimiEventLog) context.convertNextCimi(dataService.getEventLog(), CimiEventLog.class));
             dataCimi.setMachines((CimiSystemMachineCollection) context.convertNextCimi(dataService.getMachines(),
                 CimiSystemMachineCollection.class));
+            dataCimi.setNetworks((CimiSystemNetworkCollection) context.convertNextCimi(dataService.getNetworks(),
+                CimiSystemNetworkCollection.class));
+            dataCimi.setNetworkPorts((CimiSystemNetworkPortCollection) context.convertNextCimi(dataService.getNetworkPorts(),
+                CimiSystemNetworkPortCollection.class));
             dataCimi.setState(ConverterHelper.toString(dataService.getState()));
             dataCimi.setSystems((CimiSystemSystemCollection) context.convertNextCimi(dataService.getSystems(),
                 CimiSystemSystemCollection.class));
             dataCimi.setVolumes((CimiSystemVolumeCollection) context.convertNextCimi(dataService.getVolumes(),
                 CimiSystemVolumeCollection.class));
-            // TODO Networks
+
         }
     }
 
@@ -132,13 +150,21 @@ public class SystemConverter extends ObjectCommonConverter {
     @SuppressWarnings("unchecked")
     protected void doCopyToService(final CimiContext context, final CimiSystem dataCimi, final System dataService) {
         this.fill(context, dataCimi, dataService);
+        // FIXME Adresses
+        // dataService.setAddresses((List<SystemAddresses>)
+        // context.convertNextService(dataCimi.getAddresses()));
+        dataService
+            .setForwardingGroups((List<SystemForwardingGroup>) context.convertNextService(dataCimi.getForwardingGroups()));
         dataService.setCredentials((List<SystemCredentials>) context.convertNextService(dataCimi.getCredentials()));
         dataService.setMachines((List<SystemMachine>) context.convertNextService(dataCimi.getMachines()));
+        dataService.setNetworks((List<SystemNetwork>) context.convertNextService(dataCimi.getNetworks()));
+        dataService.setNetworkPorts((List<SystemNetworkPort>) context.convertNextService(dataCimi.getNetworkPorts()));
         dataService.setSystems((List<SystemSystem>) context.convertNextService(dataCimi.getSystems()));
         dataService.setVolumes((List<SystemVolume>) context.convertNextService(dataCimi.getVolumes()));
-        // TODO Networks
 
         // Next Read only
         // dataService.setState(dataService.getState());
+        // dataService.setEventLog((EventLog)
+        // context.convertNextService(dataCimi.getEventLog()));
     }
 }

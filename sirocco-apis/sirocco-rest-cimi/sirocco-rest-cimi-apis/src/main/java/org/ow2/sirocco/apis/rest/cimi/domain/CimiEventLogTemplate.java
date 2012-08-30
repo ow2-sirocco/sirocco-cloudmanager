@@ -42,6 +42,19 @@ public class CimiEventLogTemplate extends CimiObjectCommonAbstract {
     private static final long serialVersionUID = 1L;
 
     /**
+     * Field "persistence".
+     */
+    private String persistence;
+
+    /**
+     * Field "targetResource".
+     * <p>
+     * Read only
+     * </p>
+     */
+    private TargetResource targetResource;
+
+    /**
      * Default constructor.
      */
     public CimiEventLogTemplate() {
@@ -58,14 +71,52 @@ public class CimiEventLogTemplate extends CimiObjectCommonAbstract {
     }
 
     /**
+     * Return the value of field "persistence".
+     * 
+     * @return The value
+     */
+    public String getPersistence() {
+        return this.persistence;
+    }
+
+    /**
+     * Return the value of field "targetResource".
+     * 
+     * @return The value
+     */
+    public TargetResource getTargetResource() {
+        return this.targetResource;
+    }
+
+    /**
+     * Set the value of field "persistence".
+     * 
+     * @param persistence The value
+     */
+    public void setPersistence(final String persistence) {
+        this.persistence = persistence;
+    }
+
+    /**
+     * Set the value of field "targetResource".
+     * 
+     * @param persistence The value
+     */
+    public void setTargetResource(final TargetResource targetResource) {
+        this.targetResource = targetResource;
+    }
+
+    /**
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract#hasValues()
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getPersistence());
+        has = has || (null != this.getTargetResource());
+        return has;
     }
 
     /**
@@ -79,5 +130,4 @@ public class CimiEventLogTemplate extends CimiObjectCommonAbstract {
     public ExchangeType getExchangeType() {
         return ExchangeType.EventLogTemplate;
     }
-
 }

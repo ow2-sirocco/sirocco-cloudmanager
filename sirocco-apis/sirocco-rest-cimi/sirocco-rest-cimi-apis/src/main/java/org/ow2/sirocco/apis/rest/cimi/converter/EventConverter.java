@@ -103,7 +103,7 @@ public class EventConverter extends ObjectCommonConverter {
             dataCimi.setContact(dataService.getContact());
             if (null != dataService.getContent()) {
                 dataCimi.setContent((CimiEventType) context.convertNextCimi(dataService.getContent(),
-                    context.findAssociatedServiceClass(dataService.getContent().getClass())));
+                    context.findAssociatedCimiClass(dataService.getContent().getClass())));
                 dataCimi.setType(dataCimi.getContent().getEventType().getPath());
             }
             dataCimi.setOutcome(ConverterHelper.toString(dataService.getOutcome()));

@@ -24,10 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter.collection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemForwardingGroupCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemForwardingGroup;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -40,7 +42,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
  * </ul>
  * </p>
  */
-// FIXME SystemForwardingGroup missing !
 public class SystemForwardingGroupCollectionConverter extends CollectionConverterAbstract {
 
     /**
@@ -76,12 +77,9 @@ public class SystemForwardingGroupCollectionConverter extends CollectionConverte
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        // FIXME SystemForwardingGroup missing !
-        return null;
-        // List<SystemForwardingGroup> service = new
-        // ArrayList<SystemForwardingGroup>();
-        // this.copyToService(context, dataCimi, service);
-        // return service;
+        List<SystemForwardingGroup> service = new ArrayList<SystemForwardingGroup>();
+        this.copyToService(context, dataCimi, service);
+        return service;
     }
 
     /**

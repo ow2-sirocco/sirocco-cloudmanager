@@ -26,6 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.List;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeVolumeImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -105,6 +106,7 @@ public class VolumeConverter extends ObjectCommonConverter {
         if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setBootable(dataService.getBootable());
             dataCimi.setCapacity(dataService.getCapacity());
+            dataCimi.setEventLog((CimiEventLog) context.convertNextCimi(dataService.getEventLog(), CimiEventLog.class));
             dataCimi.setImages((CimiVolumeVolumeImageCollection) context.convertNextCimi(dataService.getImages(),
                 CimiVolumeVolumeImageCollection.class));
             dataCimi.setState(ConverterHelper.toString(dataService.getState()));

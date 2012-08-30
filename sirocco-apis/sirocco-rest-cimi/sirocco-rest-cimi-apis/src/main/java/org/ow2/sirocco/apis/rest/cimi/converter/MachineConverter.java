@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollection;
@@ -106,6 +107,7 @@ public class MachineConverter extends ObjectCommonConverter {
             dataCimi.setMemory(dataService.getMemory());
             dataCimi.setDisks((CimiMachineDiskCollection) context.convertNextCimi(dataService.getDisks(),
                 CimiMachineDiskCollection.class));
+            dataCimi.setEventLog((CimiEventLog) context.convertNextCimi(dataService.getEventLog(), CimiEventLog.class));
             dataCimi.setNetworkInterfaces((CimiMachineNetworkInterfaceCollection) context.convertNextCimi(
                 dataService.getNetworkInterfaces(), CimiMachineNetworkInterfaceCollection.class));
             dataCimi.setState(ConverterHelper.toString(dataService.getState()));

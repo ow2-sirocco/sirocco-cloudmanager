@@ -72,6 +72,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.SummaryConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemAddressConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemCreateConverter;
@@ -219,6 +220,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSummary;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
@@ -326,6 +328,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -336,6 +340,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
@@ -344,12 +353,15 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.AccessEventType;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.AlarmEventType;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.Event;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.ModelEventType;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.StateEventType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
@@ -384,14 +396,33 @@ public class ConfigFactory {
     }
 
     /**
-     * Build the configuration for CimiEntities.
+     * Build the configuration.
      * 
-     * @return A list of entity configs
+     * @return A list of config items
      */
     protected List<ItemConfig> buildItems() {
+        Map<Class<?>, ItemConfig> exchangeByClasses = new HashMap<Class<?>, ItemConfig>();
+        // Builds
         List<ItemConfig> items = this.buildExchangeItems();
-        items.addAll(this.buildServiceResources());
-        items.addAll(this.buildOtherItems());
+        for (ItemConfig item : items) {
+            exchangeByClasses.put(item.getKlass(), item);
+        }
+        List<ItemConfig> serviceItems = this.buildServiceResources();
+        List<ItemConfig> otherItems = this.buildOtherItems();
+        // Add builds in same list
+        items.addAll(serviceItems);
+        items.addAll(otherItems);
+        // Add associated resource service in exchange item config
+        Class<?> cimiClass;
+        ItemConfig cimiConfig;
+        for (ItemConfig serviceConfig : serviceItems) {
+            cimiClass = (Class<?>) serviceConfig.getData(ConfigFactory.ASSOCIATE_TO);
+            cimiConfig = exchangeByClasses.get(cimiClass);
+            if (null != cimiConfig) {
+                cimiConfig.putData(ConfigFactory.ASSOCIATE_TO, serviceConfig.getKlass());
+            }
+        }
+
         return items;
     }
 
@@ -578,7 +609,7 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new EventLogEventConverter());
             referenceNames = new HashMap<ExchangeType, String>();
             item.putData(ConfigFactory.NAMES, referenceNames);
-            referenceNames.put(ExchangeType.Event, "volumeImage");
+            referenceNames.put(ExchangeType.Event, "event");
             break;
 
         case EventLogEventCollection:
@@ -1475,14 +1506,14 @@ public class ConfigFactory {
     protected List<ItemConfig> buildServiceResources() {
         List<ItemConfig> items = new ArrayList<ItemConfig>();
 
-        // CloudEntity
+        // CloudEntity implementation
         items.add(this.makeAssociate(Address.class, CimiAddress.class));
         items.add(this.makeAssociate(AddressTemplate.class, CimiAddressTemplate.class));
         items.add(this.makeAssociate(CloudEntryPoint.class, CimiCloudEntryPoint.class));
         items.add(this.makeAssociate(ComponentDescriptor.class, CimiComponentDescriptor.class));
         items.add(this.makeAssociate(Event.class, CimiEvent.class));
-        // TODO EventLog
-        // TODO ForwardingGroupTemplate
+        items.add(this.makeAssociate(EventLog.class, CimiEventLog.class));
+        items.add(this.makeAssociate(ForwardingGroupTemplate.class, CimiForwardingGroupTemplate.class));
         items.add(this.makeAssociate(Job.class, CimiJob.class));
         items.add(this.makeAssociate(MachineConfiguration.class, CimiMachineConfiguration.class));
         items.add(this.makeAssociate(MachineDisk.class, CimiMachineDisk.class));
@@ -1491,41 +1522,41 @@ public class ConfigFactory {
         // TODO MeterConfiguration
         // TODO MeterSample
         // TODO MeterTemplate
-        // TODO NetworkConfiguration
-        // TODO NetworkPortConfiguration
-        // TODO NetworkPortTemplate
+        items.add(this.makeAssociate(NetworkConfiguration.class, CimiNetworkConfiguration.class));
+        items.add(this.makeAssociate(NetworkPortConfiguration.class, CimiNetworkPortConfiguration.class));
+        items.add(this.makeAssociate(NetworkPortTemplate.class, CimiNetworkPortTemplate.class));
         items.add(this.makeAssociate(VolumeConfiguration.class, CimiVolumeConfiguration.class));
         items.add(this.makeAssociate(VolumeVolumeImage.class, CimiVolumeVolumeImage.class));
 
-        // CloudCollectionItem
+        // CloudCollectionItem implementation
         items.add(this.makeAssociate(SystemCredentials.class, CimiSystemCredential.class));
         items.add(this.makeAssociate(SystemMachine.class, CimiSystemMachine.class));
-        // TODO SystemNetwork
+        items.add(this.makeAssociate(SystemNetwork.class, CimiSystemNetwork.class));
         items.add(this.makeAssociate(SystemSystem.class, CimiSystemSystem.class));
         items.add(this.makeAssociate(SystemVolume.class, CimiSystemVolume.class));
 
-        // CloudTemplate
+        // CloudTemplate implementation
         items.add(this.makeAssociate(CredentialsTemplate.class, CimiCredentialTemplate.class));
-        // TODO EventLogTemplate
+        items.add(this.makeAssociate(EventLogTemplate.class, CimiEventLogTemplate.class));
         items.add(this.makeAssociate(MachineTemplate.class, CimiMachineTemplate.class));
-        // TODO NetworkTemplate
+        items.add(this.makeAssociate(NetworkTemplate.class, CimiNetworkTemplate.class));
         items.add(this.makeAssociate(SystemTemplate.class, CimiSystemTemplate.class));
         items.add(this.makeAssociate(VolumeTemplate.class, CimiVolumeTemplate.class));
 
-        // CloudResource
+        // CloudResource implementation
         items.add(this.makeAssociate(Credentials.class, CimiCredential.class));
-        // TODO ForwardingGroup
+        items.add(this.makeAssociate(ForwardingGroup.class, CimiForwardingGroup.class));
         items.add(this.makeAssociate(Machine.class, CimiMachine.class));
         items.add(this.makeAssociate(MachineImage.class, CimiMachineImage.class));
         items.add(this.makeAssociate(MachineNetworkInterface.class, CimiMachineNetworkInterface.class));
         items.add(this.makeAssociate(MachineVolume.class, CimiMachineVolume.class));
         items.add(this.makeAssociate(Network.class, CimiNetwork.class));
-        // TODO NetworkPort
+        items.add(this.makeAssociate(NetworkPort.class, CimiNetworkPort.class));
         items.add(this.makeAssociate(System.class, CimiSystem.class));
         items.add(this.makeAssociate(Volume.class, CimiVolume.class));
         items.add(this.makeAssociate(VolumeImage.class, CimiVolumeImage.class));
 
-        // EventType
+        // EventType implementation
         items.add(this.makeAssociate(AccessEventType.class, CimiEventTypeAccess.class));
         items.add(this.makeAssociate(AlarmEventType.class, CimiEventTypeAlarm.class));
         items.add(this.makeAssociate(ModelEventType.class, CimiEventTypeModel.class));
@@ -1566,6 +1597,10 @@ public class ConfigFactory {
 
         item = new ItemConfig(CimiComponentDescriptor.class);
         item.putData(ConfigFactory.CONVERTER, new ComponentDescriptorConverter());
+        items.add(item);
+
+        item = new ItemConfig(CimiSummary.class);
+        item.putData(ConfigFactory.CONVERTER, new SummaryConverter());
         items.add(item);
 
         // EventType

@@ -69,7 +69,7 @@ public class CimiEventLog extends CimiObjectCommonAbstract {
      * Read only
      * </p>
      */
-    private Summary summary;
+    private CimiSummary summary;
 
     /**
      * Default constructor.
@@ -146,7 +146,7 @@ public class CimiEventLog extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public Summary getSummary() {
+    public CimiSummary getSummary() {
         return this.summary;
     }
 
@@ -155,7 +155,7 @@ public class CimiEventLog extends CimiObjectCommonAbstract {
      * 
      * @param persistence The value
      */
-    public void setSummary(final Summary summary) {
+    public void setSummary(final CimiSummary summary) {
         this.summary = summary;
     }
 

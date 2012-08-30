@@ -24,8 +24,11 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetworkPort;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -37,7 +40,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
  * </ul>
  * </p>
  */
-// FIXME SystemNetworkPort missing !
 public class SystemNetworkPortConverter extends ObjectCommonConverter {
     /**
      * {@inheritDoc}
@@ -60,9 +62,7 @@ public class SystemNetworkPortConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        // FIXME SystemNetworkPort missing !
-        // this.doCopyToCimi(context, (SystemNetworkPort) dataService,
-        // (CimiSystemNetworkPort) dataCimi);
+        this.doCopyToCimi(context, (SystemNetworkPort) dataService, (CimiSystemNetworkPort) dataCimi);
     }
 
     /**
@@ -73,11 +73,9 @@ public class SystemNetworkPortConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        // FIXME SystemNetworkPort missing !
-        return null;
-        // SystemNetworkPort service = new SystemNetworkPort();
-        // this.copyToService(context, dataCimi, service);
-        // return service;
+        SystemNetworkPort service = new SystemNetworkPort();
+        this.copyToService(context, dataCimi, service);
+        return service;
     }
 
     /**
@@ -89,9 +87,7 @@ public class SystemNetworkPortConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        // FIXME SystemNetworkPort missing !
-        // this.doCopyToService(context, (CimiSystemNetworkPort) dataCimi,
-        // (SystemNetworkPort) dataService);
+        this.doCopyToService(context, (CimiSystemNetworkPort) dataCimi, (SystemNetworkPort) dataService);
     }
 
     /**
@@ -101,18 +97,14 @@ public class SystemNetworkPortConverter extends ObjectCommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    // FIXME SystemNetworkPort missing !
-    // protected void doCopyToCimi(final CimiContext context, final
-    // SystemNetworkPort dataService,
-    // final CimiSystemNetworkPort dataCimi) {
-    // this.fill(context, dataService, dataCimi);
-    // if (true == context.mustBeExpanded(dataCimi)) {
-    // dataCimi
-    // .setNetworkPort((CimiNetworkPort)
-    // context.convertNextCimi(dataService.getResource(),
-    // CimiNetworkPort.class));
-    // }
-    // }
+    protected void doCopyToCimi(final CimiContext context, final SystemNetworkPort dataService,
+        final CimiSystemNetworkPort dataCimi) {
+        this.fill(context, dataService, dataCimi);
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi
+                .setNetworkPort((CimiNetworkPort) context.convertNextCimi(dataService.getResource(), CimiNetworkPort.class));
+        }
+    }
 
     /**
      * Copy data from a CIMI object to a service object.
@@ -121,12 +113,9 @@ public class SystemNetworkPortConverter extends ObjectCommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    // FIXME SystemNetworkPort missing !
-    // protected void doCopyToService(final CimiContext context, final
-    // CimiSystemNetworkPort dataCimi,
-    // final SystemNetworkPort dataService) {
-    // this.fill(context, dataCimi, dataService);
-    // dataService.setResource((CloudResource)
-    // context.convertNextService(dataCimi.getNetworkPort()));
-    // }
+    protected void doCopyToService(final CimiContext context, final CimiSystemNetworkPort dataCimi,
+        final SystemNetworkPort dataService) {
+        this.fill(context, dataCimi, dataService);
+        dataService.setResource((CloudResource) context.convertNextService(dataCimi.getNetworkPort()));
+    }
 }

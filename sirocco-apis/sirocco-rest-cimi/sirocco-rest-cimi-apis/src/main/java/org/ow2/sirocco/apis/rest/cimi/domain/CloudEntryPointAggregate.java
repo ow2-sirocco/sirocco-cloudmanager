@@ -26,25 +26,36 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import java.util.List;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
+import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 
 /**
  * Aggregation of CloudEntryPoint to add all items necesary for CIMI.
  */
-// TODO Others resources : Network, Event, ...
 public class CloudEntryPointAggregate extends CloudEntryPoint {
 
     /** Serial. */
@@ -86,6 +97,11 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
     private List<MachineTemplate> machineTemplates;
 
     /**
+     * Field "volumes".
+     */
+    private List<Volume> volumes;
+
+    /**
      * Field "volumeTemplates".
      */
     private List<VolumeTemplate> volumeTemplates;
@@ -94,11 +110,6 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * Field "volumeConfigurations".
      */
     private List<VolumeConfiguration> volumeConfigurations;
-
-    /**
-     * Field "volumes".
-     */
-    private List<Volume> volumes;
 
     /**
      * Field "volumeImages".
@@ -114,6 +125,66 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
      * Field "systemTemplates".
      */
     private List<SystemTemplate> systemTemplates;
+
+    /**
+     * Field "networks".
+     */
+    private List<Network> networks;
+
+    /**
+     * Field "networkTemplates".
+     */
+    private List<NetworkTemplate> networkTemplates;
+
+    /**
+     * Field "networkConfigurations".
+     */
+    private List<NetworkConfiguration> networkConfigurations;
+
+    /**
+     * Field "networkPorts".
+     */
+    private List<NetworkPort> networkPorts;
+
+    /**
+     * Field "networkPortTemplates".
+     */
+    private List<NetworkPortTemplate> networkPortTemplates;
+
+    /**
+     * Field "networkPortConfigurations".
+     */
+    private List<NetworkPortConfiguration> networkPortConfigurations;
+
+    /**
+     * Field "addresses".
+     */
+    private List<Address> addresses;
+
+    /**
+     * Field "addressTemplates".
+     */
+    private List<AddressTemplate> addressTemplates;
+
+    /**
+     * Field "forwardingGroups".
+     */
+    private List<ForwardingGroup> forwardingGroups;
+
+    /**
+     * Field "forwardingGroupTemplates".
+     */
+    private List<ForwardingGroupTemplate> forwardingGroupTemplates;
+
+    /**
+     * Field "eventLogs".
+     */
+    private List<EventLog> eventLogs;
+
+    /**
+     * Field "eventLogTemplates".
+     */
+    private List<EventLogTemplate> eventLogTemplates;
 
     /**
      * Parameterized constructor.
@@ -366,4 +437,219 @@ public class CloudEntryPointAggregate extends CloudEntryPoint {
         this.systemTemplates = systemTemplates;
     }
 
+    /**
+     * Return the value of field "networks".
+     * 
+     * @return The value
+     */
+    public List<Network> getNetworks() {
+        return this.networks;
+    }
+
+    /**
+     * Set the value of field "networks".
+     * 
+     * @param networks The value
+     */
+    public void setNetworks(final List<Network> networks) {
+        this.networks = networks;
+    }
+
+    /**
+     * Return the value of field "networkConfigurations".
+     * 
+     * @return The value
+     */
+    public List<NetworkConfiguration> getNetworkConfigurations() {
+        return this.networkConfigurations;
+    }
+
+    /**
+     * Set the value of field "networkConfigurations".
+     * 
+     * @param networkConfigurations The value
+     */
+    public void setNetworkConfigurations(final List<NetworkConfiguration> networkConfigurations) {
+        this.networkConfigurations = networkConfigurations;
+    }
+
+    /**
+     * Return the value of field "networkTemplates".
+     * 
+     * @return The value
+     */
+    public List<NetworkTemplate> getNetworkTemplates() {
+        return this.networkTemplates;
+    }
+
+    /**
+     * Set the value of field "networkTemplates".
+     * 
+     * @param networkTemplates The value
+     */
+    public void setNetworkTemplates(final List<NetworkTemplate> networkTemplates) {
+        this.networkTemplates = networkTemplates;
+    }
+
+    /**
+     * Return the value of field "networkPorts".
+     * 
+     * @return The value
+     */
+    public List<NetworkPort> getNetworkPorts() {
+        return this.networkPorts;
+    }
+
+    /**
+     * Set the value of field "networkPorts".
+     * 
+     * @param networkPorts The value
+     */
+    public void setNetworkPorts(final List<NetworkPort> networkPorts) {
+        this.networkPorts = networkPorts;
+    }
+
+    /**
+     * Return the value of field "networkPortConfigurations".
+     * 
+     * @return The value
+     */
+    public List<NetworkPortConfiguration> getNetworkPortConfigurations() {
+        return this.networkPortConfigurations;
+    }
+
+    /**
+     * Set the value of field "networkPortConfigurations".
+     * 
+     * @param networkPortConfigurations The value
+     */
+    public void setNetworkPortConfigurations(final List<NetworkPortConfiguration> networkPortConfigurations) {
+        this.networkPortConfigurations = networkPortConfigurations;
+    }
+
+    /**
+     * Return the value of field "networkPortTemplates".
+     * 
+     * @return The value
+     */
+    public List<NetworkPortTemplate> getNetworkPortTemplates() {
+        return this.networkPortTemplates;
+    }
+
+    /**
+     * Set the value of field "networkPortTemplates".
+     * 
+     * @param networkPortTemplates The value
+     */
+    public void setNetworkPortTemplates(final List<NetworkPortTemplate> networkPortTemplates) {
+        this.networkPortTemplates = networkPortTemplates;
+    }
+
+    /**
+     * Return the value of field "addresses".
+     * 
+     * @return The value
+     */
+    public List<Address> getAddresses() {
+        return this.addresses;
+    }
+
+    /**
+     * Set the value of field "addresss".
+     * 
+     * @param addresss The value
+     */
+    public void setAddresses(final List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    /**
+     * Return the value of field "addressTemplates".
+     * 
+     * @return The value
+     */
+    public List<AddressTemplate> getAddressTemplates() {
+        return this.addressTemplates;
+    }
+
+    /**
+     * Set the value of field "addressTemplates".
+     * 
+     * @param addressTemplates The value
+     */
+    public void setAddressTemplates(final List<AddressTemplate> addressTemplates) {
+        this.addressTemplates = addressTemplates;
+    }
+
+    /**
+     * Return the value of field "forwardingGroups".
+     * 
+     * @return The value
+     */
+    public List<ForwardingGroup> getForwardingGroups() {
+        return this.forwardingGroups;
+    }
+
+    /**
+     * Set the value of field "forwardingGroups".
+     * 
+     * @param forwardingGroups The value
+     */
+    public void setForwardingGroups(final List<ForwardingGroup> forwardingGroups) {
+        this.forwardingGroups = forwardingGroups;
+    }
+
+    /**
+     * Return the value of field "forwardingGroupTemplates".
+     * 
+     * @return The value
+     */
+    public List<ForwardingGroupTemplate> getForwardingGroupTemplates() {
+        return this.forwardingGroupTemplates;
+    }
+
+    /**
+     * Set the value of field "forwardingGroupTemplates".
+     * 
+     * @param forwardingGroupTemplates The value
+     */
+    public void setForwardingGroupTemplates(final List<ForwardingGroupTemplate> forwardingGroupTemplates) {
+        this.forwardingGroupTemplates = forwardingGroupTemplates;
+    }
+
+    /**
+     * Return the value of field "eventLogs".
+     * 
+     * @return The value
+     */
+    public List<EventLog> getEventLogs() {
+        return this.eventLogs;
+    }
+
+    /**
+     * Set the value of field "eventLogs".
+     * 
+     * @param eventLogs The value
+     */
+    public void setEventLogs(final List<EventLog> eventLogs) {
+        this.eventLogs = eventLogs;
+    }
+
+    /**
+     * Return the value of field "eventLogTemplates".
+     * 
+     * @return The value
+     */
+    public List<EventLogTemplate> getEventLogTemplates() {
+        return this.eventLogTemplates;
+    }
+
+    /**
+     * Set the value of field "eventLogTemplates".
+     * 
+     * @param eventLogTemplates The value
+     */
+    public void setEventLogTemplates(final List<EventLogTemplate> eventLogTemplates) {
+        this.eventLogTemplates = eventLogTemplates;
+    }
 }

@@ -42,6 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.Event;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 
@@ -230,6 +231,28 @@ public class ConverterHelper {
         String converted = null;
         if (null != value) {
             converted = value.toString();
+        }
+        return converted;
+    }
+
+    public static String toString(final EventLogTemplate.Persistence value) {
+        String converted = null;
+        if (null != value) {
+            converted = value.toString();
+        }
+        return converted;
+    }
+
+    public static EventLogTemplate.Persistence toEventLogTemplatePersistence(final String value) {
+        EventLogTemplate.Persistence converted = null;
+        if (null != value) {
+            EventLogTemplate.Persistence[] allEnums = EventLogTemplate.Persistence.values();
+            for (EventLogTemplate.Persistence myEnum : allEnums) {
+                if (true == value.equalsIgnoreCase(myEnum.toString())) {
+                    converted = myEnum;
+                    break;
+                }
+            }
         }
         return converted;
     }

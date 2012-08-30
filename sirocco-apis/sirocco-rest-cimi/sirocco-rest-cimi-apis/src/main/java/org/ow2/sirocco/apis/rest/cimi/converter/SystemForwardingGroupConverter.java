@@ -24,8 +24,11 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemForwardingGroup;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -37,7 +40,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
  * </ul>
  * </p>
  */
-// FIXME SystemForwardingGroup missing !
 public class SystemForwardingGroupConverter extends ObjectCommonConverter {
     /**
      * {@inheritDoc}
@@ -60,9 +62,7 @@ public class SystemForwardingGroupConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        // FIXME SystemForwardingGroup missing !
-        // this.doCopyToCimi(context, (SystemForwardingGroup) dataService,
-        // (CimiSystemForwardingGroup) dataCimi);
+        this.doCopyToCimi(context, (SystemForwardingGroup) dataService, (CimiSystemForwardingGroup) dataCimi);
     }
 
     /**
@@ -73,11 +73,9 @@ public class SystemForwardingGroupConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        // FIXME SystemForwardingGroup missing !
-        return null;
-        // SystemForwardingGroup service = new SystemForwardingGroup();
-        // this.copyToService(context, dataCimi, service);
-        // return service;
+        SystemForwardingGroup service = new SystemForwardingGroup();
+        this.copyToService(context, dataCimi, service);
+        return service;
     }
 
     /**
@@ -89,9 +87,7 @@ public class SystemForwardingGroupConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        // FIXME SystemForwardingGroup missing !
-        // this.doCopyToService(context, (CimiSystemForwardingGroup) dataCimi,
-        // (SystemForwardingGroup) dataService);
+        this.doCopyToService(context, (CimiSystemForwardingGroup) dataCimi, (SystemForwardingGroup) dataService);
     }
 
     /**
@@ -101,18 +97,14 @@ public class SystemForwardingGroupConverter extends ObjectCommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    // FIXME SystemForwardingGroup missing !
-    // protected void doCopyToCimi(final CimiContext context, final
-    // SystemForwardingGroup dataService,
-    // final CimiSystemForwardingGroup dataCimi) {
-    // this.fill(context, dataService, dataCimi);
-    // if (true == context.mustBeExpanded(dataCimi)) {
-    // dataCimi
-    // .setForwardingGroup((CimiForwardingGroup)
-    // context.convertNextCimi(dataService.getResource(),
-    // CimiForwardingGroup.class));
-    // }
-    // }
+    protected void doCopyToCimi(final CimiContext context, final SystemForwardingGroup dataService,
+        final CimiSystemForwardingGroup dataCimi) {
+        this.fill(context, dataService, dataCimi);
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi.setForwardingGroup((CimiForwardingGroup) context.convertNextCimi(dataService.getResource(),
+                CimiForwardingGroup.class));
+        }
+    }
 
     /**
      * Copy data from a CIMI object to a service object.
@@ -121,12 +113,9 @@ public class SystemForwardingGroupConverter extends ObjectCommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    // FIXME SystemForwardingGroup missing !
-    // protected void doCopyToService(final CimiContext context, final
-    // CimiSystemForwardingGroup dataCimi,
-    // final SystemForwardingGroup dataService) {
-    // this.fill(context, dataCimi, dataService);
-    // dataService.setResource((CloudResource)
-    // context.convertNextService(dataCimi.getForwardingGroup()));
-    // }
+    protected void doCopyToService(final CimiContext context, final CimiSystemForwardingGroup dataCimi,
+        final SystemForwardingGroup dataService) {
+        this.fill(context, dataCimi, dataService);
+        dataService.setResource((CloudResource) context.convertNextService(dataCimi.getForwardingGroup()));
+    }
 }

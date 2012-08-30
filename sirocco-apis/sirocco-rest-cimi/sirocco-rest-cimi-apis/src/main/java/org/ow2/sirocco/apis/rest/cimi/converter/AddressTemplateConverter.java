@@ -25,8 +25,10 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -105,10 +107,7 @@ public class AddressTemplateConverter extends ObjectCommonConverter {
             dataCimi.setHostname(dataService.getHostName());
             dataCimi.setIp(dataService.getIp());
             dataCimi.setMask(dataService.getMask());
-            // FIXME Network
-            // dataCimi.setNetwork((CimiNetworkInterface)
-            // context.convertNextCimi(dataService.getNetwork(),
-            // CimiNetworkInterface.class));
+            dataCimi.setNetwork((CimiNetwork) context.convertNextCimi(dataService.getNetwork(), CimiNetwork.class));
             dataCimi.setProtocol(dataService.getProtocol());
         }
     }
@@ -128,9 +127,7 @@ public class AddressTemplateConverter extends ObjectCommonConverter {
         dataService.setHostName(dataCimi.getHostname());
         dataService.setIp(dataCimi.getIp());
         dataService.setMask(dataCimi.getMask());
-        // FIXME Network
-        // dataService.setNetwork((Network)
-        // context.convertNextService(dataCimi.getNetwork()));
+        dataService.setNetwork((Network) context.convertNextService(dataCimi.getNetwork()));
         dataService.setProtocol(dataCimi.getProtocol());
 
         // Next Read only

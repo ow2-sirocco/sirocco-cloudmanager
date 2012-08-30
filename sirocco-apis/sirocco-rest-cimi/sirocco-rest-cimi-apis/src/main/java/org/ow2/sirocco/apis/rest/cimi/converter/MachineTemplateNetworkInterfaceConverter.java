@@ -29,9 +29,13 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateNetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -104,17 +108,17 @@ public class MachineTemplateNetworkInterfaceConverter extends ObjectCommonConver
      */
     protected void doCopyToCimi(final CimiContext context, final MachineTemplateNetworkInterface dataService,
         final CimiMachineTemplateNetworkInterface dataCimi) {
-        // this.fill(context, dataService, dataCimi);
         // Address
-        if ((null != dataCimi.getListAddresses()) && (false == dataCimi.getListAddresses().isEmpty())) {
-            List<Address> listServices = new ArrayList<Address>();
-            for (CimiAddress itemCimi : dataCimi.getListAddresses()) {
-                listServices.add((Address) context.convertNextService(itemCimi));
+        if ((null != dataService.getAddresses()) && (false == dataService.getAddresses().isEmpty())) {
+            List<CimiAddress> listCimis = new ArrayList<CimiAddress>();
+            for (Address itemService : dataService.getAddresses()) {
+                listCimis.add((CimiAddress) context.convertNextCimi(itemService, CimiAddress.class));
             }
-            dataService.setAddresses(listServices);
+            dataCimi.setListAddresses(listCimis);
         }
         dataCimi.setMtu(dataService.getMtu());
-        // TODO Network, NetworkPort
+        dataCimi.setNetwork((CimiNetwork) context.convertNextCimi(dataService.getNetwork(), CimiNetwork.class));
+        dataCimi.setNetworkPort((CimiNetworkPort) context.convertNextCimi(dataService.getNetworkPort(), CimiNetworkPort.class));
         dataCimi.setNetworkType(ConverterHelper.toString(dataService.getNetworkType()));
         dataCimi.setState(ConverterHelper.toString(dataService.getState()));
     }
@@ -128,9 +132,9 @@ public class MachineTemplateNetworkInterfaceConverter extends ObjectCommonConver
      */
     protected void doCopyToService(final CimiContext context, final CimiMachineTemplateNetworkInterface dataCimi,
         final MachineTemplateNetworkInterface dataService) {
-        // this.fill(context, dataCimi, dataService);
         dataService.setMtu(dataCimi.getMtu());
-        // TODO Network, NetworkPort
+        dataService.setNetwork((Network) context.convertNextService(dataCimi.getNetwork()));
+        dataService.setNetworkPort((NetworkPort) context.convertNextService(dataCimi.getNetworkPort(), CimiNetworkPort.class));
         dataService.setNetworkType(ConverterHelper.toNetworkType(dataCimi.getNetworkType()));
         dataService.setState(ConverterHelper.toMachineTemplateNetworkInterfaceState(dataCimi.getState()));
 

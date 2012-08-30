@@ -24,14 +24,23 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.configuration;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Config {
+import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 
-    /** Mapper by entity classes. */
+public class Config implements Serializable {
+
+    /** Serial Version */
+    private static final long serialVersionUID = 1L;
+
+    /** Mapper by class. */
     private Map<Class<?>, ItemConfig> byClasses;
+
+    /** Mapper by ExchangeType. */
+    private Map<ExchangeType, ItemConfig> byExchangeTypes;
 
     /**
      * Set the configuration for CimiEntities.
@@ -49,8 +58,12 @@ public class Config {
      */
     protected void buildMappers(final List<ItemConfig> configs) {
         this.byClasses = new HashMap<Class<?>, ItemConfig>();
+        this.byExchangeTypes = new HashMap<ExchangeType, ItemConfig>();
         for (ItemConfig item : configs) {
             this.byClasses.put(item.getKlass(), item);
+            if (null != item.getType()) {
+                this.byExchangeTypes.put(item.getType(), item);
+            }
         }
     }
 
@@ -62,5 +75,15 @@ public class Config {
      */
     public ItemConfig find(final Class<?> classToFind) {
         return this.byClasses.get(classToFind);
+    }
+
+    /**
+     * Find the item associate to the given ExchangeType.
+     * 
+     * @param typeToFind The ExchangeType to find
+     * @return The item or null if type not found
+     */
+    public ItemConfig find(final ExchangeType typeToFind) {
+        return this.byExchangeTypes.get(typeToFind);
     }
 }

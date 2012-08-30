@@ -30,13 +30,25 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortConfigurationCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
@@ -124,6 +136,66 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * Field "systemTemplates".
      */
     private CimiSystemTemplateCollection systemTemplates;
+
+    /**
+     * Field "networks".
+     */
+    private CimiNetworkCollection networks;
+
+    /**
+     * Field "networkConfigurations".
+     */
+    private CimiNetworkConfigurationCollection networkConfigurations;
+
+    /**
+     * Field "networkTemplates".
+     */
+    private CimiNetworkTemplateCollection networkTemplates;
+
+    /**
+     * Field "networkPorts".
+     */
+    private CimiNetworkPortCollection networkPorts;
+
+    /**
+     * Field "networkPortConfigurations".
+     */
+    private CimiNetworkPortConfigurationCollection networkPortConfigurations;
+
+    /**
+     * Field "networkPortTemplates".
+     */
+    private CimiNetworkPortTemplateCollection networkPortTemplates;
+
+    /**
+     * Field "addresses".
+     */
+    private CimiAddressCollection addresses;
+
+    /**
+     * Field "addressTemplates".
+     */
+    private CimiAddressTemplateCollection addressTemplates;
+
+    /**
+     * Field "forwardingGroups".
+     */
+    private CimiForwardingGroupCollection forwardingGroups;
+
+    /**
+     * Field "forwardingGroupTemplates".
+     */
+    private CimiForwardingGroupTemplateCollection forwardingGroupTemplates;
+
+    /**
+     * Field "eventLogs".
+     */
+    private CimiEventLogCollection eventLogs;
+
+    /**
+     * Field "eventLogTemplates".
+     */
+    private CimiEventLogTemplateCollection eventLogTemplates;
 
     /**
      * Default constructor.
@@ -405,4 +477,219 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
         this.systemTemplates = systemTemplates;
     }
 
+    /**
+     * Return the value of field "networks".
+     * 
+     * @return The value
+     */
+    public CimiNetworkCollection getNetworks() {
+        return this.networks;
+    }
+
+    /**
+     * Set the value of field "networks".
+     * 
+     * @param networks The value
+     */
+    public void setNetworks(final CimiNetworkCollection networks) {
+        this.networks = networks;
+    }
+
+    /**
+     * Return the value of field "networkConfigurations".
+     * 
+     * @return The value
+     */
+    public CimiNetworkConfigurationCollection getNetworkConfigs() {
+        return this.networkConfigurations;
+    }
+
+    /**
+     * Set the value of field "networkConfigurations".
+     * 
+     * @param networkConfigurations The value
+     */
+    public void setNetworkConfigs(final CimiNetworkConfigurationCollection networkConfigurations) {
+        this.networkConfigurations = networkConfigurations;
+    }
+
+    /**
+     * Return the value of field "networkTemplates".
+     * 
+     * @return The value
+     */
+    public CimiNetworkTemplateCollection getNetworkTemplates() {
+        return this.networkTemplates;
+    }
+
+    /**
+     * Set the value of field "networkTemplates".
+     * 
+     * @param networkTemplates The value
+     */
+    public void setNetworkTemplates(final CimiNetworkTemplateCollection networkTemplates) {
+        this.networkTemplates = networkTemplates;
+    }
+
+    /**
+     * Return the value of field "networkPorts".
+     * 
+     * @return The value
+     */
+    public CimiNetworkPortCollection getNetworkPorts() {
+        return this.networkPorts;
+    }
+
+    /**
+     * Set the value of field "networkPorts".
+     * 
+     * @param networkPorts The value
+     */
+    public void setNetworkPorts(final CimiNetworkPortCollection networkPorts) {
+        this.networkPorts = networkPorts;
+    }
+
+    /**
+     * Return the value of field "networkPortConfigurations".
+     * 
+     * @return The value
+     */
+    public CimiNetworkPortConfigurationCollection getNetworkPortConfigs() {
+        return this.networkPortConfigurations;
+    }
+
+    /**
+     * Set the value of field "networkPortConfigurations".
+     * 
+     * @param networkPortConfigurations The value
+     */
+    public void setNetworkPortConfigs(final CimiNetworkPortConfigurationCollection networkPortConfigurations) {
+        this.networkPortConfigurations = networkPortConfigurations;
+    }
+
+    /**
+     * Return the value of field "networkPortTemplates".
+     * 
+     * @return The value
+     */
+    public CimiNetworkPortTemplateCollection getNetworkPortTemplates() {
+        return this.networkPortTemplates;
+    }
+
+    /**
+     * Set the value of field "networkPortTemplates".
+     * 
+     * @param networkPortTemplates The value
+     */
+    public void setNetworkPortTemplates(final CimiNetworkPortTemplateCollection networkPortTemplates) {
+        this.networkPortTemplates = networkPortTemplates;
+    }
+
+    /**
+     * Return the value of field "addresses".
+     * 
+     * @return The value
+     */
+    public CimiAddressCollection getAddresses() {
+        return this.addresses;
+    }
+
+    /**
+     * Set the value of field "addresses".
+     * 
+     * @param addresses The value
+     */
+    public void setAddresses(final CimiAddressCollection addresses) {
+        this.addresses = addresses;
+    }
+
+    /**
+     * Return the value of field "addressTemplates".
+     * 
+     * @return The value
+     */
+    public CimiAddressTemplateCollection getAddressTemplates() {
+        return this.addressTemplates;
+    }
+
+    /**
+     * Set the value of field "addressTemplates".
+     * 
+     * @param addressTemplates The value
+     */
+    public void setAddressTemplates(final CimiAddressTemplateCollection addressTemplates) {
+        this.addressTemplates = addressTemplates;
+    }
+
+    /**
+     * Return the value of field "forwardingGroups".
+     * 
+     * @return The value
+     */
+    public CimiForwardingGroupCollection getForwardingGroups() {
+        return this.forwardingGroups;
+    }
+
+    /**
+     * Set the value of field "forwardingGroups".
+     * 
+     * @param forwardingGroups The value
+     */
+    public void setForwardingGroups(final CimiForwardingGroupCollection forwardingGroups) {
+        this.forwardingGroups = forwardingGroups;
+    }
+
+    /**
+     * Return the value of field "forwardingGroupTemplates".
+     * 
+     * @return The value
+     */
+    public CimiForwardingGroupTemplateCollection getForwardingGroupTemplates() {
+        return this.forwardingGroupTemplates;
+    }
+
+    /**
+     * Set the value of field "forwardingGroupTemplates".
+     * 
+     * @param forwardingGroupTemplates The value
+     */
+    public void setForwardingGroupTemplates(final CimiForwardingGroupTemplateCollection forwardingGroupTemplates) {
+        this.forwardingGroupTemplates = forwardingGroupTemplates;
+    }
+
+    /**
+     * Return the value of field "eventLogs".
+     * 
+     * @return The value
+     */
+    public CimiEventLogCollection getEventLogs() {
+        return this.eventLogs;
+    }
+
+    /**
+     * Set the value of field "eventLogs".
+     * 
+     * @param eventLogs The value
+     */
+    public void setEventLogs(final CimiEventLogCollection eventLogs) {
+        this.eventLogs = eventLogs;
+    }
+
+    /**
+     * Return the value of field "eventLogTemplates".
+     * 
+     * @return The value
+     */
+    public CimiEventLogTemplateCollection getEventLogTemplates() {
+        return this.eventLogTemplates;
+    }
+
+    /**
+     * Set the value of field "eventLogTemplates".
+     * 
+     * @param eventLogTemplates The value
+     */
+    public void setEventLogTemplates(final CimiEventLogTemplateCollection eventLogTemplates) {
+        this.eventLogTemplates = eventLogTemplates;
+    }
 }

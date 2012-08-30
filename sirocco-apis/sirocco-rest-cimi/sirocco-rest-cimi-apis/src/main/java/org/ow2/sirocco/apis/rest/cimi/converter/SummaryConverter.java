@@ -24,25 +24,21 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.apache.commons.beanutils.ConversionException;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
-import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSummary;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogSummary;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiEventLogTemplate}</li>
- * <li>Service model: {@link EventLogTemplate}</li>
+ * <li>CIMI model: {@link CimiSummary}</li>
+ * <li>Service model: {@link EventLogSummary}</li>
  * </ul>
  * </p>
  */
-public class EventLogTemplateConverter extends ObjectCommonConverter {
-
+public class SummaryConverter implements CimiConverter {
     /**
      * {@inheritDoc}
      * 
@@ -51,7 +47,7 @@ public class EventLogTemplateConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiEventLogTemplate cimi = new CimiEventLogTemplate();
+        CimiSummary cimi = new CimiSummary();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -64,7 +60,7 @@ public class EventLogTemplateConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (EventLogTemplate) dataService, (CimiEventLogTemplate) dataCimi);
+        this.doCopyToCimi(context, (EventLogSummary) dataService, (CimiSummary) dataCimi);
     }
 
     /**
@@ -75,7 +71,7 @@ public class EventLogTemplateConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        EventLogTemplate service = new EventLogTemplate();
+        EventLogSummary service = new EventLogSummary();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -89,7 +85,7 @@ public class EventLogTemplateConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiEventLogTemplate) dataCimi, (EventLogTemplate) dataService);
+        this.doCopyToService(context, (CimiSummary) dataCimi, (EventLogSummary) dataService);
     }
 
     /**
@@ -99,13 +95,11 @@ public class EventLogTemplateConverter extends ObjectCommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final CimiContext context, final EventLogTemplate dataService,
-        final CimiEventLogTemplate dataCimi) {
-        this.fill(context, dataService, dataCimi);
-        if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi.setPersistence(ConverterHelper.toString(dataService.getPersistence()));
-            dataCimi.setTargetResource(ConverterHelper.buildTargetResource(context, dataService.getTargetResource()));
-        }
+    protected void doCopyToCimi(final CimiContext context, final EventLogSummary dataService, final CimiSummary dataCimi) {
+        dataCimi.setCritical(dataService.getCritical());
+        dataCimi.setHigh(dataService.getHigh());
+        dataCimi.setLow(dataService.getLow());
+        dataCimi.setMedium(dataService.getMedium());
     }
 
     /**
@@ -115,31 +109,10 @@ public class EventLogTemplateConverter extends ObjectCommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final CimiContext context, final CimiEventLogTemplate dataCimi,
-        final EventLogTemplate dataService) {
-        this.fill(context, dataCimi, dataService);
-
-        dataService.setPersistence(ConverterHelper.toEventLogTemplatePersistence(dataCimi.getPersistence()));
-
-        ExchangeType type = PathHelper.findExchangeType(context.getRequest().getBaseUri(), dataCimi.getTargetResource()
-            .getHref());
-        if (null == type) {
-            throw new ConversionException("None associated CIMI found to this TargetResource HREF: "
-                + dataCimi.getTargetResource().getHref());
-        }
-        Class<?> classService = context.findAssociatedResourceServiceClass(type);
-        if (null == classService) {
-            throw new ConversionException("None associated resource service class found to this TargetResource HREF: "
-                + dataCimi.getTargetResource().getHref());
-        }
-
-        try {
-            CloudResource serviceInstance = (CloudResource) classService.newInstance();
-            serviceInstance.setId(PathHelper.extractId(dataCimi.getTargetResource().getHref()));
-            dataService.setTargetResource(serviceInstance);
-        } catch (Exception e) {
-            throw new ConversionException("None associated resource service class found to this TargetResource HREF: "
-                + dataCimi.getTargetResource().getHref());
-        }
+    protected void doCopyToService(final CimiContext context, final CimiSummary dataCimi, final EventLogSummary dataService) {
+        dataService.setCritical(dataCimi.getCritical());
+        dataService.setHigh(dataCimi.getHigh());
+        dataService.setLow(dataCimi.getLow());
+        dataService.setMedium(dataCimi.getMedium());
     }
 }

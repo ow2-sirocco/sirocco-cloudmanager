@@ -34,7 +34,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 @XmlRootElement(name = "Summary")
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class Summary implements Serializable {
+public class CimiSummary implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /** Field "low". */

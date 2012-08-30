@@ -115,6 +115,10 @@ public class SystemTemplateConverter extends ObjectCommonConverter {
                 }
                 dataCimi.setComponentDescriptors(listCimis.toArray(new CimiComponentDescriptor[listCimis.size()]));
             }
+            // FIXME EventLogTemplate
+            // dataCimi.setEventLogTemplate((CimiEventLogTemplate)
+            // context.convertNextCimi(dataService.getEventLogTemplate(),
+            // CimiEventLogTemplate.class));
         }
     }
 
@@ -136,6 +140,9 @@ public class SystemTemplateConverter extends ObjectCommonConverter {
             }
             dataService.setComponentDescriptors(listServices);
         }
+        // FIXME EventLogTemplate
+        // dataService.setEventLogTemplate((EventLogTemplate)
+        // context.convertNextService(dataCimi.getEventLogTemplate()));
     }
 
 }

@@ -107,9 +107,10 @@ public class VolumeTemplateConverter extends ObjectCommonConverter {
                 CimiVolumeConfiguration.class));
             dataCimi.setVolumeImage((CimiVolumeImage) context.convertNextCimi(dataService.getVolumeImage(),
                 CimiVolumeImage.class));
-
-            // TODO meterTemplate, Eventlog
-
+            // FIXME EventLogTemplate
+            // dataCimi.setEventLogTemplate((CimiEventLogTemplate)
+            // context.convertNextCimi(dataService.getEventLogTemplate(),
+            // CimiEventLogTemplate.class));
         }
     }
 
@@ -125,6 +126,8 @@ public class VolumeTemplateConverter extends ObjectCommonConverter {
         this.fill(context, dataCimi, dataService);
         dataService.setVolumeConfig((VolumeConfiguration) context.convertNextService(dataCimi.getVolumeConfig()));
         dataService.setVolumeImage((VolumeImage) context.convertNextService(dataCimi.getVolumeImage()));
-        // TODO meterTemplate, Eventlog
+        // FIXME EventLogTemplate
+        // dataService.setEventLogTemplate((EventLogTemplate)
+        // context.convertNextService(dataCimi.getEventLogTemplate()));
     }
 }

@@ -25,6 +25,8 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSummary;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogEventCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
 
@@ -99,21 +101,11 @@ public class EventLogConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final EventLog dataService, final CimiEventLog dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            // FIXME
-
-            // dataCimi.setCpu(dataService.getCpu());
-            // dataCimi.setMemory(dataService.getMemory());
-            // dataCimi.setDisks((CimiEventLogDiskCollection)
-            // context.convertNextCimi(dataService.getDisks(),
-            // CimiEventLogDiskCollection.class));
-            // dataCimi.setNetworkInterfaces((CimiEventLogNetworkInterfaceCollection)
-            // context.convertNextCimi(
-            // dataService.getNetworkInterfaces(),
-            // CimiEventLogNetworkInterfaceCollection.class));
-            // dataCimi.setState(ConverterHelper.toString(dataService.getState()));
-            // dataCimi.setVolumes((CimiEventLogVolumeCollection)
-            // context.convertNextCimi(dataService.getVolumes(),
-            // CimiEventLogVolumeCollection.class));
+            dataCimi.setEvents((CimiEventLogEventCollection) context.convertNextCimi(dataService.getEvents(),
+                CimiEventLogEventCollection.class));
+            dataCimi.setPersistence(ConverterHelper.toString(dataService.getPersistence()));
+            dataCimi.setSummary((CimiSummary) context.convertNextCimi(dataService.getSummary(), CimiSummary.class));
+            dataCimi.setTargetResource(ConverterHelper.buildTargetResource(context, dataService.getTargetResource()));
         }
     }
 
@@ -126,20 +118,9 @@ public class EventLogConverter extends ObjectCommonConverter {
      */
     protected void doCopyToService(final CimiContext context, final CimiEventLog dataCimi, final EventLog dataService) {
         this.fill(context, dataCimi, dataService);
-        // FIXME
-
-        // dataService.setCpu(dataCimi.getCpu());
-        // dataService.setMemory(dataCimi.getMemory());
+        dataService.setPersistence(ConverterHelper.toEventLogTemplatePersistence(dataCimi.getPersistence()));
 
         // Next Read only
-        // cpuArch ???
-        // dataService.setDisks((List<EventLogDisk>)
-        // context.convertNextService(dataCimi.getDisks()));
-        // dataService.setNetworkInterfaces((List<EventLogNetworkInterface>)
-        // context.convertNextService(dataCimi
-        // .getNetworkInterfaces()));
-        // dataService.setVolumes((List<EventLogVolume>)
-        // context.convertNextService(dataCimi.getVolumes()));
-        // dataService.setState(dataService.getState());
+        // Events, Summary, TargetResource
     }
 }

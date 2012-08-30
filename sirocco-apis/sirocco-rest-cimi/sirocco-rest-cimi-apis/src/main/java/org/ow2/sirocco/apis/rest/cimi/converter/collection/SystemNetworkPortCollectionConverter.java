@@ -24,10 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter.collection;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkPortCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetworkPort;
 
 /**
  * Helper class to convert the data of the CIMI model and the service model in
@@ -40,7 +42,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
  * </ul>
  * </p>
  */
-// FIXME SystemNetworkPort missing !
 public class SystemNetworkPortCollectionConverter extends CollectionConverterAbstract {
 
     /**
@@ -76,11 +77,9 @@ public class SystemNetworkPortCollectionConverter extends CollectionConverterAbs
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        // FIXME SystemNetworkPort missing !
-        return null;
-        // List<SystemNetworkPort> service = new ArrayList<SystemNetworkPort>();
-        // this.copyToService(context, dataCimi, service);
-        // return service;
+        List<SystemNetworkPort> service = new ArrayList<SystemNetworkPort>();
+        this.copyToService(context, dataCimi, service);
+        return service;
     }
 
     /**

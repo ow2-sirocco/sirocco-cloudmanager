@@ -117,6 +117,10 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
             dataCimi
                 .setCredential((CimiCredential) context.convertNextCimi(dataService.getCredentials(), CimiCredential.class));
             dataCimi.setInitialState(ConverterHelper.toString(dataService.getInitialState()));
+            // FIXME EventLogTemplate
+            // dataCimi.setEventLogTemplate((CimiEventLogTemplate)
+            // context.convertNextCimi(dataService.getEventLogTemplate(),
+            // CimiEventLogTemplate.class));
             dataCimi.setMachineConfig((CimiMachineConfiguration) context.convertNextCimi(dataService.getMachineConfiguration(),
                 CimiMachineConfiguration.class));
             dataCimi.setMachineImage((CimiMachineImage) context.convertNextCimi(dataService.getMachineImage(),
@@ -163,6 +167,9 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
         final MachineTemplate dataService) {
         this.fill(context, dataCimi, dataService);
         dataService.setCredentials((Credentials) context.convertNextService(dataCimi.getCredential()));
+        // FIXME EventLogTemplate
+        // dataService.setEventLogTemplate((EventLogTemplate)
+        // context.convertNextService(dataCimi.getEventLogTemplate()));
         dataService.setInitialState(ConverterHelper.toMachineState(dataCimi.getInitialState()));
         dataService.setMachineImage((MachineImage) context.convertNextService(dataCimi.getMachineImage()));
         dataService.setMachineConfiguration((MachineConfiguration) context.convertNextService(dataCimi.getMachineConfig()));

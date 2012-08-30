@@ -25,7 +25,10 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -37,7 +40,6 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
  * </ul>
  * </p>
  */
-// FIXME Not Working, missing ForwardingGroupNetwork !
 public class ForwardingGroupNetworkConverter extends ObjectCommonConverter {
     /**
      * {@inheritDoc}
@@ -60,9 +62,7 @@ public class ForwardingGroupNetworkConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        // FIXME Not Working, missing ForwardingGroupNetwork !
-        // this.doCopyToCimi(context, (ForwardingGroupNetwork) dataService,
-        // (CimiForwardingGroupNetwork) dataCimi);
+        this.doCopyToCimi(context, (ForwardingGroupNetwork) dataService, (CimiForwardingGroupNetwork) dataCimi);
     }
 
     /**
@@ -73,11 +73,9 @@ public class ForwardingGroupNetworkConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        // FIXME Not Working, missing ForwardingGroupNetwork !
-        // ForwardingGroupNetwork service = new ForwardingGroupNetwork();
-        // this.copyToService(context, dataCimi, service);
-        // return service;
-        return null;
+        ForwardingGroupNetwork service = new ForwardingGroupNetwork();
+        this.copyToService(context, dataCimi, service);
+        return service;
     }
 
     /**
@@ -89,9 +87,7 @@ public class ForwardingGroupNetworkConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        // FIXME Not Working, missing ForwardingGroupNetwork !
-        // this.doCopyToService(context, (CimiForwardingGroupNetwork) dataCimi,
-        // (ForwardingGroupNetwork) dataService);
+        this.doCopyToService(context, (CimiForwardingGroupNetwork) dataCimi, (ForwardingGroupNetwork) dataService);
     }
 
     /**
@@ -101,16 +97,13 @@ public class ForwardingGroupNetworkConverter extends ObjectCommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    // FIXME Not Working, missing ForwardingGroupNetwork !
-    // protected void doCopyToCimi(final CimiContext context, final
-    // ForwardingGroupNetwork dataService,
-    // final CimiForwardingGroupNetwork dataCimi) {
-    // this.fill(context, dataService, dataCimi);
-    // if (true == context.mustBeExpanded(dataCimi)) {
-    // dataCimi.setCapacity(dataService.getCapacity());
-    // dataCimi.setInitialLocation(dataService.getInitialLocation());
-    // }
-    // }
+    protected void doCopyToCimi(final CimiContext context, final ForwardingGroupNetwork dataService,
+        final CimiForwardingGroupNetwork dataCimi) {
+        this.fill(context, dataService, dataCimi);
+        if (true == context.mustBeExpanded(dataCimi)) {
+            dataCimi.setNetwork((CimiNetwork) context.convertNextCimi(dataService.getNetwork(), CimiNetwork.class));
+        }
+    }
 
     /**
      * Copy data from a CIMI object to a service object.
@@ -119,12 +112,9 @@ public class ForwardingGroupNetworkConverter extends ObjectCommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    // FIXME Not Working, missing ForwardingGroupNetwork !
-    // protected void doCopyToService(final CimiContext context, final
-    // CimiForwardingGroupNetwork dataCimi,
-    // final ForwardingGroupNetwork dataService) {
-    // this.fill(context, dataCimi, dataService);
-    // dataService.setCapacity(dataCimi.getCapacity());
-    // dataService.setInitialLocation(dataCimi.getInitialLocation());
-    // }
+    protected void doCopyToService(final CimiContext context, final CimiForwardingGroupNetwork dataCimi,
+        final ForwardingGroupNetwork dataService) {
+        this.fill(context, dataCimi, dataService);
+        dataService.setNetwork((Network) context.convertNextService(dataCimi.getNetwork()));
+    }
 }
