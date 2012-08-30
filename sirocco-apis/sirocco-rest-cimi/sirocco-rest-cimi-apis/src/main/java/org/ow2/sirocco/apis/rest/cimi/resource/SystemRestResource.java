@@ -39,8 +39,12 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiActionImport;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManager;
@@ -127,6 +131,22 @@ public class SystemRestResource extends RestResourceAbstract {
     @Qualifier("CimiManagerReadSystemVolumeCollection")
     private CimiManager cimiManagerReadSystemVolumeCollection;
 
+    @Autowired
+    @Qualifier("CimiManagerReadSystemAddressCollection")
+    private CimiManager cimiManagerReadSystemAddressCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerReadSystemForwardingGroupCollection")
+    private CimiManager cimiManagerReadSystemForwardingGroupCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerReadSystemNetworkCollection")
+    private CimiManager cimiManagerReadSystemNetworkCollection;
+
+    @Autowired
+    @Qualifier("CimiManagerReadSystemNetworkPortCollection")
+    private CimiManager cimiManagerReadSystemNetworkPortCollection;
+
     /**
      * Get a system.
      * 
@@ -186,34 +206,6 @@ public class SystemRestResource extends RestResourceAbstract {
         }
         return ResponseHelper.buildResponse(context.getResponse());
     }
-
-    // /**
-    // * Create a system.
-    // *
-    // * @return The REST response
-    // */
-    // @POST
-    // @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    // public Response create(final CimiSystemCreate cimiData) {
-    // CimiContext context =
-    // ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
-    // this.cimiManagerCreateSystem.execute(context);
-    // return ResponseHelper.buildResponse(context.getResponse());
-    // }
-    //
-    // /**
-    // * Actions on system collection.
-    // *
-    // * @return The REST response
-    // */
-    // @POST
-    // @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    // public Response actionCollection(final CimiActionImport cimiData) {
-    // CimiContext context =
-    // ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
-    // this.cimiManagerActionSystem.execute(context);
-    // return ResponseHelper.buildResponse(context.getResponse());
-    // }
 
     /**
      * Actions on system.
@@ -555,4 +547,315 @@ public class SystemRestResource extends RestResourceAbstract {
         return ResponseHelper.buildResponse(context.getResponse());
     }
 
+    /**
+     * Read a collection of addresss of a system.
+     * 
+     * @param idParent ID system
+     * @return The REST response
+     */
+    @GET
+    @Path("{idParent}" + ConstantsPath.ADDRESS_PATH)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readAddresses(@PathParam("idParent") final String idParent) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent));
+        this.cimiManagerReadSystemAddressCollection.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a address of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID address to read
+     * @return The REST response
+     */
+    @GET
+    @Path("/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readAddress(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerReadSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Update a address of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID address to update
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
+    public Response updateAddress(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
+        final CimiSystemAddress cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent), cimiData);
+        this.cimiManagerUpdateSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Create a address of a system.
+     * 
+     * @param idParent ID system
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.ADDRESS_PATH)
+    public Response createAddress(@PathParam("idParent") final String idParent, final CimiSystemAddress cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent), cimiData);
+        this.cimiManagerCreateSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Delete a address of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID address to delete
+     * @return The REST response
+     */
+    @DELETE
+    @Path("/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
+    public Response deleteAddress(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerDeleteSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a collection of forwardingGroups of a system.
+     * 
+     * @param idParent ID system
+     * @return The REST response
+     */
+    @GET
+    @Path("{idParent}" + ConstantsPath.FORWARDING_GROUP_PATH)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readForwardingGroups(@PathParam("idParent") final String idParent) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent));
+        this.cimiManagerReadSystemForwardingGroupCollection.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a forwardingGroup of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID forwardingGroup to read
+     * @return The REST response
+     */
+    @GET
+    @Path("/{idParent}" + ConstantsPath.FORWARDING_GROUP_PATH + "/{id}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readForwardingGroup(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerReadSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Update a forwardingGroup of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID forwardingGroup to update
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.FORWARDING_GROUP_PATH + "/{id}")
+    public Response updateForwardingGroup(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
+        final CimiSystemForwardingGroup cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent), cimiData);
+        this.cimiManagerUpdateSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Create a forwardingGroup of a system.
+     * 
+     * @param idParent ID system
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.FORWARDING_GROUP_PATH)
+    public Response createForwardingGroup(@PathParam("idParent") final String idParent, final CimiSystemForwardingGroup cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent), cimiData);
+        this.cimiManagerCreateSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Delete a forwardingGroup of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID forwardingGroup to delete
+     * @return The REST response
+     */
+    @DELETE
+    @Path("/{idParent}" + ConstantsPath.FORWARDING_GROUP_PATH + "/{id}")
+    public Response deleteForwardingGroup(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerDeleteSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a collection of networks of a system.
+     * 
+     * @param idParent ID system
+     * @return The REST response
+     */
+    @GET
+    @Path("{idParent}" + ConstantsPath.NETWORK_PATH)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readNetworks(@PathParam("idParent") final String idParent) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent));
+        this.cimiManagerReadSystemNetworkCollection.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a network of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID network to read
+     * @return The REST response
+     */
+    @GET
+    @Path("/{idParent}" + ConstantsPath.NETWORK_PATH + "/{id}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readNetwork(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerReadSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Update a network of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID network to update
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.NETWORK_PATH + "/{id}")
+    public Response updateNetwork(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
+        final CimiSystemNetwork cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent), cimiData);
+        this.cimiManagerUpdateSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Create a network of a system.
+     * 
+     * @param idParent ID system
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.NETWORK_PATH)
+    public Response createNetwork(@PathParam("idParent") final String idParent, final CimiSystemNetwork cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent), cimiData);
+        this.cimiManagerCreateSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Delete a network of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID network to delete
+     * @return The REST response
+     */
+    @DELETE
+    @Path("/{idParent}" + ConstantsPath.NETWORK_PATH + "/{id}")
+    public Response deleteNetwork(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerDeleteSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a collection of networkPorts of a system.
+     * 
+     * @param idParent ID system
+     * @return The REST response
+     */
+    @GET
+    @Path("{idParent}" + ConstantsPath.NETWORK_PORT_PATH)
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readNetworkPorts(@PathParam("idParent") final String idParent) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent));
+        this.cimiManagerReadSystemNetworkPortCollection.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Read a networkPort of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID networkPort to read
+     * @return The REST response
+     */
+    @GET
+    @Path("/{idParent}" + ConstantsPath.NETWORK_PORT_PATH + "/{id}")
+    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response readNetworkPort(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerReadSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Update a networkPort of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID networkPort to update
+     * @return The REST response
+     */
+    @PUT
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.NETWORK_PORT_PATH + "/{id}")
+    public Response updateNetworkPort(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
+        final CimiSystemNetworkPort cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent), cimiData);
+        this.cimiManagerUpdateSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Create a networkPort of a system.
+     * 
+     * @param idParent ID system
+     * @return The REST response
+     */
+    @POST
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    @Path("/{idParent}" + ConstantsPath.NETWORK_PORT_PATH)
+    public Response createNetworkPort(@PathParam("idParent") final String idParent, final CimiSystemNetworkPort cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent), cimiData);
+        this.cimiManagerCreateSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Delete a networkPort of a system.
+     * 
+     * @param idParent ID system
+     * @param id ID networkPort to delete
+     * @return The REST response
+     */
+    @DELETE
+    @Path("/{idParent}" + ConstantsPath.NETWORK_PORT_PATH + "/{id}")
+    public Response deleteNetworkPort(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
+        this.cimiManagerDeleteSystemEntity.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
 }

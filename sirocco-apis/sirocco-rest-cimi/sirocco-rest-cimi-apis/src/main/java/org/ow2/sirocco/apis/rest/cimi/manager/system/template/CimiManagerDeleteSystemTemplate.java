@@ -49,8 +49,7 @@ public class CimiManagerDeleteSystemTemplate extends CimiManagerDeleteAbstract {
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        // FIXME
-        // this.manager.deleteSystemTemplate(context.getRequest().getId());
+        this.manager.deleteSystemTemplate(context.getRequest().getId());
         return null;
     }
 

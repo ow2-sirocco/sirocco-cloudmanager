@@ -25,8 +25,12 @@
 package org.ow2.sirocco.apis.rest.cimi.manager.system;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
@@ -71,10 +75,18 @@ public class CimiManagerCreateSystemEntity extends CimiManagerCreateAbstract {
     @Override
     protected void beforeConvertToDataService(final CimiContext context) throws Exception {
         CimiData toMerge = context.getRequest().getCimiData();
-        if (toMerge instanceof CimiSystemCredential) {
+        if (toMerge instanceof CimiSystemAddress) {
+            this.mergeReference.merge(context, (CimiSystemAddress) toMerge);
+        } else if (toMerge instanceof CimiSystemCredential) {
             this.mergeReference.merge(context, (CimiSystemCredential) toMerge);
+        } else if (toMerge instanceof CimiSystemForwardingGroup) {
+            this.mergeReference.merge(context, (CimiSystemForwardingGroup) toMerge);
         } else if (toMerge instanceof CimiSystemMachine) {
             this.mergeReference.merge(context, (CimiSystemMachine) toMerge);
+        } else if (toMerge instanceof CimiSystemNetwork) {
+            this.mergeReference.merge(context, (CimiSystemNetwork) toMerge);
+        } else if (toMerge instanceof CimiSystemNetworkPort) {
+            this.mergeReference.merge(context, (CimiSystemNetworkPort) toMerge);
         } else if (toMerge instanceof CimiSystemSystem) {
             this.mergeReference.merge(context, (CimiSystemSystem) toMerge);
         } else if (toMerge instanceof CimiSystemVolume) {
