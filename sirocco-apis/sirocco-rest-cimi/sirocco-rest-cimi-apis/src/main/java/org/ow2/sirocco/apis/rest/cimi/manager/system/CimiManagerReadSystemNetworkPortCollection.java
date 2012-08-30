@@ -29,20 +29,20 @@ import javax.ws.rs.core.Response;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
-import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkPortCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
-import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetworkPort;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 /**
- * Manage READ request of Networks collection of a System.
+ * Manage READ request of NetworkPorts collection of a System.
  */
-@Component("CimiManagerReadSystemNetworkCollection")
+@Component("CimiManagerReadSystemNetworkPortCollection")
 public class CimiManagerReadSystemNetworkPortCollection extends CimiManagerReadAbstract {
 
     @Autowired
@@ -59,10 +59,10 @@ public class CimiManagerReadSystemNetworkPortCollection extends CimiManagerReadA
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         Object out = null;
         if (false == context.hasParamsForReadingCollection()) {
-            out = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(), SystemNetwork.class);
+            out = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(), SystemNetworkPort.class);
         } else {
             QueryResult<?> result = this.manager.getEntityListFromSystem(context.getRequest().getIdParent(),
-                SystemNetwork.class, context.valueOfFirst(), context.valueOfLast(), context.valuesOfFilter(),
+                SystemNetworkPort.class, context.valueOfFirst(), context.valueOfLast(), context.valuesOfFilter(),
                 context.valuesOfSelect());
             out = result.getItems();
         }
@@ -77,8 +77,8 @@ public class CimiManagerReadSystemNetworkPortCollection extends CimiManagerReadA
      */
     @Override
     protected void convertToResponse(final CimiContext context, final Object dataService) throws Exception {
-        CimiSystemNetworkCollectionRoot cimi = (CimiSystemNetworkCollectionRoot) context.convertToCimi(dataService,
-            CimiSystemNetworkCollectionRoot.class);
+        CimiSystemNetworkPortCollectionRoot cimi = (CimiSystemNetworkPortCollectionRoot) context.convertToCimi(dataService,
+            CimiSystemNetworkPortCollectionRoot.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
     }
