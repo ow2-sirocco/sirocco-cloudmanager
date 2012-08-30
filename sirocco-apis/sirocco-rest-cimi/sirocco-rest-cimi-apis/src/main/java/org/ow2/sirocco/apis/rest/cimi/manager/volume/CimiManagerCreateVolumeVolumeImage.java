@@ -24,10 +24,12 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.volume;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -53,11 +55,7 @@ public class CimiManagerCreateVolumeVolumeImage extends CimiManagerCreateAbstrac
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        // FIXME
-        // return
-        // this.manager.addVolumeImageToVolume(context.getRequest().getIdParent(),
-        // (VolumeVolumeImage) dataService);
-        return null;
+        return this.manager.addVolumeImageToVolume(context.getRequest().getIdParent(), (VolumeVolumeImage) dataService);
     }
 
     /**
@@ -67,9 +65,7 @@ public class CimiManagerCreateVolumeVolumeImage extends CimiManagerCreateAbstrac
      */
     @Override
     protected void beforeConvertToDataService(final CimiContext context) throws Exception {
-        // FIXME
-        // this.mergeReference.merge(context, (CimiVolumeVolumeImage)
-        // context.getRequest().getCimiData());
+        this.mergeReference.merge(context, (CimiVolumeVolumeImage) context.getRequest().getCimiData());
     }
 
 }
