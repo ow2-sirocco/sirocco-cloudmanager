@@ -67,6 +67,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkNetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
@@ -1131,7 +1132,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
         network.setProviderAssignedId(networkProviderAssignedId);
         network.setForwardingGroup(fg);
-        network.setNetworkPorts(new ArrayList<NetworkPort>());
+        network.setNetworkPorts(new ArrayList<NetworkNetworkPort>());
         this.networks.put(networkProviderAssignedId, network);
         network.setState(Network.State.CREATING);
 
@@ -1256,7 +1257,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
                 networkPort.setState(NetworkPort.State.STARTED);
                 networkPort.setNetwork(network);
-                network.getNetworkPorts().add(networkPort);
+                NetworkNetworkPort netNetworkPort = new NetworkNetworkPort();
+                netNetworkPort.setState(NetworkNetworkPort.State.AVAILABLE);
+                netNetworkPort.setNetworkPort(networkPort);
+                network.getNetworkPorts().add(netNetworkPort);
                 return networkPort;
             }
         };
