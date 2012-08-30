@@ -246,7 +246,18 @@ public interface CimiContext extends Serializable {
      * @throws ConfigurationException If associate CIMI class not found
      * @see ConfigFactory
      */
-    Class<?> findAssociatedServiceClass(Class<?> klass);
+    Class<?> findAssociatedCimiClass(Class<?> serviceClass);
+
+    /**
+     * Find a resource service class associated with an CIMI exchange type.
+     * 
+     * @param type The type to find
+     * @return The resource service class found
+     * @throws ConfigurationException If associate resource service class not
+     *         found
+     * @see ConfigFactory
+     */
+    Class<? extends Resource> findAssociatedResourceServiceClass(ExchangeType type);
 
     /**
      * Indicator of the presence of a CIMI parameters for reading collections :

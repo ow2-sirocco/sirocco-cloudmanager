@@ -422,24 +422,42 @@ public class CimiContextImpl implements CimiContext {
     @SuppressWarnings("unchecked")
     @Override
     public Class<? extends CimiResource> findAssociate(final Class<? extends Resource> klass) {
-        return (Class<? extends CimiResource>) this.findAssociatedServiceClass(klass);
+        return (Class<? extends CimiResource>) this.findAssociatedCimiClass(klass);
     }
 
     /**
      * {@inheritDoc}
      * 
-     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#findAssociatedServiceClass(java.lang.Class)
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#findAssociatedCimiClass(java.lang.Class)
      */
     @Override
-    public Class<?> findAssociatedServiceClass(final Class<?> klass) {
+    public Class<?> findAssociatedCimiClass(final Class<?> serviceClass) {
         Class<?> cimi = null;
         try {
-            ItemConfig item = AppConfig.getInstance().getConfig().find(klass);
+            ItemConfig item = AppConfig.getInstance().getConfig().find(serviceClass);
             cimi = (Class<?>) item.getData(ConfigFactory.ASSOCIATE_TO);
         } catch (Exception e) {
-            throw new ConfigurationException("Associated class not found in configuration for " + klass.getName());
+            throw new ConfigurationException("Associated class not found in configuration for " + serviceClass.getName());
         }
         return cimi;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#findAssociatedResourceServiceClass(org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType)
+     */
+    @SuppressWarnings("unchecked")
+    @Override
+    public Class<? extends Resource> findAssociatedResourceServiceClass(final ExchangeType type) {
+        Class<? extends Resource> resource = null;
+        try {
+            ItemConfig item = AppConfig.getInstance().getConfig().find(type);
+            resource = (Class<? extends Resource>) item.getData(ConfigFactory.ASSOCIATE_TO);
+        } catch (Exception e) {
+            throw new ConfigurationException("Associated class not found in configuration for type : " + type);
+        }
+        return resource;
     }
 
     /**
