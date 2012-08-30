@@ -33,12 +33,20 @@ import java.util.Map.Entry;
 
 import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigurationException;
 import org.ow2.sirocco.apis.rest.cimi.converter.PathHelper;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiComponentDescriptor;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
@@ -49,12 +57,24 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetwork;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
@@ -68,24 +88,35 @@ import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.IEventManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -110,9 +141,13 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     @Qualifier("IMachineManager")
     private IMachineManager managerMachine;
 
-    // @Autowired
-    // @Qualifier("INetworkManager")
-    // private INetworkManager managerNetwork;
+    @Autowired
+    @Qualifier("INetworkManager")
+    private INetworkManager managerNetwork;
+
+    @Autowired
+    @Qualifier("IEventManager")
+    private IEventManager managerEvent;
 
     @Autowired
     @Qualifier("IVolumeManager")
@@ -276,12 +311,16 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             if (null != cimi.getCredential()) {
                 this.merge(context, cimi.getCredential());
             }
+            if (null != cimi.getEventLogTemplate()) {
+                this.merge(context, cimi.getEventLogTemplate());
+            }
             if (null != cimi.getMachineConfig()) {
                 this.merge(context, cimi.getMachineConfig());
             }
             if (null != cimi.getMachineImage()) {
                 this.merge(context, cimi.getMachineImage());
             }
+            // TODO NetworkInterface
             if (null != cimi.getVolumes()) {
                 for (CimiMachineTemplateVolume item : cimi.getListVolumes()) {
                     this.merge(context, item);
@@ -292,8 +331,6 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
                     this.merge(context, item);
                 }
             }
-            // TODO Network, ...
-
         }
     }
 
@@ -353,6 +390,9 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             CimiVolumeTemplate cimiRef = (CimiVolumeTemplate) context.convertToFullCimi(dataService, CimiVolumeTemplate.class);
             this.merge(cimiRef, cimi);
         } else {
+            if (null != cimi.getEventLogTemplate()) {
+                this.merge(context, cimi.getEventLogTemplate());
+            }
             if (null != cimi.getVolumeConfig()) {
                 this.merge(context, cimi.getVolumeConfig());
             }
@@ -425,7 +465,9 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
                     }
                 }
             }
-
+            if (null != cimi.getEventLogTemplate()) {
+                this.merge(context, cimi.getEventLogTemplate());
+            }
         }
     }
 
@@ -495,6 +537,309 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemAddress cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiSystemAddress cimiRef = (CimiSystemAddress) context.convertToFullCimi(dataService, CimiSystemAddress.class);
+            this.merge(cimiRef, cimi);
+        }
+
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemForwardingGroup)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemForwardingGroup cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiSystemForwardingGroup cimiRef = (CimiSystemForwardingGroup) context.convertToFullCimi(dataService,
+                CimiSystemForwardingGroup.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetwork)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemNetwork cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiSystemNetwork cimiRef = (CimiSystemNetwork) context.convertToFullCimi(dataService, CimiSystemNetwork.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetworkPort)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiSystemNetworkPort cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            CloudCollectionItem dataService = this.managerSystem.getEntityFromSystem(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiSystemNetworkPort cimiRef = (CimiSystemNetworkPort) context.convertToFullCimi(dataService,
+                CimiSystemNetworkPort.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    protected void merge(final CimiContext context, final CimiNetwork cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            Network dataService = this.managerNetwork.getNetworkById(PathHelper.extractIdString(cimi.getHref()));
+            CimiNetwork cimiRef = (CimiNetwork) context.convertToFullCimi(dataService, CimiNetwork.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkCreate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiNetworkCreate cimi) throws Exception {
+        this.merge(context, cimi.getNetworkTemplate());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiNetworkConfiguration cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            NetworkConfiguration dataService = this.managerNetwork.getNetworkConfigurationById(PathHelper.extractIdString(cimi
+                .getHref()));
+            CimiNetworkConfiguration cimiRef = (CimiNetworkConfiguration) context.convertToFullCimi(dataService,
+                CimiNetworkConfiguration.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkTemplate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiNetworkTemplate cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            NetworkTemplate dataService = this.managerNetwork
+                .getNetworkTemplateById(PathHelper.extractIdString(cimi.getHref()));
+            CimiNetworkTemplate cimiRef = (CimiNetworkTemplate) context.convertToFullCimi(dataService,
+                CimiNetworkTemplate.class);
+            this.merge(cimiRef, cimi);
+        } else {
+            if (null != cimi.getEventLogTemplate()) {
+                this.merge(context, cimi.getEventLogTemplate());
+            }
+            if (null != cimi.getForwardingGroup()) {
+                this.merge(context, cimi.getForwardingGroup());
+            }
+            if (null != cimi.getNetworkConfig()) {
+                this.merge(context, cimi.getNetworkConfig());
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortCreate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiNetworkPortCreate cimi) throws Exception {
+        this.merge(context, cimi.getNetworkPortTemplate());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiNetworkPortConfiguration cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            NetworkPortConfiguration dataService = this.managerNetwork.getNetworkPortConfigurationById(PathHelper
+                .extractIdString(cimi.getHref()));
+            CimiNetworkPortConfiguration cimiRef = (CimiNetworkPortConfiguration) context.convertToFullCimi(dataService,
+                CimiNetworkPortConfiguration.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiNetworkPortTemplate cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            NetworkPortTemplate dataService = this.managerNetwork.getNetworkPortTemplateById(PathHelper.extractIdString(cimi
+                .getHref()));
+            CimiNetworkPortTemplate cimiRef = (CimiNetworkPortTemplate) context.convertToFullCimi(dataService,
+                CimiNetworkPortTemplate.class);
+            this.merge(cimiRef, cimi);
+        } else {
+            if (null != cimi.getEventLogTemplate()) {
+                this.merge(context, cimi.getEventLogTemplate());
+            }
+            if (null != cimi.getNetwork()) {
+                this.merge(context, cimi.getNetwork());
+            }
+            if (null != cimi.getNetworkPortConfig()) {
+                this.merge(context, cimi.getNetworkPortConfig());
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressCreate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiAddressCreate cimi) throws Exception {
+        this.merge(context, cimi.getAddressTemplate());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiAddressTemplate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiAddressTemplate cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            AddressTemplate dataService = this.managerNetwork
+                .getAddressTemplateById(PathHelper.extractIdString(cimi.getHref()));
+            CimiAddressTemplate cimiRef = (CimiAddressTemplate) context.convertToFullCimi(dataService,
+                CimiAddressTemplate.class);
+            this.merge(cimiRef, cimi);
+        } else {
+            if (null != cimi.getNetwork()) {
+                this.merge(context, cimi.getNetwork());
+            }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupCreate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiForwardingGroupCreate cimi) throws Exception {
+        this.merge(context, cimi.getForwardingGroupTemplate());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupTemplate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiForwardingGroupTemplate cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            ForwardingGroupTemplate dataService = this.managerNetwork.getForwardingGroupTemplateById(PathHelper
+                .extractIdString(cimi.getHref()));
+            CimiForwardingGroupTemplate cimiRef = (CimiForwardingGroupTemplate) context.convertToFullCimi(dataService,
+                CimiForwardingGroupTemplate.class);
+            this.merge(cimiRef, cimi);
+        } else {
+            if (null != cimi.getNetworks()) {
+                for (CimiNetwork item : cimi.getListNetworks()) {
+                    this.merge(context, item);
+                }
+            }
+        }
+    }
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    protected void merge(final CimiContext context, final CimiForwardingGroup cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            ForwardingGroup dataService = this.managerNetwork
+                .getForwardingGroupById(PathHelper.extractIdString(cimi.getHref()));
+            CimiForwardingGroup cimiRef = (CimiForwardingGroup) context.convertToFullCimi(dataService,
+                CimiForwardingGroup.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogCreate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiEventLogCreate cimi) throws Exception {
+        this.merge(context, cimi.getEventLogTemplate());
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiEventLogTemplate cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            EventLogTemplate dataService = this.managerEvent
+                .getEventLogTemplateById(PathHelper.extractIdString(cimi.getHref()));
+            CimiEventLogTemplate cimiRef = (CimiEventLogTemplate) context.convertToFullCimi(dataService,
+                CimiEventLogTemplate.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
      * Make a map by ExchangeType and ComponentDescriptors with all components
      * of SystemTemplate.
      * 
@@ -525,6 +870,11 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
 
             // Merge common data
             this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getEventLogTemplate()) {
+                cimi.setEventLogTemplate(cimiRef.getEventLogTemplate());
+            } else {
+                this.merge(cimiRef.getEventLogTemplate(), cimi.getEventLogTemplate());
+            }
             // Make maps to identify componenent with his ExchangeType
             Map<ExchangeType, CimiComponentDescriptor> mapComponents = this.makeMapComponents(cimi);
             Map<ExchangeType, CimiComponentDescriptor> mapRefComponents = this.makeMapComponents(cimiRef);
@@ -600,6 +950,14 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             } else {
                 this.merge(cimiRef.getCredential(), cimi.getCredential());
             }
+            if (null == cimi.getEventLogTemplate()) {
+                cimi.setEventLogTemplate(cimiRef.getEventLogTemplate());
+            } else {
+                this.merge(cimiRef.getEventLogTemplate(), cimi.getEventLogTemplate());
+            }
+            if (null == cimi.getInitialState()) {
+                cimi.setInitialState(cimiRef.getInitialState());
+            }
             if (null == cimi.getMachineConfig()) {
                 cimi.setMachineConfig(cimiRef.getMachineConfig());
             } else {
@@ -610,7 +968,11 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             } else {
                 this.merge(cimiRef.getMachineImage(), cimi.getMachineImage());
             }
-            // TODO Network, ...
+            // TODO NetworkInterface
+
+            if (null == cimi.getUserData()) {
+                cimi.setUserData(cimiRef.getUserData());
+            }
             if (null == cimi.getVolumes()) {
                 cimi.setVolumes(cimiRef.getVolumes());
             } else {
@@ -751,6 +1113,11 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     protected void merge(final CimiVolumeTemplate cimiRef, final CimiVolumeTemplate cimi) {
         if (null != cimiRef) {
             this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getEventLogTemplate()) {
+                cimi.setEventLogTemplate(cimiRef.getEventLogTemplate());
+            } else {
+                this.merge(cimiRef.getEventLogTemplate(), cimi.getEventLogTemplate());
+            }
             if (null == cimi.getVolumeConfig()) {
                 cimi.setVolumeConfig(cimiRef.getVolumeConfig());
             } else {
@@ -1016,7 +1383,16 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             if (null == cimi.getState()) {
                 cimi.setState(cimiRef.getState());
             }
-            // TODO and check Network, NetworkPort, ...
+            if (null == cimi.getNetwork()) {
+                cimi.setNetwork(cimiRef.getNetwork());
+            } else {
+                this.merge(cimiRef.getNetwork(), cimi.getNetwork());
+            }
+            if (null == cimi.getNetworkPort()) {
+                cimi.setNetworkPort(cimiRef.getNetworkPort());
+            } else {
+                this.merge(cimiRef.getNetworkPort(), cimi.getNetworkPort());
+            }
 
             // Read-only : Addresses
         }
@@ -1125,4 +1501,355 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
         }
     }
 
+    /**
+     * Merge system Address data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystemAddress cimiRef, final CimiSystemAddress cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getAddress()) {
+                cimi.setAddress(cimiRef.getAddress());
+            } else {
+                this.merge(cimiRef.getAddress(), cimi.getAddress());
+            }
+        }
+    }
+
+    /**
+     * Merge system ForwardingGroup data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystemForwardingGroup cimiRef, final CimiSystemForwardingGroup cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getForwardingGroup()) {
+                cimi.setForwardingGroup(cimiRef.getForwardingGroup());
+            } else {
+                this.merge(cimiRef.getForwardingGroup(), cimi.getForwardingGroup());
+            }
+        }
+    }
+
+    /**
+     * Merge system Network data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystemNetwork cimiRef, final CimiSystemNetwork cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getNetwork()) {
+                cimi.setNetwork(cimiRef.getNetwork());
+            } else {
+                this.merge(cimiRef.getNetwork(), cimi.getNetwork());
+            }
+        }
+    }
+
+    /**
+     * Merge system NetworkPort data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiSystemNetworkPort cimiRef, final CimiSystemNetworkPort cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getNetworkPort()) {
+                cimi.setNetworkPort(cimiRef.getNetworkPort());
+            } else {
+                this.merge(cimiRef.getNetworkPort(), cimi.getNetworkPort());
+            }
+        }
+    }
+
+    /**
+     * Merge Address resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiAddress cimiRef, final CimiAddress cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getAllocation()) {
+                cimi.setAllocation(cimiRef.getAllocation());
+            }
+            if (null == cimi.getDefaultGateway()) {
+                cimi.setDefaultGateway(cimiRef.getDefaultGateway());
+            }
+            if (null == cimi.getDns()) {
+                cimi.setDns(cimiRef.getDns());
+            }
+            if (null == cimi.getHostname()) {
+                cimi.setHostname(cimiRef.getHostname());
+            }
+            if (null == cimi.getIp()) {
+                cimi.setIp(cimiRef.getIp());
+            }
+            if (null == cimi.getMask()) {
+                cimi.setMask(cimiRef.getMask());
+            }
+            if (null == cimi.getNetwork()) {
+                cimi.setNetwork(cimiRef.getNetwork());
+            } else {
+                this.merge(cimiRef.getNetwork(), cimi.getNetwork());
+            }
+            if (null == cimi.getProtocol()) {
+                cimi.setProtocol(cimiRef.getProtocol());
+            }
+            if (null == cimi.getResource()) {
+                cimi.setResource(cimiRef.getResource());
+            }
+        }
+    }
+
+    /**
+     * Merge AddressTemplate resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiAddressTemplate cimiRef, final CimiAddressTemplate cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getAllocation()) {
+                cimi.setAllocation(cimiRef.getAllocation());
+            }
+            if (null == cimi.getDefaultGateway()) {
+                cimi.setDefaultGateway(cimiRef.getDefaultGateway());
+            }
+            if (null == cimi.getDns()) {
+                cimi.setDns(cimiRef.getDns());
+            }
+            if (null == cimi.getHostname()) {
+                cimi.setHostname(cimiRef.getHostname());
+            }
+            if (null == cimi.getIp()) {
+                cimi.setIp(cimiRef.getIp());
+            }
+            if (null == cimi.getMask()) {
+                cimi.setMask(cimiRef.getMask());
+            }
+            if (null == cimi.getNetwork()) {
+                cimi.setNetwork(cimiRef.getNetwork());
+            } else {
+                this.merge(cimiRef.getNetwork(), cimi.getNetwork());
+            }
+            if (null == cimi.getProtocol()) {
+                cimi.setProtocol(cimiRef.getProtocol());
+            }
+        }
+    }
+
+    /**
+     * Merge Network resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiNetwork cimiRef, final CimiNetwork cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getClassOfService()) {
+                cimi.setClassOfService(cimiRef.getClassOfService());
+            }
+            if (null == cimi.getForwardingGroup()) {
+                cimi.setForwardingGroup(cimiRef.getForwardingGroup());
+            } else {
+                this.merge(cimiRef.getForwardingGroup(), cimi.getForwardingGroup());
+            }
+            if (null == cimi.getMtu()) {
+                cimi.setMtu(cimiRef.getMtu());
+            }
+            if (null == cimi.getNetworkPorts()) {
+                cimi.setNetworkPorts(cimiRef.getNetworkPorts());
+            } else {
+                this.merge(cimiRef.getNetworkPorts(), cimi.getNetworkPorts());
+            }
+            if (null == cimi.getNetworkType()) {
+                cimi.setNetworkType(cimiRef.getNetworkType());
+            }
+            if (null == cimi.getState()) {
+                cimi.setState(cimiRef.getState());
+            }
+        }
+    }
+
+    /**
+     * Merge NetworkConfiguration resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiNetworkConfiguration cimiRef, final CimiNetworkConfiguration cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getClassOfService()) {
+                cimi.setClassOfService(cimiRef.getClassOfService());
+            }
+            if (null == cimi.getMtu()) {
+                cimi.setMtu(cimiRef.getMtu());
+            }
+            if (null == cimi.getNetworkType()) {
+                cimi.setNetworkType(cimiRef.getNetworkType());
+            }
+        }
+    }
+
+    /**
+     * Merge NetworkTemplate resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiNetworkTemplate cimiRef, final CimiNetworkTemplate cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getEventLogTemplate()) {
+                cimi.setEventLogTemplate(cimiRef.getEventLogTemplate());
+            } else {
+                this.merge(cimiRef.getEventLogTemplate(), cimi.getEventLogTemplate());
+            }
+            if (null == cimi.getForwardingGroup()) {
+                cimi.setForwardingGroup(cimiRef.getForwardingGroup());
+            } else {
+                this.merge(cimiRef.getForwardingGroup(), cimi.getForwardingGroup());
+            }
+            if (null == cimi.getNetworkConfig()) {
+                cimi.setNetworkConfig(cimiRef.getNetworkConfig());
+            } else {
+                this.merge(cimiRef.getNetworkConfig(), cimi.getNetworkConfig());
+            }
+        }
+    }
+
+    /**
+     * Merge NetworkPort resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiNetworkPort cimiRef, final CimiNetworkPort cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getClassOfService()) {
+                cimi.setClassOfService(cimiRef.getClassOfService());
+            }
+            if (null == cimi.getNetwork()) {
+                cimi.setNetwork(cimiRef.getNetwork());
+            } else {
+                this.merge(cimiRef.getNetwork(), cimi.getNetwork());
+            }
+            if (null == cimi.getPortType()) {
+                cimi.setPortType(cimiRef.getPortType());
+            }
+            if (null == cimi.getState()) {
+                cimi.setState(cimiRef.getState());
+            }
+        }
+    }
+
+    /**
+     * Merge NetworkPortConfiguration resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiNetworkPortConfiguration cimiRef, final CimiNetworkPortConfiguration cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getClassOfService()) {
+                cimi.setClassOfService(cimiRef.getClassOfService());
+            }
+            if (null == cimi.getPortType()) {
+                cimi.setPortType(cimiRef.getPortType());
+            }
+        }
+    }
+
+    /**
+     * Merge NetworkPortTemplate resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiNetworkPortTemplate cimiRef, final CimiNetworkPortTemplate cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getEventLogTemplate()) {
+                cimi.setEventLogTemplate(cimiRef.getEventLogTemplate());
+            } else {
+                this.merge(cimiRef.getEventLogTemplate(), cimi.getEventLogTemplate());
+            }
+            if (null == cimi.getNetwork()) {
+                cimi.setNetwork(cimiRef.getNetwork());
+            } else {
+                this.merge(cimiRef.getNetwork(), cimi.getNetwork());
+            }
+            if (null == cimi.getNetworkPortConfig()) {
+                cimi.setNetworkPortConfig(cimiRef.getNetworkPortConfig());
+            } else {
+                this.merge(cimiRef.getNetworkPortConfig(), cimi.getNetworkPortConfig());
+            }
+        }
+    }
+
+    /**
+     * Merge ForwardingGroup resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiForwardingGroup cimiRef, final CimiForwardingGroup cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getNetworks()) {
+                cimi.setNetworks(cimiRef.getNetworks());
+            } else {
+                this.merge(cimiRef.getNetworks(), cimi.getNetworks());
+            }
+        }
+    }
+
+    /**
+     * Merge ForwardingGroupTemplate resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiForwardingGroupTemplate cimiRef, final CimiForwardingGroupTemplate cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getNetworks()) {
+                cimi.setNetworks(cimiRef.getNetworks());
+            } else {
+                this.merge(cimiRef.getListNetworks(), cimi.getListNetworks());
+            }
+        }
+    }
+
+    /**
+     * Merge EventLogTemplate resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiEventLogTemplate cimiRef, final CimiEventLogTemplate cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getPersistence()) {
+                cimi.setPersistence(cimiRef.getPersistence());
+            }
+            if (null == cimi.getTargetResource()) {
+                cimi.setTargetResource(cimiRef.getTargetResource());
+            }
+        }
+    }
 }

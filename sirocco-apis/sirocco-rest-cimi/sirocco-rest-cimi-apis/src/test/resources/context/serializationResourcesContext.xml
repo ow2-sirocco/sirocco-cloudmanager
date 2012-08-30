@@ -154,15 +154,20 @@
 
 
 	<!-- Services -->
-	<bean id="IJobManager" class="org.easymock.EasyMock"
-		factory-method="createMock">
-		<constructor-arg index="0"
-			value="org.ow2.sirocco.cloudmanager.core.api.IJobManager" />
-	</bean>
 	<bean id="ICredentialsManager" class="org.easymock.EasyMock"
 		factory-method="createMock">
 		<constructor-arg index="0"
 			value="org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager" />
+	</bean>
+	<bean id="IEventManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.IEventManager" />
+	</bean>
+	<bean id="IJobManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.IJobManager" />
 	</bean>
 	<bean id="IMachineImageManager" class="org.easymock.EasyMock"
 		factory-method="createMock">
@@ -173,6 +178,11 @@
 		factory-method="createMock">
 		<constructor-arg index="0"
 			value="org.ow2.sirocco.cloudmanager.core.api.IMachineManager" />
+	</bean>
+	<bean id="INetworkManager" class="org.easymock.EasyMock"
+		factory-method="createMock">
+		<constructor-arg index="0"
+			value="org.ow2.sirocco.cloudmanager.core.api.INetworkManager" />
 	</bean>
 	<bean id="ISystemManager" class="org.easymock.EasyMock"
 		factory-method="createMock">
