@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 @Component("CimiManagerUpdateCloudEntryPoint")
 public class CimiManagerUpdateCloudEntryPoint extends CimiManagerUpdateAbstract {
 
-    // XXX Not Implemented in EJB
+    // XXX UnsupportedOperation
     // @Autowired
     // @Qualifier("IMachineManager")
     // private IMachineManager manager;
@@ -47,7 +47,7 @@ public class CimiManagerUpdateCloudEntryPoint extends CimiManagerUpdateAbstract 
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        // XXX Not Implemented in EJB
+        // XXX UnsupportedOperation
         throw new UnsupportedOperationException();
     }
 
@@ -61,7 +61,7 @@ public class CimiManagerUpdateCloudEntryPoint extends CimiManagerUpdateAbstract 
      */
     @Override
     protected Object convertToDataService(final CimiContext context) throws Exception {
-        // XXX Not Implemented in EJB
+        // XXX UnsupportedOperation
         return null;
     }
 

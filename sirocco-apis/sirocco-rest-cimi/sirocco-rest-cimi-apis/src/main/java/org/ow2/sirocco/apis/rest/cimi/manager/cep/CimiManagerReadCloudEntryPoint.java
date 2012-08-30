@@ -31,9 +31,11 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.IEventManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,6 +72,14 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
     @Qualifier("ISystemManager")
     private ISystemManager systemManager;
 
+    @Autowired
+    @Qualifier("INetworkManager")
+    private INetworkManager networkManager;
+
+    @Autowired
+    @Qualifier("IEventManager")
+    private IEventManager eventManager;
+
     /**
      * {@inheritDoc}
      * 
@@ -98,36 +108,30 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
         out.setVolumes(this.volumeManager.getVolumes());
         out.setVolumeTemplates(this.volumeManager.getVolumeTemplates());
 
-        // TODO Others resources :
+        out.setNetworkConfigurations(this.networkManager.getNetworkConfigurations());
+        out.setNetworks(this.networkManager.getNetworks());
+        out.setNetworkTemplates(this.networkManager.getNetworkTemplates());
+
+        out.setNetworkPortConfigurations(this.networkManager.getNetworkPortConfigurations());
+        out.setNetworkPorts(this.networkManager.getNetworkPorts());
+        out.setNetworkPortTemplates(this.networkManager.getNetworkPortTemplates());
+
+        out.setAddresses(this.networkManager.getAddresses());
+        out.setAddressTemplates(this.networkManager.getAddressTemplates());
+
+        out.setForwardingGroups(this.networkManager.getForwardingGroups());
+        out.setForwardingGroupTemplates(this.networkManager.getForwardingGroupTemplates());
+
+        // FIXME EventLogs
+        // out.setEventLogs(this.eventManager.getEventLogs());
+        // out.setEventLogTemplates(this.eventManager.getEventLogTemplates());
+
+        // Unsupported resources :
         // resourceMetadata
-        // systems OK
-        // systemTemplates OK
-        // machines OK
-        // machineTemplates OK
-        // machineConfigs OK
-        // machineImages OK
-        // credentials OK
-        // credentialsTemplates OK
-        // volumes OK
-        // volumeTemplates OK
-        // volumeConfigs OK
-        // volumeImages OK
-        // networks
-        // networkTemplates
-        // networkConfigs
-        // networkPorts
-        // networkPortTemplates
-        // networkPortConfigs
-        // addresses
-        // addressTemplates
-        // forwardingGroups
-        // forwardingGroupTemplates
-        // jobs OK
         // meters
         // meterTemplates
         // meterConfigs
         // eventLogs
-        // events
 
         return out;
     }
