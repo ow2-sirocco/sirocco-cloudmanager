@@ -43,23 +43,37 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiSelect;
 import org.ow2.sirocco.apis.rest.cimi.request.RequestParams;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
+import org.ow2.sirocco.cloudmanager.core.api.IEventManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
+import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -99,6 +113,14 @@ public class CimiManagersCloudEntryPointTest {
     private IVolumeManager serviceVolume;
 
     @Autowired
+    @Qualifier("INetworkManager")
+    private INetworkManager serviceNetwork;
+
+    @Autowired
+    @Qualifier("IEventManager")
+    private IEventManager serviceEvent;
+
+    @Autowired
     @Qualifier("CimiManagerReadCloudEntryPoint")
     private CimiManager managerRead;
 
@@ -136,6 +158,8 @@ public class CimiManagersCloudEntryPointTest {
         EasyMock.reset(this.serviceMachineImage);
         EasyMock.reset(this.serviceSystem);
         EasyMock.reset(this.serviceVolume);
+        EasyMock.reset(this.serviceNetwork);
+        EasyMock.reset(this.serviceEvent);
     }
 
     @Test
@@ -162,6 +186,23 @@ public class CimiManagersCloudEntryPointTest {
         List<VolumeTemplate> volumeTemplateCollection = new ArrayList<VolumeTemplate>();
         List<VolumeConfiguration> volumeConfigurationCollection = new ArrayList<VolumeConfiguration>();
         List<VolumeImage> volumeImageCollection = new ArrayList<VolumeImage>();
+        // Networks
+        List<Network> networkCollection = new ArrayList<Network>();
+        List<NetworkTemplate> networkTemplateCollection = new ArrayList<NetworkTemplate>();
+        List<NetworkConfiguration> networkConfigurationCollection = new ArrayList<NetworkConfiguration>();
+        // NetworkPorts
+        List<NetworkPort> networkPortCollection = new ArrayList<NetworkPort>();
+        List<NetworkPortTemplate> networkPortTemplateCollection = new ArrayList<NetworkPortTemplate>();
+        List<NetworkPortConfiguration> networkPortConfigurationCollection = new ArrayList<NetworkPortConfiguration>();
+        // Addresss
+        List<Address> addressCollection = new ArrayList<Address>();
+        List<AddressTemplate> addressTemplateCollection = new ArrayList<AddressTemplate>();
+        // ForwardingGroups
+        List<ForwardingGroup> forwardingGroupCollection = new ArrayList<ForwardingGroup>();
+        List<ForwardingGroupTemplate> forwardingGroupTemplateCollection = new ArrayList<ForwardingGroupTemplate>();
+        // EventLogs
+        List<EventLog> eventLogCollection = new ArrayList<EventLog>();
+        List<EventLogTemplate> eventLogTemplateCollection = new ArrayList<EventLogTemplate>();
 
         EasyMock.expect(this.serviceCredentials.getCredentials()).andReturn(credentialsCollection);
         EasyMock.expect(this.serviceCredentials.getCredentialsTemplates()).andReturn(credentialsTemplateCollection);
@@ -188,6 +229,23 @@ public class CimiManagersCloudEntryPointTest {
         EasyMock.expect(this.serviceVolume.getVolumeConfigurations()).andReturn(volumeConfigurationCollection);
         EasyMock.expect(this.serviceVolume.getVolumeImages()).andReturn(volumeImageCollection);
         EasyMock.replay(this.serviceVolume);
+
+        EasyMock.expect(this.serviceNetwork.getNetworks()).andReturn(networkCollection);
+        EasyMock.expect(this.serviceNetwork.getNetworkTemplates()).andReturn(networkTemplateCollection);
+        EasyMock.expect(this.serviceNetwork.getNetworkConfigurations()).andReturn(networkConfigurationCollection);
+        EasyMock.expect(this.serviceNetwork.getNetworkPorts()).andReturn(networkPortCollection);
+        EasyMock.expect(this.serviceNetwork.getNetworkPortTemplates()).andReturn(networkPortTemplateCollection);
+        EasyMock.expect(this.serviceNetwork.getNetworkPortConfigurations()).andReturn(networkPortConfigurationCollection);
+        EasyMock.expect(this.serviceNetwork.getAddresses()).andReturn(addressCollection);
+        EasyMock.expect(this.serviceNetwork.getAddressTemplates()).andReturn(addressTemplateCollection);
+        EasyMock.expect(this.serviceNetwork.getForwardingGroups()).andReturn(forwardingGroupCollection);
+        EasyMock.expect(this.serviceNetwork.getForwardingGroupTemplates()).andReturn(forwardingGroupTemplateCollection);
+        EasyMock.replay(this.serviceNetwork);
+
+        // FIXME EventLog
+        // EasyMock.expect(this.serviceEvent.getEventLogs()).andReturn(eventLogCollection);
+        // EasyMock.expect(this.serviceEvent.getEventLogTemplates()).andReturn(eventLogTemplateCollection);
+        // EasyMock.replay(this.serviceEvent);
 
         // this.request.setId("1");
         this.managerRead.execute(this.context);
