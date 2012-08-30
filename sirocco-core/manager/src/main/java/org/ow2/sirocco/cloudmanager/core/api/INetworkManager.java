@@ -78,7 +78,7 @@ public interface INetworkManager {
 
     Job deleteNetwork(String networkId) throws ResourceNotFoundException, CloudProviderException;
 
-    Job addNetworkPortToNetwork(String networkId, NetworkPort networkPort) throws ResourceNotFoundException,
+    Job addNetworkPortToNetwork(String networkId, NetworkNetworkPort networkPort) throws ResourceNotFoundException,
         CloudProviderException;
 
     Job removeNetworkPortFromNetwork(String networkId, String networkNetworkPortId) throws ResourceNotFoundException,

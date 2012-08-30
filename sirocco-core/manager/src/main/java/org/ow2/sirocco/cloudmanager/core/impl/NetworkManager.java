@@ -301,8 +301,8 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public Job addNetworkPortToNetwork(final String networkId, final NetworkPort networkPort) throws ResourceNotFoundException,
-        CloudProviderException {
+    public Job addNetworkPortToNetwork(final String networkId, final NetworkNetworkPort networkPort)
+        throws ResourceNotFoundException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }

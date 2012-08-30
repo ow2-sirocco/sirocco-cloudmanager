@@ -69,7 +69,7 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
 
     private String classOfService;
 
-    private List<NetworkPort> networkPorts;
+    private List<NetworkNetworkPort> networkPorts;
 
     private ForwardingGroup forwardingGroup;
 
@@ -127,13 +127,13 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
         this.classOfService = classOfService;
     }
 
-    @OneToMany(mappedBy = "network")
+    @OneToMany
     @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    public List<NetworkPort> getNetworkPorts() {
+    public List<NetworkNetworkPort> getNetworkPorts() {
         return this.networkPorts;
     }
 
-    public void setNetworkPorts(final List<NetworkPort> networkPorts) {
+    public void setNetworkPorts(final List<NetworkNetworkPort> networkPorts) {
         this.networkPorts = networkPorts;
     }
 

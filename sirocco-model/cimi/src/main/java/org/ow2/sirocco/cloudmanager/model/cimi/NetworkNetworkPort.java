@@ -57,7 +57,7 @@ public class NetworkNetworkPort extends CloudEntity implements Serializable {
         return this.networkPort;
     }
 
-    public void setNetwork(final NetworkPort networkPort) {
+    public void setNetworkPort(final NetworkPort networkPort) {
         this.networkPort = networkPort;
     }
 
