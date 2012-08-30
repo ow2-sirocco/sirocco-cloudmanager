@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  */
 @Component("CimiManagerUpdateJobCollection")
 @Deprecated
-// FIXME
+// FIXME Deprecated
 public class CimiManagerUpdateJobCollection extends CimiManagerUpdateAbstract {
 
     // @Autowired

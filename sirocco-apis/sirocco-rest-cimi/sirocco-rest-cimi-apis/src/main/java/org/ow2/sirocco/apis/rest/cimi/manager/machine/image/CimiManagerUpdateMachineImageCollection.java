@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
  */
 @Component("CimiManagerUpdateMachineImageCollection")
 @Deprecated
-// FIXME
+// FIXME Deprecated
 public class CimiManagerUpdateMachineImageCollection extends CimiManagerUpdateAbstract {
 
     // @Autowired

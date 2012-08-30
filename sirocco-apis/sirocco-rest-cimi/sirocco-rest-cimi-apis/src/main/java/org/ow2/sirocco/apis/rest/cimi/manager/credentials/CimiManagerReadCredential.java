@@ -57,7 +57,7 @@ public class CimiManagerReadCredential extends CimiManagerReadAbstract {
         if (false == context.hasParamSelect()) {
             out = this.manager.getCredentialsById(context.getRequest().getId());
         } else {
-            // FIXME
+            // XXX UnsupportedOperation
             throw new UnsupportedOperationException();
         }
         return out;

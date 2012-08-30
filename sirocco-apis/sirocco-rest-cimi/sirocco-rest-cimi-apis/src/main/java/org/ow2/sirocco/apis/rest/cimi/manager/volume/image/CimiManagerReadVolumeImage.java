@@ -57,7 +57,7 @@ public class CimiManagerReadVolumeImage extends CimiManagerReadAbstract {
         if (false == context.hasParamSelect()) {
             out = this.manager.getVolumeImageById(context.getRequest().getId());
         } else {
-            // FIXME
+            // XXX UnsupportedOperation
             throw new UnsupportedOperationException();
         }
         return out;
