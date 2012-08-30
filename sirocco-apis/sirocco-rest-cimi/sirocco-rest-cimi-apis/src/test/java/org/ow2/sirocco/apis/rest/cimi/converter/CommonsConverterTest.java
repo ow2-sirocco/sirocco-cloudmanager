@@ -497,7 +497,7 @@ public class CommonsConverterTest {
                 service = null;
                 break;
             case ForwardingGroupNetworkCollection:
-                // FIXME ForwardingGroupNetwork
+                // FIXME ForwardingGroupNetworkCollection
                 service = null;
                 break;
             case ForwardingGroupTemplate:

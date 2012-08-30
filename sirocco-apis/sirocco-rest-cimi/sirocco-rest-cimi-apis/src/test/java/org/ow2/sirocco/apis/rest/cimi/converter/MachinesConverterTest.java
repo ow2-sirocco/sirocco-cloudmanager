@@ -84,7 +84,6 @@ public class MachinesConverterTest {
     }
 
     // TODO Volumes, Network, ...
-    // FIXME Disk collection
     @Test
     public void testCimiMachine() throws Exception {
         CimiMachine cimi;
