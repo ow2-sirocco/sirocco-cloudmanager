@@ -1448,15 +1448,23 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         if (network == null) {
             throw new ConnectorException("Unknown network with id=" + networkId);
         }
-        if (!forwardingGroup.getNetworks().contains(network)) {
+        ForwardingGroupNetwork fgNetwork = null;
+        for (ForwardingGroupNetwork net : forwardingGroup.getNetworks()) {
+            if (net.getNetwork().getProviderAssignedId().equals(networkId)) {
+                fgNetwork = net;
+                break;
+            }
+        }
+        if (fgNetwork == null) {
             throw new ConnectorException("Network with id=" + networkId + " is not a member of forwarding group with id="
                 + forwardingGroupId);
         }
+        final ForwardingGroupNetwork fgNetworkToRemove = fgNetwork;
         final Callable<Void> attachTask = new Callable<Void>() {
             @Override
             public Void call() throws Exception {
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
-                forwardingGroup.getNetworks().remove(network);
+                forwardingGroup.getNetworks().remove(fgNetworkToRemove);
                 MockCloudProviderConnector.logger.info("Removed Network from ForwardingGroup " + forwardingGroupId);
                 return null;
             }
