@@ -33,11 +33,13 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 @Entity
 @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
@@ -59,6 +61,8 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     private String userData;
 
     private Machine.State initialState;
+
+    private EventLogTemplate eventLogTemplate;
 
     public MachineTemplate() {
 
@@ -173,6 +177,15 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     public void setInitialState(final Machine.State initialState) {
         this.initialState = initialState;
+    }
+
+    @OneToOne
+    public EventLogTemplate getEventLogTemplate() {
+        return this.eventLogTemplate;
+    }
+
+    public void setEventLogTemplate(final EventLogTemplate eventLogTemplate) {
+        this.eventLogTemplate = eventLogTemplate;
     }
 
 }
