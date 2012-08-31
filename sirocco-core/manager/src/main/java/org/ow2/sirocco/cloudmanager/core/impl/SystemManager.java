@@ -1017,12 +1017,6 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public Job startSystem(final String systemId) throws CloudProviderException {
-        return this.startSystem(systemId, new HashMap<String, String>());
-
-    }
-
-    @Override
     public Job startSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
         Job parentJob = null;
 
@@ -1055,11 +1049,6 @@ public class SystemManager implements ISystemManager {
             }
         }
         return parentJob;
-    }
-
-    @Override
-    public Job stopSystem(final String systemId) throws CloudProviderException {
-        return this.stopSystem(systemId, false, new HashMap<String, String>());
     }
 
     @Override
