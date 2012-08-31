@@ -122,16 +122,14 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
         out.setForwardingGroups(this.networkManager.getForwardingGroups());
         out.setForwardingGroupTemplates(this.networkManager.getForwardingGroupTemplates());
 
-        // FIXME EventLogs
-        // out.setEventLogs(this.eventManager.getEventLogs());
-        // out.setEventLogTemplates(this.eventManager.getEventLogTemplates());
+        out.setEventLogs(this.eventManager.getEventLog());
+        out.setEventLogTemplates(this.eventManager.getEventLogTemplates());
 
         // Unsupported resources :
         // resourceMetadata
         // meters
         // meterTemplates
         // meterConfigs
-        // eventLogs
 
         return out;
     }
