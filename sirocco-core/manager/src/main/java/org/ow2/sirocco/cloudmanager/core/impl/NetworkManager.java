@@ -182,7 +182,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public Job startNetwork(final String networkId, final Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException {
+        return this.performActionOnNetwork(networkId, "start");
+    }
+
+    @Override
     public Job stopNetwork(final String networkId) throws ResourceNotFoundException, CloudProviderException {
+        return this.performActionOnNetwork(networkId, "stop");
+    }
+
+    @Override
+    public Job stopNetwork(final String networkId, final Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException {
         return this.performActionOnNetwork(networkId, "stop");
     }
 
@@ -634,7 +646,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public Job startNetworkPort(final String networkPortId, final Map<String, String> properties)
+        throws ResourceNotFoundException, CloudProviderException {
+        return this.performActionOnNetworkPort(networkPortId, "start");
+    }
+
+    @Override
     public Job stopNetworkPort(final String networkPortId) throws ResourceNotFoundException, CloudProviderException {
+        return this.performActionOnNetworkPort(networkPortId, "stop");
+    }
+
+    @Override
+    public Job stopNetworkPort(final String networkPortId, final Map<String, String> properties)
+        throws ResourceNotFoundException, CloudProviderException {
         return this.performActionOnNetworkPort(networkPortId, "stop");
     }
 

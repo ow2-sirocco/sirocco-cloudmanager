@@ -57,6 +57,10 @@ public interface INetworkManager {
 
     Job createNetwork(NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException;
 
+    Job startNetwork(String networkId, Map<String, String> properties) throws ResourceNotFoundException, CloudProviderException;
+
+    Job stopNetwork(String networkId, Map<String, String> properties) throws ResourceNotFoundException, CloudProviderException;
+
     Job startNetwork(String networkId) throws ResourceNotFoundException, CloudProviderException;
 
     Job stopNetwork(String networkId) throws ResourceNotFoundException, CloudProviderException;
@@ -142,6 +146,12 @@ public interface INetworkManager {
     // NetworkPort operations
 
     Job createNetworkPort(NetworkPortCreate networkPortCreate) throws InvalidRequestException, CloudProviderException;
+
+    Job startNetworkPort(String networkPortId, Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    Job stopNetworkPort(String networkPortId, Map<String, String> properties) throws ResourceNotFoundException,
+        CloudProviderException;
 
     Job startNetworkPort(String networkPortId) throws ResourceNotFoundException, CloudProviderException;
 
