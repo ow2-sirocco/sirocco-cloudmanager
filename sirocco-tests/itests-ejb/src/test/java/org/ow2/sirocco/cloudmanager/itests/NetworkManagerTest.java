@@ -686,7 +686,7 @@ public class NetworkManagerTest {
 
         // update: remove network
 
-        job = this.networkManager.removeNetworkFromForwardingGroup(forwardingGroupId, network1Id);
+        job = this.networkManager.removeNetworkFromForwardingGroup(forwardingGroupId, createdFgNetwork.getId().toString());
         Assert.assertEquals("delete", job.getAction());
         Assert.assertEquals(job.getTargetEntity().getId().toString(), forwardingGroupId);
         Assert.assertEquals(job.getAffectedEntities().get(0).getId().toString(), network1Id);
