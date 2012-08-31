@@ -406,7 +406,7 @@ public class MachineManagerTest {
 
     void startMachine(final String machineId) throws Exception {
 
-        Job job = this.machineManager.startMachine(machineId);
+        Job job = this.machineManager.startMachine(machineId, null);
         Assert.assertNotNull("startMachine returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("start"));
@@ -432,7 +432,7 @@ public class MachineManagerTest {
 
     void stopMachine(final String machineId) throws Exception {
 
-        Job job = this.machineManager.stopMachine(machineId);
+        Job job = this.machineManager.stopMachine(machineId, false, null);
         Assert.assertNotNull("stopMachine returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("stop"));

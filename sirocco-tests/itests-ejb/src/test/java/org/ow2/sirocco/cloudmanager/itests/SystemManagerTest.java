@@ -243,7 +243,7 @@ public class SystemManagerTest extends SiroccoTester {
 
         // start system
         java.lang.System.out.println("start system");
-        Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.startSystem(systemId)));
+        Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.startSystem(systemId, null)));
 
         sv1 = this.systemManager.getSystemById(systemId);
         Assert.assertEquals(System.State.STARTED, sv1.getState());
@@ -266,7 +266,7 @@ public class SystemManagerTest extends SiroccoTester {
 
         java.lang.System.out.println("pausing machine");
         Assert.assertEquals(Job.Status.SUCCESS,
-            this.waitForJobCompletion(this.machineManager.pauseMachine(mm.getId().toString())));
+            this.waitForJobCompletion(this.machineManager.pauseMachine(mm.getId().toString(), null)));
         // refreshing system
         s2 = this.systemManager.getSystemById(sv1.getSystems().get(1).getResource().getId().toString());
         // system state to mixed?
@@ -335,7 +335,8 @@ public class SystemManagerTest extends SiroccoTester {
 
         // stop system
         java.lang.System.out.println("stop system");
-        Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.stopSystem(systemId)));
+        Assert
+            .assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(this.systemManager.stopSystem(systemId, false, null)));
 
         sv1 = this.systemManager.getSystemById(systemId);
         Assert.assertEquals(System.State.STOPPED, sv1.getState());

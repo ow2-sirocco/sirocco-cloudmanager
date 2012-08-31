@@ -895,7 +895,7 @@ public class CimiPrimerScenarioTest {
          * Start the Machine
          */
 
-        Job job = this.machineManager.startMachine(machineId);
+        Job job = this.machineManager.startMachine(machineId, null);
         this.waitForJobCompletion(job);
 
         /**
@@ -912,7 +912,7 @@ public class CimiPrimerScenarioTest {
          * Stop the Machine
          */
 
-        job = this.machineManager.stopMachine(machineId);
+        job = this.machineManager.stopMachine(machineId, false, null);
         this.waitForJobCompletion(job);
 
         /**
@@ -1045,7 +1045,7 @@ public class CimiPrimerScenarioTest {
          * Start the Machine
          */
 
-        Job job = this.machineManager.startMachine(machineId);
+        Job job = this.machineManager.startMachine(machineId, null);
         this.waitForJobCompletion(job);
 
         /**
@@ -1062,7 +1062,7 @@ public class CimiPrimerScenarioTest {
          * Stop the Machine
          */
 
-        job = this.machineManager.stopMachine(machineId);
+        job = this.machineManager.stopMachine(machineId, false, null);
         this.waitForJobCompletion(job);
 
         /**
@@ -1190,7 +1190,7 @@ public class CimiPrimerScenarioTest {
          * Start the Machine
          */
 
-        Job job = this.machineManager.startMachine(machineId);
+        Job job = this.machineManager.startMachine(machineId, null);
         this.waitForJobCompletion(job);
 
         /**
@@ -1209,7 +1209,7 @@ public class CimiPrimerScenarioTest {
          * Stop the Machine
          */
 
-        job = this.machineManager.stopMachine(machineId);
+        job = this.machineManager.stopMachine(machineId, false, null);
         this.waitForJobCompletion(job);
 
         /**
@@ -1256,7 +1256,7 @@ public class CimiPrimerScenarioTest {
          * Start the Machine
          */
 
-        Job job = this.machineManager.startMachine(machineId);
+        Job job = this.machineManager.startMachine(machineId, null);
         this.waitForJobCompletion(job);
 
         /**
@@ -1275,7 +1275,7 @@ public class CimiPrimerScenarioTest {
          * Stop the Machine
          */
 
-        job = this.machineManager.stopMachine(machineId);
+        job = this.machineManager.stopMachine(machineId, false, null);
         this.waitForJobCompletion(job);
 
         /**
