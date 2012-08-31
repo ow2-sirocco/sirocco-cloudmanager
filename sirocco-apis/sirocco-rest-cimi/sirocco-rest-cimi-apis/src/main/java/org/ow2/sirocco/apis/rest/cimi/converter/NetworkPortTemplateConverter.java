@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
@@ -31,6 +32,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -104,10 +106,8 @@ public class NetworkPortTemplateConverter extends ObjectCommonConverter {
         final CimiNetworkPortTemplate dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            // FIXME EventLogTemplate
-            // dataCimi.setEventLogTemplate((CimiEventLogTemplate)
-            // context.convertNextCimi(dataService.getEventLogTemplate(),
-            // CimiEventLogTemplate.class));
+            dataCimi.setEventLogTemplate((CimiEventLogTemplate) context.convertNextCimi(dataService.getEventLogTemplate(),
+                CimiEventLogTemplate.class));
             dataCimi.setNetworkPortConfig((CimiNetworkPortConfiguration) context.convertNextCimi(
                 dataService.getNetworkPortConfig(), CimiNetworkPortConfiguration.class));
             dataCimi.setNetwork((CimiNetwork) context.convertNextCimi(dataService.getNetwork(), CimiNetwork.class));
@@ -124,9 +124,7 @@ public class NetworkPortTemplateConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiNetworkPortTemplate dataCimi,
         final NetworkPortTemplate dataService) {
         this.fill(context, dataCimi, dataService);
-        // FIXME EventLogTemplate
-        // dataService.setEventLogTemplate((EventLogTemplate)
-        // context.convertNextService(dataCimi.getEventLogTemplate()));
+        dataService.setEventLogTemplate((EventLogTemplate) context.convertNextService(dataCimi.getEventLogTemplate()));
         dataService.setNetwork((Network) context.convertNextService(dataCimi.getNetwork()));
         dataService
             .setNetworkPortConfig((NetworkPortConfiguration) context.convertNextService(dataCimi.getNetworkPortConfig()));

@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkTemplate;
@@ -31,6 +32,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -103,10 +105,8 @@ public class NetworkTemplateConverter extends ObjectCommonConverter {
     protected void doCopyToCimi(final CimiContext context, final NetworkTemplate dataService, final CimiNetworkTemplate dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            // FIXME EventLogTemplate
-            // dataCimi.setEventLogTemplate((CimiEventLogTemplate)
-            // context.convertNextCimi(dataService.getEventLogTemplate(),
-            // CimiEventLogTemplate.class));
+            dataCimi.setEventLogTemplate((CimiEventLogTemplate) context.convertNextCimi(dataService.getEventLogTemplate(),
+                CimiEventLogTemplate.class));
             dataCimi.setNetworkConfig((CimiNetworkConfiguration) context.convertNextCimi(dataService.getNetworkConfig(),
                 CimiNetworkConfiguration.class));
             dataCimi.setForwardingGroup((CimiForwardingGroup) context.convertNextCimi(dataService.getForwardingGroup(),
@@ -124,9 +124,7 @@ public class NetworkTemplateConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiNetworkTemplate dataCimi,
         final NetworkTemplate dataService) {
         this.fill(context, dataCimi, dataService);
-        // FIXME EventLogTemplate
-        // dataService.setEventLogTemplate((EventLogTemplate)
-        // context.convertNextService(dataCimi.getEventLogTemplate()));
+        dataService.setEventLogTemplate((EventLogTemplate) context.convertNextService(dataCimi.getEventLogTemplate()));
         dataService.setForwardingGroup((ForwardingGroup) context.convertNextService(dataCimi.getForwardingGroup()));
         dataService.setNetworkConfig((NetworkConfiguration) context.convertNextService(dataCimi.getNetworkConfig()));
     }

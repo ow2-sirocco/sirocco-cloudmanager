@@ -40,6 +40,8 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
  * </ul>
  * </p>
  */
+// FIXME Deprecated
+@Deprecated
 public class EventLogEventCollectionConverter extends CollectionConverterAbstract {
 
     /**

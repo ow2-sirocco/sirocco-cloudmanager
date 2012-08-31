@@ -30,7 +30,7 @@ import javax.xml.bind.annotation.XmlTransient;
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
-import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogEventCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollection;
 
 /**
  * Class EventLog.
@@ -61,7 +61,7 @@ public class CimiEventLog extends CimiObjectCommonAbstract {
      * Read only
      * </p>
      */
-    private CimiEventLogEventCollection events;
+    private CimiEventCollection events;
 
     /**
      * Field "summary".
@@ -92,7 +92,7 @@ public class CimiEventLog extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public CimiEventLogEventCollection getEvents() {
+    public CimiEventCollection getEvents() {
         return this.events;
     }
 
@@ -101,7 +101,7 @@ public class CimiEventLog extends CimiObjectCommonAbstract {
      * 
      * @param events The value
      */
-    public void setEvents(final CimiEventLogEventCollection events) {
+    public void setEvents(final CimiEventCollection events) {
         this.events = events;
     }
 

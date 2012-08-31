@@ -32,6 +32,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredentialTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
@@ -42,6 +43,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
@@ -333,6 +335,15 @@ public interface MergeReferenceHelper {
      * @param cimi The resource with values or reference
      * @throws Exception If error in call service
      */
+    void merge(CimiContext context, CimiNetworkNetworkPort cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
     void merge(CimiContext context, CimiNetworkPortCreate cimi) throws Exception;
 
     /**
@@ -388,6 +399,15 @@ public interface MergeReferenceHelper {
      * @throws Exception If error in call service
      */
     void merge(CimiContext context, CimiForwardingGroupTemplate cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    void merge(CimiContext context, CimiForwardingGroupNetwork cimi) throws Exception;
 
     /**
      * Merge the reference of a resource only if necessary.

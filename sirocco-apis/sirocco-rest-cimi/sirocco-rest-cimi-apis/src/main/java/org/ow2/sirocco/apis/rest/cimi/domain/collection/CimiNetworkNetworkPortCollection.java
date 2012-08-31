@@ -34,7 +34,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiArrayAbstract;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 
 /**
@@ -43,7 +43,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 
 @XmlRootElement
 @JsonSerialize(include = Inclusion.NON_NULL)
-public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<CimiNetworkPort> {
+public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<CimiNetworkNetworkPort> {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
@@ -56,7 +56,7 @@ public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<Cim
     @Override
     @XmlElement(name = "NetworkPort")
     @JsonProperty(value = "networkPorts")
-    public CimiNetworkPort[] getArray() {
+    public CimiNetworkNetworkPort[] getArray() {
         return super.getArray();
     }
 
@@ -67,7 +67,7 @@ public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<Cim
      */
     @Override
     @JsonProperty(value = "networkPorts")
-    public void setArray(final CimiNetworkPort[] items) {
+    public void setArray(final CimiNetworkNetworkPort[] items) {
         super.setArray(items);
     }
 
@@ -89,7 +89,7 @@ public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<Cim
      * @see org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollection#newCollection()
      */
     @Override
-    public CimiArray<CimiNetworkPort> newCollection() {
+    public CimiArray<CimiNetworkNetworkPort> newCollection() {
         return new CimiNetworkNetworkPortArray();
     }
 
@@ -101,21 +101,21 @@ public class CimiNetworkNetworkPortCollection extends CimiCollectionAbstract<Cim
     @Override
     @XmlTransient
     @JsonIgnore
-    public Class<CimiNetworkPort> getItemClass() {
-        return CimiNetworkPort.class;
+    public Class<CimiNetworkNetworkPort> getItemClass() {
+        return CimiNetworkNetworkPort.class;
     }
 
     /**
      * Concrete class of the collection.
      */
-    public class CimiNetworkNetworkPortArray extends CimiArrayAbstract<CimiNetworkPort> {
+    public class CimiNetworkNetworkPortArray extends CimiArrayAbstract<CimiNetworkNetworkPort> {
 
         /** Serial number */
         private static final long serialVersionUID = 1L;
 
         @Override
-        public CimiNetworkPort[] newEmptyArraySized() {
-            return new CimiNetworkPort[this.size()];
+        public CimiNetworkNetworkPort[] newEmptyArraySized() {
+            return new CimiNetworkNetworkPort[this.size()];
         }
     }
 }

@@ -46,6 +46,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
@@ -60,6 +61,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortCreate;
@@ -99,6 +101,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
@@ -108,6 +111,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkNetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
@@ -622,6 +626,23 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      * {@inheritDoc}
      * 
      * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkNetworkPort)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiNetworkNetworkPort cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            NetworkNetworkPort dataService = this.managerNetwork.getNetworkPortFromNetwork(context.getRequest().getIdParent(),
+                PathHelper.extractIdString(cimi.getHref()));
+            CimiNetworkNetworkPort cimiRef = (CimiNetworkNetworkPort) context.convertToFullCimi(dataService,
+                CimiNetworkNetworkPort.class);
+            this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
      *      org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkCreate)
      */
     @Override
@@ -791,6 +812,23 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
                     this.merge(context, item);
                 }
             }
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupNetwork)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiForwardingGroupNetwork cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            ForwardingGroupNetwork dataService = this.managerNetwork.getNetworkFromForwardingGroup(context.getRequest()
+                .getIdParent(), PathHelper.extractIdString(cimi.getHref()));
+            CimiForwardingGroupNetwork cimiRef = (CimiForwardingGroupNetwork) context.convertToFullCimi(dataService,
+                CimiForwardingGroupNetwork.class);
+            this.merge(cimiRef, cimi);
         }
     }
 
@@ -1683,6 +1721,23 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     }
 
     /**
+     * Merge NetworkNetworkPort resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiNetworkNetworkPort cimiRef, final CimiNetworkNetworkPort cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getNetworkPort()) {
+                cimi.setNetworkPort(cimiRef.getNetworkPort());
+            } else {
+                this.merge(cimiRef.getNetworkPort(), cimi.getNetworkPort());
+            }
+        }
+    }
+
+    /**
      * Merge NetworkConfiguration resource data.
      * 
      * @param cimiRef Source to merge
@@ -1831,6 +1886,23 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
                 cimi.setNetworks(cimiRef.getNetworks());
             } else {
                 this.merge(cimiRef.getListNetworks(), cimi.getListNetworks());
+            }
+        }
+    }
+
+    /**
+     * Merge ForwardingGroupNetwork resource data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiForwardingGroupNetwork cimiRef, final CimiForwardingGroupNetwork cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getNetwork()) {
+                cimi.setNetwork(cimiRef.getNetwork());
+            } else {
+                this.merge(cimiRef.getNetwork(), cimi.getNetwork());
             }
         }
     }

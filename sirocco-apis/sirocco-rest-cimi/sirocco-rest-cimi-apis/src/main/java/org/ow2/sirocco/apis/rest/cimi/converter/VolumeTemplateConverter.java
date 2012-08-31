@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeTemplate;
@@ -31,6 +32,7 @@ import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -107,10 +109,8 @@ public class VolumeTemplateConverter extends ObjectCommonConverter {
                 CimiVolumeConfiguration.class));
             dataCimi.setVolumeImage((CimiVolumeImage) context.convertNextCimi(dataService.getVolumeImage(),
                 CimiVolumeImage.class));
-            // FIXME EventLogTemplate
-            // dataCimi.setEventLogTemplate((CimiEventLogTemplate)
-            // context.convertNextCimi(dataService.getEventLogTemplate(),
-            // CimiEventLogTemplate.class));
+            dataCimi.setEventLogTemplate((CimiEventLogTemplate) context.convertNextCimi(dataService.getEventLogTemplate(),
+                CimiEventLogTemplate.class));
         }
     }
 
@@ -126,8 +126,6 @@ public class VolumeTemplateConverter extends ObjectCommonConverter {
         this.fill(context, dataCimi, dataService);
         dataService.setVolumeConfig((VolumeConfiguration) context.convertNextService(dataCimi.getVolumeConfig()));
         dataService.setVolumeImage((VolumeImage) context.convertNextService(dataCimi.getVolumeImage()));
-        // FIXME EventLogTemplate
-        // dataService.setEventLogTemplate((EventLogTemplate)
-        // context.convertNextService(dataCimi.getEventLogTemplate()));
+        dataService.setEventLogTemplate((EventLogTemplate) context.convertNextService(dataCimi.getEventLogTemplate()));
     }
 }

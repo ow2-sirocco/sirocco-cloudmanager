@@ -24,23 +24,23 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSummary;
-import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkNetworkPort;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
-import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkNetworkPort;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
  * <p>
  * Converted classes:
  * <ul>
- * <li>CIMI model: {@link CimiEventLog}</li>
- * <li>Service model: {@link EventLog}</li>
+ * <li>CIMI model: {@link CimiNetworkNetworkPort}</li>
+ * <li>Service model: {@link NetworkNetworkPort}</li>
  * </ul>
  * </p>
  */
-public class EventLogConverter extends ObjectCommonConverter {
+public class NetworkNetworkPortConverter extends ObjectCommonConverter {
 
     /**
      * {@inheritDoc}
@@ -50,7 +50,7 @@ public class EventLogConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toCimi(final CimiContext context, final Object dataService) {
-        CimiEventLog cimi = new CimiEventLog();
+        CimiNetworkNetworkPort cimi = new CimiNetworkNetworkPort();
         this.copyToCimi(context, dataService, cimi);
         return cimi;
     }
@@ -63,7 +63,7 @@ public class EventLogConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToCimi(final CimiContext context, final Object dataService, final Object dataCimi) {
-        this.doCopyToCimi(context, (EventLog) dataService, (CimiEventLog) dataCimi);
+        this.doCopyToCimi(context, (NetworkNetworkPort) dataService, (CimiNetworkNetworkPort) dataCimi);
     }
 
     /**
@@ -74,7 +74,7 @@ public class EventLogConverter extends ObjectCommonConverter {
      */
     @Override
     public Object toService(final CimiContext context, final Object dataCimi) {
-        EventLog service = new EventLog();
+        NetworkNetworkPort service = new NetworkNetworkPort();
         this.copyToService(context, dataCimi, service);
         return service;
     }
@@ -88,7 +88,7 @@ public class EventLogConverter extends ObjectCommonConverter {
      */
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
-        this.doCopyToService(context, (CimiEventLog) dataCimi, (EventLog) dataService);
+        this.doCopyToService(context, (CimiNetworkNetworkPort) dataCimi, (NetworkNetworkPort) dataService);
     }
 
     /**
@@ -98,14 +98,12 @@ public class EventLogConverter extends ObjectCommonConverter {
      * @param dataService Source service object
      * @param dataCimi Destination CIMI object
      */
-    protected void doCopyToCimi(final CimiContext context, final EventLog dataService, final CimiEventLog dataCimi) {
+    protected void doCopyToCimi(final CimiContext context, final NetworkNetworkPort dataService,
+        final CimiNetworkNetworkPort dataCimi) {
         this.fill(context, dataService, dataCimi);
         if (true == context.mustBeExpanded(dataCimi)) {
-            dataCimi
-                .setEvents((CimiEventCollection) context.convertNextCimi(dataService.getEvents(), CimiEventCollection.class));
-            dataCimi.setPersistence(ConverterHelper.toString(dataService.getPersistence()));
-            dataCimi.setSummary((CimiSummary) context.convertNextCimi(dataService.getSummary(), CimiSummary.class));
-            dataCimi.setTargetResource(ConverterHelper.buildTargetResource(context, dataService.getTargetResource()));
+            dataCimi.setNetworkPort((CimiNetworkPort) context.convertNextCimi(dataService.getNetworkPort(),
+                CimiNetworkPort.class));
         }
     }
 
@@ -116,11 +114,9 @@ public class EventLogConverter extends ObjectCommonConverter {
      * @param dataCimi Source CIMI object
      * @param dataService Destination Service object
      */
-    protected void doCopyToService(final CimiContext context, final CimiEventLog dataCimi, final EventLog dataService) {
+    protected void doCopyToService(final CimiContext context, final CimiNetworkNetworkPort dataCimi,
+        final NetworkNetworkPort dataService) {
         this.fill(context, dataCimi, dataService);
-        dataService.setPersistence(ConverterHelper.toEventLogTemplatePersistence(dataCimi.getPersistence()));
-
-        // Next Read only
-        // Events, Summary, TargetResource
+        dataService.setNetworkPort((NetworkPort) context.convertNextService(dataCimi.getNetworkPort()));
     }
 }

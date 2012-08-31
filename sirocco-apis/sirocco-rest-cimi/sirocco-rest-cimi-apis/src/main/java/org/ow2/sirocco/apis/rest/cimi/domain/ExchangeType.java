@@ -56,7 +56,10 @@ public enum ExchangeType {
     /** */
     EventLogCreate(PathType.EventLog),
     /** */
-    EventLogEvent(PathType.EventLogEvent), EventLogEventCollection(PathType.EventLogEvent, false),
+    // FIXME Deprecated
+    @Deprecated
+    EventLogEvent(PathType.EventLogEvent), @Deprecated
+    EventLogEventCollection(PathType.EventLogEvent, false),
     /** */
     EventLogTemplate(PathType.EventLogTemplate), EventLogTemplateCollection(PathType.EventLogTemplate, false),
     /** */
@@ -94,7 +97,7 @@ public enum ExchangeType {
     /** */
     NetworkCreate(PathType.Network),
     /** */
-    NetworkNetworkPortCollection(PathType.NetworkNetworkPort, false),
+    NetworkNetworkPort(PathType.NetworkNetworkPort), NetworkNetworkPortCollection(PathType.NetworkNetworkPort, false),
     /** */
     NetworkConfiguration(PathType.NetworkConfiguration), NetworkConfigurationCollection(PathType.NetworkConfiguration, false),
     /** */

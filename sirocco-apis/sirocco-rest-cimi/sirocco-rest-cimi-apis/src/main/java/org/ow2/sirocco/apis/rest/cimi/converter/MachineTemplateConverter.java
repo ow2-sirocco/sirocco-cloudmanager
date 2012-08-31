@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCredential;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
@@ -42,6 +43,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -117,10 +119,8 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
             dataCimi
                 .setCredential((CimiCredential) context.convertNextCimi(dataService.getCredentials(), CimiCredential.class));
             dataCimi.setInitialState(ConverterHelper.toString(dataService.getInitialState()));
-            // FIXME EventLogTemplate
-            // dataCimi.setEventLogTemplate((CimiEventLogTemplate)
-            // context.convertNextCimi(dataService.getEventLogTemplate(),
-            // CimiEventLogTemplate.class));
+            dataCimi.setEventLogTemplate((CimiEventLogTemplate) context.convertNextCimi(dataService.getEventLogTemplate(),
+                CimiEventLogTemplate.class));
             dataCimi.setMachineConfig((CimiMachineConfiguration) context.convertNextCimi(dataService.getMachineConfiguration(),
                 CimiMachineConfiguration.class));
             dataCimi.setMachineImage((CimiMachineImage) context.convertNextCimi(dataService.getMachineImage(),
@@ -167,9 +167,7 @@ public class MachineTemplateConverter extends ObjectCommonConverter {
         final MachineTemplate dataService) {
         this.fill(context, dataCimi, dataService);
         dataService.setCredentials((Credentials) context.convertNextService(dataCimi.getCredential()));
-        // FIXME EventLogTemplate
-        // dataService.setEventLogTemplate((EventLogTemplate)
-        // context.convertNextService(dataCimi.getEventLogTemplate()));
+        dataService.setEventLogTemplate((EventLogTemplate) context.convertNextService(dataCimi.getEventLogTemplate()));
         dataService.setInitialState(ConverterHelper.toMachineState(dataCimi.getInitialState()));
         dataService.setMachineImage((MachineImage) context.convertNextService(dataCimi.getMachineImage()));
         dataService.setMachineConfiguration((MachineConfiguration) context.convertNextService(dataCimi.getMachineConfig()));

@@ -58,6 +58,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
@@ -366,6 +367,9 @@ public class WritingResourceValidatorTest {
             break;
         case NetworkCreate:
             cimi = null;
+            break;
+        case NetworkNetworkPort:
+            cimi = new CimiNetworkNetworkPort();
             break;
         case NetworkNetworkPortCollection:
             cimi = new CimiNetworkNetworkPortCollection();

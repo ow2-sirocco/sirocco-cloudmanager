@@ -34,6 +34,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  */
 @XmlRootElement(name = "Collection")
 @JsonSerialize(include = Inclusion.NON_NULL)
+@Deprecated
+// FIXME Deprecated
 public class CimiEventLogEventCollectionRoot extends CimiEventLogEventCollection {
 
     /** Serial number */

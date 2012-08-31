@@ -32,31 +32,43 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
 /**
- * Class EventLogEvent.
+ * Class NetworkNetworkPort.
  */
-@XmlRootElement(name = "EventLogEvent")
+@XmlRootElement(name = "NetworkNetworkPort")
 @JsonSerialize(include = Inclusion.NON_NULL)
-@Deprecated
-// FIXME Deprecated
-public class CimiEventLogEvent extends CimiObjectCommonAbstract {
+public class CimiNetworkNetworkPort extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /**
+     * Field "networkPort".
+     */
+    private CimiNetworkPort networkPort;
+
+    /**
      * Default constructor.
      */
-    public CimiEventLogEvent() {
+    public CimiNetworkNetworkPort() {
         super();
     }
 
     /**
-     * Parameterized constructor.
+     * Return the value of field "networkPort".
      * 
-     * @param href The reference
+     * @return The value
      */
-    public CimiEventLogEvent(final String href) {
-        super(href);
+    public CimiNetworkPort getNetworkPort() {
+        return this.networkPort;
+    }
+
+    /**
+     * Set the value of field "networkPort".
+     * 
+     * @param networkPort The value
+     */
+    public void setNetworkPort(final CimiNetworkPort networkPort) {
+        this.networkPort = networkPort;
     }
 
     /**
@@ -66,8 +78,9 @@ public class CimiEventLogEvent extends CimiObjectCommonAbstract {
      */
     @Override
     public boolean hasValues() {
-        // TODO Auto-generated method stub
-        return false;
+        boolean has = super.hasValues();
+        has = has || (null != this.getNetworkPort());
+        return has;
     }
 
     /**
@@ -79,7 +92,7 @@ public class CimiEventLogEvent extends CimiObjectCommonAbstract {
     @XmlTransient
     @JsonIgnore
     public ExchangeType getExchangeType() {
-        return ExchangeType.EventLogEvent;
+        return ExchangeType.NetworkNetworkPort;
     }
 
 }

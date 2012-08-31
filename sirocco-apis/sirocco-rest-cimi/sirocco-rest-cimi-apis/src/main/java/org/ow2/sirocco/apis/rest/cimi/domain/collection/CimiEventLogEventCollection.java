@@ -42,6 +42,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
  */
 @XmlRootElement
 @JsonSerialize(include = Inclusion.NON_NULL)
+@Deprecated
+// FIXME Deprecated
 public class CimiEventLogEventCollection extends CimiCollectionAbstract<CimiEventLogEvent> {
 
     /** Serial number */

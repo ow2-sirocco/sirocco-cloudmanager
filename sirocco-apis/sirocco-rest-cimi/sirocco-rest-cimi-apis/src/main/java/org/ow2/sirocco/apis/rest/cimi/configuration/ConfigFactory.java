@@ -67,6 +67,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.MachineVolumeConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkCreateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.NetworkNetworkPortConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortCreateConverter;
@@ -215,6 +216,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkCreate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortCreate;
@@ -871,6 +873,14 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new NetworkCreateConverter());
             break;
 
+        case NetworkNetworkPort:
+            item = new ItemConfig(CimiNetworkNetworkPort.class, ExchangeType.NetworkNetworkPort);
+            item.putData(ConfigFactory.CONVERTER, new NetworkNetworkPortConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.NetworkPort, "networkPort");
+            break;
+
         case NetworkNetworkPortCollection:
             item = new ItemConfig(CimiNetworkNetworkPortCollection.class, ExchangeType.NetworkNetworkPortCollection);
             item.putData(ConfigFactory.CONVERTER, new NetworkNetworkPortCollectionConverter());
@@ -1468,6 +1478,7 @@ public class ConfigFactory {
         case NetworkConfiguration:
         case NetworkCreate:
         case NetworkPort:
+        case NetworkNetworkPort:
         case NetworkPortConfiguration:
         case NetworkPortCreate:
         case NetworkPortTemplate:
