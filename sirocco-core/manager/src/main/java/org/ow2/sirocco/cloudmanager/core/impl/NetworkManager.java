@@ -347,6 +347,12 @@ public class NetworkManager implements INetworkManager {
         return null;
     }
 
+    @Override
+    public void updateNetworkPortInNetwork(final String networkId, final NetworkNetworkPort networkPort)
+        throws ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+    }
+
     //
     // NetworkConfiguration operations
     //
@@ -1229,6 +1235,12 @@ public class NetworkManager implements INetworkManager {
             NetworkManager.logger.error("", e);
         }
         return job;
+    }
+
+    @Override
+    public void updateNetworkInForwardingGroup(final String forwardingGroupId,
+        final ForwardingGroupNetwork forwardingGroupNetwork) throws ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
     }
 
     //

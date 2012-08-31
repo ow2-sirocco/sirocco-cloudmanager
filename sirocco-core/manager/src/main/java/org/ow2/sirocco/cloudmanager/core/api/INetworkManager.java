@@ -96,6 +96,9 @@ public interface INetworkManager {
     NetworkNetworkPort getNetworkPortFromNetwork(String networkId, String networkNetworkPortId)
         throws ResourceNotFoundException, CloudProviderException;
 
+    void updateNetworkPortInNetwork(String networkId, NetworkNetworkPort networkPort) throws ResourceNotFoundException,
+        CloudProviderException;
+
     // NetworkConfiguration operations
 
     NetworkConfiguration createNetworkConfiguration(NetworkConfiguration networkConfig) throws InvalidRequestException,
@@ -283,6 +286,9 @@ public interface INetworkManager {
         CloudProviderException;
 
     ForwardingGroupNetwork getNetworkFromForwardingGroup(String forwardingGroupId, String networkId)
+        throws ResourceNotFoundException, CloudProviderException;
+
+    void updateNetworkInForwardingGroup(String forwardingGroupId, ForwardingGroupNetwork forwardingGroupNetwork)
         throws ResourceNotFoundException, CloudProviderException;
 
     // Address operations
