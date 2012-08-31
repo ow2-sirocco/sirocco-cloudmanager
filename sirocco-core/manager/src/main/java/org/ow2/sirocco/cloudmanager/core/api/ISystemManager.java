@@ -97,11 +97,6 @@ public interface ISystemManager extends IJobListener, IEntityStateListener {
     SystemTemplate updateAttributesInSystemTemplate(final String id, Map<String, Object> updatedAttributes)
         throws CloudProviderException;
 
-    // operations on system
-    Job startSystem(String systemId) throws CloudProviderException;
-
-    Job stopSystem(String systemId) throws CloudProviderException;
-
     Job deleteSystem(String systemId) throws CloudProviderException;
 
     List<System> getSystems() throws CloudProviderException;
