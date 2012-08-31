@@ -91,8 +91,26 @@ public class EventManager implements IEventManager {
     }
 
     @Override
+    public List<EventLogTemplate> getEventLogTemplates() throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public QueryResult<EventLog> getEventLog(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<EventLog> getEventLog() throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public EventLog getEventLogById(final String eventLogId) throws ResourceNotFoundException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
@@ -117,8 +135,14 @@ public class EventManager implements IEventManager {
     }
 
     @Override
-    public void updateEventLog(final String eventLogId, final Map<String, Object> attributes) throws ResourceNotFoundException,
-        InvalidRequestException, CloudProviderException {
+    public void updateEventLogAttributes(final String eventLogId, final Map<String, Object> attributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void updateEventLog(final EventLog eventLog) throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
 
     }
@@ -130,15 +154,27 @@ public class EventManager implements IEventManager {
     }
 
     @Override
-    public Event getEvent(final String eventLogId, final String eventId) throws CloudProviderException,
+    public Event getEventFromEventLog(final String eventLogId, final String eventId) throws CloudProviderException,
         ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void deleteEvent(final String eventLogId, final String eventId) throws CloudProviderException,
+    public void removeEventFromEventLog(final String eventLogId, final String eventId) throws CloudProviderException,
         ResourceNotFoundException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public Event getEvent(final String eventId) throws InvalidRequestException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteEvent(final String eventId) throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
 
     }

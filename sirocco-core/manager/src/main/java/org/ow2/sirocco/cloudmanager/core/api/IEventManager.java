@@ -31,11 +31,10 @@ import java.util.Map;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
-
 import org.ow2.sirocco.cloudmanager.model.cimi.event.Event;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
-import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 /**
  * Events management operations
@@ -44,40 +43,53 @@ public interface IEventManager {
 
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.EventManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteEventManager@Remote";
 
-    
     /** EventLog Template operations */
-    EventLogTemplate createEventLogTemplate(EventLogTemplate eventLogTemplate) throws CloudProviderException, ResourceNotFoundException;
+    EventLogTemplate createEventLogTemplate(EventLogTemplate eventLogTemplate) throws CloudProviderException,
+        ResourceNotFoundException;
 
     void updateEventLogTemplate(EventLogTemplate eventLogTemplate) throws CloudProviderException, InvalidRequestException;
 
-    EventLogTemplate getEventLogTemplateById(String eventLogTemplateId) throws CloudProviderException, ResourceNotFoundException;
+    EventLogTemplate getEventLogTemplateById(String eventLogTemplateId) throws CloudProviderException,
+        ResourceNotFoundException;
 
-    void deleteEventLogTemplate(String EventLogTemplateId) throws ResourceNotFoundException,
-        CloudProviderException;
+    void deleteEventLogTemplate(String EventLogTemplateId) throws ResourceNotFoundException, CloudProviderException;
 
     void updateEventLogTemplateAttributes(String eventLogTemplateId, Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
     QueryResult<EventLogTemplate> getEventLogTemplates(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
-    
+
+    List<EventLogTemplate> getEventLogTemplates() throws CloudProviderException;
+
     /** EventLog operations */
     EventLog createEventLog(EventLogCreate eventLogCreate) throws CloudProviderException;
-    
+
     void deleteEventLog(String eventLogId) throws CloudProviderException, ResourceNotFoundException;
-    
-    void updateEventLog(String eventLogId, Map<String, Object> attributes) throws ResourceNotFoundException,
+
+    void updateEventLogAttributes(String eventLogId, Map<String, Object> attributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
-    
+
+    void updateEventLog(EventLog eventLog) throws InvalidRequestException, CloudProviderException;
+
     QueryResult<EventLog> getEventLog(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
-    
+
+    List<EventLog> getEventLog() throws CloudProviderException;
+
+    EventLog getEventLogById(String eventLogId) throws ResourceNotFoundException, CloudProviderException;
+
     List<Event> getEvents(String eventLogId) throws CloudProviderException;
+
     QueryResult<Event> getEvents(String eventLogId, int first, int last, List<String> filter, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
-    Event getEvent(String eventLogId, String eventId) throws CloudProviderException, ResourceNotFoundException;
-    
-    void deleteEvent(String eventLogId, String eventId) throws CloudProviderException, ResourceNotFoundException;
-    
+
+    Event getEventFromEventLog(String eventLogId, String eventId) throws CloudProviderException, ResourceNotFoundException;
+
+    void removeEventFromEventLog(String eventLogId, String eventId) throws CloudProviderException, ResourceNotFoundException;
+
+    Event getEvent(String eventId) throws InvalidRequestException, CloudProviderException;
+
+    void deleteEvent(String eventId) throws InvalidRequestException, CloudProviderException;
     // TODO CIMI spec says events are updateable???
 }
