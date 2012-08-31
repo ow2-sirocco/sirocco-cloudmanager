@@ -460,21 +460,6 @@ public class CommonsConverterTest {
             case EventLogCreate:
                 service = null;
                 break;
-            case EventLogEvent:
-                // FIXME EventLogEvent
-                // service = new EventLogEvent();
-                // ((Identifiable) service).setId(11);
-                // cimiClass = CimiEventLogEvent.class;
-                service = null;
-                break;
-            case EventLogEventCollection:
-                // FIXME EventLogEvent
-                // service = new ArrayList<EventLogEvent>();
-                // cimiClass = CimiEventLogEventCollection.class;
-                // // Add idParent in request
-                // this.request.setIds(new IdRequest(null, "999"));
-                service = null;
-                break;
             case EventLogTemplate:
                 service = new EventLogTemplate();
                 ((Identifiable) service).setId(11);

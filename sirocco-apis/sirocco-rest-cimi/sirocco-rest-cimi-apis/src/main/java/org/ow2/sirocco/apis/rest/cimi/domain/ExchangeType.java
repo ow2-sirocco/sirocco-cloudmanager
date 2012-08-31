@@ -56,11 +56,6 @@ public enum ExchangeType {
     /** */
     EventLogCreate(PathType.EventLog),
     /** */
-    // FIXME Deprecated
-    @Deprecated
-    EventLogEvent(PathType.EventLogEvent), @Deprecated
-    EventLogEventCollection(PathType.EventLogEvent, false),
-    /** */
     EventLogTemplate(PathType.EventLogTemplate), EventLogTemplateCollection(PathType.EventLogTemplate, false),
     /** */
     ForwardingGroup(PathType.ForwardingGroup), ForwardingGroupCollection(PathType.ForwardingGroup, false),

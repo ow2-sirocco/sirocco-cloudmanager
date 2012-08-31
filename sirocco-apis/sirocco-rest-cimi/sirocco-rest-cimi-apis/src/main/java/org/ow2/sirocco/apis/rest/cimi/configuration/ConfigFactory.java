@@ -41,7 +41,6 @@ import org.ow2.sirocco.apis.rest.cimi.converter.DiskConfigurationConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EventConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EventLogConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EventLogCreateConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.EventLogEventConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EventLogTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EventTypeAccessConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.EventTypeAlarmConverter;
@@ -103,8 +102,6 @@ import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventCollectionConver
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogCollectionRootConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogEventCollectionConverter;
-import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogEventCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.EventLogTemplateCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.ForwardingGroupCollectionConverter;
@@ -189,7 +186,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEvent;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogCreate;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogEvent;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventTypeAccess;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventTypeAlarm;
@@ -253,8 +249,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogCollectionRoot;
-import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogEventCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogEventCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogTemplateCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupCollection;
@@ -590,7 +584,7 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new EventLogConverter());
             referenceNames = new HashMap<ExchangeType, String>();
             item.putData(ConfigFactory.NAMES, referenceNames);
-            referenceNames.put(ExchangeType.EventLogEventCollection, "events");
+            referenceNames.put(ExchangeType.EventCollection, "events");
             break;
 
         case EventLogCollection:
@@ -604,22 +598,6 @@ public class ConfigFactory {
         case EventLogCreate:
             item = new ItemConfig(CimiEventLogCreate.class, ExchangeType.EventLogCreate);
             item.putData(ConfigFactory.CONVERTER, new EventLogCreateConverter());
-            break;
-
-        case EventLogEvent:
-            item = new ItemConfig(CimiEventLogEvent.class, ExchangeType.EventLogEvent);
-            item.putData(ConfigFactory.CONVERTER, new EventLogEventConverter());
-            referenceNames = new HashMap<ExchangeType, String>();
-            item.putData(ConfigFactory.NAMES, referenceNames);
-            referenceNames.put(ExchangeType.Event, "event");
-            break;
-
-        case EventLogEventCollection:
-            item = new ItemConfig(CimiEventLogEventCollection.class, ExchangeType.EventLogEventCollection);
-            item.putData(ConfigFactory.CONVERTER, new EventLogEventCollectionConverter());
-            referenceNames = new HashMap<ExchangeType, String>();
-            item.putData(ConfigFactory.NAMES, referenceNames);
-            referenceNames.put(ExchangeType.EventLogEvent, "events");
             break;
 
         case EventLogTemplate:
@@ -1266,11 +1244,6 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new EventLogCollectionRootConverter());
             break;
 
-        case EventLogEventCollection:
-            item = new ItemConfig(CimiEventLogEventCollectionRoot.class, ExchangeType.EventLogEventCollection);
-            item.putData(ConfigFactory.CONVERTER, new EventLogEventCollectionRootConverter());
-            break;
-
         case EventLogTemplateCollection:
             item = new ItemConfig(CimiEventLogTemplateCollectionRoot.class, ExchangeType.EventLogTemplateCollection);
             item.putData(ConfigFactory.CONVERTER, new EventLogTemplateCollectionRootConverter());
@@ -1455,7 +1428,6 @@ public class ConfigFactory {
         case Event:
         case EventLog:
         case EventLogCreate:
-        case EventLogEvent:
         case EventLogTemplate:
         case ForwardingGroup:
         case ForwardingGroupCreate:

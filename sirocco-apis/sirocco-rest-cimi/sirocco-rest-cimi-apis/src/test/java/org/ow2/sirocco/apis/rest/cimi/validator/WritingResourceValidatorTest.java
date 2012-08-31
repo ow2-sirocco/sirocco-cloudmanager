@@ -40,7 +40,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiDataCommon;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEvent;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogEvent;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupNetwork;
@@ -87,7 +86,6 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogCollection;
-import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogEventCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupNetworkCollection;
@@ -262,12 +260,6 @@ public class WritingResourceValidatorTest {
             break;
         case EventLogCreate:
             cimi = null;
-            break;
-        case EventLogEvent:
-            cimi = new CimiEventLogEvent();
-            break;
-        case EventLogEventCollection:
-            cimi = new CimiEventLogEventCollection();
             break;
         case EventLogTemplate:
             cimi = new CimiEventLogTemplate();
