@@ -114,7 +114,7 @@ public abstract class ConstantsPath {
 
     public static final String NETWORK_PORT_CONFIGURATION = "networkPortConfigs";
 
-    public static final String NETWORK_PORT_CONFIGURATION_PATH = "/" + ConstantsPath.NETWORK_CONFIGURATION;
+    public static final String NETWORK_PORT_CONFIGURATION_PATH = "/" + ConstantsPath.NETWORK_PORT_CONFIGURATION;
 
     public static final String NETWORK_PORT_TEMPLATE = "networkPortTemplates";
 
