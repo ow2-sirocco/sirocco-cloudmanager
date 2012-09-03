@@ -154,27 +154,27 @@ public class MachineImagesConverterTest {
         Assert.assertEquals(3, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/1",
             cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/2",
             cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/3",
             cimi.getArray()[2].getHref());
-        Assert.assertNull(cimi.getArray()[2].getId());
-        Assert.assertNull(cimi.getArray()[2].getName());
+        Assert.assertNotNull(cimi.getArray()[2].getId());
+        Assert.assertNotNull(cimi.getArray()[2].getName());
 
         cimi = (CimiMachineImageCollection) this.context.convertToCimi(
             Arrays.asList(new MachineImage[] {machineImage3, machineImage1}), CimiMachineImageCollection.class);
         Assert.assertEquals(2, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/3",
             cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/1",
             cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
     }
 }

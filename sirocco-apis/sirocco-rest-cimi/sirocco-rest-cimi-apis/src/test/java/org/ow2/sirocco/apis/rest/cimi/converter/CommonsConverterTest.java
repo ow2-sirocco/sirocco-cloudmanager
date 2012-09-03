@@ -354,10 +354,10 @@ public class CommonsConverterTest {
         Assert.assertNull(cimiCollection.getHref());
 
         cimi = cimiCollection.getCollection().get(0);
-        Assert.assertNull(cimi.getId());
+        Assert.assertNotNull(cimi.getId());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/29", cimi.getHref());
-        Assert.assertNull(cimi.getCreated());
-        Assert.assertNull(cimi.getUpdated());
+        Assert.assertNotNull(cimi.getCreated());
+        Assert.assertNotNull(cimi.getUpdated());
     }
 
     @Test

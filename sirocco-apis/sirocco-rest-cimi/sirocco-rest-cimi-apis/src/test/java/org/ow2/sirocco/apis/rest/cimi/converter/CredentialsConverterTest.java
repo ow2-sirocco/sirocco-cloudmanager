@@ -159,28 +159,28 @@ public class CredentialsConverterTest {
         Assert.assertEquals(3, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Credential.getPathname() + "/1",
             cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Credential.getPathname() + "/2",
             cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Credential.getPathname() + "/3",
             cimi.getArray()[2].getHref());
-        Assert.assertNull(cimi.getArray()[2].getId());
-        Assert.assertNull(cimi.getArray()[2].getName());
+        Assert.assertNotNull(cimi.getArray()[2].getId());
+        Assert.assertNotNull(cimi.getArray()[2].getName());
 
         cimi = (CimiCredentialCollection) this.context.convertToCimi(
             Arrays.asList(new Credentials[] {Credentials3, Credentials1}), CimiCredentialCollection.class);
         Assert.assertEquals(2, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Credential.getPathname() + "/3",
             cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Credential.getPathname() + "/1",
             cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
     }
 
     @Test
@@ -263,16 +263,16 @@ public class CredentialsConverterTest {
         Assert.assertEquals(3, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.CredentialTemplate.getPathname() + "/1",
             cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.CredentialTemplate.getPathname() + "/2",
             cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.CredentialTemplate.getPathname() + "/3",
             cimi.getArray()[2].getHref());
-        Assert.assertNull(cimi.getArray()[2].getId());
-        Assert.assertNull(cimi.getArray()[2].getName());
+        Assert.assertNotNull(cimi.getArray()[2].getId());
+        Assert.assertNotNull(cimi.getArray()[2].getName());
 
         cimi = (CimiCredentialTemplateCollection) this.context.convertToCimi(
             Arrays.asList(new CredentialsTemplate[] {credentialTemplate3, credentialTemplate1}),
@@ -280,12 +280,12 @@ public class CredentialsConverterTest {
         Assert.assertEquals(2, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.CredentialTemplate.getPathname() + "/3",
             cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.CredentialTemplate.getPathname() + "/1",
             cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
     }
 
     @Test

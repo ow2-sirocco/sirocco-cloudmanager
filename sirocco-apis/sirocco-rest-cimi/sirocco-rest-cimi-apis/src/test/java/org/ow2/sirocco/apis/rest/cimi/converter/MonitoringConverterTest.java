@@ -236,23 +236,23 @@ public class MonitoringConverterTest {
         cimi = (CimiJobCollection) this.context.convertToCimi(service, CimiJobCollection.class);
         Assert.assertEquals(3, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/1", cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/2", cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/3", cimi.getArray()[2].getHref());
-        Assert.assertNull(cimi.getArray()[2].getId());
-        Assert.assertNull(cimi.getArray()[2].getName());
+        Assert.assertNotNull(cimi.getArray()[2].getId());
+        Assert.assertNotNull(cimi.getArray()[2].getName());
 
         cimi = (CimiJobCollection) this.context.convertToCimi(Arrays.asList(new Job[] {Job3, Job1}), CimiJobCollection.class);
         Assert.assertEquals(2, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/3", cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.Job.getPathname() + "/1", cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
     }
 
     @Test
