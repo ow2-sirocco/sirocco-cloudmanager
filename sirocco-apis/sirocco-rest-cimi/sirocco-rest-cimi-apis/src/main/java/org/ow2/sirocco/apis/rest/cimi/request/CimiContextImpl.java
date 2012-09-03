@@ -267,7 +267,8 @@ public class CimiContextImpl implements CimiContext {
                 // All expanded ?
                 expand = this.getRequest().getParams().getCimiExpand().hasAll();
                 if (false == expand) {
-                    // Get referenced types and names of root
+                    // Get referenced types and names of root to verify with the
+                    // "expand" parameter of the QueryString
                     Map<ExchangeType, String> typeNames = this.findReferenceNames(this.getRootConverting());
                     if (null != typeNames) {
                         // Expand only if type is found and name of type is a
@@ -284,6 +285,14 @@ public class CimiContextImpl implements CimiContext {
                                     }
                                 }
                             }
+                        }
+                    }
+                    // if "expand" parameter exists in QueryString
+                    // then if the root class is a collection expands it
+                    if ((false == expand) && (true == this.getRequest().getParams().getCimiExpand().isEmpty())) {
+                        ExchangeType typeRoot = this.getType(this.getRootConverting());
+                        if (false == typeRoot.hasIdInReference()) {
+                            expand = true;
                         }
                     }
                 }
@@ -306,7 +315,6 @@ public class CimiContextImpl implements CimiContext {
     @Override
     public boolean mustBeReferenced(final CimiResource resource) {
         boolean reference = false;
-
         // All referenced except the root
         if (this.stackConvertedCimiClass.size() > 1) {
             reference = true;

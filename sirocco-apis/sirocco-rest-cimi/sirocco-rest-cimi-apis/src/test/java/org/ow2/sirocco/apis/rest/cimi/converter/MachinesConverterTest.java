@@ -213,17 +213,9 @@ public class MachinesConverterTest {
         machineVolume.setName("Volume2229");
         service.getVolumes().add(machineVolume);
 
-        // no expand
+        // Not expand in QueryString
         this.request.getParams().setCimiExpand(new CimiExpand());
         cimi = (CimiMachine) this.context.convertToCimi(service, CimiMachine.class);
-        Assert.assertNotNull(cimi.getDisks().getHref());
-        Assert.assertNull(cimi.getDisks().getId());
-
-        Assert.assertNotNull(cimi.getVolumes().getHref());
-        Assert.assertNull(cimi.getVolumes().getId());
-
-        Assert.assertNotNull(cimi.getNetworkInterfaces().getHref());
-        Assert.assertNull(cimi.getNetworkInterfaces().getId());
 
         // Trace
         strWriter = new StringWriter();
@@ -232,6 +224,16 @@ public class MachinesConverterTest {
         strWriter = new StringWriter();
         m.marshal(cimi, strWriter);
         MachinesConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Verify
+        Assert.assertNotNull(cimi.getDisks().getHref());
+        Assert.assertNull(cimi.getDisks().getId());
+
+        Assert.assertNotNull(cimi.getVolumes().getHref());
+        Assert.assertNull(cimi.getVolumes().getId());
+
+        Assert.assertNotNull(cimi.getNetworkInterfaces().getHref());
+        Assert.assertNull(cimi.getNetworkInterfaces().getId());
 
         // ----------------------------------
         // expand = *
@@ -350,28 +352,28 @@ public class MachinesConverterTest {
         Assert.assertEquals(3, cimi.getArray().length);
         Assert
             .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert
             .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/2", cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
         Assert
             .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[2].getHref());
-        Assert.assertNull(cimi.getArray()[2].getId());
-        Assert.assertNull(cimi.getArray()[2].getName());
+        Assert.assertNotNull(cimi.getArray()[2].getId());
+        Assert.assertNotNull(cimi.getArray()[2].getName());
 
         cimi = (CimiMachineCollection) this.context.convertToCimi(Arrays.asList(new Machine[] {Machine3, Machine1}),
             CimiMachineCollection.class);
         Assert.assertEquals(2, cimi.getArray().length);
         Assert
             .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert
             .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
     }
 
     @Test
@@ -417,6 +419,131 @@ public class MachinesConverterTest {
         Assert.assertEquals(3, cimi.getArray().length);
         Assert
             .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[0].getHref());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/2", cimi.getArray()[1].getHref());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[2].getHref());
+        Assert.assertNotNull(cimi.getArray()[2].getId());
+        Assert.assertNotNull(cimi.getArray()[2].getName());
+
+        cimi = (CimiMachineCollection) this.context.convertToCimi(Arrays.asList(new Machine[] {Machine3, Machine1}),
+            CimiMachineCollection.class);
+        Assert.assertEquals(2, cimi.getArray().length);
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[0].getHref());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[1].getHref());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
+    }
+
+    @Test
+    public void testCimiMachineCollectionExpand() throws Exception {
+        CimiMachineCollection cimi;
+        List<Machine> service;
+
+        // Prepare Trace
+        Writer strWriter;
+        ObjectMapper mapper = new ObjectMapper();
+        JAXBContext context = JAXBContext.newInstance(CimiMachineCollectionRoot.class);
+        Marshaller m = context.createMarshaller();
+        m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+        // Full Service -> Cimi
+        Machine Machine1 = new Machine();
+        Machine1.setId(1);
+        Machine1.setName("nameOne");
+        Machine Machine2 = new Machine();
+        Machine2.setId(2);
+        Machine2.setName("nameTwo");
+        Machine Machine3 = new Machine();
+        Machine3.setId(3);
+        Machine3.setName("nameThree");
+
+        service = new ArrayList<Machine>();
+        service.add(Machine1);
+        service.add(Machine2);
+        service.add(Machine3);
+
+        // --------------------------------
+        // Not expand in QueryString, by default the machine items are visible
+        this.request.getParams().setCimiExpand(new CimiExpand());
+        cimi = (CimiMachineCollectionRoot) this.context.convertToCimi(service, CimiMachineCollectionRoot.class);
+
+        // Trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        MachinesConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+        strWriter = new StringWriter();
+        m.marshal(cimi, strWriter);
+        MachinesConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Verify
+        Assert.assertEquals(3, cimi.getArray().length);
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[0].getHref());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/2", cimi.getArray()[1].getHref());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[2].getHref());
+        Assert.assertNotNull(cimi.getArray()[2].getId());
+        Assert.assertNotNull(cimi.getArray()[2].getName());
+
+        // --------------------------------
+        // Expand = machines, the machine items are visible
+        this.request.getParams().setCimiExpand(new CimiExpand("machines"));
+        cimi = (CimiMachineCollectionRoot) this.context.convertToCimi(service, CimiMachineCollectionRoot.class);
+
+        // Trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        MachinesConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+        strWriter = new StringWriter();
+        m.marshal(cimi, strWriter);
+        MachinesConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Verify
+        Assert.assertEquals(3, cimi.getArray().length);
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[0].getHref());
+        Assert.assertNotNull(cimi.getArray()[0].getId());
+        Assert.assertNotNull(cimi.getArray()[0].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/2", cimi.getArray()[1].getHref());
+        Assert.assertNotNull(cimi.getArray()[1].getId());
+        Assert.assertNotNull(cimi.getArray()[1].getName());
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[2].getHref());
+        Assert.assertNotNull(cimi.getArray()[2].getId());
+        Assert.assertNotNull(cimi.getArray()[2].getName());
+
+        // --------------------------------
+        // Expand = unknown, the machine items are hidden
+        this.request.getParams().setCimiExpand(new CimiExpand("unknown"));
+        cimi = (CimiMachineCollectionRoot) this.context.convertToCimi(service, CimiMachineCollectionRoot.class);
+
+        // Trace
+        strWriter = new StringWriter();
+        mapper.writeValue(strWriter, cimi);
+        MachinesConverterTest.LOGGER.debug("JSON:\n\t{}", strWriter);
+        strWriter = new StringWriter();
+        m.marshal(cimi, strWriter);
+        MachinesConverterTest.LOGGER.debug("XML:\n\t{}", strWriter);
+
+        // Verify
+        Assert.assertEquals(3, cimi.getArray().length);
+        Assert
+            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[0].getHref());
         Assert.assertNull(cimi.getArray()[0].getId());
         Assert.assertNull(cimi.getArray()[0].getName());
         Assert
@@ -427,18 +554,6 @@ public class MachinesConverterTest {
             .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[2].getHref());
         Assert.assertNull(cimi.getArray()[2].getId());
         Assert.assertNull(cimi.getArray()[2].getName());
-
-        cimi = (CimiMachineCollection) this.context.convertToCimi(Arrays.asList(new Machine[] {Machine3, Machine1}),
-            CimiMachineCollection.class);
-        Assert.assertEquals(2, cimi.getArray().length);
-        Assert
-            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/3", cimi.getArray()[0].getHref());
-        Assert.assertNull(cimi.getArray()[0].getId());
-        Assert.assertNull(cimi.getArray()[0].getName());
-        Assert
-            .assertEquals(this.request.getBaseUri() + ExchangeType.Machine.getPathname() + "/1", cimi.getArray()[1].getHref());
-        Assert.assertNull(cimi.getArray()[1].getId());
-        Assert.assertNull(cimi.getArray()[1].getName());
     }
 
     // TODO Volumes, Network, ...
