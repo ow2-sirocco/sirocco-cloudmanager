@@ -233,6 +233,12 @@ public class CimiContextImpl implements CimiContext {
         return converted;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#convertNextService(java.lang.Object,
+     *      java.lang.Class)
+     */
     @Override
     public Object convertNextService(final Object cimi, final Class<?> cimiToUse) {
         Object converted = null;
