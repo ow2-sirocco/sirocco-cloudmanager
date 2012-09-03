@@ -26,6 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.domain.TargetResource;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
@@ -248,6 +249,20 @@ public class ConverterHelper {
         if (null != value) {
             EventLogTemplate.Persistence[] allEnums = EventLogTemplate.Persistence.values();
             for (EventLogTemplate.Persistence myEnum : allEnums) {
+                if (true == value.equalsIgnoreCase(myEnum.toString())) {
+                    converted = myEnum;
+                    break;
+                }
+            }
+        }
+        return converted;
+    }
+
+    public static Operation toOperation(final String value) {
+        Operation converted = null;
+        if (null != value) {
+            Operation[] allEnums = Operation.values();
+            for (Operation myEnum : allEnums) {
                 if (true == value.equalsIgnoreCase(myEnum.toString())) {
                     converted = myEnum;
                     break;

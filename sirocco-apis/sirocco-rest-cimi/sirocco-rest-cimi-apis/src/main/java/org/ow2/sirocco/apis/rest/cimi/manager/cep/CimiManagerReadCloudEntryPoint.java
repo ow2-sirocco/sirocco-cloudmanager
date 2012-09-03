@@ -146,20 +146,4 @@ public class CimiManagerReadCloudEntryPoint extends CimiManagerReadAbstract {
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
     }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void afterConvertToResponse(final CimiContext context, final Object dataService) {
-        super.afterConvertToResponse(context, dataService);
-        // XXX UnsupportedOperation
-        // CimiResource resource = (CimiResource)
-        // context.getResponse().getCimiData();
-        // resource.add(new CimiOperation(Operation.EDIT.getRel(),
-        // resource.getId()));
-    }
 }

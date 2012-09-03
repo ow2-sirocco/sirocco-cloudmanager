@@ -26,9 +26,6 @@ package org.ow2.sirocco.apis.rest.cimi.manager.volume;
 
 import javax.ws.rs.core.Response;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
-import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerReadAbstract;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -79,21 +76,5 @@ public class CimiManagerReadVolumeCollection extends CimiManagerReadAbstract {
             CimiVolumeCollectionRoot.class);
         context.getResponse().setCimiData(cimi);
         context.getResponse().setStatus(Response.Status.OK);
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void afterConvertToResponse(final CimiContext context, final Object dataService) {
-        super.afterConvertToResponse(context, dataService);
-
-        CimiResource resource = (CimiResource) context.getResponse().getCimiData();
-
-        resource.add(new CimiOperation(Operation.ADD.getRel(), resource.getId()));
-
     }
 }

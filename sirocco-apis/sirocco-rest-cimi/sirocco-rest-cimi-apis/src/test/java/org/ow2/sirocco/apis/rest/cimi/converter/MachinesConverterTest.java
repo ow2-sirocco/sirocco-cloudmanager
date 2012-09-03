@@ -183,6 +183,7 @@ public class MachinesConverterTest {
         // Build Service Machine
         service = new Machine();
         service.setId(7);
+        service.setState(Machine.State.STOPPED);
 
         service.setDisks(new ArrayList<MachineDisk>());
         machineDisk = new MachineDisk();
@@ -336,12 +337,15 @@ public class MachinesConverterTest {
         Machine Machine1 = new Machine();
         Machine1.setId(1);
         Machine1.setName("nameOne");
+        Machine1.setState(Machine.State.STOPPED);
         Machine Machine2 = new Machine();
         Machine2.setId(2);
         Machine2.setName("nameTwo");
+        Machine2.setState(Machine.State.STARTED);
         Machine Machine3 = new Machine();
         Machine3.setId(3);
         Machine3.setName("nameThree");
+        Machine3.setState(Machine.State.STOPPING);
 
         service = new ArrayList<Machine>();
         service.add(Machine1);
@@ -403,12 +407,15 @@ public class MachinesConverterTest {
         Machine Machine1 = new Machine();
         Machine1.setId(1);
         Machine1.setName("nameOne");
+        Machine1.setState(Machine.State.STOPPED);
         Machine Machine2 = new Machine();
         Machine2.setId(2);
         Machine2.setName("nameTwo");
+        Machine2.setState(Machine.State.STARTED);
         Machine Machine3 = new Machine();
         Machine3.setId(3);
         Machine3.setName("nameThree");
+        Machine3.setState(Machine.State.STOPPING);
 
         service = new ArrayList<Machine>();
         service.add(Machine1);
@@ -459,12 +466,15 @@ public class MachinesConverterTest {
         Machine Machine1 = new Machine();
         Machine1.setId(1);
         Machine1.setName("nameOne");
+        Machine1.setState(Machine.State.STOPPED);
         Machine Machine2 = new Machine();
         Machine2.setId(2);
         Machine2.setName("nameTwo");
+        Machine2.setState(Machine.State.STARTED);
         Machine Machine3 = new Machine();
         Machine3.setId(3);
         Machine3.setName("nameThree");
+        Machine3.setState(Machine.State.STOPPING);
 
         service = new ArrayList<Machine>();
         service.add(Machine1);

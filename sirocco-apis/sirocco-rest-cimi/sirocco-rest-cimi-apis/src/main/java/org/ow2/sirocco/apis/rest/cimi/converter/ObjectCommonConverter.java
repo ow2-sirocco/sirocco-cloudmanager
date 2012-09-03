@@ -25,6 +25,8 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
@@ -53,11 +55,25 @@ public abstract class ObjectCommonConverter extends CommonConverter implements C
             dataCimi.setResourceURI(dataCimi.getExchangeType().getResourceURI());
             if (null != dataService.getId()) {
                 dataCimi.setId(context.makeHref(dataCimi, dataService.getId().toString()));
+                this.fillOperations(context, dataService, dataCimi);
             }
         }
         if (true == context.mustBeReferenced(dataCimi)) {
             dataCimi.setHref(context.makeHref(dataCimi, dataService.getId().toString()));
         }
+    }
+
+    /**
+     * Add default CIMI operations : EDIT and DELETE.
+     * 
+     * @param context The current context
+     * @param dataService Source service object
+     * @param dataCimi Destination CIMI object
+     */
+    protected void fillOperations(final CimiContext context, final Identifiable dataService, final CimiObjectCommon dataCimi) {
+        String href = context.makeHref(dataCimi, dataService.getId().toString());
+        dataCimi.add(new CimiOperation(Operation.EDIT.getRel(), href));
+        dataCimi.add(new CimiOperation(Operation.DELETE.getRel(), href));
     }
 
     /**
@@ -88,6 +104,7 @@ public abstract class ObjectCommonConverter extends CommonConverter implements C
             dataCimi.setUpdated(dataService.getUpdated());
             if (null != dataService.getId()) {
                 dataCimi.setId(context.makeHref(dataCimi, dataService.getId().toString()));
+                this.fillOperations(context, dataService, dataCimi);
             }
         }
         if (true == context.mustBeReferenced(dataCimi)) {

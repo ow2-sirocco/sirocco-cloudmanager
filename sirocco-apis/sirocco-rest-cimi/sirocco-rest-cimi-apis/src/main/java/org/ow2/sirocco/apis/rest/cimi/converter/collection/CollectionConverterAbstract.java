@@ -28,7 +28,9 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
@@ -49,6 +51,7 @@ public abstract class CollectionConverterAbstract implements CimiConverter {
     /**
      * Fill the common data from a service collection to a CIMI collection.
      * 
+     * @param <E> CimiResource
      * @param context The current context
      * @param dataService Source service collection
      * @param dataCimi Destination CIMI collection
@@ -58,10 +61,25 @@ public abstract class CollectionConverterAbstract implements CimiConverter {
         if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setResourceURI(dataCimi.getExchangeType().getResourceURI());
             dataCimi.setId(context.makeHrefBase(dataCimi));
+            this.addOperations(context, dataService, dataCimi);
         }
         if (true == context.mustBeReferenced(dataCimi)) {
             dataCimi.setHref(context.makeHrefBase(dataCimi));
         }
+    }
+
+    /**
+     * Add default CIMI operations : ADD.
+     * 
+     * @param <E> CimiResource
+     * @param context The current context
+     * @param dataService Source service collection
+     * @param dataCimi Destination CIMI collection
+     */
+    protected <E extends CimiResource> void addOperations(final CimiContext context, final Object dataService,
+        final CimiCollection<E> dataCimi) {
+        String href = context.makeHrefBase(dataCimi);
+        dataCimi.add(new CimiOperation(Operation.ADD.getRel(), href));
     }
 
     /**

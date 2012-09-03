@@ -51,29 +51,4 @@ public class CimiManagerDeleteMachine extends CimiManagerDeleteAbstract {
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         return this.manager.deleteMachine(context.getRequest().getId());
     }
-
-    // /**
-    // * Call after the conversion.
-    // *
-    // * @param request The CIMI request
-    // * @param response The CIMI response
-    // * @param dataService The output service data
-    // */
-    // @Override
-    // protected void afterConvertToResponse(final CimiContext context, final
-    // Object dataService) {
-    // if (null == context.getResponse().getCimiData()) {
-    // // Job
-    // if (dataService instanceof Job) {
-    // CimiJob cimi = (CimiJob) context.convertToCimi(dataService,
-    // CimiJob.class);
-    // context.getResponse().setCimiData(cimi);
-    // context.getResponse().putHeader(Constants.HEADER_CIMI_JOB_URI,
-    // cimi.getId());
-    // context.getResponse().putHeader(Constants.HEADER_LOCATION,
-    // cimi.getTargetResource());
-    // context.getResponse().setStatus(Response.Status.ACCEPTED);
-    // }
-    // }
-    // }
 }

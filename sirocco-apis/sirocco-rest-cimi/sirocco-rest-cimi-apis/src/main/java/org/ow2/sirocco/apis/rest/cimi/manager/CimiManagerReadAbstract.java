@@ -24,9 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
-import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.apis.rest.cimi.validator.CimiValidatorHelper;
 
@@ -53,19 +50,5 @@ public abstract class CimiManagerReadAbstract extends CimiManagerAbstract {
     @Override
     protected Object convertToDataService(final CimiContext context) throws Exception {
         return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerAbstract#afterConvertToResponse(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
-     *      java.lang.Object)
-     */
-    @Override
-    protected void afterConvertToResponse(final CimiContext context, final Object dataService) {
-        super.afterConvertToResponse(context, dataService);
-        CimiResource resource = (CimiResource) context.getResponse().getCimiData();
-        resource.add(new CimiOperation(Operation.EDIT.getRel(), resource.getId()));
-        resource.add(new CimiOperation(Operation.DELETE.getRel(), resource.getId()));
     }
 }

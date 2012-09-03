@@ -24,12 +24,19 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.Set;
+
+import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineDiskCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 
 /**
@@ -138,5 +145,32 @@ public class MachineConverter extends ObjectCommonConverter {
         // dataService.setVolumes((List<MachineVolume>)
         // context.convertNextService(dataCimi.getVolumes()));
         // dataService.setState(dataService.getState());
+    }
+
+    /**
+     * Add operation and action of a machine.
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ObjectCommonConverter#fillOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.cloudmanager.model.cimi.Identifiable,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon)
+     */
+    @Override
+    protected void fillOperations(final CimiContext context, final Identifiable dataService, final CimiObjectCommon dataCimi) {
+        String href = context.makeHref(dataCimi, dataService.getId().toString());
+        dataCimi.add(new CimiOperation(Operation.EDIT.getRel(), href));
+
+        Set<String> serviceActions = ((Machine) dataService).getOperations();
+        for (String valueAction : serviceActions) {
+            Operation operation = ConverterHelper.toOperation(valueAction);
+            ActionType action = ActionType.findValueOf(valueAction);
+            if ((null == action) && (null == operation)) {
+                throw new InvalidConversionException("Unknown CIMI operation for a machine : " + valueAction);
+            }
+            if (null != action) {
+                dataCimi.add(new CimiOperation(action.getPath(), href));
+            } else {
+                dataCimi.add(new CimiOperation(operation.getRel(), href));
+            }
+        }
     }
 }

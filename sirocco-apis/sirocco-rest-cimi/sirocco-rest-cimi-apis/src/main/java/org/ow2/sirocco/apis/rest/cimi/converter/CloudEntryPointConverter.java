@@ -25,7 +25,10 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CloudEntryPointAggregate;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
@@ -41,6 +44,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeImageCollectio
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
+import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 
 /**
  * Convert the data of the CIMI model and the service model in both directions.
@@ -157,6 +161,22 @@ public class CloudEntryPointConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiCloudEntryPoint dataCimi,
         final CloudEntryPoint dataService) {
         this.fill(context, dataCimi, dataService);
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Add only EDIT operation.
+     * </p>
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ObjectCommonConverter#fillOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.cloudmanager.model.cimi.Identifiable,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon)
+     */
+    @Override
+    protected void fillOperations(final CimiContext context, final Identifiable dataService, final CimiObjectCommon dataCimi) {
+        String href = context.makeHref(dataCimi, dataService.getId().toString());
+        dataCimi.add(new CimiOperation(Operation.EDIT.getRel(), href));
     }
 
 }

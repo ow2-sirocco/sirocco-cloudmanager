@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
-import org.apache.commons.beanutils.ConversionException;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -124,12 +123,12 @@ public class EventLogTemplateConverter extends ObjectCommonConverter {
         ExchangeType type = PathHelper.findExchangeType(context.getRequest().getBaseUri(), dataCimi.getTargetResource()
             .getHref());
         if (null == type) {
-            throw new ConversionException("None associated CIMI found to this TargetResource HREF: "
+            throw new InvalidConversionException("None associated CIMI found to this TargetResource HREF: "
                 + dataCimi.getTargetResource().getHref());
         }
         Class<?> classService = context.findAssociatedResourceServiceClass(type);
         if (null == classService) {
-            throw new ConversionException("None associated resource service class found to this TargetResource HREF: "
+            throw new InvalidConversionException("None associated resource service class found to this TargetResource HREF: "
                 + dataCimi.getTargetResource().getHref());
         }
 
@@ -138,7 +137,7 @@ public class EventLogTemplateConverter extends ObjectCommonConverter {
             serviceInstance.setId(PathHelper.extractId(dataCimi.getTargetResource().getHref()));
             dataService.setTargetResource(serviceInstance);
         } catch (Exception e) {
-            throw new ConversionException("None associated resource service class found to this TargetResource HREF: "
+            throw new InvalidConversionException("None associated resource service class found to this TargetResource HREF: "
                 + dataCimi.getTargetResource().getHref());
         }
     }

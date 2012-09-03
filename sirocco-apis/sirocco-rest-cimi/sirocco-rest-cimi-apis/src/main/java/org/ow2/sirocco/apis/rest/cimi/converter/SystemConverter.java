@@ -25,9 +25,14 @@
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.List;
+import java.util.Set;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiOperation;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.Operation;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemForwardingGroupCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollection;
@@ -36,6 +41,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemNetworkPortCol
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemForwardingGroup;
@@ -167,4 +173,32 @@ public class SystemConverter extends ObjectCommonConverter {
         // dataService.setEventLog((EventLog)
         // context.convertNextService(dataCimi.getEventLog()));
     }
+
+    /**
+     * Add operation and action of a system.
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.ObjectCommonConverter#fillOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.cloudmanager.model.cimi.Identifiable,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommon)
+     */
+    @Override
+    protected void fillOperations(final CimiContext context, final Identifiable dataService, final CimiObjectCommon dataCimi) {
+        String href = context.makeHref(dataCimi, dataService.getId().toString());
+        dataCimi.add(new CimiOperation(Operation.EDIT.getRel(), href));
+
+        Set<String> serviceActions = ((System) dataService).getOperations();
+        for (String valueAction : serviceActions) {
+            Operation operation = ConverterHelper.toOperation(valueAction);
+            ActionType action = ActionType.findValueOf(valueAction);
+            if ((null == action) && (null == operation)) {
+                throw new InvalidConversionException("Unknown CIMI operation for a system : " + valueAction);
+            }
+            if (null != action) {
+                dataCimi.add(new CimiOperation(action.getPath(), href));
+            } else {
+                dataCimi.add(new CimiOperation(operation.getRel(), href));
+            }
+        }
+    }
+
 }

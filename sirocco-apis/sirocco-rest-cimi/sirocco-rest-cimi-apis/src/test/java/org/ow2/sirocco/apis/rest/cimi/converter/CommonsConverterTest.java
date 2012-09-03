@@ -296,7 +296,6 @@ public class CommonsConverterTest {
         Assert.assertEquals("valueThree", cimi.getProperties().get("keyThree"));
     }
 
-    // FIXME
     @Test
     public void testObjectCommon() throws Exception {
         CimiMachineImage cimi;
@@ -516,6 +515,7 @@ public class CommonsConverterTest {
             case Machine:
                 service = new Machine();
                 ((Identifiable) service).setId(11);
+                ((Machine) service).setState(Machine.State.STARTED);
                 cimiClass = CimiMachine.class;
                 break;
             case MachineCollection:
@@ -731,6 +731,7 @@ public class CommonsConverterTest {
             case System:
                 service = new System();
                 ((Identifiable) service).setId(11);
+                ((System) service).setState(System.State.STARTED);
                 cimiClass = CimiSystem.class;
                 break;
             case SystemCollection:
@@ -915,6 +916,7 @@ public class CommonsConverterTest {
         // Builds resources for a machine
         Machine sMachine = new Machine();
         sMachine.setId(9999);
+        sMachine.setState(Machine.State.STARTED);
         sMachine.setDisks(new ArrayList<MachineDisk>());
         sMachine.getDisks().add(new MachineDisk());
         sMachine.getDisks().get(0).setId(111);

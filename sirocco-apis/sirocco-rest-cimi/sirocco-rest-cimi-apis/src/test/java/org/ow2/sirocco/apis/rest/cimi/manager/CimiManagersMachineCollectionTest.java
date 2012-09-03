@@ -109,6 +109,7 @@ public class CimiManagersMachineCollectionTest {
         for (int i = 0; i < 3; i++) {
             item = new Machine();
             item.setId(i + 13);
+            item.setState(Machine.State.STARTED);
             list.add(item);
         }
 

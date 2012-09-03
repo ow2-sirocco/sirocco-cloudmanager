@@ -27,6 +27,8 @@ package org.ow2.sirocco.apis.rest.cimi.converter.collection;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -93,6 +95,20 @@ public class JobCollectionConverter extends CollectionConverterAbstract {
     @Override
     public void copyToService(final CimiContext context, final Object dataCimi, final Object dataService) {
         this.doCopyToService(context, (CimiJobCollection) dataCimi, (List<Object>) dataService);
+    }
+
+    /**
+     * <p>
+     * None operation.
+     * </p>
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.converter.collection.CollectionConverterAbstract#addOperations(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,java.lang.Object,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollection)
+     */
+    @Override
+    protected <E extends CimiResource> void addOperations(final CimiContext context, final Object dataService,
+        final CimiCollection<E> dataCimi) {
+        // None operation to add
     }
 
 }

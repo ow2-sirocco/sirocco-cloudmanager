@@ -309,6 +309,7 @@ public class CimiManagersMachineTest {
     public void testRead() throws Exception {
         Machine machine = new Machine();
         machine.setId(1);
+        machine.setState(Machine.State.STARTED);
 
         EasyMock.expect(this.service.getMachineById("1")).andReturn(machine);
         EasyMock.replay(this.service);
@@ -326,6 +327,7 @@ public class CimiManagersMachineTest {
         List<String> list = Arrays.asList(new String[] {"name", "description"});
         Machine machine = new Machine();
         machine.setId(1);
+        machine.setState(Machine.State.STARTED);
 
         EasyMock.expect(this.service.getMachineAttributes(EasyMock.eq("1"), EasyMock.eq(list))).andReturn(machine);
         EasyMock.replay(this.service);
