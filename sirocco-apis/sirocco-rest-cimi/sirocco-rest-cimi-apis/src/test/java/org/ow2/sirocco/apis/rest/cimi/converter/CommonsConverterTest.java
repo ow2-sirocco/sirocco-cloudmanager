@@ -51,6 +51,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiEvent;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLog;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroup;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupNetwork;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiForwardingGroupTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachine;
@@ -96,6 +97,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiEventLogTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupNetworkCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
@@ -142,6 +144,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -485,12 +488,17 @@ public class CommonsConverterTest {
                 service = null;
                 break;
             case ForwardingGroupNetwork:
-                // FIXME ForwardingGroupNetwork
-                service = null;
+                service = new ForwardingGroupNetwork();
+                ((ForwardingGroupNetwork) service).setId(111);
+                cimiClass = CimiForwardingGroupNetwork.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case ForwardingGroupNetworkCollection:
-                // FIXME ForwardingGroupNetworkCollection
-                service = null;
+                service = new ArrayList<ForwardingGroupNetwork>();
+                cimiClass = CimiForwardingGroupNetworkCollection.class;
+                // Add idParent in request
+                this.request.setIds(new IdRequest(null, "999"));
                 break;
             case ForwardingGroupTemplate:
                 service = new ForwardingGroupTemplate();
