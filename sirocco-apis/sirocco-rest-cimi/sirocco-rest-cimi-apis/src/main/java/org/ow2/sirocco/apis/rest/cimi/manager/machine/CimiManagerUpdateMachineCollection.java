@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
  */
 @Component("CimiManagerUpdateMachineCollection")
 @Deprecated
+// FIXME Deprecated
 public class CimiManagerUpdateMachineCollection extends CimiManagerUpdateAbstract {
 
     // @Autowired
@@ -47,13 +48,6 @@ public class CimiManagerUpdateMachineCollection extends CimiManagerUpdateAbstrac
      */
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
-        // FIXME Collection
-        // CimiSelect select = context.getRequest().getHeader().getCimiSelect();
-        // if (true == select.isEmpty()) {
-        // throw new UnsupportedOperationException();
-        // } else {
-        // this.manager.updateMachineCollection(select.dispatchAttributesValues(dataService));
-        // }
         return null;
     }
 
