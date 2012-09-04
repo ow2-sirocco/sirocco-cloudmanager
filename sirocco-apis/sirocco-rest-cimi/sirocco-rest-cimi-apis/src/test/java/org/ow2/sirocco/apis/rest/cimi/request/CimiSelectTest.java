@@ -136,30 +136,6 @@ public class CimiSelectTest {
         Assert.assertFalse(cimi.isEmpty());
         Assert.assertNotNull(cimi.getValues());
         Assert.assertEquals(2, cimi.getValues().size());
-
-        // FIXME
-        // Multi select with expression array
-        selects = new ArrayList<String>();
-        selects.add("attrOne");
-        selects.add("attrTwo[expTwo = 7]");
-
-        cimi.setInitialValues(selects);
-        Assert.assertFalse(cimi.isEmpty());
-        Assert.assertNotNull(cimi.getValues());
-        Assert.assertEquals(2, cimi.getValues().size());
-
-        // FIXME
-        // Multi select with expression and numeric array
-        selects = new ArrayList<String>();
-        selects.add("attrOne");
-        selects.add("attrTwo[expTwo = 7]");
-        selects.add("attrThree[25-103]");
-
-        cimi.setInitialValues(selects);
-        Assert.assertFalse(cimi.isEmpty());
-        Assert.assertNotNull(cimi.getValues());
-        Assert.assertEquals(3, cimi.getValues().size());
-
     }
 
 }
