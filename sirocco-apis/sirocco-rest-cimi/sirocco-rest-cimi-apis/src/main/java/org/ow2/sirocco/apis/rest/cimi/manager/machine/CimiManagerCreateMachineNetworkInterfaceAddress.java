@@ -24,6 +24,7 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.machine;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
 import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -68,8 +69,7 @@ public class CimiManagerCreateMachineNetworkInterfaceAddress extends CimiManager
     @Override
     protected void beforeConvertToDataService(final CimiContext context) throws Exception {
         // FIXME Merge CimiMachineNetworkInterfaceAddress
-        // this.mergeReference.merge(context,
-        // (CimiMachineNetworkInterfaceAddress)context.getRequest().getCimiData());
+        this.mergeReference.merge(context, (CimiMachineNetworkInterfaceAddress) context.getRequest().getCimiData());
     }
 
 }

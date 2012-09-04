@@ -54,6 +54,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
@@ -90,6 +91,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeVolumeImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCollection;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
+import org.ow2.sirocco.apis.rest.cimi.request.IdRequest;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IEventManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
@@ -97,6 +99,8 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.AddressTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
@@ -108,6 +112,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
@@ -294,6 +299,37 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             CimiMachineNetworkInterface cimiRef = (CimiMachineNetworkInterface) context.convertToFullCimi(dataService,
                 CimiMachineNetworkInterface.class);
             this.merge(cimiRef, cimi);
+        }
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper#merge(org.ow2.sirocco.apis.rest.cimi.request.CimiContext,
+     *      org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterfaceAddress)
+     */
+    @Override
+    public void merge(final CimiContext context, final CimiMachineNetworkInterfaceAddress cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            MachineNetworkInterfaceAddress dataService = null;
+            QueryResult<MachineNetworkInterfaceAddress> results = this.managerMachine.getMachineNetworkInterfaceAddresses(
+                context.getRequest().getIds().getId(IdRequest.Type.RESOURCE_GRAND_PARENT), context.getRequest().getIdParent(),
+                -1, -1, null, null);
+            if (null != results.getItems()) {
+                Integer id = Integer.valueOf(context.getRequest().getId());
+                for (MachineNetworkInterfaceAddress item : results.getItems()) {
+                    if (id == item.getId()) {
+                        dataService = item;
+                        break;
+                    }
+                }
+                if (null == dataService) {
+                    throw new ResourceNotFoundException();
+                }
+                CimiMachineNetworkInterfaceAddress cimiRef = (CimiMachineNetworkInterfaceAddress) context.convertToFullCimi(
+                    dataService, CimiMachineNetworkInterfaceAddress.class);
+                this.merge(cimiRef, cimi);
+            }
         }
     }
 
@@ -1440,7 +1476,11 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     protected void merge(final CimiMachineNetworkInterface cimiRef, final CimiMachineNetworkInterface cimi) {
         if (null != cimiRef) {
             this.mergeObjectCommon(cimiRef, cimi);
-
+            if (null == cimi.getAddresses()) {
+                cimi.setAddresses(cimiRef.getAddresses());
+            } else {
+                this.merge(cimiRef.getAddresses(), cimi.getAddresses());
+            }
             if (null == cimi.getMacAddress()) {
                 cimi.setMacAddress(cimiRef.getMacAddress());
             }
@@ -1460,8 +1500,23 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             } else {
                 this.merge(cimiRef.getNetworkPort(), cimi.getNetworkPort());
             }
+        }
+    }
 
-            // Read-only : Addresses
+    /**
+     * Merge machine network data.
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void merge(final CimiMachineNetworkInterfaceAddress cimiRef, final CimiMachineNetworkInterfaceAddress cimi) {
+        if (null != cimiRef) {
+            this.mergeObjectCommon(cimiRef, cimi);
+            if (null == cimi.getAddress()) {
+                cimi.setAddress(cimiRef.getAddress());
+            } else {
+                this.merge(cimiRef.getAddress(), cimi.getAddress());
+            }
         }
     }
 
