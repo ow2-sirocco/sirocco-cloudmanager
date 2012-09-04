@@ -117,7 +117,6 @@ public class MergeReferenceHelperTest {
 
     @Test
     public void testCimiCredentials() throws Exception {
-        System.out.println("testCimiCredentials");
         CimiCredential cimi;
 
         Credentials reference;
@@ -163,7 +162,6 @@ public class MergeReferenceHelperTest {
 
     @Test
     public void testCimiCredentialsCreate() throws Exception {
-        System.out.println("testCimiCredentialsCreate");
         // Mock only one method
         MergeReferenceHelperImpl mockedClass = EasyMock.createMockBuilder(MergeReferenceHelperImpl.class)
             .addMockedMethod("merge", CimiContext.class, CimiCredentialTemplate.class).createMock();
@@ -188,7 +186,6 @@ public class MergeReferenceHelperTest {
 
     @Test
     public void testCimiCredentialsTemplate() throws Exception {
-        System.out.println("testCimiCredentialsTemplate");
         CimiCredentialTemplate cimi;
 
         CredentialsTemplate reference;
@@ -242,7 +239,6 @@ public class MergeReferenceHelperTest {
 
     @Test
     public void testCimiMachineImage() throws Exception {
-        System.out.println("testCimiMachineImage");
         CimiMachineImage cimi;
 
         MachineImage reference;
@@ -288,7 +284,6 @@ public class MergeReferenceHelperTest {
 
     @Test
     public void testCimiMachineConfiguration() throws Exception {
-        System.out.println("testCimiMachineConfiguration");
         CimiMachineConfiguration cimi;
 
         MachineConfiguration reference;
@@ -337,7 +332,6 @@ public class MergeReferenceHelperTest {
     @Test
     // TODO Volumes, Network, ..
     public void testCimiMachineTemplate() throws Exception {
-        System.out.println("testCimiMachineTemplate");
         CimiMachineTemplate cimi;
         CimiCredential cimiCredential;
         CimiMachineImage cimiImage;
@@ -533,7 +527,6 @@ public class MergeReferenceHelperTest {
 
     @Test
     public void testCimiMachineCreate() throws Exception {
-        System.out.println("testCimiMachineCreate");
         // Mock only one method
         MergeReferenceHelperImpl mockedClass = EasyMock.createMockBuilder(MergeReferenceHelperImpl.class)
             .addMockedMethod("merge", CimiContext.class, CimiMachineTemplate.class).createMock();
