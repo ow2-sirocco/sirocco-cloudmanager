@@ -38,6 +38,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.apis.rest.cimi.manager.CallServiceHelper;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
@@ -66,6 +67,11 @@ public class CimiContextImpl implements CimiContext {
 
     /** The stack of resources IDs of service classes used during conversion */
     private LinkedList<Integer> stackConvertedIdService;
+
+    /**
+     * The helper to call EJB service directly by a converter.
+     */
+    private CallServiceHelper serviceHelper;
 
     /**
      * Set constructor.
@@ -248,6 +254,26 @@ public class CimiContextImpl implements CimiContext {
             this.stackConvertedCimiClass.pop();
         }
         return converted;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#setCallServiceHelper(org.ow2.sirocco.apis.rest.cimi.manager.CallServiceHelper)
+     */
+    @Override
+    public void setCallServiceHelper(final CallServiceHelper helper) {
+        this.serviceHelper = helper;
+    }
+
+    /**
+     * {@inheritDoc}
+     * 
+     * @see org.ow2.sirocco.apis.rest.cimi.request.CimiContext#getCallServiceHelper()
+     */
+    @Override
+    public CallServiceHelper getCallServiceHelper() {
+        return this.serviceHelper;
     }
 
     /**

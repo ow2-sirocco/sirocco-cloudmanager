@@ -28,6 +28,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiEventLogTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 /**
@@ -120,25 +121,20 @@ public class EventLogTemplateConverter extends ObjectCommonConverter {
 
         dataService.setPersistence(ConverterHelper.toEventLogTemplatePersistence(dataCimi.getPersistence()));
 
+        // Get the type of resource and call EJB to get the real resource
         ExchangeType type = PathHelper.findExchangeType(context.getRequest().getBaseUri(), dataCimi.getTargetResource()
             .getHref());
         if (null == type) {
-            throw new InvalidConversionException("None associated CIMI found to this TargetResource HREF: "
+            throw new InvalidConversionException("None associated CIMI found for this TargetResource HREF: "
                 + dataCimi.getTargetResource().getHref());
         }
-        Class<?> classService = context.findAssociatedResourceServiceClass(type);
-        if (null == classService) {
-            throw new InvalidConversionException("None associated resource service class found to this TargetResource HREF: "
-                + dataCimi.getTargetResource().getHref());
-        }
-
         try {
-            CloudResource serviceInstance = (CloudResource) classService.newInstance();
-            serviceInstance.setId(PathHelper.extractId(dataCimi.getTargetResource().getHref()));
-            dataService.setTargetResource(serviceInstance);
+            Resource serviceResource = context.getCallServiceHelper().find(type,
+                PathHelper.extractIdString(dataCimi.getTargetResource().getHref()));
+            dataService.setTargetResource((CloudResource) serviceResource);
         } catch (Exception e) {
-            throw new InvalidConversionException("None associated resource service class found to this TargetResource HREF: "
-                + dataCimi.getTargetResource().getHref());
+            throw new InvalidConversionException("Resource not found for this TargetResource HREF: "
+                + dataCimi.getTargetResource().getHref(), e);
         }
     }
 }

@@ -33,6 +33,7 @@ import org.ow2.sirocco.apis.rest.cimi.configuration.ConfigurationException;
 import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.apis.rest.cimi.manager.CallServiceHelper;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 /**
@@ -152,6 +153,20 @@ public interface CimiContext extends Serializable {
      * @return A service instance converted
      */
     Object convertNextService(Object cimi, Class<?> cimiToUse);
+
+    /**
+     * Set the helper to call EJB service directly by a converter.
+     * 
+     * @param helper The helper.
+     */
+    void setCallServiceHelper(CallServiceHelper helper);
+
+    /**
+     * Get the helper to call EJB service directly by a converter.
+     * 
+     * @return The helper
+     */
+    CallServiceHelper getCallServiceHelper();
 
     /**
      * Returns true if the given resource must be expanded.

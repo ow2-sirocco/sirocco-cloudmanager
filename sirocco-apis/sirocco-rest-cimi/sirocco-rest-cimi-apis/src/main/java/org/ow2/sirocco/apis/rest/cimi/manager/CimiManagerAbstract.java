@@ -38,12 +38,18 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableExcepti
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 /**
  * Abstract class to manage the phases of validation, conversion and calling
  * services of requests.
  */
 public abstract class CimiManagerAbstract implements CimiManager {
+
+    @Autowired
+    @Qualifier("CallServiceHelper")
+    private CallServiceHelper serviceHelper;
 
     /** Logger */
     private static final Logger LOGGER = LoggerFactory.getLogger(CimiManagerAbstract.class);
@@ -102,6 +108,7 @@ public abstract class CimiManagerAbstract implements CimiManager {
     @Override
     public void execute(final CimiContext context) {
         try {
+            context.setCallServiceHelper(this.serviceHelper);
             if (this.doValidate(context)) {
                 Object dataServiceIn = this.doConvertToDataService(context);
                 if (false == context.getResponse().isCommitted()) {
@@ -199,6 +206,16 @@ public abstract class CimiManagerAbstract implements CimiManager {
     }
 
     /**
+     * Call after the conversion.
+     * 
+     * @param context The CIMI context
+     * @throws Exception In case of error
+     */
+    protected void afterConvertToDataService(final CimiContext context) throws Exception {
+        // Nothing to do
+    }
+
+    /**
      * Manage the request validation.
      * 
      * @param context The CIMI context
@@ -225,6 +242,7 @@ public abstract class CimiManagerAbstract implements CimiManager {
         Object dataService = null;
         this.beforeConvertToDataService(context);
         dataService = this.convertToDataService(context);
+        this.afterConvertToDataService(context);
         return dataService;
     }
 
