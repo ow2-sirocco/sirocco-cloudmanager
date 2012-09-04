@@ -55,6 +55,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineDisk;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateNetworkInterface;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineTemplateVolumeTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineVolume;
@@ -324,7 +325,8 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             if (null != cimi.getMachineImage()) {
                 this.merge(context, cimi.getMachineImage());
             }
-            // TODO NetworkInterface
+            // NetworkInterface : nothing to do because none ID in
+            // CimiMachineTemplateNetworkInterface
             if (null != cimi.getVolumes()) {
                 for (CimiMachineTemplateVolume item : cimi.getListVolumes()) {
                     this.merge(context, item);
@@ -1006,8 +1008,11 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             } else {
                 this.merge(cimiRef.getMachineImage(), cimi.getMachineImage());
             }
-            // TODO NetworkInterface
-
+            if (null == cimi.getNetworkInterfaces()) {
+                cimi.setNetworkInterfaces(cimiRef.getNetworkInterfaces());
+            } else {
+                this.mergeMTNI(cimiRef, cimi);
+            }
             if (null == cimi.getUserData()) {
                 cimi.setUserData(cimiRef.getUserData());
             }
@@ -1186,6 +1191,7 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
     /**
      * Merge List<E extends CimiResource> resource data.
      * 
+     * @param <E> CimiResource
      * @param cimiRef Source to merge
      * @param cimi Merged destination
      */
@@ -1210,6 +1216,29 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             }
         }
         return contains;
+    }
+
+    /**
+     * Merge List<MachineTemplateNetworkInterface> resource data.
+     * <p>
+     * Because there is none identifier, all references are added
+     * </p>
+     * 
+     * @param cimiRef Source to merge
+     * @param cimi Merged destination
+     */
+    protected void mergeMTNI(final CimiMachineTemplate cimiRef, final CimiMachineTemplate cimi) {
+        List<CimiMachineTemplateNetworkInterface> mtni = cimi.getListNetworkInterfaces();
+        List<CimiMachineTemplateNetworkInterface> mtniRef = cimiRef.getListNetworkInterfaces();
+        if (null != mtniRef) {
+            if (null == mtni) {
+                mtni = new ArrayList<CimiMachineTemplateNetworkInterface>();
+                cimi.setListNetworkInterfaces(mtni);
+            }
+            for (CimiMachineTemplateNetworkInterface item : mtniRef) {
+                mtni.add(item);
+            }
+        }
     }
 
     /**
