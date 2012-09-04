@@ -24,7 +24,6 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -34,6 +33,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertCredential;
+import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertCredentialMin;
 import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 
 /**
@@ -41,17 +42,17 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
  */
 @XmlRootElement(name = "Credential")
 @JsonSerialize(include = Inclusion.NON_NULL)
+@AssertCredential(groups = GroupCreateByValue.class)
+@AssertCredentialMin(groups = GroupWrite.class)
 public class CimiCredential extends CimiObjectCommonAbstract {
 
     /** Serial number */
     private static final long serialVersionUID = 1L;
 
     /** The initial superuser's user name. */
-    @NotNull(groups = GroupCreateByValue.class)
     private String userName;
 
     /** Initial superuser's password. */
-    @NotNull(groups = GroupCreateByValue.class)
     private String password;
 
     /** The digit of the public key for the initial superuser. */

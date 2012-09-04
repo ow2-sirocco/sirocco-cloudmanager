@@ -128,7 +128,7 @@ public class CimiValidatorHelper {
     }
 
     /**
-     * Validate a bean to create.
+     * Validate a bean to write.
      * 
      * @param <T> The type of bean
      * @param request

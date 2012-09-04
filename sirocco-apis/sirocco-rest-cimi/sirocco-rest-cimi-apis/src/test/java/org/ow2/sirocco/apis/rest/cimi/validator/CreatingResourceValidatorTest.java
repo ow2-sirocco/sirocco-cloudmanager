@@ -143,6 +143,18 @@ public class CreatingResourceValidatorTest {
         cimi.setCredentialTemplate(template);
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
+        // KO by values
+        template = new CimiCredentialTemplate("user", null, new byte[] {0, 1, 2, 3, 4, 5});
+        cimi = new CimiCredentialCreate();
+        cimi.setCredentialTemplate(template);
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
+
+        // KO by values
+        template = new CimiCredentialTemplate(null, "pass", null);
+        cimi = new CimiCredentialCreate();
+        cimi.setCredentialTemplate(template);
+        Assert.assertFalse(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
+
         // KO by reference and value
         template = new CimiCredentialTemplate(this.request.getBaseUri()
             + ExchangeType.CredentialTemplate.getPathType().getPathname() + "/17");
@@ -162,6 +174,14 @@ public class CreatingResourceValidatorTest {
 
         // OK by values
         cimi = new CimiCredentialTemplate("user", "pass", null);
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
+
+        // OK by values
+        cimi = new CimiCredentialTemplate("user", "pass", new byte[] {0, 1, 2, 3, 4, 5});
+        Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
+
+        // OK by values
+        cimi = new CimiCredentialTemplate(null, null, new byte[] {0, 1, 2, 3, 4, 5});
         Assert.assertTrue(CimiValidatorHelper.getInstance().validateToCreate(this.context, cimi));
 
         // KO by values
