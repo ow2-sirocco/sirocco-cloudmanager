@@ -54,14 +54,26 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
+import org.ow2.sirocco.apis.rest.cimi.resource.AddressRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.AddressTemplateRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.CloudEntryPointRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.CredentialRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.CredentialTemplateRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.EventLogRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.EventLogTemplateRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.EventRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.ForwardingGroupRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.JobRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.MachineConfigurationRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.MachineImageRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.MachineRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.MachineTemplateRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.NetworkConfigurationRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.NetworkPortConfigurationRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.NetworkPortRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.NetworkPortTemplateRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.NetworkRestResource;
+import org.ow2.sirocco.apis.rest.cimi.resource.NetworkTemplateRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.SystemRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.SystemTemplateRestResource;
 import org.ow2.sirocco.apis.rest.cimi.resource.VolumeConfigurationRestResource;
@@ -87,14 +99,27 @@ public class SiroccoRestCimiApplication extends Application {
         classes.add(JacksonConfigurator.class);
 
         // Resources
+        classes.add(AddressRestResource.class);
+        classes.add(AddressTemplateRestResource.class);
         classes.add(CloudEntryPointRestResource.class);
         classes.add(CredentialRestResource.class);
         classes.add(CredentialTemplateRestResource.class);
+        classes.add(EventLogRestResource.class);
+        classes.add(EventLogTemplateRestResource.class);
+        classes.add(EventRestResource.class);
+        classes.add(ForwardingGroupRestResource.class);
+        classes.add(ForwardingGroupRestResource.class);
         classes.add(JobRestResource.class);
-        classes.add(MachineRestResource.class);
         classes.add(MachineConfigurationRestResource.class);
         classes.add(MachineImageRestResource.class);
+        classes.add(MachineRestResource.class);
         classes.add(MachineTemplateRestResource.class);
+        classes.add(NetworkConfigurationRestResource.class);
+        classes.add(NetworkRestResource.class);
+        classes.add(NetworkTemplateRestResource.class);
+        classes.add(NetworkPortConfigurationRestResource.class);
+        classes.add(NetworkPortRestResource.class);
+        classes.add(NetworkPortTemplateRestResource.class);
         classes.add(SystemRestResource.class);
         classes.add(SystemTemplateRestResource.class);
         classes.add(VolumeRestResource.class);
