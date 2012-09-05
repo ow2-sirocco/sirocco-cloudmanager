@@ -68,7 +68,6 @@ public class CimiManagerCreateMachineNetworkInterfaceAddress extends CimiManager
      */
     @Override
     protected void beforeConvertToDataService(final CimiContext context) throws Exception {
-        // FIXME Merge CimiMachineNetworkInterfaceAddress
         this.mergeReference.merge(context, (CimiMachineNetworkInterfaceAddress) context.getRequest().getCimiData());
     }
 
