@@ -35,7 +35,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MeterTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -35,6 +35,39 @@
 	<packaging>bundle</packaging>
 	<name>SIROCCO :: CloudManager :: MODEL :: CIMI</name>
 
+       <repositories>
+            <repository>
+              <id>jboss-public-repository-group</id>
+              <name>JBoss Public Maven Repository Group</name>
+              <url>http://repository.jboss.org/nexus/content/groups/public</url>
+              <layout>default</layout>
+              <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+              </releases>
+              <snapshots>
+                <enabled>false</enabled>
+                <updatePolicy>never</updatePolicy>
+              </snapshots>
+            </repository>
+          </repositories>
+		  
+          <pluginRepositories>
+            <pluginRepository>
+              <id>jboss-public-repository-group</id>
+              <name>JBoss Public Maven Repository Group</name>
+              <url>http://repository.jboss.org/nexus/content/groups/public</url>
+              <layout>default</layout>
+              <releases>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+              </releases>
+              <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>never</updatePolicy>
+              </snapshots>
+            </pluginRepository>
+          </pluginRepositories>
 
 	<dependencies>
 		<dependency>
@@ -71,13 +104,33 @@
 	        <artifactId>slf4j-log4j12</artifactId>
 	        <version>1.5.6</version>
 	        <scope>runtime</scope>
-	    </dependency>  
+	    </dependency>
+		<!--<dependency>
+	<groupId>org.jboss.logging</groupId>
+	<artifactId>jboss-logging</artifactId>
+	<version>3.1.0.CR1</version>
+</dependency>  -->
+		<!--<dependency>
+            <groupId>org.infinispan</groupId>
+            <artifactId>infinispan-core</artifactId>
+            <version>4.2.1.FINAL</version>
+				      <exclusions>
+        <exclusion>
+          <artifactId>jboss-logging-spi</artifactId>
+          <groupId>org.jboss.logging</groupId>
+        </exclusion>
+	        <exclusion>
+          <artifactId>jboss-logging</artifactId>
+          <groupId>org.jboss.logging</groupId>
+        </exclusion>
+      </exclusions>
+        </dependency>-->
 		
-				<dependency>
+				<!--<dependency>
    			<groupId>net.sf.ehcache</groupId>
    			<artifactId>ehcache-core</artifactId>
    			<version>2.5.2</version>
-		</dependency>
+		</dependency>-->
 <!--
 		<dependency>
 			<groupId>org.ow2.bundles</groupId>

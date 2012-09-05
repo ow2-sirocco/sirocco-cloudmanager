@@ -1259,6 +1259,7 @@ public class MachineManager implements IMachineManager {
             return;
         }
         for (MachineDisk disk : diskColl) {
+            disk.setId(null);
             this.em.persist(disk);
             persisted.addMachineDisk(disk);
         }
@@ -1277,6 +1278,7 @@ public class MachineManager implements IMachineManager {
         MachineManager.logger.info("createNetworkInterfaces machine " + persisted.getId() + " has nics " + nics.size());
         for (MachineNetworkInterface nic : nics) {
             // TODO
+            nic.setId(null);
             nic.setNetwork(null);
             nic.setNetworkPort(null);
 

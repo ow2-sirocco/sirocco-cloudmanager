@@ -49,7 +49,7 @@ import org.hibernate.annotations.CollectionOfElements;
  * public cloud (e.g. Amazon EC2).
  */
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class CloudProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -98,7 +98,7 @@ public class CloudProvider implements Serializable {
     }
 
     @CollectionOfElements(fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Map<String, String> getProperties() {
         return this.properties;
     }
@@ -116,7 +116,7 @@ public class CloudProvider implements Serializable {
     }
 
     @OneToMany(mappedBy = "cloudProvider", fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Set<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
     }
@@ -126,7 +126,7 @@ public class CloudProvider implements Serializable {
     }
 
     @ManyToMany(mappedBy = "cloudProviders", fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Set<CloudProviderLocation> getCloudProviderLocations() {
         return this.cloudProviderLocations;
     }

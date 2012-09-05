@@ -1472,6 +1472,7 @@ public class SystemManager implements ISystemManager {
 
         // creating and adding objects
         for (SystemNetwork sn : networks) {
+            sn.getResource().setId(null);
             sn.getNetwork().setUser(user);
             sn.getNetwork().setCloudProviderAccount(account);
             sn.getNetwork().setLocation(location);
@@ -1483,6 +1484,7 @@ public class SystemManager implements ISystemManager {
         this.em.flush();
 
         for (SystemVolume sv : volumes) {
+            sv.getResource().setId(null);
             sv.getVolume().setUser(user);
             sv.getVolume().setCloudProviderAccount(account);
             sv.getVolume().setLocation(location);
@@ -1508,6 +1510,8 @@ public class SystemManager implements ISystemManager {
         this.em.flush();
 
         for (SystemSystem ss : systems) {
+            ss.getResource().setId(null);
+            ss.setId(null);
             ss.getSystem().setCloudProviderAccount(account);
             ss.getSystem().setLocation(location);
             ss.getSystem().setUser(user);
@@ -1773,6 +1777,7 @@ public class SystemManager implements ISystemManager {
                     }
                 }
             }
+            this.em.flush();
 
             if (failed) {
                 // one or more jobs are failed, so all is failed

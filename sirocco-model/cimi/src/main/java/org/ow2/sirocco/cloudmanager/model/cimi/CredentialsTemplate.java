@@ -33,7 +33,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class CredentialsTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 

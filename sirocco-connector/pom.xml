@@ -45,9 +45,9 @@
 		<module>util</module> 
 		<module>connector</module> 
 		<module>mock</module> 
-		<module>openstack</module> 
+		<module>openstack</module>
 		<module>amazon</module> 
-		<module>test</module> 
+		<!--<module>test</module>-->
 	</modules>
 
 	<build>

@@ -34,7 +34,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class SystemVolume extends CloudCollectionItem {
     private static final long serialVersionUID = 1L;
 

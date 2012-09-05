@@ -43,7 +43,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_FORWARDINGGROUP_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM ForwardingGroup n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class ForwardingGroup extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
@@ -71,7 +71,7 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
     }
 
     @OneToMany
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<ForwardingGroupNetwork> getNetworks() {
         return this.networks;
     }
@@ -81,7 +81,7 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -91,7 +91,7 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderLocation getLocation() {
         return this.location;
     }

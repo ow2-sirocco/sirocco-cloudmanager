@@ -52,7 +52,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CloudResource implements Serializable, Resource {
     private static final long serialVersionUID = 1L;
@@ -156,7 +156,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @CollectionOfElements(fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Map<String, String> getProperties() {
         return this.properties;
     }
@@ -180,7 +180,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @OneToMany(mappedBy = "targetEntity")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Set<Job> getWorkingJobs() {
         return this.workingJobs;
     }
@@ -190,7 +190,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public User getUser() {
         return this.user;
     }
@@ -200,7 +200,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @OneToMany(mappedBy = "targetResource")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<Meter> getMeters() {
         return this.meters;
     }
@@ -210,7 +210,7 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @OneToOne(mappedBy = "targetResource")
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public EventLog getEventLog() {
         return this.eventLog;
     }

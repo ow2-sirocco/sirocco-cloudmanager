@@ -281,13 +281,13 @@ public class JobManager implements IJobManager {
         // attemting to obtain a lock on the topmost job
         String topmostid = this.getThis().getTopmostJobId(this.getThis().getJobIdFromProvider(providerJob));
         String lockId = "";
-        /*
-                try {
-                    this.lockManager.lock(topmostid, Job.class.getCanonicalName());
-                } catch (CloudProviderException e) {
-                    JobManager.logger.warn("Unable to lock Job " + topmostid + " - " + e.getMessage());
-                    throw e;
-                }*/
+
+        try {
+            this.lockManager.lock(topmostid, Job.class.getCanonicalName());
+        } catch (CloudProviderException e) {
+            JobManager.logger.warn("Unable to lock Job " + topmostid + " - " + e.getMessage());
+            throw e;
+        }
 
         try {
             Job job = this.updateProviderJob(providerJob);

@@ -36,7 +36,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class NetworkPortTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -47,7 +47,7 @@ public class NetworkPortTemplate extends CloudEntity implements Serializable {
     private EventLogTemplate eventLogTemplate;
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public NetworkPortConfiguration getNetworkPortConfig() {
         return this.networkPortConfig;
     }
@@ -57,7 +57,7 @@ public class NetworkPortTemplate extends CloudEntity implements Serializable {
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Network getNetwork() {
         return this.network;
     }

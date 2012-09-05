@@ -37,7 +37,7 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -65,7 +65,7 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
 
     @CollectionOfElements
     @LazyCollection(LazyCollectionOption.FALSE)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<DiskTemplate> getDiskTemplates() {
         return this.diskTemplates;
     }

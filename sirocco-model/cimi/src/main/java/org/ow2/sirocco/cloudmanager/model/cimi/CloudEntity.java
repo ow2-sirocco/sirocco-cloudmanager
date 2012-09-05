@@ -44,7 +44,7 @@ import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @MappedSuperclass
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public abstract class CloudEntity implements Serializable, Resource {
 
     private static final long serialVersionUID = 1L;
@@ -137,7 +137,7 @@ public abstract class CloudEntity implements Serializable, Resource {
     }
 
     @CollectionOfElements(fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Map<String, String> getProperties() {
         return this.properties;
     }
@@ -161,7 +161,7 @@ public abstract class CloudEntity implements Serializable, Resource {
     }
 
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public User getUser() {
         return this.user;
     }

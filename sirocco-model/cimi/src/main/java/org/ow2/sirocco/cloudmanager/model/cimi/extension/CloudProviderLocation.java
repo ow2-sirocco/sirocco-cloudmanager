@@ -41,7 +41,7 @@ import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 @Entity
-@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"iso3166_1", "iso3166_2", "postal_code"}),
     @UniqueConstraint(columnNames = {"gps_latitude", "gps_longitude", "gps_altitude"})})
 public class CloudProviderLocation implements Serializable {
@@ -201,7 +201,7 @@ public class CloudProviderLocation implements Serializable {
     }
 
     @ManyToMany
-    @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Set<CloudProvider> getCloudProviders() {
         return this.cloudProviders;
     }
