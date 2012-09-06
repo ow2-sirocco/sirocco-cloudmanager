@@ -666,6 +666,9 @@ public class SystemManager implements ISystemManager {
     @Override
     public SystemTemplate getSystemTemplateById(final String systemTemplateId) throws CloudProviderException {
         SystemTemplate result = this.em.find(SystemTemplate.class, new Integer(systemTemplateId));
+        if (result == null) {
+            throw new ResourceNotFoundException("Invalid SystemTemplate id: " + systemTemplateId);
+        }
         return result;
     }
 
