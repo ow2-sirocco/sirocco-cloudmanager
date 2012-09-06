@@ -541,7 +541,13 @@ public class CloudProviderManager implements ICloudProviderManager {
                 throw new CloudProviderException("Cloud Provider " + cloudProviderType + " does not support location "
                     + cloudProviderLocationCountry);
             }
+        } else {
+            if (targetAccount.getCloudProvider().getCloudProviderLocations() != null
+                && !targetAccount.getCloudProvider().getCloudProviderLocations().isEmpty()) {
+                targetLocation = targetAccount.getCloudProvider().getCloudProviderLocations().iterator().next();
+            }
         }
+
         return new Placement(targetAccount, targetLocation);
     }
 
