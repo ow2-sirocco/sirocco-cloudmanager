@@ -49,7 +49,7 @@ public class JobCompletionHandlerBean implements MessageListener {
 
     private static final String JMS_TOPIC_NAME = "JobCompletion";
 
-    private static final long JMS_REDELIVERY_DELAY = 1 * 3000;
+    private static final long JMS_REDELIVERY_DELAY = 1 * 2000;
 
     @EJB
     private IJobManager jobManager;
@@ -83,7 +83,7 @@ public class JobCompletionHandlerBean implements MessageListener {
                 try {
                     // not possible to set a redelevery time in Joram/Jonas
                     Thread.sleep(JobCompletionHandlerBean.JMS_REDELIVERY_DELAY
-                        + (long) Math.floor(Math.random() * JobCompletionHandlerBean.JMS_REDELIVERY_DELAY));
+                        + (long) Math.floor(Math.random() * JobCompletionHandlerBean.JMS_REDELIVERY_DELAY * 2));
                 } catch (InterruptedException e1) {
                     JobCompletionHandlerBean.logger.warn("InterruptedException! - " + jobId);
                     // e1.printStackTrace();

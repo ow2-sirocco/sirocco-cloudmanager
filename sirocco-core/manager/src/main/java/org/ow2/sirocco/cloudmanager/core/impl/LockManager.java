@@ -147,7 +147,7 @@ public class LockManager implements ILockManager {
         boolean locked = false;
         CloudProviderException exc = new CloudProviderException("unknown exception");
 
-        int nbRetry = 20;
+        int nbRetry = 5;
 
         for (int i = 0; i < nbRetry; i++) {
             try {

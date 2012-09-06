@@ -36,8 +36,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @Entity
@@ -80,6 +78,27 @@ public class Job extends CloudEntity implements Serializable {
      * versionNum; } protected void setVersionNum(long versionNum) {
      * this.versionNum = versionNum; }
      */
+
+    public Job(final CloudProviderLocation location, final Status status, final Date timeOfStatusChange,
+        final CloudResource targetEntity, final Integer returnCode, final String action, final String statusMessage,
+        final Job parentJob, final List<Job> nestedJobs, final Boolean isCancellable, final Integer progress,
+        final List<CloudResource> affectedEntities) {
+
+        System.out.println("using job full constructor");
+        this.location = location;
+        this.status = status;
+        this.timeOfStatusChange = timeOfStatusChange;
+        this.targetEntity = targetEntity;
+        this.returnCode = returnCode;
+        this.action = action;
+        this.statusMessage = statusMessage;
+        this.parentJob = parentJob;
+        this.nestedJobs = nestedJobs;
+        this.isCancellable = isCancellable;
+        this.progress = progress;
+        this.affectedEntities = affectedEntities;
+
+    }
 
     public Job() {
     }
@@ -162,7 +181,7 @@ public class Job extends CloudEntity implements Serializable {
     }
 
     @OneToMany(mappedBy = "parentJob")
-    @LazyCollection(LazyCollectionOption.FALSE)
+    // @LazyCollection(LazyCollectionOption.FALSE)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<Job> getNestedJobs() {
         return this.nestedJobs;
@@ -183,7 +202,7 @@ public class Job extends CloudEntity implements Serializable {
     }
 
     @ManyToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
+    // @LazyCollection(LazyCollectionOption.FALSE)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<CloudResource> getAffectedEntities() {
         return this.affectedEntities;

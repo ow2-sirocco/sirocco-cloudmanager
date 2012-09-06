@@ -243,7 +243,7 @@ public class SystemManager implements ISystemManager {
         if (config == null) {
             config = new SiroccoConfiguration();
             this.em.persist(config);
-            this.em.flush();
+            // this.em.flush();
         }
         if (paramName.equals("mockConnectorImplementsSystem") && paramValue instanceof Boolean) {
             config.setMockConnectorImplementsSystem((Boolean) paramValue);
@@ -267,7 +267,7 @@ public class SystemManager implements ISystemManager {
         if (config == null) {
             config = new SiroccoConfiguration();
             this.em.persist(config);
-            this.em.flush();
+            // this.em.flush();
         }
         if (paramName.equals("mockConnectorImplementsSystem")) {
             return config.isMockConnectorImplementsSystem();
@@ -327,7 +327,7 @@ public class SystemManager implements ISystemManager {
         system.setState(State.CREATING);
         system.setUser(this.getUser());
         this.em.persist(system);
-        this.em.flush();
+        // this.em.flush();
 
         // creation of main system job
         Job parentJob = this.createJob("add", system);
@@ -387,7 +387,7 @@ public class SystemManager implements ISystemManager {
         system.setCloudProviderAccount(placement.getAccount());
         system.setLocation(placement.getLocation());
 
-        this.em.flush();
+        // this.em.flush();
 
         if (this.isSystemSupportedInConnector(connector)) {
 
@@ -710,7 +710,7 @@ public class SystemManager implements ISystemManager {
                 CloudResource resTmp = this.em.merge(entity.getResource());
                 entity.setResource(null);
                 this.em.persist(entity);
-                this.em.flush();
+                // this.em.flush();
                 entity.setResource(resTmp);
             }
         } else {
@@ -1300,7 +1300,7 @@ public class SystemManager implements ISystemManager {
         j.setTargetEntity(s);
         j.setUser(this.getUser());
         this.em.persist(j);
-        this.em.flush();
+        // this.em.flush();
 
         // Ask for connector to notify when job completes
         try {
@@ -1481,7 +1481,7 @@ public class SystemManager implements ISystemManager {
             this.updateCollectionFromProvider(sn, sn.getResource(), SystemNetwork.State.AVAILABLE);
             this.em.persist(sn);
         }
-        this.em.flush();
+        // this.em.flush();
 
         for (SystemVolume sv : volumes) {
             sv.getResource().setId(null);
@@ -1493,7 +1493,7 @@ public class SystemManager implements ISystemManager {
             this.updateCollectionFromProvider(sv, sv.getResource(), SystemVolume.State.AVAILABLE);
             this.em.persist(sv);
         }
-        this.em.flush();
+        // this.em.flush();
         if (machines != null) {
             for (SystemMachine sm : machines) {
                 Machine mach = sm.getMachine();
@@ -1507,7 +1507,7 @@ public class SystemManager implements ISystemManager {
                 this.em.persist(sm);
             }
         }
-        this.em.flush();
+        // this.em.flush();
 
         for (SystemSystem ss : systems) {
             ss.getResource().setId(null);
@@ -1521,7 +1521,7 @@ public class SystemManager implements ISystemManager {
             this.em.persist(ss);
             this.em.flush();
         }
-        this.em.flush();
+        // this.em.flush();
     }
 
     /**
@@ -1777,7 +1777,7 @@ public class SystemManager implements ISystemManager {
                     }
                 }
             }
-            this.em.flush();
+            // this.em.flush();
 
             if (failed) {
                 // one or more jobs are failed, so all is failed
