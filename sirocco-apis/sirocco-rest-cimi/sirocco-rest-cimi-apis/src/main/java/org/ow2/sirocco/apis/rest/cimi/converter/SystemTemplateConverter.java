@@ -133,13 +133,13 @@ public class SystemTemplateConverter extends ObjectCommonConverter {
         final SystemTemplate dataService) {
         this.fill(context, dataCimi, dataService);
         // ComponentDescriptor
+        Set<ComponentDescriptor> listServices = new HashSet<ComponentDescriptor>();
         if ((null != dataCimi.getListComponentDescriptors()) && (dataCimi.getListComponentDescriptors().size() > 0)) {
-            Set<ComponentDescriptor> listServices = new HashSet<ComponentDescriptor>();
             for (CimiComponentDescriptor itemCimi : dataCimi.getComponentDescriptors()) {
                 listServices.add((ComponentDescriptor) context.convertNextService(itemCimi));
             }
-            dataService.setComponentDescriptors(listServices);
         }
+        dataService.setComponentDescriptors(listServices);
         // FIXME EventLogTemplate
         // dataService.setEventLogTemplate((EventLogTemplate)
         // context.convertNextService(dataCimi.getEventLogTemplate()));
