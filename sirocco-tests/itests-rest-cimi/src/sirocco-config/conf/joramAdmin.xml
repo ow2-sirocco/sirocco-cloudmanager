@@ -103,20 +103,20 @@
   <jndi name="JobEmission"/>
  </Queue>
 
-  <Topic name="JobCompletion2">
+  <Topic name="JobCompletion">
   <freeReader/>
   <freeWriter/>
-  <jndi name="JobCompletion2"/>
+  <jndi name="JobCompletion"/>
   </Topic>
   
   <Destination type="queue"
                         serverId="0"
-                        name="JobCompletion"
+                        name="JobCompletion2"
                   
   className="com.scalagent.joram.mom.dest.scheduler.SchedulerQueue">
           <freeReader/>
           <freeWriter/>
-          <jndi name="JobCompletion"/>
+          <jndi name="JobCompletion2"/>
        </Destination>
 
   <Topic name="ClusterManager">
