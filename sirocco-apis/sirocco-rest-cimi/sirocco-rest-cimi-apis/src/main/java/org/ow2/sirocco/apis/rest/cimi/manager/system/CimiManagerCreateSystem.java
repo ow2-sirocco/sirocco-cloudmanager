@@ -24,7 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager.system;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
 import org.ow2.sirocco.apis.rest.cimi.manager.CimiManagerCreateAbstract;
+import org.ow2.sirocco.apis.rest.cimi.manager.MergeReferenceHelper;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
@@ -37,6 +39,9 @@ import org.springframework.stereotype.Component;
  */
 @Component("CimiManagerCreateSystem")
 public class CimiManagerCreateSystem extends CimiManagerCreateAbstract {
+    @Autowired
+    @Qualifier("MergeReferenceHelper")
+    private MergeReferenceHelper mergeReference;
 
     @Autowired
     @Qualifier("ISystemManager")
@@ -51,6 +56,11 @@ public class CimiManagerCreateSystem extends CimiManagerCreateAbstract {
     @Override
     protected Object callService(final CimiContext context, final Object dataService) throws Exception {
         return this.manager.createSystem((SystemCreate) dataService);
+    }
+
+    @Override
+    protected void beforeConvertToDataService(final CimiContext context) throws Exception {
+        this.mergeReference.merge(context, (CimiSystemCreate) context.getRequest().getCimiData());
     }
 
 }
