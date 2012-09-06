@@ -37,9 +37,9 @@ import javax.ws.rs.core.Response;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiActionImport;
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiData;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemForwardingGroup;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
@@ -191,19 +191,30 @@ public class SystemRestResource extends RestResourceAbstract {
     }
 
     /**
-     * Create a system or send action on collection.
+     * Create a system
      * 
      * @return The REST response
      */
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    public Response createOrActionOnCollection(final CimiData cimiData) {
+    public Response create(final CimiSystemCreate cimiData) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
-        if (cimiData instanceof CimiActionImport) {
-            this.cimiManagerActionSystem.execute(context);
-        } else {
-            this.cimiManagerCreateSystem.execute(context);
-        }
+        this.cimiManagerCreateSystem.execute(context);
+        return ResponseHelper.buildResponse(context.getResponse());
+    }
+
+    /**
+     * Import a system
+     * 
+     * @return The REST response
+     */
+    @POST
+    // TODO define this path constant elsewhere
+    @Path("/import")
+    @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
+    public Response importSystem(final CimiActionImport cimiData) {
+        CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), cimiData);
+        this.cimiManagerActionSystem.execute(context);
         return ResponseHelper.buildResponse(context.getResponse());
     }
 
