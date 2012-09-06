@@ -426,7 +426,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * @return The REST response
      */
     @GET
-    @Path("{idParent}" + ConstantsPath.NETWORK_PATH)
+    @Path("{idParent}" + ConstantsPath.NETWORK_INTERFACE_PATH)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readNetworkInterfaces(@PathParam("idParent") final String idParent) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent));
@@ -442,7 +442,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * @return The REST response
      */
     @GET
-    @Path("/{idParent}" + ConstantsPath.NETWORK_PATH + "/{id}")
+    @Path("/{idParent}" + ConstantsPath.NETWORK_INTERFACE_PATH + "/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readNetworkInterface(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
@@ -460,7 +460,7 @@ public class MachineRestResource extends RestResourceAbstract {
      */
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("/{idParent}" + ConstantsPath.NETWORK_PATH + "/{id}")
+    @Path("/{idParent}" + ConstantsPath.NETWORK_INTERFACE_PATH + "/{id}")
     public Response updateNetworkInterface(@PathParam("idParent") final String idParent, @PathParam("id") final String id,
         final CimiMachineNetworkInterface cimiData) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent), cimiData);
@@ -477,7 +477,7 @@ public class MachineRestResource extends RestResourceAbstract {
      */
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("/{idParent}" + ConstantsPath.NETWORK_PATH)
+    @Path("/{idParent}" + ConstantsPath.NETWORK_INTERFACE_PATH)
     public Response createNetworkInterface(@PathParam("idParent") final String idParent,
         final CimiMachineNetworkInterface cimiData) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent), cimiData);
@@ -493,7 +493,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * @return The REST response
      */
     @DELETE
-    @Path("/{idParent}" + ConstantsPath.NETWORK_PATH + "/{id}")
+    @Path("/{idParent}" + ConstantsPath.NETWORK_INTERFACE_PATH + "/{id}")
     public Response deleteNetworkInterface(@PathParam("idParent") final String idParent, @PathParam("id") final String id) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(id, idParent));
         this.cimiManagerDeleteMachineNetworkInterface.execute(context);
@@ -508,7 +508,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * @return
      */
     @GET
-    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH)
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_INTERFACE_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH)
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readAddresses(@PathParam("idGrandParent") final String idGrandParent,
         @PathParam("idParent") final String idParent) {
@@ -527,7 +527,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * @return The REST response
      */
     @GET
-    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_INTERFACE_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
     public Response readAddress(@PathParam("idGrandParent") final String idGrandParent,
         @PathParam("idParent") final String idParent, @PathParam("id") final String id) {
@@ -547,7 +547,7 @@ public class MachineRestResource extends RestResourceAbstract {
      */
     @POST
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH)
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_INTERFACE_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH)
     public Response createAddress(@PathParam("idGrandParent") final String idGrandParent,
         @PathParam("idParent") final String idParent, final CimiMachineNetworkInterfaceAddress cimiData) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(), new IdRequest(null, idParent,
@@ -565,7 +565,7 @@ public class MachineRestResource extends RestResourceAbstract {
      * @return The REST response
      */
     @DELETE
-    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_INTERFACE_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
     public Response deleteAddress(@PathParam("idGrandParent") final String idGrandParent,
         @PathParam("idParent") final String idParent, @PathParam("id") final String id) {
         CimiContext context = ContextHelper.buildContext(this.getJaxRsRequestInfos(),
@@ -585,7 +585,7 @@ public class MachineRestResource extends RestResourceAbstract {
      */
     @PUT
     @Consumes({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML})
-    @Path("{idGrandParent}" + ConstantsPath.NETWORK_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
+    @Path("{idGrandParent}" + ConstantsPath.NETWORK_INTERFACE_PATH + "/{idParent}" + ConstantsPath.ADDRESS_PATH + "/{id}")
     public Response updateAddress(@PathParam("idGrandParent") final String idGrandParent,
         @PathParam("idParent") final String idParent, @PathParam("id") final String id,
         final CimiMachineNetworkInterfaceAddress cimiData) {
