@@ -62,6 +62,8 @@ public class CimiMachineImage extends CimiObjectCommonAbstract {
     @NotNull(groups = {GroupCreateByValue.class})
     private ImageLocation imageLocation;
 
+    private RelatedMachineImage relatedImage;
+
     /**
      * Default constructor.
      */
@@ -122,6 +124,24 @@ public class CimiMachineImage extends CimiObjectCommonAbstract {
      */
     public void setImageLocation(final ImageLocation imageLocation) {
         this.imageLocation = imageLocation;
+    }
+
+    /**
+     * Return the value of field "relatedImage"
+     * 
+     * @return The value
+     */
+    public RelatedMachineImage getRelatedImage() {
+        return this.relatedImage;
+    }
+
+    /**
+     * Set the value of field "relatedImage"
+     * 
+     * @param relatedImage The value
+     */
+    public void setRelatedImage(final RelatedMachineImage relatedImage) {
+        this.relatedImage = relatedImage;
     }
 
     /**

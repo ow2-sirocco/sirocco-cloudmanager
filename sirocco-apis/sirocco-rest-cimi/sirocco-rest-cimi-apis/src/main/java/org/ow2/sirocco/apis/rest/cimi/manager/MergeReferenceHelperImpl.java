@@ -1310,6 +1310,9 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             if (null == cimi.getImageLocation()) {
                 cimi.setImageLocation(cimiRef.getImageLocation());
             }
+            if (null == cimi.getRelatedImage()) {
+                cimi.setRelatedImage(cimiRef.getRelatedImage());
+            }
         }
     }
 

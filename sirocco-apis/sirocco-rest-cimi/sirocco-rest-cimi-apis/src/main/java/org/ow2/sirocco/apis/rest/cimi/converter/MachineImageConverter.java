@@ -26,6 +26,7 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
+import org.ow2.sirocco.apis.rest.cimi.domain.RelatedMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
@@ -103,6 +104,10 @@ public class MachineImageConverter extends ObjectCommonConverter {
             if (null != dataService.getImageLocation()) {
                 dataCimi.setImageLocation(new ImageLocation(dataService.getImageLocation()));
             }
+            if (null != dataService.getRelatedImage()) {
+                dataCimi.setRelatedImage(new RelatedMachineImage(context.makeHref(dataCimi, dataService.getRelatedImage()
+                    .getId().toString())));
+            }
             dataCimi.setState(ConverterHelper.toString(dataService.getState()));
             dataCimi.setType(ConverterHelper.toString(dataService.getType()));
         }
@@ -120,6 +125,7 @@ public class MachineImageConverter extends ObjectCommonConverter {
         if (null != dataCimi.getImageLocation()) {
             dataService.setImageLocation(dataCimi.getImageLocation().getHref());
         }
+        // relatedImage Read only
     }
 
 }
