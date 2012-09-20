@@ -24,6 +24,9 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
 import org.ow2.sirocco.apis.rest.cimi.request.CimiContext;
@@ -103,7 +106,9 @@ public class AddressConverter extends ObjectCommonConverter {
         if (true == context.mustBeExpanded(dataCimi)) {
             dataCimi.setAllocation(dataService.getAllocation());
             dataCimi.setDefaultGateway(dataService.getDefaultGateway());
-            dataCimi.setDns(dataService.getDns());
+            if (dataService.getDns() != null && dataService.getDns().size() > 0) {
+                dataCimi.setDns(dataService.getDns().toArray(new String[dataService.getDns().size()]));
+            }
             dataCimi.setHostname(dataService.getHostName());
             dataCimi.setIp(dataService.getIp());
             dataCimi.setMask(dataService.getMask());
@@ -123,7 +128,13 @@ public class AddressConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiAddress dataCimi, final Address dataService) {
         this.fill(context, dataCimi, dataService);
         dataService.setDefaultGateway(dataCimi.getDefaultGateway());
-        dataService.setDns(dataCimi.getDns());
+        List<String> dns = new ArrayList<String>();
+        if (dataCimi.getDns() != null) {
+            for (String dnsValue : dataCimi.getDns()) {
+                dns.add(dnsValue);
+            }
+        }
+        dataService.setDns(dns);
         dataService.setHostName(dataCimi.getHostname());
         dataService.setIp(dataCimi.getIp());
         dataService.setMask(dataCimi.getMask());

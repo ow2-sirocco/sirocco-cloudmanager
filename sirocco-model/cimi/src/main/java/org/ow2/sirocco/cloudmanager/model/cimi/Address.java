@@ -26,17 +26,17 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class Address extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -48,7 +48,7 @@ public class Address extends CloudEntity implements Serializable {
 
     private String defaultGateway;
 
-    private String dns;
+    private List<String> dns;
 
     private String protocol;
 
@@ -90,11 +90,12 @@ public class Address extends CloudEntity implements Serializable {
         this.defaultGateway = defaultGateway;
     }
 
-    public String getDns() {
+    @CollectionOfElements
+    public List<String> getDns() {
         return this.dns;
     }
 
-    public void setDns(final String dns) {
+    public void setDns(final List<String> dns) {
         this.dns = dns;
     }
 
@@ -116,7 +117,7 @@ public class Address extends CloudEntity implements Serializable {
 
     // TODO check this
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Network getNetwork() {
         return this.network;
     }
@@ -127,7 +128,7 @@ public class Address extends CloudEntity implements Serializable {
 
     // TODO check this
     @OneToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudResource getResource() {
         return this.resource;
     }

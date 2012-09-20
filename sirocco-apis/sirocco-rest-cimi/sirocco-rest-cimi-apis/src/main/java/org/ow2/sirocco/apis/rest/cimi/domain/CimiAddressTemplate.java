@@ -57,7 +57,7 @@ public class CimiAddressTemplate extends CimiObjectCommonAbstract {
     private String defaultGateway;
 
     /** Field "dns". */
-    private String dns;
+    private String[] dns;
 
     /** Field "protocol". */
     private String protocol;
@@ -163,7 +163,7 @@ public class CimiAddressTemplate extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
-    public String getDns() {
+    public String[] getDns() {
         return this.dns;
     }
 
@@ -172,7 +172,7 @@ public class CimiAddressTemplate extends CimiObjectCommonAbstract {
      * 
      * @param dns The value
      */
-    public void setDns(final String dns) {
+    public void setDns(final String[] dns) {
         this.dns = dns;
     }
 
