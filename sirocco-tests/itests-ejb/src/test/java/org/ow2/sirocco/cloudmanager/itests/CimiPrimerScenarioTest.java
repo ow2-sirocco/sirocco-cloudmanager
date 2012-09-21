@@ -667,7 +667,9 @@ public class CimiPrimerScenarioTest {
                 }
 
                 addr.setIp(ip);
-                addr.setDns("162.99.11.1" + i + loop);
+                List<String> dnsEntries = new ArrayList<String>();
+                dnsEntries.add("162.99.11.1" + i + loop);
+                addr.setDns(dnsEntries);
                 addresses.add(addr);
             }
 
