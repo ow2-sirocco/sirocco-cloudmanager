@@ -164,11 +164,12 @@
 			<version>1.4</version>
 		</dependency>
 
-		<dependency>
+		<!-- dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
 			<version>1.2</version>
 		</dependency>
+		 -->
 
 		<dependency>
 			<groupId>commons-logging</groupId>
@@ -191,17 +192,17 @@
 		<dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vcloud-rest-api-schemas</artifactId>
-            <version>1.5.0</version>
+            <version>5.1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/rest-api-schemas-1.5.0.jar</systemPath>
+            <systemPath>${project.basedir}/lib/rest-api-schemas-5.1.0.jar</systemPath>
         </dependency>
 
         <dependency>
             <groupId>com.vmware</groupId>
             <artifactId>vcloud-java-sdk</artifactId>
-            <version>1.5.0</version>
+            <version>5.1.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/vcloud-java-sdk-1.5.0.jar</systemPath>
+            <systemPath>${project.basedir}/lib/vcloud-java-sdk-5.1.0.jar</systemPath>
         </dependency>
 		 
 	</dependencies>
