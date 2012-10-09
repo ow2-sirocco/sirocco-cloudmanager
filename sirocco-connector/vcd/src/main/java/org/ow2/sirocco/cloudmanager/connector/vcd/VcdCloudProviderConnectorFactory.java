@@ -25,6 +25,7 @@ package org.ow2.sirocco.cloudmanager.connector.vcd;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -59,16 +60,20 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCredentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 import org.ow2.util.log.Log;
 import org.ow2.util.log.LogFactory;
@@ -76,6 +81,7 @@ import org.ow2.util.log.LogFactory;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
+import com.vmware.vcloud.api.rest.schema.ComposeVAppParamsType;
 import com.vmware.vcloud.api.rest.schema.InstantiateVAppTemplateParamsType;
 import com.vmware.vcloud.api.rest.schema.InstantiationParamsType;
 import com.vmware.vcloud.api.rest.schema.NetworkConfigSectionType;
@@ -84,6 +90,7 @@ import com.vmware.vcloud.api.rest.schema.NetworkConnectionSectionType;
 import com.vmware.vcloud.api.rest.schema.NetworkConnectionType;
 import com.vmware.vcloud.api.rest.schema.ObjectFactory;
 import com.vmware.vcloud.api.rest.schema.ReferenceType;
+import com.vmware.vcloud.api.rest.schema.SourcedCompositionItemParamType;
 import com.vmware.vcloud.api.rest.schema.VAppNetworkConfigurationType;
 import com.vmware.vcloud.api.rest.schema.VAppType;
 import com.vmware.vcloud.api.rest.schema.VmType;
@@ -191,6 +198,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         // - FakeSSLSocketFactory
         // - CIMI Network entities (vs default network settings)
         // - nested vApp ?
+
+        boolean version1 = true;
 
         private final String cloudProviderId;
 
@@ -356,6 +365,14 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         @Override
         public Job createSystem(final SystemCreate systemCreate) throws ConnectorException {
+            if (this.version1) {
+                return this.createSystem_v1(systemCreate);
+            } else {
+                return this.createSystem_v2(systemCreate);
+            }
+        }
+
+        public Job createSystem_v1(final SystemCreate systemCreate) throws ConnectorException {
             final int waitTimeInMilliSeconds = VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
             final ReferenceType vAppTemplateRef = new ReferenceType();
             vAppTemplateRef.setHref(systemCreate.getSystemTemplate().getProviderAssignedId());
@@ -366,7 +383,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 VappTemplate vappTemplate = VappTemplate.getVappTemplateByReference(this.vcloudClient, vAppTemplateRef);
                 VcdCloudProviderConnectorFactory.logger.info("Instantiating vAppTemplate: "
                     + vappTemplate.getReference().getName());
-                vapp = this.newvAppFromTemplateDefaultMode(vAppTemplateRef, this.vdc, systemCreate);
+                vapp = this.instantiateVappTemplate(vAppTemplateRef, this.vdc, systemCreate);
             } catch (Exception ex) {
                 throw new ConnectorException(ex);
             }
@@ -410,96 +427,38 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             return VcdCloudProviderConnectorFactory.this.jobManager.newJob(system, null, "add", result);
         }
 
-        // Instantiating the vAppTemplate
-        private Vapp newvAppFromTemplateDefaultMode(final ReferenceType vAppTemplateReference, final Vdc vdc,
-            final SystemCreate systemCreate) throws VCloudException, ConnectorException {
+        public Job createSystem_v2(final SystemCreate systemCreate) throws ConnectorException {
+            final int waitTimeInMilliSeconds = VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
+            final System system = new System();
+            system.setState(System.State.CREATING);
 
-            // get the OrgNetwork to which we can connect the vAppnetwork
-            NetworkConfigurationType networkConfigurationType = new NetworkConfigurationType();
-            if (vdc.getAvailableNetworkRefs().size() == 0) {
-                throw new ConnectorException("No Networks in vdc to instantiate the vapp");
-            }
-            // VcdCloudProviderConnectorFactory.logger.info("available networks= "
-            // + vdc.getAvailableNetworkRefs().iterator().next().getName());
+            final Callable<System> createTask = new Callable<System>() {
+                @Override
+                public System call() throws Exception {
+                    try {
+                        VcdCloudProviderConnectorFactory.logger.info("Creating vApp");
+                        Vapp vapp = VcdCloudProviderConnector.this.createVapp(VcdCloudProviderConnector.this.vdc, systemCreate);
+                        List<Task> tasks = vapp.getTasks();
+                        if (tasks.size() > 0) {
+                            tasks.get(0).waitForTask(waitTimeInMilliSeconds);
+                        }
 
-            // specify the NetworkConfiguration for the vApp network.
-            networkConfigurationType.setParentNetwork(vdc.getAvailableNetworkRefs().iterator().next());
-            networkConfigurationType.setFenceMode(FenceModeValuesType.BRIDGED.value());
+                        // Deploying the Instantiated vApp
+                        VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
+                        vapp.deploy(false, 1000000, false).waitForTask(waitTimeInMilliSeconds);
 
-            VAppNetworkConfigurationType vAppNetworkConfigurationType = new VAppNetworkConfigurationType();
-            vAppNetworkConfigurationType.setConfiguration(networkConfigurationType);
-            // Default configuration (a vAppNetwork should be used instead)
-            vAppNetworkConfigurationType.setNetworkName(vdc.getAvailableNetworkRefs().iterator().next().getName());
-
-            // fill in the NetworkConfigSection
-            NetworkConfigSectionType networkConfigSectionType = new NetworkConfigSectionType();
-            MsgType networkInfo = new MsgType();
-            networkConfigSectionType.setInfo(networkInfo);
-            List<VAppNetworkConfigurationType> vAppNetworkConfigs = networkConfigSectionType.getNetworkConfig();
-            vAppNetworkConfigs.add(vAppNetworkConfigurationType);
-
-            // fill in remaining InstantititonParams (name, Source)
-            InstantiationParamsType instantiationParamsType = new InstantiationParamsType();
-            List<JAXBElement<? extends SectionType>> sections = instantiationParamsType.getSection();
-            sections.add(new ObjectFactory().createNetworkConfigSection(networkConfigSectionType));
-
-            // create the request body (InstantiateVAppTemplateParams)
-            InstantiateVAppTemplateParamsType instVappTemplParamsType = new InstantiateVAppTemplateParamsType();
-            if (systemCreate.getSystemTemplate().getName() == null || systemCreate.getSystemTemplate().getName().equals("")) {
-                throw new ConnectorException("validation error on field 'systemTemplate.name': may not be empty");
-            }
-            instVappTemplParamsType.setName(systemCreate.getSystemTemplate().getName() + "-" + UUID.randomUUID());
-            instVappTemplParamsType.setDescription(systemCreate.getSystemTemplate().getDescription());
-            instVappTemplParamsType.setSource(vAppTemplateReference);
-            instVappTemplParamsType.setInstantiationParams(instantiationParamsType);
-
-            // make the request, and get a vApp in return
-            return vdc.instantiateVappTemplate(instVappTemplParamsType);
-        }
-
-        // Configuring vms addressing mode
-        private void configureVMsDefaultIPAddressingMode(final ReferenceType vappRef) throws VCloudException, TimeoutException {
-            // Default IP allocation: Pool
-            Vapp vapp = Vapp.getVappByReference(this.vcloudClient, vappRef);
-            List<VM> childVms = vapp.getChildrenVms();
-            for (VM childVm : childVms) {
-                NetworkConnectionSectionType networkConnectionSectionType = childVm.getNetworkConnectionSection();
-                List<NetworkConnectionType> networkConnections = networkConnectionSectionType.getNetworkConnection();
-                for (NetworkConnectionType networkConnection : networkConnections) {
-                    networkConnection.setIpAddressAllocationMode(IpAddressAllocationModeType.POOL.value());
-                    networkConnection.setNetwork(this.vdc.getAvailableNetworkRefs().iterator().next().getName());
+                        // refresh the vapp (otherwise no childrenVms is
+                        // visible! - TBC)
+                        vapp = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
+                        VcdCloudProviderConnector.this.fromvAppToSystem(vapp, system);
+                    } catch (Exception ex) {
+                        throw new ConnectorException(ex);
+                    }
+                    return system;
                 }
-                childVm.updateSection(networkConnectionSectionType).waitForTask(0);
-            }
-        }
-
-        private void configureProductSection(final ReferenceType vappRef, final String userData) throws VCloudException,
-            TimeoutException {
-            Vapp vapp = Vapp.getVappByReference(this.vcloudClient, vappRef);
-            MsgType msgType = new MsgType();
-            msgType.setValue("user Data");
-
-            for (VM childVm : vapp.getChildrenVms()) {
-                ProductSectionProperty myProp = new ProductSectionProperty();
-                myProp.setUserConfigurable(true);
-                myProp.setKey("userData");
-                myProp.setValueAttrib(userData);
-                myProp.setType("string");
-                myProp.setLabel(msgType);
-                myProp.setDescription(msgType);
-
-                ProductSectionType ovfEnvSection = new ProductSectionType();
-                ovfEnvSection.setInfo(msgType);
-                ovfEnvSection.setProduct(msgType);
-                ovfEnvSection.setClazz("");
-                ovfEnvSection.setRequired(true);
-                ovfEnvSection.getCategoryOrProperty().add(myProp);
-
-                List<ProductSectionType> productSections = childVm.getProductSections();
-                productSections.add(ovfEnvSection);
-
-                childVm.updateProductSections(productSections).waitForTask(0);
-            }
+            };
+            ListenableFuture<System> result = VcdCloudProviderConnectorFactory.this.executorService.submit(createTask);
+            return VcdCloudProviderConnectorFactory.this.jobManager.newJob(system, null, "add", result);
         }
 
         @Override
@@ -680,16 +639,6 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             throw new ConnectorException("unsupported operation");
         }
 
-        private Vapp getVappByProviderAssignedId(final String id) throws ConnectorException {
-            try {
-                ReferenceType vAppRef = new ReferenceType();
-                vAppRef.setHref(id);
-                return Vapp.getVappByReference(this.vcloudClient, vAppRef);
-            } catch (VCloudException e) {
-                throw new ConnectorException(e);
-            }
-        }
-
         //
         // Compute Service
         //
@@ -826,7 +775,80 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         @Override
         public Job createMachine(final MachineCreate machineCreate) throws ConnectorException {
-            throw new ConnectorException("unsupported operation");
+            if (this.version1) {
+                throw new ConnectorException("unsupported operation");
+            } else {
+                return this.createMachine_v2(machineCreate);
+            }
+        }
+
+        public Job createMachine_v2(final MachineCreate machineCreate) throws ConnectorException {
+            final int waitTimeInMilliSeconds = VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
+            final Machine machine = new Machine();
+            machine.setState(Machine.State.CREATING);
+
+            final Callable<Machine> createTask = new Callable<Machine>() {
+                @Override
+                public Machine call() throws Exception {
+                    try {
+                        VcdCloudProviderConnectorFactory.logger.info("Creating vApp");
+                        Vapp vapp = VcdCloudProviderConnector.this
+                            .createVapp(VcdCloudProviderConnector.this.vdc, machineCreate);
+                        List<Task> tasks = vapp.getTasks();
+                        if (tasks.size() > 0) {
+                            tasks.get(0).waitForTask(waitTimeInMilliSeconds);
+                        }
+
+                        // Deploying the Instantiated vApp
+                        VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
+                        vapp.deploy(false, 1000000, false).waitForTask(waitTimeInMilliSeconds);
+
+                        // refresh the vapp (otherwise no childrenVms is
+                        // visible! - TBC)
+                        vapp = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
+                        if (vapp.getChildrenVms().size() != 1) {
+                            throw new ConnectorException("only one vm is expected!");
+                        }
+                        VcdCloudProviderConnector.this.fromVmToMachine(vapp.getChildrenVms().get(0), machine);
+                    } catch (Exception ex) {
+                        throw new ConnectorException(ex);
+                    }
+                    return machine;
+                }
+            };
+            ListenableFuture<Machine> result = VcdCloudProviderConnectorFactory.this.executorService.submit(createTask);
+            return VcdCloudProviderConnectorFactory.this.jobManager.newJob(machine, null, "add", result);
+        }
+
+        private Vapp createVapp(final Vdc vdc, final MachineCreate machineCreate) throws VCloudException, ConnectorException {
+            if (machineCreate.getMachineTemplate().getName() == null || machineCreate.getMachineTemplate().getName().equals("")) {
+                throw new ConnectorException("validation error on field 'machineTemplate.name': may not be empty");
+            }
+
+            ComponentDescriptor component = new ComponentDescriptor();
+            component.setComponentQuantity(1);
+            component.setComponentType(ComponentType.MACHINE);
+            component.setName(machineCreate.getName());
+            component.setDescription(machineCreate.getDescription());
+            component.setProperties(machineCreate.getProperties());
+            component.setComponentTemplate(machineCreate.getMachineTemplate());
+
+            Set<ComponentDescriptor> componentDescriptors = new HashSet<ComponentDescriptor>();
+            componentDescriptors.add(component);
+
+            SystemTemplate systemTemplate = new SystemTemplate();
+            systemTemplate.setName("System-" + machineCreate.getName());
+            systemTemplate.setDescription(machineCreate.getDescription());
+            systemTemplate.setProperties(new HashMap<String, String>());
+            systemTemplate.setComponentDescriptors(componentDescriptors);
+
+            SystemCreate systemCreate = new SystemCreate();
+            systemCreate.setName("System-" + machineCreate.getName());
+            systemCreate.setDescription(machineCreate.getDescription());
+            systemCreate.setProperties(new HashMap<String, String>());
+            systemCreate.setSystemTemplate(systemTemplate);
+
+            return this.createVapp(vdc, systemCreate);
         }
 
         @Override
@@ -999,6 +1021,20 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             throw new ConnectorException("unsupported operation");
         }
 
+        //
+        // VCD
+        //
+
+        private Vapp getVappByProviderAssignedId(final String id) throws ConnectorException {
+            try {
+                ReferenceType vAppRef = new ReferenceType();
+                vAppRef.setHref(id);
+                return Vapp.getVappByReference(this.vcloudClient, vAppRef);
+            } catch (VCloudException e) {
+                throw new ConnectorException(e);
+            }
+        }
+
         private VM getVmByProviderAssignedId(final String id) throws ConnectorException {
             try {
                 ReferenceType vmRef = new ReferenceType();
@@ -1007,6 +1043,341 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             } catch (VCloudException e) {
                 throw new ConnectorException(e);
             }
+        }
+
+        private Vapp createVapp(final Vdc vdc, final SystemCreate systemCreate) throws VCloudException, ConnectorException {
+            Set<ComponentDescriptor> machineComponentDescriptors = this.getComponentDescriptorsOfType(systemCreate,
+                ComponentType.MACHINE);
+
+            // create the request body (ComposeVAppParamsType)
+            ComposeVAppParamsType composeVAppParamsType = new ComposeVAppParamsType();
+            composeVAppParamsType.setDeploy(false);
+            if (systemCreate.getName() == null || systemCreate.getName().equals("")) {
+                throw new ConnectorException("validation error on field 'systemTemplate.name': may not be empty");
+            }
+            composeVAppParamsType.setName(systemCreate.getName() + "-" + UUID.randomUUID());
+            composeVAppParamsType.setDescription(systemCreate.getDescription());
+
+            // default instantiation parameters
+            InstantiationParamsType instantiationParamsType = this.createDefaultInstantiationParams(this.vdc);
+            composeVAppParamsType.setInstantiationParams(instantiationParamsType);
+
+            // TODO: define vApp network, startup, lease. parameters
+
+            // source items (VMs)
+            for (ComponentDescriptor mcd : machineComponentDescriptors) {
+                MachineTemplate mt = (MachineTemplate) mcd.getComponentTemplate();
+                for (int i = 0; i < mcd.getComponentQuantity(); i++) {
+
+                    // create sourceItem body (SourcedCompositionItemParamType)
+                    SourcedCompositionItemParamType item = new SourcedCompositionItemParamType();
+                    ReferenceType source = new ReferenceType();
+                    String name = mcd.getName() == null ? "sirocco" : mcd.getName();
+                    if (mcd.getComponentQuantity() > 1) {
+                        source.setName(name + new Integer(i).toString() + "-" + UUID.randomUUID());
+                    } else {
+                        source.setName(name + "-" + UUID.randomUUID());
+                    }
+                    // setHref
+                    String idKey = "vcd";
+                    String vmSourceRef = mt.getMachineImage().getProperties().get(idKey);
+                    if (vmSourceRef == null) {
+                        throw new ConnectorException("Cannot find vAppTemplate/vm-Id for key " + idKey);
+                    }
+                    source.setHref(vmSourceRef);
+                    item.setSource(source);
+
+                    // Configuring default vms addressing mode
+                    NetworkConnectionSectionType networkConnectionSectionType = new NetworkConnectionSectionType();
+                    networkConnectionSectionType.setInfo(new MsgType());
+
+                    NetworkConnectionType networkConnectionType = new NetworkConnectionType();
+                    networkConnectionType.setNetwork(this.vdc.getAvailableNetworkRefs().iterator().next().getName());
+                    networkConnectionType.setIpAddressAllocationMode(IpAddressAllocationModeType.POOL.value());
+                    networkConnectionSectionType.getNetworkConnection().add(networkConnectionType);
+
+                    InstantiationParamsType vmInstantiationParamsType = new InstantiationParamsType();
+                    List<JAXBElement<? extends SectionType>> vmSections = vmInstantiationParamsType.getSection();
+                    vmSections.add(new ObjectFactory().createNetworkConnectionSection(networkConnectionSectionType));
+                    item.setInstantiationParams(vmInstantiationParamsType);
+
+                    // TODO
+                    // define virtualHw, userData, NetworkConnnection.. params
+
+                    composeVAppParamsType.getSourcedItem().add(item);
+                }
+            }
+
+            // make the request, and get a vApp in return
+            return vdc.composeVapp(composeVAppParamsType);
+        }
+
+        private Set<ComponentDescriptor> getComponentDescriptorsOfType(final SystemCreate systemCreate,
+            final ComponentType cType) {
+            Set<ComponentDescriptor> componentDescriptors = new HashSet<ComponentDescriptor>();
+            for (ComponentDescriptor cd : systemCreate.getSystemTemplate().getComponentDescriptors()) {
+                if (cd.getComponentType() == cType) {
+                    componentDescriptors.add(cd);
+                }
+            }
+            return componentDescriptors;
+        }
+
+        private InstantiationParamsType createDefaultInstantiationParams(final Vdc vdc) throws ConnectorException {
+
+            // get the OrgNetwork to which we can connect the vAppnetwork
+            NetworkConfigurationType networkConfigurationType = new NetworkConfigurationType();
+            if (vdc.getAvailableNetworkRefs().size() == 0) {
+                throw new ConnectorException("No Networks in vdc to instantiate the vapp");
+            }
+            // VcdCloudProviderConnectorFactory.logger.info("available networks= "
+            // + vdc.getAvailableNetworkRefs().iterator().next().getName());
+
+            // specify the NetworkConfiguration for the vApp network.
+            networkConfigurationType.setParentNetwork(vdc.getAvailableNetworkRefs().iterator().next());
+            networkConfigurationType.setFenceMode(FenceModeValuesType.BRIDGED.value());
+            // networkConfigurationType.setFenceMode(FenceModeValuesType.NATROUTED.value());
+            // networkConfigurationType.setFenceMode(FenceModeValuesType.ISOLATED.value());
+
+            VAppNetworkConfigurationType vAppNetworkConfigurationType = new VAppNetworkConfigurationType();
+            vAppNetworkConfigurationType.setConfiguration(networkConfigurationType);
+            // Default configuration
+            vAppNetworkConfigurationType.setNetworkName(vdc.getAvailableNetworkRefs().iterator().next().getName());
+
+            // fill in the NetworkConfigSection
+            NetworkConfigSectionType networkConfigSectionType = new NetworkConfigSectionType();
+            MsgType networkInfo = new MsgType();
+            networkConfigSectionType.setInfo(networkInfo);
+            List<VAppNetworkConfigurationType> vAppNetworkConfigs = networkConfigSectionType.getNetworkConfig();
+            vAppNetworkConfigs.add(vAppNetworkConfigurationType);
+
+            // fill in remaining InstantititonParams
+            InstantiationParamsType instantiationParamsType = new InstantiationParamsType();
+            List<JAXBElement<? extends SectionType>> sections = instantiationParamsType.getSection();
+            sections.add(new ObjectFactory().createNetworkConfigSection(networkConfigSectionType));
+
+            return instantiationParamsType;
+        }
+
+        //
+        // TODO : code to be removed
+        //
+
+        // Instantiating the vAppTemplate
+        private Vapp instantiateVappTemplate(final ReferenceType vAppTemplateReference, final Vdc vdc,
+            final SystemCreate systemCreate) throws VCloudException, ConnectorException {
+
+            InstantiationParamsType instantiationParamsType = this.createDefaultInstantiationParams(this.vdc);
+
+            // create the request body (InstantiateVAppTemplateParams)
+            InstantiateVAppTemplateParamsType instVappTemplParamsType = new InstantiateVAppTemplateParamsType();
+            if (systemCreate.getSystemTemplate().getName() == null || systemCreate.getSystemTemplate().getName().equals("")) {
+                throw new ConnectorException("validation error on field 'systemTemplate.name': may not be empty");
+            }
+            instVappTemplParamsType.setName(systemCreate.getSystemTemplate().getName() + "-" + UUID.randomUUID());
+            instVappTemplParamsType.setDescription(systemCreate.getSystemTemplate().getDescription());
+            instVappTemplParamsType.setSource(vAppTemplateReference);
+            instVappTemplParamsType.setInstantiationParams(instantiationParamsType);
+
+            // make the request, and get a vApp in return
+            return vdc.instantiateVappTemplate(instVappTemplParamsType);
+        }
+
+        // Configuring vms addressing mode
+        private void configureVMsDefaultIPAddressingMode(final ReferenceType vappRef) throws VCloudException, TimeoutException {
+            // Default IP allocation: Pool
+            Vapp vapp = Vapp.getVappByReference(this.vcloudClient, vappRef);
+            List<VM> childVms = vapp.getChildrenVms();
+            for (VM childVm : childVms) {
+                NetworkConnectionSectionType networkConnectionSectionType = childVm.getNetworkConnectionSection();
+                List<NetworkConnectionType> networkConnections = networkConnectionSectionType.getNetworkConnection();
+                for (NetworkConnectionType networkConnection : networkConnections) {
+                    networkConnection.setIpAddressAllocationMode(IpAddressAllocationModeType.POOL.value());
+                    networkConnection.setNetwork(this.vdc.getAvailableNetworkRefs().iterator().next().getName());
+                }
+                childVm.updateSection(networkConnectionSectionType).waitForTask(0);
+            }
+        }
+
+        private void configureProductSection(final ReferenceType vappRef, final String userData) throws VCloudException,
+            TimeoutException {
+            Vapp vapp = Vapp.getVappByReference(this.vcloudClient, vappRef);
+            MsgType msgType = new MsgType();
+            msgType.setValue("user Data");
+
+            for (VM childVm : vapp.getChildrenVms()) {
+                ProductSectionProperty myProp = new ProductSectionProperty();
+                myProp.setUserConfigurable(true);
+                myProp.setKey("userData");
+                myProp.setValueAttrib(userData);
+                myProp.setType("string");
+                myProp.setLabel(msgType);
+                myProp.setDescription(msgType);
+
+                ProductSectionType ovfEnvSection = new ProductSectionType();
+                ovfEnvSection.setInfo(msgType);
+                ovfEnvSection.setProduct(msgType);
+                ovfEnvSection.setClazz("");
+                ovfEnvSection.setRequired(true);
+                ovfEnvSection.getCategoryOrProperty().add(myProp);
+
+                List<ProductSectionType> productSections = childVm.getProductSections();
+                productSections.add(ovfEnvSection);
+
+                childVm.updateProductSections(productSections).waitForTask(0);
+            }
+        }
+
+        public Job createSystem_v3(final SystemCreate systemCreate) throws ConnectorException {
+            final int waitTimeInMilliSeconds = VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
+            final ReferenceType vAppTemplateRef = new ReferenceType();
+            vAppTemplateRef.setHref(systemCreate.getSystemTemplate().getProviderAssignedId());
+
+            // Instantiating the vAppTemplate
+            final Vapp vapp;
+            try {
+                VappTemplate vappTemplate = VappTemplate.getVappTemplateByReference(this.vcloudClient, vAppTemplateRef);
+                VcdCloudProviderConnectorFactory.logger.info("Instantiating vAppTemplate: "
+                    + vappTemplate.getReference().getName());
+                vapp = this.composeVappTemplate(vAppTemplateRef, this.vdc, systemCreate);
+
+            } catch (Exception ex) {
+                throw new ConnectorException(ex);
+            }
+
+            final System system = new System();
+            this.fromvAppToSystem(vapp, system);
+            system.setState(System.State.CREATING);
+
+            final Callable<System> createTask = new Callable<System>() {
+                @Override
+                public System call() throws Exception {
+                    try {
+                        List<Task> tasks = vapp.getTasks();
+                        if (tasks.size() > 0) {
+                            tasks.get(0).waitForTask(waitTimeInMilliSeconds);
+                        }
+
+                        /* VcdCloudProviderConnectorFactory.logger.info("Configuring VM Ip Addressing Mode");
+                           VcdCloudProviderConnector.this.configureVMsDefaultIPAddressingMode(vapp.getReference());
+                        */
+                        if (systemCreate.getProperties() != null) {
+                            String userData = systemCreate.getProperties().get("userData");
+                            if (userData != null) {
+                                VcdCloudProviderConnectorFactory.logger.info("Configuring user data");
+                                VcdCloudProviderConnector.this.configureProductSection(vapp.getReference(), userData);
+                            }
+                        }
+
+                        // Deploying the Instantiated vApp
+                        VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
+                        vapp.deploy(false, 1000000, false).waitForTask(waitTimeInMilliSeconds);
+                        VcdCloudProviderConnector.this.fromvAppToSystem(
+                            VcdCloudProviderConnector.this.getVappByProviderAssignedId(system.getProviderAssignedId()), system);
+                    } catch (Exception ex) {
+                        throw new ConnectorException(ex);
+                    }
+                    return system;
+                }
+            };
+            ListenableFuture<System> result = VcdCloudProviderConnectorFactory.this.executorService.submit(createTask);
+            return VcdCloudProviderConnectorFactory.this.jobManager.newJob(system, null, "add", result);
+        }
+
+        // composing the vAppTemplate
+        private Vapp composeVappTemplate(final ReferenceType vAppTemplateReference, final Vdc vdc,
+            final SystemCreate systemCreate) throws VCloudException, ConnectorException {
+
+            InstantiationParamsType instantiationParamsType = this.createDefaultInstantiationParams(this.vdc);
+
+            // create the request body (ComposeVAppParamsType)
+            ComposeVAppParamsType composeVAppParamsType = new ComposeVAppParamsType();
+            composeVAppParamsType.setDeploy(false);
+            composeVAppParamsType.setInstantiationParams(instantiationParamsType);
+            composeVAppParamsType.setName("ComposedVapp-EE" + "-" + UUID.randomUUID());
+            List<SourcedCompositionItemParamType> items = composeVAppParamsType.getSourcedItem();
+
+            // getting the vapptemplates first vm.
+            VappTemplate vappTemplate = VappTemplate.getVappTemplateByReference(this.vcloudClient, vAppTemplateReference);
+            VappTemplate vm = vappTemplate.getChildren().get(0);
+            String vmHref = vm.getReference().getHref();
+            VcdCloudProviderConnectorFactory.logger.info("----VM template=" + vmHref);
+
+            // adding vm items with different names.
+            for (int i = 0; i < 1; i++) {
+                SourcedCompositionItemParamType vappTemplateItem = new SourcedCompositionItemParamType();
+                ReferenceType vappTemplateVMRef = new ReferenceType();
+                vappTemplateVMRef.setHref(vmHref);
+                vappTemplateVMRef.setName(i + "-" + vAppTemplateReference.getName() + "-" + UUID.randomUUID());
+                vappTemplateItem.setSource(vappTemplateVMRef);
+
+                // Configuring vms addressing mode
+                NetworkConnectionSectionType networkConnectionSectionType = new NetworkConnectionSectionType();
+                networkConnectionSectionType.setInfo(new MsgType());
+
+                NetworkConnectionType networkConnectionType = new NetworkConnectionType();
+                networkConnectionType.setNetwork(this.vdc.getAvailableNetworkRefs().iterator().next().getName());
+                networkConnectionType.setIpAddressAllocationMode(IpAddressAllocationModeType.POOL.value());
+                networkConnectionSectionType.getNetworkConnection().add(networkConnectionType);
+
+                InstantiationParamsType vmInstantiationParamsType = new InstantiationParamsType();
+                List<JAXBElement<? extends SectionType>> vmSections = vmInstantiationParamsType.getSection();
+                vmSections.add(new ObjectFactory().createNetworkConnectionSection(networkConnectionSectionType));
+                vappTemplateItem.setInstantiationParams(vmInstantiationParamsType);
+
+                //
+                items.add(vappTemplateItem);
+            }
+
+            // make the request, and get a vApp in return
+            return vdc.composeVapp(composeVAppParamsType);
+        }
+
+        public Job createMachine_v3(final MachineCreate machineCreate) throws ConnectorException {
+            final int waitTimeInMilliSeconds = VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
+
+            final Vapp vapp;
+            try {
+                vapp = this.createVapp(this.vdc, machineCreate);
+            } catch (Exception ex) {
+                throw new ConnectorException(ex);
+            }
+
+            final Machine machine = new Machine();
+            // this.fromVmToMachine(vapp.getChildrenVms().get(0), machine);
+            machine.setState(Machine.State.CREATING);
+
+            final Callable<Machine> createTask = new Callable<Machine>() {
+                @Override
+                public Machine call() throws Exception {
+                    try {
+                        List<Task> tasks = vapp.getTasks();
+                        if (tasks.size() > 0) {
+                            tasks.get(0).waitForTask(waitTimeInMilliSeconds);
+                        }
+
+                        // Deploying the Instantiated vApp
+                        VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
+                        vapp.deploy(false, 1000000, false).waitForTask(waitTimeInMilliSeconds);
+
+                        // TODO check this against the following alternative
+                        // refresh the vapp
+                        Vapp vapp2 = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
+
+                        VcdCloudProviderConnectorFactory.logger.info("nbr de vms: " + vapp2.getChildrenVms().size());
+                        List<VM> childVms = vapp2.getChildrenVms();
+                        for (VM childVm : childVms) {
+                            VcdCloudProviderConnectorFactory.logger.info("  vm: " + childVm.getResource().getName());
+                        }
+                        VcdCloudProviderConnector.this.fromVmToMachine(vapp2.getChildrenVms().get(0), machine);
+                    } catch (Exception ex) {
+                        throw new ConnectorException(ex);
+                    }
+                    return machine;
+                }
+            };
+            ListenableFuture<Machine> result = VcdCloudProviderConnectorFactory.this.executorService.submit(createTask);
+            return VcdCloudProviderConnectorFactory.this.jobManager.newJob(machine, null, "add", result);
         }
     }
 }
