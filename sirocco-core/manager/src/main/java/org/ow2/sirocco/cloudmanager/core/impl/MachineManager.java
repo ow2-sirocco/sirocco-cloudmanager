@@ -505,6 +505,10 @@ public class MachineManager implements IMachineManager {
         return this.doService(machineId, "start");
     }
 
+    public Job stopMachine(final String machineId, final boolean force) throws CloudProviderException {
+        return this.doService(machineId, "stop");
+    }
+
     public Job stopMachine(final String machineId) throws CloudProviderException {
         return this.doService(machineId, "stop");
     }

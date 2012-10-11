@@ -1243,6 +1243,36 @@ public class SystemManager implements ISystemManager {
         return parentJob;
     }
 
+    @Override
+    public Job startSystem(final String systemId) throws CloudProviderException {
+        return this.startSystem(systemId, null);
+    }
+
+    @Override
+    public Job stopSystem(final String systemId, final boolean force) throws CloudProviderException {
+        return this.stopSystem(systemId, force, null);
+    }
+
+    @Override
+    public Job stopSystem(final String systemId) throws CloudProviderException {
+        return this.stopSystem(systemId, false, null);
+    }
+
+    @Override
+    public Job restartSystem(final String systemId, final boolean force) throws CloudProviderException {
+        return this.restartSystem(systemId, force, null);
+    }
+
+    @Override
+    public Job pauseSystem(final String systemId) throws CloudProviderException {
+        return this.pauseSystem(systemId, null);
+    }
+
+    @Override
+    public Job suspendSystem(final String systemId) throws CloudProviderException {
+        return this.suspendSystem(systemId, null);
+    }
+
     // private methods
 
     private Job doService(final String systemId, final String basicAction, final String detailedAction,
