@@ -31,10 +31,12 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 @Entity
 //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
@@ -42,6 +44,8 @@ public class SystemTemplate extends CloudTemplate {
     private static final long serialVersionUID = 1L;
 
     private Set<ComponentDescriptor> componentDescriptors;
+
+    private EventLogTemplate eventLogTemplate;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "system_temp_id")
@@ -52,6 +56,15 @@ public class SystemTemplate extends CloudTemplate {
 
     public void setComponentDescriptors(final Set<ComponentDescriptor> componentDescriptors) {
         this.componentDescriptors = componentDescriptors;
+    }
+
+    @OneToOne
+    public EventLogTemplate getEventLogTemplate() {
+        return this.eventLogTemplate;
+    }
+
+    public void setEventLogTemplate(final EventLogTemplate eventLogTemplate) {
+        this.eventLogTemplate = eventLogTemplate;
     }
 
 }
