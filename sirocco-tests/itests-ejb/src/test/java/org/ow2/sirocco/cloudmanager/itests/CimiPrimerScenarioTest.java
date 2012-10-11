@@ -30,9 +30,11 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -667,7 +669,7 @@ public class CimiPrimerScenarioTest {
                 }
 
                 addr.setIp(ip);
-                List<String> dnsEntries = new ArrayList<String>();
+                Set<String> dnsEntries = new HashSet<String>();
                 dnsEntries.add("162.99.11.1" + i + loop);
                 addr.setDns(dnsEntries);
                 addresses.add(addr);
