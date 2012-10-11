@@ -134,7 +134,7 @@ public class MachineTemplate extends Resource<CimiMachineTemplate> {
         final String... filterExpression) throws CimiException {
         CimiMachineTemplateCollection machineTemplateCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getMachineTemplates().getHref()),
-            CimiMachineTemplateCollectionRoot.class, first, last, filterExpression);
+            CimiMachineTemplateCollectionRoot.class, first, last, null, filterExpression);
 
         List<MachineTemplate> result = new ArrayList<MachineTemplate>();
 

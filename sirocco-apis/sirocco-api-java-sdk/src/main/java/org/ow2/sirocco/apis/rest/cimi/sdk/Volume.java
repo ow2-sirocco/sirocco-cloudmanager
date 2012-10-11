@@ -90,7 +90,7 @@ public class Volume extends Resource<CimiVolume> {
         final String... filterExpression) throws CimiException {
         CimiVolumeCollection volumeCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getVolumes().getHref()), CimiVolumeCollectionRoot.class, first, last,
-            filterExpression);
+            null, filterExpression);
         List<Volume> result = new ArrayList<Volume>();
 
         if (volumeCollection.getCollection() != null) {

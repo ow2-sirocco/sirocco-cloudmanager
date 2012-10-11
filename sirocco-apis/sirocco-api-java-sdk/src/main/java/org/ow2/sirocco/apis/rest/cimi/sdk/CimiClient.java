@@ -170,7 +170,7 @@ public class CimiClient {
             throw new CimiException("Forbidden: " + message);
         } else if (response.getStatus() == 404) {
             String message = response.getEntity(String.class);
-            throw new CimiException(message);
+            throw new CimiException("Resource not found: " + message);
         } else if (response.getStatus() == 409) {
             String message = response.getEntity(String.class);
             throw new CimiException(message);
@@ -220,10 +220,13 @@ public class CimiClient {
         return new CimiClient(cimiEndpointUrl, userName, password, options);
     }
 
-    <U> U getRequest(final String path, final Class<U> clazz, final int first, final int last,
+    <U> U getRequest(final String path, final Class<U> clazz, final int first, final int last, final String expand,
         final String... filterExpressions) throws CimiException {
-        WebResource service = this.webResource.path(path);// .queryParam(CimiClient.CIMI_QUERY_EXPAND_KEYWORD,
-                                                          // "*");
+        WebResource service = this.webResource.path(path);
+        if (expand != null) {
+            service = service.queryParam(CimiClient.CIMI_QUERY_EXPAND_KEYWORD, expand);
+        }
+
         for (String filterExpression : filterExpressions) {
             if (filterExpression != null) {
                 service = service.queryParam(CimiClient.CIMI_QUERY_FILTER_KEYWORD, filterExpression);
@@ -267,7 +270,7 @@ public class CimiClient {
 
     <U extends CimiObjectCommonAbstract> U getCimiObjectByReference(final String ref, final Class<U> clazz)
         throws CimiException {
-        return this.getRequest(this.extractPath(ref), clazz, -1, -1);
+        return this.getRequest(this.extractPath(ref), clazz, -1, -1, null);
     }
 
 }

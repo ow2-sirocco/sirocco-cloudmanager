@@ -91,7 +91,7 @@ public class Credential extends Resource<CimiCredential> {
         final String... filterExpression) throws CimiException {
         CimiCredentialCollection credentialCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getCredentials().getHref()), CimiCredentialCollectionRoot.class, first,
-            last, filterExpression);
+            last, null, filterExpression);
 
         List<Credential> result = new ArrayList<Credential>();
 

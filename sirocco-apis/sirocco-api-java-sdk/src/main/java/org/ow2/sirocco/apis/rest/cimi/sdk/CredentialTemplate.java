@@ -86,7 +86,7 @@ public class CredentialTemplate extends Resource<CimiCredentialTemplate> {
         final String... filterExpression) throws CimiException {
         CimiCredentialTemplateCollection credentialTemplateCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getCredentialTemplates().getHref()),
-            CimiCredentialTemplateCollectionRoot.class, first, last, filterExpression);
+            CimiCredentialTemplateCollectionRoot.class, first, last, null, filterExpression);
 
         List<CredentialTemplate> result = new ArrayList<CredentialTemplate>();
 

@@ -87,7 +87,7 @@ public class VolumeConfiguration extends Resource<CimiVolumeConfiguration> {
         final String... filterExpression) throws CimiException {
         CimiVolumeConfigurationCollection volumeConfigCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getVolumeConfigs().getHref()),
-            CimiVolumeConfigurationCollectionRoot.class, first, last, filterExpression);
+            CimiVolumeConfigurationCollectionRoot.class, first, last, null, filterExpression);
 
         List<VolumeConfiguration> result = new ArrayList<VolumeConfiguration>();
 

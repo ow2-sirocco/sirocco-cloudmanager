@@ -32,8 +32,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.ActionType;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAction;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class System extends Resource<CimiSystem> {
@@ -77,6 +79,18 @@ public class System extends Resource<CimiSystem> {
         return new Job(this.cimiClient, cimiObject);
     }
 
+    public List<SystemMachine> getMachines() throws CimiException {
+        List<SystemMachine> machines = new ArrayList<SystemMachine>();
+        if (this.cimiObject.getMachines().getArray() != null) {
+            for (CimiSystemMachine cimiSystemMachine : this.cimiObject.getMachines().getArray()) {
+                SystemMachine systemMachine = new SystemMachine(this.cimiClient, cimiSystemMachine);
+                machines.add(systemMachine);
+            }
+        }
+        return machines;
+
+    }
+
     public static Job createSystem(final CimiClient client, final SystemCreate systemCreate) throws CimiException {
         CimiJob cimiObject = client.postRequest(ConstantsPath.SYSTEM_PATH, systemCreate.cimiSystemCreate, CimiJob.class);
         return new Job(client, cimiObject);
@@ -86,7 +100,7 @@ public class System extends Resource<CimiSystem> {
         final String... filterExpression) throws CimiException {
         CimiSystemCollection systemCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getSystems().getHref()), CimiSystemCollectionRoot.class, first, last,
-            filterExpression);
+            null, filterExpression);
         List<System> result = new ArrayList<System>();
 
         if (systemCollection.getCollection() != null) {
@@ -98,7 +112,12 @@ public class System extends Resource<CimiSystem> {
     }
 
     public static System getSystemByReference(final CimiClient client, final String ref) throws CimiException {
-        return new System(client, client.getCimiObjectByReference(ref, CimiSystem.class));
+        System result = new System(client, client.getCimiObjectByReference(ref, CimiSystem.class));
+        String systemMachineCollection = result.cimiObject.getMachines().getHref();
+        CimiSystemMachineCollectionRoot machines = client.getRequest(client.extractPath(systemMachineCollection),
+            CimiSystemMachineCollectionRoot.class, -1, -1, "*");
+        result.cimiObject.getMachines().setArray(machines.getArray());
+        return result;
     }
 
     public static System getSystemById(final CimiClient client, final String id) throws Exception {

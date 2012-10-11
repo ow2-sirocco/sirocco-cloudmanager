@@ -100,7 +100,7 @@ public class MachineImage extends Resource<CimiMachineImage> {
         final String... filterExpression) throws CimiException {
         CimiMachineImageCollection machineImagesCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getMachineImages().getHref()), CimiMachineImageCollectionRoot.class,
-            first, last, filterExpression);
+            first, last, null, filterExpression);
 
         List<MachineImage> result = new ArrayList<MachineImage>();
 

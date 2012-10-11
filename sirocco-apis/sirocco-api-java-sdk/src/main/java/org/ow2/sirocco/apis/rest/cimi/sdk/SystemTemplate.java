@@ -62,7 +62,7 @@ public class SystemTemplate extends Resource<CimiSystemTemplate> {
         final String... filterExpression) throws CimiException {
         CimiSystemTemplateCollection systemTemplateCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getSystemTemplates().getHref()), CimiSystemTemplateCollectionRoot.class,
-            first, last, filterExpression);
+            first, last, null, filterExpression);
 
         List<SystemTemplate> result = new ArrayList<SystemTemplate>();
 

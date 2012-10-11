@@ -36,6 +36,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.NestedJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollectionRoot;
 
 public class Job extends Resource<CimiJob> {
+    public final int DEFAULT_POLL_PERIOD_IN_SECONDS = 10;
+
     public static enum Status {
         RUNNING, SUCCESS, FAILED, CANCELLED
     };
@@ -92,7 +94,7 @@ public class Job extends Resource<CimiJob> {
             if (this.getStatus() != Job.Status.RUNNING) {
                 break;
             }
-            Thread.sleep(1000);
+            Thread.sleep(this.DEFAULT_POLL_PERIOD_IN_SECONDS * 1000);
             this.cimiObject = this.cimiClient.getCimiObjectByReference(this.getId(), CimiJob.class);
             if (java.lang.System.nanoTime() > endTime) {
                 throw new TimeoutException();
@@ -103,7 +105,7 @@ public class Job extends Resource<CimiJob> {
     public static List<Job> getJobs(final CimiClient client, final int first, final int last, final String... filterExpression)
         throws CimiException {
         org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection jobCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getJobs().getHref()), CimiJobCollectionRoot.class, first, last,
+            client.extractPath(client.cloudEntryPoint.getJobs().getHref()), CimiJobCollectionRoot.class, first, last, null,
             filterExpression);
 
         List<Job> result = new ArrayList<Job>();

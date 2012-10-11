@@ -96,7 +96,7 @@ public class VolumeImage extends Resource<CimiVolumeImage> {
         final String... filterExpression) throws CimiException {
         CimiVolumeImageCollection volumeImagesCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getVolumeImages().getHref()), CimiVolumeImageCollectionRoot.class, first,
-            last, filterExpression);
+            last, null, filterExpression);
 
         List<VolumeImage> result = new ArrayList<VolumeImage>();
 

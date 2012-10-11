@@ -86,7 +86,7 @@ public class VolumeTemplate extends Resource<CimiVolumeTemplate> {
         final String... filterExpression) throws CimiException {
         CimiVolumeTemplateCollection volumeTemplateCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getVolumeTemplates().getHref()), CimiVolumeTemplateCollectionRoot.class,
-            first, last, filterExpression);
+            first, last, null, filterExpression);
 
         List<VolumeTemplate> result = new ArrayList<VolumeTemplate>();
 

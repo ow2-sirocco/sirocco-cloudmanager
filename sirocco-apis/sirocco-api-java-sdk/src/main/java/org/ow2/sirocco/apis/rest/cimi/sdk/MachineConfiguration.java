@@ -122,7 +122,7 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
         final String... filterExpression) throws CimiException {
         CimiMachineConfigurationCollection machineConfigCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getMachineConfigs().getHref()),
-            CimiMachineConfigurationCollectionRoot.class, first, last, filterExpression);
+            CimiMachineConfigurationCollectionRoot.class, first, last, null, filterExpression);
 
         List<MachineConfiguration> result = new ArrayList<MachineConfiguration>();
 
