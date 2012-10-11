@@ -38,6 +38,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.CimiConverter;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiExchange;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
 import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.manager.CallServiceHelper;
 import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
@@ -383,13 +384,17 @@ public class CimiContextImpl implements CimiContext {
      *      java.lang.String)
      */
     @Override
-    public String makeHref(final Class<? extends CimiResource> classToUse, final String id) {
+    public String makeHref(final Class<? extends CimiResource> classToUse, String id) {
         String href = null;
         ExchangeType type = this.getType(classToUse);
         // Detects if type has parent
         if (true == type.hasParent()) {
             // Adds all IDs parent of the request if exists
             if (true == this.getRequest().hasParentIds()) {
+                // FIXME
+                if (classToUse == CimiMachineNetworkInterfaceAddressCollection.class) {
+                    id = this.stackConvertedIdService.get(1).toString();
+                }
                 href = type.makeHref(this.getRequest().getBaseUri(), this.getRequest().getIds().makeArrayWithParents(id));
             } else {
                 // Adds all IDs parent of the service if exists
@@ -402,7 +407,9 @@ public class CimiContextImpl implements CimiContext {
                         idsString.add(serviceId.toString());
                     }
                     // Add id
-                    idsString.add(id);
+                    if (null != id) {
+                        idsString.add(id);
+                    }
                     // Make HREF
                     href = type.makeHref(this.getRequest().getBaseUri(), idsString.toArray(new String[idsString.size()]));
                 }
