@@ -26,6 +26,8 @@ package org.ow2.sirocco.apis.rest.cimi.converter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetwork;
@@ -128,7 +130,7 @@ public class AddressConverter extends ObjectCommonConverter {
     protected void doCopyToService(final CimiContext context, final CimiAddress dataCimi, final Address dataService) {
         this.fill(context, dataCimi, dataService);
         dataService.setDefaultGateway(dataCimi.getDefaultGateway());
-        List<String> dns = new ArrayList<String>();
+        Set<String> dns = new HashSet<String>();
         if (dataCimi.getDns() != null) {
             for (String dnsValue : dataCimi.getDns()) {
                 dns.add(dnsValue);

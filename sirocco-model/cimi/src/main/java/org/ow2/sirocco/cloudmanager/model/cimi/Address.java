@@ -26,9 +26,10 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
@@ -48,7 +49,7 @@ public class Address extends CloudEntity implements Serializable {
 
     private String defaultGateway;
 
-    private List<String> dns;
+    private Set<String> dns;
 
     private String protocol;
 
@@ -90,12 +91,12 @@ public class Address extends CloudEntity implements Serializable {
         this.defaultGateway = defaultGateway;
     }
 
-    @CollectionOfElements
-    public List<String> getDns() {
+    @CollectionOfElements(fetch = FetchType.EAGER)
+    public Set<String> getDns() {
         return this.dns;
     }
 
-    public void setDns(final List<String> dns) {
+    public void setDns(final Set<String> dns) {
         this.dns = dns;
     }
 
