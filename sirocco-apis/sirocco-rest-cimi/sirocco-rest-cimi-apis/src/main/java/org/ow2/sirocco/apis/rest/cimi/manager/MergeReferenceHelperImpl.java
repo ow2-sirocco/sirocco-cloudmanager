@@ -940,10 +940,6 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
      */
     protected void merge(final CimiSystemTemplate cimiRef, final CimiSystemTemplate cimi) {
         if (null != cimiRef) {
-            CimiComponentDescriptor component;
-            CimiComponentDescriptor componentRef;
-            List<CimiComponentDescriptor> toAdd = new ArrayList<CimiComponentDescriptor>();
-
             // Merge common data
             this.mergeObjectCommon(cimiRef, cimi);
             if (null == cimi.getEventLogTemplate()) {
@@ -951,24 +947,10 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             } else {
                 this.merge(cimiRef.getEventLogTemplate(), cimi.getEventLogTemplate());
             }
-            // Make maps to identify componenent with his ExchangeType
-            Map<ExchangeType, CimiComponentDescriptor> mapComponents = this.makeMapComponents(cimi);
-            Map<ExchangeType, CimiComponentDescriptor> mapRefComponents = this.makeMapComponents(cimiRef);
-            // For each ExchangeType possible : stores the new references in a
-            // list and merges the others
-            for (ExchangeType type : CimiComponentDescriptor.TYPE_DESCRIPTORS) {
-                component = mapComponents.get(type);
-                componentRef = mapRefComponents.get(type);
-                if (null == component) {
-                    if (null != componentRef) {
-                        toAdd.add(componentRef);
-                    }
-                } else {
-                    this.merge(componentRef, component);
-                }
+
+            if (null == cimi.getComponentDescriptors()) {
+                cimi.setComponentDescriptors(cimiRef.getComponentDescriptors());
             }
-            // Add the new references
-            cimi.addAllComponentDescriptors(toAdd);
         }
     }
 
