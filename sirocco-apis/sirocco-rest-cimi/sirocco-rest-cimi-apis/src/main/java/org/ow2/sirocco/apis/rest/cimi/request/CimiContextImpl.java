@@ -392,7 +392,7 @@ public class CimiContextImpl implements CimiContext {
             // Adds all IDs parent of the request if exists
             if (true == this.getRequest().hasParentIds()) {
                 // FIXME
-                if (classToUse == CimiMachineNetworkInterfaceAddressCollection.class) {
+                if (classToUse == CimiMachineNetworkInterfaceAddressCollection.class && this.stackConvertedIdService.size() > 1) {
                     id = this.stackConvertedIdService.get(1).toString();
                 }
                 href = type.makeHref(this.getRequest().getBaseUri(), this.getRequest().getIds().makeArrayWithParents(id));
