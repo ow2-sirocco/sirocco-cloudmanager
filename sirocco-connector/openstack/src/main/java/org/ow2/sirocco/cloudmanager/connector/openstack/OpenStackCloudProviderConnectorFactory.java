@@ -433,19 +433,24 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             FloatingIP floatingIP = floatingIPClient.allocate();
             OpenStackCloudProviderConnectorFactory.logger.info("Allocating floating IP " + floatingIP.getIp());
             floatingIPClient.addFloatingIPToServer(floatingIP.getIp(), serverId);
-            int waitTimeInSeconds = OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
-            do {
-                Server server = serverClient.getServer(serverId);
-                if (server == null) {
-                    throw new Exception("Machine with id " + serverId + " unknown");
-                }
-                if (this.findIpAddressOnServer(server, floatingIP.getIp())) {
-                    OpenStackCloudProviderConnectorFactory.logger.info("Floating IP " + floatingIP.getIp()
-                        + " attached to server " + serverId);
-                    break;
-                }
-                Thread.sleep(1000);
-            } while (waitTimeInSeconds-- > 0);
+            // TODO check if it is safe not to wait that the floating IP shows
+            // up in the server detail
+
+            // int waitTimeInSeconds =
+            // OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
+            // do {
+            // Server server = serverClient.getServer(serverId);
+            // if (server == null) {
+            // throw new Exception("Machine with id " + serverId + " unknown");
+            // }
+            // if (this.findIpAddressOnServer(server, floatingIP.getIp())) {
+            // OpenStackCloudProviderConnectorFactory.logger.info("Floating IP "
+            // + floatingIP.getIp()
+            // + " attached to server " + serverId);
+            // break;
+            // }
+            // Thread.sleep(1000);
+            // } while (waitTimeInSeconds-- > 0);
             return floatingIP.getIp();
         }
 
@@ -453,7 +458,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             final FloatingIPClient floatingIPClient = this.novaClient.getFloatingIPExtensionForZone(this.zone).get();
 
             for (FloatingIP floatingIP : floatingIPClient.listFloatingIPs()) {
-                if (floatingIP.getInstanceId().equals(serverId)) {
+                if (floatingIP.getInstanceId() != null && floatingIP.getInstanceId().equals(serverId)) {
                     OpenStackCloudProviderConnectorFactory.logger.info("Releasing floating IP " + floatingIP.getIp()
                         + " from server " + serverId);
                     floatingIPClient.removeFloatingIPFromServer(floatingIP.getIp(), serverId);
