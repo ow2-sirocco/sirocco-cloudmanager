@@ -29,7 +29,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.apis</groupId>
 		<artifactId>sirocco-rest-cimi</artifactId>
-		<version>0.5.2-SNAPSHOT</version>
+		<version>0.5.2</version>
 	</parent>
 
 	<groupId>org.ow2.sirocco.apis</groupId>
