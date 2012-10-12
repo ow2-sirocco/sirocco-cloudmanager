@@ -29,7 +29,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager-apis</artifactId>
-		<version>0.5.2</version>
+		<version>0.5.3-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.ow2.sirocco.apis</groupId>
