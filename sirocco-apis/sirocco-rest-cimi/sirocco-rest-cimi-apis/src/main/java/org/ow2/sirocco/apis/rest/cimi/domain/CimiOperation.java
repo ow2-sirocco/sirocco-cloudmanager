@@ -29,6 +29,7 @@ import java.io.Serializable;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
@@ -39,6 +40,7 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  * </p>
  */
 @XmlRootElement(name = "Operation")
+@JsonPropertyOrder({"rel", "href"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiOperation implements Serializable {
 
@@ -48,20 +50,20 @@ public class CimiOperation implements Serializable {
     // ---------------------------------------- Fields
 
     /**
-     * Field "rel".
-     * <p>
-     * The name of the operation.
-     * </p>
-     */
-    private String rel;
-
-    /**
      * Field "href".
      * <p>
      * The URL to execute the operation.
      * </p>
      */
     private String href;
+
+    /**
+     * Field "rel".
+     * <p>
+     * The name of the operation.
+     * </p>
+     */
+    private String rel;
 
     /**
      * Default constructor.
@@ -76,25 +78,6 @@ public class CimiOperation implements Serializable {
     public CimiOperation(final String rel, final String href) {
         this.setRel(rel);
         this.setHref(href);
-    }
-
-    /**
-     * Return the value of field "rel".
-     * 
-     * @return The value
-     */
-    @XmlAttribute
-    public String getRel() {
-        return this.rel;
-    }
-
-    /**
-     * Set the value of field "rel".
-     * 
-     * @param rel The value
-     */
-    public void setRel(final String rel) {
-        this.rel = rel;
     }
 
     /**
@@ -114,6 +97,25 @@ public class CimiOperation implements Serializable {
      */
     public void setHref(final String href) {
         this.href = href;
+    }
+
+    /**
+     * Return the value of field "rel".
+     * 
+     * @return The value
+     */
+    @XmlAttribute
+    public String getRel() {
+        return this.rel;
+    }
+
+    /**
+     * Set the value of field "rel".
+     * 
+     * @param rel The value
+     */
+    public void setRel(final String rel) {
+        this.rel = rel;
     }
 
 }

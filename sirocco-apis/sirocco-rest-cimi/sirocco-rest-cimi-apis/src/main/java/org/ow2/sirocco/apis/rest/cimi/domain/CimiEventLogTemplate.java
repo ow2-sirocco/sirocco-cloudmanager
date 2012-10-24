@@ -26,8 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
@@ -35,6 +37,10 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  * Class EventLogTemplate.
  */
 @XmlRootElement(name = "EventLogTemplate")
+@XmlType(propOrder = {"id", "name", "description", "created", "updated", "propertyArray", "targetResource", "persistence",
+    "operations"})
+@JsonPropertyOrder({"resourceURI", "id", "name", "description", "created", "updated", "properties", "targetResource",
+    "persistence", "operations"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiEventLogTemplate extends CimiObjectCommonAbstract {
 

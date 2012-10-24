@@ -26,8 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupNetworkCollection;
@@ -36,6 +38,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiForwardingGroupNetwo
  * Class ForwardingGroup.
  */
 @XmlRootElement(name = "ForwardingGroup")
+@XmlType(propOrder = {"id", "name", "description", "created", "updated", "propertyArray", "networks", "operations"})
+@JsonPropertyOrder({"resourceURI", "id", "name", "description", "created", "updated", "properties", "networks", "operations"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiForwardingGroup extends CimiObjectCommonAbstract {
 

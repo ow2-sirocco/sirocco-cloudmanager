@@ -43,6 +43,7 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
 /**
  * Class with the common attributes of multiple resources.
  */
+@XmlTransient
 public class CimiCommon implements CimiDataCommon {
 
     /** Serial number */

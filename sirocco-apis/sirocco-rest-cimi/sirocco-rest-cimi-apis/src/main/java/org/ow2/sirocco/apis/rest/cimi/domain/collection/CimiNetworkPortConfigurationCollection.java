@@ -27,6 +27,7 @@ package org.ow2.sirocco.apis.rest.cimi.domain.collection;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
@@ -41,6 +42,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.ExchangeType;
  * Collection of NetworkPortConfiguration.
  */
 @XmlRootElement
+@XmlType(propOrder = {"id", "count", "array", "operations"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiNetworkPortConfigurationCollection extends CimiCollectionAbstract<CimiNetworkPortConfiguration> {
 

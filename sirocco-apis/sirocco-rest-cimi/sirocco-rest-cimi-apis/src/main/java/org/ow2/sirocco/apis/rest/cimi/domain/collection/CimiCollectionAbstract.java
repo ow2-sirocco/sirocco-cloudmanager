@@ -28,13 +28,18 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonIgnoreProperties;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiArray;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResourceAbstract;
 
 /**
  * Abstract class of a CIMI Collection.
  */
+@XmlTransient
+@JsonPropertyOrder({"resourceURI", "id", "count", "array", "operations"})
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class CimiCollectionAbstract<E> extends CimiResourceAbstract implements CimiCollection<E> {
 
     /** Serial number */

@@ -26,8 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressCollection;
@@ -49,6 +51,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortCollectio
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiResourceMetadataCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
@@ -61,6 +64,16 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeTemplateCollec
  * <p>
  */
 @XmlRootElement(name = "CloudEntryPoint")
+@XmlType(propOrder = {"id", "name", "description", "created", "updated", "propertyArray", "baseURI", "resourceMetadata",
+    "systems", "systemTemplates", "machines", "machineTemplates", "machineConfigs", "machineImages", "credentials",
+    "credentialTemplates", "volumes", "volumeTemplates", "volumeConfigs", "volumeImages", "networks", "networkTemplates",
+    "networkConfigs", "networkPorts", "networkPortTemplates", "networkPortConfigs", "addresses", "addressTemplates",
+    "forwardingGroups", "forwardingGroupTemplates", "jobs", "eventLogs", "eventLogTemplates", "operations"})
+@JsonPropertyOrder({"resourceURI", "id", "name", "description", "created", "updated", "properties", "baseURI",
+    "resourceMetadata", "systems", "systemTemplates", "machines", "machineTemplates", "machineConfigs", "machineImages",
+    "credentials", "credentialTemplates", "volumes", "volumeTemplates", "volumeConfigs", "volumeImages", "networks",
+    "networkTemplates", "networkConfigs", "networkPorts", "networkPortTemplates", "networkPortConfigs", "addresses",
+    "addressTemplates", "forwardingGroups", "forwardingGroupTemplates", "jobs", "eventLogs", "eventLogTemplates", "operations"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
 
@@ -71,6 +84,11 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      * Field "baseURI".
      */
     private String baseURI;
+
+    /**
+     * Field "resourceMetadata".
+     */
+    private CimiResourceMetadataCollection resourceMetadata;
 
     /**
      * Field "credentials".
@@ -229,6 +247,24 @@ public class CimiCloudEntryPoint extends CimiObjectCommonAbstract {
      */
     public void setBaseURI(final String baseURI) {
         this.baseURI = baseURI;
+    }
+
+    /**
+     * Return the value of field "resourceMetadata".
+     * 
+     * @return The value
+     */
+    public CimiResourceMetadataCollection getResourceMetadata() {
+        return this.resourceMetadata;
+    }
+
+    /**
+     * Set the value of field "resourceMetadata".
+     * 
+     * @param resourceMetadata The value
+     */
+    public void setResourceMetadata(final CimiResourceMetadataCollection resourceMetadata) {
+        this.resourceMetadata = resourceMetadata;
     }
 
     /**

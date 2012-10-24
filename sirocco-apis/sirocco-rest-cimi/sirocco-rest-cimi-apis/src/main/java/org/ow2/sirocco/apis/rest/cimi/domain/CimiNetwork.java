@@ -26,8 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkNetworkPortCollection;
@@ -36,6 +38,10 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkNetworkPortCo
  * Class Network.
  */
 @XmlRootElement(name = "Network")
+@XmlType(propOrder = {"id", "name", "description", "created", "updated", "propertyArray", "state", "networkType", "mtu",
+    "classOfService", "networkPorts", "forwardingGroup", "eventLog", "operations"})
+@JsonPropertyOrder({"resourceURI", "id", "name", "description", "created", "updated", "properties", "state", "networkType",
+    "mtu", "classOfService", "networkPorts", "forwardingGroup", "eventLog", "operations"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiNetwork extends CimiObjectCommonAbstract {
 

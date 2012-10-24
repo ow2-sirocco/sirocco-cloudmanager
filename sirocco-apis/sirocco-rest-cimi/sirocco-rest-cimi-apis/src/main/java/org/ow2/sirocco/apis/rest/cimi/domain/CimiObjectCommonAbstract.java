@@ -39,6 +39,7 @@ import org.ow2.sirocco.apis.rest.cimi.utils.CimiDateAdapter;
 /**
  * Abstract class of a CIMI common object.
  */
+@XmlTransient
 public abstract class CimiObjectCommonAbstract extends CimiCommon implements CimiObjectCommon {
 
     /** Serial number */
@@ -157,7 +158,7 @@ public abstract class CimiObjectCommonAbstract extends CimiCommon implements Cim
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiResource#getResourceURI()
      */
     @Override
-    @XmlAttribute
+    @XmlTransient
     public String getResourceURI() {
         return this.resource.getResourceURI();
     }

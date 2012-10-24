@@ -90,6 +90,8 @@ public enum PathType {
     /** */
     NetworkPortTemplate(ConstantsPath.NETWORK_PORT_TEMPLATE),
     /** */
+    ResourceMetadata(ConstantsPath.RESOURCE_METADATA),
+    /** */
     System(ConstantsPath.SYSTEM),
     /** */
     SystemCredential(ConstantsPath.CREDENTIAL, System),

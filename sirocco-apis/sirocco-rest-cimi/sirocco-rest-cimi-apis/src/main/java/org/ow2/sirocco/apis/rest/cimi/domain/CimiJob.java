@@ -29,10 +29,12 @@ import java.util.Date;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.utils.CimiDateAdapter;
@@ -41,6 +43,12 @@ import org.ow2.sirocco.apis.rest.cimi.utils.CimiDateAdapter;
  * Class Job.
  */
 @XmlRootElement(name = "Job")
+@XmlType(propOrder = {"id", "name", "description", "created", "updated", "propertyArray", "status", "targetResource",
+    "affectedResources", "action", "returnCode", "progress", "statusMessage", "timeOfStatusChange", "isCancellable",
+    "parentJob", "nestedJobs", "operations"})
+@JsonPropertyOrder({"resourceURI", "id", "name", "description", "created", "updated", "properties", "status", "targetResource",
+    "affectedResources", "action", "returnCode", "progress", "statusMessage", "timeOfStatusChange", "isCancellable",
+    "parentJob", "nestedJobs", "operations"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiJob extends CimiObjectCommonAbstract {
 
@@ -179,6 +187,8 @@ public class CimiJob extends CimiObjectCommonAbstract {
      * 
      * @return The value
      */
+    @XmlElement(name = "state")
+    @JsonProperty(value = "state")
     public String getStatus() {
         return this.status;
     }

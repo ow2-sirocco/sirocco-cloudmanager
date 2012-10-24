@@ -27,8 +27,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
@@ -38,6 +40,8 @@ import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
  * Class Network Create.
  */
 @XmlRootElement(name = "NetworkCreate")
+@XmlType(propOrder = {"name", "description", "propertyArray", "networkTemplate"})
+@JsonPropertyOrder({"resourceURI", "name", "description", "propertyArray", "networkTemplate"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiNetworkCreate extends CimiCommonResourceUriAbstract {
 

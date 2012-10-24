@@ -26,8 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
@@ -37,6 +39,9 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.AssertActionPath;
  * Class to exchange all actions without validation.
  */
 @XmlRootElement(name = "Action")
+// XXX name and description not in Action
+@XmlType(propOrder = {"name", "description", "action", "force", "format", "destination", "image", "propertyArray"})
+@JsonPropertyOrder({"resourceURI", "action", "force", "format", "destination", "image", "properties"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiAction extends CimiCommonResourceUriAbstract {
 

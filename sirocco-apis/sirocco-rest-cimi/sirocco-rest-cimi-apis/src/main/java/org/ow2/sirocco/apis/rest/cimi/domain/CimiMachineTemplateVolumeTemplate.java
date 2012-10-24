@@ -29,6 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
@@ -36,6 +37,8 @@ import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
  * Class MachineTemplateVolumeTemplate.
  */
 @XmlRootElement(name = "MachineTemplateVolumeTemplate")
+@JsonPropertyOrder({"initialLocation", "href", "id", "name", "description", "created", "updated", "properties", "volumeConfig",
+    "volumeImage", "eventLogTemplate", "operations"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiMachineTemplateVolumeTemplate extends CimiVolumeTemplate {
 

@@ -27,13 +27,18 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 @XmlRootElement(name = "content")
+@XmlType(propOrder = {"resName", "operation", "resource", "resType", "code", "state", "previous", "change", "detail",
+    "initiator"})
+@JsonPropertyOrder({"resName", "operation", "resource", "resType", "code", "state", "previous", "change", "detail", "initiator"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiEventType implements CimiData {
     private static final long serialVersionUID = 1L;

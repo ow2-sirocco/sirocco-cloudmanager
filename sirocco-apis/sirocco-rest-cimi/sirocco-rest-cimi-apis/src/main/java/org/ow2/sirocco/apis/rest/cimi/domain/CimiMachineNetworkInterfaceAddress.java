@@ -26,8 +26,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
@@ -36,6 +38,8 @@ import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
  * Class MachineNetworkInterfaceAddress.
  */
 @XmlRootElement(name = "MachineNetworkInterfaceAddress")
+@XmlType(propOrder = {"id", "name", "description", "created", "updated", "propertyArray", "address", "operations"})
+@JsonPropertyOrder({"resourceURI", "id", "name", "description", "created", "updated", "properties", "address", "operations"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiMachineNetworkInterfaceAddress extends CimiObjectCommonAbstract {
 

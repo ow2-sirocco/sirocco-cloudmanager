@@ -107,6 +107,8 @@ public enum ExchangeType {
     /** */
     NetworkPortTemplate(PathType.NetworkPortTemplate), NetworkPortTemplateCollection(PathType.NetworkPortTemplate, false),
     /** */
+    ResourceMetadata(PathType.ResourceMetadata), ResourceMetadataCollection(PathType.ResourceMetadata, false),
+    /** */
     System(PathType.System), SystemCollection(PathType.System, false),
     /** */
     SystemCreate(PathType.System),

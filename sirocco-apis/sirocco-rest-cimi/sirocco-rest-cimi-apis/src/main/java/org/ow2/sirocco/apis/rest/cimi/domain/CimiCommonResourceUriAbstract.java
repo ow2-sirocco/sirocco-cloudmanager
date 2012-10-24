@@ -24,12 +24,13 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.domain;
 
-import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * Abstract class of a common resource URI exchanged with the server not
  * identified like XxxCreate or Action.
  */
+@XmlTransient
 public abstract class CimiCommonResourceUriAbstract extends CimiCommon implements CimiExchange {
 
     /** Serial number */
@@ -44,7 +45,7 @@ public abstract class CimiCommonResourceUriAbstract extends CimiCommon implement
      * @see org.ow2.sirocco.apis.rest.cimi.domain.CimiResource#getResourceURI()
      */
     @Override
-    @XmlAttribute
+    @XmlTransient
     public String getResourceURI() {
         return this.resourceURI;
     }

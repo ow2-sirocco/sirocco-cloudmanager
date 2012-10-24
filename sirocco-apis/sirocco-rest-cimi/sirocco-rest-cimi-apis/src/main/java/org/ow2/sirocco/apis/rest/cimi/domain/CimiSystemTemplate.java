@@ -29,9 +29,11 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
 import org.codehaus.jackson.annotate.JsonProperty;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
@@ -42,6 +44,10 @@ import org.ow2.sirocco.apis.rest.cimi.validator.constraints.NotEmptyIfNotNull;
  * Class SystemTemplate.
  */
 @XmlRootElement(name = "SystemTemplate")
+@XmlType(propOrder = {"id", "name", "description", "created", "updated", "propertyArray", "componentDescriptors",
+    "eventLogTemplate", "operations"})
+@JsonPropertyOrder({"resourceURI", "id", "name", "description", "created", "updated", "properties", "componentDescriptors",
+    "eventLogTemplate", "operations"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiSystemTemplate extends CimiObjectCommonAbstract {
 

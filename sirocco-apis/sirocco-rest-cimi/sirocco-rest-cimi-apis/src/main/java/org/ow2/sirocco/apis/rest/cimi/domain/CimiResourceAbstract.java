@@ -36,6 +36,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 /**
  * Abstract class of an identified resource exchanged with the server.
  */
+@XmlTransient
 public abstract class CimiResourceAbstract implements CimiResource {
 
     /** Serial number */

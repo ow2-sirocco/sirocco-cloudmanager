@@ -29,7 +29,9 @@ import java.io.Serializable;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
@@ -38,6 +40,8 @@ import org.ow2.sirocco.apis.rest.cimi.validator.GroupWrite;
  * Class Disk.
  */
 @XmlRootElement(name = "Disk")
+@XmlType(propOrder = {"capacity", "format", "initialLocation"})
+@JsonPropertyOrder({"resourceURI", "capacity", "format", "initialLocation"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiDiskConfiguration implements Serializable {
 
