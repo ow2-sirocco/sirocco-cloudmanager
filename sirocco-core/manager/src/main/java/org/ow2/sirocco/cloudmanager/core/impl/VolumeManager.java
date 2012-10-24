@@ -156,6 +156,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             Job job = new Job();
+            job.setUser(user);
             job.setTargetEntity(volume);
             job.setCreated(new Date());
             job.setDescription("Volume creation");
@@ -483,6 +484,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             Job job = new Job();
+            job.setUser(this.getUser());
             job.setTargetEntity(volume);
             job.setCreated(new Date());
             job.setDescription("Volume deletion");
@@ -766,6 +768,7 @@ public class VolumeManager implements IVolumeManager {
         this.em.flush();
 
         Job job = new Job();
+        job.setUser(user);
         job.setTargetEntity(volumeImage);
         job.setCreated(new Date());
         job.setDescription("VolumeImage creation");
@@ -858,6 +861,7 @@ public class VolumeManager implements IVolumeManager {
         this.em.flush();
 
         Job job = new Job();
+        job.setUser(this.getUser());
         job.setTargetEntity(volumeImage);
         job.setCreated(new Date());
         job.setDescription("VolumeImage deletion");
