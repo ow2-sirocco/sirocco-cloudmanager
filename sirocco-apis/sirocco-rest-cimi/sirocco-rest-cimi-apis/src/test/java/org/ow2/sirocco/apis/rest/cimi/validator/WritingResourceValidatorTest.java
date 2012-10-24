@@ -63,6 +63,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiResource;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResourceMetadata;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemCredential;
@@ -106,6 +107,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortCollectio
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkTemplateCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiResourceMetadataCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCredentialCollection;
@@ -488,6 +490,12 @@ public class WritingResourceValidatorTest {
             break;
         case SystemVolumeCollection:
             cimi = new CimiSystemVolumeCollection();
+            break;
+        case ResourceMetadata:
+            cimi = new CimiResourceMetadata();
+            break;
+        case ResourceMetadataCollection:
+            cimi = new CimiResourceMetadataCollection();
             break;
         default:
             Assert.fail("In test method \"newResource\" : " + type.name() + " not found");
