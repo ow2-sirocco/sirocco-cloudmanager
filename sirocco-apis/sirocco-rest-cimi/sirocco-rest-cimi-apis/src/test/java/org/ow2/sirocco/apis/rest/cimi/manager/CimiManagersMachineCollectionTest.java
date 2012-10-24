@@ -124,7 +124,7 @@ public class CimiManagersMachineCollectionTest {
         Assert.assertNotNull(cimiCollect.getArray());
         Assert.assertEquals(3, cimiCollect.getArray().length);
         for (int i = 0; i < cimiCollect.getArray().length; i++) {
-            Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getHref());
+            Assert.assertEquals(ConstantsPath.MACHINE_PATH + "/" + (i + 13), cimiCollect.getArray()[i].getId());
         }
         EasyMock.verify(this.service);
     }
