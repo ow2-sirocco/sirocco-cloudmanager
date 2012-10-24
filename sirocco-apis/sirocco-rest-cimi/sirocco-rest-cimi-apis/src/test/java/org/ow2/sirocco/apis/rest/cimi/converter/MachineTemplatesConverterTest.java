@@ -358,15 +358,15 @@ public class MachineTemplatesConverterTest {
         cimi = (CimiMachineTemplateCollection) this.context.convertToCimi(service, CimiMachineTemplateCollection.class);
         Assert.assertEquals(3, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathname() + "/1",
-            cimi.getArray()[0].getHref());
+            cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathname() + "/2",
-            cimi.getArray()[1].getHref());
+            cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathname() + "/3",
-            cimi.getArray()[2].getHref());
+            cimi.getArray()[2].getId());
         Assert.assertNotNull(cimi.getArray()[2].getId());
         Assert.assertNotNull(cimi.getArray()[2].getName());
 
@@ -374,11 +374,11 @@ public class MachineTemplatesConverterTest {
             Arrays.asList(new MachineTemplate[] {MachineTemplate3, MachineTemplate1}), CimiMachineTemplateCollection.class);
         Assert.assertEquals(2, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathname() + "/3",
-            cimi.getArray()[0].getHref());
+            cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineTemplate.getPathname() + "/1",
-            cimi.getArray()[1].getHref());
+            cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getName());
     }

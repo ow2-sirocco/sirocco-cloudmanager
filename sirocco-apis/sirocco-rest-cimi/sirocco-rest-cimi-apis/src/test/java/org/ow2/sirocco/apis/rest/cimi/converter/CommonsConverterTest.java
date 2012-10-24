@@ -357,7 +357,8 @@ public class CommonsConverterTest {
 
         cimi = cimiCollection.getCollection().get(0);
         Assert.assertNotNull(cimi.getId());
-        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/29", cimi.getHref());
+        Assert.assertNull(cimi.getHref());
+        Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineImage.getPathname() + "/29", cimi.getId());
         Assert.assertNotNull(cimi.getCreated());
         Assert.assertNotNull(cimi.getUpdated());
     }
@@ -866,6 +867,10 @@ public class CommonsConverterTest {
                 // Add idParent in request
                 this.request.setIds(new IdRequest(null, "999"));
                 break;
+            case ResourceMetadata:
+            case ResourceMetadataCollection:
+                // TODO
+                continue;
             default:
                 Assert.fail(type.name());
                 break;
@@ -963,25 +968,25 @@ public class CommonsConverterTest {
             cimi.getId());
         // MachineDisk
         Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "111"),
-            cimi.getDisks().getCollection().get(0).getHref());
+            cimi.getDisks().getCollection().get(0).getId());
         Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "222"),
-            cimi.getDisks().getCollection().get(1).getHref());
+            cimi.getDisks().getCollection().get(1).getId());
         Assert.assertEquals("in " + ExchangeType.Disk, ExchangeType.Disk.makeHref(this.request.getBaseUri(), "9999", "333"),
-            cimi.getDisks().getCollection().get(2).getHref());
+            cimi.getDisks().getCollection().get(2).getId());
         // MachineNetworkInterface
         Assert.assertEquals("in " + ExchangeType.MachineNetworkInterface,
             ExchangeType.MachineNetworkInterface.makeHref(this.request.getBaseUri(), "9999", "7111"), cimi
-                .getNetworkInterfaces().getCollection().get(0).getHref());
+                .getNetworkInterfaces().getCollection().get(0).getId());
         // MachineNetworkInterfaceAddress and inner Address
         Assert.assertEquals("in " + ExchangeType.MachineNetworkInterfaceAddress,
             ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "711191"), cimi
-                .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(0).getHref());
+                .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(0).getId());
         Assert.assertEquals("in " + ExchangeType.Address, ExchangeType.Address.makeHref(this.request.getBaseUri(), "7111911"),
-            cimi.getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(0).getAddress().getHref());
+            cimi.getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(0).getAddress().getId());
         Assert.assertEquals("in " + ExchangeType.MachineNetworkInterfaceAddress,
             ExchangeType.MachineNetworkInterfaceAddress.makeHref(this.request.getBaseUri(), "9999", "7111", "711192"), cimi
-                .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(1).getHref());
+                .getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(1).getId());
         Assert.assertEquals("in " + ExchangeType.Address, ExchangeType.Address.makeHref(this.request.getBaseUri(), "7111921"),
-            cimi.getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(1).getAddress().getHref());
+            cimi.getNetworkInterfaces().getCollection().get(0).getAddresses().getCollection().get(1).getAddress().getId());
     }
 }

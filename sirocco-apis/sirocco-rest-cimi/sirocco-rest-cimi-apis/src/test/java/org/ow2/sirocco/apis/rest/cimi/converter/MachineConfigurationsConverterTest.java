@@ -190,15 +190,15 @@ public class MachineConfigurationsConverterTest {
             CimiMachineConfigurationCollection.class);
         Assert.assertEquals(3, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineConfiguration.getPathname() + "/1",
-            cimi.getArray()[0].getHref());
+            cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineConfiguration.getPathname() + "/2",
-            cimi.getArray()[1].getHref());
+            cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineConfiguration.getPathname() + "/3",
-            cimi.getArray()[2].getHref());
+            cimi.getArray()[2].getId());
         Assert.assertNotNull(cimi.getArray()[2].getId());
         Assert.assertNotNull(cimi.getArray()[2].getName());
 
@@ -207,11 +207,11 @@ public class MachineConfigurationsConverterTest {
             CimiMachineConfigurationCollection.class);
         Assert.assertEquals(2, cimi.getArray().length);
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineConfiguration.getPathname() + "/3",
-            cimi.getArray()[0].getHref());
+            cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getName());
         Assert.assertEquals(this.request.getBaseUri() + ExchangeType.MachineConfiguration.getPathname() + "/1",
-            cimi.getArray()[1].getHref());
+            cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getName());
     }
@@ -264,19 +264,19 @@ public class MachineConfigurationsConverterTest {
         Assert.assertEquals(3, cimi.getArray().length);
 
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "1"),
-            cimi.getArray()[0].getHref());
+            cimi.getArray()[0].getId());
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "1"),
             cimi.getArray()[0].getId());
         Assert.assertEquals("nameOne", cimi.getArray()[0].getName());
 
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "2"),
-            cimi.getArray()[1].getHref());
+            cimi.getArray()[1].getId());
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "2"),
             cimi.getArray()[1].getId());
         Assert.assertEquals("nameTwo", cimi.getArray()[1].getName());
 
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "3"),
-            cimi.getArray()[2].getHref());
+            cimi.getArray()[2].getId());
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "3"),
             cimi.getArray()[2].getId());
         Assert.assertEquals("nameThree", cimi.getArray()[2].getName());
@@ -301,17 +301,17 @@ public class MachineConfigurationsConverterTest {
         Assert.assertEquals(3, cimi.getArray().length);
 
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "1"),
-            cimi.getArray()[0].getHref());
+            cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getId());
         Assert.assertNotNull(cimi.getArray()[0].getName());
 
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "2"),
-            cimi.getArray()[1].getHref());
+            cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getId());
         Assert.assertNotNull(cimi.getArray()[1].getName());
 
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "3"),
-            cimi.getArray()[2].getHref());
+            cimi.getArray()[2].getId());
         Assert.assertNotNull(cimi.getArray()[2].getId());
         Assert.assertNotNull(cimi.getArray()[2].getName());
 
@@ -335,19 +335,19 @@ public class MachineConfigurationsConverterTest {
         Assert.assertEquals(3, cimi.getArray().length);
 
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "1"),
-            cimi.getArray()[0].getHref());
+            cimi.getArray()[0].getId());
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "1"),
             cimi.getArray()[0].getId());
         Assert.assertEquals("nameOne", cimi.getArray()[0].getName());
 
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "2"),
-            cimi.getArray()[1].getHref());
+            cimi.getArray()[1].getId());
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "2"),
             cimi.getArray()[1].getId());
         Assert.assertEquals("nameTwo", cimi.getArray()[1].getName());
 
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "3"),
-            cimi.getArray()[2].getHref());
+            cimi.getArray()[2].getId());
         Assert.assertEquals(ExchangeType.MachineConfiguration.makeHref(this.request.getBaseUri(), "3"),
             cimi.getArray()[2].getId());
         Assert.assertEquals("nameThree", cimi.getArray()[2].getName());
