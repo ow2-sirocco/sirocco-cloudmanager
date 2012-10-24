@@ -28,6 +28,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.TimeZone;
 
+import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class CimiDateAdapter extends XmlAdapter<String, Date> {
@@ -52,8 +53,6 @@ public class CimiDateAdapter extends XmlAdapter<String, Date> {
 
     @Override
     public Date unmarshal(final String v) throws Exception {
-        synchronized (this.dateFormat) {
-            return this.dateFormat.parse(v);
-        }
+        return DatatypeConverter.parseDateTime(v).getTime();
     }
 }
