@@ -46,7 +46,7 @@ public class Job extends Resource<CimiJob> {
         super(cimiClient, cimiJob);
     }
 
-    public Status getStatus() {
+    public Status getState() {
         return Status.valueOf(this.cimiObject.getStatus());
     }
 
@@ -91,7 +91,7 @@ public class Job extends Resource<CimiJob> {
         InterruptedException {
         long endTime = java.lang.System.nanoTime() + unit.toNanos(time);
         while (true) {
-            if (this.getStatus() != Job.Status.RUNNING) {
+            if (this.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(this.DEFAULT_POLL_PERIOD_IN_SECONDS * 1000);
