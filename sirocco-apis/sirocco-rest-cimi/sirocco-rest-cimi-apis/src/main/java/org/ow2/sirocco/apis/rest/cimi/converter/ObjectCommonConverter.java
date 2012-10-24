@@ -106,8 +106,7 @@ public abstract class ObjectCommonConverter extends CommonConverter implements C
                 dataCimi.setId(context.makeHref(dataCimi, dataService.getId().toString()));
                 this.fillOperations(context, dataService, dataCimi);
             }
-        }
-        if (true == context.mustBeReferenced(dataCimi)) {
+        } else if (true == context.mustBeReferenced(dataCimi)) {
             dataCimi.setHref(context.makeHref(dataCimi, dataService.getId().toString()));
         }
     }
