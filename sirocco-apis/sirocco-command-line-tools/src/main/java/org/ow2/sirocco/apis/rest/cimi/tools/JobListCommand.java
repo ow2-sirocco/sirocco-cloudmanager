@@ -60,7 +60,7 @@ public class JobListCommand implements Command {
         table.addCell("ID");
         table.addCell("Name");
         table.addCell("Description");
-        table.addCell("Status");
+        table.addCell("State");
         table.addCell("Action");
         table.addCell("Target entity ref");
 
@@ -68,7 +68,7 @@ public class JobListCommand implements Command {
             table.addCell(job.getId());
             table.addCell(job.getName());
             table.addCell(job.getDescription());
-            table.addCell(job.getStatus().toString());
+            table.addCell(job.getState().toString());
             table.addCell(job.getAction());
             table.addCell(job.getTargetResourceRef());
         }
@@ -80,14 +80,14 @@ public class JobListCommand implements Command {
         table.addCell("Job ID");
         table.addCell("Name");
         table.addCell("Description");
-        table.addCell("Status");
+        table.addCell("State");
         table.addCell("Action");
         table.addCell("Target entity");
 
         table.addCell(job.getId());
         table.addCell(job.getName());
         table.addCell(job.getDescription());
-        table.addCell(job.getStatus().toString());
+        table.addCell(job.getState().toString());
         table.addCell(job.getAction());
         table.addCell(job.getTargetResourceRef());
 

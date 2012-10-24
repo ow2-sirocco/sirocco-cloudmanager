@@ -56,8 +56,8 @@ public class JobShowCommand implements Command {
 
         table.addCell("action");
         table.addCell(job.getAction());
-        table.addCell("status");
-        table.addCell(job.getStatus().toString());
+        table.addCell("state");
+        table.addCell(job.getState().toString());
         table.addCell("target entity");
         table.addCell(job.getTargetResourceRef());
         table.addCell("affected entity");
