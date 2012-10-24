@@ -324,7 +324,7 @@ public class CimiContextImpl implements CimiContext {
                     // then if the root class is a collection expands it
                     if ((false == expand) && (true == this.getRequest().getParams().getCimiExpand().isEmpty())) {
                         ExchangeType typeRoot = this.getType(this.getRootConverting());
-                        if (false == typeRoot.hasIdInReference()) {
+                        if (typeRoot != ExchangeType.CloudEntryPoint && false == typeRoot.hasIdInReference()) {
                             expand = true;
                         }
                     }
