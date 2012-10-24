@@ -73,21 +73,23 @@ public class Machine extends Resource<CimiMachine> {
 
     public List<NetworkInterface> getNetworkInterface() throws CimiException {
         List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
-        if (this.cimiObject.getNetworkInterfaces().getArray() != null) {
+        if (this.cimiObject.getNetworkInterfaces() != null && this.cimiObject.getNetworkInterfaces().getArray() != null) {
             for (CimiMachineNetworkInterface cimiNic : this.cimiObject.getNetworkInterfaces().getArray()) {
                 if (cimiNic.getAddresses().getArray() == null) {
                     CimiMachineNetworkInterfaceAddressCollectionRoot addresses = this.cimiClient.getRequest(
                         this.cimiClient.extractPath(cimiNic.getAddresses().getHref()),
                         CimiMachineNetworkInterfaceAddressCollectionRoot.class, -1, -1, null);
                     cimiNic.setAddresses(addresses);
-                    for (CimiMachineNetworkInterfaceAddress nicAddr : addresses.getArray()) {
-                        CimiAddress cimiAddress = this.cimiClient.getCimiObjectByReference(nicAddr.getAddress().getHref(),
-                            CimiAddress.class);
-                        nicAddr.setAddress(cimiAddress);
+                    if (addresses.getArray() != null) {
+                        for (CimiMachineNetworkInterfaceAddress nicAddr : addresses.getArray()) {
+                            CimiAddress cimiAddress = this.cimiClient.getCimiObjectByReference(nicAddr.getAddress().getHref(),
+                                CimiAddress.class);
+                            nicAddr.setAddress(cimiAddress);
+                        }
                     }
                 }
                 String ip = "";
-                if (cimiNic.getAddresses().getArray().length > 0) {
+                if (cimiNic.getAddresses().getArray() != null && cimiNic.getAddresses().getArray().length > 0) {
                     ip = cimiNic.getAddresses().getArray()[0].getAddress().getIp();
                 }
                 NetworkInterface nic = new NetworkInterface(
@@ -140,10 +142,12 @@ public class Machine extends Resource<CimiMachine> {
 
     public static Machine getMachineByReference(final CimiClient client, final String ref) throws CimiException {
         Machine result = new Machine(client, client.getCimiObjectByReference(ref, CimiMachine.class));
-        String machineNicsRef = result.cimiObject.getNetworkInterfaces().getHref();
-        CimiMachineNetworkInterfaceCollectionRoot nics = client.getRequest(client.extractPath(machineNicsRef),
-            CimiMachineNetworkInterfaceCollectionRoot.class, -1, -1, null);
-        result.cimiObject.getNetworkInterfaces().setArray(nics.getArray());
+        if (result.cimiObject.getNetworkInterfaces() != null) {
+            String machineNicsRef = result.cimiObject.getNetworkInterfaces().getHref();
+            CimiMachineNetworkInterfaceCollectionRoot nics = client.getRequest(client.extractPath(machineNicsRef),
+                CimiMachineNetworkInterfaceCollectionRoot.class, -1, -1, null);
+            result.cimiObject.getNetworkInterfaces().setArray(nics.getArray());
+        }
         return result;
     }
 
