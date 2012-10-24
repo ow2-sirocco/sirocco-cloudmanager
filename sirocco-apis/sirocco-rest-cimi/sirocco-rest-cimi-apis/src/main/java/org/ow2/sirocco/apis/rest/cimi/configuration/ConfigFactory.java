@@ -72,6 +72,7 @@ import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortCreateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkPortTemplateConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.NetworkTemplateConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.ResourceMetadataConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SummaryConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemAddressConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.SystemConverter;
@@ -142,6 +143,8 @@ import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkPortTemplateCo
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkPortTemplateCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkTemplateCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.NetworkTemplateCollectionRootConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.ResourceMetadataCollectionConverter;
+import org.ow2.sirocco.apis.rest.cimi.converter.collection.ResourceMetadataCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemAddressCollectionConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemAddressCollectionRootConverter;
 import org.ow2.sirocco.apis.rest.cimi.converter.collection.SystemCollectionConverter;
@@ -218,6 +221,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkPortTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiNetworkTemplate;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiResourceMetadata;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSummary;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemAddress;
@@ -289,6 +293,8 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortTemplateC
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkPortTemplateCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiNetworkTemplateCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiResourceMetadataCollection;
+import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiResourceMetadataCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemAddressCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemAddressCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
@@ -494,6 +500,7 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new CloudEntryPointConverter());
             referenceNames = new HashMap<ExchangeType, String>();
             item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.ResourceMetadataCollection, "resourceMetadata");
             referenceNames.put(ExchangeType.SystemCollection, "systems");
             referenceNames.put(ExchangeType.SystemTemplateCollection, "systemTemplates");
             referenceNames.put(ExchangeType.MachineCollection, "machines");
@@ -1192,6 +1199,19 @@ public class ConfigFactory {
             referenceNames.put(ExchangeType.SystemVolume, "systemVolumes");
             break;
 
+        case ResourceMetadata:
+            item = new ItemConfig(CimiResourceMetadata.class, ExchangeType.ResourceMetadata);
+            item.putData(ConfigFactory.CONVERTER, new ResourceMetadataConverter());
+            break;
+
+        case ResourceMetadataCollection:
+            item = new ItemConfig(CimiResourceMetadataCollection.class, ExchangeType.ResourceMetadataCollection);
+            item.putData(ConfigFactory.CONVERTER, new ResourceMetadataCollectionConverter());
+            referenceNames = new HashMap<ExchangeType, String>();
+            item.putData(ConfigFactory.NAMES, referenceNames);
+            referenceNames.put(ExchangeType.Credential, "resourceMetadatas");
+            break;
+
         default:
             ConfigFactory.LOGGER.error("Configuration not found : {}", type);
             throw new ConfigurationException("Configuration not found : " + type);
@@ -1368,6 +1388,11 @@ public class ConfigFactory {
             item.putData(ConfigFactory.CONVERTER, new VolumeVolumeImageCollectionRootConverter());
             break;
 
+        case ResourceMetadataCollection:
+            item = new ItemConfig(CimiResourceMetadataCollectionRoot.class, ExchangeType.ResourceMetadataCollection);
+            item.putData(ConfigFactory.CONVERTER, new ResourceMetadataCollectionRootConverter());
+            break;
+
         case SystemCollection:
             item = new ItemConfig(CimiSystemCollectionRoot.class, ExchangeType.SystemCollection);
             item.putData(ConfigFactory.CONVERTER, new SystemCollectionRootConverter());
@@ -1472,6 +1497,7 @@ public class ConfigFactory {
         case VolumeImage:
         case VolumeTemplate:
         case VolumeVolumeImage:
+        case ResourceMetadata:
             break;
 
         default:

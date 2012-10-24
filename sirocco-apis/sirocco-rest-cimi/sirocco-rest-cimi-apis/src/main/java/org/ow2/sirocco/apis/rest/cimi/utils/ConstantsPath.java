@@ -120,6 +120,10 @@ public abstract class ConstantsPath {
 
     public static final String NETWORK_PORT_TEMPLATE_PATH = "/" + ConstantsPath.NETWORK_PORT_TEMPLATE;
 
+    public static final String RESOURCE_METADATA = "resourceMetadata";
+
+    public static final String RESOURCE_METADATA_PATH = "/" + ConstantsPath.RESOURCE_METADATA;
+
     public static final String SYSTEM = "systems";
 
     public static final String SYSTEM_PATH = "/" + ConstantsPath.SYSTEM;
