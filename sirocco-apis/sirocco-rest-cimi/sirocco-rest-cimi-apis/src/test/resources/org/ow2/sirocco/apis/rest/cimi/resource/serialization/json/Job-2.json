@@ -34,7 +34,7 @@
 		
 	],
 	"action":"actionValue_2",
-	"status":"statusValue_2",
+	"state":"statusValue_2",
 	"returnCode":2,
 	"progress":2,
 	"statusMessage":"statusMessageValue_2",

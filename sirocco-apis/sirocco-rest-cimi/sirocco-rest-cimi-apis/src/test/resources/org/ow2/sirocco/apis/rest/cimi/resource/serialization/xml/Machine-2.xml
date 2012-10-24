@@ -1,47 +1,48 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Machine href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/Machine">
-	<description>descriptionValue_2</description>
+<Machine xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_2">
+	<id>idValue_2</id>
 	<name>nameValue_2</name>
+	<description>descriptionValue_2</description>
+	<created>2002-03-03T02:02:02.002Z</created>
+	<updated>2002-03-03T02:02:02.002Z</updated>
 	<property key="keyProp_2_0">valueProp_2_0</property>
 	<property key="keyProp_2_1">valueProp_2_1</property>
-	<created>2002-03-03T02:02:02.002Z</created>
-	<id>idValue_2</id>
-	<operation href="hrefValue_2_0" rel="relValue_2_0" />
-	<operation href="hrefValue_2_1" rel="relValue_2_1" />
-	<updated>2002-03-03T02:02:02.002Z</updated>
+	<state>stateValue_2</state>
 	<cpu>2</cpu>
+	<memory>2</memory>
 	<disks href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/DiskCollection">
 		<id>idValue_2</id>
-		<operation href="hrefValue_2_0" rel="relValue_2_0" />
-		<operation href="hrefValue_2_1" rel="relValue_2_1" />
 		<count>2</count>
-		<Disk href="hrefValue_2_0" resourceURI="http://schemas.dmtf.org/cimi/1/Disk">
-			<description>descriptionValue_2_0</description>
+		<Disk href="hrefValue_2_0">
+			<id>idValue_2_0</id>
 			<name>nameValue_2_0</name>
+			<description>descriptionValue_2_0</description>
+			<created>2002-03-03T02:02:02.002Z</created>
+			<updated>2002-03-03T02:02:02.002Z</updated>
 			<property key="keyProp_2_0">valueProp_2_0</property>
 			<property key="keyProp_2_1">valueProp_2_1</property>
-			<created>2002-03-03T02:02:02.002Z</created>
-			<id>idValue_2_0</id>
-			<operation href="hrefValue_2_0" rel="relValue_2_0" />
-			<operation href="hrefValue_2_1" rel="relValue_2_1" />
-			<updated>2002-03-03T02:02:02.002Z</updated>
 			<capacity>2</capacity>
 			<initialLocation>initialLocation_2_0</initialLocation>
-		</Disk>
-		<Disk href="hrefValue_2_1" resourceURI="http://schemas.dmtf.org/cimi/1/Disk">
-			<description>descriptionValue_2_1</description>
-			<name>nameValue_2_1</name>
-			<property key="keyProp_2_0">valueProp_2_0</property>
-			<property key="keyProp_2_1">valueProp_2_1</property>
-			<created>2002-03-03T02:02:02.002Z</created>
-			<id>idValue_2_1</id>
 			<operation href="hrefValue_2_0" rel="relValue_2_0" />
 			<operation href="hrefValue_2_1" rel="relValue_2_1" />
+		</Disk>
+		<Disk href="hrefValue_2_1">
+			<id>idValue_2_1</id>
+			<name>nameValue_2_1</name>
+			<description>descriptionValue_2_1</description>
+			<created>2002-03-03T02:02:02.002Z</created>
 			<updated>2002-03-03T02:02:02.002Z</updated>
+			<property key="keyProp_2_0">valueProp_2_0</property>
+			<property key="keyProp_2_1">valueProp_2_1</property>
 			<capacity>2</capacity>
 			<initialLocation>initialLocation_2_1</initialLocation>
+			<operation href="hrefValue_2_0" rel="relValue_2_0" />
+			<operation href="hrefValue_2_1" rel="relValue_2_1" />
 		</Disk>
+		<operation href="hrefValue_2_0" rel="relValue_2_0" />
+		<operation href="hrefValue_2_1" rel="relValue_2_1" />
 	</disks>
-	<memory>2</memory>
-	<state>stateValue_2</state>
+	
+	<operation href="hrefValue_2_0" rel="relValue_2_0" />
+	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 </Machine>

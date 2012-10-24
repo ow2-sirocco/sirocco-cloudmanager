@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Collection href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection">
+<Collection xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection">
 	<id>idValue_0</id>
 </Collection>

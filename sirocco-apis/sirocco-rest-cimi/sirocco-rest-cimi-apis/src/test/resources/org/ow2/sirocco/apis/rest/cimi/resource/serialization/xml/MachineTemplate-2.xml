@@ -1,63 +1,63 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineTemplate href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineTemplate">
-	<description>descriptionValue_2</description>
+<MachineTemplate xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_2">
+	<id>idValue_2</id>
 	<name>nameValue_2</name>
+	<description>descriptionValue_2</description>
+	<created>2002-03-03T02:02:02.002Z</created>
+	<updated>2002-03-03T02:02:02.002Z</updated>
 	<property key="keyProp_2_0">valueProp_2_0</property>
 	<property key="keyProp_2_1">valueProp_2_1</property>
-	<created>2002-03-03T02:02:02.002Z</created>
-	<id>idValue_2</id>
-	<operation href="hrefValue_2_0" rel="relValue_2_0" />
-	<operation href="hrefValue_2_1" rel="relValue_2_1" />
-	<updated>2002-03-03T02:02:02.002Z</updated>
-	<credential href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/Credential">
-		<description>descriptionValue_2</description>
+	<credential href="hrefValue_2">
+		<id>idValue_2</id>
 		<name>nameValue_2</name>
+		<description>descriptionValue_2</description>
+		<created>2002-03-03T02:02:02.002Z</created>
+		<updated>2002-03-03T02:02:02.002Z</updated>
 		<property key="keyProp_2_0">valueProp_2_0</property>
 		<property key="keyProp_2_1">valueProp_2_1</property>
-		<created>2002-03-03T02:02:02.002Z</created>
-		<id>idValue_2</id>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
-		<updated>2002-03-03T02:02:02.002Z</updated>
+		<userName>userNameValue_2</userName>
 		<key>AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8gISIjJCUm</key>
 		<password>passwordValue_2</password>
-		<userName>userNameValue_2</userName>
 	</credential>
-	<machineConfig href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
-		<description>descriptionValue_2</description>
+	<machineConfig href="hrefValue_2">
+		<id>idValue_2</id>
 		<name>nameValue_2</name>
+		<description>descriptionValue_2</description>
+		<created>2002-03-03T02:02:02.002Z</created>
 		<property key="keyProp_2_0">valueProp_2_0</property>
 		<property key="keyProp_2_1">valueProp_2_1</property>
-		<created>2002-03-03T02:02:02.002Z</created>
-		<id>idValue_2</id>
-		<operation href="hrefValue_2_0" rel="relValue_2_0" />
-		<operation href="hrefValue_2_1" rel="relValue_2_1" />
 		<updated>2002-03-03T02:02:02.002Z</updated>
 		<cpu>2</cpu>
-		<disk>
-			<capacity>2</capacity>
-			<initialLocation>initialLocationValue_2_0</initialLocation>
-			<format>formatValue_2_0</format>
-		</disk>
-		<disk>
-			<capacity>2</capacity>
-			<initialLocation>initialLocationValue_2_1</initialLocation>
-			<format>formatValue_2_1</format>
-		</disk>
 		<memory>2</memory>
-	</machineConfig>
-	<machineImage href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
-		<description>descriptionValue_2</description>
-		<name>nameValue_2</name>
-		<property key="keyProp_2_0">valueProp_2_0</property>
-		<property key="keyProp_2_1">valueProp_2_1</property>
-		<created>2002-03-03T02:02:02.002Z</created>
-		<id>idValue_2</id>
+		<disk>
+			<capacity>2</capacity>
+			<format>formatValue_2_0</format>
+			<initialLocation>initialLocationValue_2_0</initialLocation>
+		</disk>
+		<disk>
+			<capacity>2</capacity>
+			<format>formatValue_2_1</format>
+			<initialLocation>initialLocationValue_2_1</initialLocation>
+		</disk>
 		<operation href="hrefValue_2_0" rel="relValue_2_0" />
 		<operation href="hrefValue_2_1" rel="relValue_2_1" />
+	</machineConfig>
+	<machineImage href="hrefValue_2">
+		<id>idValue_2</id>
+		<name>nameValue_2</name>
+		<description>descriptionValue_2</description>
+		<created>2002-03-03T02:02:02.002Z</created>
 		<updated>2002-03-03T02:02:02.002Z</updated>
-		<imageLocation href="hrefImageLocation_2" />
+		<property key="keyProp_2_0">valueProp_2_0</property>
+		<property key="keyProp_2_1">valueProp_2_1</property>
 		<state>stateValue_2</state>
 		<type>typeValue_2</type>
+		<imageLocation href="hrefImageLocation_2" />
+		<operation href="hrefValue_2_0" rel="relValue_2_0" />
+		<operation href="hrefValue_2_1" rel="relValue_2_1" />
 	</machineImage>
+	<operation href="hrefValue_2_0" rel="relValue_2_0" />
+	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 </MachineTemplate>

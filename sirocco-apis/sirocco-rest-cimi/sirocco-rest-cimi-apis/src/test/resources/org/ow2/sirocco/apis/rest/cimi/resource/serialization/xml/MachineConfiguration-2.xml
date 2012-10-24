@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineConfiguration href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
-	<description>descriptionValue_2</description>
+<MachineConfiguration xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_2">
+	<id>idValue_2</id>
 	<name>nameValue_2</name>
+	<description>descriptionValue_2</description>
+	<updated>2002-03-03T02:02:02.002Z</updated>
+	<created>2002-03-03T02:02:02.002Z</created>
 	<property key="keyProp_2_0">valueProp_2_0</property>
 	<property key="keyProp_2_1">valueProp_2_1</property>
-	<created>2002-03-03T02:02:02.002Z</created>
-	<id>idValue_2</id>
-	<operation href="hrefValue_2_0" rel="relValue_2_0" />
-	<operation href="hrefValue_2_1" rel="relValue_2_1" />
-	<updated>2002-03-03T02:02:02.002Z</updated>
 	<cpu>2</cpu>
+	<memory>2</memory>
 	<disk>
-		<initialLocation>initialLocationValue_2_0</initialLocation>
 		<capacity>2</capacity>
 		<format>formatValue_2_0</format>
+		<initialLocation>initialLocationValue_2_0</initialLocation>
 	</disk>
 	<disk>
-		<initialLocation>initialLocationValue_2_1</initialLocation>
 		<capacity>2</capacity>
 		<format>formatValue_2_1</format>
+		<initialLocation>initialLocationValue_2_1</initialLocation>
 	</disk>
-	<memory>2</memory>
+	<operation href="hrefValue_2_0" rel="relValue_2_0" />
+	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 </MachineConfiguration>

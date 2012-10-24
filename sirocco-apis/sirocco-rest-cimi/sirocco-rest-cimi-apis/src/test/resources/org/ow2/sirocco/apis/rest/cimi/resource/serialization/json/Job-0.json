@@ -10,7 +10,7 @@
 		"href":"targetResourceValue_0"
 	},
 	"action":"actionValue_0",
-	"status":"statusValue_0",
+	"state":"statusValue_0",
 	"returnCode":0,
 	"progress":0,
 	"statusMessage":"statusMessageValue_0",

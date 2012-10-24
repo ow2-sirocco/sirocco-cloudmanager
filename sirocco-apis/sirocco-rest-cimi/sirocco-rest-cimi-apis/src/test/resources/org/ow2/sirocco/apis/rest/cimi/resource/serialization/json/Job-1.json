@@ -25,7 +25,7 @@
 		}
 	],
 	"action":"actionValue_1",
-	"status":"statusValue_1",
+	"state":"statusValue_1",
 	"returnCode":1,
 	"progress":1,
 	"statusMessage":"statusMessageValue_1",

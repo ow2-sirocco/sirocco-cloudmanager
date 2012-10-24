@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineImage href="hrefValue_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
+<MachineImage xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_2">
 	<id>idValue_2</id>
 	<name>nameValue_2</name>
 	<description>descriptionValue_2</description>

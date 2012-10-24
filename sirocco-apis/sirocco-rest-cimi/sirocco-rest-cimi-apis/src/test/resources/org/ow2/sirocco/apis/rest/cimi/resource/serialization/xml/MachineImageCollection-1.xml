@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Collection href="hrefValue_1"
+<Collection xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_1"
 	resourceURI="http://schemas.dmtf.org/cimi/1/MachineImageCollection">
 	<id>idValue_1</id>
 	<count>1</count>

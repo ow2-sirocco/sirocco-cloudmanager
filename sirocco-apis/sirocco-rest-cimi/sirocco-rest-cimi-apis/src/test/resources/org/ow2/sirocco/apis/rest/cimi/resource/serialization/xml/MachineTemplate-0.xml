@@ -1,36 +1,36 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineTemplate href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/MachineTemplate">
-	<description>descriptionValue_0</description>
-	<name>nameValue_0</name>
-	<created>2000-01-01T00:00:00.000Z</created>
+<MachineTemplate xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_0">
 	<id>idValue_0</id>
+	<name>nameValue_0</name>
+	<description>descriptionValue_0</description>
+	<created>2000-01-01T00:00:00.000Z</created>
 	<updated>2000-01-01T00:00:00.000Z</updated>
-	<credential href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/Credential">
-		<description>descriptionValue_0</description>
-		<name>nameValue_0</name>
-		<created>2000-01-01T00:00:00.000Z</created>
+	<credential href="hrefValue_0">
 		<id>idValue_0</id>
+		<name>nameValue_0</name>
+		<description>descriptionValue_0</description>
+		<created>2000-01-01T00:00:00.000Z</created>
 		<updated>2000-01-01T00:00:00.000Z</updated>
-		<password>passwordValue_0</password>
 		<userName>userNameValue_0</userName>
+		<password>passwordValue_0</password>
 	</credential>
-	<machineConfig href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
-		<description>descriptionValue_0</description>
-		<name>nameValue_0</name>
-		<created>2000-01-01T00:00:00.000Z</created>
+	<machineConfig href="hrefValue_0">
 		<id>idValue_0</id>
+		<name>nameValue_0</name>
+		<description>descriptionValue_0</description>
+		<created>2000-01-01T00:00:00.000Z</created>
 		<updated>2000-01-01T00:00:00.000Z</updated>
 		<cpu>0</cpu>
 		<memory>0</memory>
 	</machineConfig>
-	<machineImage href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/MachineImage">
-		<description>descriptionValue_0</description>
-		<name>nameValue_0</name>
-		<created>2000-01-01T00:00:00.000Z</created>
+	<machineImage href="hrefValue_0">
 		<id>idValue_0</id>
+		<name>nameValue_0</name>
+		<description>descriptionValue_0</description>
+		<created>2000-01-01T00:00:00.000Z</created>
 		<updated>2000-01-01T00:00:00.000Z</updated>
-		<imageLocation href="hrefImageLocation_0" />
 		<state>stateValue_0</state>
 		<type>typeValue_0</type>
+		<imageLocation href="hrefImageLocation_0" />
 	</machineImage>
 </MachineTemplate>

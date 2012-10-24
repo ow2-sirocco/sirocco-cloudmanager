@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Job href="hrefValue_0" resourceURI="http://schemas.dmtf.org/cimi/1/Job">
-	<created>2000-01-01T00:00:00.000Z</created>
-	<description>descriptionValue_0</description>
+<Job xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_0">
 	<id>idValue_0</id>
 	<name>nameValue_0</name>
+	<description>descriptionValue_0</description>
+	<created>2000-01-01T00:00:00.000Z</created>
 	<updated>2000-01-01T00:00:00.000Z</updated>
-	<action>actionValue_0</action>
-	<isCancellable>true</isCancellable>
-	<progress>0</progress>
-	<returnCode>0</returnCode>
-	<status>statusValue_0</status>
-	<statusMessage>statusMessageValue_0</statusMessage>
+	<state>statusValue_0</state>
 	<targetResource href="targetResourceValue_0" />
+	<action>actionValue_0</action>
+	<returnCode>0</returnCode>
+	<progress>0</progress>
+	<statusMessage>statusMessageValue_0</statusMessage>
 	<timeOfStatusChange>2000-01-01T00:00:00.000Z</timeOfStatusChange>
+	<isCancellable>true</isCancellable>
 </Job>

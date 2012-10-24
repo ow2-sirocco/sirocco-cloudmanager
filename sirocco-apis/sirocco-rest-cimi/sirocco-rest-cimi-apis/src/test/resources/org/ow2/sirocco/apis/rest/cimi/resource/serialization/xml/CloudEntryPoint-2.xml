@@ -1,21 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<CloudEntryPoint href="hrefValue_2"
-	resourceURI="http://schemas.dmtf.org/cimi/1/CloudEntryPoint">
-	<description>descriptionValue_2</description>
+<CloudEntryPoint xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_2">
+	<id>idValue_2</id>
 	<name>nameValue_2</name>
+	<description>descriptionValue_2</description>
+	<created>2002-03-03T02:02:02.002Z</created>
+	<updated>2002-03-03T02:02:02.002Z</updated>
 	<property key="keyProp_2_0">valueProp_2_0</property>
 	<property key="keyProp_2_1">valueProp_2_1</property>
-	<created>2002-03-03T02:02:02.002Z</created>
-	<id>idValue_2</id>
-	<operation href="hrefValue_2_0" rel="relValue_2_0" />
-	<operation href="hrefValue_2_1" rel="relValue_2_1" />
-	<updated>2002-03-03T02:02:02.002Z</updated>
 	<baseURI>baseUriValue_2</baseURI>
+	<machines href="hrefValue_2" />
+	<machineTemplates href="hrefValue_2" />
+	<machineConfigs href="hrefValue_2" />
+	<machineImages href="hrefValue_2" />
 	<credentials href="hrefValue_2" />
 	<credentialTemplates href="hrefValue_2" />
 	<jobs href="hrefValue_2" />
-	<machineConfigs href="hrefValue_2" />
-	<machineImages href="hrefValue_2" />
-	<machineTemplates href="hrefValue_2" />
-	<machines href="hrefValue_2" />
+	<operation href="hrefValue_2_0" rel="relValue_2_0" />
+	<operation href="hrefValue_2_1" rel="relValue_2_1" />
 </CloudEntryPoint>

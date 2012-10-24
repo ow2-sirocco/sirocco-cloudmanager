@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<MachineConfiguration href="hrefValue_1" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
-	<description>descriptionValue_1</description>
-	<name>nameValue_1</name>
-	<property key="keyProp_1_0">valueProp_1_0</property>
-	<created>2001-02-02T01:01:01.001Z</created>
+<MachineConfiguration xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_1">
 	<id>idValue_1</id>
-	<operation href="hrefValue_1_0" rel="relValue_1_0" />
+	<name>nameValue_1</name>
+	<description>descriptionValue_1</description>
+	<created>2001-02-02T01:01:01.001Z</created>
 	<updated>2001-02-02T01:01:01.001Z</updated>
+	<property key="keyProp_1_0">valueProp_1_0</property>
 	<cpu>1</cpu>
+	<memory>1</memory>
 	<disk>
-		<initialLocation>initialLocationValue_1_0</initialLocation>
 		<capacity>1</capacity>
 		<format>formatValue_1_0</format>
+		<initialLocation>initialLocationValue_1_0</initialLocation>
 	</disk>
-	<memory>1</memory>
+	<operation href="hrefValue_1_0" rel="relValue_1_0" />
 </MachineConfiguration>

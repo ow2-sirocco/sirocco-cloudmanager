@@ -1,96 +1,96 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Collection href="hrefValue_3" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection">
+<Collection xmlns="http://schemas.dmtf.org/cimi/1" href="hrefValue_3" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfigurationCollection">
 	<id>idValue_3</id>
 	<count>3</count>
-	<MachineConfiguration href="hrefValue_3_0" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
-		<description>descriptionValue_3_0</description>
-		<name>nameValue_3_0</name>
-		<property key="keyProp_3_0">valueProp_3_0</property>
-		<property key="keyProp_3_2">valueProp_3_2</property>
-		<property key="keyProp_3_1">valueProp_3_1</property>
-		<created>2003-04-04T03:03:03.003Z</created>
+	<MachineConfiguration href="hrefValue_3_0">
 		<id>idValue_3_0</id>
-		<operation href="hrefValue_3_0" rel="relValue_3_0" />
-		<operation href="hrefValue_3_1" rel="relValue_3_1" />
-		<operation href="hrefValue_3_2" rel="relValue_3_2" />
+		<name>nameValue_3_0</name>
+		<description>descriptionValue_3_0</description>
+		<created>2003-04-04T03:03:03.003Z</created>
 		<updated>2003-04-04T03:03:03.003Z</updated>
-		<cpu>3</cpu>
-		<disk>
-			<capacity>3</capacity>
-			<initialLocation>initialLocationValue_3_0</initialLocation>
-			<format>formatValue_3_0</format>
-		</disk>
-		<disk>
-			<capacity>3</capacity>
-			<initialLocation>initialLocationValue_3_1</initialLocation>
-			<format>formatValue_3_1</format>
-		</disk>
-		<disk>
-			<capacity>3</capacity>
-			<initialLocation>initialLocationValue_3_2</initialLocation>
-			<format>formatValue_3_2</format>
-		</disk>
-		<memory>3</memory>
-	</MachineConfiguration>
-	<MachineConfiguration href="hrefValue_3_1" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
-		<description>descriptionValue_3_1</description>
-		<name>nameValue_3_1</name>
 		<property key="keyProp_3_0">valueProp_3_0</property>
 		<property key="keyProp_3_2">valueProp_3_2</property>
 		<property key="keyProp_3_1">valueProp_3_1</property>
-		<created>2003-04-04T03:03:03.003Z</created>
+		<cpu>3</cpu>
+		<memory>3</memory>
+		<disk>
+			<capacity>3</capacity>
+			<format>formatValue_3_0</format>
+			<initialLocation>initialLocationValue_3_0</initialLocation>
+		</disk>
+		<disk>
+			<capacity>3</capacity>
+			<format>formatValue_3_1</format>
+			<initialLocation>initialLocationValue_3_1</initialLocation>
+		</disk>
+		<disk>
+			<capacity>3</capacity>
+			<format>formatValue_3_2</format>
+			<initialLocation>initialLocationValue_3_2</initialLocation>
+		</disk>
+		<operation href="hrefValue_3_0" rel="relValue_3_0" />
+		<operation href="hrefValue_3_1" rel="relValue_3_1" />
+		<operation href="hrefValue_3_2" rel="relValue_3_2" />
+	</MachineConfiguration>
+	<MachineConfiguration href="hrefValue_3_1">
 		<id>idValue_3_1</id>
-		<operation href="hrefValue_3_0" rel="relValue_3_0" />
-		<operation href="hrefValue_3_1" rel="relValue_3_1" />
-		<operation href="hrefValue_3_2" rel="relValue_3_2" />
+		<name>nameValue_3_1</name>
+		<description>descriptionValue_3_1</description>
+		<created>2003-04-04T03:03:03.003Z</created>
 		<updated>2003-04-04T03:03:03.003Z</updated>
-		<cpu>3</cpu>
-		<disk>
-			<capacity>3</capacity>
-			<initialLocation>initialLocationValue_3_0</initialLocation>
-			<format>formatValue_3_0</format>
-		</disk>
-		<disk>
-			<capacity>3</capacity>
-			<initialLocation>initialLocationValue_3_1</initialLocation>
-			<format>formatValue_3_1</format>
-		</disk>
-		<disk>
-			<capacity>3</capacity>
-			<initialLocation>initialLocationValue_3_2</initialLocation>
-			<format>formatValue_3_2</format>
-		</disk>
-		<memory>3</memory>
-	</MachineConfiguration>
-	<MachineConfiguration href="hrefValue_3_2" resourceURI="http://schemas.dmtf.org/cimi/1/MachineConfiguration">
-		<description>descriptionValue_3_2</description>
-		<name>nameValue_3_2</name>
 		<property key="keyProp_3_0">valueProp_3_0</property>
 		<property key="keyProp_3_2">valueProp_3_2</property>
 		<property key="keyProp_3_1">valueProp_3_1</property>
-		<created>2003-04-04T03:03:03.003Z</created>
-		<id>idValue_3_2</id>
+		<cpu>3</cpu>
+		<memory>3</memory>
+		<disk>
+			<capacity>3</capacity>
+			<format>formatValue_3_0</format>
+			<initialLocation>initialLocationValue_3_0</initialLocation>
+		</disk>
+		<disk>
+			<capacity>3</capacity>
+			<format>formatValue_3_1</format>
+			<initialLocation>initialLocationValue_3_1</initialLocation>
+		</disk>
+		<disk>
+			<capacity>3</capacity>
+			<format>formatValue_3_2</format>
+			<initialLocation>initialLocationValue_3_2</initialLocation>
+		</disk>
 		<operation href="hrefValue_3_0" rel="relValue_3_0" />
 		<operation href="hrefValue_3_1" rel="relValue_3_1" />
 		<operation href="hrefValue_3_2" rel="relValue_3_2" />
+	</MachineConfiguration>
+	<MachineConfiguration href="hrefValue_3_2">
+		<id>idValue_3_2</id>
+		<name>nameValue_3_2</name>
+		<description>descriptionValue_3_2</description>
+		<created>2003-04-04T03:03:03.003Z</created>
 		<updated>2003-04-04T03:03:03.003Z</updated>
+		<property key="keyProp_3_0">valueProp_3_0</property>
+		<property key="keyProp_3_2">valueProp_3_2</property>
+		<property key="keyProp_3_1">valueProp_3_1</property>
 		<cpu>3</cpu>
-		<disk>
-			<capacity>3</capacity>
-			<initialLocation>initialLocationValue_3_0</initialLocation>
-			<format>formatValue_3_0</format>
-		</disk>
-		<disk>
-			<capacity>3</capacity>
-			<initialLocation>initialLocationValue_3_1</initialLocation>
-			<format>formatValue_3_1</format>
-		</disk>
-		<disk>
-			<capacity>3</capacity>
-			<initialLocation>initialLocationValue_3_2</initialLocation>
-			<format>formatValue_3_2</format>
-		</disk>
 		<memory>3</memory>
+		<disk>
+			<capacity>3</capacity>
+			<format>formatValue_3_0</format>
+			<initialLocation>initialLocationValue_3_0</initialLocation>
+		</disk>
+		<disk>
+			<capacity>3</capacity>
+			<format>formatValue_3_1</format>
+			<initialLocation>initialLocationValue_3_1</initialLocation>
+		</disk>
+		<disk>
+			<capacity>3</capacity>
+			<format>formatValue_3_2</format>
+			<initialLocation>initialLocationValue_3_2</initialLocation>
+		</disk>
+		<operation href="hrefValue_3_0" rel="relValue_3_0" />
+		<operation href="hrefValue_3_1" rel="relValue_3_1" />
+		<operation href="hrefValue_3_2" rel="relValue_3_2" />
 	</MachineConfiguration>
 	<operation href="hrefValue_3_0" rel="relValue_3_0" />
 	<operation href="hrefValue_3_1" rel="relValue_3_1" />
