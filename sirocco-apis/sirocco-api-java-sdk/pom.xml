@@ -31,7 +31,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager-apis</artifactId>
-		<version>0.5.2-SNAPSHOT</version>
+		<version>0.5.3-SNAPSHOT</version>
 	</parent>
 	
 	<groupId>org.ow2.sirocco.apis</groupId>
@@ -46,6 +46,16 @@
 			<groupId>org.ow2.sirocco.apis</groupId>
 			<artifactId>sirocco-rest-cimi-apis</artifactId>
 			<version>${project.version}</version>
+			<exclusions>
+				<exclusion>
+					<groupId>com.sun.jersey</groupId>
+					<artifactId>jersey-server</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.sun.jersey.contribs</groupId>
+					<artifactId>jersey-spring</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
@@ -56,6 +66,12 @@
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-json</artifactId>
 			<version>1.12</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>jettison</artifactId>
+					<groupId>org.codehaus.jettison</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>javax.validation</groupId>
