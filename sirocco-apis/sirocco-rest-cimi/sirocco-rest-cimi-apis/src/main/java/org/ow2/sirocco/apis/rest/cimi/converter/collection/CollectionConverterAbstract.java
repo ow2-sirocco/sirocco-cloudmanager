@@ -94,13 +94,13 @@ public abstract class CollectionConverterAbstract implements CimiConverter {
         final CimiCollection<E> collectionCimi) {
         this.fill(context, collectionService, collectionCimi);
         if (true == context.mustBeExpanded(collectionCimi)) {
+            CimiArray<E> cimiList = collectionCimi.newCollection();
             if ((null != collectionService) && (collectionService.size() > 0)) {
-                CimiArray<E> cimiList = collectionCimi.newCollection();
                 for (Object serviceItem : collectionService) {
                     cimiList.add((E) context.convertNextCimi(serviceItem, collectionCimi.getItemClass()));
                 }
-                collectionCimi.setCollection(cimiList);
             }
+            collectionCimi.setCollection(cimiList);
         }
     }
 
