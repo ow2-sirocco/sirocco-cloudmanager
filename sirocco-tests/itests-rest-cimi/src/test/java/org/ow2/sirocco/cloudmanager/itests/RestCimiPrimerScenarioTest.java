@@ -84,7 +84,7 @@ public class RestCimiPrimerScenarioTest {
 
     private static final String ACCOUNT_CREDENTIALS = "ignored";
 
-    private static final int ASYNC_OPERATION_WAIT_TIME_IN_SECONDS = 30;
+    private static final int ASYNC_OPERATION_WAIT_TIME_IN_SECONDS = 60;
 
     /**
      * Initial Context Factory.
@@ -254,8 +254,9 @@ public class RestCimiPrimerScenarioTest {
             if (false == "RUNNING".equals(jobRead.getStatus())) {
                 break;
             }
-            Thread.sleep(1000);
-            if (counter-- <= 0) {
+            Thread.sleep(5000);
+            counter-=5;
+            if (counter <= 0) {
                 throw new Exception("Job operation time out");
             }
         }
@@ -407,7 +408,7 @@ public class RestCimiPrimerScenarioTest {
         System.out.println("ID: " + machineImagesCollection.getId());
         if (null != machineImagesCollection.getArray()) {
             for (CimiMachineImage mImage : machineImagesCollection.getArray()) {
-                System.out.println("machineImage: " + mImage.getHref());
+                System.out.println("machineImage: " + mImage.getId());
             }
         }
         this.printTitleTest("Retrieve the list of Machine Images", false);
@@ -416,7 +417,7 @@ public class RestCimiPrimerScenarioTest {
          * Choose a Machine Image (first one)
          */
         this.printTitleTest("Choose a Machine Image (first one)", true);
-        service = webResource.path(this.extractPath(machineImagesCollection.getArray()[0].getHref()));
+        service = webResource.path(this.extractPath(machineImagesCollection.getArray()[0].getId()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         CimiMachineImage machineImage = response.getEntity(CimiMachineImage.class);
@@ -450,7 +451,7 @@ public class RestCimiPrimerScenarioTest {
          * Choose a Machine Configuration (first one)
          */
         this.printTitleTest("Choose a Machine Configuration (first one)", true);
-        service = webResource.path(this.extractPath(machineConfigsCollection.getArray()[0].getHref()));
+        service = webResource.path(this.extractPath(machineConfigsCollection.getArray()[0].getId()));
         response = this.authentication(service).accept(mediaType).get(ClientResponse.class);
         Assert.assertEquals(200, response.getStatus());
         CimiMachineConfiguration machineConfiguration = response.getEntity(CimiMachineConfiguration.class);
