@@ -354,7 +354,7 @@
 													<http port="${webcontainer.port}" />
 												</jetty>
 											</webcontainer>
-											<jms port="16010" initialTopics="JobCompletion" initialQueues="" />
+											<jms port="${jms.port}" initialTopics="JobCompletion" initialQueues="" />
 											<carol defaultPort="${carol.port}" protocols="${carol.protocol}" />
 											<db port="${db.port}" />
 										</jonasbase>
@@ -475,7 +475,7 @@
 									<carol.port>${carol.port}</carol.port>
 									<java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
 								</systemProperties>
-								<timeout>240000</timeout>
+								<timeout>480000</timeout>
 							</container>
 							<configuration>
 								<type>existing</type>
