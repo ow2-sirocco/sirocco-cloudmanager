@@ -15,9 +15,4 @@ public final class Constants {
     public static final String RASD_ALLOCATION_UNIT_KILOBYTE = "byte * 2^10";
 
     public static final String RASD_ALLOCATION_UNIT_MEGABYTE = "byte * 2^20";
-
-    public static final String RASD_ALLOCATION_UNIT_GIGABYTE = "byte * 2^30";
-
-    public static final String RASD_ALLOCATION_UNIT_TERABYTE = "byte * 2^40";
-
 }

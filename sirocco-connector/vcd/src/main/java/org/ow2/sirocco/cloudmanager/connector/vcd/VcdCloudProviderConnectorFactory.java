@@ -38,6 +38,7 @@ import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 
 import javax.xml.bind.JAXBElement;
+import javax.xml.namespace.QName;
 
 import org.apache.felix.ipojo.annotations.Component;
 import org.apache.felix.ipojo.annotations.Provides;
@@ -55,6 +56,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
+import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -102,6 +104,7 @@ import com.vmware.vcloud.api.rest.schema.ovf.MsgType;
 import com.vmware.vcloud.api.rest.schema.ovf.ProductSectionProperty;
 import com.vmware.vcloud.api.rest.schema.ovf.ProductSectionType;
 import com.vmware.vcloud.api.rest.schema.ovf.RASDType;
+import com.vmware.vcloud.api.rest.schema.ovf.ResourceType;
 import com.vmware.vcloud.api.rest.schema.ovf.SectionType;
 import com.vmware.vcloud.api.rest.schema.ovf.VirtualHardwareSectionType;
 import com.vmware.vcloud.sdk.Organization;
@@ -112,7 +115,9 @@ import com.vmware.vcloud.sdk.Vapp;
 import com.vmware.vcloud.sdk.VappTemplate;
 import com.vmware.vcloud.sdk.VcloudClient;
 import com.vmware.vcloud.sdk.Vdc;
+import com.vmware.vcloud.sdk.VirtualCpu;
 import com.vmware.vcloud.sdk.VirtualDisk;
+import com.vmware.vcloud.sdk.VirtualMemory;
 import com.vmware.vcloud.sdk.constants.FenceModeValuesType;
 import com.vmware.vcloud.sdk.constants.IpAddressAllocationModeType;
 import com.vmware.vcloud.sdk.constants.UndeployPowerActionType;
@@ -331,7 +336,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             } else if (state == VappStatus.UNRESOLVED) {
                 return System.State.STOPPED;
             } else if (state == VappStatus.WAITING_FOR_INPUT) {
-                return System.State.ERROR; // TODO: fix CIMI state
+                return System.State.ERROR; // FIXME: CIMI mapping
             } else {
                 return System.State.ERROR;
             }
@@ -404,7 +409,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 public System call() throws Exception {
                     try {
                         List<Task> tasks = vapp.getTasks();
-                        if (tasks.size() > 0) {
+                        if (tasks.size() > 0) { // FIXME wait for all tasks
                             tasks.get(0).waitForTask(waitTimeInMilliSeconds);
                         }
 
@@ -669,7 +674,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             } else if (state == VMStatus.UNRESOLVED) {
                 return Machine.State.STOPPED;
             } else if (state == VMStatus.WAITING_FOR_INPUT) {
-                return Machine.State.ERROR; // TODO: fix CIMI state
+                return Machine.State.ERROR; // FIXME: CIMI mapping
             } else {
                 return Machine.State.ERROR;
             }
@@ -695,16 +700,17 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 // + machine.getState() + ", ips=" + vm.getIpAddressesById());
 
                 // HW
-                // TODO: (check RAM & Disk size unit)
                 machine.setCpu(vm.getCpu().getNoOfCpus());
-                machine.setMemory(vm.getMemory().getMemorySize().intValue() * 1024);
+                machine.setMemory(vm.getMemory().getMemorySize().intValue() * 1024); // CIMI:
+                                                                                     // kibibytes
                 List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
                 machine.setDisks(machineDisks);
                 for (VirtualDisk disk : vm.getDisks()) {
                     if (disk.isHardDisk()) {
                         MachineDisk machineDisk = new MachineDisk();
                         machineDisk.setInitialLocation("");
-                        machineDisk.setCapacity(disk.getHardDiskSize().intValue() * 1024);
+                        machineDisk.setCapacity(disk.getHardDiskSize().intValue() * 1000); // CIMI:
+                                                                                           // kilobytes
                         machineDisks.add(machineDisk);
                     }
                 }
@@ -1100,7 +1106,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             // make the composition request, and get a vApp in return
             Vapp vapp = vdc.composeVapp(composeVAppParamsType);
             List<Task> tasks = vapp.getTasks();
-            if (tasks.size() > 0) {
+            if (tasks.size() > 0) { // TODO wait for all tasks
                 tasks.get(0).waitForTask(VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
             }
 
@@ -1159,7 +1165,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         private void configureVmSections(Vapp vapp, final Map<String, MachineTemplate> machineTemplateMap)
             throws VCloudException, TimeoutException {
-            // refresh the vapp
+            // refresh the vapp (TBC)
             vapp = Vapp.getVappByReference(this.vcloudClient, vapp.getReference());
 
             // set virtual hardware
@@ -1179,72 +1185,88 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         private void configureVirtualHardware(final Vapp vapp, final Map<String, MachineTemplate> machineTemplateMap)
             throws VCloudException, TimeoutException {
-            List<VM> childVms = vapp.getChildrenVms();
-            for (VM childVm : childVms) {
+            for (VM childVm : vapp.getChildrenVms()) {
                 MachineTemplate mt = machineTemplateMap.get(childVm.getResource().getName());
                 MachineConfiguration mc = mt.getMachineConfiguration();
                 if (mc == null) {
                     continue;
                 }
 
-                boolean sectionHasChanged = false;
                 VirtualHardwareSectionType virtualHardwareSectionType = childVm.getVirtualHardwareSection();
-                if (virtualHardwareSectionType == null) { // is that necessary?
+                if (virtualHardwareSectionType == null) {
                     virtualHardwareSectionType = new VirtualHardwareSectionType();
                 }
 
                 for (RASDType item : virtualHardwareSectionType.getItem()) {
                     int type = Integer.parseInt(item.getResourceType().getValue());
-                    VcdCloudProviderConnectorFactory.logger.info("- virtualHardwareItemType:" + type);
-                    // VcdCloudProviderConnectorFactory.logger.info("  virtualHardwareItemDesc:"
-                    // + item.getDescription().getValue());
-                    switch (type) {
-                    case Constants.RASD_RESOURCETYPE_CPU: {
-                        if (mc.getCpu() > 0) {
-                            BigInteger quantity = item.getVirtualQuantity().getValue();
-                            if (quantity.intValue() != mc.getCpu()) {
-                                CimUnsignedLong newValue = new CimUnsignedLong();
-                                newValue.setValue(BigInteger.valueOf(mc.getCpu()));
-                                item.setVirtualQuantity(newValue);
-                                sectionHasChanged = true;
-                            }
-                        }
-                        break;
-                    }
-                    case Constants.RASD_RESOURCETYPE_RAM: {
-                        if (mc.getMemory() > 0) {
-                            BigInteger quantity = item.getVirtualQuantity().getValue();
-                            String unit = item.getAllocationUnits().getValue();
-                            long sizeMo = quantity.longValue();
-                            if (Constants.RASD_ALLOCATION_UNIT_KILOBYTE.equals(unit)) {
-                                sizeMo = sizeMo / 1024;
-                            } else if (Constants.RASD_ALLOCATION_UNIT_GIGABYTE.equals(unit)) {
-                                sizeMo = sizeMo * 1024;
-                            }
-                            if (Constants.RASD_ALLOCATION_UNIT_TERABYTE.equals(unit)) {
-                                sizeMo = sizeMo * 1024 * 1024;
-                            }
-                            if (sizeMo != mc.getMemory()) {
-                                CimUnsignedLong newValue = new CimUnsignedLong();
-                                newValue.setValue(BigInteger.valueOf(mc.getMemory()));
-                                CimString newUnit = new CimString();
-                                newUnit.setValue(Constants.RASD_ALLOCATION_UNIT_MEGABYTE);
-                                item.setVirtualQuantity(newValue);
-                                item.setAllocationUnits(newUnit);
-                                sectionHasChanged = true;
-                            }
-                        }
-                        break;
-                    }
-                    default:
-                        // Not handled
-                    }
+                    /*VcdCloudProviderConnectorFactory.logger.info("- virtualHardwareItemType: " + type + ", "
+                        + item.getDescription().getValue());*/
+                }
 
-                    // TODO: disks
-
-                    if (sectionHasChanged) {
-                        childVm.updateSection(virtualHardwareSectionType).waitForTask(0);
+                // CPU
+                VcdCloudProviderConnectorFactory.logger.info("  Number of Virtual CPUs: " + childVm.getCpu().getNoOfCpus());
+                VirtualCpu virtualCpuItem = childVm.getCpu();
+                if (mc.getCpu() > 0) {
+                    if (virtualCpuItem.getNoOfCpus() != mc.getCpu()) {
+                        VcdCloudProviderConnectorFactory.logger.info("  -> updating: " + mc.getCpu() + " Virtual CPUs");
+                        virtualCpuItem.setNoOfCpus(mc.getCpu());
+                        childVm.updateCpu(virtualCpuItem).waitForTask(
+                            VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
                     }
+                }
+
+                // RAM
+                if (mc.getMemory() > 0) {
+                    VcdCloudProviderConnectorFactory.logger
+                        .info("  Memory Size: " + childVm.getMemory().getMemorySize() + "MB");
+                    long memoryInMBytes = mc.getMemory() / 1024; // kibibytes
+                                                                 // CIMI
+                    VirtualMemory virtualMemoryItemInMBytes = childVm.getMemory();
+                    if (virtualMemoryItemInMBytes.getMemorySize().longValue() != memoryInMBytes) {
+                        VcdCloudProviderConnectorFactory.logger.info("  -> updating: " + memoryInMBytes + " MB");
+                        virtualMemoryItemInMBytes.setMemorySize(BigInteger.valueOf(memoryInMBytes));
+                        childVm.updateMemory(virtualMemoryItemInMBytes).waitForTask(
+                            VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
+                    }
+                }
+
+                // DISK
+                // Add virtual disk if needed
+                List<VirtualDisk> disks = childVm.getDisks();
+                boolean diskSectionHasChanged = false;
+                for (DiskTemplate disk : mc.getDiskTemplates()) {
+                    long diskInMBytes = disk.getCapacity() / 1000; // kilobytes
+                                                                   // CIMI
+                    if (diskInMBytes < 1) {
+                        diskInMBytes = 1;
+                    }
+                    VcdCloudProviderConnectorFactory.logger.info("  Add New Disk: " + diskInMBytes + " MB, LsiLogic");
+                    CimString cimString = new CimString();
+                    Map<QName, String> cimAttributes = cimString.getOtherAttributes();
+                    cimAttributes.put(new QName("http://www.vmware.com/vcloud/v1.5", "busSubType", "vcloud"), "lsilogic");
+                    cimAttributes.put(new QName("http://www.vmware.com/vcloud/v1.5", "busType", "vcloud"), "6");
+                    cimAttributes.put(new QName("http://www.vmware.com/vcloud/v1.5", "capacity", "vcloud"),
+                        String.valueOf(diskInMBytes));
+
+                    CimString setElementName = new CimString();
+                    setElementName.setValue("Hard disk");
+                    CimString setInstanceID = new CimString();
+                    setInstanceID.setValue("anything");
+                    ResourceType setResourceType = new ResourceType();
+                    setResourceType.setValue(String.valueOf(Constants.RASD_RESOURCETYPE_DISK_DEVICE));
+
+                    RASDType diskItemType = new RASDType();
+                    diskItemType.setElementName(setElementName);
+                    diskItemType.setInstanceID(setInstanceID);
+                    diskItemType.setResourceType(setResourceType);
+                    List<CimString> diskAttributes = diskItemType.getHostResource();
+                    diskAttributes.add(cimString);
+
+                    disks.add(new VirtualDisk(diskItemType));
+                    diskSectionHasChanged = true;
+                }
+                if (diskSectionHasChanged) {
+                    childVm.updateDisks(disks).waitForTask(VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
                 }
             }
         }
@@ -1258,7 +1280,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                     networkConnection.setIpAddressAllocationMode(IpAddressAllocationModeType.POOL.value());
                     networkConnection.setNetwork(this.vdc.getAvailableNetworkRefs().iterator().next().getName());
                 }
-                childVm.updateSection(networkConnectionSectionType).waitForTask(0);
+                childVm.updateSection(networkConnectionSectionType).waitForTask(
+                    VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
             }
         }
 
@@ -1293,7 +1316,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 List<ProductSectionType> productSections = childVm.getProductSections();
                 productSections.add(ovfEnvSection);
 
-                childVm.updateProductSections(productSections).waitForTask(0);
+                childVm.updateProductSections(productSections).waitForTask(
+                    VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
             }
         }
 
@@ -1333,7 +1357,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                     networkConnection.setIpAddressAllocationMode(IpAddressAllocationModeType.POOL.value());
                     networkConnection.setNetwork(this.vdc.getAvailableNetworkRefs().iterator().next().getName());
                 }
-                childVm.updateSection(networkConnectionSectionType).waitForTask(0);
+                childVm.updateSection(networkConnectionSectionType).waitForTask(
+                    VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
             }
         }
 
@@ -1362,7 +1387,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 List<ProductSectionType> productSections = childVm.getProductSections();
                 productSections.add(ovfEnvSection);
 
-                childVm.updateProductSections(productSections).waitForTask(0);
+                childVm.updateProductSections(productSections).waitForTask(
+                    VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
             }
         }
 
@@ -1515,6 +1541,148 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             };
             ListenableFuture<Machine> result = VcdCloudProviderConnectorFactory.this.executorService.submit(createTask);
             return VcdCloudProviderConnectorFactory.this.jobManager.newJob(machine, null, "add", result);
+        }
+
+        private void configureVirtualHardware_Back2(final Vapp vapp, final Map<String, MachineTemplate> machineTemplateMap)
+            throws VCloudException, TimeoutException {
+            for (VM childVm : vapp.getChildrenVms()) {
+                MachineTemplate mt = machineTemplateMap.get(childVm.getResource().getName());
+                MachineConfiguration mc = mt.getMachineConfiguration();
+                if (mc == null) {
+                    continue;
+                }
+
+                VirtualHardwareSectionType virtualHardwareSectionType = childVm.getVirtualHardwareSection();
+                if (virtualHardwareSectionType == null) {
+                    virtualHardwareSectionType = new VirtualHardwareSectionType();
+                }
+
+                for (RASDType item : virtualHardwareSectionType.getItem()) {
+                    int type = Integer.parseInt(item.getResourceType().getValue());
+                    VcdCloudProviderConnectorFactory.logger.info("- virtualHardwareItemType: " + type + ", "
+                        + item.getDescription().getValue());
+
+                    switch (type) {
+                    case Constants.RASD_RESOURCETYPE_CPU: {
+                        VcdCloudProviderConnectorFactory.logger.info("  CPU: " + item.getVirtualQuantity().getValue() + ", "
+                            + childVm.getCpu().getNoOfCpus() + ", " + mc.getCpu());
+                        VirtualCpu virtualCpuItem = childVm.getCpu();
+                        if (mc.getCpu() > 0) {
+                            if (virtualCpuItem.getNoOfCpus() != mc.getCpu()) {
+                                VcdCloudProviderConnectorFactory.logger.info("  CPU updated");
+                                virtualCpuItem.setNoOfCpus(mc.getCpu());
+                                childVm.updateCpu(virtualCpuItem).waitForTask(
+                                    VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
+                            }
+                        }
+                        break;
+                    }
+                    case Constants.RASD_RESOURCETYPE_RAM: {
+                        if (mc.getMemory() > 0) {
+                            VcdCloudProviderConnectorFactory.logger.info("  RAM: " + item.getVirtualQuantity().getValue()
+                                + "MB, " + childVm.getMemory().getMemorySize() + "MB, " + mc.getMemory() + "KB");
+                            long memoryInMBytes = mc.getMemory() / 1024;
+                            VirtualMemory virtualMemoryItemInMBytes = childVm.getMemory();
+                            if (virtualMemoryItemInMBytes.getMemorySize().longValue() != memoryInMBytes) {
+                                VcdCloudProviderConnectorFactory.logger.info("  RAM updated");
+                                virtualMemoryItemInMBytes.setMemorySize(BigInteger.valueOf(memoryInMBytes));
+                                childVm.updateMemory(virtualMemoryItemInMBytes).waitForTask(
+                                    VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
+                            }
+                        }
+                        break;
+                    }
+                    default:
+                        // Not handled
+                    }
+
+                    // TODO: disks
+                    //
+                    // Add virtual disk if needed
+                    //
+                    /*for (DiskTemplate disk : mc.getDiskTemplates()) {
+
+                    }*/
+
+                    /*if (sectionHasChanged) {
+                        childVm.updateSection(virtualHardwareSectionType).waitForTask(
+                            VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
+                    }*/
+                }
+            }
+        }
+
+        private void configureVirtualHardware_Back(final Vapp vapp, final Map<String, MachineTemplate> machineTemplateMap)
+            throws VCloudException, TimeoutException {
+            List<VM> childVms = vapp.getChildrenVms();
+            for (VM childVm : childVms) {
+                MachineTemplate mt = machineTemplateMap.get(childVm.getResource().getName());
+                MachineConfiguration mc = mt.getMachineConfiguration();
+                if (mc == null) {
+                    continue;
+                }
+
+                boolean sectionHasChanged = false;
+                VirtualHardwareSectionType virtualHardwareSectionType = childVm.getVirtualHardwareSection();
+                if (virtualHardwareSectionType == null) {
+                    virtualHardwareSectionType = new VirtualHardwareSectionType();
+                }
+
+                for (RASDType item : virtualHardwareSectionType.getItem()) {
+                    int type = Integer.parseInt(item.getResourceType().getValue());
+                    VcdCloudProviderConnectorFactory.logger.info("- virtualHardwareItemType: " + type + ", "
+                        + item.getDescription().getValue());
+
+                    switch (type) {
+                    case Constants.RASD_RESOURCETYPE_CPU: {
+                        VcdCloudProviderConnectorFactory.logger.info("  CPU: " + item.getVirtualQuantity().getValue() + ", "
+                            + childVm.getCpu().getNoOfCpus() + ", " + mc.getCpu());
+                        if (mc.getCpu() > 0) {
+                            if (childVm.getCpu().getNoOfCpus() != mc.getCpu()) {
+                                CimUnsignedLong newValue = new CimUnsignedLong();
+                                newValue.setValue(BigInteger.valueOf(mc.getCpu()));
+                                item.setVirtualQuantity(newValue);
+                                sectionHasChanged = true;
+                            }
+                        }
+                        break;
+                    }
+                    case Constants.RASD_RESOURCETYPE_RAM: {
+                        if (mc.getMemory() > 0) {
+                            VcdCloudProviderConnectorFactory.logger.info("  RAM: " + item.getVirtualQuantity().getValue()
+                                + "MB, " + childVm.getMemory().getMemorySize() + "MB, " + mc.getMemory() + "KB");
+                            long memoryInKBytes = mc.getMemory();
+                            long vAppMemoryInKBytes = childVm.getMemory().getMemorySize().longValue() * 1024;
+                            if (vAppMemoryInKBytes != memoryInKBytes) {
+                                VcdCloudProviderConnectorFactory.logger.info("  RAM updated");
+                                CimUnsignedLong newValue = new CimUnsignedLong();
+                                newValue.setValue(BigInteger.valueOf(memoryInKBytes));
+                                CimString unit = new CimString();
+                                unit.setValue(Constants.RASD_ALLOCATION_UNIT_KILOBYTE);
+                                item.setVirtualQuantity(newValue);
+                                item.setAllocationUnits(unit);
+                                sectionHasChanged = true;
+                            }
+                        }
+                        break;
+                    }
+                    default:
+                        // Not handled
+                    }
+
+                    // TODO: disks
+                    //
+                    // Add virtual disk if needed
+                    //
+                    /*for (DiskTemplate disk : mc.getDiskTemplates()) {
+
+                    }*/
+
+                    if (sectionHasChanged) {
+                        childVm.updateSection(virtualHardwareSectionType).waitForTask(0);
+                    }
+                }
+            }
         }
     }
 }
