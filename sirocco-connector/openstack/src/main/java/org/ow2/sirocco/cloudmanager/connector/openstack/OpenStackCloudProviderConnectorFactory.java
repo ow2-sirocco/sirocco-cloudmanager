@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -43,10 +44,10 @@ import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.ServiceProperty;
 import org.jclouds.Constants;
+import org.jclouds.ContextBuilder;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.ComputeServiceContextFactory;
-import org.jclouds.openstack.nova.v2_0.NovaAsyncClient;
-import org.jclouds.openstack.nova.v2_0.NovaClient;
+import org.jclouds.openstack.nova.v2_0.NovaApi;
+import org.jclouds.openstack.nova.v2_0.NovaAsyncApi;
 import org.jclouds.openstack.nova.v2_0.domain.Address;
 import org.jclouds.openstack.nova.v2_0.domain.Flavor;
 import org.jclouds.openstack.nova.v2_0.domain.FloatingIP;
@@ -55,12 +56,13 @@ import org.jclouds.openstack.nova.v2_0.domain.RebootType;
 import org.jclouds.openstack.nova.v2_0.domain.Server;
 import org.jclouds.openstack.nova.v2_0.domain.ServerCreated;
 import org.jclouds.openstack.nova.v2_0.domain.VolumeAttachment;
-import org.jclouds.openstack.nova.v2_0.extensions.FloatingIPClient;
-import org.jclouds.openstack.nova.v2_0.extensions.KeyPairClient;
-import org.jclouds.openstack.nova.v2_0.extensions.VolumeClient;
-import org.jclouds.openstack.nova.v2_0.features.ServerClient;
+import org.jclouds.openstack.nova.v2_0.extensions.FloatingIPApi;
+import org.jclouds.openstack.nova.v2_0.extensions.KeyPairApi;
+import org.jclouds.openstack.nova.v2_0.extensions.VolumeApi;
+import org.jclouds.openstack.nova.v2_0.features.ServerApi;
 import org.jclouds.openstack.nova.v2_0.options.CreateServerOptions;
 import org.jclouds.openstack.nova.v2_0.options.CreateVolumeOptions;
+import org.jclouds.rest.RestContext;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
@@ -181,13 +183,13 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         private CloudProviderLocation cloudProviderLocation;
 
-        private NovaClient novaClient;
+        private NovaApi novaClient;
 
-        private NovaAsyncClient novaAsyncClient;
+        private NovaAsyncApi novaAsyncClient;
 
         private String zone;
 
-        private Set<Flavor> flavors;
+        private ImmutableSet<? extends Flavor> flavors;
 
         private Network cimiPrivateNetwork, cimiPublicNetwork;
 
@@ -208,14 +210,17 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             String user = this.cloudProviderAccount.getLogin();
             String apiKey = this.cloudProviderAccount.getPassword();
 
-            ComputeServiceContext context = new ComputeServiceContextFactory().createContext("openstack-nova", user, apiKey,
-                modules, overrides);
-            this.novaClient = NovaClient.class.cast(context.getProviderSpecificContext().getApi());
-            this.novaAsyncClient = NovaAsyncClient.class.cast(context.getProviderSpecificContext().getAsyncApi());
+            ContextBuilder builder = ContextBuilder.newBuilder("openstack-nova").credentials(user, apiKey).modules(modules)
+                .overrides(overrides);
+            RestContext<NovaApi, NovaAsyncApi> context = builder.buildView(ComputeServiceContext.class).unwrap();
+
+            this.novaClient = context.getApi();
+            this.novaAsyncClient = context.getAsyncApi();
+
             // XXX we pick the first zone and ignore others
             this.zone = this.novaClient.getConfiguredZones().iterator().next();
 
-            this.flavors = this.novaClient.getFlavorClientForZone(this.zone).listFlavorsInDetail();
+            this.flavors = this.novaClient.getFlavorApiForZone(this.zone).listInDetail().concat().toImmutableSet();
 
             this.cimiPrivateNetwork = new Network();
             this.cimiPrivateNetwork.setProviderAssignedId("0");
@@ -294,11 +299,21 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 long flavorMemoryInKBytes = flavor.getRam() * 1024;
                 if (memoryInKBytes == flavorMemoryInKBytes) {
                     if (machineConfig.getCpu() == flavor.getVcpus()) {
-                        if (machineConfig.getDiskTemplates().size() == 1) {
+                        if (machineConfig.getDiskTemplates().size() == 1 && !flavor.getEphemeral().isPresent()) {
                             long diskSizeInKBytes = machineConfig.getDiskTemplates().get(0).getCapacity();
-                            long flavorDiskSizeInKBytes = flavor.getDisk() * 1000;
+                            long flavorDiskSizeInKBytes = flavor.getDisk() * 1000 * 1000;
                             if (diskSizeInKBytes == flavorDiskSizeInKBytes) {
                                 return flavor.getId();
+                            }
+                        } else if (machineConfig.getDiskTemplates().size() == 2 && flavor.getEphemeral().isPresent()) {
+                            long diskSizeInKBytes = machineConfig.getDiskTemplates().get(0).getCapacity();
+                            long flavorDiskSizeInKBytes = flavor.getDisk() * 1000 * 1000;
+                            if (diskSizeInKBytes == flavorDiskSizeInKBytes) {
+                                diskSizeInKBytes = machineConfig.getDiskTemplates().get(1).getCapacity();
+                                flavorDiskSizeInKBytes = flavor.getEphemeral().get() * 1000 * 1000;
+                                if (diskSizeInKBytes == flavorDiskSizeInKBytes) {
+                                    return flavor.getId();
+                                }
                             }
                         }
                     }
@@ -338,6 +353,18 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             }
         }
 
+        private void addAddress(final Address address, final Network cimiNetwork, final MachineNetworkInterface nic) {
+            org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
+            cimiAddress.setIp(address.getAddr());
+            cimiAddress.setNetwork(cimiNetwork);
+            cimiAddress.setAllocation("dynamic");
+            cimiAddress.setProtocol("IPv4");
+            cimiAddress.setResource(cimiNetwork);
+            MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+            entry.setAddress(cimiAddress);
+            nic.getAddresses().add(entry);
+        }
+
         private void fromServerToMachine(final Server server, final Machine machine) {
             machine.setProviderAssignedId(server.getId());
             machine.setState(OpenStackCloudProviderConnector.this.fromServerStatusToMachineState(server.getStatus()));
@@ -350,27 +377,17 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             publicNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
             publicNic.setNetworkType(Network.Type.PUBLIC);
 
+            // TODO
+            // assumption: first IP address is private, next addresses are
+            // public (floating IPs)
             for (String networkType : server.getAddresses().keySet()) {
                 Collection<Address> addresses = server.getAddresses().get(networkType);
-                Network cimiNetwork = (networkType.equalsIgnoreCase("private") ? OpenStackCloudProviderConnector.this.cimiPrivateNetwork
-                    : OpenStackCloudProviderConnector.this.cimiPublicNetwork);
-                List<MachineNetworkInterfaceAddress> cimiAddresses = null;
-                if (cimiNetwork == this.cimiPrivateNetwork) {
-                    cimiAddresses = privateNic.getAddresses();
+                Iterator<Address> iterator = addresses.iterator();
+                if (iterator.hasNext()) {
+                    this.addAddress(iterator.next(), this.cimiPrivateNetwork, privateNic);
                 }
-                if (cimiNetwork == this.cimiPublicNetwork) {
-                    cimiAddresses = publicNic.getAddresses();
-                }
-                for (Address address : addresses) {
-                    org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
-                    cimiAddress.setIp(address.getAddr());
-                    cimiAddress.setNetwork(cimiNetwork);
-                    cimiAddress.setAllocation("dynamic");
-                    cimiAddress.setProtocol("IPv4");
-                    cimiAddress.setResource(cimiNetwork);
-                    MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
-                    entry.setAddress(cimiAddress);
-                    cimiAddresses.add(entry);
+                while (iterator.hasNext()) {
+                    this.addAddress(iterator.next(), this.cimiPublicNetwork, publicNic);
                 }
             }
 
@@ -381,7 +398,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 nics.add(publicNic);
             }
 
-            Flavor flavor = this.novaClient.getFlavorClientForZone(this.zone).getFlavor(server.getFlavor().getId());
+            Flavor flavor = this.novaClient.getFlavorApiForZone(this.zone).get(server.getFlavor().getId());
             machine.setCpu(flavor.getVcpus());
             machine.setMemory(flavor.getRam() * 1024);
             List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
@@ -397,18 +414,16 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 return keyPairName;
             }
 
-            KeyPairClient keyPairClient = this.novaClient.getKeyPairExtensionForZone(this.zone).get();
+            KeyPairApi keyPairClient = this.novaClient.getKeyPairExtensionForZone(this.zone).get();
 
-            for (Map<String, KeyPair> map : keyPairClient.listKeyPairs()) {
-                for (Map.Entry<String, KeyPair> entry : map.entrySet()) {
-                    if (entry.getValue().getPublicKey().equals(publicKey)) {
-                        OpenStackCloudProviderConnectorFactory.this.keyPairMap.put(publicKey, entry.getValue().getName());
-                        return entry.getValue().getName();
-                    }
+            for (KeyPair keyPair : keyPairClient.list()) {
+                if (keyPair.getPublicKey().equals(publicKey)) {
+                    OpenStackCloudProviderConnectorFactory.this.keyPairMap.put(publicKey, keyPair.getName());
+                    return keyPair.getName();
                 }
             }
 
-            KeyPair newKeyPair = keyPairClient.createKeyPairWithPublicKey("keypair-" + UUID.randomUUID().toString(), publicKey);
+            KeyPair newKeyPair = keyPairClient.createWithPublicKey("keypair-" + UUID.randomUUID().toString(), publicKey);
             OpenStackCloudProviderConnectorFactory.this.keyPairMap.put(publicKey, newKeyPair.getName());
             return newKeyPair.getName();
         }
@@ -427,42 +442,40 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         // TODO error handling
         private String addFloatingIPToMachine(final String serverId) throws Exception {
-            final FloatingIPClient floatingIPClient = this.novaClient.getFloatingIPExtensionForZone(this.zone).get();
-            final ServerClient serverClient = this.novaClient.getServerClientForZone(this.zone);
+            final FloatingIPApi floatingIPClient = this.novaClient.getFloatingIPExtensionForZone(this.zone).get();
+            final ServerApi serverClient = this.novaClient.getServerApiForZone(this.zone);
 
-            FloatingIP floatingIP = floatingIPClient.allocate();
+            FloatingIP floatingIP = floatingIPClient.create();
             OpenStackCloudProviderConnectorFactory.logger.info("Allocating floating IP " + floatingIP.getIp());
-            floatingIPClient.addFloatingIPToServer(floatingIP.getIp(), serverId);
+            floatingIPClient.addToServer(floatingIP.getIp(), serverId);
             // TODO check if it is safe not to wait that the floating IP shows
             // up in the server detail
 
-            // int waitTimeInSeconds =
-            // OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
-            // do {
-            // Server server = serverClient.getServer(serverId);
-            // if (server == null) {
-            // throw new Exception("Machine with id " + serverId + " unknown");
-            // }
-            // if (this.findIpAddressOnServer(server, floatingIP.getIp())) {
-            // OpenStackCloudProviderConnectorFactory.logger.info("Floating IP "
-            // + floatingIP.getIp()
-            // + " attached to server " + serverId);
-            // break;
-            // }
-            // Thread.sleep(1000);
-            // } while (waitTimeInSeconds-- > 0);
+            int waitTimeInSeconds = OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
+            do {
+                Server server = serverClient.get(serverId);
+                if (server == null) {
+                    throw new Exception("Machine with id " + serverId + " unknown");
+                }
+                if (this.findIpAddressOnServer(server, floatingIP.getIp())) {
+                    OpenStackCloudProviderConnectorFactory.logger.info("Floating IP " + floatingIP.getIp()
+                        + " attached to server " + serverId);
+                    break;
+                }
+                Thread.sleep(1000);
+            } while (waitTimeInSeconds-- > 0);
             return floatingIP.getIp();
         }
 
         private void freeFloatingIpsFromServer(final String serverId) {
-            final FloatingIPClient floatingIPClient = this.novaClient.getFloatingIPExtensionForZone(this.zone).get();
+            final FloatingIPApi floatingIPClient = this.novaClient.getFloatingIPExtensionForZone(this.zone).get();
 
-            for (FloatingIP floatingIP : floatingIPClient.listFloatingIPs()) {
+            for (FloatingIP floatingIP : floatingIPClient.list()) {
                 if (floatingIP.getInstanceId() != null && floatingIP.getInstanceId().equals(serverId)) {
                     OpenStackCloudProviderConnectorFactory.logger.info("Releasing floating IP " + floatingIP.getIp()
                         + " from server " + serverId);
-                    floatingIPClient.removeFloatingIPFromServer(floatingIP.getIp(), serverId);
-                    floatingIPClient.deallocate(floatingIP.getId());
+                    floatingIPClient.removeFromServer(floatingIP.getIp(), serverId);
+                    floatingIPClient.delete(floatingIP.getId());
                 }
             }
 
@@ -474,7 +487,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             if (flavorId == null) {
                 throw new ConnectorException("Cannot find Nova flavor matching machineConfig");
             }
-            final ServerClient serverClient = this.novaClient.getServerClientForZone(this.zone);
+            final ServerApi serverClient = this.novaClient.getServerApiForZone(this.zone);
 
             String keyPairName = null;
             if (machineCreate.getMachineTemplate().getCredentials() != null) {
@@ -505,7 +518,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             } else {
                 serverName = "sirocco-" + UUID.randomUUID();
             }
-            ServerCreated serverCreated = serverClient.createServer(serverName, imageId, flavorId, options);
+            ServerCreated serverCreated = serverClient.create(serverName, imageId, flavorId, options);
             final String serverId = serverCreated.getId();
             final Machine machine = new Machine();
             machine.setProviderAssignedId(serverId);
@@ -516,7 +529,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                     Server server;
                     int waitTimeInSeconds = OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
                     do {
-                        server = serverClient.getServer(serverId);
+                        server = serverClient.get(serverId);
                         if (server == null) {
                             throw new Exception("Machine with id " + serverId + " unknown");
                         }
@@ -567,14 +580,14 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         @Override
         public Job restartMachine(final String machineId, final boolean force) throws ConnectorException {
-            final ServerClient serverClient = this.novaClient.getServerClientForZone(this.zone);
+            final ServerApi serverClient = this.novaClient.getServerApiForZone(this.zone);
             final Callable<Void> startTask = new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    serverClient.rebootServer(machineId, force ? RebootType.HARD : RebootType.SOFT);
+                    serverClient.reboot(machineId, force ? RebootType.HARD : RebootType.SOFT);
                     int waitTimeInSeconds = OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
                     do {
-                        Server server = serverClient.getServer(machineId);
+                        Server server = serverClient.get(machineId);
                         Server.Status status = server.getStatus();
                         if (status != Server.Status.REBOOT) {
                             break;
@@ -597,7 +610,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         @Override
         public Job deleteMachine(final String machineId) throws ConnectorException {
-            final ServerClient serverClient = this.novaClient.getServerClientForZone(this.zone);
+            final ServerApi serverClient = this.novaClient.getServerApiForZone(this.zone);
             final Callable<Void> startTask = new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
@@ -605,12 +618,12 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                     // floating ips must be detached first
                     // see https://bugs.launchpad.net/nova/+bug/997763
                     OpenStackCloudProviderConnector.this.freeFloatingIpsFromServer(machineId);
-                    if (!serverClient.deleteServer(machineId)) {
+                    if (!serverClient.delete(machineId)) {
                         throw new Exception("Failed to delete server");
                     }
                     int waitTimeInSeconds = OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
                     do {
-                        Server server = serverClient.getServer(machineId);
+                        Server server = serverClient.get(machineId);
                         if (server == null) {
                             break;
                         }
@@ -632,8 +645,8 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
         @Override
         public org.ow2.sirocco.cloudmanager.model.cimi.Machine.State getMachineState(final String machineId)
             throws ConnectorException {
-            final ServerClient serverClient = this.novaClient.getServerClientForZone(this.zone);
-            Server server = serverClient.getServer(machineId);
+            final ServerApi serverClient = this.novaClient.getServerApiForZone(this.zone);
+            Server server = serverClient.get(machineId);
             if (server == null) {
                 throw new ConnectorException("Machine with id " + machineId + " not found");
             }
@@ -643,8 +656,8 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         @Override
         public Machine getMachine(final String machineId) throws ConnectorException {
-            final ServerClient serverClient = this.novaClient.getServerClientForZone(this.zone);
-            Server server = serverClient.getServer(machineId);
+            final ServerApi serverClient = this.novaClient.getServerApiForZone(this.zone);
+            Server server = serverClient.get(machineId);
             if (server == null) {
                 throw new ConnectorException("Machine " + machineId + " does not exist");
             }
@@ -663,8 +676,8 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 throw new ConnectorException("device not specified");
             }
             try {
-                ListenableFuture<VolumeAttachment> attachResult = this.novaAsyncClient.getVolumeExtensionForZone(this.zone)
-                    .get().attachVolumeToServerAsDevice(volumeId, machineId, device);
+                ListenableFuture<? extends VolumeAttachment> attachResult = this.novaAsyncClient
+                    .getVolumeExtensionForZone(this.zone).get().attachVolumeToServerAsDevice(volumeId, machineId, device);
                 return OpenStackCloudProviderConnectorFactory.this.jobManager.newJob(machine, volume, "add", attachResult);
             } catch (Exception ex) {
                 throw new ConnectorException(ex.getMessage());
@@ -719,12 +732,12 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         @Override
         public Job createVolume(final VolumeCreate volumeCreate) throws ConnectorException {
-            final VolumeClient volumeClient = this.novaClient.getVolumeExtensionForZone(this.zone).get();
+            final VolumeApi volumeClient = this.novaClient.getVolumeExtensionForZone(this.zone).get();
             CreateVolumeOptions options = CreateVolumeOptions.Builder.name(volumeCreate.getName()).description(
                 volumeCreate.getDescription());
             VolumeConfiguration volumeConfig = volumeCreate.getVolumeTemplate().getVolumeConfig();
             int sizeInGB = volumeConfig.getCapacity() / (1000 * 1000);
-            org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.createVolume(sizeInGB, options);
+            org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.create(sizeInGB, options);
             final String novaVolumeId = novaVolume.getId();
             final Volume cimiVolume = new Volume();
             this.fromNovaVolumeToCimiVolume(novaVolume, cimiVolume);
@@ -734,7 +747,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 public Volume call() throws Exception {
                     int waitTimeInSeconds = OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
                     do {
-                        org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.getVolume(novaVolumeId);
+                        org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.get(novaVolumeId);
                         if (novaVolume == null) {
                             throw new Exception("Volume does not exist");
                         }
@@ -754,9 +767,9 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
         @Override
         public Job deleteVolume(final String volumeId) throws ConnectorException {
             Volume volume = this.getVolume(volumeId);
-            final VolumeClient volumeClient = this.novaClient.getVolumeExtensionForZone(this.zone).get();
+            final VolumeApi volumeClient = this.novaClient.getVolumeExtensionForZone(this.zone).get();
 
-            if (!volumeClient.deleteVolume(volumeId)) {
+            if (!volumeClient.delete(volumeId)) {
                 throw new ConnectorException("Failed to delete volume " + volumeId);
             }
             final Callable<Void> deleteTask = new Callable<Void>() {
@@ -764,7 +777,7 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 public Void call() throws Exception {
                     int waitTimeInSeconds = OpenStackCloudProviderConnectorFactory.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
                     do {
-                        org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.getVolume(volumeId);
+                        org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.get(volumeId);
                         if (novaVolume == null) {
                             break;
                         }
@@ -779,8 +792,8 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         @Override
         public State getVolumeState(final String volumeId) throws ConnectorException {
-            final VolumeClient volumeClient = this.novaClient.getVolumeExtensionForZone(this.zone).get();
-            org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.getVolume(volumeId);
+            final VolumeApi volumeClient = this.novaClient.getVolumeExtensionForZone(this.zone).get();
+            org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.get(volumeId);
             if (novaVolume == null) {
                 throw new ConnectorException("Volume " + volumeId + " does not exist");
             }
@@ -789,8 +802,8 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         @Override
         public Volume getVolume(final String volumeId) throws ConnectorException {
-            final VolumeClient volumeClient = this.novaClient.getVolumeExtensionForZone(this.zone).get();
-            org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.getVolume(volumeId);
+            final VolumeApi volumeClient = this.novaClient.getVolumeExtensionForZone(this.zone).get();
+            org.jclouds.openstack.nova.v2_0.domain.Volume novaVolume = volumeClient.get(volumeId);
             if (novaVolume == null) {
                 throw new ConnectorException("Volume " + volumeId + " does not exist");
             }
