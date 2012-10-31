@@ -17,13 +17,12 @@ import org.apache.felix.ipojo.annotations.Provides;
 import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.ServiceProperty;
 import org.jclouds.Constants;
+import org.jclouds.ContextBuilder;
 import org.jclouds.aws.ec2.AWSEC2AsyncClient;
 import org.jclouds.aws.ec2.AWSEC2Client;
 import org.jclouds.aws.ec2.domain.AWSRunningInstance;
 import org.jclouds.aws.ec2.services.AWSKeyPairClient;
-import org.jclouds.compute.ComputeService;
 import org.jclouds.compute.ComputeServiceContext;
-import org.jclouds.compute.ComputeServiceContextFactory;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.ec2.compute.domain.EC2HardwareBuilder;
 import org.jclouds.ec2.domain.Attachment;
@@ -34,7 +33,7 @@ import org.jclouds.ec2.domain.KeyPair;
 import org.jclouds.ec2.domain.Reservation;
 import org.jclouds.ec2.options.RunInstancesOptions;
 import org.jclouds.ec2.services.ElasticBlockStoreClient;
-import org.jclouds.location.suppliers.derived.ZoneIdToURIFromJoinOnRegionIdToURI;
+import org.jclouds.rest.RestContext;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
@@ -223,13 +222,12 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
             overrides.setProperty(Constants.PROPERTY_TRUST_ALL_CERTS, "true");
             overrides.setProperty(Constants.PROPERTY_RELAX_HOSTNAME, "true");
 
-            Class zz = ZoneIdToURIFromJoinOnRegionIdToURI.class;
+            ContextBuilder builder = ContextBuilder.newBuilder("aws-ec2").credentials(this.accessKeyId, this.secretKeyId)
+                .modules(ImmutableSet.<Module> of()).overrides(overrides);
+            RestContext<AWSEC2Client, AWSEC2AsyncClient> context = builder.buildView(ComputeServiceContext.class).unwrap();
 
-            ComputeServiceContext computeServiceContext = new ComputeServiceContextFactory().createContext("aws-ec2",
-                this.accessKeyId, this.secretKeyId, ImmutableSet.<Module> of(), overrides);
-            ComputeService computeService = computeServiceContext.getComputeService();
-            this.syncClient = (AWSEC2Client) computeServiceContext.getProviderSpecificContext().getApi();
-            this.asyncClient = (AWSEC2AsyncClient) computeServiceContext.getProviderSpecificContext().getAsyncApi();
+            this.syncClient = context.getApi();
+            this.asyncClient = context.getAsyncApi();
 
             this.defaultAvailabilityZone = this.syncClient.getAvailabilityZoneAndRegionServices()
                 .describeAvailabilityZonesInRegion(this.amazonRegionCode).iterator().next().getZone();
