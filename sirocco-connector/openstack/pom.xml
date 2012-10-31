@@ -40,7 +40,7 @@
 	<name>SIROCCO :: CloudManager :: Connector :: OpenStack Nova</name>
 	
 	<properties>
-		<jclouds.version>1.5.0-beta.4</jclouds.version>
+		<jclouds.version>1.5.2</jclouds.version>
 	</properties>
 
 	<build>
