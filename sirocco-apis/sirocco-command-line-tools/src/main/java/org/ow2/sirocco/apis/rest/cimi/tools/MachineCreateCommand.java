@@ -28,9 +28,12 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Job;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
+import org.ow2.sirocco.apis.rest.cimi.sdk.Credential;
 import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
+import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineCreate;
+import org.ow2.sirocco.apis.rest.cimi.sdk.MachineImage;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineTemplate;
 
 import com.beust.jcommander.Parameter;
@@ -38,8 +41,17 @@ import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "create machine")
 public class MachineCreateCommand implements Command {
-    @Parameter(names = "-template", description = "id of the template", required = true)
+    @Parameter(names = "-template", description = "id of the template", required = false)
     private String templateId;
+
+    @Parameter(names = "-config", description = "id of the config", required = false)
+    private String configId;
+
+    @Parameter(names = "-image", description = "id of the image", required = false)
+    private String imageId;
+
+    @Parameter(names = "-credential", description = "id of the credential", required = false)
+    private String credId;
 
     @Parameter(names = "-userData", description = "user data", required = false)
     private String userData;
@@ -60,8 +72,21 @@ public class MachineCreateCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
+        if (this.templateId == null && (this.configId == null && this.imageId == null)) {
+            throw new CimiException("You need to specify either a template id or both a config id and an image id");
+        }
         MachineCreate machineCreate = new MachineCreate();
-        MachineTemplate machineTemplate = new MachineTemplate(cimiClient, this.templateId);
+        MachineTemplate machineTemplate;
+        if (this.templateId != null) {
+            machineTemplate = new MachineTemplate(cimiClient, this.templateId);
+        } else {
+            machineTemplate = new MachineTemplate();
+            machineTemplate.setMachineConfig(new MachineConfiguration(cimiClient, this.configId));
+            machineTemplate.setMachineImage(new MachineImage(cimiClient, this.imageId));
+            if (this.credId != null) {
+                machineTemplate.setCredential(new Credential(cimiClient, this.credId));
+            }
+        }
         machineTemplate.setUserData(this.userData);
         machineCreate.setMachineTemplate(machineTemplate);
         machineCreate.setName(this.name);
@@ -71,10 +96,13 @@ public class MachineCreateCommand implements Command {
                 machineCreate.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
             }
         }
-        Job job = Machine.createMachine(cimiClient, machineCreate);
-        System.out.println("Machine " + job.getTargetResourceRef() + " being created");
-
-        JobListCommand.printJob(job);
+        CreateResult<Machine> result = Machine.createMachine(cimiClient, machineCreate);
+        if (result.getJob() != null) {
+            System.out.println("Machine " + result.getJob().getTargetResourceRef() + " being created");
+            JobListCommand.printJob(result.getJob());
+        } else {
+            MachineShowCommand.printMachine(result.getResource());
+        }
 
     }
 }

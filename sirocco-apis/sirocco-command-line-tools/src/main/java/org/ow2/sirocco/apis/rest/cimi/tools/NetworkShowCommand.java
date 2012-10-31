@@ -29,63 +29,55 @@ import java.util.Map;
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration.Disk;
+import org.ow2.sirocco.apis.rest.cimi.sdk.Network;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "show machine config")
-public class MachineConfigShowCommand implements Command {
-    @Parameter(names = "-id", description = "id of the machine config", required = true)
-    private String machineConfigId;
+@Parameters(commandDescription = "show network")
+public class NetworkShowCommand implements Command {
+    @Parameter(names = "-id", description = "id of the network", required = true)
+    private String networkId;
 
     @Override
     public String getName() {
-        return "machineconfig-show";
+        return "network-show";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        MachineConfiguration machineConfig = MachineConfiguration.getMachineConfigurationByReference(cimiClient,
-            this.machineConfigId, null);
+        Network net = Network.getNetworkById(cimiClient, this.networkId);
 
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");
 
         table.addCell("id");
-        table.addCell(machineConfig.getId());
+        table.addCell(net.getId());
 
         table.addCell("name");
-        table.addCell(machineConfig.getName());
-
+        table.addCell(net.getName());
         table.addCell("description");
-        table.addCell(machineConfig.getDescription());
-        table.addCell("cpu");
-        table.addCell(Integer.toString(machineConfig.getCpu()));
-        table.addCell("memory (KB)");
-        table.addCell(Integer.toString(machineConfig.getMemory()));
+        table.addCell(net.getDescription());
 
-        for (int i = 0; i < machineConfig.getDisks().length; i++) {
-            Disk disk = machineConfig.getDisks()[i];
-            table.addCell("disk #" + i);
-            table.addCell("capacity=" + disk.capacity + "KB, format=" + disk.format + ", initialLocation="
-                + disk.initialLocation);
-        }
+        table.addCell("state");
+        table.addCell(net.getState().toString());
+
+        table.addCell("type");
+        table.addCell(net.getNetworkType());
 
         table.addCell("created");
-        table.addCell(machineConfig.getCreated().toString());
+        table.addCell(net.getCreated().toString());
         table.addCell("updated");
-        if (machineConfig.getUpdated() != null) {
-            table.addCell(machineConfig.getUpdated().toString());
+        if (net.getUpdated() != null) {
+            table.addCell(net.getUpdated().toString());
         } else {
             table.addCell("");
         }
         table.addCell("properties");
         StringBuffer sb = new StringBuffer();
-        if (machineConfig.getProperties() != null) {
-            for (Map.Entry<String, String> prop : machineConfig.getProperties().entrySet()) {
+        if (net.getProperties() != null) {
+            for (Map.Entry<String, String> prop : net.getProperties().entrySet()) {
                 sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
             }
         }
@@ -93,4 +85,5 @@ public class MachineConfigShowCommand implements Command {
 
         System.out.println(table.render());
     }
+
 }

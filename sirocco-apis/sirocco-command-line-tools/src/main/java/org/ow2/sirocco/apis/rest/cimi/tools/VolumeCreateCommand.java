@@ -28,8 +28,9 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Job;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
 import org.ow2.sirocco.apis.rest.cimi.sdk.Volume;
+import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeCreate;
 import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeTemplate;
 
@@ -38,8 +39,14 @@ import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "create volume")
 public class VolumeCreateCommand implements Command {
-    @Parameter(names = "-template", description = "id of the template", required = true)
+    @Parameter(names = "-template", description = "id of the template", required = false)
     private String templateId;
+
+    @Parameter(names = "-config", description = "id of the config", required = false)
+    private String configId;
+
+    @Parameter(names = "-capacity", description = "capacity of the volume in megabytes", required = false)
+    private Integer capacityMB;
 
     @Parameter(names = "-name", description = "name of the template", required = false)
     private String name;
@@ -57,8 +64,25 @@ public class VolumeCreateCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
+        if (this.templateId == null && this.configId == null && this.capacityMB == null) {
+            throw new CimiException("You need to provide either a template id, a config id or a capacity");
+        }
         VolumeCreate volumeCreate = new VolumeCreate();
-        volumeCreate.setVolumeTemplate(new VolumeTemplate(cimiClient, this.templateId));
+        VolumeTemplate volumeTemplate = new VolumeTemplate();
+        if (this.templateId != null) {
+            volumeTemplate = new VolumeTemplate(cimiClient, this.templateId);
+        } else if (this.configId != null) {
+            volumeTemplate = new VolumeTemplate();
+            volumeTemplate.setVolumeConfig(new VolumeConfiguration(cimiClient, this.configId));
+        } else {
+            volumeTemplate = new VolumeTemplate();
+            VolumeConfiguration volumeConfig = new VolumeConfiguration();
+            volumeConfig.setCapacity(this.capacityMB * 1000);
+            // XXX
+            volumeConfig.setType("http://schemas.dmtf.org/cimi/1/mapped");
+            volumeTemplate.setVolumeConfig(volumeConfig);
+        }
+        volumeCreate.setVolumeTemplate(volumeTemplate);
         volumeCreate.setName(this.name);
         volumeCreate.setDescription(this.description);
         if (this.properties != null) {
@@ -66,10 +90,13 @@ public class VolumeCreateCommand implements Command {
                 volumeCreate.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
             }
         }
-        Job job = Volume.createVolume(cimiClient, volumeCreate);
-        System.out.println("Volume " + job.getTargetResourceRef() + " being created");
-
-        JobListCommand.printJob(job);
+        CreateResult<Volume> result = Volume.createVolume(cimiClient, volumeCreate);
+        if (result.getJob() != null) {
+            System.out.println("Volume " + result.getJob().getTargetResourceRef() + " being created");
+            JobListCommand.printJob(result.getJob());
+        } else {
+            VolumeShowCommand.printVolume(result.getResource());
+        }
 
     }
 }

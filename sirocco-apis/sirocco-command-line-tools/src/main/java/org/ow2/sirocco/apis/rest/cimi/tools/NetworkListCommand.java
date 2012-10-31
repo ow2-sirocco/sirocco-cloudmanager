@@ -29,14 +29,14 @@ import java.util.List;
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
+import org.ow2.sirocco.apis.rest.cimi.sdk.Network;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "list machines")
-public class MachineListCommand implements Command {
-    public static String COMMAND_NAME = "machine-list";
+@Parameters(commandDescription = "list networks")
+public class NetworkListCommand implements Command {
+    public static String COMMAND_NAME = "network-list";
 
     @Parameter(names = "-first", description = "First index of entity to return")
     private Integer first = -1;
@@ -47,29 +47,26 @@ public class MachineListCommand implements Command {
     @Parameter(names = "-filter", description = "Filter expression")
     private String filter;
 
-    @Parameter(names = "-expand", description = "expand machine properties", required = false)
-    private String expand;
-
     @Override
     public String getName() {
-        return MachineListCommand.COMMAND_NAME;
+        return NetworkListCommand.COMMAND_NAME;
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<Machine> machines = Machine.getMachines(cimiClient, this.first, this.last, this.expand, this.filter);
+        List<Network> nets = Network.getNetworks(cimiClient, this.first, this.last, this.filter);
 
         Table table = new Table(4);
         table.addCell("ID");
         table.addCell("Name");
-        table.addCell("Description");
         table.addCell("State");
+        table.addCell("Type");
 
-        for (Machine machine : machines) {
-            table.addCell(machine.getId());
-            table.addCell(machine.getName());
-            table.addCell(machine.getDescription());
-            table.addCell(machine.getState().toString());
+        for (Network net : nets) {
+            table.addCell(net.getId());
+            table.addCell(net.getName());
+            table.addCell(net.getState().toString());
+            table.addCell(net.getNetworkType());
         }
         System.out.println(table.render());
     }

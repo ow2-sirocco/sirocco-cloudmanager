@@ -27,65 +27,85 @@ package org.ow2.sirocco.apis.rest.cimi.tools;
 import java.util.Map;
 
 import org.nocrala.tools.texttablefmt.Table;
+import org.ow2.sirocco.apis.rest.cimi.sdk.Address;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration.Disk;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "show machine config")
-public class MachineConfigShowCommand implements Command {
-    @Parameter(names = "-id", description = "id of the machine config", required = true)
-    private String machineConfigId;
+@Parameters(commandDescription = "show address")
+public class AddressShowCommand implements Command {
+    @Parameter(names = "-id", description = "id of the address", required = true)
+    private String addressId;
 
     @Override
     public String getName() {
-        return "machineconfig-show";
+        return "address-show";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        MachineConfiguration machineConfig = MachineConfiguration.getMachineConfigurationByReference(cimiClient,
-            this.machineConfigId, null);
+        Address address = Address.getAddressById(cimiClient, this.addressId);
 
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");
 
         table.addCell("id");
-        table.addCell(machineConfig.getId());
+        table.addCell(address.getId());
 
         table.addCell("name");
-        table.addCell(machineConfig.getName());
-
+        table.addCell(address.getName());
         table.addCell("description");
-        table.addCell(machineConfig.getDescription());
-        table.addCell("cpu");
-        table.addCell(Integer.toString(machineConfig.getCpu()));
-        table.addCell("memory (KB)");
-        table.addCell(Integer.toString(machineConfig.getMemory()));
+        table.addCell(address.getDescription());
 
-        for (int i = 0; i < machineConfig.getDisks().length; i++) {
-            Disk disk = machineConfig.getDisks()[i];
-            table.addCell("disk #" + i);
-            table.addCell("capacity=" + disk.capacity + "KB, format=" + disk.format + ", initialLocation="
-                + disk.initialLocation);
+        table.addCell("ip");
+        table.addCell(address.getIp());
+
+        table.addCell("hostname");
+        table.addCell(address.getHostname());
+
+        table.addCell("allocation");
+        table.addCell(address.getAllocation());
+
+        table.addCell("defaultGateway");
+        table.addCell(address.getDefaultGateway());
+
+        table.addCell("dns");
+        StringBuffer sb = new StringBuffer();
+        if (address.getDns() != null) {
+            for (String dns : address.getDns()) {
+                sb.append(dns + " ");
+            }
+        }
+        table.addCell(sb.toString());
+
+        table.addCell("protocol");
+        table.addCell(address.getProtocol());
+
+        table.addCell("mask");
+        table.addCell(address.getMask());
+
+        table.addCell("network");
+        if (address.getNetwork() != null) {
+            table.addCell(address.getNetwork().getId());
+        } else {
+            table.addCell("");
         }
 
         table.addCell("created");
-        table.addCell(machineConfig.getCreated().toString());
+        table.addCell(address.getCreated().toString());
         table.addCell("updated");
-        if (machineConfig.getUpdated() != null) {
-            table.addCell(machineConfig.getUpdated().toString());
+        if (address.getUpdated() != null) {
+            table.addCell(address.getUpdated().toString());
         } else {
             table.addCell("");
         }
         table.addCell("properties");
-        StringBuffer sb = new StringBuffer();
-        if (machineConfig.getProperties() != null) {
-            for (Map.Entry<String, String> prop : machineConfig.getProperties().entrySet()) {
+        sb = new StringBuffer();
+        if (address.getProperties() != null) {
+            for (Map.Entry<String, String> prop : address.getProperties().entrySet()) {
                 sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
             }
         }
@@ -93,4 +113,5 @@ public class MachineConfigShowCommand implements Command {
 
         System.out.println(table.render());
     }
+
 }

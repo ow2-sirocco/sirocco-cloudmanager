@@ -47,7 +47,10 @@ public class VolumeShowCommand implements Command {
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
         Volume volume = Volume.getVolumeByReference(cimiClient, this.volumeId);
+        VolumeShowCommand.printVolume(volume);
+    }
 
+    public static void printVolume(final Volume volume) {
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");

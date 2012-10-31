@@ -59,7 +59,8 @@ public class Client {
         new VolumeTemplateListCommand(), new VolumeTemplateDeleteCommand(), new VolumeCreateCommand(), new VolumeShowCommand(),
         new VolumeListCommand(), new VolumeDeleteCommand(), new SystemCreateCommand(), new SystemDeleteCommand(),
         new SystemListCommand(), new SystemShowCommand(), new SystemStartCommand(), new SystemStopCommand(),
-        new SystemTemplateListCommand(), new SystemTemplateShowCommand()};
+        new SystemTemplateListCommand(), new SystemTemplateShowCommand(), new AddressListCommand(), new AddressShowCommand(),
+        new NetworkListCommand(), new NetworkShowCommand()};
 
     private Client(final String[] args) {
         String userName = System.getenv(Client.SIROCCO_USERNAME_ENV_NAME);

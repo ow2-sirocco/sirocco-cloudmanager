@@ -40,6 +40,9 @@ public class MachineShowCommand implements Command {
     @Parameter(names = "-id", description = "id of the machine", required = true)
     private String machineId;
 
+    @Parameter(names = "-expand", description = "expand machine properties", required = false)
+    private String expand;
+
     @Override
     public String getName() {
         return "machine-show";
@@ -47,8 +50,11 @@ public class MachineShowCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Machine machine = Machine.getMachineByReference(cimiClient, this.machineId);
+        Machine machine = Machine.getMachineByReference(cimiClient, this.machineId, this.expand);
+        MachineShowCommand.printMachine(machine);
+    }
 
+    public static void printMachine(final Machine machine) throws CimiException {
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");
