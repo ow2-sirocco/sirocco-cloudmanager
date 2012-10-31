@@ -486,23 +486,22 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
             this.merge(cimiRef, cimi);
         } else {
             if (null != cimi.getListComponentDescriptors()) {
-                Map<ExchangeType, CimiComponentDescriptor> mapComponents = this.makeMapComponents(cimi);
-                for (Entry<ExchangeType, CimiComponentDescriptor> entry : mapComponents.entrySet()) {
-                    switch (entry.getKey()) {
+                for (CimiComponentDescriptor component : cimi.getListComponentDescriptors()) {
+                    switch (component.getComponent().getExchangeType()) {
                     case CredentialTemplate:
-                        this.merge(context, entry.getValue().getCredentialTemplate());
+                        this.merge(context, component.getCredentialTemplate());
                         break;
                     case MachineTemplate:
-                        this.merge(context, entry.getValue().getMachineTemplate());
+                        this.merge(context, component.getMachineTemplate());
                         break;
                     case SystemTemplate:
-                        this.merge(context, entry.getValue().getSystemTemplate());
+                        this.merge(context, component.getSystemTemplate());
                         break;
                     case VolumeTemplate:
-                        this.merge(context, entry.getValue().getVolumeTemplate());
+                        this.merge(context, component.getVolumeTemplate());
                         break;
                     default:
-                        throw new ConfigurationException("This type [" + entry.getKey().toString()
+                        throw new ConfigurationException("This type [" + component.getComponent().getExchangeType().toString()
                             + "] is unknown. Merging is impossible.");
                     }
                 }
