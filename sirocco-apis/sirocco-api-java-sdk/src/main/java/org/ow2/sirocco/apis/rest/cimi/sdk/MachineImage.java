@@ -98,6 +98,9 @@ public class MachineImage extends Resource<CimiMachineImage> {
 
     public static List<MachineImage> getMachineImages(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getMachineImages() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiMachineImageCollection machineImagesCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getMachineImages().getHref()), CimiMachineImageCollectionRoot.class,
             first, last, null, filterExpression);

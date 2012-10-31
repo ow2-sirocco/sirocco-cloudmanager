@@ -28,6 +28,7 @@ package org.ow2.sirocco.apis.rest.cimi.sdk;
 import javax.ws.rs.core.MediaType;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiCloudEntryPoint;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiObjectCommonAbstract;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
@@ -71,6 +72,27 @@ public class CimiClient {
 
         public void setMediaType(final MediaType mediaType) {
             this.mediaType = mediaType;
+        }
+
+    }
+
+    static class CimiCreateResult<E> {
+        final CimiJob job;
+
+        final E resource;
+
+        public CimiCreateResult(final CimiJob job, final E resource) {
+            super();
+            this.job = job;
+            this.resource = resource;
+        }
+
+        public CimiJob getJob() {
+            return this.job;
+        }
+
+        public E getResource() {
+            return this.resource;
         }
 
     }
@@ -253,6 +275,23 @@ public class CimiClient {
         return response.getEntity(outputClazz);
     }
 
+    <U, V> CimiCreateResult<V> postCreateRequest(final String path, final U input, final Class<V> outputClazz)
+        throws CimiException {
+        WebResource service = this.webResource.path(path);
+        ClientResponse response = this.authentication(service, this.userName, this.password).accept(this.mediaType)
+            .entity(input, this.mediaType).post(ClientResponse.class);
+        this.handleResponseStatus(response);
+        CimiCreateResult<V> createResult = null;
+        if (response.getStatus() == 201) {
+            V resource = response.getEntity(outputClazz);
+            createResult = new CimiCreateResult<V>(null, resource);
+        } else if (response.getStatus() == 202) {
+            CimiJob job = response.getEntity(CimiJob.class);
+            createResult = new CimiCreateResult<V>(job, null);
+        }
+        return createResult;
+    }
+
     <V> V deleteRequest(final String path, final Class<V> outputClazz) throws CimiException {
         WebResource service = this.webResource.path(path);
         ClientResponse response = this.authentication(service, this.userName, this.password).accept(this.mediaType)
@@ -266,6 +305,11 @@ public class CimiClient {
         ClientResponse response = this.authentication(service, this.userName, this.password).accept(this.mediaType)
             .delete(ClientResponse.class);
         this.handleResponseStatus(response);
+    }
+
+    <U extends CimiObjectCommonAbstract> U getCimiObjectByReference(final String ref, final Class<U> clazz, final String expand)
+        throws CimiException {
+        return this.getRequest(this.extractPath(ref), clazz, -1, -1, expand);
     }
 
     <U extends CimiObjectCommonAbstract> U getCimiObjectByReference(final String ref, final Class<U> clazz)

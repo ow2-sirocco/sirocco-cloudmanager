@@ -104,6 +104,9 @@ public class Job extends Resource<CimiJob> {
 
     public static List<Job> getJobs(final CimiClient client, final int first, final int last, final String... filterExpression)
         throws CimiException {
+        if (client.cloudEntryPoint.getJobs() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiJobCollection jobCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getJobs().getHref()), CimiJobCollectionRoot.class, first, last, null,
             filterExpression);

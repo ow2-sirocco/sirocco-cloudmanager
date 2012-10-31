@@ -28,6 +28,7 @@ package org.ow2.sirocco.apis.rest.cimi.sdk;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiComponentDescriptor;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemTemplateCollectionRoot;
@@ -51,6 +52,16 @@ public class SystemTemplate extends Resource<CimiSystemTemplate> {
         this.cimiClient.deleteRequest(this.cimiClient.extractPath(this.getId()));
     }
 
+    public List<ComponentDescriptor> getComponentDescriptors() {
+        List<ComponentDescriptor> result = new ArrayList<ComponentDescriptor>();
+        if (this.cimiObject.getComponentDescriptors() != null) {
+            for (CimiComponentDescriptor comp : this.cimiObject.getComponentDescriptors()) {
+                result.add(new ComponentDescriptor(comp));
+            }
+        }
+        return result;
+    }
+
     public static SystemTemplate createSystemTemplate(final CimiClient client, final SystemTemplate systemTemplate)
         throws CimiException {
         CimiSystemTemplate cimiObject = client.postRequest(ConstantsPath.SYSTEM_TEMPLATE_PATH, systemTemplate.cimiObject,
@@ -60,6 +71,9 @@ public class SystemTemplate extends Resource<CimiSystemTemplate> {
 
     public static List<SystemTemplate> getSystemTemplates(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getSystemTemplates() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiSystemTemplateCollection systemTemplateCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getSystemTemplates().getHref()), CimiSystemTemplateCollectionRoot.class,
             first, last, null, filterExpression);

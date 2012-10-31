@@ -43,6 +43,10 @@ public class CredentialTemplate extends Resource<CimiCredentialTemplate> {
         this.cimiObject.setHref(id);
     }
 
+    public CredentialTemplate(final CimiCredentialTemplate cimiObject) {
+        super(null, cimiObject);
+    }
+
     public CredentialTemplate(final CimiClient cimiClient, final CimiCredentialTemplate cimiObject) {
         super(cimiClient, cimiObject);
     }
@@ -84,6 +88,9 @@ public class CredentialTemplate extends Resource<CimiCredentialTemplate> {
 
     public static List<CredentialTemplate> getCredentialTemplates(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getCredentialTemplates() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiCredentialTemplateCollection credentialTemplateCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getCredentialTemplates().getHref()),
             CimiCredentialTemplateCollectionRoot.class, first, last, null, filterExpression);

@@ -32,9 +32,12 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient.CimiCreateResult;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class Volume extends Resource<CimiVolume> {
+    public static final String TYPE_URI = "http://schemas.dmtf.org/cimi/1/Volume";
+
     public static enum State {
         CREATING, AVAILABLE, DELETING, DELETED, ERROR
     }
@@ -81,13 +84,20 @@ public class Volume extends Resource<CimiVolume> {
         return new Job(this.cimiClient, cimiObject);
     }
 
-    public static Job createVolume(final CimiClient client, final VolumeCreate volumeCreate) throws CimiException {
-        CimiJob cimiObject = client.postRequest(ConstantsPath.VOLUME_PATH, volumeCreate.cimiVolumeCreate, CimiJob.class);
-        return new Job(client, cimiObject);
+    public static CreateResult<Volume> createVolume(final CimiClient client, final VolumeCreate volumeCreate)
+        throws CimiException {
+        CimiCreateResult<CimiVolume> result = client.postCreateRequest(ConstantsPath.VOLUME_PATH,
+            volumeCreate.cimiVolumeCreate, CimiVolume.class);
+        Job job = result.getJob() != null ? new Job(client, result.getJob()) : null;
+        Volume volume = result.getResource() != null ? new Volume(client, result.getResource()) : null;
+        return new CreateResult<Volume>(job, volume);
     }
 
     public static List<Volume> getVolumes(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getVolumes() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiVolumeCollection volumeCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getVolumes().getHref()), CimiVolumeCollectionRoot.class, first, last,
             null, filterExpression);

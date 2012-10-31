@@ -90,4 +90,8 @@ public abstract class Resource<E extends CimiObjectCommonAbstract> {
         this.cimiObject.getProperties().put(key, value);
     }
 
+    public E getResource() {
+        return this.cimiObject;
+    }
+
 }

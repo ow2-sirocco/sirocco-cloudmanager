@@ -119,10 +119,13 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
     }
 
     public static List<MachineConfiguration> getMachineConfigurations(final CimiClient client, final int first, final int last,
-        final String... filterExpression) throws CimiException {
+        final String expand, final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getMachineConfigs() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiMachineConfigurationCollection machineConfigCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getMachineConfigs().getHref()),
-            CimiMachineConfigurationCollectionRoot.class, first, last, null, filterExpression);
+            CimiMachineConfigurationCollectionRoot.class, first, last, expand, filterExpression);
 
         List<MachineConfiguration> result = new ArrayList<MachineConfiguration>();
 
@@ -134,9 +137,9 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
         return result;
     }
 
-    public static MachineConfiguration getMachineConfigurationByReference(final CimiClient client, final String ref)
-        throws CimiException {
-        return new MachineConfiguration(client, client.getCimiObjectByReference(ref, CimiMachineConfiguration.class));
+    public static MachineConfiguration getMachineConfigurationByReference(final CimiClient client, final String ref,
+        final String expand) throws CimiException {
+        return new MachineConfiguration(client, client.getCimiObjectByReference(ref, CimiMachineConfiguration.class, expand));
     }
 
     public static MachineConfiguration getMachineConfigurationById(final CimiClient client, final String id)

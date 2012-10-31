@@ -50,6 +50,10 @@ public class MachineTemplate extends Resource<CimiMachineTemplate> {
         this.cimiObject.setHref(id);
     }
 
+    MachineTemplate(final CimiMachineTemplate cimiObject) {
+        super(null, cimiObject);
+    }
+
     public MachineTemplate(final CimiClient cimiClient, final CimiMachineTemplate cimiObject) {
         super(cimiClient, cimiObject);
         this.machineImage = new MachineImage(cimiClient, cimiObject.getMachineImage());
@@ -132,6 +136,9 @@ public class MachineTemplate extends Resource<CimiMachineTemplate> {
 
     public static List<MachineTemplate> getMachineTemplates(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getMachineTemplates() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiMachineTemplateCollection machineTemplateCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getMachineTemplates().getHref()),
             CimiMachineTemplateCollectionRoot.class, first, last, null, filterExpression);

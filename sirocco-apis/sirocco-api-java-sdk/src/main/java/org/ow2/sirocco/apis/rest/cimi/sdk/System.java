@@ -98,6 +98,9 @@ public class System extends Resource<CimiSystem> {
 
     public static List<System> getSystems(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getSystems() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiSystemCollection systemCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getSystems().getHref()), CimiSystemCollectionRoot.class, first, last,
             null, filterExpression);

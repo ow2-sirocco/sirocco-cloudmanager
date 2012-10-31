@@ -47,6 +47,10 @@ public class VolumeTemplate extends Resource<CimiVolumeTemplate> {
         this.cimiObject.setHref(id);
     }
 
+    public VolumeTemplate(final CimiVolumeTemplate cimiObject) {
+        super(null, cimiObject);
+    }
+
     public VolumeTemplate(final CimiClient cimiClient, final CimiVolumeTemplate cimiObject) {
         super(cimiClient, cimiObject);
         this.volumeImage = new VolumeImage(cimiClient, cimiObject.getVolumeImage());
@@ -84,6 +88,9 @@ public class VolumeTemplate extends Resource<CimiVolumeTemplate> {
 
     public static List<VolumeTemplate> getVolumeTemplates(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getVolumeTemplates() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiVolumeTemplateCollection volumeTemplateCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getVolumeTemplates().getHref()), CimiVolumeTemplateCollectionRoot.class,
             first, last, null, filterExpression);

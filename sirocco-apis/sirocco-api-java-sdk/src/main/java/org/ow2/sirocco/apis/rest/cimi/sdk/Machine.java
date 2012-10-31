@@ -39,9 +39,12 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceAddressCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineNetworkInterfaceCollectionRoot;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient.CimiCreateResult;
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class Machine extends Resource<CimiMachine> {
+    public static final String TYPE_URI = "http://schemas.dmtf.org/cimi/1/Machine";
+
     public static enum State {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
     }
@@ -120,16 +123,23 @@ public class Machine extends Resource<CimiMachine> {
         return new Job(this.cimiClient, cimiObject);
     }
 
-    public static Job createMachine(final CimiClient client, final MachineCreate machineCreate) throws CimiException {
-        CimiJob cimiObject = client.postRequest(ConstantsPath.MACHINE_PATH, machineCreate.cimiMachineCreate, CimiJob.class);
-        return new Job(client, cimiObject);
+    public static CreateResult<Machine> createMachine(final CimiClient client, final MachineCreate machineCreate)
+        throws CimiException {
+        CimiCreateResult<CimiMachine> result = client.postCreateRequest(ConstantsPath.MACHINE_PATH,
+            machineCreate.cimiMachineCreate, CimiMachine.class);
+        Job job = result.getJob() != null ? new Job(client, result.getJob()) : null;
+        Machine machine = result.getResource() != null ? new Machine(client, result.getResource()) : null;
+        return new CreateResult<Machine>(job, machine);
     }
 
-    public static List<Machine> getMachines(final CimiClient client, final int first, final int last,
+    public static List<Machine> getMachines(final CimiClient client, final int first, final int last, final String expand,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getMachines() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiMachineCollection machinesCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getMachines().getHref()), CimiMachineCollectionRoot.class, first, last,
-            null, filterExpression);
+            expand, filterExpression);
         List<Machine> result = new ArrayList<Machine>();
 
         if (machinesCollection.getCollection() != null) {
@@ -140,8 +150,9 @@ public class Machine extends Resource<CimiMachine> {
         return result;
     }
 
-    public static Machine getMachineByReference(final CimiClient client, final String ref) throws CimiException {
-        Machine result = new Machine(client, client.getCimiObjectByReference(ref, CimiMachine.class));
+    public static Machine getMachineByReference(final CimiClient client, final String ref, final String expand)
+        throws CimiException {
+        Machine result = new Machine(client, client.getCimiObjectByReference(ref, CimiMachine.class, expand));
         if (result.cimiObject.getNetworkInterfaces() != null) {
             String machineNicsRef = result.cimiObject.getNetworkInterfaces().getHref();
             CimiMachineNetworkInterfaceCollectionRoot nics = client.getRequest(client.extractPath(machineNicsRef),

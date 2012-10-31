@@ -34,6 +34,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiCredentialCollection
 import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
 
 public class Credential extends Resource<CimiCredential> {
+    public static final String TYPE_URI = "http://schemas.dmtf.org/cimi/1/Credential";
 
     public Credential() {
         super(null, new CimiCredential());
@@ -89,6 +90,9 @@ public class Credential extends Resource<CimiCredential> {
 
     public static List<Credential> getCredentials(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getCredentials() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiCredentialCollection credentialCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getCredentials().getHref()), CimiCredentialCollectionRoot.class, first,
             last, null, filterExpression);

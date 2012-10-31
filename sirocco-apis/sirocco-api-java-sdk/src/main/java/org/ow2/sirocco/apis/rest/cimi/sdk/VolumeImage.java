@@ -94,6 +94,9 @@ public class VolumeImage extends Resource<CimiVolumeImage> {
 
     public static List<VolumeImage> getVolumeImages(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getVolumeImages() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiVolumeImageCollection volumeImagesCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getVolumeImages().getHref()), CimiVolumeImageCollectionRoot.class, first,
             last, null, filterExpression);

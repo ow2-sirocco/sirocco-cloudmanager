@@ -85,6 +85,9 @@ public class VolumeConfiguration extends Resource<CimiVolumeConfiguration> {
 
     public static List<VolumeConfiguration> getVolumeConfigurations(final CimiClient client, final int first, final int last,
         final String... filterExpression) throws CimiException {
+        if (client.cloudEntryPoint.getVolumeConfigs() == null) {
+            throw new CimiException("Unsupported operation");
+        }
         CimiVolumeConfigurationCollection volumeConfigCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getVolumeConfigs().getHref()),
             CimiVolumeConfigurationCollectionRoot.class, first, last, null, filterExpression);
