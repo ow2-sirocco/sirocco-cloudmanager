@@ -28,7 +28,9 @@ package org.ow2.sirocco.cloudmanager.connector.itests;
 import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import org.junit.Assert;
@@ -72,6 +74,8 @@ public class CloudProviderConnectorTest {
 
     private static final String MACHINE_IMAGE_ID_PROP = "machineimage.id";
 
+    private static final String MACHINE_IMAGE_KEY_PROP = "machineimage.key";
+
     private static final String MACHINE_STOP_PROP = "machine.stop";
 
     private static final String VOLUME_ATTACH_PROP = "volume.attach";
@@ -90,6 +94,8 @@ public class CloudProviderConnectorTest {
 
     private ICloudProviderConnector connector;
 
+    private String providerName;
+
     private int machineConfigCpu;
 
     private int machineConfigMemory;
@@ -102,24 +108,27 @@ public class CloudProviderConnectorTest {
 
     private String imageId;
 
+    private String imageKey;
+
     private String key;
 
     private boolean testStopMachine, testVolumeAttach;
 
     @Before
     public void setUp() throws Exception {
-        String providerName = System.getProperty("test.provider");
-        if (providerName == null) {
+        this.providerName = System.getProperty("test.provider");
+        if (this.providerName == null) {
             throw new Exception("Missing test.provider property");
         }
         Properties prop = new Properties();
-        InputStream in = this.getClass().getResourceAsStream(providerName.toLowerCase() + ".properties");
+        InputStream in = this.getClass().getResourceAsStream(this.providerName.toLowerCase() + ".properties");
         prop.load(in);
         in.close();
 
         this.machineConfigCpu = Integer.valueOf(prop.getProperty(CloudProviderConnectorTest.MACHINE_CONFIG_CPU_PROP));
         this.machineConfigMemory = Integer.valueOf(prop.getProperty(CloudProviderConnectorTest.MACHINE_CONFIG_MEMORY_PROP));
         this.imageId = prop.getProperty(CloudProviderConnectorTest.MACHINE_IMAGE_ID_PROP);
+        this.imageKey = prop.getProperty(CloudProviderConnectorTest.MACHINE_IMAGE_KEY_PROP);
         String diskSizes[] = prop.getProperty(CloudProviderConnectorTest.MACHINE_CONFIG_DISKS_PROP).split(", ");
         this.machineConfigDiskSizes = new int[diskSizes.length];
         for (int i = 0; i < diskSizes.length; i++) {
@@ -138,8 +147,8 @@ public class CloudProviderConnectorTest {
         this.testVolumeAttach = Boolean.valueOf(prop.getProperty(CloudProviderConnectorTest.VOLUME_ATTACH_PROP));
 
         this.jobManager = JobManager.newJobManager();
-        String className = "org.ow2.sirocco.cloudmanager.connector." + providerName.toLowerCase() + "." + providerName
-            + "CloudProviderConnectorFactory";
+        String className = "org.ow2.sirocco.cloudmanager.connector." + this.providerName.toLowerCase() + "."
+            + this.providerName + "CloudProviderConnectorFactory";
         Class<?> connectorFactoryClass = Class.forName(className);
 
         Constructor<?> ctor = connectorFactoryClass.getDeclaredConstructor(IJobManager.class);
@@ -209,6 +218,11 @@ public class CloudProviderConnectorTest {
         machineTemplate.setMachineConfiguration(machineConfiguration);
         MachineImage machineImage = new MachineImage();
         machineImage.setProviderAssignedId(this.imageId);
+        Map<String, String> imageProps = new HashMap<String, String>();
+        if (this.imageKey != null) {
+            imageProps.put(this.imageKey, this.imageId);
+        }
+        machineImage.setProperties(imageProps);
         machineTemplate.setMachineImage(machineImage);
         List<MachineTemplateNetworkInterface> nics = new ArrayList<MachineTemplateNetworkInterface>();
         MachineTemplateNetworkInterface nic = new MachineTemplateNetworkInterface();
