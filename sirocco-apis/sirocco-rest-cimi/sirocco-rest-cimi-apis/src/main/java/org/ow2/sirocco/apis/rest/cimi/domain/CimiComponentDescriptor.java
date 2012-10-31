@@ -27,8 +27,10 @@ package org.ow2.sirocco.apis.rest.cimi.domain;
 import javax.validation.constraints.NotNull;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 
 import org.codehaus.jackson.annotate.JsonIgnore;
+import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 import org.ow2.sirocco.apis.rest.cimi.validator.GroupCreateByValue;
@@ -38,6 +40,11 @@ import org.ow2.sirocco.apis.rest.cimi.validator.ValidChild;
  * Class ComponentDescriptor.
  */
 @XmlRootElement(name = "ComponentDescriptor")
+@XmlType(propOrder = {"name", "description", "propertyArray", "type", "machineTemplate", "credentialTemplate",
+    "volumeTemplate", "systemTemplate", "networkTemplate", "networkPortTemplate", "addressTemplate", "forwardingGroupTemplate",
+    "quantity"})
+@JsonPropertyOrder({"name", "description", "properties", "type", "machineTemplate", "credentialTemplate", "volumeTemplate",
+    "systemTemplate", "networkTemplate", "networkPortTemplate", "addressTemplate", "forwardingGroupTemplate", "quantity"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class CimiComponentDescriptor extends CimiCommon {
 
@@ -148,7 +155,7 @@ public class CimiComponentDescriptor extends CimiCommon {
      * 
      * @param credentialsTemplate The value
      */
-    public void setCredentialsTemplate(final CimiCredentialTemplate credentialsTemplate) {
+    public void setCredentialTemplate(final CimiCredentialTemplate credentialsTemplate) {
         this.component = credentialsTemplate;
     }
 
