@@ -29,20 +29,20 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -70,7 +70,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public MachineConfiguration getMachineConfiguration() {
         return this.machineConfiguration;
     }
@@ -80,7 +80,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public MachineImage getMachineImage() {
         return this.machineImage;
     }
@@ -90,7 +90,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Credentials getCredentials() {
         return this.credentials;
     }
@@ -101,7 +101,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
@@ -124,7 +124,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineVolumeTemplate> getVolumeTemplates() {
         return this.volumeTemplates;
     }
@@ -148,7 +148,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineTemplateNetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
@@ -163,6 +163,8 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
         this.networkInterfaces = networkInterfaces;
     }
 
+    @Lob
+    @Column(length = 1024)
     public String getUserData() {
         return this.userData;
     }
