@@ -24,8 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.manager;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -212,11 +212,15 @@ public class CimiManagersMachineConfigurationTest {
     @Test
     public void testUpdateWithCimiSelect() throws Exception {
 
-        Map<String, Object> map = new HashMap<String, Object>();
-        map.put("name", "fooName");
-        map.put("description", "fooDescription");
+        List<String> attrs = new ArrayList<String>();
+        attrs.add("name");
+        attrs.add("description");
+        MachineConfiguration machineConfig = new MachineConfiguration();
+        machineConfig.setName("fooName");
+        machineConfig.setDescription("fooDescription");
 
-        this.service.updateMachineConfigurationAttributes(EasyMock.eq("1"), EasyMock.eq(map));
+        this.service.updateMachineConfigurationAttributes(EasyMock.eq("1"), EasyMock.anyObject(MachineConfiguration.class),
+            EasyMock.eq(attrs));
         EasyMock.replay(this.service);
 
         CimiMachineConfiguration cimi = new CimiMachineConfiguration();
