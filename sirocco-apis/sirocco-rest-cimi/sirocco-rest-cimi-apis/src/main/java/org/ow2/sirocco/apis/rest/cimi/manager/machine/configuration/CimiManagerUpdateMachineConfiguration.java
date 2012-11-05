@@ -53,8 +53,8 @@ public class CimiManagerUpdateMachineConfiguration extends CimiManagerUpdateAbst
         if (false == context.hasParamSelect()) {
             this.manager.updateMachineConfiguration((MachineConfiguration) dataService);
         } else {
-            this.manager.updateMachineConfigurationAttributes(context.getRequest().getId(),
-                context.copyBeanAttributesOfSelect(dataService));
+            this.manager.updateMachineConfigurationAttributes(context.getRequest().getId(), (MachineConfiguration) dataService,
+                context.getRequest().getParams().getCimiSelect().getValues());
         }
         return null;
     }
