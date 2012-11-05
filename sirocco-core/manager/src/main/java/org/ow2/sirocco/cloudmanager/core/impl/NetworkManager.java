@@ -370,6 +370,7 @@ public class NetworkManager implements INetworkManager {
             }
         }
         networkConfig.setUser(user);
+        networkConfig.setCreated(new Date());
         this.em.persist(networkConfig);
         this.em.flush();
         return networkConfig;
@@ -448,6 +449,7 @@ public class NetworkManager implements INetworkManager {
             }
         }
         networkTemplate.setUser(user);
+        networkTemplate.setCreated(new Date());
         this.em.persist(networkTemplate);
         this.em.flush();
         return networkTemplate;
@@ -733,6 +735,7 @@ public class NetworkManager implements INetworkManager {
             }
         }
         networkPortConfiguration.setUser(user);
+        networkPortConfiguration.setCreated(new Date());
         this.em.persist(networkPortConfiguration);
         this.em.flush();
         return networkPortConfiguration;
@@ -816,6 +819,7 @@ public class NetworkManager implements INetworkManager {
             }
         }
         networkPortTemplate.setUser(user);
+        networkPortTemplate.setCreated(new Date());
         this.em.persist(networkPortTemplate);
         this.em.flush();
         return networkPortTemplate;
@@ -1318,6 +1322,7 @@ public class NetworkManager implements INetworkManager {
             }
         }
         addressTemplate.setUser(user);
+        addressTemplate.setCreated(new Date());
         this.em.persist(addressTemplate);
         this.em.flush();
         return addressTemplate;
