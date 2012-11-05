@@ -59,6 +59,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemNetworkPort;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemSystem;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemTemplate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemVolume;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeCreate;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolumeImage;
@@ -184,6 +185,15 @@ public interface MergeReferenceHelper {
      * @throws Exception If error in call service
      */
     void merge(CimiContext context, CimiVolumeCreate cimi) throws Exception;
+
+    /**
+     * Merge the reference of a resource only if necessary.
+     * 
+     * @param context The working context
+     * @param cimi The resource with values or reference
+     * @throws Exception If error in call service
+     */
+    void merge(CimiContext context, CimiVolume cimi) throws Exception;
 
     /**
      * Merge the reference of a resource only if necessary.

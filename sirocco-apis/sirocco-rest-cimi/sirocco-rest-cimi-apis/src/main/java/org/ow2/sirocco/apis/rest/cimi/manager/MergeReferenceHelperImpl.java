@@ -282,6 +282,17 @@ public class MergeReferenceHelperImpl implements MergeReferenceHelper {
                 PathHelper.extractIdString(cimi.getHref()));
             CimiMachineVolume cimiRef = (CimiMachineVolume) context.convertToFullCimi(dataService, CimiMachineVolume.class);
             this.merge(cimiRef, cimi);
+        } else {
+            this.merge(context, cimi.getVolume());
+        }
+    }
+
+    @Override
+    public void merge(final CimiContext context, final CimiVolume cimi) throws Exception {
+        if (true == cimi.hasReference()) {
+            Volume dataService = this.managerVolume.getVolumeById(PathHelper.extractIdString(cimi.getHref()));
+            CimiVolume cimiRef = (CimiVolume) context.convertToFullCimi(dataService, CimiVolume.class);
+            this.merge(cimiRef, cimi);
         }
     }
 
