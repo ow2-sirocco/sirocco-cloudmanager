@@ -287,7 +287,6 @@ public class CimiContextImpl implements CimiContext {
     public boolean mustBeExpanded(final CimiResource resource) {
         boolean expand = false;
         expand = this.isConvertedExpand();
-
         if (false == expand) {
             int sizeStack = this.stackConvertedCimiClass.size();
             switch (sizeStack) {
@@ -298,39 +297,69 @@ public class CimiContextImpl implements CimiContext {
             // CimiResource is a child of root
             case 2:
                 // All expanded ?
-                expand = this.getRequest().getParams().getCimiExpand().hasAll();
+                expand = this.getRequest().getParams().getCimiExpand().expandAll();
                 if (false == expand) {
-                    // Get referenced types and names of root to verify with the
-                    // "expand" parameter of the QueryString
-                    Map<ExchangeType, String> typeNames = this.findReferenceNames(this.getRootConverting());
-                    if (null != typeNames) {
-                        // Expand only if type is found and name of type is a
-                        // value of expand parameter
-                        ExchangeType typeCurrent = this.getType(resource);
-                        if (true == typeNames.containsKey(typeCurrent)) {
-                            String nameCurent = typeNames.get(typeCurrent);
-                            List<String> expandParams = this.getRequest().getParams().getCimiExpand().getValues();
-                            if (null != expandParams) {
-                                for (String param : expandParams) {
-                                    if (true == nameCurent.equalsIgnoreCase(param)) {
-                                        expand = true;
-                                        break;
+                    ExchangeType typeRoot = this.getType(this.getRootConverting());
+                    if (typeRoot != ExchangeType.CloudEntryPoint && false == typeRoot.hasIdInReference()) {
+                        expand = true;
+                    } else {
+                        // Get referenced types and names of root to verify with
+                        // the
+                        // "expand" parameter of the QueryString
+                        Map<ExchangeType, String> typeNames = this.findReferenceNames(this.getRootConverting());
+                        if (null != typeNames) {
+                            // Expand only if type is found and name of type is
+                            // a
+                            // value of expand parameter
+                            ExchangeType typeCurrent = this.getType(resource);
+                            if (true == typeNames.containsKey(typeCurrent)) {
+                                String nameCurent = typeNames.get(typeCurrent);
+                                List<String> expandParams = this.getRequest().getParams().getCimiExpand().getValues();
+                                if (null != expandParams) {
+                                    for (String param : expandParams) {
+                                        if (true == nameCurent.equalsIgnoreCase(param)) {
+                                            expand = true;
+                                            break;
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                    // if "expand" parameter exists in QueryString
-                    // then if the root class is a collection expands it
-                    if ((false == expand) && (true == this.getRequest().getParams().getCimiExpand().isEmpty())) {
-                        ExchangeType typeRoot = this.getType(this.getRootConverting());
-                        if (typeRoot != ExchangeType.CloudEntryPoint && false == typeRoot.hasIdInReference()) {
-                            expand = true;
+                }
+                break;
+            // Expand items within collection items
+            case 3:
+                ExchangeType typeRoot = this.getType(this.getRootConverting());
+                // root type must be a collection
+                if (typeRoot != ExchangeType.CloudEntryPoint && false == typeRoot.hasIdInReference()) {
+                    expand = this.getRequest().getParams().getCimiExpand().expandAll();
+                    if (!expand) {
+                        // Get referenced types and names of root to verify with
+                        // the
+                        // "expand" parameter of the QueryString
+                        Map<ExchangeType, String> typeNames = this.findReferenceNames(this.stackConvertedCimiClass.get(1));
+                        if (null != typeNames) {
+                            // Expand only if type is found and name of type is
+                            // a
+                            // value of expand parameter
+                            ExchangeType typeCurrent = this.getType(resource);
+                            if (true == typeNames.containsKey(typeCurrent)) {
+                                String nameCurent = typeNames.get(typeCurrent);
+                                List<String> expandParams = this.getRequest().getParams().getCimiExpand().getValues();
+                                if (null != expandParams) {
+                                    for (String param : expandParams) {
+                                        if (true == nameCurent.equalsIgnoreCase(param)) {
+                                            expand = true;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
                 break;
-            // CimiResource is a grandchild of root
             default:
                 expand = false;
                 break;
@@ -353,6 +382,11 @@ public class CimiContextImpl implements CimiContext {
             reference = true;
         }
         return reference;
+    }
+
+    @Override
+    public int getObjectDepth() {
+        return this.stackConvertedCimiClass.size();
     }
 
     /**

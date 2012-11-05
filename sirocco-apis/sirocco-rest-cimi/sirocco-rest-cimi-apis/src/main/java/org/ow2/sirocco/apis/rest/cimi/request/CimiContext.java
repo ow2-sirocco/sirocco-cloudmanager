@@ -185,6 +185,13 @@ public interface CimiContext extends Serializable {
     boolean mustBeReferenced(CimiResource resource);
 
     /**
+     * Returns the current object depth
+     * 
+     * @return the current object depth
+     */
+    int getObjectDepth();
+
+    /**
      * Make the base HREF without ID.
      * 
      * @param data

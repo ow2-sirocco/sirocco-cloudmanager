@@ -95,6 +95,10 @@ public abstract class CimiStringParams extends CimiParam {
         return empty;
     }
 
+    public boolean isProvided() {
+        return this.initialValues != null;
+    }
+
     /**
      * Returns true if one parameter contains '*'.
      * 

@@ -81,4 +81,8 @@ public class CimiExpand extends CimiFilter {
         this.prepareWildCardAll();
     }
 
+    public boolean expandAll() {
+        return this.hasAll() || (this.isProvided() && this.isEmpty());
+    }
+
 }
