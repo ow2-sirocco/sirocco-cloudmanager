@@ -79,4 +79,9 @@ public class VolumeCreate {
         this.cimiVolumeCreate.setVolumeTemplate(volumeTemplate.cimiObject);
     }
 
+    public void setVolumeTemplateRef(final String volumeTemplateRef) {
+        this.volumeTemplate = new VolumeTemplate(null, volumeTemplateRef);
+        this.cimiVolumeCreate.setVolumeTemplate(this.volumeTemplate.cimiObject);
+    }
+
 }

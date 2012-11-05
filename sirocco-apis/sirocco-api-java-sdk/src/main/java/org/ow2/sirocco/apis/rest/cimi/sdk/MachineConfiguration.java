@@ -27,12 +27,15 @@ package org.ow2.sirocco.apis.rest.cimi.sdk;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiDiskConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineConfigurationCollectionRoot;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient.CimiResult;
 
 public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
     public static class Disk {
@@ -55,7 +58,7 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
         super(null, new CimiMachineConfiguration());
     }
 
-    public MachineConfiguration(final CimiClient cimiClient, final String id) {
+    MachineConfiguration(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiMachineConfiguration());
         this.cimiObject.setHref(id);
     }
@@ -88,7 +91,7 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
         return disks;
     }
 
-    public void setDisks(final Disk[] disks) {
+    private static CimiDiskConfiguration[] diskArrayToCimiDiskConfigurationArray(final Disk[] disks) {
         CimiDiskConfiguration diskConfigs[] = new CimiDiskConfiguration[disks.length];
         for (int i = 0; i < disks.length; i++) {
             diskConfigs[i] = new CimiDiskConfiguration();
@@ -104,28 +107,87 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
                 diskConfigs[i].setInitialLocation("");
             }
         }
-        this.cimiObject.setDisks(diskConfigs);
+        return diskConfigs;
     }
 
-    public void delete() throws CimiException {
-        this.cimiClient.deleteRequest(this.cimiClient.extractPath(this.getId()));
+    public void setDisks(final Disk[] disks) {
+        this.cimiObject.setDisks(MachineConfiguration.diskArrayToCimiDiskConfigurationArray(disks));
     }
 
-    public static MachineConfiguration createMachineConfiguration(final CimiClient client,
+    public Job delete() throws CimiException {
+        String deleteRef = Helper.findOperation("delete", this.cimiObject);
+        if (deleteRef == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiJob job = this.cimiClient.deleteRequest(deleteRef);
+        if (job != null) {
+            return new Job(this.cimiClient, job);
+        } else {
+            return null;
+        }
+    }
+
+    public static CreateResult<MachineConfiguration> createMachineConfiguration(final CimiClient client,
         final MachineConfiguration machineConfig) throws CimiException {
-        CimiMachineConfiguration cimiObject = client.postRequest(ConstantsPath.MACHINE_CONFIGURATION_PATH,
-            machineConfig.cimiObject, CimiMachineConfiguration.class);
-        return new MachineConfiguration(client, cimiObject);
-    }
-
-    public static List<MachineConfiguration> getMachineConfigurations(final CimiClient client, final int first, final int last,
-        final String expand, final String... filterExpression) throws CimiException {
         if (client.cloudEntryPoint.getMachineConfigs() == null) {
             throw new CimiException("Unsupported operation");
         }
         CimiMachineConfigurationCollection machineConfigCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getMachineConfigs().getHref()),
-            CimiMachineConfigurationCollectionRoot.class, first, last, expand, filterExpression);
+            CimiMachineConfigurationCollectionRoot.class, null);
+        String addRef = Helper.findOperation("add", machineConfigCollection);
+        if (addRef == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiResult<CimiMachineConfiguration> result = client.postCreateRequest(addRef, machineConfig.cimiObject,
+            CimiMachineConfiguration.class);
+        Job job = result.getJob() != null ? new Job(client, result.getJob()) : null;
+        MachineConfiguration createdMachineConfig = result.getResource() != null ? new MachineConfiguration(client,
+            result.getResource()) : null;
+        return new CreateResult<MachineConfiguration>(job, createdMachineConfig);
+    }
+
+    public static UpdateResult<MachineConfiguration> updateMachineConfiguration(final CimiClient client, final String id,
+        final Map<String, Object> attributeValues) throws CimiException {
+        CimiMachineConfiguration cimiObject = new CimiMachineConfiguration();
+        StringBuilder sb = new StringBuilder();
+        for (Entry<String, Object> entry : attributeValues.entrySet()) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            String attribute = entry.getKey();
+            sb.append(attribute);
+            if (attribute.equals("name")) {
+                cimiObject.setName((String) entry.getValue());
+            } else if (attribute.equals("description")) {
+                cimiObject.setDescription((String) entry.getValue());
+            } else if (attribute.equals("properties")) {
+                cimiObject.setProperties((Map<String, String>) entry.getValue());
+            } else if (attribute.equals("cpu")) {
+                cimiObject.setCpu((Integer) entry.getValue());
+            } else if (attribute.equals("memory")) {
+                cimiObject.setMemory((Integer) entry.getValue());
+            } else if (attribute.equals("disks")) {
+                cimiObject.setDisks(MachineConfiguration.diskArrayToCimiDiskConfigurationArray((Disk[]) entry.getValue()));
+            } else if (attribute.equals("cpuArch")) {
+                cimiObject.setCpuArch((String) entry.getValue());
+            }
+        }
+        CimiResult<CimiMachineConfiguration> cimiResult = client.partialUpdateRequest(id, cimiObject, sb.toString());
+        Job job = cimiResult.getJob() != null ? new Job(client, cimiResult.getJob()) : null;
+        MachineConfiguration machineConfig = cimiResult.getResource() != null ? new MachineConfiguration(client,
+            cimiResult.getResource()) : null;
+        return new UpdateResult<MachineConfiguration>(job, machineConfig);
+    }
+
+    public static List<MachineConfiguration> getMachineConfigurations(final CimiClient client, final QueryParams queryParams)
+        throws CimiException {
+        if (client.cloudEntryPoint.getMachineConfigs() == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiMachineConfigurationCollection machineConfigCollection = client.getRequest(
+            client.extractPath(client.cloudEntryPoint.getMachineConfigs().getHref()),
+            CimiMachineConfigurationCollectionRoot.class, queryParams);
 
         List<MachineConfiguration> result = new ArrayList<MachineConfiguration>();
 
@@ -138,14 +200,14 @@ public class MachineConfiguration extends Resource<CimiMachineConfiguration> {
     }
 
     public static MachineConfiguration getMachineConfigurationByReference(final CimiClient client, final String ref,
-        final String expand) throws CimiException {
-        return new MachineConfiguration(client, client.getCimiObjectByReference(ref, CimiMachineConfiguration.class, expand));
+        final QueryParams queryParams) throws CimiException {
+        return new MachineConfiguration(client, client.getCimiObjectByReference(ref, CimiMachineConfiguration.class,
+            queryParams));
     }
 
-    public static MachineConfiguration getMachineConfigurationById(final CimiClient client, final String id)
+    public static MachineConfiguration getMachineConfigurationByReference(final CimiClient client, final String ref)
         throws CimiException {
-        String path = client.getMachineConfigurationsPath() + "/" + id;
-        return new MachineConfiguration(client, client.getCimiObjectByReference(path, CimiMachineConfiguration.class));
+        return MachineConfiguration.getMachineConfigurationByReference(client, ref, null);
     }
 
 }

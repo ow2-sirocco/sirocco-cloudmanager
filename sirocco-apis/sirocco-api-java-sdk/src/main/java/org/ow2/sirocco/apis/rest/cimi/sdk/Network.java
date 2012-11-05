@@ -38,7 +38,7 @@ public class Network extends Resource<CimiNetwork> {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, DELETING, DELETED, ERROR
     }
 
-    public Network(final CimiClient cimiClient, final String id) {
+    Network(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiNetwork());
         this.cimiObject.setHref(id);
     }
@@ -59,14 +59,12 @@ public class Network extends Resource<CimiNetwork> {
         this.cimiObject.setNetworkType(networkType);
     }
 
-    public static List<Network> getNetworks(final CimiClient client, final int first, final int last,
-        final String... filterExpression) throws CimiException {
+    public static List<Network> getNetworks(final CimiClient client, final QueryParams queryParams) throws CimiException {
         if (client.cloudEntryPoint.getNetworks() == null) {
             throw new CimiException("Unsupported operation");
         }
         CimiNetworkCollection addressCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getNetworks().getHref()), CimiNetworkCollectionRoot.class, first, last,
-            null, filterExpression);
+            client.extractPath(client.cloudEntryPoint.getNetworks().getHref()), CimiNetworkCollectionRoot.class, queryParams);
         List<Network> result = new ArrayList<Network>();
 
         if (addressCollection.getCollection() != null) {
@@ -77,7 +75,7 @@ public class Network extends Resource<CimiNetwork> {
         return result;
     }
 
-    public static Network getNetworkById(final CimiClient client, final String id) throws CimiException {
+    public static Network getNetworkByReference(final CimiClient client, final String id) throws CimiException {
         return new Network(client, client.getCimiObjectByReference(id, CimiNetwork.class));
     }
 }

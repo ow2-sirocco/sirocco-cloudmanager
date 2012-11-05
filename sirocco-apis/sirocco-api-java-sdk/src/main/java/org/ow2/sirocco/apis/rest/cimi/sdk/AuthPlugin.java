@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2011 France Telecom
+ * Copyright (C) 2012 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -24,26 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.sdk;
 
-import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
+import java.util.Map;
 
-public class SystemMachine extends Resource<CimiSystemMachine> {
-    private Machine machine;
-
-    public SystemMachine() {
-        super(null, new CimiSystemMachine());
-    }
-
-    SystemMachine(final CimiClient cimiClient, final String id) {
-        super(cimiClient, new CimiSystemMachine());
-        this.cimiObject.setHref(id);
-    }
-
-    SystemMachine(final CimiClient cimiClient, final CimiSystemMachine cimiObject) throws CimiException {
-        super(cimiClient, cimiObject);
-        this.machine = Machine.getMachineByReference(cimiClient, cimiObject.getMachine().getHref(), null);
-    }
-
-    public Machine getMachine() {
-        return this.machine;
-    }
+public interface AuthPlugin {
+    Map<String, String> authenticate(String user, String password) throws CimiException;
 }

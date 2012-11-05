@@ -79,4 +79,9 @@ public class MachineCreate {
         this.cimiMachineCreate.setMachineTemplate(machineTemplate.cimiObject);
     }
 
+    public void setMachineTemplateRef(final String machineTemplateRef) {
+        this.machineTemplate = new MachineTemplate(null, machineTemplateRef);
+        this.cimiMachineCreate.setMachineTemplate(this.machineTemplate.cimiObject);
+    }
+
 }

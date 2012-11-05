@@ -32,8 +32,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiVolume;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiVolumeCollectionRoot;
-import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient.CimiCreateResult;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient.CimiResult;
 
 public class Volume extends Resource<CimiVolume> {
     public static final String TYPE_URI = "http://schemas.dmtf.org/cimi/1/Volume";
@@ -42,7 +41,7 @@ public class Volume extends Resource<CimiVolume> {
         CREATING, AVAILABLE, DELETING, DELETED, ERROR
     }
 
-    public Volume(final CimiClient cimiClient, final String id) {
+    Volume(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiVolume());
         this.cimiObject.setHref(id);
     }
@@ -80,27 +79,41 @@ public class Volume extends Resource<CimiVolume> {
     }
 
     public Job delete() throws CimiException {
-        CimiJob cimiObject = this.cimiClient.deleteRequest(this.cimiClient.extractPath(this.getId()), CimiJob.class);
-        return new Job(this.cimiClient, cimiObject);
+        String deleteRef = Helper.findOperation("delete", this.cimiObject);
+        if (deleteRef == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiJob job = this.cimiClient.deleteRequest(deleteRef);
+        if (job != null) {
+            return new Job(this.cimiClient, job);
+        } else {
+            return null;
+        }
     }
 
     public static CreateResult<Volume> createVolume(final CimiClient client, final VolumeCreate volumeCreate)
         throws CimiException {
-        CimiCreateResult<CimiVolume> result = client.postCreateRequest(ConstantsPath.VOLUME_PATH,
-            volumeCreate.cimiVolumeCreate, CimiVolume.class);
+        if (client.cloudEntryPoint.getVolumes() == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiVolumeCollection volumeCollection = client.getRequest(
+            client.extractPath(client.cloudEntryPoint.getVolumes().getHref()), CimiVolumeCollectionRoot.class, null);
+        String addRef = Helper.findOperation("add", volumeCollection);
+        if (addRef == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiResult<CimiVolume> result = client.postCreateRequest(addRef, volumeCreate.cimiVolumeCreate, CimiVolume.class);
         Job job = result.getJob() != null ? new Job(client, result.getJob()) : null;
         Volume volume = result.getResource() != null ? new Volume(client, result.getResource()) : null;
         return new CreateResult<Volume>(job, volume);
     }
 
-    public static List<Volume> getVolumes(final CimiClient client, final int first, final int last,
-        final String... filterExpression) throws CimiException {
+    public static List<Volume> getVolumes(final CimiClient client, final QueryParams queryParams) throws CimiException {
         if (client.cloudEntryPoint.getVolumes() == null) {
             throw new CimiException("Unsupported operation");
         }
         CimiVolumeCollection volumeCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getVolumes().getHref()), CimiVolumeCollectionRoot.class, first, last,
-            null, filterExpression);
+            client.extractPath(client.cloudEntryPoint.getVolumes().getHref()), CimiVolumeCollectionRoot.class, queryParams);
         List<Volume> result = new ArrayList<Volume>();
 
         if (volumeCollection.getCollection() != null) {
@@ -113,11 +126,6 @@ public class Volume extends Resource<CimiVolume> {
 
     public static Volume getVolumeByReference(final CimiClient client, final String ref) throws CimiException {
         return new Volume(client, client.getCimiObjectByReference(ref, CimiVolume.class));
-    }
-
-    public static Volume getVolumeById(final CimiClient client, final String id) throws Exception {
-        String path = client.getMachinesPath() + "/" + id;
-        return new Volume(client, client.getCimiObjectByReference(path, CimiVolume.class));
     }
 
 }

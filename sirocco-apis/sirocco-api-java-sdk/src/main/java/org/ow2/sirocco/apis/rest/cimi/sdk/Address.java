@@ -34,7 +34,7 @@ import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiAddressCollectionRoo
 public class Address extends Resource<CimiAddress> {
     public static final String TYPE_URI = "http://schemas.dmtf.org/cimi/1/Address";
 
-    public Address(final CimiClient cimiClient, final String id) {
+    Address(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiAddress());
         this.cimiObject.setHref(id);
     }
@@ -111,14 +111,12 @@ public class Address extends Resource<CimiAddress> {
         this.cimiObject.setNetwork(network.cimiObject);
     }
 
-    public static List<Address> getAddresses(final CimiClient client, final int first, final int last,
-        final String... filterExpression) throws CimiException {
+    public static List<Address> getAddresses(final CimiClient client, final QueryParams queryParams) throws CimiException {
         if (client.cloudEntryPoint.getAddresses() == null) {
             throw new CimiException("Unsupported operation");
         }
         CimiAddressCollection addressCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getAddresses().getHref()), CimiAddressCollectionRoot.class, first, last,
-            null, filterExpression);
+            client.extractPath(client.cloudEntryPoint.getAddresses().getHref()), CimiAddressCollectionRoot.class, queryParams);
         List<Address> result = new ArrayList<Address>();
 
         if (addressCollection.getCollection() != null) {
@@ -129,7 +127,7 @@ public class Address extends Resource<CimiAddress> {
         return result;
     }
 
-    public static Address getAddressById(final CimiClient client, final String id) throws CimiException {
+    public static Address getAddressByReference(final CimiClient client, final String id) throws CimiException {
         return new Address(client, client.getCimiObjectByReference(id, CimiAddress.class));
     }
 }

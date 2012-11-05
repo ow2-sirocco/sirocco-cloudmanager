@@ -36,14 +36,14 @@ import org.ow2.sirocco.apis.rest.cimi.domain.CimiSystemMachine;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemCollectionRoot;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiSystemMachineCollectionRoot;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient.CimiResult;
 
 public class System extends Resource<CimiSystem> {
     public static enum State {
         CREATING, CREATED, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, MIXED, DELETING, DELETED, ERROR
     }
 
-    public System(final CimiClient cimiClient, final String id) {
+    System(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiSystem());
         this.cimiObject.setHref(id);
     }
@@ -61,25 +61,54 @@ public class System extends Resource<CimiSystem> {
     }
 
     public Job start() throws CimiException {
+        String startRef = Helper.findOperation(ActionType.START.getPath(), this.cimiObject);
+        if (startRef == null) {
+            throw new CimiException("Illegal operation");
+        }
         CimiAction actionStart = new CimiAction();
         actionStart.setAction(ActionType.START.getPath());
-        CimiJob cimiObject = this.cimiClient.postRequest(this.cimiClient.extractPath(this.getId()), actionStart, CimiJob.class);
-        return new Job(this.cimiClient, cimiObject);
+        CimiJob cimiJob = this.cimiClient.actionRequest(startRef, actionStart);
+        if (cimiJob != null) {
+            return new Job(this.cimiClient, cimiJob);
+        } else {
+            return null;
+        }
     }
 
     public Job stop() throws CimiException {
-        CimiAction actionStart = new CimiAction();
-        actionStart.setAction(ActionType.STOP.getPath());
-        CimiJob cimiObject = this.cimiClient.postRequest(this.cimiClient.extractPath(this.getId()), actionStart, CimiJob.class);
-        return new Job(this.cimiClient, cimiObject);
+        String stopRef = Helper.findOperation(ActionType.STOP.getPath(), this.cimiObject);
+        if (stopRef == null) {
+            throw new CimiException("Illegal operation");
+        }
+        CimiAction actionStop = new CimiAction();
+        actionStop.setAction(ActionType.STOP.getPath());
+        CimiJob cimiJob = this.cimiClient.actionRequest(stopRef, actionStop);
+        if (cimiJob != null) {
+            return new Job(this.cimiClient, cimiJob);
+        } else {
+            return null;
+        }
     }
 
     public Job delete() throws CimiException {
-        CimiJob cimiObject = this.cimiClient.deleteRequest(this.cimiClient.extractPath(this.getId()), CimiJob.class);
-        return new Job(this.cimiClient, cimiObject);
+        String deleteRef = Helper.findOperation("delete", this.cimiObject);
+        if (deleteRef == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiJob job = this.cimiClient.deleteRequest(deleteRef);
+        if (job != null) {
+            return new Job(this.cimiClient, job);
+        } else {
+            return null;
+        }
     }
 
     public List<SystemMachine> getMachines() throws CimiException {
+        String systemMachineCollection = this.cimiObject.getMachines().getHref();
+        CimiSystemMachineCollectionRoot sysMachines = this.cimiClient.getRequest(this.cimiClient
+            .extractPath(systemMachineCollection), CimiSystemMachineCollectionRoot.class,
+            QueryParams.build().setExpand("machine"));
+        this.cimiObject.getMachines().setArray(sysMachines.getArray());
         List<SystemMachine> machines = new ArrayList<SystemMachine>();
         if (this.cimiObject.getMachines().getArray() != null) {
             for (CimiSystemMachine cimiSystemMachine : this.cimiObject.getMachines().getArray()) {
@@ -91,19 +120,29 @@ public class System extends Resource<CimiSystem> {
 
     }
 
-    public static Job createSystem(final CimiClient client, final SystemCreate systemCreate) throws CimiException {
-        CimiJob cimiObject = client.postRequest(ConstantsPath.SYSTEM_PATH, systemCreate.cimiSystemCreate, CimiJob.class);
-        return new Job(client, cimiObject);
-    }
-
-    public static List<System> getSystems(final CimiClient client, final int first, final int last,
-        final String... filterExpression) throws CimiException {
+    public static CreateResult<System> createSystem(final CimiClient client, final SystemCreate systemCreate)
+        throws CimiException {
         if (client.cloudEntryPoint.getSystems() == null) {
             throw new CimiException("Unsupported operation");
         }
         CimiSystemCollection systemCollection = client.getRequest(
-            client.extractPath(client.cloudEntryPoint.getSystems().getHref()), CimiSystemCollectionRoot.class, first, last,
-            null, filterExpression);
+            client.extractPath(client.cloudEntryPoint.getSystems().getHref()), CimiSystemCollectionRoot.class, null);
+        String addRef = Helper.findOperation("add", systemCollection);
+        if (addRef == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiResult<CimiSystem> result = client.postCreateRequest(addRef, systemCreate.cimiSystemCreate, CimiSystem.class);
+        Job job = result.getJob() != null ? new Job(client, result.getJob()) : null;
+        System system = result.getResource() != null ? new System(client, result.getResource()) : null;
+        return new CreateResult<System>(job, system);
+    }
+
+    public static List<System> getSystems(final CimiClient client, final QueryParams queryParams) throws CimiException {
+        if (client.cloudEntryPoint.getSystems() == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiSystemCollection systemCollection = client.getRequest(
+            client.extractPath(client.cloudEntryPoint.getSystems().getHref()), CimiSystemCollectionRoot.class, queryParams);
         List<System> result = new ArrayList<System>();
 
         if (systemCollection.getCollection() != null) {
@@ -115,17 +154,15 @@ public class System extends Resource<CimiSystem> {
     }
 
     public static System getSystemByReference(final CimiClient client, final String ref) throws CimiException {
-        System result = new System(client, client.getCimiObjectByReference(ref, CimiSystem.class));
-        String systemMachineCollection = result.cimiObject.getMachines().getHref();
-        CimiSystemMachineCollectionRoot machines = client.getRequest(client.extractPath(systemMachineCollection),
-            CimiSystemMachineCollectionRoot.class, -1, -1, "*");
-        result.cimiObject.getMachines().setArray(machines.getArray());
+        System result = new System(client, client.getCimiObjectByReference(ref, CimiSystem.class, QueryParams.build()
+            .setExpand("machines")));
         return result;
     }
 
-    public static System getSystemById(final CimiClient client, final String id) throws Exception {
-        String path = client.getSystemsPath() + "/" + id;
-        return new System(client, client.getCimiObjectByReference(path, CimiSystem.class));
+    public static System getSystemByReference(final CimiClient client, final String ref, final QueryParams queryParams)
+        throws CimiException {
+        System result = new System(client, client.getCimiObjectByReference(ref, CimiSystem.class, queryParams));
+        return result;
     }
 
 }

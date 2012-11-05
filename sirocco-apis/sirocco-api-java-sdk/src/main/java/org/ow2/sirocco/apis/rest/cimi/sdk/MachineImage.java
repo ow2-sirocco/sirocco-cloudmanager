@@ -27,13 +27,15 @@ package org.ow2.sirocco.apis.rest.cimi.sdk;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiJob;
 import org.ow2.sirocco.apis.rest.cimi.domain.CimiMachineImage;
 import org.ow2.sirocco.apis.rest.cimi.domain.ImageLocation;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollection;
 import org.ow2.sirocco.apis.rest.cimi.domain.collection.CimiMachineImageCollectionRoot;
-import org.ow2.sirocco.apis.rest.cimi.utils.ConstantsPath;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient.CimiResult;
 
 public class MachineImage extends Resource<CimiMachineImage> {
     public static enum State {
@@ -48,7 +50,7 @@ public class MachineImage extends Resource<CimiMachineImage> {
         super(null, new CimiMachineImage());
     }
 
-    public MachineImage(final CimiClient cimiClient, final String id) {
+    MachineImage(final CimiClient cimiClient, final String id) {
         super(cimiClient, new CimiMachineImage());
         this.cimiObject.setHref(id);
     }
@@ -87,23 +89,73 @@ public class MachineImage extends Resource<CimiMachineImage> {
         this.cimiObject.setType(type.toString());
     }
 
-    public void delete() throws CimiException {
-        this.cimiClient.deleteRequest(this.cimiClient.extractPath(this.getId()));
+    public Job delete() throws CimiException {
+        String deleteRef = Helper.findOperation("delete", this.cimiObject);
+        if (deleteRef == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiJob job = this.cimiClient.deleteRequest(deleteRef);
+        if (job != null) {
+            return new Job(this.cimiClient, job);
+        } else {
+            return null;
+        }
     }
 
-    public static Job createMachineImage(final CimiClient client, final MachineImage machineImage) throws CimiException {
-        CimiJob cimiObject = client.postRequest(ConstantsPath.MACHINE_IMAGE_PATH, machineImage.cimiObject, CimiJob.class);
-        return new Job(client, cimiObject);
+    public static CreateResult<MachineImage> createMachineImage(final CimiClient client, final MachineImage machineImage)
+        throws CimiException {
+        if (client.cloudEntryPoint.getMachineImages() == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiMachineImageCollection machineImagesCollection = client
+            .getRequest(client.extractPath(client.cloudEntryPoint.getMachineImages().getHref()),
+                CimiMachineImageCollectionRoot.class, null);
+        String addRef = Helper.findOperation("add", machineImagesCollection);
+        if (addRef == null) {
+            throw new CimiException("Unsupported operation");
+        }
+        CimiResult<CimiMachineImage> result = client.postCreateRequest(addRef, machineImage.cimiObject, CimiMachineImage.class);
+        Job job = result.getJob() != null ? new Job(client, result.getJob()) : null;
+        MachineImage createdMachineImage = result.getResource() != null ? new MachineImage(client, result.getResource()) : null;
+        return new CreateResult<MachineImage>(job, createdMachineImage);
     }
 
-    public static List<MachineImage> getMachineImages(final CimiClient client, final int first, final int last,
-        final String... filterExpression) throws CimiException {
+    public static UpdateResult<MachineImage> updateMachineImage(final CimiClient client, final String id,
+        final Map<String, Object> attributeValues) throws CimiException {
+        CimiMachineImage cimiObject = new CimiMachineImage();
+        StringBuilder sb = new StringBuilder();
+        for (Entry<String, Object> entry : attributeValues.entrySet()) {
+            if (sb.length() > 0) {
+                sb.append(",");
+            }
+            String attribute = entry.getKey();
+            sb.append(attribute);
+            if (attribute.equals("name")) {
+                cimiObject.setName((String) entry.getValue());
+            } else if (attribute.equals("description")) {
+                cimiObject.setDescription((String) entry.getValue());
+            } else if (attribute.equals("properties")) {
+                cimiObject.setProperties((Map<String, String>) entry.getValue());
+            } else if (attribute.equals("imageLocation")) {
+                ImageLocation location = new ImageLocation((String) entry.getValue());
+                cimiObject.setImageLocation(location);
+            }
+        }
+        CimiResult<CimiMachineImage> cimiResult = client.partialUpdateRequest(id, cimiObject, sb.toString());
+        Job job = cimiResult.getJob() != null ? new Job(client, cimiResult.getJob()) : null;
+        MachineImage machineImage = cimiResult.getResource() != null ? new MachineImage(client, cimiResult.getResource())
+            : null;
+        return new UpdateResult<MachineImage>(job, machineImage);
+    }
+
+    public static List<MachineImage> getMachineImages(final CimiClient client, final QueryParams queryParams)
+        throws CimiException {
         if (client.cloudEntryPoint.getMachineImages() == null) {
             throw new CimiException("Unsupported operation");
         }
         CimiMachineImageCollection machineImagesCollection = client.getRequest(
             client.extractPath(client.cloudEntryPoint.getMachineImages().getHref()), CimiMachineImageCollectionRoot.class,
-            first, last, null, filterExpression);
+            queryParams);
 
         List<MachineImage> result = new ArrayList<MachineImage>();
 
@@ -117,11 +169,6 @@ public class MachineImage extends Resource<CimiMachineImage> {
 
     public static MachineImage getMachineImageByReference(final CimiClient client, final String ref) throws CimiException {
         return new MachineImage(client, client.getCimiObjectByReference(ref, CimiMachineImage.class));
-    }
-
-    public static MachineImage getMachineImageById(final CimiClient client, final String id) throws CimiException {
-        String path = client.getMachineImagesPath() + "/" + id;
-        return new MachineImage(client, client.getCimiObjectByReference(path, CimiMachineImage.class));
     }
 
 }

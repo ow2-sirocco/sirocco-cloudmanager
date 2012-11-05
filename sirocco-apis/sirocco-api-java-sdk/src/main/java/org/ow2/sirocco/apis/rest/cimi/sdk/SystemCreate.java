@@ -79,4 +79,9 @@ public class SystemCreate {
         this.cimiSystemCreate.setSystemTemplate(systemTemplate.cimiObject);
     }
 
+    public void setSystemTemplateRef(final String systemTemplateRef) {
+        this.systemTemplate = new SystemTemplate(null, systemTemplateRef);
+        this.cimiSystemCreate.setSystemTemplate(this.systemTemplate.cimiObject);
+    }
+
 }
