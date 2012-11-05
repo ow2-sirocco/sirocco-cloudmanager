@@ -114,15 +114,9 @@ public class MachineImageManager implements IMachineImageManager {
     }
 
     public MachineImage getMachineImageById(final String imageId) throws CloudProviderException {
-
         MachineImage image = null;
-        try {
-            image = this.em.find(MachineImage.class, Integer.valueOf(new String(imageId)));
-
-        } catch (Exception e) {
-            throw new CloudProviderException("MachineImage of identity " + imageId + " cannot be found ");
-        }
-        if (image.getState() == State.DELETED) {
+        image = this.em.find(MachineImage.class, Integer.valueOf(new String(imageId)));
+        if (image == null || image.getState() == State.DELETED) {
             throw new ResourceNotFoundException();
         }
         return image;
@@ -181,19 +175,25 @@ public class MachineImageManager implements IMachineImageManager {
     public void updateMachineImageAttributes(final String imageId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
 
-        MachineImage image = null;
-        try {
-            image = this.em.find(MachineImage.class, Integer.valueOf(imageId));
-        } catch (Exception e) {
+        MachineImage image = this.em.find(MachineImage.class, Integer.valueOf(imageId));
+        if (image == null) {
             throw new ResourceNotFoundException("MachineImage of identity " + imageId + " cannot be found ");
         }
-        try {
-            // TODO Filter RO attributes
-            UtilsForManagers.fillObject(image, attributes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CloudProviderException("Error updating machine image  " + e.getMessage());
+        if (attributes.containsKey("name")) {
+            image.setName((String) attributes.get("name"));
         }
+        if (attributes.containsKey("description")) {
+            image.setDescription((String) attributes.get("description"));
+        }
+        if (attributes.containsKey("properties")) {
+            image.setProperties((Map<String, String>) attributes.get("properties"));
+        }
+        if (attributes.containsKey("imageLocation")) {
+            image.setImageLocation((String) attributes.get("imageLocation"));
+        }
+        image.setUpdated(new Date());
+        this.em.merge(image);
+        this.em.flush();
     }
 
     @Override
