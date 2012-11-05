@@ -122,8 +122,8 @@ public interface IMachineManager extends IJobListener {
     void updateMachineConfiguration(MachineConfiguration machineConfiguration) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
-    void updateMachineConfigurationAttributes(String machineConfigurationId, Map<String, Object> updatedAttributes)
-        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
+    void updateMachineConfigurationAttributes(String machineConfigurationId, MachineConfiguration machineConfiguration,
+        List<String> updatedAttributes) throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
     void deleteMachineConfiguration(final String machineConfigurationId) throws ResourceNotFoundException,
         CloudProviderException;

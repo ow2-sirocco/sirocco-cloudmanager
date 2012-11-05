@@ -758,6 +758,11 @@ public class MachineManager implements IMachineManager {
             m.setDescription((String) attributes.get("description"));
         }
 
+        if (attributes.containsKey("properties")) {
+            m.setProperties((Map<String, String>) attributes.get("properties"));
+        }
+        m.setUpdated(new Date());
+
         j = new Job();
         j.setTargetEntity(m);
         j.setStatus(Job.Status.SUCCESS);
@@ -794,8 +799,8 @@ public class MachineManager implements IMachineManager {
 
     }
 
-    public void updateMachineConfigurationAttributes(final String mcId, final Map<String, Object> attributes)
-        throws CloudProviderException {
+    public void updateMachineConfigurationAttributes(final String mcId, final MachineConfiguration from,
+        final List<String> attributes) throws CloudProviderException {
         if ((mcId == null) || (attributes == null)) {
             throw new InvalidRequestException(" null machine configuration id");
         }
@@ -803,18 +808,26 @@ public class MachineManager implements IMachineManager {
         if (mc == null) {
             throw new ResourceNotFoundException("Unknown machine configuration " + mcId);
         }
-        if (attributes.containsKey("cpu")) {
-            mc.setCpu((Integer) attributes.get("cpu"));
+        if (attributes.contains("name")) {
+            mc.setName(from.getName());
         }
-        if (attributes.containsKey("memory")) {
-            mc.setMemory((Integer) attributes.get("memory"));
+        if (attributes.contains("description")) {
+            mc.setDescription(from.getDescription());
+        }
+        if (attributes.contains("properties")) {
+            mc.setProperties(from.getProperties());
+        }
+        if (attributes.contains("cpu")) {
+            mc.setCpu(from.getCpu());
+        }
+        if (attributes.contains("memory")) {
+            mc.setMemory(from.getMemory());
         }
 
-        if (attributes.containsKey("disks")) {
-            List<DiskTemplate> dts = (List<DiskTemplate>) attributes.get("disks");
-            mc.setDiskTemplates(dts);
+        if (attributes.contains("disks")) {
+            mc.setDiskTemplates(from.getDiskTemplates());
         }
-
+        mc.setUpdated(new Date());
         this.em.flush();
     }
 
@@ -942,9 +955,9 @@ public class MachineManager implements IMachineManager {
             }
             // Cannot change attributes of original machineConfig
             // only reference is changed
-            if (attributes.containsKey("machineConfiguration")) {
+            if (attributes.containsKey("machineConfig")) {
 
-                String mc = (String) attributes.get("machineConfiguration");
+                String mc = (String) attributes.get("machineConfig");
 
                 MachineConfiguration config = this.em.find(MachineConfiguration.class, Integer.valueOf(mc));
                 if (config == null) {
@@ -961,8 +974,8 @@ public class MachineManager implements IMachineManager {
                 }
                 mt.setMachineImage(image);
             }
-            if (attributes.containsKey("credentials")) {
-                String credentials = (String) attributes.get("credentials");
+            if (attributes.containsKey("credential")) {
+                String credentials = (String) attributes.get("credential");
 
                 Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentials));
                 if (cred == null) {
