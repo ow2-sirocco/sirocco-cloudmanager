@@ -211,6 +211,7 @@ public class VolumeManager implements IVolumeManager {
             }
         }
         volumeConfig.setUser(user);
+        volumeConfig.setCreated(new Date());
         this.em.persist(volumeConfig);
         this.em.flush();
         return volumeConfig;
@@ -228,6 +229,7 @@ public class VolumeManager implements IVolumeManager {
             }
         }
         volumeTemplate.setUser(user);
+        volumeTemplate.setCreated(new Date());
         this.em.persist(volumeTemplate);
         this.em.flush();
         return volumeTemplate;
