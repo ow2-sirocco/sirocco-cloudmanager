@@ -43,7 +43,7 @@ public class MachineImageDeleteCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        MachineImage machineImage = new MachineImage(cimiClient, this.machineImageId);
+        MachineImage machineImage = MachineImage.getMachineImageByReference(cimiClient, this.machineImageId);
         machineImage.delete();
         System.out.println("MachineImage " + this.machineImageId + " deleted");
     }

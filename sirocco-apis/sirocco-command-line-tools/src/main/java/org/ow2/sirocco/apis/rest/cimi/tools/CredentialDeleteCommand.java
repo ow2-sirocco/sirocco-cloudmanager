@@ -43,7 +43,7 @@ public class CredentialDeleteCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Credential cred = new Credential(cimiClient, this.credentialId);
+        Credential cred = Credential.getCredentialByReference(cimiClient, this.credentialId);
         cred.delete();
         System.out.println("Credential " + this.credentialId + " deleted");
     }

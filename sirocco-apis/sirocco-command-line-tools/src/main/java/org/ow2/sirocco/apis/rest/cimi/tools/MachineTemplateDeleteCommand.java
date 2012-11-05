@@ -43,7 +43,7 @@ public class MachineTemplateDeleteCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        MachineTemplate machineTemplate = new MachineTemplate(cimiClient, this.machineTemplateId);
+        MachineTemplate machineTemplate = MachineTemplate.getMachineTemplateByReference(cimiClient, this.machineTemplateId);
         machineTemplate.delete();
         System.out.println("MachineTemplate " + this.machineTemplateId + " deleted");
     }

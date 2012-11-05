@@ -46,7 +46,7 @@ public class NetworkShowCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Network net = Network.getNetworkById(cimiClient, this.networkId);
+        Network net = Network.getNetworkByReference(cimiClient, this.networkId);
 
         Table table = new Table(2);
         table.addCell("Attribute");

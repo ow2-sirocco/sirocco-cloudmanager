@@ -29,6 +29,7 @@ import java.util.Map;
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
+import org.ow2.sirocco.apis.rest.cimi.sdk.QueryParams;
 import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeTemplate;
 
 import com.beust.jcommander.Parameter;
@@ -39,6 +40,9 @@ public class VolumeTemplateShowCommand implements Command {
     @Parameter(names = "-id", description = "id of the volume template", required = true)
     private String volumeTemplateId;
 
+    @Parameter(names = "-expand", description = "template properties to expand", required = false)
+    private String expand;
+
     @Override
     public String getName() {
         return "volumetemplate-show";
@@ -46,8 +50,12 @@ public class VolumeTemplateShowCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        VolumeTemplate volumeTemplate = VolumeTemplate.getVolumeTemplateByReference(cimiClient, this.volumeTemplateId);
+        VolumeTemplate volumeTemplate = VolumeTemplate.getVolumeTemplateByReference(cimiClient, this.volumeTemplateId,
+            QueryParams.build().setExpand(this.expand));
+        VolumeTemplateShowCommand.printVolumeTemplate(volumeTemplate);
+    }
 
+    public static void printVolumeTemplate(final VolumeTemplate volumeTemplate) {
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");
@@ -65,7 +73,11 @@ public class VolumeTemplateShowCommand implements Command {
         table.addCell(volumeTemplate.getVolumeConfig().getId());
 
         table.addCell("volume image id");
-        table.addCell(volumeTemplate.getVolumeImage().getId());
+        if (volumeTemplate.getVolumeImage() != null) {
+            table.addCell(volumeTemplate.getVolumeImage().getId());
+        } else {
+            table.addCell("null");
+        }
 
         table.addCell("created");
         table.addCell(volumeTemplate.getCreated().toString());

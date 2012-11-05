@@ -68,12 +68,13 @@ public class VolumeCreateCommand implements Command {
             throw new CimiException("You need to provide either a template id, a config id or a capacity");
         }
         VolumeCreate volumeCreate = new VolumeCreate();
-        VolumeTemplate volumeTemplate = new VolumeTemplate();
+        VolumeTemplate volumeTemplate;
         if (this.templateId != null) {
-            volumeTemplate = new VolumeTemplate(cimiClient, this.templateId);
+            volumeCreate.setVolumeTemplateRef(this.templateId);
         } else if (this.configId != null) {
             volumeTemplate = new VolumeTemplate();
-            volumeTemplate.setVolumeConfig(new VolumeConfiguration(cimiClient, this.configId));
+            volumeTemplate.setVolumeConfigRef(this.configId);
+            volumeCreate.setVolumeTemplate(volumeTemplate);
         } else {
             volumeTemplate = new VolumeTemplate();
             VolumeConfiguration volumeConfig = new VolumeConfiguration();
@@ -81,8 +82,9 @@ public class VolumeCreateCommand implements Command {
             // XXX
             volumeConfig.setType("http://schemas.dmtf.org/cimi/1/mapped");
             volumeTemplate.setVolumeConfig(volumeConfig);
+            volumeCreate.setVolumeTemplate(volumeTemplate);
         }
-        volumeCreate.setVolumeTemplate(volumeTemplate);
+
         volumeCreate.setName(this.name);
         volumeCreate.setDescription(this.description);
         if (this.properties != null) {

@@ -24,60 +24,61 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
-import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
+import org.ow2.sirocco.apis.rest.cimi.sdk.UpdateResult;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "create volume config")
-public class VolumeConfigCreateCommand implements Command {
-    @Parameter(names = "-name", description = "name of the volume config", required = false)
+@Parameters(commandDescription = "update machine")
+public class MachineUpdateCommand implements Command {
+    @Parameter(names = "-id", description = "id of the machine", required = true)
+    private String machineId;
+
+    @Parameter(names = "-name", description = "name of the image", required = false)
     private String name;
 
-    @Parameter(names = "-description", description = "description of the volume config", required = false)
+    @Parameter(names = "-description", description = "description of the image", required = false)
     private String description;
 
     @Parameter(names = "-properties", variableArity = true, description = "key value pairs", required = false)
     private List<String> properties;
 
-    @Parameter(names = "-capacity", description = "capacity in KB", required = true)
-    private int capacity;
-
-    @Parameter(names = "-format", description = "format", required = true)
-    private String format;
-
     @Override
     public String getName() {
-        return "volumeconfig-create";
+        return "machine-update";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        VolumeConfiguration volumeConfig = new VolumeConfiguration();
-
-        volumeConfig.setName(this.name);
-        volumeConfig.setDescription(this.description);
-        if (this.properties != null) {
-            for (int i = 0; i < this.properties.size() / 2; i++) {
-                volumeConfig.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
-            }
+        Map<String, Object> attributeValues = new HashMap<String, Object>();
+        if (this.name != null) {
+            attributeValues.put("name", this.name);
         }
-        volumeConfig.setCapacity(this.capacity);
-        volumeConfig.setFormat(this.format);
-        volumeConfig.setType("http://schemas.dmtf.org/cimi/1/mapped"); // XXX
+        if (this.description != null) {
+            attributeValues.put("description", this.description);
+        }
+        if (this.properties != null) {
+            Map<String, String> props = new HashMap<String, String>();
+            for (int i = 0; i < this.properties.size() / 2; i++) {
+                props.put(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
+            }
+            attributeValues.put("properties", props);
+        }
 
-        CreateResult<VolumeConfiguration> result = VolumeConfiguration.createVolumeConfiguration(cimiClient, volumeConfig);
+        UpdateResult<Machine> result = Machine.updateMachine(cimiClient, this.machineId, attributeValues);
         if (result.getJob() != null) {
-            java.lang.System.out.println("VolumeConfiguration " + result.getJob().getTargetResourceRef() + " being created");
+            System.out.println("Machine " + result.getJob().getTargetResourceRef() + " being updated");
             JobListCommand.printJob(result.getJob());
         } else {
-            VolumeConfigShowCommand.printVolumeConfig(result.getResource());
+            System.out.println("Machine: " + this.machineId + " updated");
         }
-
     }
+
 }

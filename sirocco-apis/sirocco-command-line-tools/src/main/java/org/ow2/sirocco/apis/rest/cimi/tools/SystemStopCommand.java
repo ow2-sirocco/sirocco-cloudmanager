@@ -44,7 +44,7 @@ public class SystemStopCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        System system = new System(cimiClient, this.systemId);
+        System system = System.getSystemByReference(cimiClient, this.systemId);
         Job job = system.stop();
         java.lang.System.out.println("Stopping system " + this.systemId);
         JobListCommand.printJob(job);

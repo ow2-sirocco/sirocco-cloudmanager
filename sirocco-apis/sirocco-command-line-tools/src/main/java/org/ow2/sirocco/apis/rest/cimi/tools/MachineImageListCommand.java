@@ -54,7 +54,8 @@ public class MachineImageListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<MachineImage> machineImages = MachineImage.getMachineImages(cimiClient, this.first, this.last, this.filter);
+        List<MachineImage> machineImages = MachineImage.getMachineImages(cimiClient,
+            CommandHelper.buildQueryParams(this.first, this.last, this.filter, null));
 
         Table table = new Table(4);
         table.addCell("ID");

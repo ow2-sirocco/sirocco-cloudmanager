@@ -43,7 +43,7 @@ public class VolumeTemplateDeleteCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        VolumeTemplate volumeTemplate = new VolumeTemplate(cimiClient, this.volumeTemplateId);
+        VolumeTemplate volumeTemplate = VolumeTemplate.getVolumeTemplateByReference(cimiClient, this.volumeTemplateId);
         volumeTemplate.delete();
         System.out.println("VolumeTemplate " + this.volumeTemplateId + " deleted");
     }

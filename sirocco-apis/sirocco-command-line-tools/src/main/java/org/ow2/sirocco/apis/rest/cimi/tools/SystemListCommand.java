@@ -47,6 +47,9 @@ public class SystemListCommand implements Command {
     @Parameter(names = "-filter", description = "Filter expression")
     private String filter;
 
+    @Parameter(names = "-expand", description = "system properties to expand", required = false)
+    private String expand;
+
     @Override
     public String getName() {
         return SystemListCommand.COMMAND_NAME;
@@ -54,7 +57,8 @@ public class SystemListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<System> systems = System.getSystems(cimiClient, this.first, this.last, this.filter);
+        List<System> systems = System.getSystems(cimiClient,
+            CommandHelper.buildQueryParams(this.first, this.last, this.filter, this.expand));
 
         Table table = new Table(4);
         table.addCell("ID");

@@ -57,7 +57,8 @@ public class MachineListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<Machine> machines = Machine.getMachines(cimiClient, this.first, this.last, this.expand, this.filter);
+        List<Machine> machines = Machine.getMachines(cimiClient,
+            CommandHelper.buildQueryParams(this.first, this.last, this.filter, this.expand));
 
         Table table = new Table(4);
         table.addCell("ID");

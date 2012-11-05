@@ -29,11 +29,8 @@ import java.util.List;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Credential;
 import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineCreate;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineImage;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineTemplate;
 
 import com.beust.jcommander.Parameter;
@@ -78,13 +75,14 @@ public class MachineCreateCommand implements Command {
         MachineCreate machineCreate = new MachineCreate();
         MachineTemplate machineTemplate;
         if (this.templateId != null) {
-            machineTemplate = new MachineTemplate(cimiClient, this.templateId);
+            machineCreate.setMachineTemplateRef(this.templateId);
+            machineTemplate = machineCreate.getMachineTemplate();
         } else {
             machineTemplate = new MachineTemplate();
-            machineTemplate.setMachineConfig(new MachineConfiguration(cimiClient, this.configId));
-            machineTemplate.setMachineImage(new MachineImage(cimiClient, this.imageId));
+            machineTemplate.setMachineConfigRef(this.configId);
+            machineTemplate.setMachineImageRef(this.imageId);
             if (this.credId != null) {
-                machineTemplate.setCredential(new Credential(cimiClient, this.credId));
+                machineTemplate.setCredentialRef(this.credId);
             }
         }
         machineTemplate.setUserData(this.userData);

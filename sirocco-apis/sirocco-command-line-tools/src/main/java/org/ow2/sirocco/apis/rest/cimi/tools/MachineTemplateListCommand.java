@@ -47,6 +47,9 @@ public class MachineTemplateListCommand implements Command {
     @Parameter(names = "-filter", description = "Filter expression")
     private String filter;
 
+    @Parameter(names = "-expand", description = "expand machine properties", required = false)
+    private String expand;
+
     @Override
     public String getName() {
         return MachineTemplateListCommand.COMMAND_NAME;
@@ -54,8 +57,8 @@ public class MachineTemplateListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<MachineTemplate> machineTemplates = MachineTemplate.getMachineTemplates(cimiClient, this.first, this.last,
-            this.filter);
+        List<MachineTemplate> machineTemplates = MachineTemplate.getMachineTemplates(cimiClient,
+            CommandHelper.buildQueryParams(this.first, this.last, this.filter, this.expand));
 
         Table table = new Table(3);
         table.addCell("ID");

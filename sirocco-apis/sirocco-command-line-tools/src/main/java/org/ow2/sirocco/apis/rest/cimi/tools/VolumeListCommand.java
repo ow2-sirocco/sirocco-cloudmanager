@@ -47,6 +47,9 @@ public class VolumeListCommand implements Command {
     @Parameter(names = "-filter", description = "Filter expression")
     private String filter;
 
+    @Parameter(names = "-expand", description = "volume properties to expand", required = false)
+    private String expand;
+
     @Override
     public String getName() {
         return VolumeListCommand.COMMAND_NAME;
@@ -54,7 +57,8 @@ public class VolumeListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<Volume> volumes = Volume.getVolumes(cimiClient, this.first, this.last, this.filter);
+        List<Volume> volumes = Volume.getVolumes(cimiClient,
+            CommandHelper.buildQueryParams(this.first, this.last, this.filter, this.expand));
 
         Table table = new Table(6);
         table.addCell("ID");

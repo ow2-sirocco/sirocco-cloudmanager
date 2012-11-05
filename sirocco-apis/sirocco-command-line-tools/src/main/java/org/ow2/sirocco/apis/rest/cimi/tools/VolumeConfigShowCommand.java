@@ -24,6 +24,8 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.util.Map;
+
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
@@ -46,7 +48,10 @@ public class VolumeConfigShowCommand implements Command {
     public void execute(final CimiClient cimiClient) throws CimiException {
         VolumeConfiguration volumeConfig = VolumeConfiguration.getVolumeConfigurationByReference(cimiClient,
             this.volumeConfigId);
+        VolumeConfigShowCommand.printVolumeConfig(volumeConfig);
+    }
 
+    public static void printVolumeConfig(final VolumeConfiguration volumeConfig) {
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");
@@ -64,6 +69,23 @@ public class VolumeConfigShowCommand implements Command {
         table.addCell(volumeConfig.getFormat());
         table.addCell("type");
         table.addCell(volumeConfig.getType());
+
+        table.addCell("created");
+        table.addCell(volumeConfig.getCreated().toString());
+        table.addCell("updated");
+        if (volumeConfig.getUpdated() != null) {
+            table.addCell(volumeConfig.getUpdated().toString());
+        } else {
+            table.addCell("");
+        }
+        table.addCell("properties");
+        StringBuffer sb = new StringBuffer();
+        if (volumeConfig.getProperties() != null) {
+            for (Map.Entry<String, String> prop : volumeConfig.getProperties().entrySet()) {
+                sb.append("(" + prop.getKey() + "," + prop.getValue() + ") ");
+            }
+        }
+        table.addCell(sb.toString());
 
         System.out.println(table.render());
     }

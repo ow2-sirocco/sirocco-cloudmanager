@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration.Disk;
 
@@ -49,7 +50,7 @@ public class MachineConfigCreateCommand implements Command {
     @Parameter(names = "-cpu", description = "number of cpu", required = true)
     private int numberOfCpus;
 
-    @Parameter(names = "-mem", description = "memory size in KB", required = true)
+    @Parameter(names = "-memory", description = "memory size in KB", required = true)
     private int memoryInKB;
 
     @Parameter(names = "-disk", description = "add disk with size in KB", required = true)
@@ -81,8 +82,13 @@ public class MachineConfigCreateCommand implements Command {
         }
         machineConfig.setDisks(disks);
 
-        machineConfig = MachineConfiguration.createMachineConfiguration(cimiClient, machineConfig);
-        System.out.println("MachineConfig: " + machineConfig.getId() + " created");
+        CreateResult<MachineConfiguration> result = MachineConfiguration.createMachineConfiguration(cimiClient, machineConfig);
+        if (result.getJob() != null) {
+            System.out.println("MachineConfig " + result.getJob().getTargetResourceRef() + " being created");
+            JobListCommand.printJob(result.getJob());
+        } else {
+            MachineConfigShowCommand.printMachineConfig(result.getResource());
+        }
     }
 
 }

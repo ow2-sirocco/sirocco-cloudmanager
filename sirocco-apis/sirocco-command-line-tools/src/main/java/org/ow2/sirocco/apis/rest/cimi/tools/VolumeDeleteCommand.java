@@ -44,7 +44,7 @@ public class VolumeDeleteCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Volume volume = new Volume(cimiClient, this.volumeId);
+        Volume volume = Volume.getVolumeByReference(cimiClient, this.volumeId);
         Job job = volume.delete();
         System.out.println("Volume " + this.volumeId + " being deleted");
         JobListCommand.printJob(job);

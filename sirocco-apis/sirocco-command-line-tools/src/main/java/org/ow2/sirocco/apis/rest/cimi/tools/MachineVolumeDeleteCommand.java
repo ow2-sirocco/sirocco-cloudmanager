@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2011 France Telecom
+ * Copyright (C) 2012 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -26,26 +26,27 @@ package org.ow2.sirocco.apis.rest.cimi.tools;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.MachineConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.sdk.Job;
+import org.ow2.sirocco.apis.rest.cimi.sdk.MachineVolume;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "delete machine config")
-public class MachineConfigDeleteCommand implements Command {
-    @Parameter(names = "-id", description = "id of the machine config", required = true)
-    private String machineConfigId;
+@Parameters(commandDescription = "detach volume from machine")
+public class MachineVolumeDeleteCommand implements Command {
+    @Parameter(names = "-id", description = "id of the machine volume", required = true)
+    private String machineVolumeId;
 
     @Override
     public String getName() {
-        return "machineconfig-delete";
+        return "machinevolume-delete";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        MachineConfiguration machineConfig = MachineConfiguration.getMachineConfigurationByReference(cimiClient,
-            this.machineConfigId);
-        machineConfig.delete();
-        System.out.println("MachineConfig " + this.machineConfigId + " deleted");
+        MachineVolume machineVolume = MachineVolume.getMachineVolumeByReference(cimiClient, this.machineVolumeId);
+        Job job = machineVolume.delete();
+        System.out.println("MachineVolume " + this.machineVolumeId + " being deleted");
+        JobListCommand.printJob(job);
     }
 }

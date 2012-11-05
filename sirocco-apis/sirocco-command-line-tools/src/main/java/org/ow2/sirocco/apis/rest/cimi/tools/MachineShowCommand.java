@@ -31,6 +31,7 @@ import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
 import org.ow2.sirocco.apis.rest.cimi.sdk.Machine;
 import org.ow2.sirocco.apis.rest.cimi.sdk.NetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.sdk.QueryParams;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -40,7 +41,7 @@ public class MachineShowCommand implements Command {
     @Parameter(names = "-id", description = "id of the machine", required = true)
     private String machineId;
 
-    @Parameter(names = "-expand", description = "expand machine properties", required = false)
+    @Parameter(names = "-expand", description = "machine properties to expand", required = false)
     private String expand;
 
     @Override
@@ -50,7 +51,7 @@ public class MachineShowCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Machine machine = Machine.getMachineByReference(cimiClient, this.machineId, this.expand);
+        Machine machine = Machine.getMachineByReference(cimiClient, this.machineId, QueryParams.build().setExpand(this.expand));
         MachineShowCommand.printMachine(machine);
     }
 

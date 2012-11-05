@@ -46,7 +46,7 @@ public class AddressShowCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Address address = Address.getAddressById(cimiClient, this.addressId);
+        Address address = Address.getAddressByReference(cimiClient, this.addressId);
 
         Table table = new Table(2);
         table.addCell("Attribute");

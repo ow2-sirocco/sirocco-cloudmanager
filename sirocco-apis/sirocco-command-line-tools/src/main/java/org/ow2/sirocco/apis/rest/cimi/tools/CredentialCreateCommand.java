@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
 import org.ow2.sirocco.apis.rest.cimi.sdk.Credential;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CredentialCreate;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CredentialTemplate;
@@ -75,7 +76,12 @@ public class CredentialCreateCommand implements Command {
                 credentialCreate.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
             }
         }
-        Credential credential = Credential.createCredential(cimiClient, credentialCreate);
-        System.out.println("Credential: " + credential.getId() + " created");
+        CreateResult<Credential> result = Credential.createCredential(cimiClient, credentialCreate);
+        if (result.getJob() != null) {
+            System.out.println("Credential " + result.getJob().getTargetResourceRef() + " being created");
+            JobListCommand.printJob(result.getJob());
+        } else {
+            CredentialShowCommand.printCredential(result.getResource());
+        }
     }
 }

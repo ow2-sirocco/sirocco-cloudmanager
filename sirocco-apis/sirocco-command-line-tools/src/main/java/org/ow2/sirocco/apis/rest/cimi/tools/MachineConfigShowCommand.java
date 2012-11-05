@@ -49,7 +49,10 @@ public class MachineConfigShowCommand implements Command {
     public void execute(final CimiClient cimiClient) throws CimiException {
         MachineConfiguration machineConfig = MachineConfiguration.getMachineConfigurationByReference(cimiClient,
             this.machineConfigId, null);
+        MachineConfigShowCommand.printMachineConfig(machineConfig);
+    }
 
+    public static void printMachineConfig(final MachineConfiguration machineConfig) {
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");

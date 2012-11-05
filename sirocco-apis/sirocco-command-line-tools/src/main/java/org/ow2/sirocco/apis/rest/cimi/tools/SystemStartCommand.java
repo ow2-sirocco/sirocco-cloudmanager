@@ -44,7 +44,7 @@ public class SystemStartCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        System system = new System(cimiClient, this.systemId);
+        System system = System.getSystemByReference(cimiClient, this.systemId);
         Job job = system.start();
         java.lang.System.out.println("Starting system " + this.systemId);
         JobListCommand.printJob(job);

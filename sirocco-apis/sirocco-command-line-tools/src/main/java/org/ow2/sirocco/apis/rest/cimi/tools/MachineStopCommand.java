@@ -44,7 +44,7 @@ public class MachineStopCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Machine machine = new Machine(cimiClient, this.machineId);
+        Machine machine = Machine.getMachineByReference(cimiClient, this.machineId);
         Job job = machine.stop();
         System.out.println("Stopping machine " + this.machineId);
         JobListCommand.printJob(job);

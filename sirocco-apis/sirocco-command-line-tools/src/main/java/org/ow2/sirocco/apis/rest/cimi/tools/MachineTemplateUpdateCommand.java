@@ -24,20 +24,23 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineTemplate;
-import org.ow2.sirocco.apis.rest.cimi.sdk.NetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.sdk.UpdateResult;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "create machine template")
-public class MachineTemplateCreateCommand implements Command {
+@Parameters(commandDescription = "update machine template")
+public class MachineTemplateUpdateCommand implements Command {
+    @Parameter(names = "-id", description = "id of the machine template", required = true)
+    private String machineTemplateId;
+
     @Parameter(names = "-name", description = "name of the template", required = false)
     private String name;
 
@@ -47,53 +50,53 @@ public class MachineTemplateCreateCommand implements Command {
     @Parameter(names = "-properties", variableArity = true, description = "key value pairs", required = false)
     private List<String> properties;
 
-    @Parameter(names = "-config", description = "machine config id", required = true)
+    @Parameter(names = "-config", description = "machine config id", required = false)
     private String machineConfigId;
 
-    @Parameter(names = "-image", description = "machine image id", required = true)
+    @Parameter(names = "-image", description = "machine image id", required = false)
     private String machineImageId;
 
     @Parameter(names = "-cred", description = "credential id", required = false)
     private String credentialId;
 
-    @Parameter(names = "-nic", description = "network interface", required = false)
-    private List<String> nicTypes;
-
     @Override
     public String getName() {
-        return "machinetemplate-create";
+        return "machinetemplate-update";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        MachineTemplate machineTemplate = new MachineTemplate();
-        machineTemplate.setName(this.name);
-        machineTemplate.setDescription(this.description);
+        Map<String, Object> attributeValues = new HashMap<String, Object>();
+        if (this.name != null) {
+            attributeValues.put("name", this.name);
+        }
+        if (this.description != null) {
+            attributeValues.put("description", this.description);
+        }
         if (this.properties != null) {
+            Map<String, String> props = new HashMap<String, String>();
             for (int i = 0; i < this.properties.size() / 2; i++) {
-                machineTemplate.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
+                props.put(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
             }
+            attributeValues.put("properties", props);
         }
-        machineTemplate.setMachineConfigRef(this.machineConfigId);
-        machineTemplate.setMachineImageRef(this.machineImageId);
-        List<NetworkInterface> nics = new ArrayList<NetworkInterface>();
-        if (this.nicTypes != null) {
-            for (String nicType : this.nicTypes) {
-                nics.add(new NetworkInterface(NetworkInterface.Type.valueOf(nicType), ""));
-            }
+        if (this.machineConfigId != null) {
+            attributeValues.put("machineConfig", this.machineConfigId);
         }
-        machineTemplate.setNetworkInterface(nics);
-
         if (this.credentialId != null) {
-            machineTemplate.setCredentialRef(this.credentialId);
+            attributeValues.put("credential", this.credentialId);
+        }
+        if (this.machineImageId != null) {
+            attributeValues.put("machineImage", this.machineImageId);
         }
 
-        CreateResult<MachineTemplate> result = MachineTemplate.createMachineTemplate(cimiClient, machineTemplate);
+        UpdateResult<MachineTemplate> result = MachineTemplate.updateMachineTemplate(cimiClient, this.machineTemplateId,
+            attributeValues);
         if (result.getJob() != null) {
-            System.out.println("MachineTemplate " + result.getJob().getTargetResourceRef() + " being created");
+            System.out.println("MachineTemplate " + result.getJob().getTargetResourceRef() + " being updated");
             JobListCommand.printJob(result.getJob());
         } else {
-            MachineTemplateShowCommand.printMachineTemplate(result.getResource());
+            System.out.println("MachineTemplate: " + this.machineTemplateId + " updated");
         }
     }
 

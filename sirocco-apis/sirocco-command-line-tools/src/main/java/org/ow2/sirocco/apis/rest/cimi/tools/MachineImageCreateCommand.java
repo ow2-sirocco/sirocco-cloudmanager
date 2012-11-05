@@ -28,7 +28,7 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.Job;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineImage;
 
 import com.beust.jcommander.Parameter;
@@ -66,11 +66,13 @@ public class MachineImageCreateCommand implements Command {
         machineImage.setType(MachineImage.Type.IMAGE);
         machineImage.setImageLocation(this.imageLocation);
 
-        Job job = MachineImage.createMachineImage(cimiClient, machineImage);
-        System.out.println("MachineImage " + job.getTargetResourceRef() + " being created");
-
-        JobListCommand.printJob(job);
-
+        CreateResult<MachineImage> result = MachineImage.createMachineImage(cimiClient, machineImage);
+        if (result.getJob() != null) {
+            System.out.println("MachineImage " + result.getJob().getTargetResourceRef() + " being created");
+            JobListCommand.printJob(result.getJob());
+        } else {
+            MachineImageShowCommand.printMachineImage(result.getResource());
+        }
     }
 
 }

@@ -47,7 +47,10 @@ public class CredentialShowCommand implements Command {
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
         Credential cred = Credential.getCredentialByReference(cimiClient, this.credentialId);
+        CredentialShowCommand.printCredential(cred);
+    }
 
+    public static void printCredential(final Credential cred) {
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");

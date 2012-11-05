@@ -44,7 +44,7 @@ public class SystemDeleteCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        System system = new System(cimiClient, this.systemId);
+        System system = System.getSystemByReference(cimiClient, this.systemId);
         Job job = system.delete();
         java.lang.System.out.println("System " + this.systemId + " being deleted");
         JobListCommand.printJob(job);

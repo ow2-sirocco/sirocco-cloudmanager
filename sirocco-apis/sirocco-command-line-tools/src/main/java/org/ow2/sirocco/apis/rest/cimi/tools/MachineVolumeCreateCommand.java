@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2011 France Telecom
+ * Copyright (C) 2012 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -29,54 +29,50 @@ import java.util.List;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
-import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeConfiguration;
+import org.ow2.sirocco.apis.rest.cimi.sdk.MachineVolume;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 
-@Parameters(commandDescription = "create volume config")
-public class VolumeConfigCreateCommand implements Command {
-    @Parameter(names = "-name", description = "name of the volume config", required = false)
+@Parameters(commandDescription = "attach volume to machine")
+public class MachineVolumeCreateCommand implements Command {
+    @Parameter(names = "-machine", description = "id of the machine", required = true)
+    private String machineId;
+
+    @Parameter(names = "-volume", description = "id of the volume", required = true)
+    private String volumeId;
+
+    @Parameter(names = "-name", description = "name of the MachineVolume", required = false)
     private String name;
 
-    @Parameter(names = "-description", description = "description of the volume config", required = false)
+    @Parameter(names = "-description", description = "description of the MachineVolume", required = false)
     private String description;
 
     @Parameter(names = "-properties", variableArity = true, description = "key value pairs", required = false)
     private List<String> properties;
 
-    @Parameter(names = "-capacity", description = "capacity in KB", required = true)
-    private int capacity;
-
-    @Parameter(names = "-format", description = "format", required = true)
-    private String format;
-
     @Override
     public String getName() {
-        return "volumeconfig-create";
+        return "machinevolume-create";
     }
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        VolumeConfiguration volumeConfig = new VolumeConfiguration();
-
-        volumeConfig.setName(this.name);
-        volumeConfig.setDescription(this.description);
+        MachineVolume machineVolume = new MachineVolume();
+        machineVolume.setVolumeRef(this.volumeId);
+        machineVolume.setName(this.name);
+        machineVolume.setDescription(this.description);
         if (this.properties != null) {
             for (int i = 0; i < this.properties.size() / 2; i++) {
-                volumeConfig.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
+                machineVolume.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
             }
         }
-        volumeConfig.setCapacity(this.capacity);
-        volumeConfig.setFormat(this.format);
-        volumeConfig.setType("http://schemas.dmtf.org/cimi/1/mapped"); // XXX
-
-        CreateResult<VolumeConfiguration> result = VolumeConfiguration.createVolumeConfiguration(cimiClient, volumeConfig);
+        CreateResult<MachineVolume> result = MachineVolume.createMachineVolume(cimiClient, this.machineId, machineVolume);
         if (result.getJob() != null) {
-            java.lang.System.out.println("VolumeConfiguration " + result.getJob().getTargetResourceRef() + " being created");
+            System.out.println("Volume " + this.volumeId + " being attached");
             JobListCommand.printJob(result.getJob());
         } else {
-            VolumeConfigShowCommand.printVolumeConfig(result.getResource());
+            MachineVolumeShowCommand.printMachineVolume(result.getResource());
         }
 
     }

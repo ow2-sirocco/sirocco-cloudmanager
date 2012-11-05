@@ -29,6 +29,7 @@ import java.util.Map;
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
+import org.ow2.sirocco.apis.rest.cimi.sdk.QueryParams;
 import org.ow2.sirocco.apis.rest.cimi.sdk.System;
 
 import com.beust.jcommander.Parameter;
@@ -39,6 +40,9 @@ public class SystemShowCommand implements Command {
     @Parameter(names = "-id", description = "id of the system", required = true)
     private String systemId;
 
+    @Parameter(names = "-expand", description = "system properties to expand", required = false)
+    private String expand;
+
     @Override
     public String getName() {
         return "system-show";
@@ -46,8 +50,11 @@ public class SystemShowCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        System system = System.getSystemByReference(cimiClient, this.systemId);
+        System system = System.getSystemByReference(cimiClient, this.systemId, QueryParams.build().setExpand(this.expand));
+        SystemShowCommand.printSystem(system);
+    }
 
+    public static void printSystem(final System system) {
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");
@@ -80,5 +87,4 @@ public class SystemShowCommand implements Command {
 
         java.lang.System.out.println(table.render());
     }
-
 }

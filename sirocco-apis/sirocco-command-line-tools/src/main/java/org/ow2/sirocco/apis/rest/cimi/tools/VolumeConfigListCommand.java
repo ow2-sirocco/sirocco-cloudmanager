@@ -54,8 +54,8 @@ public class VolumeConfigListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<VolumeConfiguration> volumeConfigs = VolumeConfiguration.getVolumeConfigurations(cimiClient, this.first,
-            this.last, this.filter);
+        List<VolumeConfiguration> volumeConfigs = VolumeConfiguration.getVolumeConfigurations(cimiClient,
+            CommandHelper.buildQueryParams(this.first, this.last, this.filter, null));
 
         Table table = new Table(5);
         table.addCell("ID");

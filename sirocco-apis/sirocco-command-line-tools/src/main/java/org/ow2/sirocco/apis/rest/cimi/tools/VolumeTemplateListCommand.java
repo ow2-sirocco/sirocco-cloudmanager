@@ -47,6 +47,9 @@ public class VolumeTemplateListCommand implements Command {
     @Parameter(names = "-filter", description = "Filter expression")
     private String filter;
 
+    @Parameter(names = "-expand", description = "template properties to expand", required = false)
+    private String expand;
+
     @Override
     public String getName() {
         return VolumeTemplateListCommand.COMMAND_NAME;
@@ -54,8 +57,8 @@ public class VolumeTemplateListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        List<VolumeTemplate> volumeTemplates = VolumeTemplate
-            .getVolumeTemplates(cimiClient, this.first, this.last, this.filter);
+        List<VolumeTemplate> volumeTemplates = VolumeTemplate.getVolumeTemplates(cimiClient,
+            CommandHelper.buildQueryParams(this.first, this.last, this.filter, this.expand));
 
         Table table = new Table(3);
         table.addCell("ID");

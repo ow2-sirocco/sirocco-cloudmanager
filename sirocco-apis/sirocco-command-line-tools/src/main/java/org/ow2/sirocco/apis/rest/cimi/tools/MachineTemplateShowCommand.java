@@ -31,6 +31,7 @@ import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
 import org.ow2.sirocco.apis.rest.cimi.sdk.MachineTemplate;
 import org.ow2.sirocco.apis.rest.cimi.sdk.NetworkInterface;
+import org.ow2.sirocco.apis.rest.cimi.sdk.QueryParams;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -40,6 +41,9 @@ public class MachineTemplateShowCommand implements Command {
     @Parameter(names = "-id", description = "id of the machine template", required = true)
     private String machineTemplateId;
 
+    @Parameter(names = "-expand", description = "template properties to expand", required = false)
+    private String expand;
+
     @Override
     public String getName() {
         return "machinetemplate-show";
@@ -47,8 +51,12 @@ public class MachineTemplateShowCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        MachineTemplate machineTemplate = MachineTemplate.getMachineTemplateByReference(cimiClient, this.machineTemplateId);
+        MachineTemplate machineTemplate = MachineTemplate.getMachineTemplateByReference(cimiClient, this.machineTemplateId,
+            QueryParams.build().setExpand(this.expand));
+        MachineTemplateShowCommand.printMachineTemplate(machineTemplate);
+    }
 
+    public static void printMachineTemplate(final MachineTemplate machineTemplate) {
         Table table = new Table(2);
         table.addCell("Attribute");
         table.addCell("Value");
@@ -104,5 +112,4 @@ public class MachineTemplateShowCommand implements Command {
 
         System.out.println(table.render());
     }
-
 }

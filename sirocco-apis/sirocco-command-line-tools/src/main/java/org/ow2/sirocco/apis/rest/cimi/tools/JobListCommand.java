@@ -44,7 +44,10 @@ public class JobListCommand implements Command {
     private Integer last = -1;
 
     @Parameter(names = "-filter", description = "Filter expression")
-    private List<String> filters;
+    private String filter;
+
+    @Parameter(names = "-expand", description = "job properties to expand", required = false)
+    private String expand;
 
     @Override
     public String getName() {
@@ -53,8 +56,8 @@ public class JobListCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws Exception {
-        List<Job> jobs = Job.getJobs(cimiClient, this.first, this.last,
-            this.filters != null ? this.filters.toArray(new String[this.filters.size()]) : new String[0]);
+        List<Job> jobs = Job.getJobs(cimiClient,
+            CommandHelper.buildQueryParams(this.first, this.last, this.filter, this.expand));
 
         Table table = new Table(6);
         table.addCell("ID");

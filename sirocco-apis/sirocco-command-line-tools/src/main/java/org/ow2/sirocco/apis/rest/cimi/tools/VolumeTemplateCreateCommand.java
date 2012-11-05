@@ -28,8 +28,7 @@ import java.util.List;
 
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiClient;
 import org.ow2.sirocco.apis.rest.cimi.sdk.CimiException;
-import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeConfiguration;
-import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeImage;
+import org.ow2.sirocco.apis.rest.cimi.sdk.CreateResult;
 import org.ow2.sirocco.apis.rest.cimi.sdk.VolumeTemplate;
 
 import com.beust.jcommander.Parameter;
@@ -67,17 +66,18 @@ public class VolumeTemplateCreateCommand implements Command {
                 volumeTemplate.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
             }
         }
-        VolumeConfiguration volumeConfig = new VolumeConfiguration(cimiClient, this.volumeConfigId);
-        volumeTemplate.setVolumeConfig(volumeConfig);
+        volumeTemplate.setVolumeConfigRef(this.volumeConfigId);
         if (this.volumeImageId != null) {
-            VolumeImage volumeImage = new VolumeImage(cimiClient, this.volumeImageId);
-            volumeTemplate.setVolumeImage(volumeImage);
+            volumeTemplate.setVolumeImageRef(this.volumeImageId);
         }
 
-        volumeTemplate = VolumeTemplate.createVolumeTemplate(cimiClient, volumeTemplate);
-
-        System.out.println("VolumeTemplate: " + volumeTemplate.getId() + " created");
-
+        CreateResult<VolumeTemplate> result = VolumeTemplate.createVolumeTemplate(cimiClient, volumeTemplate);
+        if (result.getJob() != null) {
+            System.out.println("VolumeTemplate " + result.getJob().getTargetResourceRef() + " being created");
+            JobListCommand.printJob(result.getJob());
+        } else {
+            VolumeTemplateShowCommand.printVolumeTemplate(result.getResource());
+        }
     }
 
 }

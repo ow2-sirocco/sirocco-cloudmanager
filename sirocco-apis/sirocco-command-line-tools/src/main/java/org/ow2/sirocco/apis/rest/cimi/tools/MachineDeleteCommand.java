@@ -44,7 +44,7 @@ public class MachineDeleteCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        Machine machine = new Machine(cimiClient, this.machineId);
+        Machine machine = Machine.getMachineByReference(cimiClient, this.machineId);
         Job job = machine.delete();
         System.out.println("Machine " + this.machineId + " being deleted");
         JobListCommand.printJob(job);

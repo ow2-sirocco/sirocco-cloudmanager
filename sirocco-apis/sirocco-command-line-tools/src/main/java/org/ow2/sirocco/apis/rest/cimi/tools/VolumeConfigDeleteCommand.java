@@ -43,7 +43,8 @@ public class VolumeConfigDeleteCommand implements Command {
 
     @Override
     public void execute(final CimiClient cimiClient) throws CimiException {
-        VolumeConfiguration volumeConfig = new VolumeConfiguration(cimiClient, this.volumeConfigId);
+        VolumeConfiguration volumeConfig = VolumeConfiguration.getVolumeConfigurationByReference(cimiClient,
+            this.volumeConfigId);
         volumeConfig.delete();
         System.out.println("VolumeConfig " + this.volumeConfigId + " deleted");
     }
