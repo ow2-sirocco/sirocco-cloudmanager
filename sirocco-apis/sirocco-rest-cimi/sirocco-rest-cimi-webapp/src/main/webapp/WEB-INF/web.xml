@@ -61,13 +61,13 @@
 	</servlet>
 	<servlet-mapping>
 		<servlet-name>SiroccoRestCimiServlet</servlet-name>
-		<url-pattern>/cimi/*</url-pattern>
+		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
 
 	<security-constraint>
 		<web-resource-collection>
 			<web-resource-name>Secure CIMI Content</web-resource-name>
-			<url-pattern>/cimi/*</url-pattern>
+			<url-pattern>/*</url-pattern>
 		</web-resource-collection>
 		<auth-constraint>
 			<role-name>sirocco-user</role-name>
