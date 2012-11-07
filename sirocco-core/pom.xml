@@ -38,6 +38,7 @@
 	<name>SIROCCO :: CloudManager :: CORE</name>
 
 	<modules>
+		<module>api</module>
 		<module>manager</module>
 	</modules>
 

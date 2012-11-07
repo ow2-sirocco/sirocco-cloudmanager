@@ -103,6 +103,12 @@
 			<version>1.0.0</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-core-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
@@ -156,6 +162,9 @@
 							<tasks>
 								<copy todir="${project.build.directory}/model-cimi" overwrite="true">
 									<fileset dir="../../sirocco-model/cimi/src/main/java" includes="**/*.*" />
+								</copy>
+								<copy todir="${project.build.directory}/model-cimi" overwrite="true">
+									<fileset dir="../api/src/main/java" includes="**/*.*" />
 								</copy>
 							</tasks>
 						</configuration>
