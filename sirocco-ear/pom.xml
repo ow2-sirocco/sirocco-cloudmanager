@@ -47,12 +47,18 @@
 			<type>ejb</type>
 		</dependency>
 		<dependency>
-			<groupId>org.ow2.sirocco.apis</groupId>
-			<artifactId>sirocco-rest-cimi-webapp</artifactId>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-core-api</artifactId>
 			<version>${project.version}</version>
-			<type>war</type>
+			<type>jar</type>
 		</dependency>
-
+		 <dependency>
+            <groupId>org.ow2.sirocco.cloudmanager</groupId>
+            <artifactId>sirocco-cloudmanager-model-cimi</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+		
 	</dependencies>
 
 	<build>
@@ -67,17 +73,16 @@
 					<generateApplicationXml>true</generateApplicationXml>
 					<displayName>${product.name}</displayName>
 					<modules>
+						<jarModule>
+							<groupId>org.ow2.sirocco.cloudmanager</groupId>
+							<artifactId>sirocco-cloudmanager-core-api</artifactId>
+							<includeInApplicationXml>true</includeInApplicationXml>
+						</jarModule>
 						<ejbModule>
 							<groupId>org.ow2.sirocco.cloudmanager</groupId>
 							<artifactId>sirocco-cloudmanager-core-manager</artifactId>
 							<bundleFileName>sirocco-core.jar</bundleFileName>
 						</ejbModule>
-						<webModule>
-							<groupId>org.ow2.sirocco.apis</groupId>
-							<artifactId>sirocco-rest-cimi-webapp</artifactId>
-							<bundleFileName>sirocco-rest-cimi.war</bundleFileName>
-							<contextRoot>sirocco-rest</contextRoot> 
-						</webModule>
 					</modules>
 					<archive>
 						<manifestEntries>
