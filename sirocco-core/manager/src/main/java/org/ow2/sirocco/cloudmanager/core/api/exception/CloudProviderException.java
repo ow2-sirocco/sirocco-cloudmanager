@@ -25,12 +25,12 @@
 
 package org.ow2.sirocco.cloudmanager.core.api.exception;
 
-import javax.ejb.ApplicationException;
+//import javax.ejb.ApplicationException;
 
 /**
  * Base class of the exception classes.
  */
-@ApplicationException(rollback=true)
+//@ApplicationException(rollback=true)
 public class CloudProviderException extends Exception {
     private static final long serialVersionUID = 4102349022960352481L;
 
