@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<Action xmlns="http://schemas.dmtf.org/cimi/1">
-	<name>nameValue_1</name>
-	<description>descriptionValue_1</description>
-	<action>http://schemas.dmtf.org/cimi/1/action/start</action>
-	<property key="keyProp_1_0">valueProp_1_0</property>
-</Action>
