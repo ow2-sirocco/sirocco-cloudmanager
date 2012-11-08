@@ -39,7 +39,6 @@
 
 
 	<modules>
-		<module>sirocco-rest-cimi</module>
 		<module>sirocco-admin-command-line-tools</module>
 	</modules>
 
