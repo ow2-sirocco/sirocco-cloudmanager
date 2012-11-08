@@ -55,6 +55,14 @@
 
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-core-api</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
+			<scope>test</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-core-manager</artifactId>
 			<version>${project.version}</version>
 			<type>ejb</type>
@@ -282,6 +290,13 @@
 											<version>${project.version}</version>
 											<overWrite>true</overWrite>
 											<destFileName>sirocco-cloudmanager-connector-mock.jar</destFileName>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.ow2.sirocco.cloudmanager</groupId>
+											<artifactId>sirocco-cloudmanager-core-api</artifactId>
+											<version>${project.version}</version>
+											<overWrite>true</overWrite>
+											<destFileName>sirocco-cloudmanager-core-api.jar</destFileName>
 										</artifactItem>
 									</artifactItems>
 									<outputDirectory>${project.build.directory}/repository</outputDirectory>
