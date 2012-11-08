@@ -24,6 +24,11 @@
 		<url:resource>sirocco-cloudmanager-connector-mock.jar</url:resource>
 	</deployment>
 	
+	<deployment xsi:type="url:url-deploymentType" id="dep950"
+		reloadable="true">
+		<url:resource>sirocco-cloudmanager-core-api.jar</url:resource>
+	</deployment>
+	
 	<deployment xsi:type="url:url-deploymentType" id="dep1000"
 		reloadable="true">
 		<url:resource>sirocco-cloudmanager-ear.ear</url:resource>
