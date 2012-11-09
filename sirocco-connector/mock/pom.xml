@@ -30,7 +30,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager-connectors</artifactId>
-		<version>0.5.3-SNAPSHOT</version>
+		<version>0.5.3</version>
 	</parent>
 
 	<artifactId>sirocco-cloudmanager-connector-mock</artifactId>
@@ -68,7 +68,7 @@
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-connector-api</artifactId>
-			<version>0.5.3-SNAPSHOT</version>
+			<version>0.5.3</version>
 		</dependency>
 		
 		<dependency>
