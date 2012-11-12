@@ -380,6 +380,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
                 MachineNetworkInterface privateNic = new MachineNetworkInterface();
                 privateNic.setAddresses(cimiAddresses);
                 privateNic.setNetworkType(Network.Type.PRIVATE);
+                privateNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
                 nics.add(privateNic);
             }
 
@@ -399,6 +400,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
                 MachineNetworkInterface publicNic = new MachineNetworkInterface();
                 publicNic.setAddresses(cimiAddresses);
                 publicNic.setNetworkType(Network.Type.PUBLIC);
+                publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
                 nics.add(publicNic);
             }
 

@@ -373,9 +373,11 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             MachineNetworkInterface privateNic = new MachineNetworkInterface();
             privateNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
             privateNic.setNetworkType(Network.Type.PRIVATE);
+            privateNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
             MachineNetworkInterface publicNic = new MachineNetworkInterface();
             publicNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
             publicNic.setNetworkType(Network.Type.PUBLIC);
+            publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
 
             // TODO
             // assumption: first IP address is private, next addresses are
