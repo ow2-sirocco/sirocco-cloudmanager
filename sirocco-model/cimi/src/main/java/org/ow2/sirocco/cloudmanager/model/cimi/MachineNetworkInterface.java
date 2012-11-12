@@ -38,18 +38,16 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineNetworkInterface extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static enum InterfaceState {
-        ACTIVE, PASSIVE
+        ACTIVE, PASSIVE, DISABLED
     }
 
     private List<MachineNetworkInterfaceAddress> addresses;
@@ -101,7 +99,7 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
     @LazyCollection(LazyCollectionOption.FALSE)
     @OrderBy("id")
     @JoinColumn(name = "machinenetworkinterface_id", referencedColumnName = "id")
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineNetworkInterfaceAddress> getAddresses() {
         return this.addresses;
     }
@@ -123,7 +121,7 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Network getNetwork() {
         return this.network;
     }
