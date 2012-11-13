@@ -210,7 +210,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         // - CIMI Network entities (vs default network settings)
         // - nested vApp ?
 
-        boolean version1 = true;
+        boolean version1 = false;
 
         private final String cloudProviderId;
 
@@ -442,15 +442,37 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         public Job createSystem_v2(final SystemCreate systemCreate) throws ConnectorException {
             VcdCloudProviderConnectorFactory.logger.info("creating system ");
             final int waitTimeInMilliSeconds = VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
+            final Map<String, MachineTemplate> machineTemplateMap = new HashMap<String, MachineTemplate>();
             final System system = new System();
-            system.setState(System.State.CREATING);
+
+            // create the vApp
+            final Vapp vapp;
+            try {
+                vapp = VcdCloudProviderConnector.this.createVapp(VcdCloudProviderConnector.this.vdc, systemCreate,
+                    machineTemplateMap);
+                /*VcdCloudProviderConnectorFactory.logger.info("nbr de vms: " + vapp.getChildrenVms().size());
+                for (VM childVm : vapp.getChildrenVms()) {
+                    VcdCloudProviderConnectorFactory.logger.info("  vm: " + childVm.getResource().getName());
+                }*/
+
+                VcdCloudProviderConnector.this.fromvAppToSystem(vapp, system);
+                system.setState(System.State.CREATING);
+            } catch (Exception ex) {
+                throw new ConnectorException(ex);
+            }
 
             final Callable<System> createTask = new Callable<System>() {
                 @Override
                 public System call() throws Exception {
                     try {
-                        // VcdCloudProviderConnectorFactory.logger.info("Creating vApp");
-                        Vapp vapp = VcdCloudProviderConnector.this.createVapp(VcdCloudProviderConnector.this.vdc, systemCreate);
+                        VcdCloudProviderConnectorFactory.logger.info("start Job");
+                        List<Task> tasks = vapp.getTasks();
+                        if (tasks.size() > 0) { // TODO wait for all tasks
+                            tasks.get(0).waitForTask(waitTimeInMilliSeconds);
+                        }
+
+                        // configure vms
+                        VcdCloudProviderConnector.this.configureVmSections(vapp, machineTemplateMap);
 
                         // Deploying the Instantiated vApp
                         VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
@@ -458,8 +480,10 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
                         // refresh the vapp (otherwise no childrenVms is
                         // visible! - TBC)
-                        vapp = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
-                        VcdCloudProviderConnector.this.fromvAppToSystem(vapp, system);
+                        Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
+                            vapp.getReference());
+
+                        VcdCloudProviderConnector.this.fromvAppToSystem(vappFresh, system);
                     } catch (Exception ex) {
                         throw new ConnectorException(ex);
                     }
@@ -751,7 +775,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                         cimiAddresses.add(entry);
                         MachineNetworkInterface privateNic = new MachineNetworkInterface();
                         privateNic.setAddresses(cimiAddresses);
-                        // TODO hack for POC (NetworkType should be
+                        privateNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
+                        // FIXME hack for POC (NetworkType should be
                         // PRIVATE)
                         privateNic.setNetworkType(Network.Type.PUBLIC);
                         nics.add(privateNic);
@@ -772,6 +797,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                         cimiAddresses.add(entry);
                         MachineNetworkInterface publicNic = new MachineNetworkInterface();
                         publicNic.setAddresses(cimiAddresses);
+                        publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
                         publicNic.setNetworkType(Network.Type.PUBLIC);
                         nics.add(publicNic);
                     }
@@ -795,28 +821,54 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         public Job createMachine_v2(final MachineCreate machineCreate) throws ConnectorException {
             VcdCloudProviderConnectorFactory.logger.info("creating machine ");
             final int waitTimeInMilliSeconds = VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
+            final Map<String, MachineTemplate> machineTemplateMap = new HashMap<String, MachineTemplate>();
             final Machine machine = new Machine();
-            machine.setState(Machine.State.CREATING);
+
+            // create the vApp
+            final Vapp vapp;
+            try {
+                vapp = VcdCloudProviderConnector.this.createVapp(VcdCloudProviderConnector.this.vdc, machineCreate,
+                    machineTemplateMap);
+
+                List<Task> tasks = vapp.getTasks();
+                if (tasks.size() > 0) { // TODO wait for all tasks
+                    tasks.get(0).waitForTask(waitTimeInMilliSeconds);
+                }
+
+                // refresh the vapp (otherwise no childrenVms is visible! - TBC)
+                Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
+                VcdCloudProviderConnectorFactory.logger.info("nbr de vms: " + vappFresh.getChildrenVms().size());
+                for (VM childVm : vappFresh.getChildrenVms()) {
+                    VcdCloudProviderConnectorFactory.logger.info("  vm: " + childVm.getResource().getName());
+                }
+                if (vappFresh.getChildrenVms().size() != 1) {
+                    throw new ConnectorException("only one vm is expected!");
+                }
+
+                VcdCloudProviderConnector.this.fromVmToMachine(vappFresh.getChildrenVms().get(0), machine);
+                machine.setState(Machine.State.CREATING);
+
+            } catch (Exception ex) {
+                throw new ConnectorException(ex);
+            }
 
             final Callable<Machine> createTask = new Callable<Machine>() {
                 @Override
                 public Machine call() throws Exception {
                     try {
-                        // VcdCloudProviderConnectorFactory.logger.info("Creating vApp");
-                        Vapp vapp = VcdCloudProviderConnector.this
-                            .createVapp(VcdCloudProviderConnector.this.vdc, machineCreate);
+                        VcdCloudProviderConnectorFactory.logger.info("start Job");
+                        // configure vms
+                        VcdCloudProviderConnector.this.configureVmSections(vapp, machineTemplateMap);
 
                         // Deploying the Instantiated vApp
                         VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
                         vapp.deploy(false, 1000000, false).waitForTask(waitTimeInMilliSeconds);
 
-                        // refresh the vapp (otherwise no childrenVms is
-                        // visible! - TBC)
-                        vapp = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
-                        if (vapp.getChildrenVms().size() != 1) {
-                            throw new ConnectorException("only one vm is expected!");
-                        }
-                        VcdCloudProviderConnector.this.fromVmToMachine(vapp.getChildrenVms().get(0), machine);
+                        // refresh the vapp
+                        Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
+                            vapp.getReference());
+
+                        VcdCloudProviderConnector.this.fromVmToMachine(vappFresh.getChildrenVms().get(0), machine);
                     } catch (Exception ex) {
                         throw new ConnectorException(ex);
                     }
@@ -827,11 +879,11 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             return VcdCloudProviderConnectorFactory.this.jobManager.newJob(machine, null, "add", result);
         }
 
-        private Vapp createVapp(final Vdc vdc, final MachineCreate machineCreate) throws VCloudException, ConnectorException,
-            TimeoutException {
-            if (machineCreate.getName() == null || machineCreate.getName().equals("")) {
+        private Vapp createVapp(final Vdc vdc, final MachineCreate machineCreate,
+            final Map<String, MachineTemplate> machineTemplateMap) throws VCloudException, ConnectorException, TimeoutException {
+            /*if (machineCreate.getName() == null || machineCreate.getName().equals("")) {
                 throw new ConnectorException("validation error on field 'machineCreate.name': may not be empty");
-            }
+            }*/
 
             ComponentDescriptor component = new ComponentDescriptor();
             component.setComponentQuantity(1);
@@ -845,18 +897,18 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             componentDescriptors.add(component);
 
             SystemTemplate systemTemplate = new SystemTemplate();
-            systemTemplate.setName("System-" + machineCreate.getName());
+            systemTemplate.setName(machineCreate.getName());
             systemTemplate.setDescription(machineCreate.getDescription());
             systemTemplate.setProperties(new HashMap<String, String>());
             systemTemplate.setComponentDescriptors(componentDescriptors);
 
             SystemCreate systemCreate = new SystemCreate();
-            systemCreate.setName("System-" + machineCreate.getName());
+            systemCreate.setName(machineCreate.getName());
             systemCreate.setDescription(machineCreate.getDescription());
             systemCreate.setProperties(new HashMap<String, String>());
             systemCreate.setSystemTemplate(systemTemplate);
 
-            return this.createVapp(vdc, systemCreate);
+            return this.createVapp(vdc, systemCreate, machineTemplateMap);
         }
 
         @Override
@@ -1053,16 +1105,19 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             }
         }
 
-        private Vapp createVapp(final Vdc vdc, final SystemCreate systemCreate) throws VCloudException, ConnectorException,
-            TimeoutException {
+        private Vapp createVapp(final Vdc vdc, final SystemCreate systemCreate,
+            final Map<String, MachineTemplate> machineTemplateMap) throws VCloudException, ConnectorException, TimeoutException {
 
             // create the request body (ComposeVAppParamsType)
             ComposeVAppParamsType composeVAppParamsType = new ComposeVAppParamsType();
             composeVAppParamsType.setDeploy(false);
-            if (systemCreate.getName() == null || systemCreate.getName().equals("")) {
-                throw new ConnectorException("validation error on field 'systemCreate.name': may not be empty");
+            String systemName = systemCreate.getName();
+            if (systemName == null || systemName.equals("")) {
+                /*throw new ConnectorException("validation error on field 'systemCreate.name': may not be empty");*/
+                systemName = "sirocco";
             }
-            composeVAppParamsType.setName(systemCreate.getName() + "-" + UUID.randomUUID());
+            /*composeVAppParamsType.setName(systemName + "-" + UUID.randomUUID());*/
+            composeVAppParamsType.setName(systemName);
             composeVAppParamsType.setDescription(systemCreate.getDescription());
 
             // set default vApp instantiation parameters
@@ -1074,7 +1129,6 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             // source items (VMs)
             Set<ComponentDescriptor> machineComponentDescriptors = this.getComponentDescriptorsOfType(systemCreate,
                 ComponentType.MACHINE);
-            Map<String, MachineTemplate> machineTemplateMap = new HashMap<String, MachineTemplate>();
             for (ComponentDescriptor mcd : machineComponentDescriptors) {
                 MachineTemplate mt = (MachineTemplate) mcd.getComponentTemplate();
                 for (int i = 0; i < mcd.getComponentQuantity(); i++) {
@@ -1082,11 +1136,11 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                     // create sourceItem body (SourcedCompositionItemParamType)
                     SourcedCompositionItemParamType item = new SourcedCompositionItemParamType();
                     ReferenceType source = new ReferenceType();
-                    String name = mcd.getName() == null ? "siroccoMachine" : mcd.getName();
+                    String name = (mcd.getName() == null || mcd.getName().equals("")) ? "sirocco" : mcd.getName();
                     if (mcd.getComponentQuantity() > 1) {
-                        name += new Integer(i).toString();
+                        name += new Integer(i + 1).toString();
                     }
-                    name += "-" + UUID.randomUUID();
+                    /*name += "-" + UUID.randomUUID();*/
                     source.setName(name);
                     machineTemplateMap.put(name, mt);
 
@@ -1104,16 +1158,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             }
 
             // make the composition request, and get a vApp in return
-            Vapp vapp = vdc.composeVapp(composeVAppParamsType);
-            List<Task> tasks = vapp.getTasks();
-            if (tasks.size() > 0) { // TODO wait for all tasks
-                tasks.get(0).waitForTask(VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
-            }
-
-            // configure vms
-            VcdCloudProviderConnector.this.configureVmSections(vapp, machineTemplateMap);
-
-            return vapp;
+            return vdc.composeVapp(composeVAppParamsType);
         }
 
         private Set<ComponentDescriptor> getComponentDescriptorsOfType(final SystemCreate systemCreate,
@@ -1192,18 +1237,18 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                     continue;
                 }
 
-                VirtualHardwareSectionType virtualHardwareSectionType = childVm.getVirtualHardwareSection();
+                /*VirtualHardwareSectionType virtualHardwareSectionType = childVm.getVirtualHardwareSection();
                 if (virtualHardwareSectionType == null) {
                     virtualHardwareSectionType = new VirtualHardwareSectionType();
                 }
 
                 for (RASDType item : virtualHardwareSectionType.getItem()) {
                     int type = Integer.parseInt(item.getResourceType().getValue());
-                    /*VcdCloudProviderConnectorFactory.logger.info("- virtualHardwareItemType: " + type + ", "
-                        + item.getDescription().getValue());*/
-                }
+                    VcdCloudProviderConnectorFactory.logger.info("- virtualHardwareItemType: " + type + ", "
+                        + item.getDescription().getValue());
+                }*/
 
-                // CPU
+                // configure CPU if needed
                 VcdCloudProviderConnectorFactory.logger.info("  Number of Virtual CPUs: " + childVm.getCpu().getNoOfCpus());
                 VirtualCpu virtualCpuItem = childVm.getCpu();
                 if (mc.getCpu() > 0) {
@@ -1215,7 +1260,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                     }
                 }
 
-                // RAM
+                // configure RAM if needed
                 if (mc.getMemory() > 0) {
                     VcdCloudProviderConnectorFactory.logger
                         .info("  Memory Size: " + childVm.getMemory().getMemorySize() + "MB");
@@ -1230,7 +1275,6 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                     }
                 }
 
-                // DISK
                 // Add virtual disk if needed
                 List<VirtualDisk> disks = childVm.getDisks();
                 boolean diskSectionHasChanged = false;
@@ -1499,10 +1543,11 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         public Job createMachine_v3(final MachineCreate machineCreate) throws ConnectorException {
             final int waitTimeInMilliSeconds = VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
+            Map<String, MachineTemplate> machineTemplateMap = new HashMap<String, MachineTemplate>();
 
             final Vapp vapp;
             try {
-                vapp = this.createVapp(this.vdc, machineCreate);
+                vapp = this.createVapp(this.vdc, machineCreate, machineTemplateMap);
             } catch (Exception ex) {
                 throw new ConnectorException(ex);
             }
