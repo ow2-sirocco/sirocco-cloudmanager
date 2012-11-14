@@ -334,7 +334,7 @@
 													<http port="${webcontainer.port}" />
 												</jetty>
 											</webcontainer>
-											<jms port="${jms.port}" initialTopics="JobCompletion" initialQueues="" />
+											<jms port="16010" initialTopics="JobCompletion" initialQueues="" />
 											<carol defaultPort="${carol.port}" protocols="${carol.protocol}" />
 											<db port="${db.port}" />
 										</jonasbase>
