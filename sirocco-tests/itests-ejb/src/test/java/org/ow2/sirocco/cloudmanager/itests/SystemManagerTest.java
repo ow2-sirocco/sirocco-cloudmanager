@@ -217,27 +217,27 @@ public class SystemManagerTest extends SiroccoTester {
         Assert.assertEquals("descr-sc1", sv1.getDescription());
 
         Assert.assertEquals(2, sv1.getMachines().size());
-        Assert.assertEquals("MaMachine0", sv1.getMachines().get(0).getResource().getName());
+        Assert.assertEquals("MaMachine1", sv1.getMachines().get(0).getResource().getName());
         Assert.assertEquals("desc-comp", sv1.getMachines().get(0).getResource().getDescription());
         // Assert.assertEquals(sv1.getMachines().get(0).getCpu().getCpuSpeedUnit(),Cpu.Frequency.GIGA);
-        Assert.assertEquals("MaMachine1", sv1.getMachines().get(1).getResource().getName());
+        Assert.assertEquals("MaMachine2", sv1.getMachines().get(1).getResource().getName());
         Assert.assertEquals("desc-comp", sv1.getMachines().get(1).getResource().getDescription());
 
         Assert.assertEquals(2, sv1.getSystems().size());
         org.ow2.sirocco.cloudmanager.model.cimi.system.System s1 = this.systemManager.getSystemById(sv1.getSystems().get(0)
             .getResource().getId().toString());
-        Assert.assertEquals("MonSystemeBisque0", s1.getName());
+        Assert.assertEquals("MonSystemeBisque1", s1.getName());
         Assert.assertEquals("desc-comp3", s1.getDescription());
         Assert.assertEquals(3, s1.getMachines().size());
-        Assert.assertEquals("MaMachineBisque0", s1.getMachines().get(0).getResource().getName());
+        Assert.assertEquals("MaMachineBisque1", s1.getMachines().get(0).getResource().getName());
         Assert.assertEquals("desc-comp2", s1.getMachines().get(0).getResource().getDescription());
-        Assert.assertEquals("MaMachineBisque1", s1.getMachines().get(1).getResource().getName());
+        Assert.assertEquals("MaMachineBisque2", s1.getMachines().get(1).getResource().getName());
         Assert.assertEquals("desc-comp2", s1.getMachines().get(1).getResource().getDescription());
-        Assert.assertEquals("MaMachineBisque2", s1.getMachines().get(2).getResource().getName());
+        Assert.assertEquals("MaMachineBisque3", s1.getMachines().get(2).getResource().getName());
         Assert.assertEquals("desc-comp2", s1.getMachines().get(2).getResource().getDescription());
         org.ow2.sirocco.cloudmanager.model.cimi.system.System s2 = this.systemManager.getSystemById(sv1.getSystems().get(1)
             .getResource().getId().toString());
-        Assert.assertEquals("MonSystemeBisque1", s2.getName());
+        Assert.assertEquals("MonSystemeBisque2", s2.getName());
         Assert.assertEquals("desc-comp3", s2.getDescription());
         Assert.assertEquals(3, s2.getMachines().size());
 
@@ -284,8 +284,8 @@ public class SystemManagerTest extends SiroccoTester {
         List<System> ls = this.systemManager.getSystems();
         Assert.assertEquals(3, ls.size());
         Assert.assertEquals("systemTest1", ls.get(0).getName());
-        Assert.assertEquals("MonSystemeBisque0", ls.get(1).getName());
-        Assert.assertEquals("MonSystemeBisque1", ls.get(2).getName());
+        Assert.assertEquals("MonSystemeBisque1", ls.get(1).getName());
+        Assert.assertEquals("MonSystemeBisque2", ls.get(2).getName());
 
         List<SystemTemplate> sts1 = this.systemManager.getSystemTemplates();
         int nbTemplates = sts1.size();
