@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -41,8 +42,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -50,7 +49,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
 public class Machine extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
@@ -81,9 +80,9 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     private static transient FSM<Machine.State, String> fsm = Machine.initFSM();
 
     public Machine() {
-        this.networkInterfaces = new ArrayList<MachineNetworkInterface>();
-        this.disks = new ArrayList<MachineDisk>();
-        this.volumes = new ArrayList<MachineVolume>();
+        // this.networkInterfaces = new ArrayList<MachineNetworkInterface>();
+        // this.disks = new ArrayList<MachineDisk>();
+        // this.volumes = new ArrayList<MachineVolume>();
     }
 
     @Enumerated(EnumType.STRING)
@@ -113,7 +112,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineDisk> getDisks() {
         return this.disks;
     }
@@ -130,7 +129,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
     }
@@ -156,12 +155,15 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "machine_id", referencedColumnName = "id")
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineNetworkInterface> getNetworkInterfaces() {
         return this.networkInterfaces;
     }
 
     public void addNetworkInterface(final MachineNetworkInterface networkInterface) {
+        if (this.networkInterfaces == null) {
+            this.networkInterfaces = new ArrayList<MachineNetworkInterface>();
+        }
         if (!this.getNetworkInterfaces().contains(networkInterface)) {
             this.getNetworkInterfaces().add(networkInterface);
         }
@@ -172,7 +174,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -253,13 +255,20 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     /** get operations allowed in this state */
     @Transient
     public Set<String> getOperations() {
-        Set<String> operations = Machine.fsm.getActionsAtState(this.state);
-        operations.remove(new String("internal"));
+        Set<String> operations;
+        // state may be null if not selected in the query that returns this
+        // object
+        if (this.state == null) {
+            operations = Collections.emptySet();
+        } else {
+            operations = Machine.fsm.getActionsAtState(this.state);
+            operations.remove(new String("internal"));
+        }
         return operations;
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderLocation getLocation() {
         return this.location;
     }
