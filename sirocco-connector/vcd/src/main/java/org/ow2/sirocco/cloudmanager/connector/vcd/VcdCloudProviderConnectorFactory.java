@@ -663,6 +663,13 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         }
 
         @Override
+        public Job deleteEntityInSystem(final String systemId, final String entityId, final String entityType)
+            throws ConnectorException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
         public Job removeEntityFromSystem(final String systemId, final String entityId) throws ConnectorException {
             throw new ConnectorException("unsupported operation");
         }
@@ -744,12 +751,9 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
                 machine.setNetworkInterfaces(nics);
                 for (NetworkConnectionType networkConnection : vm.getNetworkConnections()) {
-                    // VcdCloudProviderConnectorFactory.logger.info("### vm Ip="
-                    // + networkConnection.getIpAddress()
-                    // + ", vm external Ip=" +
-                    // networkConnection.getExternalIpAddress() +
-                    // ", vm allocation mode="
-                    // + networkConnection.getIpAddressAllocationMode());
+                    /*VcdCloudProviderConnectorFactory.logger.info("### vm Ip=" + networkConnection.getIpAddress()
+                        + ", vm external Ip=" + networkConnection.getExternalIpAddress() + ", vm allocation mode="
+                        + networkConnection.getIpAddressAllocationMode());*/
 
                     String ipAddressAllocationMode = networkConnection.getIpAddressAllocationMode();
                     String cimiIpAddressAllocationMode = "";
@@ -1136,6 +1140,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                     // create sourceItem body (SourcedCompositionItemParamType)
                     SourcedCompositionItemParamType item = new SourcedCompositionItemParamType();
                     ReferenceType source = new ReferenceType();
+
                     String name = (mcd.getName() == null || mcd.getName().equals("")) ? "sirocco" : mcd.getName();
                     if (mcd.getComponentQuantity() > 1) {
                         name += new Integer(i + 1).toString();
@@ -1232,7 +1237,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             throws VCloudException, TimeoutException {
             for (VM childVm : vapp.getChildrenVms()) {
                 MachineTemplate mt = machineTemplateMap.get(childVm.getResource().getName());
-                MachineConfiguration mc = mt.getMachineConfiguration();
+                MachineConfiguration mc = mt.getMachineConfig();
                 if (mc == null) {
                     continue;
                 }
@@ -1278,7 +1283,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 // Add virtual disk if needed
                 List<VirtualDisk> disks = childVm.getDisks();
                 boolean diskSectionHasChanged = false;
-                for (DiskTemplate disk : mc.getDiskTemplates()) {
+                for (DiskTemplate disk : mc.getDisks()) {
                     long diskInMBytes = disk.getCapacity() / 1000; // kilobytes
                                                                    // CIMI
                     if (diskInMBytes < 1) {
@@ -1592,7 +1597,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             throws VCloudException, TimeoutException {
             for (VM childVm : vapp.getChildrenVms()) {
                 MachineTemplate mt = machineTemplateMap.get(childVm.getResource().getName());
-                MachineConfiguration mc = mt.getMachineConfiguration();
+                MachineConfiguration mc = mt.getMachineConfig();
                 if (mc == null) {
                     continue;
                 }
@@ -1662,7 +1667,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             List<VM> childVms = vapp.getChildrenVms();
             for (VM childVm : childVms) {
                 MachineTemplate mt = machineTemplateMap.get(childVm.getResource().getName());
-                MachineConfiguration mc = mt.getMachineConfiguration();
+                MachineConfiguration mc = mt.getMachineConfig();
                 if (mc == null) {
                     continue;
                 }

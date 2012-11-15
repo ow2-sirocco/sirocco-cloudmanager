@@ -700,6 +700,13 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return this.simulateProviderTask(system, SystemAction.ADD, failedCancelled);
     }
 
+    @Override
+    public Job deleteEntityInSystem(final String systemId, final String entityId, final String entityType)
+        throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     /**
      * remove an entity (systemMachine, systemVolume etc) from a system<br>
      * <b><font color=red>Warning:the entityId is the provider id of <i>the
