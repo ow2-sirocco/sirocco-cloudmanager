@@ -305,8 +305,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             @Override
             public Machine call() throws Exception {
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
-                for (MachineNetworkInterface networkInterface : machine.getNetworkInterfaces()) {
-                    networkInterface.setState(InterfaceState.ACTIVE);
+                if (machine.getNetworkInterfaces() != null) {
+                    for (MachineNetworkInterface networkInterface : machine.getNetworkInterfaces()) {
+                        networkInterface.setState(InterfaceState.ACTIVE);
+                    }
                 }
                 machine.setState(Machine.State.STOPPED);
                 return machine;
@@ -510,8 +512,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             } catch (InterruptedException e) {
             }
         }
-        if (j.getState().equals(Status.FAILED) || j.getState().equals(Status.CANCELLED)
-            || j.getState().equals(Status.RUNNING)) {
+        if (j.getState().equals(Status.FAILED) || j.getState().equals(Status.CANCELLED) || j.getState().equals(Status.RUNNING)) {
             return true;
         }
         return false;
