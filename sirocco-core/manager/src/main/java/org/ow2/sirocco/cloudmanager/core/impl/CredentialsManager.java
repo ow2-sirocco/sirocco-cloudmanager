@@ -170,7 +170,7 @@ public class CredentialsManager implements ICredentialsManager {
          */
         List<MachineTemplate> mts = null;
         try {
-            mts = this.em.createQuery("FROM MachineTemplate t WHERE t.credentials=:cred").setParameter("cred", cred)
+            mts = this.em.createQuery("FROM MachineTemplate t WHERE t.credential=:cred").setParameter("cred", cred)
                 .getResultList();
         } catch (Exception e) {
             throw new CloudProviderException(" Internal Error");
