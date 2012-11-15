@@ -135,6 +135,9 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     }
 
     public void addMachineVolume(final MachineVolume mv) {
+        if (this.volumes == null) {
+            this.volumes = new ArrayList<MachineVolume>();
+        }
         if (!this.getVolumes().contains(mv)) {
             this.getVolumes().add(mv);
             mv.setOwner(this);
