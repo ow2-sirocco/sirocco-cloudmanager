@@ -262,7 +262,7 @@ public class MachineManager implements IMachineManager {
     private void validateCreationParameters(final MachineTemplate mt, final User u) throws CloudProviderException {
         // TODO check all references
         this.checkVolumes(mt, u);
-        this.validateMachineConfiguration(mt.getMachineConfiguration());
+        this.validateMachineConfiguration(mt.getMachineConfig());
         this.validateMachineImage(mt, u);
     }
 
@@ -270,10 +270,10 @@ public class MachineManager implements IMachineManager {
         final Job.Status status, final Job parent) throws CloudProviderException {
 
         Job j = new Job();
-        j.setTargetEntity(targetResource);
-        j.setAffectedEntities(affectedResources);
+        j.setTargetResource(targetResource);
+        j.setAffectedResources(affectedResources);
         j.setAction(action);
-        j.setStatus(status);
+        j.setState(status);
         j.setUser(this.getUser());
         j.setCreated(new Date());
         j.setProperties(new HashMap<String, String>());
@@ -318,7 +318,7 @@ public class MachineManager implements IMachineManager {
             MachineManager.logger.info("addVolumes job " + connJob.getId());
 
             MachineVolume mv = new MachineVolume();
-            mv.setVolume((Volume) connJob.getTargetEntity());
+            mv.setVolume((Volume) connJob.getTargetResource());
             mv.setInitialLocation(mvt.getInitialLocation());
             mv.setState(MachineVolume.State.PENDING);
             this.em.persist(mv);
@@ -366,7 +366,7 @@ public class MachineManager implements IMachineManager {
 
         this.validateCreationParameters(mt, this.getUser());
 
-        if (this.checkQuota(this.getUser(), mt.getMachineConfiguration()) == false) {
+        if (this.checkQuota(this.getUser(), mt.getMachineConfig()) == false) {
             throw new CloudProviderException("User exceeded quota ");
         }
 
@@ -384,10 +384,11 @@ public class MachineManager implements IMachineManager {
             computeService = connector.getComputeService();
             jobCreateMachine = computeService.createMachine(machineCreate);
         } catch (Exception e) {
+            MachineManager.logger.error("Failed to create machine", e);
             throw new CloudProviderException(e.getMessage());
         }
 
-        if (jobCreateMachine.getStatus() == Job.Status.FAILED) {
+        if (jobCreateMachine.getState() == Job.Status.FAILED) {
             throw new ServiceUnavailableException("Machine creation failed ");
         }
 
@@ -400,11 +401,11 @@ public class MachineManager implements IMachineManager {
 
         m.setState(Machine.State.CREATING);
         m.setUser(this.getUser());
-        m.setCpu(mt.getMachineConfiguration().getCpu());
-        m.setMemory(mt.getMachineConfiguration().getMemory());
+        m.setCpu(mt.getMachineConfig().getCpu());
+        m.setMemory(mt.getMachineConfig().getMemory());
 
         m.setCloudProviderAccount(placement.getAccount());
-        m.setProviderAssignedId(jobCreateMachine.getTargetEntity().getProviderAssignedId());
+        m.setProviderAssignedId(jobCreateMachine.getTargetResource().getProviderAssignedId());
 
         m.setLocation(placement.getLocation());
         m.setCreated(new Date());
@@ -421,8 +422,8 @@ public class MachineManager implements IMachineManager {
         j.setProperties(map);
 
         this.updateJob(j);
-        MachineManager.logger.info("Machine create non leaf job id " + j.getId() + " status " + jobCreateMachine.getStatus());
-        Job child = this.createJob(m, null, "add", jobCreateMachine.getStatus(), j);
+        MachineManager.logger.info("Machine create non leaf job id " + j.getId() + " status " + jobCreateMachine.getState());
+        Job child = this.createJob(m, null, "add", jobCreateMachine.getState(), j);
 
         child.setProviderAssignedId(jobCreateMachine.getProviderAssignedId());
         child.setDescription("Machine creation ");
@@ -467,14 +468,8 @@ public class MachineManager implements IMachineManager {
     @Override
     public QueryResult<Machine> getMachines(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws CloudProviderException {
-
-        QueryResult<Machine> result = UtilsForManagers.getEntityList("Machine", this.em, this.getUser().getUsername(), first,
-            last, filters, attributes, true);
-
-        for (Machine machine : result.getItems()) {
-            this.readMachineAttributes(machine);
-        }
-        return result;
+        return UtilsForManagers.getEntityList("Machine", Machine.class, this.em, this.getUser().getUsername(), first, last,
+            filters, attributes, true);
     }
 
     @Override
@@ -597,9 +592,9 @@ public class MachineManager implements IMachineManager {
             throw new ServiceUnavailableException(e.getMessage() + " action " + action + " machine id "
                 + m.getProviderAssignedId() + " " + m.getId());
         }
-        MachineManager.logger.info("operation " + action + " for machine " + m.getId() + " job status " + j.getStatus());
+        MachineManager.logger.info("operation " + action + " for machine " + m.getId() + " job status " + j.getState());
 
-        Job job = this.createJob(m, null, action, j.getStatus(), null);
+        Job job = this.createJob(m, null, action, j.getState(), null);
         job.setProviderAssignedId(j.getProviderAssignedId());
         this.updateJob(job);
         Map<String, String> map = job.getProperties();
@@ -607,14 +602,14 @@ public class MachineManager implements IMachineManager {
         job.setProperties(map);
         job.setDescription("Machine " + action);
 
-        if (j.getStatus() != Job.Status.FAILED) {
+        if (j.getState() != Job.Status.FAILED) {
             try {
                 UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
             } catch (Exception e) {
                 throw new ServiceUnavailableException(e.getMessage() + "  " + action);
             }
         }
-        MachineManager.logger.info("operation " + action + " requested " + j.getStatus());
+        MachineManager.logger.info("operation " + action + " requested " + j.getState());
         this.relConnector(m, connector);
         return job;
     }
@@ -658,7 +653,7 @@ public class MachineManager implements IMachineManager {
         } catch (ConnectorException e) {
             throw new ServiceUnavailableException(e.getMessage());
         }
-        if (j.getStatus() != Job.Status.RUNNING) {
+        if (j.getState() != Job.Status.RUNNING) {
             Machine.State s = m.getState();
             try {
                 s = computeService.getMachineState(m.getProviderAssignedId());
@@ -667,7 +662,7 @@ public class MachineManager implements IMachineManager {
             m.setState(s);
         }
 
-        Job job = this.createJob(m, null, "delete", j.getStatus(), null);
+        Job job = this.createJob(m, null, "delete", j.getState(), null);
         job.setDescription("Machine deletion");
         job.setProviderAssignedId(j.getProviderAssignedId());
         this.updateJob(job);
@@ -675,7 +670,7 @@ public class MachineManager implements IMachineManager {
         map.put("parent-machine", "ok");
         job.setProperties(map);
 
-        if (j.getStatus() != Job.Status.FAILED) {
+        if (j.getState() != Job.Status.FAILED) {
             try {
                 UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
             } catch (Exception e) {
@@ -708,7 +703,7 @@ public class MachineManager implements IMachineManager {
         throws ResourceNotFoundException, CloudProviderException {
         Machine m = this.getMachineFromId(machineId);
         this.readMachineAttributes(m);
-        return m;
+        return UtilsForManagers.fillResourceAttributes(m, attributes);
     }
 
     /**
@@ -764,8 +759,8 @@ public class MachineManager implements IMachineManager {
         m.setUpdated(new Date());
 
         j = new Job();
-        j.setTargetEntity(m);
-        j.setStatus(Job.Status.SUCCESS);
+        j.setTargetResource(m);
+        j.setState(Job.Status.SUCCESS);
         j.setAction("update");
         j.setParentJob(null);
         j.setNestedJobs(null);
@@ -788,8 +783,15 @@ public class MachineManager implements IMachineManager {
         if (mc == null) {
             throw new ResourceNotFoundException("Unknown machine configuration " + mcId);
         }
-        mc.getDiskTemplates().size();
+        mc.getDisks().size();
         return mc;
+    }
+
+    @Override
+    public MachineConfiguration getMachineConfigurationAttributes(final String machineConfigurationId,
+        final List<String> attributes) throws ResourceNotFoundException, CloudProviderException {
+        MachineConfiguration mc = this.getMachineConfigurationById(machineConfigurationId);
+        return UtilsForManagers.fillResourceAttributes(mc, attributes);
     }
 
     @Override
@@ -825,7 +827,7 @@ public class MachineManager implements IMachineManager {
         }
 
         if (attributes.contains("disks")) {
-            mc.setDiskTemplates(from.getDiskTemplates());
+            mc.setDisks(from.getDisks());
         }
         mc.setUpdated(new Date());
         this.em.flush();
@@ -860,7 +862,7 @@ public class MachineManager implements IMachineManager {
             .createQuery("SELECT c FROM MachineConfiguration c WHERE c.user.id=:userid")
             .setParameter("userid", this.getUser().getId()).getResultList();
         for (MachineConfiguration machineConfig : machineConfigs) {
-            machineConfig.getDiskTemplates().size();
+            machineConfig.getDisks().size();
         }
         return machineConfigs;
     }
@@ -869,10 +871,13 @@ public class MachineManager implements IMachineManager {
     public QueryResult<MachineConfiguration> getMachineConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        QueryResult<MachineConfiguration> machineConfigs = UtilsForManagers.getEntityList("MachineConfiguration", this.em,
+        QueryResult<MachineConfiguration> machineConfigs;
+        machineConfigs = UtilsForManagers.getEntityList("MachineConfiguration", MachineConfiguration.class, this.em,
             user.getUsername(), first, last, filters, attributes, false);
         for (MachineConfiguration machineConfig : machineConfigs.getItems()) {
-            machineConfig.getDiskTemplates().size();
+            if (machineConfig.getDisks() != null) {
+                machineConfig.getDisks().size();
+            }
         }
         return machineConfigs;
     }
@@ -918,9 +923,16 @@ public class MachineManager implements IMachineManager {
             mt.getVolumeTemplates().size();
         }
         mt.getNetworkInterfaces().size();
-        mt.getMachineConfiguration().getDiskTemplates().size();
+        mt.getMachineConfig().getDisks().size();
 
         return mt;
+    }
+
+    @Override
+    public MachineTemplate getMachineTemplateAttributes(final String machineTemplateId, final List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException {
+        MachineTemplate mt = this.getMachineTemplateById(machineTemplateId);
+        return UtilsForManagers.fillResourceAttributes(mt, attributes);
     }
 
     @Override
@@ -963,7 +975,7 @@ public class MachineManager implements IMachineManager {
                 if (config == null) {
                     throw new InvalidRequestException(" Could not find machine configuration" + mc);
                 }
-                mt.setMachineConfiguration(config);
+                mt.setMachineConfig(config);
             }
             if (attributes.containsKey("machineImage")) {
                 String mi = (String) attributes.get("machineImage");
@@ -981,7 +993,7 @@ public class MachineManager implements IMachineManager {
                 if (cred == null) {
                     throw new InvalidRequestException(" Could not find credentials" + credentials);
                 }
-                mt.setCredentials(cred);
+                mt.setCredential(cred);
             }
 
             if (attributes.containsKey("networkInterfaces")) {
@@ -1124,7 +1136,7 @@ public class MachineManager implements IMachineManager {
         if (exists == true) {
             throw new InvalidRequestException("MachineTemplate by name already exists " + mt.getName());
         }
-        MachineConfiguration mc = mt.getMachineConfiguration();
+        MachineConfiguration mc = mt.getMachineConfig();
         if (mc == null) {
             throw new InvalidRequestException("No machineconfiguration ");
         }
@@ -1132,7 +1144,7 @@ public class MachineManager implements IMachineManager {
         if (mc1 == null) {
             throw new InvalidRequestException("Invalid reference to machine configuraiton " + mc.getId());
         }
-        this.validateMachineConfiguration(mt.getMachineConfiguration());
+        this.validateMachineConfiguration(mt.getMachineConfig());
 
         MachineImage mi = mt.getMachineImage();
         if (mi == null) {
@@ -1154,11 +1166,11 @@ public class MachineManager implements IMachineManager {
         mt.setCreated(new Date());
         this.em.persist(mt);
         this.em.flush();
-        if (mt.getMachineConfiguration().getDiskTemplates() != null) {
-            mt.getMachineConfiguration().getDiskTemplates().size();
+        if (mt.getMachineConfig().getDisks() != null) {
+            mt.getMachineConfig().getDisks().size();
         }
-        if (mt.getMachineConfiguration().getProperties() != null) {
-            mt.getMachineConfiguration().getProperties().size();
+        if (mt.getMachineConfig().getProperties() != null) {
+            mt.getMachineConfig().getProperties().size();
         }
         if (mt.getVolumes() != null) {
             mt.getVolumes().size();
@@ -1169,8 +1181,8 @@ public class MachineManager implements IMachineManager {
     @Override
     public QueryResult<MachineTemplate> getMachineTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getEntityList("MachineTemplate", this.em, this.getUser().getUsername(), first, last, filters,
-            attributes, false);
+        return UtilsForManagers.getEntityList("MachineTemplate", MachineTemplate.class, this.em, this.getUser().getUsername(),
+            first, last, filters, attributes, false);
     }
 
     @Override
@@ -1178,7 +1190,7 @@ public class MachineManager implements IMachineManager {
         List<MachineTemplate> machineTemplates = this.em.createQuery("SELECT c FROM MachineTemplate c WHERE c.user.id=:userid")
             .setParameter("userid", this.getUser().getId()).getResultList();
         for (MachineTemplate machineTemplate : machineTemplates) {
-            machineTemplate.getMachineConfiguration().getDiskTemplates().size();
+            machineTemplate.getMachineConfig().getDisks().size();
         }
         return machineTemplates;
     }
@@ -1207,7 +1219,7 @@ public class MachineManager implements IMachineManager {
             throw new InvalidRequestException("Incorrect MachineConfiguration ");
         }
 
-        List<DiskTemplate> disks = mc.getDiskTemplates();
+        List<DiskTemplate> disks = mc.getDisks();
         if (disks == null || disks.size() == 0) {
             return;
         }
@@ -1277,6 +1289,7 @@ public class MachineManager implements IMachineManager {
         }
         for (MachineDisk disk : diskColl) {
             disk.setId(null);
+            disk.setCreated(new Date());
             this.em.persist(disk);
             persisted.addMachineDisk(disk);
         }
@@ -1331,9 +1344,9 @@ public class MachineManager implements IMachineManager {
      */
     private boolean isVolumeAttach(final Job job) {
 
-        if ((job.getTargetEntity() instanceof Machine) && (job.getAffectedEntities() != null)
-            && job.getAffectedEntities().size() != 0 && (job.getAffectedEntities().get(0) instanceof Volume)) {
-            Volume volume = (Volume) job.getAffectedEntities().get(0);
+        if ((job.getTargetResource() instanceof Machine) && (job.getAffectedResources() != null)
+            && job.getAffectedResources().size() != 0 && (job.getAffectedResources().get(0) instanceof Volume)) {
+            Volume volume = (Volume) job.getAffectedResources().get(0);
             try {
                 this.volumeManager.getVolumeById(volume.getId().toString());
             } catch (ResourceNotFoundException e) {
@@ -1345,7 +1358,7 @@ public class MachineManager implements IMachineManager {
     }
 
     private boolean isVolumeDetach(final Job job) {
-        List<CloudResource> resources = job.getAffectedEntities();
+        List<CloudResource> resources = job.getAffectedResources();
         if ((job.getAction().equals("delete") == false) || (resources == null) || (resources.size() == 0)) {
             return false;
         }
@@ -1453,14 +1466,14 @@ public class MachineManager implements IMachineManager {
             MachineManager.logger.info("Could not find the machine creation job!! ");
             return false;
         }
-        if (machineCreate.getStatus() == Job.Status.RUNNING) {
+        if (machineCreate.getState() == Job.Status.RUNNING) {
             MachineManager.logger.info("machineCreationContinuation machine job status " + machineCreate.getId() + " "
-                + machineCreate.getStatus());
+                + machineCreate.getState());
             return true;
         }
-        if (machineCreate.getStatus() == Job.Status.FAILED) {
+        if (machineCreate.getState() == Job.Status.FAILED) {
             MachineManager.logger.info("machine create job failed ");
-            job.setStatus(Job.Status.FAILED);
+            job.setState(Job.Status.FAILED);
             return true;
         }
         /**
@@ -1499,7 +1512,7 @@ public class MachineManager implements IMachineManager {
                         mv.setState(MachineVolume.State.ERROR);
                         continue;
                     }
-                    if (j.getStatus() == Job.Status.FAILED) {
+                    if (j.getState() == Job.Status.FAILED) {
                         MachineManager.logger.info(" machineCreateContinuation : attachment failed ");
                         mv.setState(MachineVolume.State.ERROR);
                         continue;
@@ -1507,13 +1520,13 @@ public class MachineManager implements IMachineManager {
                     List<CloudResource> affected = new ArrayList<CloudResource>();
                     affected.add(mv.getVolume());
                     MachineManager.logger.info("machineCreationContinuation create job for attachment ");
-                    Job child = this.createJob(m, affected, "add", j.getStatus(), job);
+                    Job child = this.createJob(m, affected, "add", j.getState(), job);
                     child.setDescription("Volume attachment");
                     child.setProviderAssignedId(j.getProviderAssignedId());
                     this.updateJob(child);
                     newJobs.add(child);
                     MachineManager.logger.info("machineCreationContinuation attachment job " + child.getId() + " "
-                        + child.getStatus());
+                        + child.getState());
                 }
             } else {
                 /** volume has an error */
@@ -1529,18 +1542,18 @@ public class MachineManager implements IMachineManager {
         Job.Status parentStatus = Job.Status.SUCCESS;
         for (Job j : allChildren) {
             MachineManager.logger.info("machineCreationContinuation check status of child id: " + j.getId() + " status "
-                + j.getStatus());
-            if (j.getStatus() == Job.Status.RUNNING) {
+                + j.getState());
+            if (j.getState() == Job.Status.RUNNING) {
                 done = false;
-            } else if (j.getStatus() == Job.Status.FAILED) {
+            } else if (j.getState() == Job.Status.FAILED) {
                 parentStatus = Job.Status.FAILED;
             }
         }
         // TODO
         for (Job j : newJobs) {
-            if (j.getStatus() == Job.Status.RUNNING) {
+            if (j.getState() == Job.Status.RUNNING) {
                 done = false;
-            } else if (j.getStatus() == Job.Status.FAILED) {
+            } else if (j.getState() == Job.Status.FAILED) {
                 parentStatus = Job.Status.FAILED;
                 MachineManager.logger.info("");
             }
@@ -1548,7 +1561,7 @@ public class MachineManager implements IMachineManager {
         if (done == true) {
             /** all actions for machine create have terminated */
             MachineManager.logger.info("machineCreationContinuation all children terminated for " + job.getId());
-            job.setStatus(parentStatus);
+            job.setState(parentStatus);
             this.updateJob(job);
         }
         this.em.flush();
@@ -1562,7 +1575,7 @@ public class MachineManager implements IMachineManager {
      */
     private boolean completeMachineCreation(final Job notification, final Machine local, final Machine remote) {
         MachineManager.logger.info("completeMachineCreation for machine " + local.getId() + " " + notification.getId() + " "
-            + notification.getStatus());
+            + notification.getState());
         local.setCreated(new Date());
         this.createDisks(local, remote);
         this.createNetworkInterfaces(local, remote);
@@ -1590,32 +1603,32 @@ public class MachineManager implements IMachineManager {
              * targetEntity = machine affectedEntity = volume
              */
             MachineManager.logger.info(" Volume attachment to machine " + local.getId() + " job " + notification.getId()
-                + " status " + notification.getStatus());
-            MachineVolume mv = this.getMachineVolume(local, (Volume) notification.getAffectedEntities().get(0));
+                + " status " + notification.getState());
+            MachineVolume mv = this.getMachineVolume(local, (Volume) notification.getAffectedResources().get(0));
             if (mv == null) {
                 MachineManager.logger.info(" could not find machine volume!! " + local.getId());
                 return true;
             }
-            if (notification.getStatus() == Job.Status.SUCCESS) {
+            if (notification.getState() == Job.Status.SUCCESS) {
                 MachineManager.logger.info(" Volume attachment succeeded for machine " + local.getId());
                 mv.setState(MachineVolume.State.ATTACHED);
-            } else if (notification.getStatus() == Job.Status.FAILED) {
+            } else if (notification.getState() == Job.Status.FAILED) {
                 /** job failed */
                 MachineManager.logger.info(" Volume attachment failed for machine " + local.getId());
                 mv.setState(MachineVolume.State.ERROR);
                 if (machineCreation == false) {
-                    this.removeMachineVolumeEntry(local, (Volume) notification.getAffectedEntities().get(0));
+                    this.removeMachineVolumeEntry(local, (Volume) notification.getAffectedResources().get(0));
                 }
             }
         } else if (this.isVolumeDetach(notification) == true) {
-            MachineVolume mv = (MachineVolume) notification.getAffectedEntities().get(0);
+            MachineVolume mv = (MachineVolume) notification.getAffectedResources().get(0);
             MachineManager.logger.info(" detached volume " + mv.getVolume().getId() + " from machine " + local.getId() + " "
-                + notification.getStatus());
-            if (notification.getStatus() == Job.Status.SUCCESS) {
-                notification.getAffectedEntities().remove(0);
+                + notification.getState());
+            if (notification.getState() == Job.Status.SUCCESS) {
+                notification.getAffectedResources().remove(0);
                 this.removeMachineVolumeEntry(local, mv.getVolume());
             } else {
-                MachineManager.logger.info("completeDeviceAttachmentToMachine attach failed " + notification.getStatus());
+                MachineManager.logger.info("completeDeviceAttachmentToMachine attach failed " + notification.getState());
             }
         } else {
             MachineManager.logger
@@ -1639,7 +1652,7 @@ public class MachineManager implements IMachineManager {
         }
 
         Machine mpersisted = null;
-        Integer mid = notification.getTargetEntity().getId();
+        Integer mid = notification.getTargetResource().getId();
 
         try {
             mpersisted = this.em.find(Machine.class, mid);
@@ -1690,7 +1703,7 @@ public class MachineManager implements IMachineManager {
                 /**
                  * Machine creation Device attachment/detachment operations
                  */
-                List<CloudResource> affected = notification.getAffectedEntities();
+                List<CloudResource> affected = notification.getAffectedResources();
                 if (affected == null || affected.size() == 0) {
                     /** machine creation leaf job: no affectedEntity */
                     MachineManager.logger.info("completeMachineCreation notification for machine " + notification.getId());
@@ -1699,8 +1712,7 @@ public class MachineManager implements IMachineManager {
                     /**
                      * Device attachment
                      */
-                    MachineManager.logger
-                        .info("completeMachineCreation complete device management " + notification.getStatus());
+                    MachineManager.logger.info("completeMachineCreation complete device management " + notification.getState());
                     return this.completeDeviceManagement(true, notification, mpersisted, updated);
                 }
             } else if (op.equals("edit")) {
@@ -1710,7 +1722,7 @@ public class MachineManager implements IMachineManager {
             } else if (op.equals("delete")) {
                 /** Device detachment */
                 MachineManager.logger.info("completeMachineCreation complete device management (delete ) "
-                    + notification.getStatus());
+                    + notification.getState());
                 return this.completeDeviceManagement(true, notification, mpersisted, updated);
             } else {
                 MachineManager.logger.info("unexpected notification " + notification.getId() + " on machine "
@@ -1752,8 +1764,8 @@ public class MachineManager implements IMachineManager {
     @Override
     public QueryResult<MachineVolume> getMachineVolumes(final String machineId, final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getCollectionItemList("MachineVolume", this.em, this.getUser().getUsername(), first, last,
-            filters, attributes, false, "Machine", "volumes", machineId);
+        return UtilsForManagers.getCollectionItemList("MachineVolume", MachineVolume.class, this.em, this.getUser()
+            .getUsername(), first, last, filters, attributes, false, "Machine", "volumes", machineId);
     }
 
     private Job addVolumeToMachine(final Machine m, final MachineVolume mv) throws ServiceUnavailableException {
@@ -1787,7 +1799,7 @@ public class MachineManager implements IMachineManager {
         } catch (ConnectorException e) {
             throw new ServiceUnavailableException(e.getMessage() + " in add volume to machine " + m.getId());
         }
-        if (j.getStatus() != Job.Status.FAILED) {
+        if (j.getState() != Job.Status.FAILED) {
             try {
                 UtilsForManagers.emitJobListenerMessage(j.getProviderAssignedId(), this.ctx);
             } catch (Exception e) {
@@ -1795,7 +1807,7 @@ public class MachineManager implements IMachineManager {
             }
         }
         MachineManager.logger.info("addVolumeToMachine " + m.getId() + " " + mv.getVolume().getId() + " " + j.getId() + " "
-            + j.getStatus());
+            + j.getState());
         return j;
     }
 
@@ -1820,7 +1832,7 @@ public class MachineManager implements IMachineManager {
 
         Job j = this.addVolumeToMachine(m, mv);
 
-        if (j.getStatus() == Job.Status.FAILED) {
+        if (j.getState() == Job.Status.FAILED) {
             throw new CloudProviderException("Could not attach volume " + volumeId + " to machine " + m.getId());
         } else {
             MachineManager.logger.info(" Attaching volume " + volumeId + " to machine " + m.getId());
@@ -1832,12 +1844,12 @@ public class MachineManager implements IMachineManager {
         List<CloudResource> affected = new ArrayList<CloudResource>();
         affected.add(mv.getVolume());
 
-        Job persisted = this.createJob(m, affected, "add", j.getStatus(), null);
+        Job persisted = this.createJob(m, affected, "add", j.getState(), null);
         persisted.setProviderAssignedId(j.getProviderAssignedId());
         persisted.setDescription("Volume attachment");
         this.updateJob(persisted);
         MachineManager.logger.info(" Add volume " + volumeId + " to machine " + m.getId() + " job state "
-            + persisted.getStatus());
+            + persisted.getState());
         return persisted;
     }
 
@@ -1878,7 +1890,7 @@ public class MachineManager implements IMachineManager {
             MachineManager.logger.info(" detaching volume from machine error case " + machineId);
             this.removeMachineVolumeEntry(m, mv.getVolume());
             Job j = new Job();
-            j.setStatus(Job.Status.SUCCESS);
+            j.setState(Job.Status.SUCCESS);
 
         }
         /**
@@ -1907,10 +1919,10 @@ public class MachineManager implements IMachineManager {
             throw new ServiceUnavailableException(e.getMessage() + " in remove volume from machine " + m.getId());
         }
 
-        if (j.getStatus() == Job.Status.FAILED) {
+        if (j.getState() == Job.Status.FAILED) {
             throw new CloudProviderException("Could not remove volume to machine " + m.getId());
         }
-        MachineManager.logger.info("removeVolumeFromMachine " + machineId + " volume " + mvId + " job status " + j.getStatus());
+        MachineManager.logger.info("removeVolumeFromMachine " + machineId + " volume " + mvId + " job status " + j.getState());
         try {
             UtilsForManagers.emitJobListenerMessage(j.getProviderAssignedId(), this.ctx);
         } catch (Exception e) {
@@ -1919,7 +1931,7 @@ public class MachineManager implements IMachineManager {
         List<CloudResource> affectedEntities = new ArrayList<CloudResource>();
         affectedEntities.add(mv);
 
-        Job persisted = this.createJob(m, affectedEntities, "delete", j.getStatus(), null);
+        Job persisted = this.createJob(m, affectedEntities, "delete", j.getState(), null);
         persisted.setProviderAssignedId(j.getProviderAssignedId());
         persisted.setDescription("Volume detachment");
         this.updateJob(persisted);
@@ -2086,8 +2098,8 @@ public class MachineManager implements IMachineManager {
     @Override
     public QueryResult<MachineDisk> getMachineDisks(final String machineId, final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getCollectionItemList("MachineDisk", this.em, this.getUser().getUsername(), first, last,
-            filters, attributes, false, "Machine", "disks", machineId);
+        return UtilsForManagers.getCollectionItemList("MachineDisk", MachineDisk.class, this.em, this.getUser().getUsername(),
+            first, last, filters, attributes, false, "Machine", "disks", machineId);
     }
 
     @Override
@@ -2201,8 +2213,8 @@ public class MachineManager implements IMachineManager {
     public QueryResult<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId, final int first,
         final int last, final List<String> filters, final List<String> attributes) throws InvalidRequestException,
         CloudProviderException {
-        return UtilsForManagers.getCollectionItemList("MachineNetworkInterface", this.em, this.getUser().getUsername(), first,
-            last, filters, attributes, false, "Machine", "networkInterfaces", machineId);
+        return UtilsForManagers.getCollectionItemList("MachineNetworkInterface", MachineNetworkInterface.class, this.em, this
+            .getUser().getUsername(), first, last, filters, attributes, false, "Machine", "networkInterfaces", machineId);
     }
 
     /**

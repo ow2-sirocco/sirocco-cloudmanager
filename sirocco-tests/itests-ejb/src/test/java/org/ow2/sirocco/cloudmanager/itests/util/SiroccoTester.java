@@ -129,7 +129,7 @@ public class SiroccoTester {
         String jobId = job.getId().toString();
         while (true) {
             job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -137,7 +137,7 @@ public class SiroccoTester {
                 throw new Exception("Machine operation time out");
             }
         }
-        return job.getStatus();
+        return job.getState();
     }
 
     private MachineConfiguration buildMachineConfiguration(final String name, final String description, final int numCpus,
@@ -153,7 +153,7 @@ public class SiroccoTester {
 
         machineConfig.setCpu(numCpus);
         machineConfig.setMemory(ramSizeInMB * 1024);
-        machineConfig.setDiskTemplates(Collections.singletonList(disk));
+        machineConfig.setDisks(Collections.singletonList(disk));
         return machineConfig;
     }
 
@@ -238,7 +238,7 @@ public class SiroccoTester {
 
         Job job = this.volumeManager.createVolume(volumeCreate);
 
-        volumeId = job.getTargetEntity().getId().toString();
+        volumeId = job.getTargetResource().getId().toString();
         System.out.println(" createVolume: wait for volume creation completion ");
         this.waitForJobCompletion(job);
 

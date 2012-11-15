@@ -124,9 +124,9 @@ public class JobManager implements IJobManager {
         throws CloudProviderException {
 
         Job j = new Job();
-        j.setTargetEntity(targetEntity);
+        j.setTargetResource(targetEntity);
         j.setAction(action);
-        j.setStatus(Status.RUNNING);
+        j.setState(Status.RUNNING);
 
         if (parentJob != null) {
             Job parent = this.getJobById(parentJob);
@@ -151,7 +151,7 @@ public class JobManager implements IJobManager {
             throw new ResourceNotFoundException("Invalid Job id " + id);
         }
         result.getNestedJobs().size();
-        result.getAffectedEntities().size();
+        result.getAffectedResources().size();
         return result;
     }
 
@@ -188,8 +188,8 @@ public class JobManager implements IJobManager {
     @Override
     public Job getJobAttributes(final String id, final List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        Job job = this.getJobById(id);
+        return UtilsForManagers.fillResourceAttributes(job, attributes);
     }
 
     @SuppressWarnings("unchecked")
@@ -203,7 +203,8 @@ public class JobManager implements IJobManager {
     public QueryResult<Job> getJobs(final int first, final int last, final List<String> filters, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("Job", this.em, user.getUsername(), first, last, filters, attributes, false);
+        return UtilsForManagers.getEntityList("Job", Job.class, this.em, user.getUsername(), first, last, filters, attributes,
+            false);
     }
 
     @Override
@@ -236,7 +237,7 @@ public class JobManager implements IJobManager {
         try {
             job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
                 .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
-            job.setStatus(providerJob.getStatus());
+            job.setState(providerJob.getState());
             job.setStatusMessage(providerJob.getStatusMessage());
             job.setReturnCode(providerJob.getReturnCode());
             job.setTimeOfStatusChange(new Date());
@@ -297,7 +298,7 @@ public class JobManager implements IJobManager {
             // dispatch event to related managers and parent jobs
             while (job != null) {
                 // find manager
-                CloudResource target = job.getTargetEntity();
+                CloudResource target = job.getTargetResource();
 
                 if (target instanceof Machine) {
                     JobManager.logger.info("calling  machineManager jobCompletionHandler with Job " + job.getId().toString());

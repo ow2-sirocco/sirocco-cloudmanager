@@ -190,7 +190,7 @@ public class NetworkManagerTest {
         String jobId = job.getId().toString();
         while (true) {
             job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -198,7 +198,7 @@ public class NetworkManagerTest {
                 throw new Exception("Operation time out");
             }
         }
-        Assert.assertTrue("Job failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+        Assert.assertTrue("Job failed: " + job.getStatusMessage(), job.getState() == Job.Status.SUCCESS);
     }
 
     NetworkConfiguration newNetworkConfiguration(final String name) {
@@ -339,12 +339,12 @@ public class NetworkManagerTest {
 
         Job job = this.networkManager.createNetwork(networkCreate);
         Assert.assertEquals("add", job.getAction());
-        Assert.assertTrue(job.getTargetEntity() instanceof Network);
-        Assert.assertTrue(job.getTargetEntity().getId() != null);
+        Assert.assertTrue(job.getTargetResource() instanceof Network);
+        Assert.assertTrue(job.getTargetResource().getId() != null);
 
         this.waitForJobCompletion(job);
 
-        return job.getTargetEntity().getId().toString();
+        return job.getTargetResource().getId().toString();
     }
 
     @Test
@@ -367,13 +367,13 @@ public class NetworkManagerTest {
 
         Job job = this.networkManager.createNetwork(networkCreate);
         Assert.assertEquals("add", job.getAction());
-        Assert.assertTrue(job.getTargetEntity() instanceof Network);
-        Assert.assertTrue(job.getTargetEntity().getId() != null);
+        Assert.assertTrue(job.getTargetResource() instanceof Network);
+        Assert.assertTrue(job.getTargetResource().getId() != null);
 
         this.waitForJobCompletion(job);
 
         // read
-        String netId = job.getTargetEntity().getId().toString();
+        String netId = job.getTargetResource().getId().toString();
 
         Network network = this.networkManager.getNetworkById(netId);
         Assert.assertEquals(network.getId().toString(), netId);
@@ -387,8 +387,8 @@ public class NetworkManagerTest {
 
         job = this.networkManager.deleteNetwork(netId);
         Assert.assertEquals("delete", job.getAction());
-        Assert.assertTrue(job.getTargetEntity() instanceof Network);
-        Assert.assertEquals(job.getTargetEntity().getId().toString(), netId);
+        Assert.assertTrue(job.getTargetResource() instanceof Network);
+        Assert.assertEquals(job.getTargetResource().getId().toString(), netId);
 
         this.waitForJobCompletion(job);
 
@@ -485,7 +485,7 @@ public class NetworkManagerTest {
         Job job = this.networkManager.createNetwork(networkCreate);
 
         this.waitForJobCompletion(job);
-        Network network = this.networkManager.getNetworkById(job.getTargetEntity().getId().toString());
+        Network network = this.networkManager.getNetworkById(job.getTargetResource().getId().toString());
 
         // create
 
@@ -562,7 +562,7 @@ public class NetworkManagerTest {
         Job job = this.networkManager.createNetwork(networkCreate);
 
         this.waitForJobCompletion(job);
-        Network network = this.networkManager.getNetworkById(job.getTargetEntity().getId().toString());
+        Network network = this.networkManager.getNetworkById(job.getTargetResource().getId().toString());
 
         // create port
 
@@ -582,13 +582,13 @@ public class NetworkManagerTest {
 
         job = this.networkManager.createNetworkPort(networkPortCreate);
         Assert.assertEquals("add", job.getAction());
-        Assert.assertTrue(job.getTargetEntity() instanceof NetworkPort);
-        Assert.assertTrue(job.getTargetEntity().getId() != null);
+        Assert.assertTrue(job.getTargetResource() instanceof NetworkPort);
+        Assert.assertTrue(job.getTargetResource().getId() != null);
 
         this.waitForJobCompletion(job);
 
         // read
-        String netPortId = job.getTargetEntity().getId().toString();
+        String netPortId = job.getTargetResource().getId().toString();
 
         NetworkPort networkPort = this.networkManager.getNetworkPortById(netPortId);
         Assert.assertEquals(networkPort.getId().toString(), netPortId);
@@ -602,8 +602,8 @@ public class NetworkManagerTest {
 
         job = this.networkManager.deleteNetworkPort(netPortId);
         Assert.assertEquals("delete", job.getAction());
-        Assert.assertTrue(job.getTargetEntity() instanceof NetworkPort);
-        Assert.assertEquals(job.getTargetEntity().getId().toString(), netPortId);
+        Assert.assertTrue(job.getTargetResource() instanceof NetworkPort);
+        Assert.assertEquals(job.getTargetResource().getId().toString(), netPortId);
 
         this.waitForJobCompletion(job);
 
@@ -635,11 +635,11 @@ public class NetworkManagerTest {
 
         Job job = this.networkManager.createForwardingGroup(forwardingGroupCreate);
         Assert.assertEquals("add", job.getAction());
-        Assert.assertTrue(job.getTargetEntity() instanceof ForwardingGroup);
-        Assert.assertTrue(job.getTargetEntity().getId() != null);
+        Assert.assertTrue(job.getTargetResource() instanceof ForwardingGroup);
+        Assert.assertTrue(job.getTargetResource().getId() != null);
 
         // read
-        String forwardingGroupId = job.getTargetEntity().getId().toString();
+        String forwardingGroupId = job.getTargetResource().getId().toString();
 
         this.waitForJobCompletion(job);
 
@@ -667,7 +667,7 @@ public class NetworkManagerTest {
 
         job = this.networkManager.createNetwork(networkCreate);
         this.waitForJobCompletion(job);
-        String network1Id = job.getTargetEntity().getId().toString();
+        String network1Id = job.getTargetResource().getId().toString();
 
         Network network1 = this.networkManager.getNetworkById(network1Id);
 
@@ -675,9 +675,9 @@ public class NetworkManagerTest {
         fgNetwork.setNetwork(network1);
         job = this.networkManager.addNetworkToForwardingGroup(forwardingGroupId, fgNetwork);
         Assert.assertEquals("add", job.getAction());
-        Assert.assertEquals(job.getTargetEntity().getId().toString(), forwardingGroupId);
-        Assert.assertEquals(job.getAffectedEntities().get(0).getId().toString(), network1Id);
-        Assert.assertTrue(job.getTargetEntity().getId() != null);
+        Assert.assertEquals(job.getTargetResource().getId().toString(), forwardingGroupId);
+        Assert.assertEquals(job.getAffectedResources().get(0).getId().toString(), network1Id);
+        Assert.assertTrue(job.getTargetResource().getId() != null);
         this.waitForJobCompletion(job);
         forwardingGroup = this.networkManager.getForwardingGroupById(forwardingGroupId);
         Assert.assertEquals(forwardingGroup.getNetworks().size(), 1);
@@ -688,9 +688,9 @@ public class NetworkManagerTest {
 
         job = this.networkManager.removeNetworkFromForwardingGroup(forwardingGroupId, createdFgNetwork.getId().toString());
         Assert.assertEquals("delete", job.getAction());
-        Assert.assertEquals(job.getTargetEntity().getId().toString(), forwardingGroupId);
-        Assert.assertEquals(job.getAffectedEntities().get(0).getId().toString(), network1Id);
-        Assert.assertTrue(job.getTargetEntity().getId() != null);
+        Assert.assertEquals(job.getTargetResource().getId().toString(), forwardingGroupId);
+        Assert.assertEquals(job.getAffectedResources().get(0).getId().toString(), network1Id);
+        Assert.assertTrue(job.getTargetResource().getId() != null);
         this.waitForJobCompletion(job);
         forwardingGroup = this.networkManager.getForwardingGroupById(forwardingGroupId);
         Assert.assertEquals(forwardingGroup.getNetworks().size(), 0);
@@ -699,8 +699,8 @@ public class NetworkManagerTest {
 
         job = this.networkManager.deleteForwardingGroup(forwardingGroupId);
         Assert.assertEquals("delete", job.getAction());
-        Assert.assertTrue(job.getTargetEntity() instanceof ForwardingGroup);
-        Assert.assertEquals(job.getTargetEntity().getId().toString(), forwardingGroupId);
+        Assert.assertTrue(job.getTargetResource() instanceof ForwardingGroup);
+        Assert.assertEquals(job.getTargetResource().getId().toString(), forwardingGroupId);
 
         this.waitForJobCompletion(job);
 

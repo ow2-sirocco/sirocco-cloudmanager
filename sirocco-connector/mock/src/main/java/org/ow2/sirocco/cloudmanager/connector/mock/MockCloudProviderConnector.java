@@ -258,11 +258,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             machine.setProperties(new HashMap<String, String>(machineCreate.getProperties()));
         }
         machine.setState(Machine.State.CREATING);
-        machine.setCpu(machineCreate.getMachineTemplate().getMachineConfiguration().getCpu());
-        machine.setMemory(machineCreate.getMachineTemplate().getMachineConfiguration().getMemory());
+        machine.setCpu(machineCreate.getMachineTemplate().getMachineConfig().getCpu());
+        machine.setMemory(machineCreate.getMachineTemplate().getMachineConfig().getMemory());
         List<MachineDisk> disks = new ArrayList<MachineDisk>();
-        if (machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates() != null) {
-            for (DiskTemplate diskTemplate : machineCreate.getMachineTemplate().getMachineConfiguration().getDiskTemplates()) {
+        if (machineCreate.getMachineTemplate().getMachineConfig().getDisks() != null) {
+            for (DiskTemplate diskTemplate : machineCreate.getMachineTemplate().getMachineConfig().getDisks()) {
                 MachineDisk mdisk = new MachineDisk();
                 mdisk.setCapacity(diskTemplate.getCapacity());
                 mdisk.setInitialLocation(diskTemplate.getInitialLocation());
@@ -500,7 +500,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         if (j == null) {
             return true;
         }
-        while (j.getStatus().equals(Job.Status.RUNNING)) {
+        while (j.getState().equals(Job.Status.RUNNING)) {
             try {
                 time++;
                 if (time > maxTimeSecond) {
@@ -510,8 +510,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             } catch (InterruptedException e) {
             }
         }
-        if (j.getStatus().equals(Status.FAILED) || j.getStatus().equals(Status.CANCELLED)
-            || j.getStatus().equals(Status.RUNNING)) {
+        if (j.getState().equals(Status.FAILED) || j.getState().equals(Status.CANCELLED)
+            || j.getState().equals(Status.RUNNING)) {
             return true;
         }
         return false;
@@ -600,10 +600,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     // warning:job returned by createXXX is a copy!
                     Job j = jobManager.getJobById(this.createMachine(mc).getProviderAssignedId().toString());
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                    if (j.getStatus().equals(Status.SUCCESS)) {
+                    if (j.getState().equals(Status.SUCCESS)) {
                         SystemMachine sm = new SystemMachine();
                         sm.setState(SystemMachine.State.AVAILABLE);
-                        sm.setResource(j.getTargetEntity());
+                        sm.setResource(j.getTargetResource());
                         system.getMachines().add(sm);
                     }
                 }
@@ -627,10 +627,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     // warning:job returned by createXXX is a copy!
                     Job j = jobManager.getJobById(this.createVolume(vc).getProviderAssignedId().toString());
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                    if (j.getStatus().equals(Status.SUCCESS)) {
+                    if (j.getState().equals(Status.SUCCESS)) {
                         SystemVolume sv = new SystemVolume();
                         sv.setState(SystemVolume.State.AVAILABLE);
-                        sv.setResource(j.getTargetEntity());
+                        sv.setResource(j.getTargetResource());
                         system.getVolumes().add(sv);
                     }
                 }
@@ -654,10 +654,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     // warning:job returned by createXXX is a copy!
                     Job j = jobManager.getJobById(this.createSystem(sc).getProviderAssignedId().toString());
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                    if (j.getStatus().equals(Status.SUCCESS)) {
+                    if (j.getState().equals(Status.SUCCESS)) {
                         SystemSystem ss = new SystemSystem();
                         ss.setState(SystemSystem.State.AVAILABLE);
-                        ss.setResource(j.getTargetEntity());
+                        ss.setResource(j.getTargetResource());
                         system.getSystems().add(ss);
                     }
                 }
@@ -681,10 +681,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     // warning:job returned by createXXX is a copy!
                     Job j = jobManager.getJobById(this.createNetwork(nc).getProviderAssignedId().toString());
                     failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                    if (j.getStatus().equals(Status.SUCCESS)) {
+                    if (j.getState().equals(Status.SUCCESS)) {
                         SystemNetwork sn = new SystemNetwork();
                         sn.setState(SystemNetwork.State.AVAILABLE);
-                        sn.setResource(j.getTargetEntity());
+                        sn.setResource(j.getTargetResource());
                         system.getNetworks().add(sn);
                     }
                 }

@@ -194,7 +194,7 @@ public class CimiPrimerScenarioTest {
         String jobId = job.getId().toString();
         while (true) {
             job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -218,7 +218,7 @@ public class CimiPrimerScenarioTest {
 
         machineConfig.setCpu(numCpus);
         machineConfig.setMemory(ramSizeInMB * 1024);
-        machineConfig.setDiskTemplates(Collections.singletonList(disk));
+        machineConfig.setDisks(Collections.singletonList(disk));
         return machineConfig;
     }
 
@@ -307,7 +307,7 @@ public class CimiPrimerScenarioTest {
             .toString());
         System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
             + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
-            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
+            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDisks()
             + "]");
 
         /**
@@ -326,9 +326,9 @@ public class CimiPrimerScenarioTest {
         System.out.println("New Credentials id=" + credentials.getId());
         MachineTemplate machineTemplate = new MachineTemplate();
 
-        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineConfig(machineConfig);
         machineTemplate.setMachineImage(image);
-        machineTemplate.setCredentials(credentials);
+        machineTemplate.setCredential(credentials);
 
         List<MachineVolume> volColl = new ArrayList<MachineVolume>();
 
@@ -403,7 +403,7 @@ public class CimiPrimerScenarioTest {
             .toString());
         System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
             + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
-            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
+            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDisks()
             + "]");
 
         /**
@@ -431,9 +431,9 @@ public class CimiPrimerScenarioTest {
 
         MachineTemplate machineTemplate = new MachineTemplate();
 
-        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineConfig(machineConfig);
         machineTemplate.setMachineImage(image);
-        machineTemplate.setCredentials(credentials);
+        machineTemplate.setCredential(credentials);
 
         List<MachineVolume> volColl = new ArrayList<MachineVolume>();
 
@@ -446,7 +446,7 @@ public class CimiPrimerScenarioTest {
         machineCreate.setMachineTemplate(machineTemplate);
 
         Job job = this.machineManager.createMachine(machineCreate);
-        String machineId = job.getTargetEntity().getId().toString();
+        String machineId = job.getTargetResource().getId().toString();
         System.out.println("createMachine wait for job completion " + machineId);
         this.waitForJobCompletion(job);
         return machineId;
@@ -488,7 +488,7 @@ public class CimiPrimerScenarioTest {
             .toString());
         System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
             + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
-            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
+            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDisks()
             + "]");
 
         /**
@@ -525,9 +525,9 @@ public class CimiPrimerScenarioTest {
 
         MachineTemplate machineTemplate = new MachineTemplate();
 
-        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineConfig(machineConfig);
         machineTemplate.setMachineImage(image);
-        machineTemplate.setCredentials(credentials);
+        machineTemplate.setCredential(credentials);
 
         ArrayList<MachineVolume> vtItems = new ArrayList<MachineVolume>();
         MachineVolume mv1 = new MachineVolume();
@@ -549,7 +549,7 @@ public class CimiPrimerScenarioTest {
 
         System.out.println(" createMachineWithPreExistingVolumes : create machine now");
         Job job = this.machineManager.createMachine(machineCreate);
-        String machineId = job.getTargetEntity().getId().toString();
+        String machineId = job.getTargetResource().getId().toString();
         System.out.println(" createMachineWithPreExistingVolumes : new machine id " + machineId + " with job " + job.getId());
         this.waitForJobCompletion(job);
 
@@ -601,7 +601,7 @@ public class CimiPrimerScenarioTest {
             .toString());
         System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
             + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
-            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
+            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDisks()
             + "]");
 
         /**
@@ -629,9 +629,9 @@ public class CimiPrimerScenarioTest {
 
         MachineTemplate machineTemplate = new MachineTemplate();
 
-        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineConfig(machineConfig);
         machineTemplate.setMachineImage(image);
-        machineTemplate.setCredentials(credentials);
+        machineTemplate.setCredential(credentials);
 
         List<MachineVolume> volColl = new ArrayList<MachineVolume>();
 
@@ -682,7 +682,7 @@ public class CimiPrimerScenarioTest {
         machineCreate.setMachineTemplate(machineTemplate);
         System.out.println("createMachineWithNewVolumesAndNetworks create machine ");
         Job job = this.machineManager.createMachine(machineCreate);
-        String machineId = job.getTargetEntity().getId().toString();
+        String machineId = job.getTargetResource().getId().toString();
         System.out.println("createMachineWithNewVolumes wait for job completion ");
         this.waitForJobCompletion(job);
         Machine m = this.machineManager.getMachineById(machineId);
@@ -738,7 +738,7 @@ public class CimiPrimerScenarioTest {
             .toString());
         System.out.println("MachineConfiguration [id=" + machineConfig.getId() + ", name=" + machineConfig.getName()
             + ", description=" + machineConfig.getDescription() + ", created=" + machineConfig.getCreated() + ", cpu="
-            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDiskTemplates()
+            + machineConfig.getCpu() + ", memory=" + machineConfig.getMemory() + ", disks=" + machineConfig.getDisks()
             + "]");
 
         /**
@@ -766,9 +766,9 @@ public class CimiPrimerScenarioTest {
 
         MachineTemplate machineTemplate = new MachineTemplate();
 
-        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineConfig(machineConfig);
         machineTemplate.setMachineImage(image);
-        machineTemplate.setCredentials(credentials);
+        machineTemplate.setCredential(credentials);
 
         List<MachineVolume> volColl = new ArrayList<MachineVolume>();
 
@@ -788,7 +788,7 @@ public class CimiPrimerScenarioTest {
         machineCreate.setMachineTemplate(machineTemplate);
         System.out.println("createMachineWithNewVolumes create machine ");
         Job job = this.machineManager.createMachine(machineCreate);
-        String machineId = job.getTargetEntity().getId().toString();
+        String machineId = job.getTargetResource().getId().toString();
         System.out.println("createMachineWithNewVolumes wait for job completion ");
         this.waitForJobCompletion(job);
         return machineId;
@@ -859,7 +859,7 @@ public class CimiPrimerScenarioTest {
 
         Job job = this.volumeManager.createVolume(volumeCreate);
 
-        volumeId = job.getTargetEntity().getId().toString();
+        volumeId = job.getTargetResource().getId().toString();
         System.out.println(" createVolume: wait for volume creation completion ");
         this.waitForJobCompletion(job);
 
@@ -978,7 +978,7 @@ public class CimiPrimerScenarioTest {
 
         Job job = this.volumeManager.createVolume(volumeCreate);
 
-        String volumeId = job.getTargetEntity().getId().toString();
+        String volumeId = job.getTargetResource().getId().toString();
         System.out.println(" testScenarioTwo: wait for volume creation completion ");
         this.waitForJobCompletion(job);
 
@@ -998,7 +998,7 @@ public class CimiPrimerScenarioTest {
         machineVolume.setInitialLocation("/dev/sdb");
         job = this.machineManager.addVolumeToMachine(machineId, machineVolume);
         System.out.println(" testScenarioTwo: add volume to machine wait for job completion " + job.getId() + " "
-            + job.getStatus());
+            + job.getState());
         this.waitForJobCompletion(job);
 
         /**
@@ -1131,7 +1131,7 @@ public class CimiPrimerScenarioTest {
                 mv.setVolume(reattached);
                 mv.setInitialLocation("/idontcare");
                 Job reattachJob = this.machineManager.addVolumeToMachine(machineId, mv);
-                if (reattachJob.getStatus() != Job.Status.FAILED) {
+                if (reattachJob.getState() != Job.Status.FAILED) {
                     this.waitForJobCompletion(deleteJob);
 
                     Machine mm = this.machineManager.getMachineById(machineId);
@@ -1146,7 +1146,7 @@ public class CimiPrimerScenarioTest {
                     Assert.assertNotNull(toremove);
                     /** detach this volume now */
                     Job detachJob = this.machineManager.removeVolumeFromMachine(machineId, toremove.getId().toString());
-                    if (detachJob.getStatus().equals(Job.Status.FAILED)) {
+                    if (detachJob.getState().equals(Job.Status.FAILED)) {
                         throw new Exception(" detach of reattached volume failed " + machineId);
                     }
                     this.waitForJobCompletion(detachJob);
@@ -1158,7 +1158,7 @@ public class CimiPrimerScenarioTest {
 
         deleteJob = this.machineManager.deleteMachine(machineId);
 
-        if (deleteJob.getStatus() == Job.Status.RUNNING) {
+        if (deleteJob.getState() == Job.Status.RUNNING) {
             System.out.println(" testScenarioThree : wait for deletion of machine " + machineId);
             this.waitForJobCompletion(deleteJob);
         } else {
@@ -1303,7 +1303,7 @@ public class CimiPrimerScenarioTest {
 
             Job deleteJob = this.machineManager.removeVolumeFromMachine(machineId, mv.getId().toString());
             System.out.println(" testScenarioFive status detach of volume " + mv.getId() + " job status = "
-                + deleteJob.getStatus());
+                + deleteJob.getState());
             this.waitForJobCompletion(deleteJob);
 
         }
@@ -1313,7 +1313,7 @@ public class CimiPrimerScenarioTest {
 
         Job deleteJob = this.machineManager.deleteMachine(machineId);
 
-        if (deleteJob.getStatus() == Job.Status.RUNNING) {
+        if (deleteJob.getState() == Job.Status.RUNNING) {
             System.out.println(" testScenarioFive : wait for deletion of machine " + machineId);
             this.waitForJobCompletion(deleteJob);
         } else {

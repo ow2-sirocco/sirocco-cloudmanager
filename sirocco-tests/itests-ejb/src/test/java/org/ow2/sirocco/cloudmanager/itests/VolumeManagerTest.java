@@ -169,7 +169,7 @@ public class VolumeManagerTest {
         String jobId = job.getId().toString();
         while (true) {
             job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -177,7 +177,7 @@ public class VolumeManagerTest {
                 throw new Exception("Operation time out");
             }
         }
-        Assert.assertTrue("Job failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+        Assert.assertTrue("Job failed: " + job.getStatusMessage(), job.getState() == Job.Status.SUCCESS);
     }
 
     String createVolume() throws Exception {
@@ -199,7 +199,7 @@ public class VolumeManagerTest {
 
         Assert.assertNotNull(job.getId());
         Assert.assertTrue("job action is invalid", job.getAction().equals("add"));
-        String volumeId = job.getTargetEntity().getId().toString();
+        String volumeId = job.getTargetResource().getId().toString();
         Assert.assertNotNull("job target entity is invalid", volumeId);
 
         this.waitForJobCompletion(job);
@@ -233,7 +233,7 @@ public class VolumeManagerTest {
         Assert.assertNotNull("deleteVolume returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("delete"));
-        Assert.assertEquals("job target entity is invalid", volumeId, job.getTargetEntity().getId().toString());
+        Assert.assertEquals("job target entity is invalid", volumeId, job.getTargetResource().getId().toString());
 
         this.waitForJobCompletion(job);
 
@@ -330,7 +330,7 @@ public class VolumeManagerTest {
 
         Assert.assertNotNull(job.getId());
         Assert.assertTrue("job action is invalid", job.getAction().equals("add"));
-        String volumeImageId = job.getTargetEntity().getId().toString();
+        String volumeImageId = job.getTargetResource().getId().toString();
         Assert.assertNotNull("job target entity is invalid", volumeImageId);
 
         this.waitForJobCompletion(job);
@@ -343,7 +343,7 @@ public class VolumeManagerTest {
         Assert.assertNotNull("deleteVolumeImage returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("delete"));
-        Assert.assertEquals("job target entity is invalid", volumeImageId, job.getTargetEntity().getId().toString());
+        Assert.assertEquals("job target entity is invalid", volumeImageId, job.getTargetResource().getId().toString());
 
         this.waitForJobCompletion(job);
 

@@ -53,7 +53,11 @@ public interface ISystemManager extends IJobListener, IEntityStateListener {
     // get by id
     System getSystemById(String systemId) throws CloudProviderException;
 
+    System getSystemAttributes(String systemId, List<String> attributes) throws CloudProviderException;
+
     SystemTemplate getSystemTemplateById(String systemTemplateId) throws CloudProviderException;
+
+    SystemTemplate getSystemTemplateAttributes(String systemTemplateId, List<String> attributes) throws CloudProviderException;
 
     // CRUD on system collections
     Job addEntityToSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException;

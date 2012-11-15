@@ -92,6 +92,8 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
             "California"), "us-west-1");
         AmazonCloudProviderConnectorFactory.locationMap.put(new CloudProviderLocation("SG", null, "Singapore", null),
             "ap-southeast-1");
+        AmazonCloudProviderConnectorFactory.locationMap.put(new CloudProviderLocation("AU", "AU-NSW", "Australia", "Sydney"),
+            "ap-southeast-2");
         AmazonCloudProviderConnectorFactory.locationMap.put(new CloudProviderLocation("JP", "JP-13", "Japan", "Tokyo"),
             "ap-northeast-1");
         AmazonCloudProviderConnectorFactory.locationMap.put(new CloudProviderLocation("BR", "BR-SP", "Brazil", "Sao Paulo"),
@@ -309,22 +311,21 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
                 if (memoryInMBytes == hardware.getRam()) {
                     if (machineConfig.getCpu() == hardware.getProcessors().size()) {
                         // special test for micro instance with no disk
-                        if (hardware.getVolumes().size() == 0 && machineConfig.getDiskTemplates().size() == 1
-                            && machineConfig.getDiskTemplates().get(0).getCapacity() == 0) {
+                        if (hardware.getVolumes().size() == 0 && machineConfig.getDisks().size() == 1
+                            && machineConfig.getDisks().get(0).getCapacity() == 0) {
                             return hardware.getProviderId();
                         }
-                        if (machineConfig.getDiskTemplates().size() == hardware.getVolumes().size()) {
+                        if (machineConfig.getDisks().size() == hardware.getVolumes().size()) {
                             // XXX we assume that disks are ordered the same way
                             int i = 0;
-                            for (; i < machineConfig.getDiskTemplates().size(); i++) {
-                                long diskSizeInGigaBytes = machineConfig.getDiskTemplates().get(i).getCapacity()
-                                    / (1000 * 1000);
+                            for (; i < machineConfig.getDisks().size(); i++) {
+                                long diskSizeInGigaBytes = machineConfig.getDisks().get(i).getCapacity() / (1000 * 1000);
                                 long hardwareDiskSizeInGigaBytes = hardware.getVolumes().get(i).getSize().longValue();
                                 if (diskSizeInGigaBytes != hardwareDiskSizeInGigaBytes) {
                                     break;
                                 }
                             }
-                            if (i >= machineConfig.getDiskTemplates().size()) {
+                            if (i >= machineConfig.getDisks().size()) {
                                 return hardware.getProviderId();
                             }
                         }
@@ -451,14 +452,13 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
 
         @Override
         public Job createMachine(final MachineCreate machineCreate) throws ConnectorException {
-            final String instanceType = this.findSuitableInstanceType(machineCreate.getMachineTemplate()
-                .getMachineConfiguration());
+            final String instanceType = this.findSuitableInstanceType(machineCreate.getMachineTemplate().getMachineConfig());
             if (instanceType == null) {
                 throw new ConnectorException("Not suitable instance type found");
             }
             KeyPair keyPair = null;
-            if (machineCreate.getMachineTemplate().getCredentials() != null) {
-                keyPair = this.findOrInstallKeyPair(new String(machineCreate.getMachineTemplate().getCredentials()
+            if (machineCreate.getMachineTemplate().getCredential() != null) {
+                keyPair = this.findOrInstallKeyPair(new String(machineCreate.getMachineTemplate().getCredential()
                     .getPublicKey()));
             }
             RunInstancesOptions options = RunInstancesOptions.Builder.asType(instanceType);
@@ -802,7 +802,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
 
             try {
                 final ElasticBlockStoreClient ebsClient = this.syncClient.getElasticBlockStoreServices();
-
+                AmazonCloudProviderConnectorFactory.logger.info("zone=" + this.defaultAvailabilityZone);
                 org.jclouds.ec2.domain.Volume ebsVolume = ebsClient.createVolumeInAvailabilityZone(
                     this.defaultAvailabilityZone, sizeInGB);
                 final String ebsVolumeId = ebsVolume.getId();
@@ -832,6 +832,7 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
                 ListenableFuture<Volume> result = AmazonCloudProviderConnectorFactory.this.executorService.submit(createTask);
                 return AmazonCloudProviderConnectorFactory.this.jobManager.newJob(cimiVolume, null, "add", result);
             } catch (Exception ex) {
+                AmazonCloudProviderConnectorFactory.logger.error("Failed to create volume", ex);
                 throw new ConnectorException(ex.getMessage());
             }
         }

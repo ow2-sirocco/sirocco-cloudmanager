@@ -133,7 +133,7 @@ public class NetworkManager implements INetworkManager {
             throw new CloudProviderException(e.getMessage());
         }
 
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
@@ -146,7 +146,7 @@ public class NetworkManager implements INetworkManager {
             : new HashMap<String, String>(networkCreate.getProperties()));
         network.setUser(user);
 
-        network.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+        network.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         network.setCloudProviderAccount(defaultAccount);
 
         network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
@@ -159,10 +159,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         Job job = new Job();
-        job.setTargetEntity(network);
+        job.setTargetResource(network);
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -223,7 +223,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<Network> getNetworks(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("Network", this.em, user.getUsername(), first, last, filters, attributes, true);
+        return UtilsForManagers.getEntityList("Network", Network.class, this.em, user.getUsername(), first, last, filters,
+            attributes, true);
     }
 
     @Override
@@ -274,7 +275,7 @@ public class NetworkManager implements INetworkManager {
         }
 
         // if by change the job is done and has failed, bail out
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
@@ -290,10 +291,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         Job job = new Job();
-        job.setTargetEntity(network);
+        job.setTargetResource(network);
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -401,8 +402,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<NetworkConfiguration> getNetworkConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkConfiguration", this.em, user.getUsername(), first, last, filters,
-            attributes, false);
+        return UtilsForManagers.getEntityList("NetworkConfiguration", NetworkConfiguration.class, this.em, user.getUsername(),
+            first, last, filters, attributes, false);
     }
 
     @Override
@@ -480,8 +481,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<NetworkTemplate> getNetworkTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkTemplate", this.em, user.getUsername(), first, last, filters, attributes,
-            false);
+        return UtilsForManagers.getEntityList("NetworkTemplate", NetworkTemplate.class, this.em, user.getUsername(), first,
+            last, filters, attributes, false);
     }
 
     @Override
@@ -547,7 +548,7 @@ public class NetworkManager implements INetworkManager {
             throw new CloudProviderException(e.getMessage());
         }
 
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
@@ -560,7 +561,7 @@ public class NetworkManager implements INetworkManager {
             : new HashMap<String, String>(networkPortCreate.getProperties()));
         networkPort.setUser(user);
 
-        networkPort.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+        networkPort.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         networkPort.setCloudProviderAccount(defaultAccount);
 
         networkPort.setNetwork(networkPortCreate.getNetworkPortTemplate().getNetwork());
@@ -572,10 +573,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         Job job = new Job();
-        job.setTargetEntity(networkPort);
+        job.setTargetResource(networkPort);
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -615,7 +616,7 @@ public class NetworkManager implements INetworkManager {
         }
 
         // if by change the job is done and has failed, bail out
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
@@ -631,10 +632,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         Job job = new Job();
-        job.setTargetEntity(networkPort);
+        job.setTargetResource(networkPort);
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -694,8 +695,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<NetworkPort> getNetworkPorts(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkPort", this.em, user.getUsername(), first, last, filters, attributes,
-            true);
+        return UtilsForManagers.getEntityList("NetworkPort", NetworkPort.class, this.em, user.getUsername(), first, last,
+            filters, attributes, true);
     }
 
     @Override
@@ -768,8 +769,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<NetworkPortConfiguration> getNetworkPortConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkPortConfiguration", this.em, user.getUsername(), first, last, filters,
-            attributes, false);
+        return UtilsForManagers.getEntityList("NetworkPortConfiguration", NetworkPortConfiguration.class, this.em,
+            user.getUsername(), first, last, filters, attributes, false);
     }
 
     @Override
@@ -851,8 +852,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<NetworkPortTemplate> getNetworkPortTemplates(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkPortTemplate", this.em, user.getUsername(), first, last, filters,
-            attributes, false);
+        return UtilsForManagers.getEntityList("NetworkPortTemplate", NetworkPortTemplate.class, this.em, user.getUsername(),
+            first, last, filters, attributes, false);
     }
 
     @Override
@@ -929,8 +930,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<ForwardingGroupTemplate> getForwardingGroupTemplates(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("ForwardingGroupTemplate", this.em, user.getUsername(), first, last, filters,
-            attributes, false);
+        return UtilsForManagers.getEntityList("ForwardingGroupTemplate", ForwardingGroupTemplate.class, this.em,
+            user.getUsername(), first, last, filters, attributes, false);
     }
 
     @Override
@@ -991,7 +992,7 @@ public class NetworkManager implements INetworkManager {
             throw new CloudProviderException(e.getMessage());
         }
 
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
@@ -1004,7 +1005,7 @@ public class NetworkManager implements INetworkManager {
             : new HashMap<String, String>(forwardingGroupCreate.getProperties()));
         forwardingGroup.setUser(user);
 
-        forwardingGroup.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+        forwardingGroup.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         forwardingGroup.setCloudProviderAccount(defaultAccount);
 
         List<ForwardingGroupNetwork> networks = new ArrayList<ForwardingGroupNetwork>();
@@ -1023,10 +1024,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         Job job = new Job();
-        job.setTargetEntity(forwardingGroup);
+        job.setTargetResource(forwardingGroup);
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -1065,8 +1066,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<ForwardingGroup> getForwardingGroups(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("ForwardingGroup", this.em, user.getUsername(), first, last, filters, attributes,
-            true);
+        return UtilsForManagers.getEntityList("ForwardingGroup", ForwardingGroup.class, this.em, user.getUsername(), first,
+            last, filters, attributes, true);
     }
 
     @Override
@@ -1103,7 +1104,7 @@ public class NetworkManager implements INetworkManager {
         }
 
         // if by change the job is done and has failed, bail out
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
@@ -1113,10 +1114,10 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         Job job = new Job();
-        job.setTargetEntity(forwardingGroup);
+        job.setTargetResource(forwardingGroup);
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -1163,16 +1164,16 @@ public class NetworkManager implements INetworkManager {
             throw new CloudProviderException(e.getMessage());
         }
 
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
         Job job = new Job();
-        job.setTargetEntity(forwardingGroup);
-        job.setAffectedEntities(Collections.<CloudResource> singletonList(network));
+        job.setTargetResource(forwardingGroup);
+        job.setAffectedResources(Collections.<CloudResource> singletonList(network));
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -1218,16 +1219,16 @@ public class NetworkManager implements INetworkManager {
             throw new CloudProviderException(e.getMessage());
         }
 
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
         Job job = new Job();
-        job.setTargetEntity(forwardingGroup);
-        job.setAffectedEntities(Collections.<CloudResource> singletonList(forwardingGroupNetwork.getNetwork()));
+        job.setTargetResource(forwardingGroup);
+        job.setAffectedResources(Collections.<CloudResource> singletonList(forwardingGroupNetwork.getNetwork()));
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -1282,7 +1283,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<Address> getAddresses(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("Address", this.em, user.getUsername(), first, last, filters, attributes, false);
+        return UtilsForManagers.getEntityList("Address", Address.class, this.em, user.getUsername(), first, last, filters,
+            attributes, false);
     }
 
     @Override
@@ -1353,8 +1355,8 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<AddressTemplate> getAddressTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("AddressTemplate", this.em, user.getUsername(), first, last, filters, attributes,
-            false);
+        return UtilsForManagers.getEntityList("AddressTemplate", AddressTemplate.class, this.em, user.getUsername(), first,
+            last, filters, attributes, false);
     }
 
     @Override
@@ -1384,11 +1386,11 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public boolean jobCompletionHandler(final Job job) throws CloudProviderException {
-        if (job.getTargetEntity() instanceof Network) {
+        if (job.getTargetResource() instanceof Network) {
             return this.networkCompletionHandler(job);
-        } else if (job.getTargetEntity() instanceof NetworkPort) {
+        } else if (job.getTargetResource() instanceof NetworkPort) {
             return this.networkPortCompletionHandler(job);
-        } else if (job.getTargetEntity() instanceof ForwardingGroup) {
+        } else if (job.getTargetResource() instanceof ForwardingGroup) {
             return this.forwardingGroupCompletionHandler(job);
         }
         return false;
@@ -1419,9 +1421,9 @@ public class NetworkManager implements INetworkManager {
         Network network = null;
 
         try {
-            network = this.getNetworkByProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+            network = this.getNetworkByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         } catch (PersistenceException e) {
-            NetworkManager.logger.error("Cannot find Network with provider-assigned id " + providerJob.getTargetEntity());
+            NetworkManager.logger.error("Cannot find Network with provider-assigned id " + providerJob.getTargetResource());
             return false;
         }
 
@@ -1429,7 +1431,7 @@ public class NetworkManager implements INetworkManager {
         ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount());
 
         if (providerJob.getAction().equals("add")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
                     network.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
                     network.setCreated(new Date());
@@ -1437,7 +1439,7 @@ public class NetworkManager implements INetworkManager {
                 } catch (Exception ex) {
                     NetworkManager.logger.error("Failed to create network " + network.getName(), ex);
                 }
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 network.setState(Network.State.ERROR);
                 NetworkManager.logger.error("Failed to create network  " + network.getName() + ": "
                     + providerJob.getStatusMessage());
@@ -1445,7 +1447,7 @@ public class NetworkManager implements INetworkManager {
             }
         }
         if (providerJob.getAction().equals("start")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
                     network.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
                     network.setUpdated(new Date());
@@ -1453,7 +1455,7 @@ public class NetworkManager implements INetworkManager {
                 } catch (Exception ex) {
                     NetworkManager.logger.error("Failed to start network " + network.getName(), ex);
                 }
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 network.setState(Network.State.ERROR);
                 NetworkManager.logger.error("Failed to start network  " + network.getName() + ": "
                     + providerJob.getStatusMessage());
@@ -1461,7 +1463,7 @@ public class NetworkManager implements INetworkManager {
             }
         }
         if (providerJob.getAction().equals("stop")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
                     network.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
                     network.setUpdated(new Date());
@@ -1469,18 +1471,18 @@ public class NetworkManager implements INetworkManager {
                 } catch (Exception ex) {
                     NetworkManager.logger.error("Failed to stop network " + network.getName(), ex);
                 }
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 network.setState(Network.State.ERROR);
                 NetworkManager.logger.error("Failed to create network  " + network.getName() + ": "
                     + providerJob.getStatusMessage());
                 this.em.persist(network);
             }
         } else if (providerJob.getAction().equals("delete")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 network.setState(Network.State.DELETED);
                 this.em.persist(network);
                 this.em.flush();
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 network.setState(Network.State.ERROR);
                 NetworkManager.logger.error("Failed to delete network  " + network.getName() + ": "
                     + providerJob.getStatusMessage());
@@ -1497,9 +1499,9 @@ public class NetworkManager implements INetworkManager {
         NetworkPort networkPort = null;
 
         try {
-            networkPort = this.getNetworkPortByProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+            networkPort = this.getNetworkPortByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         } catch (PersistenceException e) {
-            NetworkManager.logger.error("Cannot find NetworkPort with provider-assigned id " + providerJob.getTargetEntity());
+            NetworkManager.logger.error("Cannot find NetworkPort with provider-assigned id " + providerJob.getTargetResource());
             return false;
         }
 
@@ -1507,7 +1509,7 @@ public class NetworkManager implements INetworkManager {
         ICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount());
 
         if (providerJob.getAction().equals("add")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
                     networkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
                         .getState());
@@ -1516,7 +1518,7 @@ public class NetworkManager implements INetworkManager {
                 } catch (Exception ex) {
                     NetworkManager.logger.error("Failed to create network port" + networkPort.getName(), ex);
                 }
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 networkPort.setState(NetworkPort.State.ERROR);
                 NetworkManager.logger.error("Failed to create network port " + networkPort.getName() + " : "
                     + providerJob.getStatusMessage());
@@ -1524,7 +1526,7 @@ public class NetworkManager implements INetworkManager {
             }
         }
         if (providerJob.getAction().equals("start")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
                     networkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
                         .getState());
@@ -1533,7 +1535,7 @@ public class NetworkManager implements INetworkManager {
                 } catch (Exception ex) {
                     NetworkManager.logger.error("Failed to start network port " + networkPort.getName(), ex);
                 }
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 networkPort.setState(NetworkPort.State.ERROR);
                 NetworkManager.logger.error("Failed to start network port " + networkPort.getName() + ": "
                     + providerJob.getStatusMessage());
@@ -1541,7 +1543,7 @@ public class NetworkManager implements INetworkManager {
             }
         }
         if (providerJob.getAction().equals("stop")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
                     networkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
                         .getState());
@@ -1550,18 +1552,18 @@ public class NetworkManager implements INetworkManager {
                 } catch (Exception ex) {
                     NetworkManager.logger.error("Failed to stop network port " + networkPort.getName(), ex);
                 }
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 networkPort.setState(NetworkPort.State.ERROR);
                 NetworkManager.logger.error("Failed to create network port " + networkPort.getName() + ": "
                     + providerJob.getStatusMessage());
                 this.em.persist(networkPort);
             }
         } else if (providerJob.getAction().equals("delete")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 networkPort.setState(NetworkPort.State.DELETED);
                 this.em.persist(networkPort);
                 this.em.flush();
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 networkPort.setState(NetworkPort.State.ERROR);
                 NetworkManager.logger.error("Failed to delete network port " + networkPort.getName() + ": "
                     + providerJob.getStatusMessage());
@@ -1577,24 +1579,24 @@ public class NetworkManager implements INetworkManager {
 
         try {
             forwardingGroup = this
-                .getForwardingGroupByProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+                .getForwardingGroupByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         } catch (PersistenceException e) {
             NetworkManager.logger.error("Cannot find ForwardingGroup with provider-assigned id "
-                + providerJob.getTargetEntity());
+                + providerJob.getTargetResource());
             return false;
         }
 
         ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount());
 
         Network affectedNetwork = null;
-        if (providerJob.getAffectedEntities().size() == 1 && providerJob.getAffectedEntities().get(0) instanceof Network) {
-            affectedNetwork = this.getNetworkByProviderAssignedId(providerJob.getAffectedEntities().get(0)
+        if (providerJob.getAffectedResources().size() == 1 && providerJob.getAffectedResources().get(0) instanceof Network) {
+            affectedNetwork = this.getNetworkByProviderAssignedId(providerJob.getAffectedResources().get(0)
                 .getProviderAssignedId());
         }
 
         if (providerJob.getAction().equals("add")) {
             if (affectedNetwork == null) {
-                if (providerJob.getStatus() == Job.Status.SUCCESS) {
+                if (providerJob.getState() == Job.Status.SUCCESS) {
                     try {
                         forwardingGroup.setState(connector.getNetworkService()
                             .getForwardingGroup(forwardingGroup.getProviderAssignedId()).getState());
@@ -1603,7 +1605,7 @@ public class NetworkManager implements INetworkManager {
                     } catch (Exception ex) {
                         NetworkManager.logger.error("Failed to create forwarding group " + forwardingGroup.getName(), ex);
                     }
-                } else if (providerJob.getStatus() == Job.Status.FAILED) {
+                } else if (providerJob.getState() == Job.Status.FAILED) {
                     forwardingGroup.setState(ForwardingGroup.State.ERROR);
                     NetworkManager.logger.error("Failed to create forwarding group  " + forwardingGroup.getName() + ": "
                         + providerJob.getStatusMessage());
@@ -1611,7 +1613,7 @@ public class NetworkManager implements INetworkManager {
                 }
             } else {
                 // add network to forwarding group
-                if (providerJob.getStatus() == Job.Status.SUCCESS) {
+                if (providerJob.getState() == Job.Status.SUCCESS) {
                     try {
                         ForwardingGroupNetwork forwardingGroupNetwork = null;
                         for (ForwardingGroupNetwork net : forwardingGroup.getNetworks()) {
@@ -1632,7 +1634,7 @@ public class NetworkManager implements INetworkManager {
                         NetworkManager.logger.error("Failed to add network to forwarding group " + forwardingGroup.getName(),
                             ex);
                     }
-                } else if (providerJob.getStatus() == Job.Status.FAILED) {
+                } else if (providerJob.getState() == Job.Status.FAILED) {
                     forwardingGroup.setState(ForwardingGroup.State.ERROR);
                     NetworkManager.logger.error("Failed to add network to forwarding group  " + forwardingGroup.getName()
                         + ": " + providerJob.getStatusMessage());
@@ -1642,12 +1644,12 @@ public class NetworkManager implements INetworkManager {
             }
         } else if (providerJob.getAction().equals("delete")) {
             if (affectedNetwork == null) {
-                if (providerJob.getStatus() == Job.Status.SUCCESS) {
+                if (providerJob.getState() == Job.Status.SUCCESS) {
                     forwardingGroup.setState(ForwardingGroup.State.DELETED);
                     forwardingGroup.setNetworks(Collections.<ForwardingGroupNetwork> emptyList());
                     this.em.persist(forwardingGroup);
                     this.em.flush();
-                } else if (providerJob.getStatus() == Job.Status.FAILED) {
+                } else if (providerJob.getState() == Job.Status.FAILED) {
                     forwardingGroup.setState(ForwardingGroup.State.ERROR);
                     NetworkManager.logger.error("Failed to delete forwarding group  " + forwardingGroup.getName() + ": "
                         + providerJob.getStatusMessage());
@@ -1655,7 +1657,7 @@ public class NetworkManager implements INetworkManager {
                 }
             } else {
                 // remove network from forwarding group
-                if (providerJob.getStatus() == Job.Status.SUCCESS) {
+                if (providerJob.getState() == Job.Status.SUCCESS) {
                     boolean found = false;
                     for (Iterator<ForwardingGroupNetwork> it = forwardingGroup.getNetworks().iterator(); it.hasNext();) {
                         ForwardingGroupNetwork net = it.next();
@@ -1673,7 +1675,7 @@ public class NetworkManager implements INetworkManager {
                     forwardingGroup.getNetworks().remove(affectedNetwork);
                     this.em.persist(forwardingGroup);
                     this.em.flush();
-                } else if (providerJob.getStatus() == Job.Status.FAILED) {
+                } else if (providerJob.getState() == Job.Status.FAILED) {
                     forwardingGroup.setState(ForwardingGroup.State.ERROR);
                     NetworkManager.logger.error("Failed to remove network from forwarding group  " + forwardingGroup.getName()
                         + ": " + providerJob.getStatusMessage());
@@ -1697,8 +1699,9 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<ForwardingGroupNetwork> getForwardingGroupNetworks(final String forwardingGroupId, final int first,
         final int last, final List<String> filters, final List<String> attributes) throws InvalidRequestException,
         CloudProviderException {
-        return UtilsForManagers.getCollectionItemList("ForwardingGroupNetwork", this.em, this.getUser().getUsername(), first,
-            last, filters, attributes, false, "ForwardingGroup", "networks", forwardingGroupId);
+        return UtilsForManagers
+            .getCollectionItemList("ForwardingGroupNetwork", ForwardingGroupNetwork.class, this.em, this.getUser()
+                .getUsername(), first, last, filters, attributes, false, "ForwardingGroup", "networks", forwardingGroupId);
     }
 
     @Override

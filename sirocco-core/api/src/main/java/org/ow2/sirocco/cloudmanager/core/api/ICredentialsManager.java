@@ -48,6 +48,9 @@ public interface ICredentialsManager {
 
     Credentials getCredentialsById(String credentialsId) throws CloudProviderException;
 
+    Credentials getCredentialsAttributes(final String credentialsId, List<String> attributes) throws ResourceNotFoundException,
+        CloudProviderException;
+
     void deleteCredentials(String credentialsId) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
 
@@ -62,6 +65,9 @@ public interface ICredentialsManager {
     void updateCredentialsTemplate(CredentialsTemplate credentialsTemplate) throws CloudProviderException;
 
     CredentialsTemplate getCredentialsTemplateById(String credentialsTemplateId) throws CloudProviderException;
+
+    CredentialsTemplate getCredentialsTemplateAttributes(final String credentialsTemplateId, List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException;
 
     void deleteCredentialsTemplate(String credentialsTemplateId) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;

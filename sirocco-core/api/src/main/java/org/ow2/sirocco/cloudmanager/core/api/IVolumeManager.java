@@ -314,6 +314,8 @@ public interface IVolumeManager extends IJobListener {
 
     VolumeImage getVolumeImageById(final String volumeImageId) throws ResourceNotFoundException;
 
+    VolumeImage getVolumeImageAttributes(final String volumeImageId, List<String> attributes) throws ResourceNotFoundException;
+
     QueryResult<VolumeImage> getVolumeImages(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 

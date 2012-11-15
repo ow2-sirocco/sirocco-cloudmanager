@@ -65,16 +65,16 @@ public class SystemManagerTest extends SiroccoTester {
         MachineConfiguration out_c = this.machineManager.createMachineConfiguration(in_c);
 
         MachineConfiguration machineConfig = out_c;
-        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineConfig(machineConfig);
 
         MachineImage in_i = machineTest.initMachineImage();
         Job out_j = this.machineImageManager.createMachineImage(in_i);
 
-        machineTemplate.setMachineImage((MachineImage) out_j.getTargetEntity());
+        machineTemplate.setMachineImage((MachineImage) out_j.getTargetResource());
 
         Credentials out_cr = this.credManager.createCredentials(machineTest.initCredentials());
 
-        machineTemplate.setCredentials(out_cr);
+        machineTemplate.setCredential(out_cr);
 
         Volume v = this.createVolume("testVolumeAttach");
 
@@ -208,7 +208,7 @@ public class SystemManagerTest extends SiroccoTester {
         java.lang.System.out.println("creating a non trivial system");
         Job j = this.systemManager.createSystem(systemCreate1);
         Assert.assertEquals(Job.Status.SUCCESS, this.waitForJobCompletion(j));
-        String systemId = j.getTargetEntity().getId().toString();
+        String systemId = j.getTargetResource().getId().toString();
 
         // verif
         org.ow2.sirocco.cloudmanager.model.cimi.system.System sv1 = this.systemManager.getSystemById(systemId);

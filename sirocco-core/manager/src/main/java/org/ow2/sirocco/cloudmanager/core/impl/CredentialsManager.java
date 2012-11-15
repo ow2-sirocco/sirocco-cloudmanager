@@ -148,6 +148,13 @@ public class CredentialsManager implements ICredentialsManager {
         return cred;
     }
 
+    @Override
+    public Credentials getCredentialsAttributes(final String credentialsId, final List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException {
+        Credentials cred = this.getCredentialsById(credentialsId);
+        return UtilsForManagers.fillResourceAttributes(cred, attributes);
+    }
+
     public void deleteCredentials(final String credentialsId) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException {
         User user = this.getUser();
@@ -208,8 +215,8 @@ public class CredentialsManager implements ICredentialsManager {
     public QueryResult<Credentials> getCredentials(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("Credentials", this.em, user.getUsername(), first, last, filters, attributes,
-            false);
+        return UtilsForManagers.getEntityList("Credentials", Credentials.class, this.em, user.getUsername(), first, last,
+            filters, attributes, false);
     }
 
     @Override
@@ -238,6 +245,13 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     @Override
+    public CredentialsTemplate getCredentialsTemplateAttributes(final String credentialsTemplateId,
+        final List<String> attributes) throws ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
     public void deleteCredentialsTemplate(final String credentialsTemplateId) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
@@ -261,7 +275,7 @@ public class CredentialsManager implements ICredentialsManager {
     public QueryResult<CredentialsTemplate> getCredentialsTemplates(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("CredentialsTemplate", this.em, user.getUsername(), first, last, filters,
-            attributes, false);
+        return UtilsForManagers.getEntityList("CredentialsTemplate", CredentialsTemplate.class, this.em, user.getUsername(),
+            first, last, filters, attributes, false);
     }
 }

@@ -187,7 +187,7 @@ public class CloudProviderConnectorTest {
         String jobId = job.getProviderAssignedId().toString();
         while (true) {
             job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -195,7 +195,7 @@ public class CloudProviderConnectorTest {
                 throw new Exception("Operation time out");
             }
         }
-        Assert.assertTrue("Job failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+        Assert.assertTrue("Job failed: " + job.getStatusMessage(), job.getState() == Job.Status.SUCCESS);
     }
 
     @Test
@@ -214,8 +214,8 @@ public class CloudProviderConnectorTest {
             disk.setCapacity(diskSizeGB * 1000 * 1000);
             disks.add(disk);
         }
-        machineConfiguration.setDiskTemplates(disks);
-        machineTemplate.setMachineConfiguration(machineConfiguration);
+        machineConfiguration.setDisks(disks);
+        machineTemplate.setMachineConfig(machineConfiguration);
         MachineImage machineImage = new MachineImage();
         machineImage.setProviderAssignedId(this.imageId);
         Map<String, String> imageProps = new HashMap<String, String>();
@@ -235,7 +235,7 @@ public class CloudProviderConnectorTest {
         if (this.key != null) {
             Credentials credentials = new Credentials();
             credentials.setPublicKey(this.key.getBytes());
-            machineTemplate.setCredentials(credentials);
+            machineTemplate.setCredential(credentials);
         }
         machineTemplate.setUserData("color=blue\nip=1.2.3.4\n");
         machineCreate.setMachineTemplate(machineTemplate);
@@ -245,7 +245,7 @@ public class CloudProviderConnectorTest {
         Job job = computeService.createMachine(machineCreate);
         this.waitForJobCompletion(job);
 
-        String machineId = job.getTargetEntity().getProviderAssignedId();
+        String machineId = job.getTargetResource().getProviderAssignedId();
         Machine machine = computeService.getMachine(machineId);
         System.out.println("Machine id=" + machine.getProviderAssignedId() + " state=" + machine.getState());
         for (MachineNetworkInterface netInterface : machine.getNetworkInterfaces()) {
@@ -293,7 +293,7 @@ public class CloudProviderConnectorTest {
         System.out.println("Creating Volume size=" + this.volumeConfigSizeGB + "GB");
         job = volumeService.createVolume(volumeCreate);
         this.waitForJobCompletion(job);
-        String volumeId = job.getTargetEntity().getProviderAssignedId();
+        String volumeId = job.getTargetResource().getProviderAssignedId();
 
         Volume volume = volumeService.getVolume(volumeId);
         System.out.println("Volume id=" + volume.getProviderAssignedId() + " size=" + volume.getCapacity() + " KB");

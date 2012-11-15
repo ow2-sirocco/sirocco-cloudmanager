@@ -116,8 +116,11 @@ public interface IMachineManager extends IJobListener {
     /**
      * Operations on MachineConfiguration
      */
-    MachineConfiguration getMachineConfigurationById(final String MachineId) throws ResourceNotFoundException,
-        CloudProviderException;;
+    MachineConfiguration getMachineConfigurationById(final String machineConfigurationId) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    MachineConfiguration getMachineConfigurationAttributes(final String machineConfigurationId, List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException;
 
     void updateMachineConfiguration(MachineConfiguration machineConfiguration) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
@@ -148,6 +151,9 @@ public interface IMachineManager extends IJobListener {
      * Operations on MachineTemplate
      */
     MachineTemplate getMachineTemplateById(String machineTemplateId) throws ResourceNotFoundException, CloudProviderException;
+
+    MachineTemplate getMachineTemplateAttributes(final String machineTemplateId, List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException;
 
     void updateMachineTemplate(MachineTemplate machineTemplate) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;

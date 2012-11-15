@@ -237,7 +237,7 @@ public class MachineManagerTest {
         }
         in_c.setCpu(1);
         in_c.setMemory(1024 + 512);
-        in_c.setDiskTemplates(dTemplates);
+        in_c.setDisks(dTemplates);
         return in_c;
     }
 
@@ -261,7 +261,7 @@ public class MachineManagerTest {
         int loop = 0;
         while (done != true) {
             int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
-            i = this.machineImageManager.getMachineImageById(out_j.getTargetEntity().getId().toString());
+            i = this.machineImageManager.getMachineImageById(out_j.getTargetResource().getId().toString());
 
             if (i == null) {
 
@@ -316,11 +316,11 @@ public class MachineManagerTest {
         MachineTemplate machineTemplate = new MachineTemplate();
 
         MachineConfiguration machineConfig = this.createMachineConfiguration();
-        machineTemplate.setMachineConfiguration(machineConfig);
+        machineTemplate.setMachineConfig(machineConfig);
 
         machineTemplate.setMachineImage(this.createMachineImage());
 
-        machineTemplate.setCredentials(this.createCredentials());
+        machineTemplate.setCredential(this.createCredentials());
         machineTemplate.setVolumes(new ArrayList<MachineVolume>());
         machineTemplate.setVolumeTemplates(new ArrayList<MachineVolumeTemplate>());
         machineTemplate.setNetworkInterfaces(new ArrayList<MachineTemplateNetworkInterface>());
@@ -331,7 +331,7 @@ public class MachineManagerTest {
 
         Assert.assertNotNull(job.getId());
         Assert.assertTrue("job action is invalid", job.getAction().equals("add"));
-        String machineId = job.getTargetEntity().getId().toString();
+        String machineId = job.getTargetResource().getId().toString();
         Assert.assertNotNull("job target entity is invalid", machineId);
 
         String jobId = job.getId().toString();
@@ -343,7 +343,7 @@ public class MachineManagerTest {
         while (true) {
             job = this.jobManager.getJobById(jobId);
 
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -352,7 +352,7 @@ public class MachineManagerTest {
             }
         }
 
-        Assert.assertTrue("machine creation failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+        Assert.assertTrue("machine creation failed: " + job.getStatusMessage(), job.getState() == Job.Status.SUCCESS);
 
         machine = this.machineManager.getMachineById(machineId);
         Assert.assertNotNull("cannot find machine juste created", machine);
@@ -384,14 +384,14 @@ public class MachineManagerTest {
         Assert.assertNotNull("deleteMachine returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("delete"));
-        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity().getId().toString());
+        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetResource().getId().toString());
 
         String jobId = job.getId().toString();
 
         int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
             job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -400,7 +400,7 @@ public class MachineManagerTest {
             }
         }
 
-        Assert.assertTrue("machine deletion failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+        Assert.assertTrue("machine deletion failed: " + job.getStatusMessage(), job.getState() == Job.Status.SUCCESS);
 
     }
 
@@ -410,14 +410,14 @@ public class MachineManagerTest {
         Assert.assertNotNull("startMachine returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("start"));
-        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity().getId().toString());
+        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetResource().getId().toString());
 
         String jobId = job.getId().toString();
 
         int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
             job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -426,7 +426,7 @@ public class MachineManagerTest {
             }
         }
 
-        Assert.assertTrue("machine start failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+        Assert.assertTrue("machine start failed: " + job.getStatusMessage(), job.getState() == Job.Status.SUCCESS);
 
     }
 
@@ -436,14 +436,14 @@ public class MachineManagerTest {
         Assert.assertNotNull("stopMachine returns no job", job);
 
         Assert.assertTrue("job action is invalid", job.getAction().equals("stop"));
-        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetEntity().getId().toString());
+        Assert.assertEquals("job target entity is invalid", machineId, job.getTargetResource().getId().toString());
 
         String jobId = job.getId().toString();
 
         int counter = MachineManagerTest.MACHINE_ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
         while (true) {
             job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -452,7 +452,7 @@ public class MachineManagerTest {
             }
         }
 
-        Assert.assertTrue("machine stop failed: " + job.getStatusMessage(), job.getStatus() == Job.Status.SUCCESS);
+        Assert.assertTrue("machine stop failed: " + job.getStatusMessage(), job.getState() == Job.Status.SUCCESS);
 
     }
 }

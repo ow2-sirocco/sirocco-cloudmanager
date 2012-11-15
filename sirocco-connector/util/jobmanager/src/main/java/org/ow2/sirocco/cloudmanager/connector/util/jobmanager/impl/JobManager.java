@@ -19,7 +19,7 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: JobManager.java 1561 2012-07-24 08:18:02Z dangtran $
+ *  $Id$
  *
  */
 package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl;
@@ -136,7 +136,7 @@ public class JobManager implements IJobManager, ManagedService {
                 Date now = new Date();
                 for (JobEntry jobEntry : JobManager.this.jobs.values()) {
                     Job job = jobEntry.job;
-                    if (job.getStatus() != Job.Status.RUNNING) {
+                    if (job.getState() != Job.Status.RUNNING) {
                         if (TimeUnit.MILLISECONDS.toSeconds(now.getTime() - job.getTimeOfStatusChange().getTime()) > JobManager.this.jobRetentionPeriodInSeconds) {
                             JobManager.logger.info("Reaping job " + job.getProviderAssignedId());
                             JobManager.this.jobs.remove(job.getProviderAssignedId());
@@ -165,13 +165,13 @@ public class JobManager implements IJobManager, ManagedService {
         String jobId = UUID.randomUUID().toString();
         final Job job = new Job();
         job.setProviderAssignedId(jobId);
-        job.setTargetEntity(targetEntity);
+        job.setTargetResource(targetEntity);
         job.setAction(action);
         job.setIsCancellable(false);
         job.setCreated(new Date());
-        job.setStatus(Job.Status.RUNNING);
+        job.setState(Job.Status.RUNNING);
         List<CloudResource> affectedEntities = new ArrayList<CloudResource>();
-        job.setAffectedEntities(affectedEntities);
+        job.setAffectedResources(affectedEntities);
         if (affectedEntity != null) {
             affectedEntities.add(affectedEntity);
         }
@@ -182,7 +182,7 @@ public class JobManager implements IJobManager, ManagedService {
             public void run() {
                 synchronized (jobEntry) {
                     if (jobEntry.result.isCancelled()) {
-                        jobEntry.job.setStatus(Job.Status.CANCELLED);
+                        jobEntry.job.setState(Job.Status.CANCELLED);
                         jobEntry.job.setStatusMessage("cancelled");
                     } else {
                         boolean interrupted = false;
@@ -190,7 +190,7 @@ public class JobManager implements IJobManager, ManagedService {
                             while (true) {
                                 try {
                                     jobEntry.result.get();
-                                    jobEntry.job.setStatus(Job.Status.SUCCESS);
+                                    jobEntry.job.setState(Job.Status.SUCCESS);
                                     break;
                                 } catch (InterruptedException ex) {
                                     interrupted = true;
@@ -198,10 +198,10 @@ public class JobManager implements IJobManager, ManagedService {
                                 } catch (ExecutionException ex) {
                                     JobManager.logger.info("Job failed", ex.getCause());
                                     jobEntry.job.setStatusMessage(ex.getCause().getMessage());
-                                    jobEntry.job.setStatus(Job.Status.FAILED);
+                                    jobEntry.job.setState(Job.Status.FAILED);
                                     break;
                                 } catch (CancellationException ex) {
-                                    jobEntry.job.setStatus(Job.Status.CANCELLED);
+                                    jobEntry.job.setState(Job.Status.CANCELLED);
                                     jobEntry.job.setStatusMessage("cancelled");
                                     break;
                                 }
@@ -223,12 +223,12 @@ public class JobManager implements IJobManager, ManagedService {
         synchronized (jobEntry) {
             jobByValue.setAction(job.getAction());
             jobByValue.setProviderAssignedId(job.getProviderAssignedId());
-            jobByValue.setTargetEntity(job.getTargetEntity());
+            jobByValue.setTargetResource(job.getTargetResource());
             jobByValue.setAction(job.getAction());
             jobByValue.setIsCancellable(job.getIsCancellable());
-            jobByValue.setStatus(job.getStatus());
+            jobByValue.setState(job.getState());
             jobByValue.setStatusMessage(job.getStatusMessage());
-            jobByValue.setAffectedEntities(job.getAffectedEntities());
+            jobByValue.setAffectedResources(job.getAffectedResources());
         }
 
         return jobByValue;
@@ -241,7 +241,7 @@ public class JobManager implements IJobManager, ManagedService {
             throw new Exception("Invalid jobId: " + jobId);
         }
         synchronized (jobEntry) {
-            if (jobEntry.job.getStatus() != Job.Status.RUNNING) {
+            if (jobEntry.job.getState() != Job.Status.RUNNING) {
                 this.emitJobCompletionEvent(jobEntry.job);
             } else {
                 jobEntry.sendNotif = true;
@@ -268,7 +268,7 @@ public class JobManager implements IJobManager, ManagedService {
     private <T> void emitJobCompletionEvent(final Job job) {
         try {
             JobManager.logger.info("SENDING EVENT JobCompletion action=" + job.getAction() + " target="
-                + job.getTargetEntity().getClass() + " id=" + job.getTargetEntity().getProviderAssignedId());
+                + job.getTargetResource().getClass() + " id=" + job.getTargetResource().getProviderAssignedId());
             this.emitMessage(job);
         } catch (Exception ex) {
             JobManager.logger.error("Failed to emit message", ex);

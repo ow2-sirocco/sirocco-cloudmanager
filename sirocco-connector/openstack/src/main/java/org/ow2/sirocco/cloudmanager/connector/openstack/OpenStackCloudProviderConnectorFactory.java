@@ -299,17 +299,17 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 long flavorMemoryInKBytes = flavor.getRam() * 1024;
                 if (memoryInKBytes == flavorMemoryInKBytes) {
                     if (machineConfig.getCpu() == flavor.getVcpus()) {
-                        if (machineConfig.getDiskTemplates().size() == 1 && !flavor.getEphemeral().isPresent()) {
-                            long diskSizeInKBytes = machineConfig.getDiskTemplates().get(0).getCapacity();
+                        if (machineConfig.getDisks().size() == 1 && !flavor.getEphemeral().isPresent()) {
+                            long diskSizeInKBytes = machineConfig.getDisks().get(0).getCapacity();
                             long flavorDiskSizeInKBytes = flavor.getDisk() * 1000 * 1000;
                             if (diskSizeInKBytes == flavorDiskSizeInKBytes) {
                                 return flavor.getId();
                             }
-                        } else if (machineConfig.getDiskTemplates().size() == 2 && flavor.getEphemeral().isPresent()) {
-                            long diskSizeInKBytes = machineConfig.getDiskTemplates().get(0).getCapacity();
+                        } else if (machineConfig.getDisks().size() == 2 && flavor.getEphemeral().isPresent()) {
+                            long diskSizeInKBytes = machineConfig.getDisks().get(0).getCapacity();
                             long flavorDiskSizeInKBytes = flavor.getDisk() * 1000 * 1000;
                             if (diskSizeInKBytes == flavorDiskSizeInKBytes) {
-                                diskSizeInKBytes = machineConfig.getDiskTemplates().get(1).getCapacity();
+                                diskSizeInKBytes = machineConfig.getDisks().get(1).getCapacity();
                                 flavorDiskSizeInKBytes = flavor.getEphemeral().get() * 1000 * 1000;
                                 if (diskSizeInKBytes == flavorDiskSizeInKBytes) {
                                     return flavor.getId();
@@ -485,15 +485,15 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
 
         @Override
         public Job createMachine(final MachineCreate machineCreate) throws ConnectorException {
-            String flavorId = this.findSuitableFlavor(machineCreate.getMachineTemplate().getMachineConfiguration());
+            String flavorId = this.findSuitableFlavor(machineCreate.getMachineTemplate().getMachineConfig());
             if (flavorId == null) {
                 throw new ConnectorException("Cannot find Nova flavor matching machineConfig");
             }
             final ServerApi serverClient = this.novaClient.getServerApiForZone(this.zone);
 
             String keyPairName = null;
-            if (machineCreate.getMachineTemplate().getCredentials() != null) {
-                String publicKey = new String(machineCreate.getMachineTemplate().getCredentials().getPublicKey());
+            if (machineCreate.getMachineTemplate().getCredential() != null) {
+                String publicKey = new String(machineCreate.getMachineTemplate().getCredential().getPublicKey());
                 keyPairName = this.getKeyPair(publicKey);
             }
 

@@ -125,7 +125,7 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // if by chance the job is done and has failed, bail out
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
@@ -135,7 +135,7 @@ public class VolumeManager implements IVolumeManager {
 
         Volume volume = new Volume();
 
-        volume.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+        volume.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         volume.setCloudProviderAccount(placement.getAccount());
         volume.setLocation(placement.getLocation());
         volume.setCapacity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity());
@@ -148,7 +148,7 @@ public class VolumeManager implements IVolumeManager {
             : new HashMap<String, String>(volumeCreate.getProperties()));
         volume.setUser(user);
 
-        if (providerJob.getStatus() == Job.Status.RUNNING) {
+        if (providerJob.getState() == Job.Status.RUNNING) {
             // job is running: persist volume+job and set up notification on job
             // completion
             volume.setState(Volume.State.CREATING);
@@ -157,11 +157,11 @@ public class VolumeManager implements IVolumeManager {
 
             Job job = new Job();
             job.setUser(user);
-            job.setTargetEntity(volume);
+            job.setTargetResource(volume);
             job.setCreated(new Date());
             job.setDescription("Volume creation");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
-            job.setStatus(providerJob.getStatus());
+            job.setState(providerJob.getState());
             job.setAction(providerJob.getAction());
             job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
             this.em.persist(job);
@@ -178,7 +178,7 @@ public class VolumeManager implements IVolumeManager {
             // persist volume+job
             try {
                 volume.setState(connector.getVolumeService().getVolumeState(
-                    providerJob.getTargetEntity().getProviderAssignedId()));
+                    providerJob.getTargetResource().getProviderAssignedId()));
             } catch (ConnectorException e) {
                 throw new CloudProviderException(e.getMessage());
             }
@@ -186,11 +186,11 @@ public class VolumeManager implements IVolumeManager {
             this.em.persist(volume);
 
             Job job = new Job();
-            job.setTargetEntity(volume);
+            job.setTargetResource(volume);
             job.setCreated(new Date());
             job.setDescription("Volume creation");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
-            job.setStatus(providerJob.getStatus());
+            job.setState(providerJob.getState());
             job.setAction(providerJob.getAction());
             job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
             this.em.persist(job);
@@ -302,7 +302,8 @@ public class VolumeManager implements IVolumeManager {
     public QueryResult<Volume> getVolumes(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("Volume", this.em, user.getUsername(), first, last, filters, attributes, true);
+        return UtilsForManagers.getEntityList("Volume", Volume.class, this.em, user.getUsername(), first, last, filters,
+            attributes, true);
     }
 
     @Override
@@ -316,8 +317,8 @@ public class VolumeManager implements IVolumeManager {
     public QueryResult<VolumeConfiguration> getVolumeConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("VolumeConfiguration", this.em, user.getUsername(), first, last, filters,
-            attributes, false);
+        return UtilsForManagers.getEntityList("VolumeConfiguration", VolumeConfiguration.class, this.em, user.getUsername(),
+            first, last, filters, attributes, false);
     }
 
     @Override
@@ -331,8 +332,8 @@ public class VolumeManager implements IVolumeManager {
     public QueryResult<VolumeTemplate> getVolumeTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("VolumeTemplate", this.em, user.getUsername(), first, last, filters, attributes,
-            false);
+        return UtilsForManagers.getEntityList("VolumeTemplate", VolumeTemplate.class, this.em, user.getUsername(), first, last,
+            filters, attributes, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -474,11 +475,11 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // if by change the job is done and has failed, bail out
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
-        if (providerJob.getStatus() == Job.Status.RUNNING) {
+        if (providerJob.getState() == Job.Status.RUNNING) {
             // job is running: persist volume+job and set up notification on job
             // completion
             volume.setState(Volume.State.DELETING);
@@ -487,11 +488,11 @@ public class VolumeManager implements IVolumeManager {
 
             Job job = new Job();
             job.setUser(this.getUser());
-            job.setTargetEntity(volume);
+            job.setTargetResource(volume);
             job.setCreated(new Date());
             job.setDescription("Volume deletion");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
-            job.setStatus(providerJob.getStatus());
+            job.setState(providerJob.getState());
             job.setAction(providerJob.getAction());
             job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
             this.em.persist(job);
@@ -511,11 +512,11 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             Job job = new Job();
-            job.setTargetEntity(volume);
+            job.setTargetResource(volume);
             job.setCreated(new Date());
             job.setDescription("Volume deletion");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
-            job.setStatus(providerJob.getStatus());
+            job.setState(providerJob.getState());
             job.setAction(providerJob.getAction());
             job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
             this.em.persist(job);
@@ -568,9 +569,9 @@ public class VolumeManager implements IVolumeManager {
             return false;
         }
 
-        if (job.getTargetEntity() instanceof Volume) {
+        if (job.getTargetResource() instanceof Volume) {
             return this.volumeCompletionHandler(job);
-        } else if (job.getTargetEntity() instanceof VolumeImage) {
+        } else if (job.getTargetResource() instanceof VolumeImage) {
             return this.volumeImageCompletionHandler(job);
         }
         return false;
@@ -581,9 +582,9 @@ public class VolumeManager implements IVolumeManager {
         Volume volume = null;
 
         try {
-            volume = this.getVolumeByProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+            volume = this.getVolumeByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         } catch (PersistenceException e) {
-            VolumeManager.logger.error("Cannot find Volume with provider-assigned id " + providerJob.getTargetEntity());
+            VolumeManager.logger.error("Cannot find Volume with provider-assigned id " + providerJob.getTargetResource());
             return false;
         }
 
@@ -592,7 +593,7 @@ public class VolumeManager implements IVolumeManager {
             volume.getLocation());
 
         if (providerJob.getAction().equals("add")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
                     volume.setState(connector.getVolumeService().getVolumeState(volume.getProviderAssignedId()));
                     volume.setCreated(new Date());
@@ -600,18 +601,18 @@ public class VolumeManager implements IVolumeManager {
                 } catch (Exception ex) {
                     VolumeManager.logger.error("Failed to create volume " + volume.getName(), ex);
                 }
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 volume.setState(Volume.State.ERROR);
                 VolumeManager.logger.error("Failed to create volume  " + volume.getName() + ": "
                     + providerJob.getStatusMessage());
                 this.em.persist(volume);
             }
         } else if (providerJob.getAction().equals("delete")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 volume.setState(Volume.State.DELETED);
                 this.em.persist(volume);
                 this.em.flush();
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 volume.setState(Volume.State.ERROR);
                 VolumeManager.logger.error("Failed to delete volume  " + volume.getName() + ": "
                     + providerJob.getStatusMessage());
@@ -626,9 +627,9 @@ public class VolumeManager implements IVolumeManager {
         VolumeImage volumeImage = null;
 
         try {
-            volumeImage = this.getVolumeImageByProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+            volumeImage = this.getVolumeImageByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         } catch (PersistenceException e) {
-            VolumeManager.logger.error("Cannot find VolumeImage with provider-assigned id " + providerJob.getTargetEntity());
+            VolumeManager.logger.error("Cannot find VolumeImage with provider-assigned id " + providerJob.getTargetResource());
             return false;
         }
 
@@ -636,7 +637,7 @@ public class VolumeManager implements IVolumeManager {
             volumeImage.getLocation());
 
         if (providerJob.getAction().equals("add")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
                     volumeImage.setState(connector.getVolumeService().getVolumeImage(volumeImage.getProviderAssignedId())
                         .getState());
@@ -653,18 +654,18 @@ public class VolumeManager implements IVolumeManager {
                 } catch (Exception ex) {
                     VolumeManager.logger.error("Failed to create volume image " + volumeImage.getName(), ex);
                 }
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 volumeImage.setState(VolumeImage.State.ERROR);
                 VolumeManager.logger.error("Failed to create volume image  " + volumeImage.getName() + ": "
                     + providerJob.getStatusMessage());
                 this.em.persist(volumeImage);
             }
         } else if (providerJob.getAction().equals("delete")) {
-            if (providerJob.getStatus() == Job.Status.SUCCESS) {
+            if (providerJob.getState() == Job.Status.SUCCESS) {
                 volumeImage.setState(VolumeImage.State.DELETED);
                 this.em.persist(volumeImage);
                 this.em.flush();
-            } else if (providerJob.getStatus() == Job.Status.FAILED) {
+            } else if (providerJob.getState() == Job.Status.FAILED) {
                 volumeImage.setState(VolumeImage.State.ERROR);
                 VolumeManager.logger.error("Failed to delete volume image  " + volumeImage.getName() + ": "
                     + providerJob.getStatusMessage());
@@ -682,6 +683,13 @@ public class VolumeManager implements IVolumeManager {
             throw new ResourceNotFoundException(" Invalid volumeImage id " + volumeImageId);
         }
         return volumeImage;
+    }
+
+    @Override
+    public VolumeImage getVolumeImageAttributes(final String volumeImageId, final List<String> attributes)
+        throws ResourceNotFoundException {
+        VolumeImage volumeImage = this.getVolumeImageById(volumeImageId);
+        return UtilsForManagers.fillResourceAttributes(volumeImage, attributes);
     }
 
     @Override
@@ -745,13 +753,13 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // if by chance the job is done and has failed, bail out
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
         // prepare the VolumeImage entity to be persisted
 
-        volumeImage.setProviderAssignedId(providerJob.getTargetEntity().getProviderAssignedId());
+        volumeImage.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         volumeImage.setCloudProviderAccount(placement.getAccount());
         volumeImage.setLocation(placement.getLocation());
         volumeImage.setUser(user);
@@ -771,11 +779,11 @@ public class VolumeManager implements IVolumeManager {
 
         Job job = new Job();
         job.setUser(user);
-        job.setTargetEntity(volumeImage);
+        job.setTargetResource(volumeImage);
         job.setCreated(new Date());
         job.setDescription("VolumeImage creation");
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -793,8 +801,8 @@ public class VolumeManager implements IVolumeManager {
     public QueryResult<VolumeImage> getVolumeImages(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("VolumeImage", this.em, user.getUsername(), first, last, filters, attributes,
-            false);
+        return UtilsForManagers.getEntityList("VolumeImage", VolumeImage.class, this.em, user.getUsername(), first, last,
+            filters, attributes, false);
     }
 
     @Override
@@ -826,9 +834,9 @@ public class VolumeManager implements IVolumeManager {
         }
         // TODO call job manager
         Job j = new Job();
-        j.setTargetEntity(volumeImage);
+        j.setTargetResource(volumeImage);
         j.setAction("edit");
-        j.setStatus(Status.SUCCESS);
+        j.setState(Status.SUCCESS);
         this.em.persist(j);
         return j;
     }
@@ -854,7 +862,7 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // if by change the job is done and has failed, bail out
-        if (providerJob.getStatus() == Job.Status.CANCELLED || providerJob.getStatus() == Job.Status.FAILED) {
+        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
         }
 
@@ -864,11 +872,11 @@ public class VolumeManager implements IVolumeManager {
 
         Job job = new Job();
         job.setUser(this.getUser());
-        job.setTargetEntity(volumeImage);
+        job.setTargetResource(volumeImage);
         job.setCreated(new Date());
         job.setDescription("VolumeImage deletion");
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setStatus(providerJob.getStatus());
+        job.setState(providerJob.getState());
         job.setAction(providerJob.getAction());
         job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
         this.em.persist(job);
@@ -906,8 +914,8 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public QueryResult<VolumeVolumeImage> getVolumeVolumeImages(final String volumeId, final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getCollectionItemList("VolumeVolumeImage", this.em, this.getUser().getUsername(), first, last,
-            filters, attributes, false, "Volume", "images", volumeId);
+        return UtilsForManagers.getCollectionItemList("VolumeVolumeImage", VolumeVolumeImage.class, this.em, this.getUser()
+            .getUsername(), first, last, filters, attributes, false, "Volume", "images", volumeId);
     }
 
     @Override
@@ -946,9 +954,9 @@ public class VolumeManager implements IVolumeManager {
         // TODO call job manager
         Job j = new Job();
         // XXX should be VolumeVolumeImage
-        j.setTargetEntity(volumeImage);
+        j.setTargetResource(volumeImage);
         j.setAction("delete");
-        j.setStatus(Status.SUCCESS);
+        j.setState(Status.SUCCESS);
         this.em.persist(j);
         return j;
     }

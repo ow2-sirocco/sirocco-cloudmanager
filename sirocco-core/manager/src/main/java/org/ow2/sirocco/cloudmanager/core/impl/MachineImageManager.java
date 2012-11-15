@@ -96,8 +96,8 @@ public class MachineImageManager implements IMachineImageManager {
 
         j.setCreated(new Date());
         j.setDescription("MachineImage creation");
-        j.setTargetEntity(mi);
-        j.setStatus(Job.Status.SUCCESS);
+        j.setTargetResource(mi);
+        j.setState(Job.Status.SUCCESS);
         j.setAction("add");
         j.setParentJob(null);
         j.setNestedJobs(null);
@@ -125,7 +125,8 @@ public class MachineImageManager implements IMachineImageManager {
     @Override
     public MachineImage getMachineImageAttributes(final String imageId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.getMachineImageById(imageId);
+        MachineImage machineImage = this.getMachineImageById(imageId);
+        return UtilsForManagers.fillResourceAttributes(machineImage, attributes);
     }
 
     public void deleteMachineImage(final String imageId) throws CloudProviderException, ResourceNotFoundException {
@@ -161,8 +162,8 @@ public class MachineImageManager implements IMachineImageManager {
     @Override
     public QueryResult<MachineImage> getMachineImages(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getEntityList("MachineImage", this.em, this.getUser().getUsername(), first, last, filters,
-            attributes, true);
+        return UtilsForManagers.getEntityList("MachineImage", MachineImage.class, this.em, this.getUser().getUsername(), first,
+            last, filters, attributes, true);
     }
 
     @Override
