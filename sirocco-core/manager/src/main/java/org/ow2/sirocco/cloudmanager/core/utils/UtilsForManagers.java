@@ -6,6 +6,7 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -19,6 +20,7 @@ import javax.jms.Session;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
+import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.proxy.HibernateProxy;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
@@ -206,8 +208,8 @@ public class UtilsForManagers {
         return jpqlFilterClause.toString();
     }
 
-    public static <E> QueryResult<E> getEntityList(final String entityType, final EntityManager em, final String username,
-        final int first, final int last, final List<String> filters, final List<String> attributes,
+    public static <E> QueryResult<E> getEntityList(final String entityType, final Class<E> clazz, final EntityManager em,
+        final String username, final int first, final int last, final List<String> filters, final List<String> attributes,
         final boolean verifyDeletedState) throws InvalidRequestException {
         StringBuffer whereClauseSB = new StringBuffer();
         if (username != null) {
@@ -236,10 +238,11 @@ public class UtilsForManagers {
             }
         }
         String whereClause = whereClauseSB.toString();
+
         try {
             int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + entityType + " v WHERE " + whereClause)
                 .setParameter("username", username).getSingleResult()).intValue();
-            Query query = em.createQuery("FROM " + entityType + " v WHERE " + whereClause + " ORDER BY v.id").setParameter(
+            Query query = em.createQuery("FROM " + entityType + " v  WHERE " + whereClause + " ORDER BY v.id").setParameter(
                 "username", username);
             if (first != -1) {
                 query.setFirstResult(first);
@@ -251,17 +254,69 @@ public class UtilsForManagers {
                     query.setMaxResults(last + 1);
                 }
             }
-            List<E> items = query.getResultList();
-            return new QueryResult<E>(count, items);
+            List<E> queryResult = query.getResultList();
+            if (attributes != null) {
+                List<E> items = new ArrayList<E>();
+                for (E from : queryResult) {
+                    E resource = clazz.newInstance();
+                    for (int i = 0; i < attributes.size(); i++) {
+                        try {
+                            PropertyUtils.setSimpleProperty(resource, attributes.get(i),
+                                PropertyUtils.getSimpleProperty(from, attributes.get(i)));
+                        } catch (NoSuchMethodException e) {
+                            // ignore wrong attribute name
+                        }
+                    }
+                    items.add(resource);
+                }
+                return new QueryResult<E>(count, items);
+            } else {
+                return new QueryResult<E>(count, queryResult);
+            }
         } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+            throw new InvalidRequestException(ex.getMessage());
+        } catch (InstantiationException ex) {
+            ex.printStackTrace();
+            throw new InvalidRequestException(ex.getMessage());
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+            throw new InvalidRequestException(ex.getMessage());
+        } catch (InvocationTargetException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
             throw new InvalidRequestException(ex.getMessage());
         }
     }
 
-    public static <E> QueryResult<E> getCollectionItemList(final String entityType, final EntityManager em,
-        final String username, final int first, final int last, final List<String> filters, final List<String> attributes,
-        final boolean verifyDeletedState, final String containerType, final String containerAttributeName,
-        final String containerId) throws InvalidRequestException {
+    public static <E> E fillResourceAttributes(final E from, final List<String> attributes) {
+        E resource = null;
+        try {
+            resource = (E) from.getClass().newInstance();
+        } catch (InstantiationException e) {
+            UtilsForManagers.logger.fatal("", e);
+        } catch (IllegalAccessException e) {
+            UtilsForManagers.logger.fatal("", e);
+        }
+        for (int i = 0; i < attributes.size(); i++) {
+            try {
+                PropertyUtils.setSimpleProperty(resource, attributes.get(i),
+                    PropertyUtils.getSimpleProperty(from, attributes.get(i)));
+            } catch (NoSuchMethodException e) {
+                // ignore wrong attribute name
+            } catch (IllegalAccessException e) {
+                UtilsForManagers.logger.info("", e);
+            } catch (InvocationTargetException e) {
+                UtilsForManagers.logger.info("", e);
+            }
+        }
+        return resource;
+    }
+
+    public static <E> QueryResult<E> getCollectionItemList(final String entityType, final Class<E> clazz,
+        final EntityManager em, final String username, final int first, final int last, final List<String> filters,
+        final List<String> attributes, final boolean verifyDeletedState, final String containerType,
+        final String containerAttributeName, final String containerId) throws InvalidRequestException {
         StringBuffer whereClauseSB = new StringBuffer();
         if (username != null) {
             whereClauseSB.append(" v.user.username=:username ");
@@ -314,9 +369,37 @@ public class UtilsForManagers {
                     query.setMaxResults(last + 1);
                 }
             }
-            List<E> items = query.getResultList();
-            return new QueryResult<E>(count, items);
+            List<E> queryResult = query.getResultList();
+            if (attributes != null) {
+                List<E> items = new ArrayList<E>();
+                for (E from : queryResult) {
+                    E resource = clazz.newInstance();
+                    for (int i = 0; i < attributes.size(); i++) {
+                        try {
+                            PropertyUtils.setSimpleProperty(resource, attributes.get(i),
+                                PropertyUtils.getSimpleProperty(from, attributes.get(i)));
+                        } catch (NoSuchMethodException e) {
+                            // ignore wrong attribute name
+                        }
+                    }
+                    items.add(resource);
+                }
+                return new QueryResult<E>(count, items);
+            } else {
+                return new QueryResult<E>(count, queryResult);
+            }
         } catch (IllegalArgumentException ex) {
+            ex.printStackTrace();
+            throw new InvalidRequestException(ex.getMessage());
+        } catch (InstantiationException ex) {
+            ex.printStackTrace();
+            throw new InvalidRequestException(ex.getMessage());
+        } catch (IllegalAccessException ex) {
+            ex.printStackTrace();
+            throw new InvalidRequestException(ex.getMessage());
+        } catch (InvocationTargetException ex) {
+            // TODO Auto-generated catch block
+            ex.printStackTrace();
             throw new InvalidRequestException(ex.getMessage());
         }
     }
