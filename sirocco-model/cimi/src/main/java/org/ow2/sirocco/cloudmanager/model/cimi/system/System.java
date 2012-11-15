@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi.system;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -197,8 +198,15 @@ public class System extends CloudResource implements Serializable, ICloudProvide
 
     @Transient
     public Set<String> getOperations() {
-        Set<String> operations = System.fsm.getActionsAtState(this.state);
-        operations.remove(new String("internal"));
+        Set<String> operations;
+        // state may be null if not selected in the query that returns this
+        // object
+        if (this.state == null) {
+            operations = Collections.emptySet();
+        } else {
+            operations = System.fsm.getActionsAtState(this.state);
+            operations.remove(new String("internal"));
+        }
         return operations;
     }
 
