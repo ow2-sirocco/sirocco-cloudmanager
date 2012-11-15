@@ -520,6 +520,7 @@ public class VolumeManagerTest {
         List<String> attributes = new ArrayList<String>();
         attributes.add("name");
         attributes.add("id");
+        attributes.add("volumeConfig");
         QueryResult<VolumeTemplate> query = this.volumeManager.getVolumeTemplates(0, 9, null, attributes);
         Assert.assertEquals(query.getCount(), 20);
         Assert.assertEquals(10, query.getItems().size());
