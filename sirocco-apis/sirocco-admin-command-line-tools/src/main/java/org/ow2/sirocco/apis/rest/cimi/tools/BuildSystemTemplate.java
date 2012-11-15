@@ -31,7 +31,7 @@ public class BuildSystemTemplate {
     private IRemoteJobManager jobManager;
 
     public void start() throws Exception {
-        String rmiEndpointUrl = "rmi://p-sirocco:1099";
+        String rmiEndpointUrl = "rmi://localhost:1099";
         String login = "guest";
         String password = "guest";
 
@@ -44,7 +44,7 @@ public class BuildSystemTemplate {
 
         MachineTemplate machineTemplate = null;
         for (MachineTemplate template : machineManager.getMachineTemplates()) {
-            if (template.getName().equals("tiny-debian")) {
+            if (template.getName().equals("small-vamp-springoo")) {
                 machineTemplate = template;
                 break;
             }
@@ -91,6 +91,66 @@ public class BuildSystemTemplate {
 
         systemTemplate.setName("SpringooTemplate");
         systemTemplate.setDescription("Springoo 3-tiers application template");
+        systemTemplate.setComponentDescriptors(componentDescriptors);
+
+        systemManager.createSystemTemplate(systemTemplate);
+
+        // SystemCreate systemCreate = new SystemCreate();
+        // systemCreate.setName("Springoo");
+        // systemCreate.setDescription("Springoo application");
+        // props = new HashMap<String, String>();
+        // props.put("provider", "amazon");
+        // props.put("location", "Ireland");
+        // systemCreate.setProperties(props);
+        // systemCreate.setSystemTemplate(systemTemplate);
+        //
+        // Job job = systemManager.createSystem(systemCreate);
+        //
+        // this.waitForJobCompletion(job);
+
+    }
+    
+    public void buildDMTemplate() throws Exception {
+        String rmiEndpointUrl = "rmi://localhost:1099";
+        String login = "guest";
+        String password = "guest";
+
+        EJBClient.connect(rmiEndpointUrl, login, password);
+
+        Context context = new InitialContext();
+        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(ISystemManager.EJB_JNDI_NAME);
+        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
+        this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+
+        MachineTemplate machineTemplate = null;
+        for (MachineTemplate template : machineManager.getMachineTemplates()) {
+            if (template.getName().equals("small-vamp-deploymentmgr")) {
+                machineTemplate = template;
+                break;
+            }
+        }
+
+        if (machineTemplate == null) {
+            java.lang.System.out.println("Cannot find machine template");
+            return;
+        }
+
+        Set<ComponentDescriptor> componentDescriptors = new HashSet<ComponentDescriptor>();
+
+        ComponentDescriptor component = new ComponentDescriptor();
+        component.setName("DeploymentManager");
+        component.setComponentQuantity(1);
+        component.setComponentType(ComponentType.MACHINE);
+        component.setDescription("Deployement Manager machine");
+        Map<String, String> props = new HashMap<String, String>();
+        component.setProperties(props);
+        component.setComponentTemplate(machineTemplate);
+        componentDescriptors.add(component);
+
+        SystemTemplate systemTemplate = new SystemTemplate();
+
+        systemTemplate.setName("DeploymentManagerTemplate");
+        systemTemplate.setDescription("VAMP Deployment Manager template");
         systemTemplate.setComponentDescriptors(componentDescriptors);
 
         systemManager.createSystemTemplate(systemTemplate);
@@ -272,7 +332,7 @@ public class BuildSystemTemplate {
 
         this.waitForJobCompletion(job);
 
-        String systemId = job.getTargetEntity().getId().toString();
+        String systemId = job.getTargetResource().getId().toString();
 
         System system = systemManager.getSystemById(systemId);
 
@@ -371,7 +431,7 @@ public class BuildSystemTemplate {
         String jobId = job.getId().toString();
         while (true) {
             job = this.jobManager.getJobById(jobId);
-            if (job.getStatus() != Job.Status.RUNNING) {
+            if (job.getState() != Job.Status.RUNNING) {
                 break;
             }
             Thread.sleep(1000);
@@ -383,6 +443,7 @@ public class BuildSystemTemplate {
 
     public static void main(final String[] args) throws Exception {
         new BuildSystemTemplate().start();
+        new BuildSystemTemplate().buildDMTemplate();
     }
 
 }
