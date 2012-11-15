@@ -46,11 +46,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 public class MachineTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private MachineConfiguration machineConfiguration;
+    private MachineConfiguration machineConfig;
 
     private MachineImage machineImage;
 
-    private Credentials credentials;
+    private Credentials credential;
 
     private List<MachineVolume> volumes;
 
@@ -71,12 +71,12 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     @ManyToOne
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    public MachineConfiguration getMachineConfiguration() {
-        return this.machineConfiguration;
+    public MachineConfiguration getMachineConfig() {
+        return this.machineConfig;
     }
 
-    public void setMachineConfiguration(final MachineConfiguration machineConfiguration) {
-        this.machineConfiguration = machineConfiguration;
+    public void setMachineConfig(final MachineConfiguration machineConfiguration) {
+        this.machineConfig = machineConfiguration;
     }
 
     @ManyToOne
@@ -91,12 +91,12 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     @ManyToOne
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    public Credentials getCredentials() {
-        return this.credentials;
+    public Credentials getCredential() {
+        return this.credential;
     }
 
-    public void setCredentials(final Credentials credentials) {
-        this.credentials = credentials;
+    public void setCredential(final Credentials credentials) {
+        this.credential = credentials;
     }
 
     @OneToMany
@@ -107,6 +107,9 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     public void addMachineVolume(final MachineVolume mv) {
+        if (this.volumes == null) {
+            this.volumes = new ArrayList<MachineVolume>();
+        }
         if (!this.getVolumes().contains(mv)) {
             this.getVolumes().add(mv);
         }
@@ -130,6 +133,9 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     public void addMachineVolumeTemplate(final MachineVolumeTemplate mvt) {
+        if (this.volumeTemplates == null) {
+            this.volumeTemplates = new ArrayList<MachineVolumeTemplate>();
+        }
         if (!this.getVolumeTemplates().contains(mvt)) {
             this.getVolumeTemplates().add(mvt);
         }
@@ -154,6 +160,9 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     }
 
     public void addNetworkInterface(final MachineTemplateNetworkInterface networkInterface) {
+        if (this.networkInterfaces == null) {
+            this.networkInterfaces = new ArrayList<MachineTemplateNetworkInterface>();
+        }
         if (!this.getNetworkInterfaces().contains(networkInterface)) {
             this.getNetworkInterfaces().add(networkInterface);
         }

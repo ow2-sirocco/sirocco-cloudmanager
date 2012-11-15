@@ -51,11 +51,11 @@ public class Job extends CloudEntity implements Serializable {
 
     private CloudProviderLocation location;
 
-    private Status status;
+    private Status state;
 
     private Date timeOfStatusChange;
 
-    private CloudResource targetEntity;
+    private CloudResource targetResource;
 
     private Integer returnCode;
 
@@ -67,11 +67,11 @@ public class Job extends CloudEntity implements Serializable {
 
     private List<Job> nestedJobs;
 
-    private Boolean isCancellable;
-
     private Integer progress;
 
-    private List<CloudResource> affectedEntities;
+    private List<CloudResource> affectedResources;
+
+    private Boolean isCancellable;
 
     /*
      * protected long versionNum;
@@ -88,17 +88,16 @@ public class Job extends CloudEntity implements Serializable {
 
         System.out.println("using job full constructor");
         this.location = location;
-        this.status = status;
+        this.state = status;
         this.timeOfStatusChange = timeOfStatusChange;
-        this.targetEntity = targetEntity;
+        this.targetResource = targetEntity;
         this.returnCode = returnCode;
         this.action = action;
         this.statusMessage = statusMessage;
         this.parentJob = parentJob;
         this.nestedJobs = nestedJobs;
-        this.isCancellable = isCancellable;
         this.progress = progress;
-        this.affectedEntities = affectedEntities;
+        this.affectedResources = affectedEntities;
 
     }
 
@@ -106,12 +105,12 @@ public class Job extends CloudEntity implements Serializable {
     }
 
     @Enumerated(EnumType.STRING)
-    public Status getStatus() {
-        return this.status;
+    public Status getState() {
+        return this.state;
     }
 
-    public void setStatus(final Status status) {
-        this.status = status;
+    public void setState(final Status status) {
+        this.state = status;
     }
 
     public Date getTimeOfStatusChange() {
@@ -124,12 +123,12 @@ public class Job extends CloudEntity implements Serializable {
 
     @ManyToOne
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    public CloudResource getTargetEntity() {
-        return this.targetEntity;
+    public CloudResource getTargetResource() {
+        return this.targetResource;
     }
 
-    public void setTargetEntity(final CloudResource targetEntity) {
-        this.targetEntity = targetEntity;
+    public void setTargetResource(final CloudResource targetEntity) {
+        this.targetResource = targetEntity;
     }
 
     public Integer getReturnCode() {
@@ -166,14 +165,6 @@ public class Job extends CloudEntity implements Serializable {
         this.parentJob = parentJob;
     }
 
-    public Boolean getIsCancellable() {
-        return this.isCancellable;
-    }
-
-    public void setIsCancellable(final Boolean isCancellable) {
-        this.isCancellable = isCancellable;
-    }
-
     public Integer getProgress() {
         return this.progress;
     }
@@ -206,12 +197,20 @@ public class Job extends CloudEntity implements Serializable {
     @ManyToMany
     @LazyCollection(LazyCollectionOption.FALSE)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    public List<CloudResource> getAffectedEntities() {
-        return this.affectedEntities;
+    public List<CloudResource> getAffectedResources() {
+        return this.affectedResources;
     }
 
-    public void setAffectedEntities(final List<CloudResource> affectedEntities) {
-        this.affectedEntities = affectedEntities;
+    public void setAffectedResources(final List<CloudResource> affectedEntities) {
+        this.affectedResources = affectedEntities;
+    }
+
+    public Boolean getIsCancellable() {
+        return this.isCancellable;
+    }
+
+    public void setIsCancellable(final Boolean isCancellable) {
+        this.isCancellable = isCancellable;
     }
 
 }
