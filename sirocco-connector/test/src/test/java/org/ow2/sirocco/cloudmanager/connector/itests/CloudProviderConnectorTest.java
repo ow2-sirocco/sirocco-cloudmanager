@@ -234,7 +234,7 @@ public class CloudProviderConnectorTest {
         machineTemplate.setNetworkInterfaces(nics);
         if (this.key != null) {
             Credentials credentials = new Credentials();
-            credentials.setPublicKey(this.key.getBytes());
+            credentials.setPublicKey(this.key);
             machineTemplate.setCredential(credentials);
         }
         machineTemplate.setUserData("color=blue\nip=1.2.3.4\n");

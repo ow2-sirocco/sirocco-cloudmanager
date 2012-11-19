@@ -37,7 +37,6 @@ import javax.naming.NamingException;
 
 import org.dbunit.PropertiesBasedJdbcDatabaseTester;
 import org.dbunit.dataset.xml.XmlDataSet;
-import org.dbunit.operation.DatabaseOperation;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -111,7 +110,7 @@ public class CredentialsTest {
         XmlDataSet dataSet = new XmlDataSet(reader);
         databaseTest = new PropertiesBasedJdbcDatabaseTester();
         databaseTest.setDataSet(dataSet);
-        //databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
+        // databaseTest.setSetUpOperation(DatabaseOperation.DELETE_ALL);
         databaseTest.setSetUpOperation(new CustomDBUnitDeleteAllOperation(System.getProperty("database.type")));
         databaseTest.onSetup();
     }
@@ -145,8 +144,7 @@ public class CredentialsTest {
         credentialsCreate.setProperties(new HashMap<String, String>());
         in.setUserName("madras");
         in.setPassword("bombaydelhi");
-        String key = new String("parisnewyork" + this.credcounter);
-        in.setPublicKey(key.getBytes());
+        in.setPublicKey("parisnewyork" + this.credcounter);
         this.credcounter += 1;
         return credentialsCreate;
     }

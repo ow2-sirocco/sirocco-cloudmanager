@@ -30,11 +30,8 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class Credentials extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -42,7 +39,7 @@ public class Credentials extends CloudResource implements Serializable {
 
     private String password;
 
-    private byte[] publicKey;
+    private String publicKey;
 
     public Credentials() {
     }
@@ -64,11 +61,11 @@ public class Credentials extends CloudResource implements Serializable {
     }
 
     @Lob
-    public byte[] getPublicKey() {
+    public String getPublicKey() {
         return this.publicKey;
     }
 
-    public void setPublicKey(final byte[] key) {
+    public void setPublicKey(final String key) {
         this.publicKey = key;
     }
 }

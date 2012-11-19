@@ -82,20 +82,24 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     private void validateCredentials(final Credentials cred) throws CloudProviderException {
-        if (cred.getUserName().length() < 1) {
-            throw new InvalidRequestException("Too short user name ");
+        if (cred.getUserName() != null) {
+            if (cred.getUserName().length() < 1) {
+                throw new InvalidRequestException("Too short user name ");
+            }
+            if (Pattern.matches("[\\w]*$", cred.getUserName()) == false) {
+                throw new InvalidRequestException("Non word characters in user name ");
+            }
         }
-        if (Pattern.matches("[\\w]*$", cred.getUserName()) == false) {
-            throw new InvalidRequestException("Non word characters in user name ");
-        }
-        if (cred.getPassword().length() < 1) {
-            throw new InvalidRequestException("Too short password ");
-        }
-        if (Pattern.matches("[\\w]*$", cred.getPassword()) == false) {
-            throw new InvalidRequestException("Non word characters in user name ");
-        }
-        if (Pattern.matches("[^\\s]*$", cred.getPassword()) == false) {
-            throw new InvalidRequestException("Spaces in password ");
+        if (cred.getPassword() != null) {
+            if (cred.getPassword().length() < 1) {
+                throw new InvalidRequestException("Too short password ");
+            }
+            if (Pattern.matches("[\\w]*$", cred.getPassword()) == false) {
+                throw new InvalidRequestException("Non word characters in user name ");
+            }
+            if (Pattern.matches("[^\\s]*$", cred.getPassword()) == false) {
+                throw new InvalidRequestException("Spaces in password ");
+            }
         }
     }
 

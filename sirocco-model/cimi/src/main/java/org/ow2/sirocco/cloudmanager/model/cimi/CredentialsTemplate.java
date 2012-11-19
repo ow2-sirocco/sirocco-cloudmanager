@@ -29,11 +29,8 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class CredentialsTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -41,7 +38,7 @@ public class CredentialsTemplate extends CloudTemplate implements Serializable {
 
     private String password;
 
-    private byte[] publicKey;
+    private String publicKey;
 
     public CredentialsTemplate() {
     }
@@ -63,11 +60,11 @@ public class CredentialsTemplate extends CloudTemplate implements Serializable {
     }
 
     @Lob
-    public byte[] getPublicKey() {
+    public String getPublicKey() {
         return this.publicKey;
     }
 
-    public void setPublicKey(final byte[] key) {
+    public void setPublicKey(final String key) {
         this.publicKey = key;
     }
 }
