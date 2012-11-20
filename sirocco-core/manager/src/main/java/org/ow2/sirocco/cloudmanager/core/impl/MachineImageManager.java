@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +50,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
@@ -97,6 +99,9 @@ public class MachineImageManager implements IMachineImageManager {
         j.setCreated(new Date());
         j.setDescription("MachineImage creation");
         j.setTargetResource(mi);
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(mi);
+        j.setAffectedResources(affectedResources);
         j.setState(Job.Status.SUCCESS);
         j.setAction("add");
         j.setParentJob(null);

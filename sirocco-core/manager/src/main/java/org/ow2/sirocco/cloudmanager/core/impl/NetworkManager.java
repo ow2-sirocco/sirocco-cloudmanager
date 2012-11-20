@@ -160,6 +160,9 @@ public class NetworkManager implements INetworkManager {
 
         Job job = new Job();
         job.setTargetResource(network);
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(network);
+        job.setAffectedResources(affectedResources);
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
         job.setState(providerJob.getState());
@@ -574,6 +577,9 @@ public class NetworkManager implements INetworkManager {
 
         Job job = new Job();
         job.setTargetResource(networkPort);
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(networkPort);
+        job.setAffectedResources(affectedResources);
         job.setCreated(new Date());
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
         job.setState(providerJob.getState());
@@ -1578,8 +1584,8 @@ public class NetworkManager implements INetworkManager {
         ForwardingGroup forwardingGroup = null;
 
         try {
-            forwardingGroup = this
-                .getForwardingGroupByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
+            forwardingGroup = this.getForwardingGroupByProviderAssignedId(providerJob.getTargetResource()
+                .getProviderAssignedId());
         } catch (PersistenceException e) {
             NetworkManager.logger.error("Cannot find ForwardingGroup with provider-assigned id "
                 + providerJob.getTargetResource());

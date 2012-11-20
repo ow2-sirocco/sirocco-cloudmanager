@@ -333,6 +333,9 @@ public class SystemManager implements ISystemManager {
         Job parentJob = this.createJob("add", system);
         this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.CREATE_ACTION);
         parentJob.setTargetResource(system);
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(system);
+        parentJob.setAffectedResources(affectedResources);
         this.em.persist(parentJob);
         this.em.flush();
 
@@ -349,7 +352,7 @@ public class SystemManager implements ISystemManager {
                     CredentialsCreate cc = new CredentialsCreate();
                     if (cd.getComponentQuantity() > 1) {
                         String name = cd.getName() == null ? "" : cd.getName();
-                        cc.setName(name + new Integer(i+1).toString());
+                        cc.setName(name + new Integer(i + 1).toString());
                     } else {
                         cc.setName(cd.getName());
                     }
@@ -436,7 +439,7 @@ public class SystemManager implements ISystemManager {
                         MachineCreate mc = new MachineCreate();
                         if (cd.getComponentQuantity() > 1) {
                             String name = cd.getName() == null ? "" : cd.getName();
-                            mc.setName(name + new Integer(i+1).toString());
+                            mc.setName(name + new Integer(i + 1).toString());
                         } else {
                             mc.setName(cd.getName());
                         }
@@ -466,7 +469,7 @@ public class SystemManager implements ISystemManager {
                         VolumeCreate vc = new VolumeCreate();
                         if (cd.getComponentQuantity() > 1) {
                             String name = cd.getName() == null ? "" : cd.getName();
-                            vc.setName(name + new Integer(i+1).toString());
+                            vc.setName(name + new Integer(i + 1).toString());
                         } else {
                             vc.setName(cd.getName());
                         }
@@ -496,7 +499,7 @@ public class SystemManager implements ISystemManager {
                         SystemCreate sc = new SystemCreate();
                         if (cd.getComponentQuantity() > 1) {
                             String name = cd.getName() == null ? "" : cd.getName();
-                            sc.setName(name + new Integer(i+1).toString());
+                            sc.setName(name + new Integer(i + 1).toString());
                         } else {
                             sc.setName(cd.getName());
                         }
@@ -533,7 +536,7 @@ public class SystemManager implements ISystemManager {
                         NetworkCreate nc = new NetworkCreate();
                         if (cd.getComponentQuantity() > 1) {
                             String name = cd.getName() == null ? "" : cd.getName();
-                            nc.setName(name + new Integer(i+1).toString());
+                            nc.setName(name + new Integer(i + 1).toString());
                         } else {
                             nc.setName(cd.getName());
                         }

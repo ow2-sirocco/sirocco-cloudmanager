@@ -1343,10 +1343,13 @@ public class MachineManager implements IMachineManager {
      * targetEntity == machine, affectedEntities[0] == volume
      */
     private boolean isVolumeAttach(final Job job) {
-
+        List<CloudResource> resources = job.getAffectedResources();
+        if ((job.getAction().equals("add") == false) || (resources == null) || (resources.size() == 0)) {
+            return false;
+        }
         if ((job.getTargetResource() instanceof Machine) && (job.getAffectedResources() != null)
-            && job.getAffectedResources().size() != 0 && (job.getAffectedResources().get(0) instanceof Volume)) {
-            Volume volume = (Volume) job.getAffectedResources().get(0);
+            && job.getAffectedResources().size() != 0 && (job.getAffectedResources().get(0) instanceof MachineVolume)) {
+            Volume volume = ((MachineVolume) job.getAffectedResources().get(0)).getVolume();
             try {
                 this.volumeManager.getVolumeById(volume.getId().toString());
             } catch (ResourceNotFoundException e) {
@@ -1380,7 +1383,7 @@ public class MachineManager implements IMachineManager {
             if (mv.getVolume() != null && mv.getVolume().getId().equals(v.getId())) {
                 mv.setVolume(null);
                 m.removeMachineVolume(mv);
-                this.em.remove(mv);
+                mv.setState(MachineVolume.State.DELETED);
                 break;
             }
         }
@@ -1600,15 +1603,18 @@ public class MachineManager implements IMachineManager {
             MachineManager.logger.info(" TODO : networkInterface add to machine " + local.getId());
         } else if (this.isVolumeAttach(notification) == true) {
             /**
-             * targetEntity = machine affectedEntity = volume
+             * targetEntity = machine affectedEntity = machine volume
              */
             MachineManager.logger.info(" Volume attachment to machine " + local.getId() + " job " + notification.getId()
                 + " status " + notification.getState());
-            MachineVolume mv = this.getMachineVolume(local, (Volume) notification.getAffectedResources().get(0));
-            if (mv == null) {
-                MachineManager.logger.info(" could not find machine volume!! " + local.getId());
-                return true;
-            }
+            // MachineVolume mv = this.getMachineVolume(local, (Volume)
+            // notification.getAffectedResources().get(0));
+            // if (mv == null) {
+            // MachineManager.logger.info(" could not find machine volume!! " +
+            // local.getId());
+            // return true;
+            // }
+            MachineVolume mv = (MachineVolume) notification.getAffectedResources().get(0);
             if (notification.getState() == Job.Status.SUCCESS) {
                 MachineManager.logger.info(" Volume attachment succeeded for machine " + local.getId());
                 mv.setState(MachineVolume.State.ATTACHED);
@@ -1765,7 +1771,7 @@ public class MachineManager implements IMachineManager {
     public QueryResult<MachineVolume> getMachineVolumes(final String machineId, final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         return UtilsForManagers.getCollectionItemList("MachineVolume", MachineVolume.class, this.em, this.getUser()
-            .getUsername(), first, last, filters, attributes, false, "Machine", "volumes", machineId);
+            .getUsername(), first, last, filters, attributes, true, "Machine", "volumes", machineId);
     }
 
     private Job addVolumeToMachine(final Machine m, final MachineVolume mv) throws ServiceUnavailableException {
@@ -1842,7 +1848,7 @@ public class MachineManager implements IMachineManager {
         }
 
         List<CloudResource> affected = new ArrayList<CloudResource>();
-        affected.add(mv.getVolume());
+        affected.add(mv);
 
         Job persisted = this.createJob(m, affected, "add", j.getState(), null);
         persisted.setProviderAssignedId(j.getProviderAssignedId());
@@ -2069,7 +2075,7 @@ public class MachineManager implements IMachineManager {
         if (volumes != null) {
             volumes.size();
             for (MachineVolume v : volumes) {
-                if (v.getId().toString().equals(macVolId)) {
+                if (v.getId().toString().equals(macVolId) && v.getState() != MachineVolume.State.DELETED) {
                     return v;
                 }
             }

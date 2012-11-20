@@ -1,5 +1,6 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -158,6 +159,9 @@ public class VolumeManager implements IVolumeManager {
             Job job = new Job();
             job.setUser(user);
             job.setTargetResource(volume);
+            List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+            affectedResources.add(volume);
+            job.setAffectedResources(affectedResources);
             job.setCreated(new Date());
             job.setDescription("Volume creation");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
@@ -187,6 +191,9 @@ public class VolumeManager implements IVolumeManager {
 
             Job job = new Job();
             job.setTargetResource(volume);
+            List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+            affectedResources.add(volume);
+            job.setAffectedResources(affectedResources);
             job.setCreated(new Date());
             job.setDescription("Volume creation");
             job.setProviderAssignedId(providerJob.getProviderAssignedId());
@@ -780,6 +787,9 @@ public class VolumeManager implements IVolumeManager {
         Job job = new Job();
         job.setUser(user);
         job.setTargetResource(volumeImage);
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(volumeImage);
+        job.setAffectedResources(affectedResources);
         job.setCreated(new Date());
         job.setDescription("VolumeImage creation");
         job.setProviderAssignedId(providerJob.getProviderAssignedId());
