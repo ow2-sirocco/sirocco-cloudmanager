@@ -1521,7 +1521,7 @@ public class MachineManager implements IMachineManager {
                         continue;
                     }
                     List<CloudResource> affected = new ArrayList<CloudResource>();
-                    affected.add(mv.getVolume());
+                    affected.add(mv);
                     MachineManager.logger.info("machineCreationContinuation create job for attachment ");
                     Job child = this.createJob(m, affected, "add", j.getState(), job);
                     child.setDescription("Volume attachment");
