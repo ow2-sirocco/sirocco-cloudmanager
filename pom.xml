@@ -34,7 +34,7 @@
 	</parent>
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
 	<artifactId>sirocco-cloudmanager</artifactId>
-	<version>0.5.4</version>
+	<version>0.5.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>SIROCCO :: CloudManager :: Parent</name>
 	
@@ -152,9 +152,9 @@
 	</build>
 
 	<scm>
-		<connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/sirocco//cloudmanager/tags/sirocco-cloudmanager-0.5.4</connection>
-		<developerConnection>scm:svn:svn+ssh://dangtran@svn.forge.objectweb.org/svnroot/sirocco/cloudmanager/tags/sirocco-cloudmanager-0.5.4</developerConnection>
-		<url>http://websvn.ow2.org/listing.php?repname=sirocco&amp;path=/cloudmanager/tags/sirocco-cloudmanager-0.5.4?repname=sirocco&amp;path=/cloudmanager/trunk/</url>
+		<connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/sirocco//cloudmanager/trunk</connection>
+		<developerConnection>scm:svn:svn+ssh://dangtran@svn.forge.objectweb.org/svnroot/sirocco/cloudmanager/trunk</developerConnection>
+		<url>http://websvn.ow2.org/listing.php?repname=sirocco&amp;path=/cloudmanager/trunk/</url>
 	</scm>
 
 </project>

@@ -31,7 +31,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager</artifactId>
-		<version>0.5.4</version>
+		<version>0.5.5-SNAPSHOT</version>
 	</parent>
 
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
