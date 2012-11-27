@@ -255,7 +255,7 @@ public class UtilsForManagers {
                 }
             }
             List<E> queryResult = query.getResultList();
-            if (attributes != null) {
+            if (attributes != null && attributes.size() != 0) {
                 List<E> items = new ArrayList<E>();
                 for (E from : queryResult) {
                     E resource = clazz.newInstance();
@@ -370,7 +370,7 @@ public class UtilsForManagers {
                 }
             }
             List<E> queryResult = query.getResultList();
-            if (attributes != null) {
+            if (attributes != null && attributes.size() != 0) {
                 List<E> items = new ArrayList<E>();
                 for (E from : queryResult) {
                     E resource = clazz.newInstance();
