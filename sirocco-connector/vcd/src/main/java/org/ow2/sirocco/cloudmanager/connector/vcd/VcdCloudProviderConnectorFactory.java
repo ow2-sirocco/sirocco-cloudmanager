@@ -86,6 +86,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 import com.vmware.vcloud.api.rest.schema.ComposeVAppParamsType;
+import com.vmware.vcloud.api.rest.schema.GuestCustomizationSectionType;
 import com.vmware.vcloud.api.rest.schema.InstantiateVAppTemplateParamsType;
 import com.vmware.vcloud.api.rest.schema.InstantiationParamsType;
 import com.vmware.vcloud.api.rest.schema.NetworkConfigSectionType;
@@ -349,9 +350,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             system.setDescription(vAppType.getDescription());
             system.setProviderAssignedId(vAppType.getHref());
             system.setState(this.fromvAppStatusToSystemState(vapp));
-            // VcdCloudProviderConnectorFactory.logger.info("# vApp state=" +
-            // vapp.getVappStatus() + ", system state="
-            // + system.getState());
+            /*VcdCloudProviderConnectorFactory.logger.info("# vApp state=" + vapp.getVappStatus() + ", system state=" + system.getState());*/
             system.setLocation(this.cloudProviderLocation);
             system.setCloudProviderAccount(this.cloudProviderAccount);
 
@@ -475,14 +474,27 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                         VcdCloudProviderConnector.this.configureVmSections(vapp, machineTemplateMap);
 
                         // Deploying the Instantiated vApp
-                        VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
-                        vapp.deploy(false, 1000000, false).waitForTask(waitTimeInMilliSeconds);
+                        /*VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
+                        vapp.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);
 
                         // refresh the vapp (otherwise no childrenVms is
                         // visible! - TBC)
                         Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
                             vapp.getReference());
 
+                        VcdCloudProviderConnector.this.fromvAppToSystem(vappFresh, system);*/
+
+                        // ---
+                        // Deploying the Instantiated vApp
+                        VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
+                        // refresh the vapp (otherwise no childrenVms is
+                        // visible! - TBC)
+                        Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
+                            vapp.getReference());
+                        for (VM childVm : vapp.getChildrenVms()) {
+                            childVm.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);
+                        }
+                        vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
                         VcdCloudProviderConnector.this.fromvAppToSystem(vappFresh, system);
                     } catch (Exception ex) {
                         throw new ConnectorException(ex);
@@ -506,11 +518,13 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 public System call() throws Exception {
                     try {
                         Vapp vapp = VcdCloudProviderConnector.this.getVappByProviderAssignedId(systemId);
-                        VcdCloudProviderConnectorFactory.logger.info("Undeploying " + vapp.getResource().getName());
-                        if (vapp.getVappStatus() == VappStatus.POWERED_ON) {
-                            vapp.undeploy(UndeployPowerActionType.POWEROFF).waitForTask(waitTimeInMilliSeconds);
-                        } else {
-                            vapp.undeploy(UndeployPowerActionType.DEFAULT).waitForTask(waitTimeInMilliSeconds);
+                        if (vapp.isDeployed()) {
+                            VcdCloudProviderConnectorFactory.logger.info("Undeploying " + vapp.getResource().getName());
+                            if (vapp.getVappStatus() == VappStatus.POWERED_ON) {
+                                vapp.undeploy(UndeployPowerActionType.POWEROFF).waitForTask(waitTimeInMilliSeconds);
+                            } else {
+                                vapp.undeploy(UndeployPowerActionType.DEFAULT).waitForTask(waitTimeInMilliSeconds);
+                            }
                         }
                         VcdCloudProviderConnectorFactory.logger.info("deleting " + vapp.getResource().getName());
                         vapp.delete().waitForTask(waitTimeInMilliSeconds);
@@ -665,8 +679,55 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         @Override
         public Job deleteEntityInSystem(final String systemId, final String entityId, final String entityType)
             throws ConnectorException {
-            // TODO Auto-generated method stub
-            return null;
+            VcdCloudProviderConnectorFactory.logger.info("deleting Entity with providerAssignedId " + entityId + " and type="
+                + entityType + ", in system with providerAssignedId=" + systemId);
+            final System system = this.getSystem(systemId);
+
+            if (entityType.equals(SystemMachine.class.getName())) {
+                for (SystemMachine sm : system.getMachines()) {
+                    if (sm.getResource().getProviderAssignedId().equals(entityId)) {
+                        return this.deleteMachineInSystem(system, (Machine) sm.getResource());
+                    }
+                }
+            } else {
+                throw new ConnectorException("unsupported entity type: " + entityType);
+            }
+
+            throw new ConnectorException("entity " + entityId + " not found in system " + systemId);
+        }
+
+        private Job deleteMachineInSystem(final System system, final Machine machine) throws ConnectorException {
+            final int waitTimeInMilliSeconds = VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
+            // final Machine machine = this.getMachine(machineId);
+            machine.setState(Machine.State.DELETING);
+            system.setState(System.State.MIXED);
+
+            final Callable<System> createTask = new Callable<System>() {
+                @Override
+                public System call() throws Exception {
+                    try {
+                        VM vm = VcdCloudProviderConnector.this.getVmByProviderAssignedId(machine.getProviderAssignedId());
+                        if (vm.isDeployed()) {
+                            VcdCloudProviderConnectorFactory.logger.info("Undeploying " + vm.getResource().getName());
+                            if (vm.getVMStatus() == VMStatus.POWERED_ON) {
+                                vm.undeploy(UndeployPowerActionType.POWEROFF).waitForTask(waitTimeInMilliSeconds);
+                            } else {
+                                vm.undeploy(UndeployPowerActionType.DEFAULT).waitForTask(waitTimeInMilliSeconds);
+                            }
+                        }
+                        VcdCloudProviderConnectorFactory.logger.info("deleting " + vm.getResource().getName());
+                        vm.delete().waitForTask(waitTimeInMilliSeconds);
+                        VcdCloudProviderConnector.this.fromvAppToSystem(
+                            VcdCloudProviderConnector.this.getVappByProviderAssignedId(system.getProviderAssignedId()), system);
+                        machine.setState(Machine.State.DELETED);
+                    } catch (Exception ex) {
+                        throw new ConnectorException(ex);
+                    }
+                    return system;
+                }
+            };
+            ListenableFuture<System> result = VcdCloudProviderConnectorFactory.this.executorService.submit(createTask);
+            return VcdCloudProviderConnectorFactory.this.jobManager.newJob(system, machine, "delete", result);
         }
 
         @Override
@@ -677,6 +738,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         @Override
         public Job addEntityToSystem(final String systemId, final String entityId) throws ConnectorException {
             throw new ConnectorException("unsupported operation");
+            // TODO
         }
 
         //
@@ -726,22 +788,19 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 machine.setDescription(vmType.getDescription());
                 machine.setProviderAssignedId(vmType.getHref());
                 machine.setState(this.fromvVmStatusToMachineState(vm));
-                // VcdCloudProviderConnectorFactory.logger.info("## vm state=" +
-                // vm.getVMStatus() + ", machine state="
-                // + machine.getState() + ", ips=" + vm.getIpAddressesById());
+                /*VcdCloudProviderConnectorFactory.logger.info("## vm state=" + vm.getVMStatus() 
+                    + ", machine state=" + machine.getState() + ", ips=" + vm.getIpAddressesById());*/
 
                 // HW
                 machine.setCpu(vm.getCpu().getNoOfCpus());
-                machine.setMemory(vm.getMemory().getMemorySize().intValue() * 1024); // CIMI:
-                                                                                     // kibibytes
+                machine.setMemory(vm.getMemory().getMemorySize().intValue() * 1024); /*CIMI: kibibytes*/
                 List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
                 machine.setDisks(machineDisks);
                 for (VirtualDisk disk : vm.getDisks()) {
                     if (disk.isHardDisk()) {
                         MachineDisk machineDisk = new MachineDisk();
                         machineDisk.setInitialLocation("");
-                        machineDisk.setCapacity(disk.getHardDiskSize().intValue() * 1000); // CIMI:
-                                                                                           // kilobytes
+                        machineDisk.setCapacity(disk.getHardDiskSize().intValue() * 1000); /*CIMI: kilobytes*/
                         machineDisks.add(machineDisk);
                     }
                 }
@@ -865,14 +924,36 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                         VcdCloudProviderConnector.this.configureVmSections(vapp, machineTemplateMap);
 
                         // Deploying the Instantiated vApp
-                        VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
-                        vapp.deploy(false, 1000000, false).waitForTask(waitTimeInMilliSeconds);
+                        /*VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
+                        vapp.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);
 
                         // refresh the vapp
                         Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
                             vapp.getReference());
 
+                        VcdCloudProviderConnector.this.fromVmToMachine(vappFresh.getChildrenVms().get(0), machine);*/
+
+                        // ---
+                        // Deploying the Instantiated vApp
+                        VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
+                        // refresh the vapp (otherwise no childrenVms is
+                        // visible! - TBC)
+                        Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
+                            vapp.getReference());
+                        for (VM childVm : vapp.getChildrenVms()) {
+                            childVm.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);
+                        }
+                        vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
                         VcdCloudProviderConnector.this.fromVmToMachine(vappFresh.getChildrenVms().get(0), machine);
+
+                        // ----
+                        // Deploying the Instantiated vApp
+                        /*VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
+                        Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
+                            vapp.getReference());
+                        VM vm = vappFresh.getChildrenVms().get(0);
+                        vm.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);
+                        VcdCloudProviderConnector.this.fromVmToMachine(vm, machine);*/
                     } catch (Exception ex) {
                         throw new ConnectorException(ex);
                     }
@@ -927,14 +1008,34 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 public Machine call() throws Exception {
                     try {
                         VM vm = VcdCloudProviderConnector.this.getVmByProviderAssignedId(machineId);
-                        VcdCloudProviderConnectorFactory.logger.info("Undeploying " + vm.getResource().getName());
+
+                        /*VcdCloudProviderConnectorFactory.logger.info("Undeploying " + vm.getResource().getName());
                         if (vm.getVMStatus() == VMStatus.POWERED_ON) {
                             vm.undeploy(UndeployPowerActionType.POWEROFF).waitForTask(waitTimeInMilliSeconds);
                         } else {
                             vm.undeploy(UndeployPowerActionType.DEFAULT).waitForTask(waitTimeInMilliSeconds);
                         }
                         VcdCloudProviderConnectorFactory.logger.info("deleting " + vm.getResource().getName());
-                        vm.delete().waitForTask(waitTimeInMilliSeconds);
+                        vm.delete().waitForTask(waitTimeInMilliSeconds);*/
+
+                        vm.getParentVappReference();
+                        Vapp vapp = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
+                            vm.getParentVappReference());
+                        if (vapp.getChildrenVms().size() != 1) {
+                            // This method only applies to isolated machine!
+                            throw new ConnectorException("only one vm is expected!");
+                        }
+                        if (vapp.isDeployed()) {
+                            VcdCloudProviderConnectorFactory.logger.info("Undeploying " + vapp.getResource().getName());
+                            if (vapp.getVappStatus() == VappStatus.POWERED_ON) {
+                                vapp.undeploy(UndeployPowerActionType.POWEROFF).waitForTask(waitTimeInMilliSeconds);
+                            } else {
+                                vapp.undeploy(UndeployPowerActionType.DEFAULT).waitForTask(waitTimeInMilliSeconds);
+                            }
+                        }
+                        VcdCloudProviderConnectorFactory.logger.info("deleting " + vapp.getResource().getName());
+                        vapp.delete().waitForTask(waitTimeInMilliSeconds);
+
                         machine.setState(Machine.State.DELETED);
                     } catch (Exception ex) {
                         throw new ConnectorException(ex);
@@ -1147,6 +1248,9 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                     }
                     /*name += "-" + UUID.randomUUID();*/
                     source.setName(name);
+
+                    // associate machine instances with templates
+                    // (name conflicts, if any, will be detected by VCD)
                     machineTemplateMap.put(name, mt);
 
                     // set Href
@@ -1184,8 +1288,9 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             if (vdc.getAvailableNetworkRefs().size() == 0) {
                 throw new ConnectorException("No Networks in vdc to instantiate the vapp");
             }
-            // VcdCloudProviderConnectorFactory.logger.info("available networks= "
-            // + vdc.getAvailableNetworkRefs().iterator().next().getName());
+            VcdCloudProviderConnectorFactory.logger.info("available networks= "
+                + vdc.getAvailableNetworkRefs().iterator().next().getName() + ", "
+                + vdc.getAvailableNetworkRefs().iterator().next().getName());
 
             // specify the NetworkConfiguration for the vApp network.
             networkConfigurationType.setParentNetwork(vdc.getAvailableNetworkRefs().iterator().next());
@@ -1269,8 +1374,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 if (mc.getMemory() > 0) {
                     VcdCloudProviderConnectorFactory.logger
                         .info("  Memory Size: " + childVm.getMemory().getMemorySize() + "MB");
-                    long memoryInMBytes = mc.getMemory() / 1024; // kibibytes
-                                                                 // CIMI
+                    long memoryInMBytes = mc.getMemory() / 1024; /* CIMI: kibibytes*/
                     VirtualMemory virtualMemoryItemInMBytes = childVm.getMemory();
                     if (virtualMemoryItemInMBytes.getMemorySize().longValue() != memoryInMBytes) {
                         VcdCloudProviderConnectorFactory.logger.info("  -> updating: " + memoryInMBytes + " MB");
@@ -1284,8 +1388,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 List<VirtualDisk> disks = childVm.getDisks();
                 boolean diskSectionHasChanged = false;
                 for (DiskTemplate disk : mc.getDisks()) {
-                    long diskInMBytes = disk.getCapacity() / 1000; // kilobytes
-                                                                   // CIMI
+                    long diskInMBytes = disk.getCapacity() / 1000; /*CIMI: kilobytes*/
                     if (diskInMBytes < 1) {
                         diskInMBytes = 1;
                     }
@@ -1341,6 +1444,16 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             msgType.setValue("user Data");
 
             for (VM childVm : vapp.getChildrenVms()) {
+
+                // FIXME: GuestCustomization
+                GuestCustomizationSectionType guestCustomizationSection = childVm.getGuestCustomizationSection();
+                guestCustomizationSection.setEnabled(true);
+                childVm.updateSection(guestCustomizationSection).waitForTask(0);
+
+                VcdCloudProviderConnectorFactory.logger.info("Configuring guest.customization "
+                    + guestCustomizationSection.getCustomizationScript());
+
+                // ----
                 MachineTemplate mt = machineTemplateMap.get(childVm.getResource().getName());
                 String userData = mt.getUserData();
                 if (userData == null) {
@@ -1484,7 +1597,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
                         // Deploying the Instantiated vApp
                         VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
-                        vapp.deploy(false, 1000000, false).waitForTask(waitTimeInMilliSeconds);
+                        vapp.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);
                         VcdCloudProviderConnector.this.fromvAppToSystem(
                             VcdCloudProviderConnector.this.getVappByProviderAssignedId(system.getProviderAssignedId()), system);
                     } catch (Exception ex) {
@@ -1572,7 +1685,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
                         // Deploying the Instantiated vApp
                         VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
-                        vapp.deploy(false, 1000000, false).waitForTask(waitTimeInMilliSeconds);
+                        vapp.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);
 
                         // refresh the vapp
                         Vapp vapp2 = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
