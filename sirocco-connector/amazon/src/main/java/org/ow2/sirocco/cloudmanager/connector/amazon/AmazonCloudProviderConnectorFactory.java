@@ -90,6 +90,8 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
             "Virginia"), "us-east-1");
         AmazonCloudProviderConnectorFactory.locationMap.put(new CloudProviderLocation("US", "US-CA", "United States",
             "California"), "us-west-1");
+        AmazonCloudProviderConnectorFactory.locationMap.put(
+            new CloudProviderLocation("US", "US-OR", "United States", "Oregon"), "us-west-2");
         AmazonCloudProviderConnectorFactory.locationMap.put(new CloudProviderLocation("SG", null, "Singapore", null),
             "ap-southeast-1");
         AmazonCloudProviderConnectorFactory.locationMap.put(new CloudProviderLocation("AU", "AU-NSW", "Australia", "Sydney"),
@@ -493,11 +495,13 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
                         Reservation<? extends AWSRunningInstance> reservation = Iterables.getFirst(
                             AmazonCloudProviderConnector.this.syncClient.getInstanceServices().describeInstancesInRegion(
                                 AmazonCloudProviderConnector.this.amazonRegionCode, instanceId), null);
-                        AWSRunningInstance instance = Iterables.getFirst(reservation, null);
-                        if (instance.getInstanceState() != InstanceState.PENDING) {
-                            System.out.println("Machine created status=" + instance.getInstanceState());
-                            AmazonCloudProviderConnector.this.fromAWSRunningInstanceToMachine(instance, machine);
-                            break;
+                        if (reservation != null) {
+                            AWSRunningInstance instance = Iterables.getFirst(reservation, null);
+                            if (instance.getInstanceState() != InstanceState.PENDING) {
+                                System.out.println("Machine created status=" + instance.getInstanceState());
+                                AmazonCloudProviderConnector.this.fromAWSRunningInstanceToMachine(instance, machine);
+                                break;
+                            }
                         }
                         Thread.sleep(1000);
                     } while (waitTimeInSeconds-- > 0);
