@@ -33,11 +33,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineVolumeTemplate implements Serializable, Identifiable {
 
     private static final long serialVersionUID = 1L;
@@ -60,7 +57,7 @@ public class MachineVolumeTemplate implements Serializable, Identifiable {
 
     // TODO unidirectional
     @OneToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public VolumeTemplate getVolumeTemplate() {
         return this.volumeTemplate;
     }

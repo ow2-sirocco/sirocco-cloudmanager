@@ -31,14 +31,13 @@ import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 @Entity
@@ -99,8 +98,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
         this.credential = credentials;
     }
 
-    @OneToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(fetch = FetchType.EAGER)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
@@ -125,8 +123,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
         this.volumes = volumes;
     }
 
-    @OneToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(fetch = FetchType.EAGER)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineVolumeTemplate> getVolumeTemplates() {
         return this.volumeTemplates;
@@ -151,8 +148,7 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
         this.volumeTemplates = volumeTemplates;
     }
 
-    @OneToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(name = "machinetemplate_id", referencedColumnName = "id")
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineTemplateNetworkInterface> getNetworkInterfaces() {

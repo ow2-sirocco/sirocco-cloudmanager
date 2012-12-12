@@ -31,14 +31,12 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MeterConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -66,8 +64,8 @@ public class MeterConfiguration extends CloudEntity implements Serializable {
 
     protected boolean isContinuous;
 
-    @CollectionOfElements
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    @OneToMany
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<String> getAssociatedTo() {
         return this.associatedTo;
     }

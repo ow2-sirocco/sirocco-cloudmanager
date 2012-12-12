@@ -35,6 +35,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -42,8 +43,6 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
@@ -110,8 +109,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
         this.memory = memory;
     }
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineDisk> getDisks() {
         return this.disks;
@@ -127,8 +125,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
         }
     }
 
-    @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineVolume> getVolumes() {
         return this.volumes;
@@ -155,8 +152,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
         this.volumes = volumes;
     }
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE})
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     @JoinColumn(name = "machine_id", referencedColumnName = "id")
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineNetworkInterface> getNetworkInterfaces() {

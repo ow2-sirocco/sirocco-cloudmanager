@@ -31,16 +31,12 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineTemplateNetworkInterface extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -85,9 +81,8 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
         return this.networkPort;
     }
 
-    @OneToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    @OneToMany(fetch = FetchType.EAGER)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<Address> getAddresses() {
         return this.addresses;
     }
@@ -97,7 +92,7 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Network getNetwork() {
         return this.network;
     }

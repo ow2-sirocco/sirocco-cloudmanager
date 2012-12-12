@@ -36,14 +36,12 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_NETWORK_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM Network n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class Network extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
@@ -83,7 +81,7 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -93,7 +91,7 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderLocation getLocation() {
         return this.location;
     }
@@ -128,7 +126,7 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
     }
 
     @OneToMany
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<NetworkNetworkPort> getNetworkPorts() {
         return this.networkPorts;
     }
@@ -138,7 +136,7 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public ForwardingGroup getForwardingGroup() {
         return this.forwardingGroup;
     }

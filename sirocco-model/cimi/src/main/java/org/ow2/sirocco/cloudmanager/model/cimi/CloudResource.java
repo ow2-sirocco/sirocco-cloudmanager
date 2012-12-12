@@ -44,7 +44,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.hibernate.annotations.CollectionOfElements;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
@@ -150,7 +149,7 @@ public abstract class CloudResource implements Serializable, Resource {
         this.properties = properties;
     }
 
-    @CollectionOfElements(fetch = FetchType.EAGER)
+    @OneToMany(fetch = FetchType.EAGER)
     // //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Map<String, String> getProperties() {
         return this.properties;

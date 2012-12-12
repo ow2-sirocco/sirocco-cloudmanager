@@ -31,18 +31,15 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class ForwardingGroupTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private List<Network> networks;
 
     @OneToMany
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<Network> getNetworks() {
         return this.networks;
     }

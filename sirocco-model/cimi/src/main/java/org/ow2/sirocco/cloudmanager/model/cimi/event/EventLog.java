@@ -34,13 +34,11 @@ import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class EventLog extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -55,7 +53,7 @@ public class EventLog extends CloudEntity implements Serializable {
 
     // TODO check
     @OneToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudResource getTargetResource() {
         return this.targetResource;
     }
@@ -65,7 +63,7 @@ public class EventLog extends CloudEntity implements Serializable {
     }
 
     @OneToMany(cascade = CascadeType.ALL)
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<Event> getEvents() {
         return this.events;
     }

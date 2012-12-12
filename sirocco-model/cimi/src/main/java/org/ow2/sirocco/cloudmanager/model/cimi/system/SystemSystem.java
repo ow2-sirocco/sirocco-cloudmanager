@@ -28,12 +28,10 @@ package org.ow2.sirocco.cloudmanager.model.cimi.system;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class SystemSystem extends CloudCollectionItem {
     private static final long serialVersionUID = 1L;
 

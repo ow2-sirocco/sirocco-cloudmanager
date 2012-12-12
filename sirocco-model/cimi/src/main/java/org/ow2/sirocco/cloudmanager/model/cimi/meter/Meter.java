@@ -38,13 +38,11 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class Meter extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -71,7 +69,7 @@ public class Meter extends CloudEntity implements Serializable {
     protected Date expiresTime;
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudResource getTargetResource() {
         return this.targetResource;
     }
@@ -124,7 +122,7 @@ public class Meter extends CloudEntity implements Serializable {
     }
 
     @OneToMany
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MeterSample> getSamples() {
         return this.samples;
     }

@@ -30,8 +30,7 @@ import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
-
-import org.hibernate.annotations.CollectionOfElements;
+import javax.persistence.OneToMany;
 
 @Entity
 // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
@@ -86,7 +85,7 @@ public class AddressTemplate extends CloudEntity implements Serializable {
         this.defaultGateway = defaultGateway;
     }
 
-    @CollectionOfElements
+    @OneToMany
     public List<String> getDns() {
         return this.dns;
     }
