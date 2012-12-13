@@ -32,11 +32,12 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @Entity
@@ -172,7 +173,8 @@ public class Job extends CloudEntity implements Serializable {
         this.progress = progress;
     }
 
-    @OneToMany(mappedBy = "parentJob", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "parentJob")
+    @LazyCollection(LazyCollectionOption.FALSE)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<Job> getNestedJobs() {
         return this.nestedJobs;
@@ -192,7 +194,8 @@ public class Job extends CloudEntity implements Serializable {
         this.location = location;
     }
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
+    @LazyCollection(LazyCollectionOption.FALSE)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<CloudResource> getAffectedResources() {
         return this.affectedResources;

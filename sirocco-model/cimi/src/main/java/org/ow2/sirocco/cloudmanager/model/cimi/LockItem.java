@@ -39,9 +39,12 @@ import javax.persistence.TemporalType;
 import javax.persistence.UniqueConstraint;
 import javax.persistence.Version;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"lockedObjectId", "lockedObjectType"})})
-// @Cache(usage = CacheConcurrencyStrategy.NONE)
+@Cache(usage = CacheConcurrencyStrategy.NONE)
 public class LockItem implements Serializable {
     private static final long serialVersionUID = 1L;
 

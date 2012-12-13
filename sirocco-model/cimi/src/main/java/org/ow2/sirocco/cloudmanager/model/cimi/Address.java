@@ -31,9 +31,10 @@ import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.CollectionOfElements;
 
 @Entity
 // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
@@ -90,7 +91,7 @@ public class Address extends CloudEntity implements Serializable {
         this.defaultGateway = defaultGateway;
     }
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @CollectionOfElements(fetch = FetchType.EAGER)
     public Set<String> getDns() {
         return this.dns;
     }

@@ -32,11 +32,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
+
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
@@ -89,7 +91,8 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
         return this.networkPort;
     }
 
-    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE}, fetch = FetchType.EAGER)
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.REMOVE, CascadeType.MERGE})
+    @LazyCollection(LazyCollectionOption.FALSE)
     @OrderBy("id")
     @JoinColumn(name = "machinenetworkinterface_id", referencedColumnName = "id")
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)

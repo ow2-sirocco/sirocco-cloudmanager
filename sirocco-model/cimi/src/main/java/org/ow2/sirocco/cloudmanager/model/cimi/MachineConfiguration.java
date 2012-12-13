@@ -29,8 +29,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.OneToMany;
+
+import org.hibernate.annotations.CollectionOfElements;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
@@ -59,7 +61,8 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
         this.memory = memory;
     }
 
-    @OneToMany(fetch = FetchType.EAGER)
+    @CollectionOfElements
+    @LazyCollection(LazyCollectionOption.FALSE)
     // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<DiskTemplate> getDisks() {
         return this.disks;

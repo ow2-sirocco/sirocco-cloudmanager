@@ -38,6 +38,10 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.CollectionOfElements;
+
 /**
  * A CloudProvider can provision compute resources (virtual machines along with
  * their network and storage resources). A CloudProvider can represent a private
@@ -45,7 +49,7 @@ import javax.persistence.OneToMany;
  * public cloud (e.g. Amazon EC2).
  */
 @Entity
-// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class CloudProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -93,8 +97,8 @@ public class CloudProvider implements Serializable {
         this.properties = properties;
     }
 
-    @OneToMany(fetch = FetchType.EAGER)
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    @CollectionOfElements(fetch = FetchType.EAGER)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Map<String, String> getProperties() {
         return this.properties;
     }
@@ -112,7 +116,7 @@ public class CloudProvider implements Serializable {
     }
 
     @OneToMany(mappedBy = "cloudProvider", fetch = FetchType.EAGER)
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Set<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
     }
@@ -122,7 +126,7 @@ public class CloudProvider implements Serializable {
     }
 
     @ManyToMany(mappedBy = "cloudProviders", fetch = FetchType.EAGER)
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Set<CloudProviderLocation> getCloudProviderLocations() {
         return this.cloudProviderLocations;
     }

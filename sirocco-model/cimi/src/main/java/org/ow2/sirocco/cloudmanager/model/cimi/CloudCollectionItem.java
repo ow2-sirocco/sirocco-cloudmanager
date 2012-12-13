@@ -34,8 +34,11 @@ import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 @Entity
-// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CloudCollectionItem extends CloudEntity {
     private static final long serialVersionUID = 1L;
@@ -50,7 +53,7 @@ public abstract class CloudCollectionItem extends CloudEntity {
 
     @OneToOne(optional = true, fetch = FetchType.EAGER)
     @JoinColumn(name = "cloudcoll_ent_id")
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudResource getResource() {
         return this.resource;
     }
