@@ -1,7 +1,7 @@
 #
 #
 # SIROCCO
-# Copyright (C) 2011 France Telecom
+# Copyright (C) 2012 France Telecom
 # Contact: sirocco@ow2.org
 #
 # This library is free software; you can redistribute it and/or
@@ -19,13 +19,11 @@
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
 # USA
 #
-#  $Id$
-#
 #
 
 Private-Package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.impl
 
-Export-Package org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api,org.ow2.sirocco.cloudmanager.connector.util
+Export-Package 
 
 Import-Package  *
 

@@ -54,13 +54,13 @@ import org.osgi.service.cm.ManagedService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.util.log.Log;
-import org.ow2.util.log.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ListenableFuture;
 
 public class JobManager implements IJobManager, ManagedService {
-    private static Log logger = LogFactory.getLog(JobManager.class);
+    private static Logger logger = LoggerFactory.getLogger(JobManager.class);
 
     public static String JOB_WATCHER_PERIOD_PROP_NAME = "jobWatcherPeriodInSeconds";
 
@@ -70,9 +70,9 @@ public class JobManager implements IJobManager, ManagedService {
 
     public static long DEFAULT_JOB_RETENTION_TIME_IN_SECONDS = 5 * 60;
 
-    private static final String JMS_TOPIC_CONNECTION_FACTORY_NAME = "JTCF";
+    private static final String JMS_TOPIC_CONNECTION_FACTORY_NAME = "jms/TopicConnectionFactory";
 
-    private static final String JMS_TOPIC_NAME = "JobCompletion";
+    private static final String JMS_TOPIC_NAME = "jms/JobCompletion";
 
     private static class JobEntry {
         JobEntry(final Job job, final ListenableFuture<?> result) {
