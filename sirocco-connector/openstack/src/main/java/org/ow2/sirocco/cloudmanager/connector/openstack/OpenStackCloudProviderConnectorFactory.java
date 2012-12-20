@@ -90,8 +90,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.util.log.Log;
-import org.ow2.util.log.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -102,7 +102,7 @@ import com.google.inject.Module;
 @Component(public_factory = false)
 @Provides
 public class OpenStackCloudProviderConnectorFactory implements ICloudProviderConnectorFactory {
-    private static Log logger = LogFactory.getLog(OpenStackCloudProviderConnectorFactory.class);
+    private static Logger logger = LoggerFactory.getLogger(OpenStackCloudProviderConnectorFactory.class);
 
     public static final String CLOUD_PROVIDER_TYPE = "openstack";
 

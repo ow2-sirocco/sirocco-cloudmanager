@@ -32,25 +32,28 @@ import java.util.concurrent.Executors;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
+import org.osgi.util.tracker.ServiceTracker;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.util.log.Log;
-import org.ow2.util.log.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.util.concurrent.ListeningExecutorService;
 import com.google.common.util.concurrent.MoreExecutors;
 
 public class MockCloudProviderConnectorFactory implements ICloudProviderConnectorFactory {
 
-    private static Log logger = LogFactory.getLog(MockCloudProviderConnectorFactory.class);
+    private static Logger logger = LoggerFactory.getLogger(MockCloudProviderConnectorFactory.class);
 
     private static final int THREADPOOL_SIZE = 10;
 
     private IJobManager jobManager;
+
+    private BundleContext context;
 
     private ListeningExecutorService executorService = MoreExecutors.listeningDecorator(Executors
         .newFixedThreadPool(MockCloudProviderConnectorFactory.THREADPOOL_SIZE));
@@ -58,6 +61,7 @@ public class MockCloudProviderConnectorFactory implements ICloudProviderConnecto
     private Set<ICloudProviderConnector> cloudProvidersInUse = new LinkedHashSet<ICloudProviderConnector>();
 
     public MockCloudProviderConnectorFactory(final BundleContext context) {
+        this.context = context;
         ServiceReference jobManagerServiceRef = context.getServiceReference(IJobManager.class.getName());
         if (jobManagerServiceRef != null) {
             this.jobManager = (IJobManager) context.getService(jobManagerServiceRef);
@@ -115,6 +119,16 @@ public class MockCloudProviderConnectorFactory implements ICloudProviderConnecto
     }
 
     IJobManager getJobManager() {
+        if (this.jobManager == null) {
+            ServiceTracker st = new ServiceTracker(this.context, IJobManager.class.getName(), null);
+            st.open();
+            try {
+                return IJobManager.class.cast(st.waitForService(30000));
+            } catch (InterruptedException e) {
+
+            } finally {
+            }
+        }
         return this.jobManager;
     }
 

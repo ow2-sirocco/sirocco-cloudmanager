@@ -60,8 +60,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.util.log.Log;
-import org.ow2.util.log.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
@@ -73,7 +73,7 @@ import com.google.inject.Module;
 @Component(public_factory = false)
 @Provides
 public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnectorFactory {
-    private static Log logger = LogFactory.getLog(AmazonCloudProviderConnectorFactory.class);
+    private static Logger logger = LoggerFactory.getLogger(AmazonCloudProviderConnectorFactory.class);
 
     public static final String CLOUD_PROVIDER_TYPE = "amazon";
 

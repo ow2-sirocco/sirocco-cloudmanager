@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.connector.mock;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -87,8 +88,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
-import org.ow2.util.log.Log;
-import org.ow2.util.log.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -96,7 +97,7 @@ import com.google.common.util.concurrent.ListenableFuture;
 public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, IVolumeService,
     INetworkService, IImageService {
 
-    private static Log logger = LogFactory.getLog(MockCloudProviderConnector.class);
+    private static Logger logger = LoggerFactory.getLogger(MockCloudProviderConnector.class);
 
     private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS = 0;
 
@@ -535,15 +536,15 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             throw new ConnectorException("System " + systemId + " does not exist");
         }
         if (entityType.equals(SystemMachine.class.getName())) {
-            return system.getMachines();
+            return new ArrayList<SystemMachine>(system.getMachines());
         } else if (entityType.equals(SystemVolume.class.getName())) {
-            return system.getVolumes();
+            return new ArrayList<SystemVolume>(system.getVolumes());
         } else if (entityType.equals(SystemSystem.class.getName())) {
-            return system.getSystems();
+            return new ArrayList<SystemSystem>(system.getSystems());
         } else if (entityType.equals(SystemNetwork.class.getName())) {
-            return system.getNetworks();
+            return new ArrayList<SystemNetwork>(system.getNetworks());
         } else if (entityType.equals(SystemCredentials.class.getName())) {
-            return system.getCredentials();
+            return new ArrayList<SystemCredentials>(system.getCredentials());
         } else {
             throw new ConnectorException("object type not owned by a system");
         }
@@ -1140,7 +1141,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
         network.setProviderAssignedId(networkProviderAssignedId);
         network.setForwardingGroup(fg);
-        network.setNetworkPorts(new ArrayList<NetworkNetworkPort>());
+        network.setNetworkPorts(new HashSet<NetworkNetworkPort>());
         this.networks.put(networkProviderAssignedId, network);
         network.setState(Network.State.CREATING);
 
@@ -1356,7 +1357,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     @Override
     public Job createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws ConnectorException {
-        final List<ForwardingGroupNetwork> networksToAdd = new ArrayList<ForwardingGroupNetwork>();
+        final Set<ForwardingGroupNetwork> networksToAdd = new HashSet<ForwardingGroupNetwork>();
         if (forwardingGroupCreate.getForwardingGroupTemplate().getNetworks() != null) {
             for (Network net : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
                 String netId = net.getProviderAssignedId();
@@ -1373,7 +1374,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         final String forwardingGroupProviderAssignedId = UUID.randomUUID().toString();
         final ForwardingGroup forwardingGroup = new ForwardingGroup();
         forwardingGroup.setProviderAssignedId(forwardingGroupProviderAssignedId);
-        forwardingGroup.setNetworks(new ArrayList<ForwardingGroupNetwork>());
+        forwardingGroup.setNetworks(new HashSet<ForwardingGroupNetwork>());
         this.forwardingGroups.put(forwardingGroupProviderAssignedId, forwardingGroup);
         forwardingGroup.setState(ForwardingGroup.State.CREATING);
 

@@ -33,12 +33,12 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
-import org.ow2.util.log.Log;
-import org.ow2.util.log.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Activator implements BundleActivator {
 
-    private static Log logger = LogFactory.getLog(Activator.class);
+    private static Logger logger = LoggerFactory.getLogger(Activator.class);
 
     private ServiceRegistration serviceRegistration;
 
