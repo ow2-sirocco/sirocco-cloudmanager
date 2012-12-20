@@ -40,7 +40,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -54,13 +53,15 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteCredentialsManager.class)
 @Local(ICredentialsManager.class)
 public class CredentialsManager implements ICredentialsManager {
 
-    private static Logger logger = Logger.getLogger(CredentialsManager.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(CredentialsManager.class.getName());
 
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;

@@ -35,19 +35,14 @@ import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
-import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic"),
-    @ActivationConfigProperty(propertyName = "destination", propertyValue = "JobCompletion")})
+@MessageDriven(mappedName = "jms/JobCompletion", activationConfig = {@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Topic")})
 public class JobCompletionHandlerBean implements MessageListener {
-    private static Logger logger = Logger.getLogger(JobCompletionHandlerBean.class.getName());
-
-    private static final String JMS_TOPIC_CONNECTION_FACTORY_NAME = "JTCF";
-
-    private static final String JMS_TOPIC_NAME = "JobCompletion";
+    private static Logger logger = LoggerFactory.getLogger(JobCompletionHandlerBean.class.getName());
 
     private static final long JMS_REDELIVERY_DELAY = 1 * 2000;
 

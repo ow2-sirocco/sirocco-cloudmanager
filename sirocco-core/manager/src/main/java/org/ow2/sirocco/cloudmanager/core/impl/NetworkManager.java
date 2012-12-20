@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -14,12 +16,12 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 
-import org.apache.log4j.Logger;
-import org.ow2.easybeans.osgi.annotation.OSGiResource;
+import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
@@ -54,12 +56,14 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteNetworkManager.class)
 @Local(INetworkManager.class)
 public class NetworkManager implements INetworkManager {
-    private static Logger logger = Logger.getLogger(NetworkManager.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(NetworkManager.class.getName());
 
     @PersistenceContext
     private EntityManager em;
@@ -67,7 +71,8 @@ public class NetworkManager implements INetworkManager {
     @Resource
     private EJBContext context;
 
-    @OSGiResource
+    @Inject
+    @OSGiService(dynamic = true)
     private ICloudProviderConnectorFactoryFinder connectorFactoryFinder;
 
     @EJB
@@ -1014,7 +1019,7 @@ public class NetworkManager implements INetworkManager {
         forwardingGroup.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         forwardingGroup.setCloudProviderAccount(defaultAccount);
 
-        List<ForwardingGroupNetwork> networks = new ArrayList<ForwardingGroupNetwork>();
+        Set<ForwardingGroupNetwork> networks = new HashSet<ForwardingGroupNetwork>();
         if (forwardingGroupCreate.getForwardingGroupTemplate().getNetworks() != null) {
             for (Network net : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
                 ForwardingGroupNetwork forwardingGroupNetwork = new ForwardingGroupNetwork();
@@ -1595,8 +1600,9 @@ public class NetworkManager implements INetworkManager {
         ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount());
 
         Network affectedNetwork = null;
-        if (providerJob.getAffectedResources().size() == 1 && providerJob.getAffectedResources().get(0) instanceof Network) {
-            affectedNetwork = this.getNetworkByProviderAssignedId(providerJob.getAffectedResources().get(0)
+        if (providerJob.getAffectedResources().size() == 1
+            && providerJob.getAffectedResources().iterator().next() instanceof Network) {
+            affectedNetwork = this.getNetworkByProviderAssignedId(providerJob.getAffectedResources().iterator().next()
                 .getProviderAssignedId());
         }
 
@@ -1652,7 +1658,7 @@ public class NetworkManager implements INetworkManager {
             if (affectedNetwork == null) {
                 if (providerJob.getState() == Job.Status.SUCCESS) {
                     forwardingGroup.setState(ForwardingGroup.State.DELETED);
-                    forwardingGroup.setNetworks(Collections.<ForwardingGroupNetwork> emptyList());
+                    forwardingGroup.setNetworks(Collections.<ForwardingGroupNetwork> emptySet());
                     this.em.persist(forwardingGroup);
                     this.em.flush();
                 } else if (providerJob.getState() == Job.Status.FAILED) {
@@ -1698,7 +1704,7 @@ public class NetworkManager implements INetworkManager {
     public List<ForwardingGroupNetwork> getForwardingGroupNetworks(final String forwardingGroupId)
         throws ResourceNotFoundException, CloudProviderException {
         ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
-        return forwardingGroup.getNetworks();
+        return new ArrayList<ForwardingGroupNetwork>(forwardingGroup.getNetworks());
     }
 
     @Override

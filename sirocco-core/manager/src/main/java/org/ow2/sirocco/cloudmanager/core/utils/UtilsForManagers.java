@@ -17,11 +17,11 @@ import javax.jms.MessageProducer;
 import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Session;
+import javax.naming.InitialContext;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.apache.log4j.Logger;
 import org.hibernate.proxy.HibernateProxy;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -31,9 +31,11 @@ import org.ow2.sirocco.cloudmanager.core.util.ParseException;
 import org.ow2.sirocco.cloudmanager.core.util.TokenMgrError;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class UtilsForManagers {
-    private static Logger logger = Logger.getLogger(UtilsForManagers.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(UtilsForManagers.class.getName());
 
     /**
      * This generic method fills a bean with a map of attribute names and
@@ -110,12 +112,7 @@ public class UtilsForManagers {
      * @throws Exception
      */
     public static void emitJobListenerMessage(final Serializable payload, final EJBContext ctx) throws Exception {
-        UtilsForManagers.emitJMSMessage(payload, ctx, "JobEmission", 0, 0);
-    }
-
-    public static void emitJobCompletionMessage(final Serializable payload, final EJBContext ctx, final long delayMillis,
-        final long deliveriesCounter) throws Exception {
-        UtilsForManagers.emitJMSMessage(payload, ctx, "JobCompletion", delayMillis, deliveriesCounter);
+        UtilsForManagers.emitJMSMessage(payload, ctx, "jms/JobEmission", 0, 0);
     }
 
     /**
@@ -126,9 +123,11 @@ public class UtilsForManagers {
      * @param queueName
      * @throws Exception
      */
-    public static void emitJMSMessage(final Serializable payload, final EJBContext ctx, final String queueName,
+
+    public static void emitJMSMessage(final Serializable payload, final EJBContext ignored, final String queueName,
         final long delayMillis, final long deliveriesCounter) throws Exception {
-        ConnectionFactory cf = (ConnectionFactory) ctx.lookup("QCF");
+        InitialContext ctx = new InitialContext();
+        ConnectionFactory cf = (ConnectionFactory) ctx.lookup("jms/QueueConnectionFactory");
         Queue queue = (Queue) ctx.lookup(queueName);
         Connection conn = cf.createConnection();
 
@@ -294,9 +293,9 @@ public class UtilsForManagers {
         try {
             resource = (E) from.getClass().newInstance();
         } catch (InstantiationException e) {
-            UtilsForManagers.logger.fatal("", e);
+            UtilsForManagers.logger.error("", e);
         } catch (IllegalAccessException e) {
-            UtilsForManagers.logger.fatal("", e);
+            UtilsForManagers.logger.error("", e);
         }
         for (int i = 0; i < attributes.size(); i++) {
             try {

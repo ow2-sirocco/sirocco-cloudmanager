@@ -41,17 +41,18 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.ILockManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.model.cimi.LockItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Local(ILockManager.class)
 @SuppressWarnings("unused")
 public class LockManager implements ILockManager {
 
-    private static Logger logger = Logger.getLogger(LockManager.class);
+    private static Logger logger = LoggerFactory.getLogger(LockManager.class);
 
     public long lockTimeoutInSeconds = 600;
 

@@ -38,14 +38,14 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
-import org.ow2.easybeans.osgi.annotation.OSGiResource;
+import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
@@ -92,6 +92,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteMachineManager.class)
@@ -100,7 +102,7 @@ public class MachineManager implements IMachineManager {
 
     static final String EJB_JNDI_NAME = "MachineManager";
 
-    private static Logger logger = Logger.getLogger(MachineManager.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(MachineManager.class.getName());
 
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
@@ -123,7 +125,8 @@ public class MachineManager implements IMachineManager {
     @EJB
     private IJobManager jobManager;
 
-    @OSGiResource
+    @Inject
+    @OSGiService(dynamic = true)
     private ICloudProviderConnectorFactoryFinder cloudProviderConnectorFactoryFinder;
 
     @Resource
@@ -1100,7 +1103,7 @@ public class MachineManager implements IMachineManager {
             return;
         }
         for (MachineTemplateNetworkInterface nic : nics) {
-            List<Address> addresses = nic.getAddresses();
+            Set<Address> addresses = nic.getAddresses();
             if (addresses != null) {
                 for (Address addr : addresses) {
                     if (addr.getId() == null) {

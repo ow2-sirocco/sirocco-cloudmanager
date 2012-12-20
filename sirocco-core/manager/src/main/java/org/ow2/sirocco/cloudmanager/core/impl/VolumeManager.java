@@ -12,12 +12,12 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceException;
 
-import org.apache.log4j.Logger;
-import org.ow2.easybeans.osgi.annotation.OSGiResource;
+import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
@@ -48,12 +48,14 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteVolumeManager.class)
 @Local(IVolumeManager.class)
 public class VolumeManager implements IVolumeManager {
-    private static Logger logger = Logger.getLogger(VolumeManager.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(VolumeManager.class.getName());
 
     @PersistenceContext
     private EntityManager em;
@@ -61,7 +63,8 @@ public class VolumeManager implements IVolumeManager {
     @Resource
     private EJBContext context;
 
-    @OSGiResource
+    @Inject
+    @OSGiService(dynamic = true, waitTimeout = 20000)
     private ICloudProviderConnectorFactoryFinder connectorFactoryFinder;
 
     @EJB

@@ -39,14 +39,14 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
-import org.ow2.easybeans.osgi.annotation.OSGiResource;
+import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
@@ -102,6 +102,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteSystemManager.class)
@@ -109,7 +111,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 @SuppressWarnings("unused")
 public class SystemManager implements ISystemManager {
 
-    private static Logger logger = Logger.getLogger(SystemManager.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(SystemManager.class.getName());
 
     private static String CREATE_ACTION = "system creation";
 
@@ -173,7 +175,8 @@ public class SystemManager implements ISystemManager {
     @Resource
     private EJBContext ctx;
 
-    @OSGiResource
+    @Inject
+    @OSGiService(dynamic = true)
     private ICloudProviderConnectorFactoryFinder cloudProviderConnectorFactoryFinder;
 
     @EJB
@@ -292,7 +295,6 @@ public class SystemManager implements ISystemManager {
         sc.setResource(resource);
         sc.setState(state);
         sc.setCreated(new Date());
-        sc.setUser(this.getUser());
         sc.setProperties(new HashMap<String, String>());
         return sc;
     }
@@ -306,7 +308,6 @@ public class SystemManager implements ISystemManager {
         sc.setResource(resource);
         sc.setState(state);
         sc.setCreated(new Date());
-        sc.setUser(this.getUser());
         sc.setProperties(new HashMap<String, String>());
         return sc;
     }

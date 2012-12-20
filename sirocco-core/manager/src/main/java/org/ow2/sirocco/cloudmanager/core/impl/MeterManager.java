@@ -25,24 +25,16 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.PersistenceContextType;
-import javax.persistence.Query;
 
-import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IMeterManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMeterManager;
+import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
@@ -50,160 +42,166 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.MeterConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.MeterCreate;
-import org.ow2.sirocco.cloudmanager.model.cimi.meter.MeterTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.MeterSample;
-import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.model.cimi.meter.MeterTemplate;
 
 @Stateless
 @Remote(IRemoteMeterManager.class)
 @Local(IMeterManager.class)
-
 public class MeterManager implements IMeterManager {
 
     @Override
-    public MeterConfiguration createMeterConfiguration(MeterConfiguration meterConfiguration) throws CloudProviderException {
+    public MeterConfiguration createMeterConfiguration(final MeterConfiguration meterConfiguration)
+        throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void deleteMeterConfiguration(String meterConfigId) throws CloudProviderException, ResourceNotFoundException {
+    public void deleteMeterConfiguration(final String meterConfigId) throws CloudProviderException, ResourceNotFoundException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public MeterConfiguration getMeterConfiguration(String meterConfigId) throws CloudProviderException,
+    public MeterConfiguration getMeterConfiguration(final String meterConfigId) throws CloudProviderException,
         ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public QueryResult<MeterConfiguration> getMeterConfigurations(int first, int last, List<String> filters, List<String> attributes) throws CloudProviderException {
+    public QueryResult<MeterConfiguration> getMeterConfigurations(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void updateMeterConfiguration(String meterConfigId, Map<String, Object> attributes) throws CloudProviderException,
-        InvalidRequestException, ResourceNotFoundException {
+    public void updateMeterConfiguration(final String meterConfigId, final Map<String, Object> attributes)
+        throws CloudProviderException, InvalidRequestException, ResourceNotFoundException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public MeterTemplate createMeterTemplate(MeterTemplate meterTemplate) throws CloudProviderException,
+    public MeterTemplate createMeterTemplate(final MeterTemplate meterTemplate) throws CloudProviderException,
         ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void updateMeterTemplate(MeterTemplate meterTemplate) throws CloudProviderException, InvalidRequestException {
+    public void updateMeterTemplate(final MeterTemplate meterTemplate) throws CloudProviderException, InvalidRequestException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public MeterTemplate getMeterTemplateById(String meterTemplateId) throws CloudProviderException, ResourceNotFoundException {
+    public MeterTemplate getMeterTemplateById(final String meterTemplateId) throws CloudProviderException,
+        ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void deleteMeterTemplate(String meterTemplateId) throws ResourceNotFoundException, CloudProviderException {
+    public void deleteMeterTemplate(final String meterTemplateId) throws ResourceNotFoundException, CloudProviderException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public void updateMeterTemplateAttributes(String meterTemplateId, Map<String, Object> attributes)
+    public void updateMeterTemplateAttributes(final String meterTemplateId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public QueryResult<MeterTemplate> getMeterTemplates(int first, int last, List<String> filters, List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+    public QueryResult<MeterTemplate> getMeterTemplates(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Job createMeter(MeterCreate meterCreate) throws CloudProviderException {
+    public Job createMeter(final MeterCreate meterCreate) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Job createMeter(MeterCreate meterCreate, String cloudResourceId) throws CloudProviderException {
+    public Job createMeter(final MeterCreate meterCreate, final String cloudResourceId) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Job deleteMeter(String meterId) throws CloudProviderException, ResourceNotFoundException {
+    public Job deleteMeter(final String meterId) throws CloudProviderException, ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public void updateMeter(String meterId, Map<String, Object> attributes) throws ResourceNotFoundException,
+    public void updateMeter(final String meterId, final Map<String, Object> attributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public QueryResult<Meter> getMeters(int first, int last, List<String> filters, List<String> attributes) throws CloudProviderException {
+    public QueryResult<Meter> getMeters(final int first, final int last, final List<String> filters,
+        final List<String> attributes) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public QueryResult<Meter> getMeters(String cloudResourceId, int first, int last, List<String> filters, List<String> attributes) throws ResourceNotFoundException, CloudProviderException {
+    public QueryResult<Meter> getMeters(final String cloudResourceId, final int first, final int last,
+        final List<String> filters, final List<String> attributes) throws ResourceNotFoundException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Meter getMeter(String cloudResourceId, String meterId) throws CloudProviderException, ResourceNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public Job deleteMeter(String cloudResourceId, String meterId) throws CloudProviderException, ResourceNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-   
-    @Override
-    public List<MeterSample> getMeterSamples(String meterId) throws CloudProviderException, ResourceNotFoundException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<MeterSample> getMeterSamples(String cloudResourceId, String meterId) throws CloudProviderException,
+    public Meter getMeter(final String cloudResourceId, final String meterId) throws CloudProviderException,
         ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Job startMeter(String cloudResourceId, String meterId) throws CloudProviderException, ResourceNotFoundException {
+    public Job deleteMeter(final String cloudResourceId, final String meterId) throws CloudProviderException,
+        ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public Job stopMeter(String cloudResourceId, String meterId) throws CloudProviderException, ResourceNotFoundException {
+    public List<MeterSample> getMeterSamples(final String meterId) throws CloudProviderException, ResourceNotFoundException {
         // TODO Auto-generated method stub
         return null;
     }
-    
+
+    @Override
+    public List<MeterSample> getMeterSamples(final String cloudResourceId, final String meterId) throws CloudProviderException,
+        ResourceNotFoundException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job startMeter(final String cloudResourceId, final String meterId) throws CloudProviderException,
+        ResourceNotFoundException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Job stopMeter(final String cloudResourceId, final String meterId) throws CloudProviderException,
+        ResourceNotFoundException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

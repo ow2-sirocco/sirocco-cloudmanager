@@ -29,15 +29,15 @@ import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJBContext;
 import javax.ejb.MessageDriven;
+import javax.inject.Inject;
 import javax.jms.Message;
 import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
-import org.apache.log4j.Logger;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceReference;
-import org.ow2.easybeans.osgi.annotation.OSGiResource;
+import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This MDB is used to guarantee that we send messages to listen provider jobs
@@ -46,24 +46,18 @@ import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
  * 
  * @author ycas7461
  */
-@MessageDriven(activationConfig = {
-    @ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue"),
-    @ActivationConfigProperty(propertyName = "destination", propertyValue = "JobEmission")})
+@MessageDriven(mappedName = "jms/JobEmission", activationConfig = {@ActivationConfigProperty(propertyName = "destinationType", propertyValue = "javax.jms.Queue")})
 public class JobSendHandlerBean implements MessageListener {
-    private static Logger logger = Logger.getLogger(JobSendHandlerBean.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(JobSendHandlerBean.class.getName());
 
     private static final long JMS_REDELIVERY_DELAY = 5 * 1000;
 
     @Resource
     private EJBContext ctx;
 
-    @OSGiResource
-    BundleContext context;
-
-    private IJobManager getJobManager() {
-        ServiceReference sr = this.context.getServiceReference(IJobManager.class.getName());
-        return (IJobManager) this.context.getService(sr);
-    }
+    @Inject
+    @OSGiService(dynamic = true)
+    IJobManager jobManager;
 
     @Override
     public void onMessage(final Message msg) {
@@ -72,14 +66,9 @@ public class JobSendHandlerBean implements MessageListener {
             try {
                 ObjectMessage objectMessage = (ObjectMessage) msg;
 
-                IJobManager jobM = this.getJobManager();
-                if (jobM == null) {
-                    throw new Exception("JobManager is null");
-                }
-
                 Object payload = objectMessage.getObject();
                 JobSendHandlerBean.logger.debug("setting up Job completion listener");
-                jobM.setNotificationOnJobCompletion((String) payload);
+                this.jobManager.setNotificationOnJobCompletion((String) payload);
             } catch (Exception e2) {
                 JobSendHandlerBean.logger.warn("Exception " + e2.getMessage() + " - message rollback");
                 this.ctx.setRollbackOnly();

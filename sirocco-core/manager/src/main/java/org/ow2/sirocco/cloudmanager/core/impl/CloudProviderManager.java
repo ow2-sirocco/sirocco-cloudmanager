@@ -40,7 +40,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -51,6 +50,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteCloudProviderManager.class)
@@ -58,7 +59,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 @SuppressWarnings("unused")
 public class CloudProviderManager implements ICloudProviderManager {
 
-    private static Logger logger = Logger.getLogger(MachineImageManager.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(CloudProviderManager.class.getName());
 
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
@@ -196,7 +197,12 @@ public class CloudProviderManager implements ICloudProviderManager {
         users.add(u);
         cpa.setUsers(users);
 
+        u.getCloudProviderAccounts().add(cpa);
+
         this.em.merge(cpa);
+
+        CloudProviderManager.logger.info("Added CloudProvider account " + cpa.getCloudProvider().getCloudProviderType()
+            + " to user " + u.getUsername());
 
     }
 
@@ -520,6 +526,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         }
         CloudProviderAccount targetAccount = null;
         for (CloudProviderAccount account : user.getCloudProviderAccounts()) {
+            CloudProviderManager.logger.info("Account " + account.getCloudProvider().getCloudProviderType());
             if (account.getCloudProvider().getCloudProviderType().equals(cloudProviderType)) {
                 targetAccount = account;
                 break;

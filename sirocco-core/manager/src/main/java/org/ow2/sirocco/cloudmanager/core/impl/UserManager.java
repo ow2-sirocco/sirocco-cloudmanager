@@ -29,16 +29,16 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
+import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
 import org.apache.commons.validator.routines.EmailValidator;
-import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -46,6 +46,8 @@ import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteUserManager.class)
@@ -53,17 +55,36 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 @SuppressWarnings("unused")
 public class UserManager implements IUserManager {
 
-    private static Logger logger = Logger.getLogger(UserManager.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(UserManager.class.getName());
 
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource
-    private SessionContext ctx;
+    private EJBContext context;
+
+    public String md5(final String md5) {
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] array = md.digest(md5.getBytes());
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < array.length; ++i) {
+                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+            }
+            return sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+        }
+        return null;
+    }
 
     @Override
     public User createUser(final String firstName, final String lastName, final String email, final String username,
         final String password) throws CloudProviderException {
+        try {
+            this.em.createQuery("FROM User u WHERE u.username=:name").setParameter("name", username).getSingleResult();
+            throw new CloudProviderException("User with username " + username + " already exists");
+        } catch (NoResultException e) {
+        }
         User u = new User();
         u.setFirstName(firstName);
         u.setLastName(lastName);
@@ -72,7 +93,6 @@ public class UserManager implements IUserManager {
         u.setPassword(password);
 
         return this.createUser(u);
-
     }
 
     @Override
@@ -81,6 +101,7 @@ public class UserManager implements IUserManager {
         // throw new UserException("user validation failed");
         // }
         u.setRole("sirocco-user");
+        u.setPassword(this.md5(u.getPassword()));
         this.em.persist(u);
         CloudEntryPoint cep = new CloudEntryPoint();
         cep.setUser(u);
@@ -131,7 +152,7 @@ public class UserManager implements IUserManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<User> getUsers() throws CloudProviderException {
-        return (List<User>)this.em.createQuery("Select u From User u").getResultList();
+        return this.em.createQuery("Select u From User u").getResultList();
     }
 
     @SuppressWarnings("unchecked")

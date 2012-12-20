@@ -43,7 +43,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.ILockManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
@@ -70,6 +69,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteJobManager.class)
@@ -77,7 +78,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 @SuppressWarnings("unused")
 public class JobManager implements IJobManager {
 
-    private static Logger logger = Logger.getLogger(JobManager.class);
+    private static Logger logger = LoggerFactory.getLogger(JobManager.class);
 
     public static long DEFAULT_JOB_SCHEDULER_PERIOD_IN_SECONDS = 20;
 

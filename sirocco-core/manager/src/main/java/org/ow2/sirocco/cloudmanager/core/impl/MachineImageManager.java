@@ -40,7 +40,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.apache.log4j.Logger;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -56,6 +55,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteMachineImageManager.class)
@@ -63,7 +64,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 @SuppressWarnings("unused")
 public class MachineImageManager implements IMachineImageManager {
 
-    private static Logger logger = Logger.getLogger(MachineImageManager.class.getName());
+    private static Logger logger = LoggerFactory.getLogger(MachineImageManager.class.getName());
 
     @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
