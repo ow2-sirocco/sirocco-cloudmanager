@@ -1,0 +1,28 @@
+<projectDescription>
+  <name>sirocco-cloudmanager-itest</name>
+  <comment>The OW2 Consortium is an open source community committed to making available to everyone
+    the best and most reliable middleware technology, including generic enterprise applications
+    and cloud computing technologies. The mission of the OW2 Consortium is to
+      i) develop open source code for middleware, generic enterprise applications and cloud computing and
+      ii) to foster a vibrant community and business ecosystem. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <projects>
+    <project>sirocco-cloudmanager-connector-finder</project>
+    <project>sirocco-cloudmanager-connector-mock</project>
+    <project>sirocco-cloudmanager-connector-util-jobmanager</project>
+    <project>sirocco-cloudmanager-core-api</project>
+    <project>sirocco-cloudmanager-core-manager</project>
+    <project>sirocco-cloudmanager-model-cimi</project>
+  </projects>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+    <buildCommand>
+      <name>org.maven.ide.eclipse.maven2Builder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.maven.ide.eclipse.maven2Nature</nature>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+  </natures>
+</projectDescription>
