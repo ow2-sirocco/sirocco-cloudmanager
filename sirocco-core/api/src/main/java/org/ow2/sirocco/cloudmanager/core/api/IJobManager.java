@@ -38,7 +38,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
  */
 public interface IJobManager {
 
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.JobManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager@Remote";
+    static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/JobManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager";
 
     Job createJob(CloudResource targetEntity, String action, String parentJob) throws CloudProviderException;
 

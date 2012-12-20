@@ -26,5 +26,6 @@
 package org.ow2.sirocco.cloudmanager.core.api;
 
 public interface IRemoteMachineManager extends IMachineManager {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager";
 
 }

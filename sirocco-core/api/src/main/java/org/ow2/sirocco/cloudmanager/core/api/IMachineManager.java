@@ -48,7 +48,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
  */
 public interface IMachineManager extends IJobListener {
 
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.MachineManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager@Remote";
+    static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/MachineManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager";
 
     /**
      * Operations on CEP

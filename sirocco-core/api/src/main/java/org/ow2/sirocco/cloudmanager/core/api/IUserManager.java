@@ -7,9 +7,6 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 public interface IUserManager {
-
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.UserManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager@Remote";
-
     User createUser(String firstName, String lastName, String email, String username, String password)
         throws CloudProviderException;
 

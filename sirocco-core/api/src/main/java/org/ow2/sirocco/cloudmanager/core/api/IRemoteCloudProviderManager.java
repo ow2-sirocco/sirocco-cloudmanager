@@ -25,7 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.api;
 
-
-public interface IRemoteCloudProviderManager extends ICloudProviderManager{
+public interface IRemoteCloudProviderManager extends ICloudProviderManager {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager";
 
 }

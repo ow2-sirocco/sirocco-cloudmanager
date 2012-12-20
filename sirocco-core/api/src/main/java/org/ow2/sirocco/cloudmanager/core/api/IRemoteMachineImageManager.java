@@ -26,5 +26,5 @@
 package org.ow2.sirocco.cloudmanager.core.api;
 
 public interface IRemoteMachineImageManager extends IMachineImageManager {
-
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager";
 }

@@ -43,7 +43,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
  * Volume management operations
  */
 public interface IVolumeManager extends IJobListener {
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.VolumeManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager@Remote";
+    static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/VolumeManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager";
 
     /**
      * Creates a new Volume, this operation is asynchronous

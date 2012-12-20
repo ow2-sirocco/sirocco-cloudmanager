@@ -25,8 +25,8 @@
 
 package org.ow2.sirocco.cloudmanager.core.api;
 
-import org.ow2.sirocco.cloudmanager.core.api.IMeterManager;
 
 public interface IRemoteMeterManager extends IMeterManager {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteMeterManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteMeterManager";
 
 }

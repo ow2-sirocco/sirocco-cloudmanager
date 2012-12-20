@@ -39,7 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
  */
 public interface IMachineImageManager {
 
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.MachineImageManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager@Remote";
+    static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/MachineImageManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager";
 
     Job createMachineImage(MachineImage machineImage) throws CloudProviderException;
 

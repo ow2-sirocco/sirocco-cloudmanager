@@ -25,7 +25,6 @@
 
 package org.ow2.sirocco.cloudmanager.core.api;
 
-
-public interface IRemoteCredentialsManager extends ICredentialsManager{
-
+public interface IRemoteCredentialsManager extends ICredentialsManager {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager";
 }

@@ -25,8 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.api;
 
-import org.ow2.sirocco.cloudmanager.core.api.IEventManager;
 
 public interface IRemoteEventManager extends IEventManager {
-
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteEventManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteEventManager";
 }

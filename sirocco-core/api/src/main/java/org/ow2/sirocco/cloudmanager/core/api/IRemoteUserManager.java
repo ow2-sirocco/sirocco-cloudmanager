@@ -26,5 +26,5 @@
 package org.ow2.sirocco.cloudmanager.core.api;
 
 public interface IRemoteUserManager extends IUserManager {
-
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager";
 }

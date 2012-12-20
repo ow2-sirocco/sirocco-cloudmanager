@@ -41,7 +41,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
  */
 public interface IEventManager {
 
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.impl.EventManager_org.ow2.sirocco.cloudmanager.core.api.IRemoteEventManager@Remote";
+    static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/EventManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteEventManager";
 
     /** EventLog Template operations */
     EventLogTemplate createEventLogTemplate(EventLogTemplate eventLogTemplate) throws CloudProviderException,
