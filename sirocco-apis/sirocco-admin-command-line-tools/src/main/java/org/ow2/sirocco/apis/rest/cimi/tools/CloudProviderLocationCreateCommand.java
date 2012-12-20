@@ -26,10 +26,8 @@
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
 
 import org.nocrala.tools.texttablefmt.Table;
-import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
@@ -38,7 +36,7 @@ import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "create cloud provider location")
 public class CloudProviderLocationCreateCommand implements Command {
-    public static String COMMAND_NAME = "cloud-provider-location-create";
+    public static String COMMAND_NAME = "location-create";
 
     @Parameter(names = "-iso3166-1", description = "country code", required = true)
     private String iso3166_1;
@@ -58,10 +56,9 @@ public class CloudProviderLocationCreateCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
-        Context context = new InitialContext();
+    public void execute(final Context context) throws Exception {
         IRemoteCloudProviderManager cloudProviderManager = (IRemoteCloudProviderManager) context
-            .lookup(ICloudProviderManager.EJB_JNDI_NAME);
+            .lookup(IRemoteCloudProviderManager.EJB_JNDI_NAME);
 
         CloudProviderLocation location = new CloudProviderLocation();
         location.setIso3166_1(this.iso3166_1);

@@ -30,10 +30,8 @@ import java.util.List;
 import java.util.Map;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
 
 import org.nocrala.tools.texttablefmt.Table;
-import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -43,7 +41,7 @@ import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "create cloud provider account")
 public class CloudProviderAccountCreateCommand implements Command {
-    public static String COMMAND_NAME = "cloud-provider-account-create";
+    public static String COMMAND_NAME = "cloudprovideraccount-create";
 
     @Parameter(names = "-login", description = "login", required = true)
     private String login;
@@ -63,10 +61,9 @@ public class CloudProviderAccountCreateCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
-        Context context = new InitialContext();
+    public void execute(final Context context) throws Exception {
         IRemoteCloudProviderManager cloudProviderManager = (IRemoteCloudProviderManager) context
-            .lookup(ICloudProviderManager.EJB_JNDI_NAME);
+            .lookup(IRemoteCloudProviderManager.EJB_JNDI_NAME);
 
         CloudProviderAccount account = new CloudProviderAccount();
         account.setLogin(this.login);

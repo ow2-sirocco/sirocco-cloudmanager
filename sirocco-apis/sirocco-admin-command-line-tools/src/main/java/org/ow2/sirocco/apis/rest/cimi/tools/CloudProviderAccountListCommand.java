@@ -28,10 +28,8 @@ package org.ow2.sirocco.apis.rest.cimi.tools;
 import java.util.List;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
 
 import org.nocrala.tools.texttablefmt.Table;
-import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 
@@ -40,7 +38,7 @@ import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "list cloud provider accounts")
 public class CloudProviderAccountListCommand implements Command {
-    public static String COMMAND_NAME = "cloud-provider-account-list";
+    public static String COMMAND_NAME = "cloudprovideraccount-list";
 
     @Parameter(names = "-user", description = "user id", required = false)
     private String userId;
@@ -51,10 +49,9 @@ public class CloudProviderAccountListCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
-        Context context = new InitialContext();
+    public void execute(final Context context) throws Exception {
         IRemoteCloudProviderManager cloudProviderManager = (IRemoteCloudProviderManager) context
-            .lookup(ICloudProviderManager.EJB_JNDI_NAME);
+            .lookup(IRemoteCloudProviderManager.EJB_JNDI_NAME);
 
         List<CloudProviderAccount> accounts;
 

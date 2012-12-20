@@ -24,17 +24,28 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.rmi.AccessException;
+import java.util.Properties;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import com.sun.appserv.security.ProgrammaticLogin;
 
 public class AdminClient {
     private static String SIROCCO_ADMIN_USERNAME_ENV_NAME = "SIROCCO_ADMIN_USERNAME";
 
     private static String SIROCCO_ADMIN_PASSWORD_ENV_NAME = "SIROCCO_ADMIN_PASSWORD";
 
-    private static String SIROCCO_RMI_ENDPOINT_URL_ENV_NAME = "SIROCCO_RMI_ENDPOINT_URL";
+    private static String SIROCCO_ADMIN_HOST_ENV_NAME = "SIROCCO_ADMIN_HOST";
+
+    private static String SIROCCO_ADMIN_PORT_ENV_NAME = "SIROCCO_ADMIN_PORT";
+
+    public static final String GF_INITIAL_CONTEXT_FACTORY = "com.sun.enterprise.naming.SerialInitContextFactory";
 
     private static Command commands[] = {new UserCreateCommand(), new UserListCommand(), new CloudProviderCreateCommand(),
         new CloudProviderListCommand(), new CloudProviderAccountListCommand(), new CloudProviderAccountCreateCommand(),
@@ -52,9 +63,14 @@ public class AdminClient {
             System.err.println("SIROCCO_ADMIN_PASSWORD environment variable not set");
             System.exit(1);
         }
-        String rmiEndpointUrl = System.getenv(AdminClient.SIROCCO_RMI_ENDPOINT_URL_ENV_NAME);
-        if (rmiEndpointUrl == null) {
-            System.err.println("SIROCCO_RMI_ENDPOINT_URL environment variable not set");
+        String host = System.getenv(AdminClient.SIROCCO_ADMIN_HOST_ENV_NAME);
+        if (host == null) {
+            System.err.println("SIROCCO_ADMIN_HOST environment variable not set");
+            System.exit(1);
+        }
+        String port = System.getenv(AdminClient.SIROCCO_ADMIN_PORT_ENV_NAME);
+        if (port == null) {
+            System.err.println("SIROCCO_ADMIN_PORT environment variable not set");
             System.exit(1);
         }
 
@@ -71,16 +87,35 @@ public class AdminClient {
             }
             Command command = (Command) jCommander.getCommands().get(commandName).getObjects().get(0);
 
-            EJBClient.connect(rmiEndpointUrl, login, password);
+            Properties props = new Properties();
 
-            command.execute();
+            props.setProperty("org.omg.CORBA.ORBInitialHost", host);
+            props.setProperty("org.omg.CORBA.ORBInitialPort", port);
+            props.setProperty(Context.INITIAL_CONTEXT_FACTORY, AdminClient.GF_INITIAL_CONTEXT_FACTORY);
+
+            ProgrammaticLogin programmaticLogin = new ProgrammaticLogin();
+            programmaticLogin.login(login, password);
+
+            Context context = new InitialContext(props);
+
+            command.execute(context);
         } catch (ParameterException ex) {
             this.printUsageAndExit(jCommander);
         } catch (CloudProviderException ex) {
             System.out.println("Request failed: " + ex.getMessage());
             System.exit(1);
         } catch (Exception ex) {
-            ex.printStackTrace();
+            Throwable cause = ex.getCause();
+            while (cause != null) {
+                if (cause instanceof AccessException) {
+                    System.err.println("Access denied");
+                    break;
+                }
+                cause = cause.getCause();
+            }
+            if (cause == null) {
+                ex.printStackTrace();
+            }
             System.exit(1);
         }
 

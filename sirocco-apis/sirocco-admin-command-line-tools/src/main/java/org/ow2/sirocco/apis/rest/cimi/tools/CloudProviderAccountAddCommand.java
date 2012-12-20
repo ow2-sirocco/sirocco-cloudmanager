@@ -26,9 +26,7 @@
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
 import javax.naming.Context;
-import javax.naming.InitialContext;
 
-import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 
 import com.beust.jcommander.Parameter;
@@ -36,7 +34,7 @@ import com.beust.jcommander.Parameters;
 
 @Parameters(commandDescription = "add cloud provider account to user")
 public class CloudProviderAccountAddCommand implements Command {
-    public static String COMMAND_NAME = "cloud-provider-account-add";
+    public static String COMMAND_NAME = "cloudprovideraccount-add";
 
     @Parameter(names = "-account", description = "account id", required = true)
     private String accountId;
@@ -50,10 +48,9 @@ public class CloudProviderAccountAddCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
-        Context context = new InitialContext();
+    public void execute(final Context context) throws Exception {
         IRemoteCloudProviderManager cloudProviderManager = (IRemoteCloudProviderManager) context
-            .lookup(ICloudProviderManager.EJB_JNDI_NAME);
+            .lookup(IRemoteCloudProviderManager.EJB_JNDI_NAME);
 
         cloudProviderManager.addCloudProviderAccountToUser(this.userId, this.accountId);
 

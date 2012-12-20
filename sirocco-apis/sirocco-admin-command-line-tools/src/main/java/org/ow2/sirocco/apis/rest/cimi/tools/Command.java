@@ -24,10 +24,11 @@
  */
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import javax.naming.Context;
 
 public interface Command {
     String getName();
 
-    void execute() throws Exception;
+    void execute(Context context) throws Exception;
 
 }

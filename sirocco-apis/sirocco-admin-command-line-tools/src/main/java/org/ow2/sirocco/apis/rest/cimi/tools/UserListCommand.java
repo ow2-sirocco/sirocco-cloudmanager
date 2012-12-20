@@ -25,17 +25,19 @@
 
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.rmi.AccessException;
 import java.util.List;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
-import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 import com.beust.jcommander.Parameters;
+import com.sun.appserv.security.ProgrammaticLogin;
 
 @Parameters(commandDescription = "list users")
 public class UserListCommand implements Command {
@@ -47,9 +49,8 @@ public class UserListCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
-        Context context = new InitialContext();
-        IRemoteUserManager userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
+    public void execute(final Context context) throws Exception {
+        IRemoteUserManager userManager = (IRemoteUserManager) context.lookup(IRemoteUserManager.EJB_JNDI_NAME);
 
         List<User> users = userManager.getUsers();
 
@@ -65,5 +66,33 @@ public class UserListCommand implements Command {
         }
 
         System.out.println(table.render());
+    }
+
+    public static void main(final String[] args) {
+        try {
+            Properties props = new Properties();
+            props.setProperty("org.omg.CORBA.ORBInitialHost", "127.0.0.1");
+            props.setProperty("org.omg.CORBA.ORBInitialPort", "3700");
+            props.setProperty(Context.INITIAL_CONTEXT_FACTORY, AdminClient.GF_INITIAL_CONTEXT_FACTORY);
+
+            ProgrammaticLogin programmaticLogin = new ProgrammaticLogin();
+            programmaticLogin.login("admin", "admin");
+
+            Context context = new InitialContext(props);
+
+            new UserListCommand().execute(context);
+        } catch (Exception ex) {
+            Throwable cause = ex.getCause();
+            while (cause != null) {
+                if (cause instanceof AccessException) {
+                    System.err.println("Access denied");
+                    break;
+                }
+                cause = cause.getCause();
+            }
+            if (cause == null) {
+                ex.printStackTrace();
+            }
+        }
     }
 }

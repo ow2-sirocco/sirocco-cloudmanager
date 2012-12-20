@@ -4,17 +4,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 
-import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager;
-import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
@@ -26,21 +25,34 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemMachine;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 
+import com.sun.appserv.security.ProgrammaticLogin;
+
 public class BuildSystemTemplate {
 
     private IRemoteJobManager jobManager;
 
+    private final String host = "localhost";
+
+    private final String port = "3700";
+
+    Context getContext() throws NamingException {
+        Properties env = new Properties();
+
+        env.setProperty("org.omg.CORBA.ORBInitialHost", this.host);
+        env.setProperty("org.omg.CORBA.ORBInitialPort", this.port);
+        env.setProperty(Context.INITIAL_CONTEXT_FACTORY, AdminClient.GF_INITIAL_CONTEXT_FACTORY);
+
+        ProgrammaticLogin programmaticLogin = new ProgrammaticLogin();
+        programmaticLogin.login("guest", "guest");
+
+        return new InitialContext(env);
+    }
+
     public void start() throws Exception {
-        String rmiEndpointUrl = "rmi://localhost:1099";
-        String login = "guest";
-        String password = "guest";
-
-        EJBClient.connect(rmiEndpointUrl, login, password);
-
-        Context context = new InitialContext();
-        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(ISystemManager.EJB_JNDI_NAME);
-        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
-        this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+        Context context = this.getContext();
+        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(IRemoteSystemManager.EJB_JNDI_NAME);
+        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IRemoteMachineManager.EJB_JNDI_NAME);
+        this.jobManager = (IRemoteJobManager) context.lookup(IRemoteJobManager.EJB_JNDI_NAME);
 
         MachineTemplate machineTemplate = null;
         for (MachineTemplate template : machineManager.getMachineTemplates()) {
@@ -109,18 +121,12 @@ public class BuildSystemTemplate {
         // this.waitForJobCompletion(job);
 
     }
-    
+
     public void buildDMTemplate() throws Exception {
-        String rmiEndpointUrl = "rmi://localhost:1099";
-        String login = "guest";
-        String password = "guest";
-
-        EJBClient.connect(rmiEndpointUrl, login, password);
-
-        Context context = new InitialContext();
-        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(ISystemManager.EJB_JNDI_NAME);
-        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
-        this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+        Context context = this.getContext();
+        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(IRemoteSystemManager.EJB_JNDI_NAME);
+        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IRemoteMachineManager.EJB_JNDI_NAME);
+        this.jobManager = (IRemoteJobManager) context.lookup(IRemoteJobManager.EJB_JNDI_NAME);
 
         MachineTemplate machineTemplate = null;
         for (MachineTemplate template : machineManager.getMachineTemplates()) {
@@ -171,16 +177,10 @@ public class BuildSystemTemplate {
     }
 
     public void start444() throws Exception {
-        String rmiEndpointUrl = "rmi://localhost:1099";
-        String login = "guest";
-        String password = "guest";
-
-        EJBClient.connect(rmiEndpointUrl, login, password);
-
-        Context context = new InitialContext();
-        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(ISystemManager.EJB_JNDI_NAME);
-        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
-        this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+        Context context = this.getContext();
+        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(IRemoteSystemManager.EJB_JNDI_NAME);
+        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IRemoteMachineManager.EJB_JNDI_NAME);
+        this.jobManager = (IRemoteJobManager) context.lookup(IRemoteJobManager.EJB_JNDI_NAME);
 
         MachineTemplate machineTemplate = null;
         for (MachineTemplate template : machineManager.getMachineTemplates()) {
@@ -251,16 +251,10 @@ public class BuildSystemTemplate {
     }
 
     public void start22() throws Exception {
-        String rmiEndpointUrl = "rmi://localhost:1099";
-        String login = "guest";
-        String password = "guest";
-
-        EJBClient.connect(rmiEndpointUrl, login, password);
-
-        Context context = new InitialContext();
-        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(ISystemManager.EJB_JNDI_NAME);
-        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
-        this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+        Context context = this.getContext();
+        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(IRemoteSystemManager.EJB_JNDI_NAME);
+        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IRemoteMachineManager.EJB_JNDI_NAME);
+        this.jobManager = (IRemoteJobManager) context.lookup(IRemoteJobManager.EJB_JNDI_NAME);
 
         Set<ComponentDescriptor> componentDescriptors = new HashSet<ComponentDescriptor>();
 
@@ -301,19 +295,13 @@ public class BuildSystemTemplate {
     }
 
     public void example() throws Exception {
-        String rmiEndpointUrl = "rmi://localhost:1099";
-        String login = "guest";
-        String password = "guest";
-
         // id of the system template to use
         // the template has been created offline in Sirocco
         String systemTemplateId = "5";
 
-        EJBClient.connect(rmiEndpointUrl, login, password);
-
-        Context context = new InitialContext();
-        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(ISystemManager.EJB_JNDI_NAME);
-        this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+        Context context = this.getContext();
+        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(IRemoteSystemManager.EJB_JNDI_NAME);
+        this.jobManager = (IRemoteJobManager) context.lookup(IRemoteJobManager.EJB_JNDI_NAME);
 
         SystemTemplate systemTemplate = systemManager.getSystemTemplateById(systemTemplateId);
 
@@ -340,7 +328,8 @@ public class BuildSystemTemplate {
             Machine machine = (Machine) systemMachine.getResource();
 
             for (MachineNetworkInterface nic : machine.getNetworkInterfaces()) {
-                java.lang.System.out.println("NIC type=" + nic.getNetworkType() + " IP address=" + nic.getAddresses().get(0));
+                java.lang.System.out.println("NIC type=" + nic.getNetworkType() + " IP address="
+                    + nic.getAddresses().iterator().next());
             }
         }
 
@@ -359,16 +348,10 @@ public class BuildSystemTemplate {
     }
 
     public void start4() throws Exception {
-        String rmiEndpointUrl = "rmi://localhost:1099";
-        String login = "guest";
-        String password = "guest";
-
-        EJBClient.connect(rmiEndpointUrl, login, password);
-
-        Context context = new InitialContext();
-        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(ISystemManager.EJB_JNDI_NAME);
-        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
-        this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+        Context context = this.getContext();
+        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(IRemoteSystemManager.EJB_JNDI_NAME);
+        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IRemoteMachineManager.EJB_JNDI_NAME);
+        this.jobManager = (IRemoteJobManager) context.lookup(IRemoteJobManager.EJB_JNDI_NAME);
 
         System system = systemManager.getSystems().get(0);
 
@@ -379,16 +362,10 @@ public class BuildSystemTemplate {
     }
 
     public void start77() throws Exception {
-        String rmiEndpointUrl = "rmi://p-sirocco:1099";
-        String login = "guest";
-        String password = "guest";
-
-        EJBClient.connect(rmiEndpointUrl, login, password);
-
-        Context context = new InitialContext();
-        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(ISystemManager.EJB_JNDI_NAME);
-        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
-        this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
+        Context context = this.getContext();
+        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(IRemoteSystemManager.EJB_JNDI_NAME);
+        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IRemoteMachineManager.EJB_JNDI_NAME);
+        this.jobManager = (IRemoteJobManager) context.lookup(IRemoteJobManager.EJB_JNDI_NAME);
 
         List<SystemTemplate> templates = systemManager.getSystemTemplates();
         for (SystemTemplate template : templates) {
@@ -409,20 +386,6 @@ public class BuildSystemTemplate {
         Job job = systemManager.createSystem(systemCreate);
 
         this.waitForJobCompletion(job);
-
-    }
-
-    public void start2() throws Exception {
-        String rmiEndpointUrl = "rmi://localhost:1099";
-        String login = "guest";
-        String password = "guest";
-
-        EJBClient.connect(rmiEndpointUrl, login, password);
-
-        Context context = new InitialContext();
-        IRemoteSystemManager systemManager = (IRemoteSystemManager) context.lookup(ISystemManager.EJB_JNDI_NAME);
-        IRemoteMachineManager machineManager = (IRemoteMachineManager) context.lookup(IMachineManager.EJB_JNDI_NAME);
-        this.jobManager = (IRemoteJobManager) context.lookup(IJobManager.EJB_JNDI_NAME);
 
     }
 

@@ -25,16 +25,19 @@
 
 package org.ow2.sirocco.apis.rest.cimi.tools;
 
+import java.rmi.AccessException;
+import java.util.Properties;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
-import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.sun.appserv.security.ProgrammaticLogin;
 
 @Parameters(commandDescription = "create user")
 public class UserCreateCommand implements Command {
@@ -52,9 +55,9 @@ public class UserCreateCommand implements Command {
     }
 
     @Override
-    public void execute() throws Exception {
-        Context context = new InitialContext();
-        IRemoteUserManager userManager = (IRemoteUserManager) context.lookup(IUserManager.EJB_JNDI_NAME);
+    public void execute(final Context context) throws Exception {
+        IRemoteUserManager userManager = (IRemoteUserManager) context.lookup(IRemoteUserManager.EJB_JNDI_NAME);
+
         User user = new User();
         user.setUsername(this.userLogin);
         user.setPassword(this.userPassword);
@@ -70,5 +73,35 @@ public class UserCreateCommand implements Command {
         table.addCell(user.getPassword());
 
         System.out.println(table.render());
+    }
+
+    public static void main(final String[] args) {
+        try {
+            Properties props = new Properties();
+            props.setProperty("org.omg.CORBA.ORBInitialHost", "127.0.0.1");
+            props.setProperty("org.omg.CORBA.ORBInitialPort", "3700");
+
+            ProgrammaticLogin programmaticLogin = new ProgrammaticLogin();
+            programmaticLogin.login("admin", "admin");
+
+            Context context = new InitialContext(props);
+
+            UserCreateCommand create = new UserCreateCommand();
+            create.userLogin = "guest";
+            create.userPassword = "guest";
+            create.execute(context);
+        } catch (Exception ex) {
+            Throwable cause = ex.getCause();
+            while (cause != null) {
+                if (cause instanceof AccessException) {
+                    System.err.println("Access denied");
+                    break;
+                }
+                cause = cause.getCause();
+            }
+            if (cause == null) {
+                ex.printStackTrace();
+            }
+        }
     }
 }
