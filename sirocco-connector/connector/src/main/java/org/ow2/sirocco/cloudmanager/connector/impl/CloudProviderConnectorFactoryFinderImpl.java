@@ -34,12 +34,12 @@ import org.osgi.framework.InvalidSyntaxException;
 import org.osgi.util.tracker.ServiceTracker;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
-import org.ow2.util.log.Log;
-import org.ow2.util.log.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CloudProviderConnectorFactoryFinderImpl implements ICloudProviderConnectorFactoryFinder {
 
-    private static Log logger = LogFactory.getLog(CloudProviderConnectorFactoryFinderImpl.class);
+    private static Logger logger = LoggerFactory.getLogger(CloudProviderConnectorFactoryFinderImpl.class);
 
     private BundleContext context;
 
