@@ -63,39 +63,50 @@
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<version>1.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.2.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-connector-api</artifactId>
 			<version>0.5.5-SNAPSHOT</version>
+			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-util-jobmanager</artifactId>
+			<artifactId>sirocco-cloudmanager-connector-util-jobmanager-api</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.ow2.util</groupId>
-			<artifactId>util-log</artifactId>
-			<version>1.0.25</version>
-		</dependency>
-		 <dependency>
      		 <groupId>javax.persistence</groupId>
       		<artifactId>persistence-api</artifactId>
      		 <version>1.0</version>
      		 <scope>provided</scope>
-    	</dependency>
-		<!-- The following dependency is needed if, and only if this bundle is deployed in a non Jonas environment.
-		<dependency>
-			<groupId>org.ow2.bundles</groupId>
-			<artifactId>ow2-util-i18n</artifactId>
-			<version>1.0.27</version>
 		</dependency>
-		 -->
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.5.0-Final</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.5.8</version>
+			<scope>provided</scope>
+		</dependency>
 	</dependencies>
 
 </project>

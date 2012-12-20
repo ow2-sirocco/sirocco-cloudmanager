@@ -30,8 +30,9 @@
 
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
-		<artifactId>sirocco-cloudmanager</artifactId>
+		<artifactId>sirocco-cloudmanager-project</artifactId>
 		<version>0.5.5-SNAPSHOT</version>
+		<relativePath>../project/pom.xml</relativePath>
 	</parent>
 
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
@@ -43,12 +44,12 @@
 
 	<modules>
 		<module>util</module> 
+		<module>connector-api</module> 
 		<module>connector</module> 
 		<module>mock</module> 
 		<module>openstack</module> 
 		<module>amazon</module> 
-		<module>vcd</module> 
-		<module>test</module> 
+		<module>test</module>  
 	</modules>
 
 	<build>

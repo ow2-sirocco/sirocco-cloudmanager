@@ -35,11 +35,11 @@
 		<version>0.5.5-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>sirocco-cloudmanager-connector-api</artifactId>
+	<artifactId>sirocco-cloudmanager-connector-finder</artifactId>
 
 	<packaging>bundle</packaging>
 
-	<name>SIROCCO :: CloudManager :: Connector :: API</name>
+	<name>SIROCCO :: CloudManager :: Connector :: Finder</name>
 
 	<build>
 		<plugins>
@@ -125,36 +125,44 @@
 	<dependencies>
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-connector-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.apache.felix</groupId>
+			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
-			<version>1.4.0</version>
+			<version>4.2.0</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>
-			<artifactId>osgi_R4_compendium</artifactId>
-			<version>1.0</version>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.2.0</version>
+			<scope>provided</scope>
 		</dependency>
-		 <dependency>
-                        <groupId>org.ow2.jonas.osgi</groupId>
-                        <artifactId>javaee-api</artifactId>
-                        <version>5.1.1</version>
-                        <scope>provided</scope>
-                </dependency>
-                <dependency>
-                        <groupId>org.hibernate</groupId>
-                        <artifactId>hibernate-annotations</artifactId>
-                        <version>3.4.0.GA</version>
-                        <scope>provided</scope>
-                </dependency>
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.5.0-Final</version>
+			<scope>provided</scope>
+		</dependency>
 
 		<dependency>
-			<groupId>org.ow2.util</groupId>
-			<artifactId>util-log</artifactId>
-			<version>1.0.27</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.5.8</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 

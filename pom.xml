@@ -26,135 +26,36 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<parent>
-		<groupId>org.ow2</groupId>
-		<artifactId>ow2</artifactId>
-		<version>1.3</version>
+		<groupId>org.ow2.sirocco.cloudmanager</groupId>
+		<artifactId>sirocco-cloudmanager-project</artifactId>
+		<version>0.5.5-SNAPSHOT</version>
+        	<relativePath>project/pom.xml</relativePath>
 	</parent>
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
-	<artifactId>sirocco-cloudmanager</artifactId>
+	<artifactId>cloudmanager-multi</artifactId>
 	<version>0.5.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>SIROCCO :: CloudManager :: Parent</name>
 	
-	<licenses>
-     <license>
-      <name>GNU LESSER GENERAL PUBLIC LICENSE Version 2.1</name>
-      <url>http://www.gnu.org/copyleft/lesser.html</url>
-     </license>
-    </licenses>
-
-	<properties>
-		<product.name>Sirocco</product.name>
-		<ow2.jonas.version>5.2.3</ow2.jonas.version>
-	</properties>
 
 	<modules>
+		<module>project</module>
 		<module>sirocco-model</module>
 		<module>sirocco-core</module>
 		<module>sirocco-connector</module>
 		<module>sirocco-apis</module>
-		<module>sirocco-ear</module>
-		<module>sirocco-tests</module>
 	</modules>
+
+	<profiles>
+                <profile>
+                        <id>test</id>
+			<modules>
+				<module>sirocco-itests</module>
+			</modules>
+                </profile>
+        </profiles>
+
 	
-	<dependencies>
-		<dependency>
-		<groupId>log4j</groupId>
-		<artifactId>log4j</artifactId>
-		<version>1.2.16</version>
-		</dependency>
-		<dependency>
-		<groupId>log4j</groupId>
-		<artifactId>apache-log4j-extras</artifactId>
-		<version>1.1</version>
-		</dependency>
-    </dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-					<!-- <encoding>ISO-8859-1</encoding> -->
-					<encoding>UTF-8</encoding>
-					<sourceEncoding>UTF-8</sourceEncoding>
-				</configuration>
-			</plugin>
-			
-			<!-- Add the following plugin, in order to avoid:
-			[WARNING] Using platform encoding (Cp1252 actually)
-			to copy filtered resources, i.e. build is platform
-			dependent! -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<configuration>
-					<encoding>UTF-8</encoding>
-					<sourceEncoding>UTF-8</sourceEncoding>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<configuration>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<preparationGoals>clean install</preparationGoals>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>com.mycila.maven-license-plugin</groupId>
-				<artifactId>maven-license-plugin</artifactId>
-				<version>1.9.0</version>
-				<configuration>
-					<aggregate>true</aggregate>
-					<strictCheck>true</strictCheck>
-					<header>etc/header.txt</header>
-					<excludes>
-						<exclude>**/ovf/datamodel/*.java</exclude>
-						<exclude>**/*.swf</exclude>
-						<exclude>**/*.swc</exclude>
-						<exclude>**/*.ovf</exclude>
-						<exclude>**/*.TTF</exclude>
-					</excludes>
-					<mapping>
-						<bnd>SCRIPT_STYLE</bnd>
-						<tmpl>XML_STYLE</tmpl>
-					</mapping>
-					<properties>
-						<year>2011</year>
-						<email>sirocco@ow2.org</email>
-						<copyrightHolder>France Telecom</copyrightHolder>
-					</properties>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.8</version>
-				<configuration>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
-				</configuration>
-			</plugin>
-
-
-		</plugins>
-
-	</build>
-
-	<scm>
-		<connection>scm:svn:svn://svn.forge.objectweb.org/svnroot/sirocco//cloudmanager/trunk</connection>
-		<developerConnection>scm:svn:svn+ssh://dangtran@svn.forge.objectweb.org/svnroot/sirocco/cloudmanager/trunk</developerConnection>
-		<url>http://websvn.ow2.org/listing.php?repname=sirocco&amp;path=/cloudmanager/trunk/</url>
-	</scm>
-
 </project>

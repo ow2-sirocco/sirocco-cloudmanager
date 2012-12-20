@@ -45,6 +45,18 @@
 			<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+                <dependency>
+            <groupId>javax</groupId>
+            <artifactId>javaee-api</artifactId>
+            <version>6.0</version>
+            <scope>provided</scope>
+        </dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.5.0-Final</version>
+			<scope>provided</scope>
+		</dependency>
 
 	</dependencies>
 	
@@ -57,6 +69,7 @@
 				<extensions>true</extensions>
 				<configuration>
 					<instructions>
+						<_include>-target/classes/META-INF/${project.artifactId}.bnd</_include>
 						<Bundle-Name>${project.name}</Bundle-Name>
 						<Bundle-Vendor>Orange Labs</Bundle-Vendor>
 						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>

@@ -2,7 +2,7 @@
 <!--
 
    SIROCCO
-   Copyright (C) 2010 France Telecom
+   Copyright (C) 2012 France Telecom
    Contact: sirocco@ow2.org
 
    This library is free software; you can redistribute it and/or
@@ -20,11 +20,10 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
    USA
 
-   $Id$
-
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
@@ -32,7 +31,7 @@
 		<artifactId>sirocco-cloudmanager-apis</artifactId>
 		<version>0.5.5-SNAPSHOT</version>
 	</parent>
-	
+
 	<groupId>org.ow2.sirocco.apis</groupId>
 	<artifactId>sirocco-admin-command-line-tools</artifactId>
 	<packaging>jar</packaging>
@@ -45,23 +44,75 @@
 			<artifactId>jcommander</artifactId>
 			<version>1.25</version>
 		</dependency>
-		 <dependency>
+		<dependency>
 			<groupId>org.ow2.sirocco</groupId>
 			<artifactId>sirocco-text-table-formatter</artifactId>
 			<version>1.0</version>
-	 	</dependency>
-	 	<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-core-manager</artifactId>
-			<version>${project.version}</version>
-			<type>ejb</type>
 		</dependency>
 		<dependency>
-			<groupId>org.ow2.jonas</groupId>
-			<artifactId>jonas-client</artifactId>
-			<version>${ow2.jonas.version}</version>
-			<type>jar</type>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-core-api</artifactId>
+			<version>${project.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.glassfish.main.extras</groupId>
+			<artifactId>glassfish-embedded-all</artifactId>
+			<version>3.1.2.2</version>
+		</dependency>
+		<!--  <dependency>
+			<groupId>org.glassfish.appclient</groupId>
+			<artifactId>gf-client</artifactId>
+			<version>3.1.1</version>
+			<exclusions>
+				<exclusion>
+					<groupId>org.eclipse.persistence</groupId>
+					<artifactId>javax.persistence</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.persistence</groupId>
+					<artifactId>org.eclipse.persistence.core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.persistence</groupId>
+					<artifactId>org.eclipse.persistence.jpa</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.persistence</groupId>
+					<artifactId>org.eclipse.persistence.jpa.modelgen</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>org.eclipse.persistence</groupId>
+					<artifactId>org.eclipse.persistence.oracle</artifactId>
+				</exclusion>
+				<exclusion>
+					<artifactId>eclipselink-wrapper</artifactId>
+					<groupId>org.glassfish.persistence</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>-->
+		<dependency>
+   			<groupId>javax.persistence</groupId>
+    		<artifactId>persistence-api</artifactId>
+    		<version>1.0</version>
+    		<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.5.0-Final</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>3.5.0-Final</version>
+		</dependency>
+		<dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.7</version>
+                <scope>compile</scope>
+            </dependency>
 	</dependencies>
 
 	<build>
@@ -114,8 +165,5 @@
 				</executions>
 			</plugin>
 		</plugins>
-
 	</build>
-
-
 </project>

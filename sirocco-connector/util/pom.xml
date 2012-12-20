@@ -39,6 +39,7 @@
 
 
 	<modules>
+		<module>jobmanager-api</module>
 		<module>jobmanager</module>
 	</modules>
 

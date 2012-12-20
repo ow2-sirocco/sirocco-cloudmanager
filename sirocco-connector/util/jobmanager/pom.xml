@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!-- 
 
    SIROCCO
-   Copyright (C) 2010 France Telecom
+   Copyright (C) 2012 France Telecom
    Contact: sirocco@ow2.org
 
    This library is free software; you can redistribute it and/or
@@ -21,11 +20,10 @@
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
    USA
 
-   $Id$
-
 -->
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
 	<modelVersion>4.0.0</modelVersion>
 
@@ -39,37 +37,53 @@
 
 	<packaging>bundle</packaging>
 
-	<name>SIROCCO :: CloudManager :: Connectors :: Util: JobManager </name>
-	
+	<name>SIROCCO :: CloudManager :: Connector :: Util: JobManager </name>
+
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.felix</groupId>
+			<groupId>org.osgi</groupId>
 			<artifactId>org.osgi.core</artifactId>
-			<version>1.0.0</version>
+			<version>4.2.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.osgi</groupId>
-			<artifactId>osgi_R4_compendium</artifactId>
-			<version>1.0</version>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.2.0</version>
 			<scope>provided</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
 			<version>13.0</version>
 		</dependency>
-		 <dependency>
-          <groupId>org.ow2.jonas.osgi</groupId>
-          <artifactId>javaee-api</artifactId>
-          <version>5.1.1</version>
-          <scope>provided</scope>
-        </dependency>
 		<dependency>
-			<groupId>org.ow2.util</groupId>
-			<artifactId>util-log</artifactId>
-			<version>1.0.25</version>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.5.0-Final</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.5.8</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.ow2.sirocco.cloudmanager</groupId>
+			<artifactId>sirocco-cloudmanager-connector-util-jobmanager-api</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
@@ -99,6 +113,6 @@
 		</plugins>
 	</build>
 
-	
+
 
 </project>
