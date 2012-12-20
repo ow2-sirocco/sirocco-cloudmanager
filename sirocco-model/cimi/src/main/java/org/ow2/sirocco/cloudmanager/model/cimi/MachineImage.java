@@ -33,13 +33,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineImage extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
@@ -82,7 +79,6 @@ public class MachineImage extends CloudResource implements Serializable, ICloudP
     }
 
     @OneToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public MachineImage getRelatedImage() {
         return this.relatedImage;
     }
@@ -100,7 +96,6 @@ public class MachineImage extends CloudResource implements Serializable, ICloudP
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -114,7 +109,6 @@ public class MachineImage extends CloudResource implements Serializable, ICloudP
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public void setLocation(final CloudProviderLocation location) {
         this.location = location;
     }

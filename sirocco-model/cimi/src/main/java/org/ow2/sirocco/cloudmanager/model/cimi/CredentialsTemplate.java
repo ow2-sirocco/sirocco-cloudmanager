@@ -30,7 +30,6 @@ import javax.persistence.Entity;
 import javax.persistence.Lob;
 
 @Entity
-// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class CredentialsTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 

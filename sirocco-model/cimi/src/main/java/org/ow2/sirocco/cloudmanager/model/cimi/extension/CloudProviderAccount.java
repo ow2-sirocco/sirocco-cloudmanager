@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -37,12 +38,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.CollectionOfElements;
-
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class CloudProviderAccount implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -91,14 +87,12 @@ public class CloudProviderAccount implements Serializable {
         this.properties = properties;
     }
 
-    @CollectionOfElements(fetch = FetchType.EAGER)
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    @ElementCollection(fetch = FetchType.EAGER, targetClass = java.lang.String.class)
     public Map<String, String> getProperties() {
         return this.properties;
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProvider getCloudProvider() {
         return this.cloudProvider;
     }
@@ -107,8 +101,7 @@ public class CloudProviderAccount implements Serializable {
         this.cloudProvider = cloudProvider;
     }
 
-    @ManyToMany
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
+    @ManyToMany(fetch = FetchType.EAGER)
     public Set<User> getUsers() {
         return this.users;
     }

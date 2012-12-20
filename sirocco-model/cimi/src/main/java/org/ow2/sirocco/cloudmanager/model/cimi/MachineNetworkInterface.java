@@ -41,7 +41,6 @@ import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
-// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineNetworkInterface extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -95,7 +94,6 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
     @LazyCollection(LazyCollectionOption.FALSE)
     @OrderBy("id")
     @JoinColumn(name = "machinenetworkinterface_id", referencedColumnName = "id")
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<MachineNetworkInterfaceAddress> getAddresses() {
         return this.addresses;
     }
@@ -105,7 +103,6 @@ public class MachineNetworkInterface extends CloudResource implements Serializab
     }
 
     @ManyToOne
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Network getNetwork() {
         return this.network;
     }

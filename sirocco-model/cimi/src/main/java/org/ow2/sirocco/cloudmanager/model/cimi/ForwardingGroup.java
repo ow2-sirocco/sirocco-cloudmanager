@@ -26,7 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -36,14 +36,11 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_FORWARDINGGROUP_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM ForwardingGroup n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class ForwardingGroup extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
@@ -59,7 +56,7 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
 
     private State state;
 
-    private List<ForwardingGroupNetwork> networks;
+    private Set<ForwardingGroupNetwork> networks;
 
     @Enumerated(EnumType.STRING)
     public State getState() {
@@ -71,17 +68,15 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
     }
 
     @OneToMany
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    public List<ForwardingGroupNetwork> getNetworks() {
+    public Set<ForwardingGroupNetwork> getNetworks() {
         return this.networks;
     }
 
-    public void setNetworks(final List<ForwardingGroupNetwork> networks) {
+    public void setNetworks(final Set<ForwardingGroupNetwork> networks) {
         this.networks = networks;
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -91,7 +86,6 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderLocation getLocation() {
         return this.location;
     }

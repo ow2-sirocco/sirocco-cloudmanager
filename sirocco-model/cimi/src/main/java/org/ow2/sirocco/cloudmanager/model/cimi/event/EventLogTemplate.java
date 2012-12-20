@@ -30,13 +30,10 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class EventLogTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -49,7 +46,6 @@ public class EventLogTemplate extends CloudTemplate implements Serializable {
     private Persistence persistence;
 
     @OneToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudResource getTargetResource() {
         return this.targetResource;
     }

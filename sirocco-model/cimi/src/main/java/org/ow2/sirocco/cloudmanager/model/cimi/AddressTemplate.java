@@ -28,13 +28,12 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
-import org.hibernate.annotations.CollectionOfElements;
-
 @Entity
-// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class AddressTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -86,7 +85,7 @@ public class AddressTemplate extends CloudEntity implements Serializable {
         this.defaultGateway = defaultGateway;
     }
 
-    @CollectionOfElements
+    @ElementCollection(fetch = FetchType.EAGER)
     public List<String> getDns() {
         return this.dns;
     }
@@ -113,7 +112,6 @@ public class AddressTemplate extends CloudEntity implements Serializable {
 
     // TODO check this
     @ManyToOne
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Network getNetwork() {
         return this.network;
     }

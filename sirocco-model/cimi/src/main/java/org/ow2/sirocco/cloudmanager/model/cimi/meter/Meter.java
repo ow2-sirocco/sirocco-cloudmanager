@@ -27,7 +27,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi.meter;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -38,13 +38,10 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class Meter extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -60,7 +57,7 @@ public class Meter extends CloudEntity implements Serializable {
 
     protected boolean isContinuous;
 
-    protected List<MeterSample> samples;
+    protected Set<MeterSample> samples;
 
     protected String minValue;
 
@@ -71,7 +68,6 @@ public class Meter extends CloudEntity implements Serializable {
     protected Date expiresTime;
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudResource getTargetResource() {
         return this.targetResource;
     }
@@ -124,12 +120,11 @@ public class Meter extends CloudEntity implements Serializable {
     }
 
     @OneToMany
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    public List<MeterSample> getSamples() {
+    public Set<MeterSample> getSamples() {
         return this.samples;
     }
 
-    public void setSamples(final List<MeterSample> samples) {
+    public void setSamples(final Set<MeterSample> samples) {
         this.samples = samples;
     }
 

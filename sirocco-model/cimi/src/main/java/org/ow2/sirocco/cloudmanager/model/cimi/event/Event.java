@@ -32,12 +32,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class Event extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -78,7 +75,6 @@ public class Event extends CloudEntity implements Serializable {
     }
 
     @OneToOne(cascade = CascadeType.ALL)
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public EventType getContent() {
         return this.content;
     }

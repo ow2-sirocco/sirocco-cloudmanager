@@ -26,7 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -34,13 +34,10 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class MachineTemplateNetworkInterface extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -48,7 +45,7 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
         ACTIVE, PASSIVE
     }
 
-    private List<Address> addresses;
+    private Set<Address> addresses;
 
     private Network network;
 
@@ -87,17 +84,15 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
 
     @OneToMany
     @LazyCollection(LazyCollectionOption.FALSE)
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
-    public List<Address> getAddresses() {
+    public Set<Address> getAddresses() {
         return this.addresses;
     }
 
-    public void setAddresses(final List<Address> addresses) {
+    public void setAddresses(final Set<Address> addresses) {
         this.addresses = addresses;
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public Network getNetwork() {
         return this.network;
     }

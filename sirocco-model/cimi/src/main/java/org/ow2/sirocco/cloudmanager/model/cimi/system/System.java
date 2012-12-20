@@ -49,7 +49,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
-// @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 @Table(name = "SYSTEMINSTANCE")
 public class System extends CloudResource implements Serializable, ICloudProviderResource {
 
@@ -88,7 +87,6 @@ public class System extends CloudResource implements Serializable, ICloudProvide
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "system_id")
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<SystemCredentials> getCredentials() {
         return this.credentials;
     }
@@ -100,7 +98,6 @@ public class System extends CloudResource implements Serializable, ICloudProvide
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "system_id")
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<SystemMachine> getMachines() {
         return this.machines;
     }
@@ -112,7 +109,6 @@ public class System extends CloudResource implements Serializable, ICloudProvide
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "system_id")
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<SystemSystem> getSystems() {
         return this.systems;
     }
@@ -124,7 +120,6 @@ public class System extends CloudResource implements Serializable, ICloudProvide
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "system_id")
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<SystemVolume> getVolumes() {
         return this.volumes;
     }
@@ -143,7 +138,6 @@ public class System extends CloudResource implements Serializable, ICloudProvide
     }
 
     @ManyToOne
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderAccount getCloudProviderAccount() {
         return this.cloudProviderAccount;
     }
@@ -153,7 +147,6 @@ public class System extends CloudResource implements Serializable, ICloudProvide
     }
 
     @ManyToOne
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public CloudProviderLocation getLocation() {
         return this.location;
     }
@@ -165,7 +158,6 @@ public class System extends CloudResource implements Serializable, ICloudProvide
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "system_id")
-    // @Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public List<SystemNetwork> getNetworks() {
         return this.networks;
     }

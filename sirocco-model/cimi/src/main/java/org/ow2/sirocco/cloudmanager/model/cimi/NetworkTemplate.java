@@ -31,12 +31,9 @@ import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 @Entity
-//@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
 public class NetworkTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -47,7 +44,6 @@ public class NetworkTemplate extends CloudTemplate implements Serializable {
     private EventLogTemplate eventLogTemplate;
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public NetworkConfiguration getNetworkConfig() {
         return this.networkConfig;
     }
@@ -57,7 +53,6 @@ public class NetworkTemplate extends CloudTemplate implements Serializable {
     }
 
     @ManyToOne
-    //@Cache(usage = CacheConcurrencyStrategy.TRANSACTIONAL)
     public ForwardingGroup getForwardingGroup() {
         return this.forwardingGroup;
     }
