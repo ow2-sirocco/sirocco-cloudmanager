@@ -92,6 +92,30 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>build-helper-maven-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>generate-port-numbers</id>
+						<phase>pre-integration-test</phase>
+						<goals>
+							<goal>reserve-network-port</goal>
+						</goals>
+						<configuration>
+							<portNames>
+								<portName>admin.port</portName>
+								<portName>http1.port</portName>
+								<portName>http2.port</portName>
+								<portName>jms.port</portName>
+								<portName>iiop.port</portName>
+							</portNames>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<executions>
 					<execution>
@@ -146,7 +170,7 @@
 					</execution>
 					<execution>
 						<id>copy2</id>
-						<phase>integration-test</phase>
+						<phase>pre-integration-test</phase>
 						<goals>
 							<goal>copy</goal>
 						</goals>
@@ -161,7 +185,7 @@
 									<destFileName>sirocco-cloudmanager-core-manager.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${glassfish.bundles}</outputDirectory>
+							<outputDirectory>${project.build.directory}</outputDirectory>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
@@ -193,8 +217,33 @@
 								<copy tofile="${glassfish.root}/config/_logging.properties"
 									file="src/test/resources/_logging.properties" />
 								<copy tofile="${glassfish.domain}/config/logging.properties"
-									file="src/test/resources/logging.properties" />	
+									file="src/test/resources/logging.properties" />
 								<copy tofile="${glassfish.domain}/lib/h2-1.3.170.jar" file="etc/lib/h2-1.3.170.jar" />
+								<replace file="${glassfish.domain}/config/domain.xml"
+									token="@ADMIN.PORT@" value="${admin.port}" />
+								<replace file="${glassfish.domain}/config/domain.xml"
+									token="@HTTP1.PORT@" value="${http1.port}" />
+								<replace file="${glassfish.domain}/config/domain.xml"
+									token="@HTTP2.PORT@" value="${http2.port}" />
+								<replace file="${glassfish.domain}/config/domain.xml"
+									token="@JMS.PORT@" value="${jms.port}" />
+								<replace file="${glassfish.domain}/config/domain.xml"
+									token="@IIOP.PORT@" value="${iiop.port}" />
+							</tasks>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>install-core-ejb</id>
+						<phase>integration-test</phase>
+						<configuration>
+							<tasks>
+								<echo>Waiting 1 mn</echo>
+								<sleep seconds="60" />
+								<echo>Installing EJB application bundle</echo>
+								<copy tofile="${glassfish.bundles}/sirocco-cloudmanager-core-manager.jar" file="${project.build.directory}/sirocco-cloudmanager-core-manager.jar" />
 							</tasks>
 						</configuration>
 						<goals>
@@ -236,7 +285,7 @@
 						<systemProperties>
 							<java.net.preferIPv4Stack>true</java.net.preferIPv4Stack>
 						</systemProperties>
-						<!-- <timeout>480000</timeout> -->
+						<timeout>240000</timeout>
 					</container>
 					<configuration>
 						<type>existing</type>
@@ -245,6 +294,8 @@
 							<cargo.remote.username>admin</cargo.remote.username>
 							<cargo.remote.password>admin</cargo.remote.password>
 							<cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
+							<cargo.glassfish.adminPort>${admin.port}</cargo.glassfish.adminPort>
+							<cargo.servlet.port>${http1.port}</cargo.servlet.port>
 						</properties>
 					</configuration>
 					<!-- <deployer> <type>installed</type> <deployables> <deployable> <groupId>org.ow2.sirocco.cloudmanager</groupId> 
@@ -271,30 +322,34 @@
 						</goals>
 						<configuration>
 							<skip>${maven.test.skip}</skip>
-							 <includes>
-           						 <include>**/*Test.java</include>
-         					 </includes>
+							<includes>
+								<include>**/*Test.java</include>
+							</includes>
 							<argLine>-XX:MaxPermSize=512m</argLine>
 							<systemProperties>
 								<property>
 									<name>sirocco.version</name>
 									<value>${project.version}</value>
 								</property>
+								<property>
+									<name>iiop.port</name>
+									<value>${iiop.port}</value>
+								</property>
 							</systemProperties>
 						</configuration>
 					</execution>
 					<execution>
-           				 <id>verify</id>
-           				 <phase>verify</phase>
-           				 <goals>
-             		 		  <goal>verify</goal>
-           				 </goals>
-       				 </execution>
+						<id>verify</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>verify</goal>
+						</goals>
+					</execution>
 				</executions>
 			</plugin>
 
-</plugins>
-</build>
+		</plugins>
+	</build>
 
 
 </project>

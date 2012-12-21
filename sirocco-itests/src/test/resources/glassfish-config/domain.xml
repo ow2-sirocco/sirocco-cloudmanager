@@ -85,7 +85,7 @@
       </http-service>
       <iiop-service>
         <orb use-thread-pool-ids="thread-pool-1"></orb>
-        <iiop-listener port="3700" id="orb-listener-1" address="0.0.0.0" lazy-init="true"></iiop-listener>
+        <iiop-listener port="@IIOP.PORT@" id="orb-listener-1" address="0.0.0.0" lazy-init="true"></iiop-listener>
         <iiop-listener port="3820" id="SSL" address="0.0.0.0" security-enabled="true">
           <ssl classname="com.sun.enterprise.security.ssl.GlassfishSSLImpl" cert-nickname="s1as"></ssl>
         </iiop-listener>
@@ -116,7 +116,7 @@
       </ejb-container>
       <mdb-container></mdb-container>
       <jms-service default-jms-host="default_JMS_host">
-        <jms-host host="localhost" name="default_JMS_host"></jms-host>
+        <jms-host port="@JMS.PORT@" host="localhost" name="default_JMS_host"></jms-host>
       </jms-service>
       <security-service>
         <auth-realm classname="com.sun.enterprise.security.auth.realm.file.FileRealm" name="admin-realm">
@@ -244,9 +244,9 @@
           </protocol>
         </protocols>
         <network-listeners>
-          <network-listener port="8080" protocol="http-listener-1" transport="tcp" name="http-listener-1" thread-pool="http-thread-pool"></network-listener>
-          <network-listener port="8181" protocol="http-listener-2" transport="tcp" name="http-listener-2" thread-pool="http-thread-pool"></network-listener>
-          <network-listener port="4848" protocol="admin-listener" transport="tcp" name="admin-listener" thread-pool="admin-thread-pool"></network-listener>
+          <network-listener port="@HTTP1.PORT@" protocol="http-listener-1" transport="tcp" name="http-listener-1" thread-pool="http-thread-pool"></network-listener>
+          <network-listener port="@HTTP2.PORT@" protocol="http-listener-2" transport="tcp" name="http-listener-2" thread-pool="http-thread-pool"></network-listener>
+          <network-listener port="@ADMIN.PORT@" protocol="admin-listener" transport="tcp" name="admin-listener" thread-pool="admin-thread-pool"></network-listener>
         </network-listeners>
         <transports>
           <transport name="tcp"></transport>

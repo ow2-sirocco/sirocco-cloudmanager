@@ -1,5 +1,7 @@
 package org.ow2.sirocco.cloudmanager.itests;
 
+import java.util.Properties;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -66,9 +68,11 @@ public class AbstractTestBase {
 
     protected void connectToCloudManager() throws Exception {
         final long timeout = System.currentTimeMillis() + AbstractTestBase.INITIALIZE_TIMEOUT * 1000;
+        Properties props = new Properties();
+        props.setProperty("org.omg.CORBA.ORBInitialPort", System.getProperty("iiop.port", "3700"));
         while (true) {
             try {
-                Context context = new InitialContext();
+                Context context = new InitialContext(props);
                 this.machineManager = (IRemoteMachineManager) context.lookup(this.getJndiName("MachineManager"));
                 this.cloudProviderManager = (IRemoteCloudProviderManager) context.lookup(this
                     .getJndiName("CloudProviderManager"));
