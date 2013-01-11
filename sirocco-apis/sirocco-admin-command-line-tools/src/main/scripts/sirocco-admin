@@ -42,4 +42,4 @@ if $cygwin; then
   CLASSPATH=";$CLASSPATH"
 fi
 
-java -cp "$CLASSPATH"  -Djava.security.auth.login.config=$SIROCCO_ADMIN_TOOLS_HOME/conf/jaas.config  org.ow2.sirocco.apis.rest.cimi.tools.AdminClient "$@"                   
+java -cp "$GLASSFISH_HOME/glassfish/lib/gf-client.jar:$CLASSPATH"  -Djava.security.auth.login.config=$SIROCCO_ADMIN_TOOLS_HOME/conf/jaas.config  org.ow2.sirocco.apis.rest.cimi.tools.AdminClient "$@"                   
