@@ -28,9 +28,11 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+
+import org.hibernate.annotations.CollectionOfElements;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 public class MachineConfiguration extends CloudEntity implements Serializable {
@@ -58,7 +60,8 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
         this.memory = memory;
     }
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionOfElements
+    @LazyCollection(LazyCollectionOption.FALSE)
     public List<DiskTemplate> getDisks() {
         return this.disks;
     }
