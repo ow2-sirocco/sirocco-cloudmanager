@@ -15,4 +15,9 @@ public final class Constants {
     public static final String RASD_ALLOCATION_UNIT_KILOBYTE = "byte * 2^10";
 
     public static final String RASD_ALLOCATION_UNIT_MEGABYTE = "byte * 2^20";
+
+    // Network (tmp)
+    public static final String VAPP_NETWORK_NAME = "VappNtwk";
+
+    // public static final String PARENT_NETWORK_NAME = "DirectNet";
 }
