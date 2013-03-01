@@ -124,12 +124,33 @@
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
-
+		
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.5.8</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+			<version>1.5.6</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-annotations</artifactId>
+			<version>3.5.0-Final</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<!-- dependency>
 			<groupId>org.ow2.util</groupId>
 			<artifactId>util-log</artifactId>
 			<version>1.0.25</version>
-		</dependency>
+		</dependency -->
+		
 		 <dependency>
      		 <groupId>javax.persistence</groupId>
       		<artifactId>persistence-api</artifactId>
@@ -137,12 +158,26 @@
      		 <scope>provided</scope>
     	</dependency>
     	
-		<!-- The following dependency is temporary. -->
     	<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-api</artifactId>
+			<version>6.0</version>
+			<scope>provided</scope>
+		</dependency>
+    	
+		<dependency>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.2.0</version>
+			<scope>provided</scope>
+		</dependency>
+    	
+		<!-- The following dependency is temporary. -->
+    	<!-- dependency>
 			<groupId>org.ow2.jonas.osgi</groupId>
 			<artifactId>javaee-api</artifactId>
 			<version>5.1.1</version>
-		</dependency>
+		</dependency -->
 		
 		<!-- The following dependency is needed if, and only if this bundle is deployed in a non Jonas environment.
 		<dependency>
