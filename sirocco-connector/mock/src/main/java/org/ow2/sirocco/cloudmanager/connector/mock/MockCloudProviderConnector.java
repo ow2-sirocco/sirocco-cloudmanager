@@ -1169,6 +1169,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return this.networks.get(networkId);
     }
 
+	@Override
+	public List<Network> getNetworks() throws ConnectorException {
+        return new ArrayList<Network>(this.networks.values());
+	}
+
     @Override
     public Job deleteNetwork(final String networkId) throws ConnectorException {
         MockCloudProviderConnector.logger.info("Deleting network with providerAssignedId " + networkId);
