@@ -36,6 +36,7 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 
 @Entity
 public class MachineTemplateNetworkInterface extends CloudEntity implements Serializable {
@@ -48,6 +49,8 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
     private Set<Address> addresses;
 
     private Network network;
+    
+    private ComponentDescriptor networkTemplateComponentDescriptor;
 
     private NetworkPort networkPort;
 
@@ -99,6 +102,15 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
 
     public void setNetwork(final Network network) {
         this.network = network;
+    }
+
+    @ManyToOne
+    public ComponentDescriptor getNetworkTemplateComponentDescriptor() {
+        return this.networkTemplateComponentDescriptor;
+    }
+
+    public void setNetworkTemplateComponentDescriptor(final ComponentDescriptor networkTemplateComponentDescriptor) {
+        this.networkTemplateComponentDescriptor = networkTemplateComponentDescriptor;
     }
 
     @Enumerated(EnumType.STRING)
