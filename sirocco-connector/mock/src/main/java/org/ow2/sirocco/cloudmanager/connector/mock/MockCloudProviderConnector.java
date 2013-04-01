@@ -1141,7 +1141,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
         network.setProviderAssignedId(networkProviderAssignedId);
         network.setForwardingGroup(fg);
-        network.setNetworkPorts(new HashSet<NetworkNetworkPort>());
+        network.setNetworkPorts(new ArrayList<NetworkNetworkPort>());
         this.networks.put(networkProviderAssignedId, network);
         network.setState(Network.State.CREATING);
 
@@ -1169,10 +1169,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return this.networks.get(networkId);
     }
 
-	@Override
-	public List<Network> getNetworks() throws ConnectorException {
+    @Override
+    public List<Network> getNetworks() throws ConnectorException {
         return new ArrayList<Network>(this.networks.values());
-	}
+    }
 
     @Override
     public Job deleteNetwork(final String networkId) throws ConnectorException {

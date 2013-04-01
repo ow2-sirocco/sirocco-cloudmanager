@@ -26,7 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -36,6 +36,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
@@ -66,7 +68,7 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
 
     private String classOfService;
 
-    private Set<NetworkNetworkPort> networkPorts;
+    private List<NetworkNetworkPort> networkPorts;
 
     private ForwardingGroup forwardingGroup;
 
@@ -123,11 +125,12 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
     }
 
     @OneToMany
-    public Set<NetworkNetworkPort> getNetworkPorts() {
+    @LazyCollection(LazyCollectionOption.FALSE)
+    public List<NetworkNetworkPort> getNetworkPorts() {
         return this.networkPorts;
     }
 
-    public void setNetworkPorts(final Set<NetworkNetworkPort> networkPorts) {
+    public void setNetworkPorts(final List<NetworkNetworkPort> networkPorts) {
         this.networkPorts = networkPorts;
     }
 
