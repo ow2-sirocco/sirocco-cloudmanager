@@ -45,7 +45,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkNetworkPort;
@@ -109,9 +111,44 @@ public class NetworkManager implements INetworkManager {
     // Network operations
     //
 
+    private Job createPublicNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
+        NetworkManager.logger.info("Creating Public Network");
+        // TODO only one public network can be created
+        User user = this.getUser();
+        Network network = new Network();
+        network.setName(networkCreate.getName());
+        network.setDescription(networkCreate.getDescription());
+        network.setProperties(networkCreate.getProperties() == null ? new HashMap<String, String>()
+            : new HashMap<String, String>(networkCreate.getProperties()));
+        network.setUser(user);
+
+        network.setNetworkType(Type.PUBLIC);
+
+        network.setState(Network.State.STARTED);
+        this.em.persist(network);
+        this.em.flush();
+
+        Job job = new Job();
+        job.setTargetResource(network);
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(network);
+        job.setAffectedResources(affectedResources);
+        job.setCreated(new Date());
+        job.setState(Status.SUCCESS);
+        job.setAction("add");
+        job.setTimeOfStatusChange(new Date());
+        this.em.persist(job);
+        this.em.flush();
+        return job;
+    }
+
     @Override
     public Job createNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
         NetworkManager.logger.info("Creating Network");
+
+        if (networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType() == Type.PUBLIC) {
+            return this.createPublicNetwork(networkCreate);
+        }
 
         // retrieve user
         User user = this.getUser();
