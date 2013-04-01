@@ -200,6 +200,15 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             this.cloudProviderAccount = cloudProviderAccount;
 
             Properties overrides = new Properties();
+            String httpProxyHost = System.getProperty("http.proxyHost");
+            String httpProxyPort = System.getProperty("http.proxyPort");
+            if (httpProxyHost != null) {
+                overrides.setProperty(Constants.PROPERTY_PROXY_HOST, httpProxyHost);
+            }
+            if (httpProxyPort != null) {
+                overrides.setProperty(Constants.PROPERTY_PROXY_PORT, httpProxyPort);
+                OpenStackCloudProviderConnectorFactory.logger.info("HTTP proxy " + httpProxyHost + " " + httpProxyPort);
+            }
             overrides.setProperty(Constants.PROPERTY_ENDPOINT, cloudProviderAccount.getCloudProvider().getEndpoint());
             overrides.setProperty(Constants.PROPERTY_API_VERSION, "2.0");
             overrides.setProperty(Constants.PROPERTY_TRUST_ALL_CERTS, "true");
@@ -299,7 +308,8 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                 long flavorMemoryInKBytes = flavor.getRam() * 1024;
                 if (memoryInKBytes == flavorMemoryInKBytes) {
                     if (machineConfig.getCpu() == flavor.getVcpus()) {
-                        if (machineConfig.getDisks().size() == 1 && !flavor.getEphemeral().isPresent()) {
+                        if (machineConfig.getDisks().size() == 1
+                            && (!flavor.getEphemeral().isPresent() || flavor.getEphemeral().get() == 0)) {
                             long diskSizeInKBytes = machineConfig.getDisks().get(0).getCapacity();
                             long flavorDiskSizeInKBytes = flavor.getDisk() * 1000 * 1000;
                             if (diskSizeInKBytes == flavorDiskSizeInKBytes) {
@@ -542,7 +552,8 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
                         Thread.sleep(1000);
                     } while (waitTimeInSeconds-- > 0);
 
-                    // XXX tentative fix to determine if a public IP needs to be
+                    // XXX tentative fix to determine if a public IP needs
+                    // to be
                     // assigned to the machine
                     boolean allocateFloatingIp = false;
                     if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
@@ -562,7 +573,6 @@ public class OpenStackCloudProviderConnectorFactory implements ICloudProviderCon
             };
             ListenableFuture<Machine> result = OpenStackCloudProviderConnectorFactory.this.executorService.submit(createTask);
             return OpenStackCloudProviderConnectorFactory.this.jobManager.newJob(machine, null, "add", result);
-
         }
 
         @Override
