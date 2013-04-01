@@ -33,7 +33,6 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
-
 @Entity
 public class MachineVolume extends CloudResource implements Serializable, Identifiable {
 
@@ -47,6 +46,8 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
     private Machine owner;
 
     private Volume volume;
+
+    private String systemVolumeName;
 
     public static enum State {
         PENDING, ATTACHING, ATTACHED, DETACHING, DELETED, ERROR
@@ -72,6 +73,14 @@ public class MachineVolume extends CloudResource implements Serializable, Identi
 
     public void setVolume(final Volume volume) {
         this.volume = volume;
+    }
+
+    public String getSystemVolumeName() {
+        return this.systemVolumeName;
+    }
+
+    public void setSystemVolumeName(final String systemVolumeName) {
+        this.systemVolumeName = systemVolumeName;
     }
 
     public String getInitialLocation() {

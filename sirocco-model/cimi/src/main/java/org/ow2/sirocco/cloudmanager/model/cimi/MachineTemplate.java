@@ -51,6 +51,8 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     private Credentials credential;
 
+    private String systemCredentialName;
+
     private List<MachineVolume> volumes;
 
     private List<MachineVolumeTemplate> volumeTemplates;
@@ -93,6 +95,14 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     public void setCredential(final Credentials credentials) {
         this.credential = credentials;
+    }
+
+    public String getSystemCredentialName() {
+        return this.systemCredentialName;
+    }
+
+    public void setSystemCredentialName(final String systemCredentialName) {
+        this.systemCredentialName = systemCredentialName;
     }
 
     @OneToMany
