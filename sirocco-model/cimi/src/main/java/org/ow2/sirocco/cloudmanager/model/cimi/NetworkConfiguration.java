@@ -28,7 +28,8 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Entity
 public class NetworkConfiguration extends CloudEntity implements Serializable {
@@ -40,6 +41,7 @@ public class NetworkConfiguration extends CloudEntity implements Serializable {
 
     private String classOfService;
 
+    @Enumerated(EnumType.STRING)
     public Network.Type getNetworkType() {
         return this.networkType;
     }
