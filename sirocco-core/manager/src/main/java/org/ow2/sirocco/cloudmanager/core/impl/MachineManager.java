@@ -1147,7 +1147,8 @@ public class MachineManager implements IMachineManager {
         if (mc1 == null) {
             throw new InvalidRequestException("Invalid reference to machine configuraiton " + mc.getId());
         }
-        this.validateMachineConfiguration(mt.getMachineConfig());
+        mt.setMachineConfig(mc1);
+        // this.validateMachineConfiguration(mt.getMachineConfig());
 
         MachineImage mi = mt.getMachineImage();
         if (mi == null) {
@@ -1157,6 +1158,7 @@ public class MachineManager implements IMachineManager {
         if (mi == null || mi.getState() == MachineImage.State.DELETED) {
             throw new InvalidRequestException("Invalid reference to machine image " + mi.getId());
         }
+        mt.setMachineImage(mi);
 
         /**
          * create volume and volume template collection.
