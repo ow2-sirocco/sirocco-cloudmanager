@@ -80,6 +80,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
@@ -588,9 +590,64 @@ public class SystemManager implements ISystemManager {
         return prop.get(key);
     }
 
-    @Override
-    public SystemTemplate createSystemTemplate(final SystemTemplate systemT) throws CloudProviderException {
+    private boolean findComponentDescriptor(final SystemTemplate systemTemplate, final String name, final ComponentType type) {
+        for (ComponentDescriptor cd : systemTemplate.getComponentDescriptors()) {
+            if (cd.getComponentType() == type && cd.getName() != null && cd.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
+    private void validateSystemTemplate(final SystemTemplate systemTemplate) throws InvalidRequestException,
+        CloudProviderException {
+        for (ComponentDescriptor cd : systemTemplate.getComponentDescriptors()) {
+            if (cd.getId() == null) {
+                CloudTemplate ct = cd.getComponentTemplate();
+                if (ct instanceof SystemTemplate) {
+                    this.validateSystemTemplate((SystemTemplate) ct);
+                } else if (ct instanceof MachineTemplate) {
+                    MachineTemplate machineTemplate = (MachineTemplate) ct;
+                    if (machineTemplate.getNetworkInterfaces() != null) {
+                        for (MachineTemplateNetworkInterface nic : machineTemplate.getNetworkInterfaces()) {
+                            if (nic.getSystemNetworkName() != null) {
+                                if (!this.findComponentDescriptor(systemTemplate, nic.getSystemNetworkName(),
+                                    ComponentType.NETWORK)) {
+                                    throw new InvalidRequestException("Invalid network interface: component #"
+                                        + nic.getSystemNetworkName() + " not found");
+                                }
+                            } else if (nic.getNetwork() == null) {
+                                throw new InvalidRequestException("Invalid network interface: missing network");
+                            }
+
+                        }
+                    }
+                    if (machineTemplate.getVolumes() != null) {
+                        for (MachineVolume machineVolume : machineTemplate.getVolumes()) {
+                            if (machineVolume.getSystemVolumeName() != null
+                                && !this.findComponentDescriptor(systemTemplate, machineVolume.getSystemVolumeName(),
+                                    ComponentType.VOLUME)) {
+                                throw new InvalidRequestException("Invalid volume: component #"
+                                    + machineVolume.getSystemVolumeName() + " not found");
+                            }
+                        }
+                    }
+                    if (machineTemplate.getSystemCredentialName() != null
+                        && !this.findComponentDescriptor(systemTemplate, machineTemplate.getSystemCredentialName(),
+                            ComponentType.CREDENTIALS)) {
+                        throw new InvalidRequestException("Invalid credential: component #"
+                            + machineTemplate.getSystemCredentialName() + " not found");
+                    }
+                }
+            }
+        }
+    }
+
+    @Override
+    public SystemTemplate createSystemTemplate(final SystemTemplate systemT) throws InvalidRequestException,
+        CloudProviderException {
+        SystemManager.logger.info("Creating SystemTemplate name=" + systemT.getName());
+        this.validateSystemTemplate(systemT);
         systemT.setUser(this.getUser());
         systemT.setCreated(new Date());
 
@@ -615,12 +672,13 @@ public class SystemManager implements ISystemManager {
                     if (ct instanceof NetworkTemplate) {
                         this.networkManager.createNetworkTemplate((NetworkTemplate) ct);
                     }
-                    if (ct instanceof MachineTemplate) {
-                        this.machineManager.createMachineTemplate((MachineTemplate) ct);
-                    }
                     if (ct instanceof CredentialsTemplate) {
                         this.credentialsManager.createCredentialsTemplate((CredentialsTemplate) ct);
                     }
+                    if (ct instanceof MachineTemplate) {
+                        this.machineManager.createMachineTemplate((MachineTemplate) ct);
+                    }
+
                 }
             }
         }
