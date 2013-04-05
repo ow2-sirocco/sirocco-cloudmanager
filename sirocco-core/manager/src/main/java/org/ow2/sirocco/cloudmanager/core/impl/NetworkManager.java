@@ -27,6 +27,8 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
+import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
+import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteNetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -57,6 +59,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,6 +76,9 @@ public class NetworkManager implements INetworkManager {
     @Resource
     private EJBContext context;
 
+    @EJB
+    private ICloudProviderManager cloudProviderManager;
+
     @Inject
     @OSGiService(dynamic = true)
     private ICloudProviderConnectorFactoryFinder connectorFactoryFinder;
@@ -80,8 +86,8 @@ public class NetworkManager implements INetworkManager {
     @EJB
     private IUserManager userManager;
 
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
-        throws CloudProviderException {
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount,
+        final CloudProviderLocation location) throws CloudProviderException {
         NetworkManager.logger.info("Getting connector for cloud provider type "
             + cloudProviderAccount.getCloudProvider().getCloudProviderType());
         ICloudProviderConnectorFactory connectorFactory = this.connectorFactoryFinder
@@ -92,7 +98,7 @@ public class NetworkManager implements INetworkManager {
             return null;
         }
         try {
-            return connectorFactory.getCloudProviderConnector(cloudProviderAccount, null);
+            return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
         } catch (ConnectorException e) {
             throw new CloudProviderException(e.getMessage());
         }
@@ -153,15 +159,11 @@ public class NetworkManager implements INetworkManager {
         // retrieve user
         User user = this.getUser();
 
-        // pick up first cloud provider account associated with user
-        if (user.getCloudProviderAccounts().isEmpty()) {
-            throw new CloudProviderException("No cloud provider account for user " + user.getUsername());
-        }
-        CloudProviderAccount defaultAccount = user.getCloudProviderAccounts().iterator().next();
-        ICloudProviderConnector connector = this.getCloudProviderConnector(defaultAccount);
+        Placement placement = this.cloudProviderManager.placeResource(networkCreate.getProperties());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         if (connector == null) {
-            throw new CloudProviderException("Cannot find cloud provider connector "
-                + defaultAccount.getCloudProvider().getCloudProviderType());
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
 
         // delegates network creation to cloud provider connector
@@ -189,7 +191,7 @@ public class NetworkManager implements INetworkManager {
         network.setUser(user);
 
         network.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
-        network.setCloudProviderAccount(defaultAccount);
+        network.setCloudProviderAccount(placement.getAccount());
 
         network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
         network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
@@ -302,7 +304,8 @@ public class NetworkManager implements INetworkManager {
         }
 
         // delegates volume deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount(),
+            network.getLocation());
         Job providerJob = null;
 
         try {
@@ -571,15 +574,11 @@ public class NetworkManager implements INetworkManager {
         // retrieve user
         User user = this.getUser();
 
-        // pick up first cloud provider account associated with user
-        if (user.getCloudProviderAccounts().isEmpty()) {
-            throw new CloudProviderException("No cloud provider account for user " + user.getUsername());
-        }
-        CloudProviderAccount defaultAccount = user.getCloudProviderAccounts().iterator().next();
-        ICloudProviderConnector connector = this.getCloudProviderConnector(defaultAccount);
+        Placement placement = this.cloudProviderManager.placeResource(networkPortCreate.getProperties());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         if (connector == null) {
-            throw new CloudProviderException("Cannot find cloud provider connector "
-                + defaultAccount.getCloudProvider().getCloudProviderType());
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
 
         // delegates network port creation to cloud provider connector
@@ -607,7 +606,7 @@ public class NetworkManager implements INetworkManager {
         networkPort.setUser(user);
 
         networkPort.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
-        networkPort.setCloudProviderAccount(defaultAccount);
+        networkPort.setCloudProviderAccount(placement.getAccount());
 
         networkPort.setNetwork(networkPortCreate.getNetworkPortTemplate().getNetwork());
         networkPort.setClassOfService(networkPortCreate.getNetworkPortTemplate().getNetworkPortConfig().getClassOfService());
@@ -646,7 +645,8 @@ public class NetworkManager implements INetworkManager {
         }
 
         // delegates volume deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
+            networkPort.getLocation());
         Job providerJob = null;
 
         try {
@@ -1018,15 +1018,11 @@ public class NetworkManager implements INetworkManager {
         // retrieve user
         User user = this.getUser();
 
-        // pick up first cloud provider account associated with user
-        if (user.getCloudProviderAccounts().isEmpty()) {
-            throw new CloudProviderException("No cloud provider account for user " + user.getUsername());
-        }
-        CloudProviderAccount defaultAccount = user.getCloudProviderAccounts().iterator().next();
-        ICloudProviderConnector connector = this.getCloudProviderConnector(defaultAccount);
+        Placement placement = this.cloudProviderManager.placeResource(forwardingGroupCreate.getProperties());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         if (connector == null) {
-            throw new CloudProviderException("Cannot find cloud provider connector "
-                + defaultAccount.getCloudProvider().getCloudProviderType());
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
 
         // delegates network port creation to cloud provider connector
@@ -1054,7 +1050,7 @@ public class NetworkManager implements INetworkManager {
         forwardingGroup.setUser(user);
 
         forwardingGroup.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
-        forwardingGroup.setCloudProviderAccount(defaultAccount);
+        forwardingGroup.setCloudProviderAccount(placement.getAccount());
 
         Set<ForwardingGroupNetwork> networks = new HashSet<ForwardingGroupNetwork>();
         if (forwardingGroupCreate.getForwardingGroupTemplate().getNetworks() != null) {
@@ -1140,7 +1136,8 @@ public class NetworkManager implements INetworkManager {
         }
 
         // delegates ForwardingGroup deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+            forwardingGroup.getLocation());
         Job providerJob = null;
 
         try {
@@ -1200,7 +1197,8 @@ public class NetworkManager implements INetworkManager {
         this.em.persist(forwardingGroup);
 
         // delegates ForwardingGroup add to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+            forwardingGroup.getLocation());
         Job providerJob = null;
 
         try {
@@ -1255,7 +1253,8 @@ public class NetworkManager implements INetworkManager {
         forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.DETACHING);
 
         // delegates ForwardingGroup deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+            forwardingGroup.getLocation());
         Job providerJob = null;
 
         try {
@@ -1476,7 +1475,8 @@ public class NetworkManager implements INetworkManager {
         }
 
         // update Network entity
-        ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount(),
+            network.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
@@ -1554,7 +1554,8 @@ public class NetworkManager implements INetworkManager {
         }
 
         // update NetworkPort entity
-        ICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
+            networkPort.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
@@ -1634,7 +1635,8 @@ public class NetworkManager implements INetworkManager {
             return false;
         }
 
-        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+            forwardingGroup.getLocation());
 
         Network affectedNetwork = null;
         if (providerJob.getAffectedResources().size() == 1
