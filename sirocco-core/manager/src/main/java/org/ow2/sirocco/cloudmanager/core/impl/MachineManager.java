@@ -1269,8 +1269,10 @@ public class MachineManager implements IMachineManager {
                 List<MachineNetworkInterfaceAddress> addrs = nic.getAddresses();
                 for (MachineNetworkInterfaceAddress addr : addrs) {
                     Address address = addr.getAddress();
+                    // TODO why only for static addresses ?
                     if (address != null && address.getAllocation().equals("static")) {
                         addr.setAddress(null);
+                        this.em.remove(address);
                     }
                 }
                 nic.setNetwork(null);
@@ -2266,6 +2268,10 @@ public class MachineManager implements IMachineManager {
                                 + addr.getId());
                         }
                         if (addr.getAddress() != null) {
+                            addr.getAddress().setNetwork(null);
+                            addr.getAddress().setResource(null);
+                            addr.getAddress().setCreated(new Date());
+                            addr.getAddress().setUser(machine.getUser());
                             this.em.persist(addr.getAddress());
                         } else {
                             MachineManager.logger
