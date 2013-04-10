@@ -72,6 +72,8 @@ public interface INetworkManager {
 
     List<Network> getNetworks() throws CloudProviderException;
 
+    Network getPublicNetwork();
+
     QueryResult<Network> getNetworks(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 

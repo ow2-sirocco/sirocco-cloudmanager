@@ -117,6 +117,11 @@ public class NetworkManager implements INetworkManager {
     // Network operations
     //
 
+    public Network getPublicNetwork() {
+        List<Network> publicNetworks = this.em.createQuery("FROM Network n WHERE networkType='PUBLIC'").getResultList();
+        return publicNetworks.get(0);
+    }
+
     private Job createPublicNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
         NetworkManager.logger.info("Creating Public Network");
         // TODO only one public network can be created
