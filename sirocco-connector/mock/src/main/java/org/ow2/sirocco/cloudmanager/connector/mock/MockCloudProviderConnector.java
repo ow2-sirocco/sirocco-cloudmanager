@@ -1234,6 +1234,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         }
         final String networkProviderAssignedId = UUID.randomUUID().toString();
         final Network network = new Network();
+        network.setName(networkCreate.getName());
+        network.setNetworkType(networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType());
         network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
         network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
         network.setProviderAssignedId(networkProviderAssignedId);
@@ -1246,7 +1248,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             @Override
             public Network call() throws Exception {
                 Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
-                network.setState(Network.State.STARTED);
+                network.setState(Network.State.STOPPED);
                 if (fg != null) {
                     ForwardingGroupNetwork fgNetwork = new ForwardingGroupNetwork();
                     fgNetwork.setNetwork(network);
