@@ -193,6 +193,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     public synchronized Job createVolume(final VolumeCreate volumeCreate) throws ConnectorException {
         final String volumeProviderAssignedId = UUID.randomUUID().toString();
         final Volume volume = new Volume();
+        volume.setName(volumeCreate.getName());
         volume.setProviderAssignedId(volumeProviderAssignedId);
         volume.setCapacity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity());
         this.volumes.put(volumeProviderAssignedId, volume);
