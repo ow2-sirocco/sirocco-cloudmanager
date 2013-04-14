@@ -40,6 +40,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
+import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -47,10 +48,10 @@ import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
-import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
@@ -71,6 +72,9 @@ public class MachineImageManager implements IMachineImageManager {
 
     @EJB
     private IUserManager userManager;
+
+    @EJB
+    private IJobManager jobManager;
 
     @Resource
     private SessionContext ctx;
@@ -204,9 +208,34 @@ public class MachineImageManager implements IMachineImageManager {
     }
 
     @Override
-    public Job captureMachine(final MachineImage machineImage, final String machineId) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        throw new ServiceUnavailableException();
+    public boolean jobCompletionHandler(final String jobId, final CloudResource... resources) throws CloudProviderException {
+        Job job;
+
+        try {
+            job = this.jobManager.getJobById(jobId);
+        } catch (ResourceNotFoundException e) {
+            MachineImageManager.logger.info("Could not find job " + jobId);
+            return false;
+        }
+
+        MachineImage machineImage = this.em.find(MachineImage.class, job.getTargetResource().getId());
+        if (machineImage == null) {
+            throw new CloudProviderException("Internal error: cannot find MachineImage with id "
+                + job.getTargetResource().getId());
+        }
+
+        if (job.getAction().equals("add")) {
+            if (job.getState() == Status.SUCCESS) {
+                machineImage.setState(MachineImage.State.AVAILABLE);
+                machineImage.setCreated(new Date());
+                MachineImage machineImageFromProvider = (MachineImage) resources[0];
+                machineImage.setProviderAssignedId(machineImageFromProvider.getProviderAssignedId());
+            } else {
+                machineImage.setState(MachineImage.State.ERROR);
+            }
+        }
+
+        return false;
     }
 
 }

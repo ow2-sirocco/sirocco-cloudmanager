@@ -38,6 +38,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
@@ -84,6 +85,8 @@ public interface IMachineManager extends IJobListener {
     Job restartMachine(final String machineId, boolean force) throws ResourceNotFoundException, CloudProviderException;
 
     Job pauseMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
+
+    Job captureMachine(final String machineId, final MachineImage machineImage) throws CloudProviderException;
 
     Job deleteMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 

@@ -554,6 +554,60 @@ public class MachineManager implements IMachineManager {
         return this.doService(machineId, "suspend");
     }
 
+    @Override
+    public Job captureMachine(final String machineId, final MachineImage machineImage) throws CloudProviderException {
+        Job j;
+        Machine m = this.checkOps(machineId, "capture");
+        ICloudProviderConnector connector = this.getConnector(m);
+        IComputeService computeService;
+        try {
+            computeService = connector.getComputeService();
+        } catch (ConnectorException e) {
+            String eee = e.getMessage();
+            throw new ServiceUnavailableException(" " + eee + " action capture machine " + machineId + " "
+                + m.getProviderAssignedId());
+        }
+        MachineImage capturedMachineImage = new MachineImage();
+        capturedMachineImage.setUser(this.getUser());
+        capturedMachineImage.setName(machineImage.getName());
+        capturedMachineImage.setDescription(machineImage.getDescription());
+        capturedMachineImage.setProperties(machineImage.getProperties());
+        capturedMachineImage.setState(MachineImage.State.CREATING);
+        capturedMachineImage.setType(MachineImage.Type.IMAGE);
+
+        try {
+            j = computeService.captureMachine(m.getProviderAssignedId(), capturedMachineImage);
+        } catch (org.ow2.sirocco.cloudmanager.connector.api.BadStateException e) {
+            throw new BadStateException(e.getMessage() + " action capture machine id " + m.getProviderAssignedId() + " "
+                + m.getId());
+        } catch (ConnectorException e) {
+            throw new ServiceUnavailableException(e.getMessage() + " action capture machine id " + m.getProviderAssignedId()
+                + " " + m.getId());
+        }
+
+        this.em.persist(capturedMachineImage);
+        this.em.flush();
+
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(capturedMachineImage);
+        affectedResources.add(m);
+        Job job = this.createJob(capturedMachineImage, affectedResources, "add", j.getState(), null);
+        job.setProviderAssignedId(j.getProviderAssignedId());
+        this.updateJob(job);
+        job.setDescription("Machine capture");
+
+        if (j.getState() != Job.Status.FAILED) {
+            try {
+                UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
+            } catch (Exception e) {
+                throw new ServiceUnavailableException(e.getMessage() + "  capture");
+            }
+        }
+        MachineManager.logger.info("operation capture requested " + j.getState());
+        this.relConnector(m, connector);
+        return job;
+    }
+
     private Job doService(final String machineId, final String action, final Object... params) throws CloudProviderException {
 
         Job j;
@@ -581,6 +635,8 @@ public class MachineManager implements IMachineManager {
             } else if (action.equals("pause")) {
                 j = computeService.pauseMachine(m.getProviderAssignedId());
                 m.setState(Machine.State.PAUSING);
+            } else if (action.equals("capture")) {
+                j = computeService.captureMachine(m.getProviderAssignedId(), ((MachineImage) params[0]));
             } else if (action.equals("restart")) {
                 boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
                 j = computeService.restartMachine(m.getProviderAssignedId(), force);
@@ -1651,7 +1707,8 @@ public class MachineManager implements IMachineManager {
         return true;
     }
 
-    public boolean jobCompletionHandler(final String notification_id) throws CloudProviderException {
+    public boolean jobCompletionHandler(final String notification_id, final CloudResource... resources)
+        throws CloudProviderException {
         Job notification;
 
         try {

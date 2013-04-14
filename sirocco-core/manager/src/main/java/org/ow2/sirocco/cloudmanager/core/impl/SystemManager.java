@@ -1704,7 +1704,8 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public boolean jobCompletionHandler(final String notification_id) throws CloudProviderException {
+    public boolean jobCompletionHandler(final String notification_id, final CloudResource... resources)
+        throws CloudProviderException {
 
         Job job;
         try {

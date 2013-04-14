@@ -306,7 +306,9 @@ public class JobManager implements IJobManager {
                     this.machineManager.jobCompletionHandler(job.getId().toString());
                 }
                 if (target instanceof MachineImage) {
-                    // this.machineImageManager.jobCompletionHandler(job);
+                    JobManager.logger.info("calling  machineImageManager jobCompletionHandler with Job "
+                        + job.getId().toString());
+                    this.machineImageManager.jobCompletionHandler(job.getId().toString(), providerJob.getTargetResource());
                 }
                 if ((target instanceof Volume) || (target instanceof VolumeImage)) {
                     this.volumeManager.jobCompletionHandler(job.getId().toString());

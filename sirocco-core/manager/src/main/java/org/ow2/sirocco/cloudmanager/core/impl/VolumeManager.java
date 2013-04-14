@@ -567,7 +567,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public boolean jobCompletionHandler(final String job_id) throws CloudProviderException {
+    public boolean jobCompletionHandler(final String job_id, final CloudResource... resources) throws CloudProviderException {
         Job job;
         try {
             job = this.jobManager.getJobById(job_id);
