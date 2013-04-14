@@ -60,6 +60,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface.InterfaceState;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
@@ -447,6 +448,32 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         ListenableFuture<Void> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(pauseTask);
         return this.mockCloudProviderConnectorFactory.getJobManager().newJob(machine, null, "pause", result);
+    }
+
+    @Override
+    public Job captureMachine(final String machineId, final MachineImage machineImage) throws ConnectorException {
+        final Machine machine = this.machines.get(machineId);
+        if (machine == null) {
+            throw new ConnectorException("Machine " + machineId + " doesn't exist");
+        }
+        final MachineImage capturedMachineImage = new MachineImage();
+        capturedMachineImage.setName(machineImage.getName());
+        capturedMachineImage.setDescription(machineImage.getDescription());
+        capturedMachineImage.setType(Type.IMAGE);
+        capturedMachineImage.setState(MachineImage.State.CREATING);
+        Map<String, String> props = new HashMap<String, String>();
+        props.put("mock", "1234");
+        capturedMachineImage.setProperties(props);
+        final Callable<MachineImage> createTask = new Callable<MachineImage>() {
+            @Override
+            public MachineImage call() throws Exception {
+                Thread.sleep(MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS);
+                capturedMachineImage.setState(MachineImage.State.AVAILABLE);
+                return machineImage;
+            }
+        };
+        ListenableFuture<MachineImage> result = this.mockCloudProviderConnectorFactory.getExecutorService().submit(createTask);
+        return this.mockCloudProviderConnectorFactory.getJobManager().newJob(capturedMachineImage, machine, "add", result);
     }
 
     @Override

@@ -49,6 +49,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
@@ -620,6 +621,12 @@ public class AmazonCloudProviderConnectorFactory implements ICloudProviderConnec
 
         @Override
         public Job pauseMachine(final String machineId) throws ConnectorException {
+            throw new ConnectorException("unsupported operation");
+        }
+
+        @Override
+        public Job captureMachine(final String machineId, final MachineImage machineImage) throws ConnectorException {
+            // TODO
             throw new ConnectorException("unsupported operation");
         }
 

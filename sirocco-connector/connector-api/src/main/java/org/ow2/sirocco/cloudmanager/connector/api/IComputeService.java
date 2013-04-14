@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 
 public interface IComputeService {
@@ -45,6 +46,8 @@ public interface IComputeService {
     Job pauseMachine(final String machineId) throws ConnectorException;
 
     Job deleteMachine(final String machineId) throws ConnectorException;
+
+    Job captureMachine(String machineId, MachineImage machineImage) throws ConnectorException;
 
     Machine.State getMachineState(final String machineId) throws ConnectorException;
 
