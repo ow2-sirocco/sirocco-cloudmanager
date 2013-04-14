@@ -606,37 +606,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         boolean failedCancelled = false;
 
+        // create Volumes and Networks first
         Iterator<ComponentDescriptor> iter = componentDescriptors.iterator();
         while (iter.hasNext()) {
             ComponentDescriptor cd = iter.next();
-
-            if (cd.getComponentType() == ComponentType.MACHINE) {
-                // creating new machines
-                for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                    MachineCreate mc = new MachineCreate();
-                    if (cd.getComponentQuantity() > 1) {
-                        String name = cd.getName() == null ? "" : cd.getName();
-                        mc.setName(name + new Integer(i + 1).toString());
-                    } else {
-                        mc.setName(cd.getName());
-                    }
-
-                    MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
-                    mc.setMachineTemplate(mt);
-                    mc.setDescription(cd.getDescription());
-                    mc.setProperties(cd.getProperties());
-
-                    // warning:job returned by createXXX is a copy!
-                    Job j = jobManager.getJobById(this.createMachine(mc).getProviderAssignedId().toString());
-                    failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                    if (j.getState().equals(Status.SUCCESS)) {
-                        SystemMachine sm = new SystemMachine();
-                        sm.setState(SystemMachine.State.AVAILABLE);
-                        sm.setResource(j.getTargetResource());
-                        system.getMachines().add(sm);
-                    }
-                }
-            }
 
             if (cd.getComponentType() == ComponentType.VOLUME) {
                 // creating new volumes
@@ -661,6 +634,128 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                         sv.setState(SystemVolume.State.AVAILABLE);
                         sv.setResource(j.getTargetResource());
                         system.getVolumes().add(sv);
+                    }
+                }
+            }
+
+            if (cd.getComponentType() == ComponentType.NETWORK) {
+                // creating new networks
+                for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                    NetworkCreate nc = new NetworkCreate();
+                    if (cd.getComponentQuantity() > 1) {
+                        String name = cd.getName() == null ? "" : cd.getName();
+                        nc.setName(name + new Integer(i + 1).toString());
+                    } else {
+                        nc.setName(cd.getName());
+                    }
+                    NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
+                    nc.setNetworkTemplate(nt);
+                    nc.setDescription(cd.getDescription());
+                    nc.setProperties(cd.getProperties());
+
+                    // warning:job returned by createXXX is a copy!
+                    Job j = jobManager.getJobById(this.createNetwork(nc).getProviderAssignedId().toString());
+                    failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
+                    if (j.getState().equals(Status.SUCCESS)) {
+                        SystemNetwork sn = new SystemNetwork();
+                        sn.setState(SystemNetwork.State.AVAILABLE);
+                        sn.setResource(j.getTargetResource());
+                        system.getNetworks().add(sn);
+                    }
+                }
+            }
+        }
+
+        // resolve volume component references if any
+        for (ComponentDescriptor component : systemCreate.getSystemTemplate().getComponentDescriptors()) {
+            if (component.getComponentType() == ComponentType.MACHINE) {
+                MachineTemplate machineTemplate = (MachineTemplate) component.getComponentTemplate();
+                if (machineTemplate.getVolumes() != null) {
+                    for (MachineVolume machineVolume : machineTemplate.getVolumes()) {
+                        if (machineVolume.getSystemVolumeName() != null) {
+                            MockCloudProviderConnector.logger.info("Resolving volume ref #"
+                                + machineVolume.getSystemVolumeName());
+                            for (SystemVolume sysVolume : system.getVolumes()) {
+                                Volume vol = sysVolume.getVolume();
+                                if (vol.getName() != null && vol.getName().equals(machineVolume.getSystemVolumeName())) {
+                                    machineVolume.setVolume(vol);
+                                    MockCloudProviderConnector.logger.info("Volume ref #" + machineVolume.getSystemVolumeName()
+                                        + " resolved");
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // resolve network component references if any
+        for (ComponentDescriptor component : systemCreate.getSystemTemplate().getComponentDescriptors()) {
+            if (component.getComponentType() == ComponentType.MACHINE) {
+                MachineTemplate machineTemplate = (MachineTemplate) component.getComponentTemplate();
+                for (MachineTemplateNetworkInterface nic : machineTemplate.getNetworkInterfaces()) {
+                    if (nic.getSystemNetworkName() != null) {
+                        MockCloudProviderConnector.logger.info("Resolving network ref #" + nic.getSystemNetworkName());
+                        for (SystemNetwork sysNetwork : system.getNetworks()) {
+                            Network net = sysNetwork.getNetwork();
+                            if (net.getName() != null && net.getName().equals(nic.getSystemNetworkName())) {
+                                nic.setNetwork(net);
+                                MockCloudProviderConnector.logger.info("Network ref #" + nic.getSystemNetworkName()
+                                    + " resolved");
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // create Machines and Systems
+        iter = componentDescriptors.iterator();
+        while (iter.hasNext()) {
+            ComponentDescriptor cd = iter.next();
+
+            if (cd.getComponentType() == ComponentType.MACHINE) {
+                // creating new machines
+                for (int i = 0; i < cd.getComponentQuantity(); i++) {
+                    MachineCreate mc = new MachineCreate();
+                    if (cd.getComponentQuantity() > 1) {
+                        String name = cd.getName() == null ? "" : cd.getName();
+                        mc.setName(name + new Integer(i + 1).toString());
+                    } else {
+                        mc.setName(cd.getName());
+                    }
+
+                    MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
+                    mc.setMachineTemplate(mt);
+                    mc.setDescription(cd.getDescription());
+                    mc.setProperties(cd.getProperties());
+
+                    // warning:job returned by createXXX is a copy!
+                    Job j = jobManager.getJobById(this.createMachine(mc).getProviderAssignedId().toString());
+                    failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
+                    if (j.getState().equals(Status.SUCCESS)) {
+                        Machine machine = (Machine) j.getTargetResource();
+                        // attach volumes
+                        if (mt.getVolumes() != null) {
+                            for (MachineVolume machineVolume : mt.getVolumes()) {
+                                if (machineVolume.getVolume() == null) {
+                                    MockCloudProviderConnector.logger.error("Unresolved MachineVolume ref="
+                                        + machineVolume.getSystemVolumeName());
+                                    continue;
+                                }
+                                MachineVolume machineVolume2 = new MachineVolume();
+                                machineVolume2.setInitialLocation(machineVolume.getInitialLocation());
+                                machineVolume2.setVolume(machineVolume.getVolume());
+                                machine.getVolumes().add(machineVolume2);
+                            }
+                        }
+                        // TODO create and attach volumes
+                        SystemMachine sm = new SystemMachine();
+                        sm.setState(SystemMachine.State.AVAILABLE);
+                        sm.setResource(j.getTargetResource());
+                        system.getMachines().add(sm);
                     }
                 }
             }
@@ -692,32 +787,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 }
             }
 
-            if (cd.getComponentType() == ComponentType.NETWORK) {
-                // creating new networks
-                for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                    NetworkCreate nc = new NetworkCreate();
-                    if (cd.getComponentQuantity() > 1) {
-                        String name = cd.getName() == null ? "" : cd.getName();
-                        nc.setName(name + new Integer(i + 1).toString());
-                    } else {
-                        nc.setName(cd.getName());
-                    }
-                    NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
-                    nc.setNetworkTemplate(nt);
-                    nc.setDescription(cd.getDescription());
-                    nc.setProperties(cd.getProperties());
-
-                    // warning:job returned by createXXX is a copy!
-                    Job j = jobManager.getJobById(this.createNetwork(nc).getProviderAssignedId().toString());
-                    failedCancelled = this.waitForJob(j, MockCloudProviderConnector.maxJobTimeInSeconds);
-                    if (j.getState().equals(Status.SUCCESS)) {
-                        SystemNetwork sn = new SystemNetwork();
-                        sn.setState(SystemNetwork.State.AVAILABLE);
-                        sn.setResource(j.getTargetResource());
-                        system.getNetworks().add(sn);
-                    }
-                }
-            }
         }
 
         if (failedCancelled) {
