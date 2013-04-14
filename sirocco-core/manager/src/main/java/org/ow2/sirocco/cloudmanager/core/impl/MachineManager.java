@@ -1140,14 +1140,14 @@ public class MachineManager implements IMachineManager {
         }
         for (MachineVolume mv : volumes) {
             Volume v = mv.getVolume();
-            if (v == null || v.getId() == null) {
-                continue;
-            }
-            try {
-                this.em.find(Volume.class, v.getId());
-            } catch (Exception e) {
-                MachineManager.logger.info(" Incorrect volume being attached to machine template " + v.getId() + " ignoring ");
-                continue;
+            if (v != null) {
+                try {
+                    this.em.find(Volume.class, v.getId());
+                } catch (Exception e) {
+                    MachineManager.logger.info(" Incorrect volume being attached to machine template " + v.getId()
+                        + " ignoring ");
+                    continue;
+                }
             }
             this.em.persist(mv);
         }
@@ -2300,16 +2300,6 @@ public class MachineManager implements IMachineManager {
             throw new CloudProviderException(" Machine " + machine.getId() + " already persisted ");
         }
 
-        List<MachineVolume> vols = machine.getVolumes();
-        if (vols != null) {
-            for (MachineVolume v : vols) {
-                Volume volume = v.getVolume();
-                if (volume.getId() == null) {
-                    this.em.persist(volume);
-                }
-            }
-            this.em.flush();
-        }
         List<MachineNetworkInterface> nics = machine.getNetworkInterfaces();
         if (nics != null && nics.size() > 0) {
 
@@ -2342,6 +2332,21 @@ public class MachineManager implements IMachineManager {
 
         this.em.persist(machine);
         this.em.flush();
+
+        List<MachineVolume> vols = machine.getVolumes();
+        if (vols != null) {
+            for (MachineVolume v : vols) {
+                Volume volume = v.getVolume();
+                if (volume.getId() == null) {
+                    this.em.persist(volume);
+                }
+                if (v.getId() == null) {
+                    this.em.persist(v);
+                }
+                v.setOwner(machine);
+            }
+            this.em.flush();
+        }
 
         nics = machine.getNetworkInterfaces();
         if (nics != null && nics.size() > 0) {
