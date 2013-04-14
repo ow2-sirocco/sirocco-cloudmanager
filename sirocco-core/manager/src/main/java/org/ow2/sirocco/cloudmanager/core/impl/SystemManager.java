@@ -347,10 +347,13 @@ public class SystemManager implements ISystemManager {
         Set<ComponentDescriptor> componentDescriptorsCred = systemCreate.getSystemTemplate().getComponentDescriptors();
 
         Iterator<ComponentDescriptor> iterCred = componentDescriptorsCred.iterator();
+        List<SystemCredentials> creds = new ArrayList<SystemCredentials>();
+
         while (iterCred.hasNext()) {
             ComponentDescriptor cd = iterCred.next();
             if (cd.getComponentType() == ComponentType.CREDENTIALS) {
                 // creating new credentials
+
                 for (int i = 0; i < cd.getComponentQuantity(); i++) {
                     CredentialsCreate cc = new CredentialsCreate();
                     if (cd.getComponentQuantity() > 1) {
@@ -370,7 +373,24 @@ public class SystemManager implements ISystemManager {
                     SystemCredentials sc = (SystemCredentials) this.createCollection(SystemCredentials.class, c,
                         SystemCredentials.State.AVAILABLE);
                     this.em.persist(sc);
-                    system.getCredentials().add(sc);
+                    creds.add(sc);
+                }
+            }
+        }
+        system.setCredentials(creds);
+
+        // resolve MachineTemplate credential component references if any
+        for (ComponentDescriptor component : systemCreate.getSystemTemplate().getComponentDescriptors()) {
+            if (component.getComponentType() == ComponentType.MACHINE) {
+                MachineTemplate machineTemplate = (MachineTemplate) component.getComponentTemplate();
+                if (machineTemplate.getSystemCredentialName() != null) {
+                    for (SystemCredentials sysCred : creds) {
+                        Credentials cred = (Credentials) sysCred.getResource();
+                        if (cred.getName() != null && cred.getName().equals(machineTemplate.getSystemCredentialName())) {
+                            machineTemplate.setCredential(cred);
+                            break;
+                        }
+                    }
                 }
             }
         }
