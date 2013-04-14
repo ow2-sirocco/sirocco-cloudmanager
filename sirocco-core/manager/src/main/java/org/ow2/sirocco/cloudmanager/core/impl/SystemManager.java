@@ -79,10 +79,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.SiroccoConfiguration;
@@ -1597,6 +1599,8 @@ public class SystemManager implements ISystemManager {
             .getSystems();
         List<SystemNetwork> networks = providerSystem.getNetworks() == null ? new ArrayList<SystemNetwork>() : providerSystem
             .getNetworks();
+        Map<String, Network> networkMap = new HashMap<String, Network>();
+        Map<String, Volume> volumeMap = new HashMap<String, Volume>();
 
         // creating and adding objects
         for (SystemNetwork sn : networks) {
@@ -1605,7 +1609,9 @@ public class SystemManager implements ISystemManager {
             sn.getNetwork().setCloudProviderAccount(account);
             sn.getNetwork().setLocation(location);
             // TODO: replace with dedicated method from related manager!
-            this.em.persist(sn.getResource());
+            Network network = sn.getNetwork();
+            this.em.persist(network);
+            networkMap.put(network.getProviderAssignedId(), network);
             this.updateCollectionFromProvider(sn, sn.getResource(), SystemNetwork.State.AVAILABLE);
             this.em.persist(sn);
         }
@@ -1618,6 +1624,7 @@ public class SystemManager implements ISystemManager {
             sv.getVolume().setLocation(location);
             // TODO: replace with dedicated method from related manager!
             this.em.persist(sv.getResource());
+            volumeMap.put(sv.getVolume().getProviderAssignedId(), sv.getVolume());
             this.updateCollectionFromProvider(sv, sv.getResource(), SystemVolume.State.AVAILABLE);
             this.em.persist(sv);
         }
@@ -1629,6 +1636,26 @@ public class SystemManager implements ISystemManager {
                 mach.setCloudProviderAccount(account);
                 mach.setLocation(location);
                 mach.setCreated(new Date());
+
+                if (mach.getNetworkInterfaces() != null) {
+                    for (MachineNetworkInterface nic : mach.getNetworkInterfaces()) {
+                        if (nic.getNetwork() != null) {
+                            if (nic.getNetwork().getNetworkType() == Type.PRIVATE) {
+                                Network persistedNetwork = networkMap.get(nic.getNetwork().getProviderAssignedId());
+                                nic.setNetwork(persistedNetwork);
+                            } else {
+                                nic.setNetwork(this.networkManager.getPublicNetwork());
+                            }
+                        }
+                    }
+                }
+                if (mach.getVolumes() != null) {
+                    for (MachineVolume machineVol : mach.getVolumes()) {
+                        if (machineVol.getVolume() != null) {
+                            machineVol.setVolume(volumeMap.get(machineVol.getVolume().getProviderAssignedId()));
+                        }
+                    }
+                }
 
                 this.machineManager.persistMachineInSystem(mach);
                 this.updateCollectionFromProvider(sm, sm.getResource(), SystemMachine.State.AVAILABLE);
