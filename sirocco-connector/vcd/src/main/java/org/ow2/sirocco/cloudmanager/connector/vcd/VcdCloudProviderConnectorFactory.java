@@ -65,6 +65,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
@@ -924,11 +925,16 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
                     if (networkConnection.getIpAddress() != null && networkConnection.getIpAddress() != "") {
                         Address cimiAddress = new Address();
-                        if (!this.cimiPublicOrgVdcNetworkIsRouted) {
+                        if (network.getNetworkType().equals(Network.Type.PUBLIC) && this.cimiPublicOrgVdcNetworkIsRouted) { /* if CIMI.public && NAT routed */
+                            cimiAddress.setIp(this.getNatRoutedIpAddress(networkConnection.getIpAddress()));
+                        } else {
+                            cimiAddress.setIp(networkConnection.getIpAddress());
+                        }
+                        /*if (!this.cimiPublicOrgVdcNetworkIsRouted) {
                             cimiAddress.setIp(networkConnection.getIpAddress());
                         } else {
-                            cimiAddress.setIp(this.getNatRoutedIpAddress(networkConnection.getIpAddress()));
-                        }
+                            cimiAddress.setIp(this.getNatRoutedIpAddress(networkConnection.getIpAddress())); 
+                        }*/
                         cimiAddress.setAllocation(cimiIpAddressAllocationMode);
                         cimiAddress.setProtocol("IPv4");
                         // cimiAddress.setNetwork(network);
@@ -1275,6 +1281,11 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         @Override
         public Job removeVolumeFromMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException {
+            throw new ConnectorException("unsupported operation");
+        }
+
+        @Override
+        public Job captureMachine(final String machineId, final MachineImage machineImage) throws ConnectorException {
             throw new ConnectorException("unsupported operation");
         }
 
