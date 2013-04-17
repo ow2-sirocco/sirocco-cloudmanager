@@ -259,6 +259,10 @@ public class System extends CloudResource implements Serializable, ICloudProvide
 
         System.fsm.addAction(State.DELETING, "delete", State.DELETING);
         System.fsm.addAction(State.DELETING, "internal", State.DELETED);
+
+        System.fsm.addAction(State.MIXED, "delete", State.DELETING);
+        System.fsm.addAction(State.MIXED, "internal", State.STARTED);
+        System.fsm.addAction(State.MIXED, "internal", State.STOPPED);
         return System.fsm;
     }
 
