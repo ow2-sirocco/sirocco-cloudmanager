@@ -31,10 +31,19 @@ import javax.persistence.Entity;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
-
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CloudTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    private Boolean isEmbeddedInSystemTemplate = false;
+
+    public Boolean getIsEmbeddedInSystemTemplate() {
+        return this.isEmbeddedInSystemTemplate;
+    }
+
+    public void setIsEmbeddedInSystemTemplate(final Boolean isEmbeddedInSystemTemplate) {
+        this.isEmbeddedInSystemTemplate = isEmbeddedInSystemTemplate;
+    }
 
 }
