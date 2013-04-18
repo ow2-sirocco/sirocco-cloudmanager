@@ -47,6 +47,7 @@ import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
@@ -219,9 +220,9 @@ public class CredentialsManager implements ICredentialsManager {
     @Override
     public QueryResult<Credentials> getCredentials(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("Credentials", Credentials.class, this.em, user.getUsername(), first, last,
-            filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Credentials", Credentials.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
@@ -279,8 +280,10 @@ public class CredentialsManager implements ICredentialsManager {
     @Override
     public QueryResult<CredentialsTemplate> getCredentialsTemplates(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("CredentialsTemplate", CredentialsTemplate.class, this.em, user.getUsername(),
-            first, last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("CredentialsTemplate",
+            CredentialsTemplate.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate());
     }
 }

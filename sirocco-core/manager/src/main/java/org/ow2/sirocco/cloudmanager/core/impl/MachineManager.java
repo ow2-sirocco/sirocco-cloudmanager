@@ -67,6 +67,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
@@ -471,13 +472,15 @@ public class MachineManager implements IMachineManager {
     @Override
     public QueryResult<Machine> getMachines(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws CloudProviderException {
-        return UtilsForManagers.getEntityList("Machine", Machine.class, this.em, this.getUser().getUsername(), first, last,
-            filters, attributes, true);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Machine", Machine.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .verifyDeletedState());
     }
 
     @Override
     public List<Machine> getMachines() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("Machine", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("Machine", this.em, this.getUser().getUsername());
     }
 
     private Machine checkOps(final String machineId, final String action) throws CloudProviderException {
@@ -929,10 +932,10 @@ public class MachineManager implements IMachineManager {
     @Override
     public QueryResult<MachineConfiguration> getMachineConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        QueryResult<MachineConfiguration> machineConfigs;
-        machineConfigs = UtilsForManagers.getEntityList("MachineConfiguration", MachineConfiguration.class, this.em,
-            user.getUsername(), first, last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineConfiguration",
+            MachineConfiguration.class);
+        QueryResult<MachineConfiguration> machineConfigs = QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
         for (MachineConfiguration machineConfig : machineConfigs.getItems()) {
             if (machineConfig.getDisks() != null) {
                 machineConfig.getDisks().size();
@@ -1242,13 +1245,17 @@ public class MachineManager implements IMachineManager {
     @Override
     public QueryResult<MachineTemplate> getMachineTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getEntityList("MachineTemplate", MachineTemplate.class, this.em, this.getUser().getUsername(),
-            first, last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
+            .builder("MachineTemplate", MachineTemplate.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate());
     }
 
     @Override
     public List<MachineTemplate> getMachineTemplates() throws CloudProviderException {
-        List<MachineTemplate> machineTemplates = this.em.createQuery("SELECT c FROM MachineTemplate c WHERE c.user.id=:userid")
+        List<MachineTemplate> machineTemplates = this.em
+            .createQuery("SELECT c FROM MachineTemplate c WHERE c.user.id=:userid AND c.isEmbeddedInSystemTemplate=false")
             .setParameter("userid", this.getUser().getId()).getResultList();
         for (MachineTemplate machineTemplate : machineTemplates) {
             machineTemplate.getMachineConfig().getDisks().size();
@@ -1834,8 +1841,10 @@ public class MachineManager implements IMachineManager {
     @Override
     public QueryResult<MachineVolume> getMachineVolumes(final String machineId, final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getCollectionItemList("MachineVolume", MachineVolume.class, this.em, this.getUser()
-            .getUsername(), first, last, filters, attributes, true, "Machine", "volumes", machineId);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineVolume", MachineVolume.class);
+        return QueryHelper.getCollectionItemList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .containerType("Machine").containerId(machineId).containerAttributeName("volumes"));
     }
 
     private Job addVolumeToMachine(final Machine m, final MachineVolume mv) throws ServiceUnavailableException {
@@ -2168,8 +2177,10 @@ public class MachineManager implements IMachineManager {
     @Override
     public QueryResult<MachineDisk> getMachineDisks(final String machineId, final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getCollectionItemList("MachineDisk", MachineDisk.class, this.em, this.getUser().getUsername(),
-            first, last, filters, attributes, false, "Machine", "disks", machineId);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineDisk", MachineDisk.class);
+        return QueryHelper.getCollectionItemList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .containerType("Machine").containerId(machineId).containerAttributeName("disks"));
     }
 
     @Override
@@ -2283,8 +2294,11 @@ public class MachineManager implements IMachineManager {
     public QueryResult<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId, final int first,
         final int last, final List<String> filters, final List<String> attributes) throws InvalidRequestException,
         CloudProviderException {
-        return UtilsForManagers.getCollectionItemList("MachineNetworkInterface", MachineNetworkInterface.class, this.em, this
-            .getUser().getUsername(), first, last, filters, attributes, false, "Machine", "networkInterfaces", machineId);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineNetworkInterface",
+            MachineNetworkInterface.class);
+        return QueryHelper.getCollectionItemList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .containerType("Machine").containerId(machineId).containerAttributeName("networkInterfaces"));
     }
 
     /**

@@ -68,6 +68,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
@@ -684,6 +685,8 @@ public class SystemManager implements ISystemManager {
                     // no id, the template is new: calling manager
                     // createTemplate for each one
 
+                    ct.setIsEmbeddedInSystemTemplate(true);
+
                     if (ct instanceof SystemTemplate) {
                         // recursive calls
                         this.createSystemTemplate((SystemTemplate) ct);
@@ -718,14 +721,16 @@ public class SystemManager implements ISystemManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<System> getSystems() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("System", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("System", this.em, this.getUser().getUsername());
     }
 
     @Override
     public QueryResult<System> getSystems(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getEntityList("System", System.class, this.em, this.getUser().getUsername(), first, last,
-            filters, attributes, true);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("System", System.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .verifyDeletedState());
     }
 
     @Override
@@ -772,14 +777,16 @@ public class SystemManager implements ISystemManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<SystemTemplate> getSystemTemplates() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("SystemTemplate", this.em, this.getUser().getUsername(), false);
+        return QueryHelper.getEntityList("SystemTemplate", this.em, this.getUser().getUsername(), false);
     }
 
     @Override
     public QueryResult<SystemTemplate> getSystemTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getEntityList("SystemTemplate", SystemTemplate.class, this.em, this.getUser().getUsername(),
-            first, last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("SystemTemplate", SystemTemplate.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate());
     }
 
     private ComponentDescriptor getComponentDescriptorById(final String componentDescriptorId) throws CloudProviderException {
@@ -798,7 +805,7 @@ public class SystemManager implements ISystemManager {
         if (entity.getResource() == null) {
             throw new CloudProviderException("no resource linked to this entity");
         }
-        if (UtilsForManagers.getCloudResourceById(this.em, entity.getResource().getId().toString()) == null) {
+        if (QueryHelper.getCloudResourceById(this.em, entity.getResource().getId().toString()) == null) {
             throw new CloudProviderException("nonexisting resource linked to this SystemEntity");
         }
 
@@ -850,7 +857,7 @@ public class SystemManager implements ISystemManager {
     public Job removeEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException {
 
         System s = this.getSystemById(systemId);
-        CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
+        CloudCollectionItem ce = QueryHelper.getCloudCollectionById(this.em, entityId);
         if (ce == null || s == null) {
             throw new CloudProviderException("bad id given in parameter");
         }
@@ -906,7 +913,7 @@ public class SystemManager implements ISystemManager {
 
     private void removeEntityFromSystem_Final(final Job job, final System s) throws CloudProviderException {
         String entityId = this.getJobProperty(job, SystemManager.PROP_JOB_COLLECTION_ID);
-        CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
+        CloudCollectionItem ce = QueryHelper.getCloudCollectionById(this.em, entityId);
         ce.setState(CloudCollectionItem.State.DELETED);
         this.removeItemFromSystemCollection(s, ce);
         // deleting SystemXXX
@@ -940,7 +947,7 @@ public class SystemManager implements ISystemManager {
         if (entity == null || s == null) {
             throw new CloudProviderException("bad id given in parameter");
         }
-        if (UtilsForManagers.getCloudResourceById(this.em, entity.getResource().getId().toString()) == null) {
+        if (QueryHelper.getCloudResourceById(this.em, entity.getResource().getId().toString()) == null) {
             throw new CloudProviderException("nonexisting resource linked to this SystemEntity");
         }
 
@@ -969,7 +976,7 @@ public class SystemManager implements ISystemManager {
     }
 
     public CloudCollectionItem getEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException {
-        CloudCollectionItem ce = UtilsForManagers.getCloudCollectionById(this.em, entityId);
+        CloudCollectionItem ce = QueryHelper.getCloudCollectionById(this.em, entityId);
         if (ce == null) {
             throw new CloudProviderException("bad id given in parameter");
         }
@@ -1705,7 +1712,7 @@ public class SystemManager implements ISystemManager {
         // syncing objects status
 
         for (SystemMachine sn : machines) {
-            Machine lmanaged = (Machine) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+            Machine lmanaged = (Machine) QueryHelper.getResourceFromProviderId(this.em, sn.getResource()
                 .getProviderAssignedId());
             if (jobAction.equals(SystemManager.DELETE_ACTION)) {
                 // lmanaged.setState(Machine.State.DELETED);
@@ -1716,8 +1723,7 @@ public class SystemManager implements ISystemManager {
         }
 
         for (SystemVolume sn : volumes) {
-            Volume lmanaged = (Volume) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                .getProviderAssignedId());
+            Volume lmanaged = (Volume) QueryHelper.getResourceFromProviderId(this.em, sn.getResource().getProviderAssignedId());
             if (jobAction.equals(SystemManager.DELETE_ACTION)) {
                 lmanaged.setState(Volume.State.DELETED);
             } else {
@@ -1726,7 +1732,7 @@ public class SystemManager implements ISystemManager {
         }
 
         for (SystemNetwork sn : networks) {
-            Network lmanaged = (Network) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
+            Network lmanaged = (Network) QueryHelper.getResourceFromProviderId(this.em, sn.getResource()
                 .getProviderAssignedId());
             if (jobAction.equals(SystemManager.DELETE_ACTION)) {
                 lmanaged.setState(Network.State.DELETED);
@@ -1738,8 +1744,7 @@ public class SystemManager implements ISystemManager {
         for (SystemSystem sn : systems) {
             // recursion rules!
             this.updateSystemContentState(connector, (System) sn.getResource(), jobAction);
-            System lmanaged = (System) UtilsForManagers.getResourceFromProviderId(this.em, sn.getResource()
-                .getProviderAssignedId());
+            System lmanaged = (System) QueryHelper.getResourceFromProviderId(this.em, sn.getResource().getProviderAssignedId());
             if (jobAction.equals(SystemManager.DELETE_ACTION)) {
                 lmanaged.setState(System.State.DELETED);
                 sn.setState(SystemSystem.State.DELETED);
@@ -1892,8 +1897,8 @@ public class SystemManager implements ISystemManager {
 
                         if (j.getTargetResource() instanceof Machine) {
                             if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                                SystemMachine sc = (SystemMachine) UtilsForManagers.getCloudCollectionFromCloudResource(
-                                    this.em, j.getTargetResource());
+                                SystemMachine sc = (SystemMachine) QueryHelper.getCloudCollectionFromCloudResource(this.em,
+                                    j.getTargetResource());
                                 sc.setState(SystemMachine.State.AVAILABLE);
                                 s.getMachines().add(sc);
                             }
@@ -1902,7 +1907,7 @@ public class SystemManager implements ISystemManager {
                         }
                         if (j.getTargetResource() instanceof Volume) {
                             if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                                SystemVolume sc = (SystemVolume) UtilsForManagers.getCloudCollectionFromCloudResource(this.em,
+                                SystemVolume sc = (SystemVolume) QueryHelper.getCloudCollectionFromCloudResource(this.em,
                                     j.getTargetResource());
                                 sc.setState(SystemVolume.State.AVAILABLE);
                                 s.getVolumes().add(sc);
@@ -1911,7 +1916,7 @@ public class SystemManager implements ISystemManager {
                         }
                         if (j.getTargetResource() instanceof System) {
                             if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                                SystemSystem sc = (SystemSystem) UtilsForManagers.getCloudCollectionFromCloudResource(this.em,
+                                SystemSystem sc = (SystemSystem) QueryHelper.getCloudCollectionFromCloudResource(this.em,
                                     j.getTargetResource());
                                 sc.setState(SystemSystem.State.AVAILABLE);
                                 s.getSystems().add(sc);
@@ -1920,8 +1925,8 @@ public class SystemManager implements ISystemManager {
                         }
                         if (j.getTargetResource() instanceof Network) {
                             if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                                SystemNetwork sc = (SystemNetwork) UtilsForManagers.getCloudCollectionFromCloudResource(
-                                    this.em, j.getTargetResource());
+                                SystemNetwork sc = (SystemNetwork) QueryHelper.getCloudCollectionFromCloudResource(this.em,
+                                    j.getTargetResource());
                                 sc.setState(SystemNetwork.State.AVAILABLE);
                                 s.getNetworks().add(sc);
                             }

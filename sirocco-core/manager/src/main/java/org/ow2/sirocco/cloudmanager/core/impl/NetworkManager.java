@@ -37,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.AddressCreate;
@@ -267,16 +268,17 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<Network> getNetworks() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("Network", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("Network", this.em, this.getUser().getUsername());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public QueryResult<Network> getNetworks(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("Network", Network.class, this.em, user.getUsername(), first, last, filters,
-            attributes, true);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Network", Network.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .verifyDeletedState());
     }
 
     @Override
@@ -454,9 +456,10 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<NetworkConfiguration> getNetworkConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkConfiguration", NetworkConfiguration.class, this.em, user.getUsername(),
-            first, last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkConfiguration",
+            NetworkConfiguration.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
@@ -511,7 +514,9 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException {
-        return this.em.createQuery("FROM NetworkTemplate v WHERE v.user.username=:username ORDER BY v.id")
+        return this.em
+            .createQuery(
+                "FROM NetworkTemplate v WHERE v.user.username=:username AND v.isEmbeddedInSystemTemplate=false ORDER BY v.id")
             .setParameter("username", this.getUser().getUsername()).getResultList();
     }
 
@@ -534,8 +539,15 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<NetworkTemplate> getNetworkTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkTemplate", NetworkTemplate.class, this.em, user.getUsername(), first,
-            last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
+            .builder("NetworkTemplate", NetworkTemplate.class);
+
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate());
+        // return UtilsForManagers.getEntityList("NetworkTemplate",
+        // NetworkTemplate.class, this.em, user.getUsername(), first,
+        // last, filters, attributes, false);
     }
 
     @Override
@@ -726,7 +738,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPort> getNetworkPorts() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("NetworkPort", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("NetworkPort", this.em, this.getUser().getUsername());
     }
 
     @Override
@@ -747,9 +759,10 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<NetworkPort> getNetworkPorts(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkPort", NetworkPort.class, this.em, user.getUsername(), first, last,
-            filters, attributes, true);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPort", NetworkPort.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .verifyDeletedState());
     }
 
     @Override
@@ -821,9 +834,10 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<NetworkPortConfiguration> getNetworkPortConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkPortConfiguration", NetworkPortConfiguration.class, this.em,
-            user.getUsername(), first, last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPortConfiguration",
+            NetworkPortConfiguration.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
@@ -904,9 +918,11 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<NetworkPortTemplate> getNetworkPortTemplates(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("NetworkPortTemplate", NetworkPortTemplate.class, this.em, user.getUsername(),
-            first, last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPortTemplate",
+            NetworkPortTemplate.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate());
     }
 
     @Override
@@ -982,9 +998,11 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<ForwardingGroupTemplate> getForwardingGroupTemplates(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("ForwardingGroupTemplate", ForwardingGroupTemplate.class, this.em,
-            user.getUsername(), first, last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("ForwardingGroupTemplate",
+            ForwardingGroupTemplate.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate());
     }
 
     @Override
@@ -1092,7 +1110,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<ForwardingGroup> getForwardingGroups() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("ForwardingGroup", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("ForwardingGroup", this.em, this.getUser().getUsername());
     }
 
     @Override
@@ -1114,9 +1132,11 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<ForwardingGroup> getForwardingGroups(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("ForwardingGroup", ForwardingGroup.class, this.em, user.getUsername(), first,
-            last, filters, attributes, true);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
+            .builder("ForwardingGroup", ForwardingGroup.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .verifyDeletedState());
     }
 
     @Override
@@ -1334,9 +1354,9 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<Address> getAddresses(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("Address", Address.class, this.em, user.getUsername(), first, last, filters,
-            attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Address", Address.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
@@ -1406,9 +1426,11 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<AddressTemplate> getAddressTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("AddressTemplate", AddressTemplate.class, this.em, user.getUsername(), first,
-            last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
+            .builder("AddressTemplate", AddressTemplate.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate());
     }
 
     @Override
@@ -1755,9 +1777,11 @@ public class NetworkManager implements INetworkManager {
     public QueryResult<ForwardingGroupNetwork> getForwardingGroupNetworks(final String forwardingGroupId, final int first,
         final int last, final List<String> filters, final List<String> attributes) throws InvalidRequestException,
         CloudProviderException {
-        return UtilsForManagers
-            .getCollectionItemList("ForwardingGroupNetwork", ForwardingGroupNetwork.class, this.em, this.getUser()
-                .getUsername(), first, last, filters, attributes, false, "ForwardingGroup", "networks", forwardingGroupId);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("ForwardingGroupNetwork",
+            ForwardingGroupNetwork.class);
+        return QueryHelper.getCollectionItemList(this.em, params.userName(this.getUser().getUsername()).first(first).last(last)
+            .filter(filters).attributes(attributes).containerType("ForwardingGroup").containerId(forwardingGroupId)
+            .containerAttributeName("networks"));
     }
 
     @Override

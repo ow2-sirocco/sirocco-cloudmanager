@@ -34,6 +34,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
@@ -304,16 +305,17 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<Volume> getVolumes() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("Volume", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("Volume", this.em, this.getUser().getUsername());
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public QueryResult<Volume> getVolumes(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("Volume", Volume.class, this.em, user.getUsername(), first, last, filters,
-            attributes, true);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Volume", Volume.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .verifyDeletedState());
     }
 
     @Override
@@ -326,9 +328,10 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public QueryResult<VolumeConfiguration> getVolumeConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("VolumeConfiguration", VolumeConfiguration.class, this.em, user.getUsername(),
-            first, last, filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeConfiguration",
+            VolumeConfiguration.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
@@ -341,9 +344,10 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public QueryResult<VolumeTemplate> getVolumeTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("VolumeTemplate", VolumeTemplate.class, this.em, user.getUsername(), first, last,
-            filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeTemplate", VolumeTemplate.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate());
     }
 
     @SuppressWarnings("unchecked")
@@ -813,14 +817,14 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public QueryResult<VolumeImage> getVolumeImages(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("VolumeImage", VolumeImage.class, this.em, user.getUsername(), first, last,
-            filters, attributes, false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeImage", VolumeImage.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
     public List<VolumeImage> getVolumeImages() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("VolumeImage", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("VolumeImage", this.em, this.getUser().getUsername());
     }
 
     @Override
@@ -927,8 +931,11 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public QueryResult<VolumeVolumeImage> getVolumeVolumeImages(final String volumeId, final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getCollectionItemList("VolumeVolumeImage", VolumeVolumeImage.class, this.em, this.getUser()
-            .getUsername(), first, last, filters, attributes, false, "Volume", "images", volumeId);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeVolumeImage",
+            VolumeVolumeImage.class);
+        return QueryHelper.getCollectionItemList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .containerType("Volume").containerId(volumeId).containerAttributeName("images"));
     }
 
     @Override

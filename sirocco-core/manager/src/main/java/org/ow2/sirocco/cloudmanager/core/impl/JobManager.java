@@ -56,6 +56,7 @@ import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
@@ -203,9 +204,9 @@ public class JobManager implements IJobManager {
     @Override
     public QueryResult<Job> getJobs(final int first, final int last, final List<String> filters, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
-        return UtilsForManagers.getEntityList("Job", Job.class, this.em, user.getUsername(), first, last, filters, attributes,
-            false);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Job", Job.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override

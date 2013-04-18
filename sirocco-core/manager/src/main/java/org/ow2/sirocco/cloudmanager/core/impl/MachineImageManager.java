@@ -48,6 +48,7 @@ import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -120,7 +121,7 @@ public class MachineImageManager implements IMachineImageManager {
 
     @Override
     public List<MachineImage> getMachineImages() throws CloudProviderException {
-        return UtilsForManagers.getEntityList("MachineImage", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("MachineImage", this.em, this.getUser().getUsername());
     }
 
     public MachineImage getMachineImageById(final String imageId) throws CloudProviderException {
@@ -172,8 +173,10 @@ public class MachineImageManager implements IMachineImageManager {
     @Override
     public QueryResult<MachineImage> getMachineImages(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        return UtilsForManagers.getEntityList("MachineImage", MachineImage.class, this.em, this.getUser().getUsername(), first,
-            last, filters, attributes, true);
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineImage", MachineImage.class);
+        return QueryHelper.getEntityList(this.em,
+            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+                .verifyDeletedState());
     }
 
     @Override
