@@ -221,15 +221,17 @@ public class MachineManager implements IMachineManager {
                 if (mv.getInitialLocation() == null) {
                     throw new InvalidRequestException("initialLocation not set for volume ");
                 }
-                Volume v = mv.getVolume();
-                /**
-                 * Volume should not be passed by value. Check that the volume
-                 * id exists.
-                 */
-                if ((v == null) || (v.getId() == null)) {
-                    throw new InvalidRequestException("No volume id ");
+                if (mv.getSystemVolumeName() == null) {
+                    Volume v = mv.getVolume();
+                    /**
+                     * Volume should not be passed by value. Check that the
+                     * volume id exists.
+                     */
+                    if ((v == null) || (v.getId() == null)) {
+                        throw new InvalidRequestException("No volume id ");
+                    }
+                    this.volumeManager.getVolumeById(v.getId().toString());
                 }
-                this.volumeManager.getVolumeById(v.getId().toString());
             }
         }
         List<MachineVolumeTemplate> vts = mt.getVolumeTemplates();
