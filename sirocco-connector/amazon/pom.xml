@@ -130,13 +130,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-annotations</artifactId>
-			<version>3.5.0-Final</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
 			<version>1.0</version>

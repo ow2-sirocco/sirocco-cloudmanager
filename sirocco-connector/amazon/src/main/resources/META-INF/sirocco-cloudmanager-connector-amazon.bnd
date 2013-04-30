@@ -28,6 +28,6 @@ Private-Package org.ow2.sirocco.cloudmanager.connector.amazon
 
 Export-Package 
 
-Import-Package  *
+Import-Package  !org.slf4j, *
 
 

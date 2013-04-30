@@ -25,4 +25,4 @@ Private-Package
 
 Export-Package org.ow2.sirocco.cloudmanager.core.api, org.ow2.sirocco.cloudmanager.core.api.exception
 
-Import-Package *
+Import-Package !org.slf4j, *

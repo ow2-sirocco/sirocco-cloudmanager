@@ -27,4 +27,4 @@ Private-Package
 
 Export-Package org.ow2.sirocco.cloudmanager.model.utils, org.ow2.sirocco.cloudmanager.model.cimi , org.ow2.sirocco.cloudmanager.model.cimi.event, org.ow2.sirocco.cloudmanager.model.cimi.meter, org.ow2.sirocco.cloudmanager.model.cimi.system, org.ow2.sirocco.cloudmanager.model.cimi.extension
 
-Import-Package *, org.hibernate.proxy, javassist.util.proxy
+Import-Package !org.slf4j, *

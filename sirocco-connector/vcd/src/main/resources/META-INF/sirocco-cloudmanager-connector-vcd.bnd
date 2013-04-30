@@ -29,7 +29,7 @@ Private-Package org.ow2.sirocco.cloudmanager.connector.vcd, com.vmware.vcloud.sd
 
 Export-Package 
 
-Import-Package  !org.apache.avalon.framework.*,org.apache.log;resolution:=optional,*
+Import-Package  !org.slf4j, !org.apache.avalon.framework.*,org.apache.log;resolution:=optional,*
 
 
 

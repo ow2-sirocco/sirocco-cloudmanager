@@ -49,12 +49,6 @@
 			<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-annotations</artifactId>
-			<version>3.5.0-Final</version>
-			<scope>provided</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
