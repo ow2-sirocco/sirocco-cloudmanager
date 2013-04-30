@@ -19,7 +19,6 @@ import javax.jms.Session;
 import javax.naming.InitialContext;
 
 import org.apache.commons.beanutils.PropertyUtils;
-import org.hibernate.proxy.HibernateProxy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,15 +78,6 @@ public class UtilsForManagers {
             }
         }
         throw new NoSuchFieldException(targetObj.getClass() + " has no field " + attrName);
-    }
-
-    public static Object getEntityThroughProxy(Object o) {
-        if (o instanceof HibernateProxy) {
-            HibernateProxy oProxy = (HibernateProxy) o;
-            o = oProxy.getHibernateLazyInitializer().getImplementation();
-        }
-        return o;
-
     }
 
     /**
