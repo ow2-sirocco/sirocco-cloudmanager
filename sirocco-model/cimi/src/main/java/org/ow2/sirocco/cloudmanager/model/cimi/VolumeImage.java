@@ -92,11 +92,11 @@ public class VolumeImage extends CloudResource implements Serializable, ICloudPr
         this.cloudProviderAccount = cloudProviderAccount;
     }
 
+    @ManyToOne
     public CloudProviderLocation getLocation() {
         return this.location;
     }
 
-    @ManyToOne
     public void setLocation(final CloudProviderLocation location) {
         this.location = location;
     }

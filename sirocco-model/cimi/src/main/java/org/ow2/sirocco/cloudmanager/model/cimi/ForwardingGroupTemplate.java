@@ -29,10 +29,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 public class ForwardingGroupTemplate extends CloudEntity implements Serializable {
@@ -40,8 +38,7 @@ public class ForwardingGroupTemplate extends CloudEntity implements Serializable
 
     private List<Network> networks;
 
-    @OneToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(fetch = FetchType.EAGER)
     public List<Network> getNetworks() {
         return this.networks;
     }

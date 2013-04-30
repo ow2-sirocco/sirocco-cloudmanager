@@ -31,11 +31,9 @@ import java.util.Set;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 
 @Entity
 public class MachineTemplateNetworkInterface extends CloudEntity implements Serializable {
@@ -84,8 +82,7 @@ public class MachineTemplateNetworkInterface extends CloudEntity implements Seri
         return this.networkPort;
     }
 
-    @OneToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(fetch = FetchType.EAGER)
     public Set<Address> getAddresses() {
         return this.addresses;
     }

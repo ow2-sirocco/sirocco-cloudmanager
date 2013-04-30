@@ -32,12 +32,13 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @Entity
@@ -112,6 +113,7 @@ public class Job extends CloudEntity implements Serializable {
         this.state = status;
     }
 
+    @Temporal(TemporalType.TIMESTAMP)
     public Date getTimeOfStatusChange() {
         return this.timeOfStatusChange;
     }
@@ -170,8 +172,7 @@ public class Job extends CloudEntity implements Serializable {
         this.progress = progress;
     }
 
-    @OneToMany(mappedBy = "parentJob")
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "parentJob", fetch = FetchType.EAGER)
     public List<Job> getNestedJobs() {
         return this.nestedJobs;
     }
@@ -189,8 +190,7 @@ public class Job extends CloudEntity implements Serializable {
         this.location = location;
     }
 
-    @ManyToMany
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @ManyToMany(fetch = FetchType.EAGER)
     public List<CloudResource> getAffectedResources() {
         return this.affectedResources;
     }

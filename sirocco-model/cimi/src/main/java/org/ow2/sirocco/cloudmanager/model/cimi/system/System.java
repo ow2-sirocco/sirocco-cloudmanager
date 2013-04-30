@@ -34,14 +34,13 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.ICloudProviderResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -84,8 +83,7 @@ public class System extends CloudResource implements Serializable, ICloudProvide
     public System() {
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "system_id")
     public List<SystemCredentials> getCredentials() {
         return this.credentials;
@@ -95,8 +93,7 @@ public class System extends CloudResource implements Serializable, ICloudProvide
         this.credentials = credentials;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "system_id")
     public List<SystemMachine> getMachines() {
         return this.machines;
@@ -106,8 +103,7 @@ public class System extends CloudResource implements Serializable, ICloudProvide
         this.machines = machines;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "system_id")
     public List<SystemSystem> getSystems() {
         return this.systems;
@@ -117,8 +113,7 @@ public class System extends CloudResource implements Serializable, ICloudProvide
         this.systems = systems;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "system_id")
     public List<SystemVolume> getVolumes() {
         return this.volumes;
@@ -155,8 +150,7 @@ public class System extends CloudResource implements Serializable, ICloudProvide
         this.location = location;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "system_id")
     public List<SystemNetwork> getNetworks() {
         return this.networks;
@@ -166,8 +160,7 @@ public class System extends CloudResource implements Serializable, ICloudProvide
         this.networks = networks;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "system_id")
     public List<SystemNetworkPort> getNetworkPorts() {
         return this.networkPorts;
@@ -177,8 +170,7 @@ public class System extends CloudResource implements Serializable, ICloudProvide
         this.networkPorts = networkPorts;
     }
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "system_id")
     public List<SystemForwardingGroup> getForwardingGroups() {
         return this.forwardingGroups;

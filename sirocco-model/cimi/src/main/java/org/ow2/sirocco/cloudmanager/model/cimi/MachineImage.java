@@ -104,11 +104,11 @@ public class MachineImage extends CloudResource implements Serializable, ICloudP
         this.cloudProviderAccount = cloudProviderAccount;
     }
 
+    @ManyToOne
     public CloudProviderLocation getLocation() {
         return this.location;
     }
 
-    @ManyToOne
     public void setLocation(final CloudProviderLocation location) {
         this.location = location;
     }
