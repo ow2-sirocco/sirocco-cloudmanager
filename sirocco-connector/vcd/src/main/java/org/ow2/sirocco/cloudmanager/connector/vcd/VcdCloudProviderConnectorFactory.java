@@ -35,7 +35,6 @@ import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
@@ -126,8 +125,6 @@ import com.vmware.vcloud.api.rest.schema.ovf.ResourceType;
 import com.vmware.vcloud.api.rest.schema.ovf.SectionType;
 import com.vmware.vcloud.sdk.Expression;
 import com.vmware.vcloud.sdk.Filter;
-import com.vmware.vcloud.sdk.OrgVdcNetwork;
-import com.vmware.vcloud.sdk.Organization;
 import com.vmware.vcloud.sdk.QueryParams;
 import com.vmware.vcloud.sdk.ReferenceResult;
 import com.vmware.vcloud.sdk.Task;
@@ -135,8 +132,6 @@ import com.vmware.vcloud.sdk.VCloudException;
 import com.vmware.vcloud.sdk.VM;
 import com.vmware.vcloud.sdk.Vapp;
 import com.vmware.vcloud.sdk.VappNetwork;
-import com.vmware.vcloud.sdk.VcloudClient;
-import com.vmware.vcloud.sdk.Vdc;
 import com.vmware.vcloud.sdk.VirtualCpu;
 import com.vmware.vcloud.sdk.VirtualDisk;
 import com.vmware.vcloud.sdk.VirtualMemory;
@@ -151,7 +146,6 @@ import com.vmware.vcloud.sdk.constants.NatTypeType;
 import com.vmware.vcloud.sdk.constants.UndeployPowerActionType;
 import com.vmware.vcloud.sdk.constants.VMStatus;
 import com.vmware.vcloud.sdk.constants.VappStatus;
-import com.vmware.vcloud.sdk.constants.Version;
 import com.vmware.vcloud.sdk.constants.query.ExpressionType;
 import com.vmware.vcloud.sdk.constants.query.QueryReferenceField;
 import com.vmware.vcloud.sdk.constants.query.QueryReferenceType;
@@ -238,15 +232,17 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
     private class VcdCloudProviderConnector implements ICloudProviderConnector, ISystemService, IComputeService,
         INetworkService {
 
-        /* TODO
-         Support HTTPS: FakeSSLSocketFactory is insecure
-         Support CIMI Private Network shared between systems
-         Support VCD login with user role (vs. org/sys admin role)
+        /* TODO 
+         
+         --- Support
+         HTTPS: FakeSSLSocketFactory is insecure
+         CIMI Private Network shared between systems
+         VCD login with user role (vs. org/sys admin role)
          - Encapsulate Context and use Org/Sys admin operations only if requested  
-         Support Disk updates: The current policy adds new disks (as specified in Machine Configuration)
+         Disk updates: The current policy adds new disks (as specified in Machine Configuration)
          - specify a common policy (used by all connectors) for disk updates
          - support this policy in the VCD connector 
-         Support Scale Out
+         Scale Out
          - Specify the API (at CIMI & connector levels) 
          - Implement this API in the VCD connector (using "re-compose" VCD operation)
          
@@ -254,6 +250,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
          Stopped vApp/Vm are in a "partially running" state
          Delete vApp if System/Machine creation fails
          Wait for all tasks (blocking task)
+         Cost of vApp2System, VmToMachine on the fly
          
          --- Other 
          Unspecified in CIMI: startup section, nic index...
@@ -266,145 +263,37 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         private final CloudProviderLocation cloudProviderLocation;
 
-        private VcloudClient vcloudClient;
-
-        private String orgName;
-
-        private Organization org;
-
-        // private AdminOrganization adminOrg;
-
-        private String vdcName;
-
-        private Vdc vdc;
-
-        // private AdminVdc adminVdc;
-
-        private String cimiPublicOrgVdcNetworkName;
-
-        private OrgVdcNetwork cimiPublicOrgVdcNetwork;
-
-        private boolean cimiPublicOrgVdcNetworkIsRouted = false;
-
-        private String edgeGatewayName;
-
-        private EdgeGateway edgeGateway;
+        private final VCloudContext vCloudContext;
 
         public VcdCloudProviderConnector(final CloudProviderAccount cloudProviderAccount,
             final CloudProviderLocation cloudProviderLocation) throws ConnectorException {
             this.cloudProviderId = UUID.randomUUID().toString();
             this.cloudProviderLocation = cloudProviderLocation;
             this.cloudProviderAccount = cloudProviderAccount;
+            this.vCloudContext = new VCloudContext(cloudProviderAccount, VcdCloudProviderConnectorFactory.logger);
 
-            Map<String, String> properties = cloudProviderAccount.getCloudProvider().getProperties();
-            if (properties == null || properties.get("orgName") == null || properties.get("vdcName") == null
-                || properties.get("cimiPublicOrgVdcNetworkName") == null) {
-                throw new ConnectorException("No access to properties: orgName or vdcName or cimiPublicOrgVdcNetworkName");
-            }
-            this.orgName = properties.get("orgName");
-            this.vdcName = properties.get("vdcName");
-            this.cimiPublicOrgVdcNetworkName = properties.get("cimiPublicOrgVdcNetworkName");
-            VcdCloudProviderConnectorFactory.logger.info("connect: " + cloudProviderAccount.getLogin() + " to Organization="
-                + this.orgName + ", VirtualDataCenter=" + this.vdcName + ", cimiPublicOrgVdcNetwork="
-                + this.cimiPublicOrgVdcNetworkName);
-
-            try {
-                VcloudClient.setLogLevel(Level.OFF);
-                // VcloudClient.setLogLevel(Level.INFO);
-                this.vcloudClient = new VcloudClient(cloudProviderAccount.getCloudProvider().getEndpoint(), Version.V5_1);
-                this.vcloudClient.registerScheme("https", 443, FakeSSLSocketFactory.getInstance());
-                String user = cloudProviderAccount.getLogin() + "@" + this.orgName;
-                /*String user = "Administrator@System";*/// !!!
-                this.vcloudClient.login(user, cloudProviderAccount.getPassword());
-
-                // Org
-                ReferenceType orgRef = this.vcloudClient.getOrgRefByName(this.orgName);
-                if (orgRef == null) {
-                    throw new ConnectorException("No Organization: " + this.orgName);
-                }
-                this.org = Organization.getOrganizationByReference(this.vcloudClient, orgRef);
-                // require orgAdmin role
-                /*ReferenceType adminOrgRef = this.vcloudClient.getVcloudAdmin().getAdminOrgRefByName(this.orgName);
-                this.adminOrg = AdminOrganization.getAdminOrgByReference(this.vcloudClient, adminOrgRef);*/
-
-                // Vdc
-                ReferenceType vdcRef = this.org.getVdcRefByName(this.vdcName);
-                if (vdcRef == null) {
-                    throw new ConnectorException("No Vdc: " + this.vdcName);
-                }
-                this.vdc = Vdc.getVdcByReference(this.vcloudClient, vdcRef);
-                // require sysAdmin role
-                /*ReferenceType adminVdcRef = this.adminOrg.getAdminVdcRefByName(this.vdcName);
-                this.adminVdc = AdminVdc.getAdminVdcByReference(this.vcloudClient, adminVdcRef);*/
-
-                // OrgVdcNetwork
-                VcdCloudProviderConnectorFactory.logger.info("Available OrgVdcNetworks: "
-                    + this.vdc.getAvailableNetworkRefsByName());
-                ReferenceType orgVdcNetworkNameRef = this.vdc.getAvailableNetworkRefByName(this.cimiPublicOrgVdcNetworkName);
-                if (orgVdcNetworkNameRef == null) {
-                    throw new ConnectorException("No OrgVdcNetwork: " + this.cimiPublicOrgVdcNetworkName);
-                }
-                this.cimiPublicOrgVdcNetwork = OrgVdcNetwork.getOrgVdcNetworkByReference(this.vcloudClient,
-                    orgVdcNetworkNameRef);
-                /*VcdCloudProviderConnectorFactory.logger.info("publicOrgVdcNetwork=" + this.cimiPublicOrgVdcNetwork.getResource().getName());*/
-
-                // Bridged/NatRouted
-                if (this.cimiPublicOrgVdcNetwork.getResource().getConfiguration().getFenceMode()
-                    .equals(FenceModeValuesType.BRIDGED.value())) {
-                    this.cimiPublicOrgVdcNetworkIsRouted = false;
-                } else if (this.cimiPublicOrgVdcNetwork.getResource().getConfiguration().getFenceMode()
-                    .equals(FenceModeValuesType.NATROUTED.value())) {
-                    this.cimiPublicOrgVdcNetworkIsRouted = true;
-                    if (properties.get("edgeGatewayName") == null) {
-                        throw new ConnectorException("No access to properties: edgeGatewayName");
-                    }
-                    /* NB: Network services associated to the cimiPublicOrgVdcNetwork are not visible (is this a bug of the SDK ?).
-                     * Therefore, we get them from the edge Gateway. */
-                    this.edgeGatewayName = properties.get("edgeGatewayName");
-                    QueryParams<QueryReferenceField> params = new QueryParams<QueryReferenceField>();
-                    Filter filter = new Filter(new Expression(QueryReferenceField.NAME, this.edgeGatewayName,
-                        ExpressionType.EQUALS));
-                    params.setFilter(filter);
-                    ReferenceResult result = this.vcloudClient.getQueryService().queryReferences(
-                        QueryReferenceType.EDGEGATEWAY, params);
-                    if (result.getReferences().size() == 0) {
-                        throw new ConnectorException("No edgeGateway : " + this.edgeGatewayName);
-                    }
-                    this.edgeGateway = EdgeGateway.getEdgeGatewayByReference(this.vcloudClient, result.getReferences().get(0));
-                    /*VcdCloudProviderConnectorFactory.logger
-                        .info("edgeGateway name=" + this.edgeGateway.getResource().getName());*/
-                } else {
-                    throw new ConnectorException(this.cimiPublicOrgVdcNetworkName + "OrgVdcNetwork type="
-                        + this.cimiPublicOrgVdcNetwork.getResource().getConfiguration().getFenceMode()
-                        + " : should be Direct or Routed");
-                }
-                VcdCloudProviderConnectorFactory.logger.info("CIMI public OrgVdcNetwork="
-                    + this.cimiPublicOrgVdcNetwork.getResource().getName() + ", isRouted="
-                    + this.cimiPublicOrgVdcNetworkIsRouted);
-
-                if (this.cimiPublicOrgVdcNetworkIsRouted) {
-                    /* NB: Network services associated to the cimiPublicOrgVdcNetwork are not visible (is this a bug of the SDK ?). */
-                    /*if (this.cimiPublicOrgVdcNetwork.getResource().getConfiguration() != null) {
-                        VcdCloudProviderConnectorFactory.logger.info("public adminOrgVdcNetwork has Configuration");
-                        if (this.cimiPublicOrgVdcNetwork.getResource().getConfiguration().getFeatures() != null) {
-                            VcdCloudProviderConnectorFactory.logger
-                                .info("public adminOrgVdcNetwork Configuration has features");
-                            for (JAXBElement<? extends NetworkServiceType> jaxbElement : this.cimiPublicOrgVdcNetwork
-                                .getResource().getConfiguration().getFeatures().getNetworkService()) {
-                                this.logNetworkService(jaxbElement);
-                            }
+            // ---- test OrgVdcNetwork and EdgeGateway
+            /*if (this.vCloudContext.isCimiPublicOrgVdcNetworkIsRouted()) {
+                //NB: Network services associated to the cimiPublicOrgVdcNetwork are not visible (is this a bug of the SDK ?).
+                if (this.vCloudContext.getCimiPublicOrgVdcNetwork().getResource().getConfiguration() != null) {
+                    VcdCloudProviderConnectorFactory.logger.info("public adminOrgVdcNetwork has Configuration");
+                    if (this.vCloudContext.getCimiPublicOrgVdcNetwork().getResource().getConfiguration().getFeatures() != null) {
+                        VcdCloudProviderConnectorFactory.logger.info("public adminOrgVdcNetwork Configuration has features");
+                        for (JAXBElement<? extends NetworkServiceType> jaxbElement : this.vCloudContext
+                            .getCimiPublicOrgVdcNetwork().getResource().getConfiguration().getFeatures().getNetworkService()) {
+                            this.logNetworkService(jaxbElement);
                         }
-                    }*/
+                    }
                 }
+            }*/
 
-                // ----
-                // this.logAdminOrgVdcNetwork();
-                // this.logEdgeGatewayByQuery();
-                // this.logEdgeGateway();
-
+            /*try {
+                this.logAdminOrgVdcNetwork();
+                this.logEdgeGatewayByQuery();
+                this.logEdgeGateway();
             } catch (Exception ex) {
                 throw new ConnectorException(ex);
-            }
+            }*/
         }
 
         @Override
@@ -522,8 +411,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             system.setNetworks(new ArrayList<SystemNetwork>());
             try {
                 for (ReferenceType vappNetworkReferenceType : vapp.getVappNetworkRefsByName().values()) {
-                    VappNetwork vappNetwork = VappNetwork
-                        .getVappNetworkByReference(this.vcloudClient, vappNetworkReferenceType);
+                    VappNetwork vappNetwork = VappNetwork.getVappNetworkByReference(this.vCloudContext.getVcloudClient(),
+                        vappNetworkReferenceType);
                     SystemNetwork systemNetwork = new SystemNetwork();
                     this.fromVAppNetworkToSystemNetwork(vappNetwork, systemNetwork);
                     if (!systemNetwork.getNetwork().getNetworkType().equals(Network.Type.PRIVATE)) {
@@ -583,10 +472,9 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                         /*VcdCloudProviderConnectorFactory.logger.info("Deploying " + vapp.getResource().getName());
                         vapp.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);*/
 
-                        // refresh the vapp (otherwise no childrenVms is
-                        // visible! - TBC)
-                        Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
-                            vapp.getReference());
+                        /*refresh the vapp (otherwise no childrenVms is visible! - TBC)*/
+                        Vapp vappFresh = Vapp.getVappByReference(
+                            VcdCloudProviderConnector.this.vCloudContext.getVcloudClient(), vapp.getReference());
                         /*for (VM childVm : vappFresh.getChildrenVms()) {
                             VcdCloudProviderConnectorFactory.logger.info("deploying  vm: " + childVm.getResource().getName());
                             childVm.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);
@@ -918,23 +806,20 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                         cimiIpAddressAllocationMode = "static";
                     }
 
-                    Vapp parentVapp = Vapp.getVappByReference(this.vcloudClient, vm.getParentVappReference());
+                    Vapp parentVapp = Vapp
+                        .getVappByReference(this.vCloudContext.getVcloudClient(), vm.getParentVappReference());
                     VappNetwork vappNetwork = this.getVappNetworkByName(parentVapp, networkConnection.getNetwork());
                     Network network = new Network();
                     this.fromVappNetworkToNetwork(vappNetwork, network);
 
                     if (networkConnection.getIpAddress() != null && networkConnection.getIpAddress() != "") {
                         Address cimiAddress = new Address();
-                        if (network.getNetworkType().equals(Network.Type.PUBLIC) && this.cimiPublicOrgVdcNetworkIsRouted) { /* if CIMI.public && NAT routed */
+                        if (network.getNetworkType().equals(Network.Type.PUBLIC)
+                            && this.vCloudContext.isCimiPublicOrgVdcNetworkIsRouted()) { /* if CIMI.public && NAT routed */
                             cimiAddress.setIp(this.getNatRoutedIpAddress(networkConnection.getIpAddress()));
                         } else {
                             cimiAddress.setIp(networkConnection.getIpAddress());
                         }
-                        /*if (!this.cimiPublicOrgVdcNetworkIsRouted) {
-                            cimiAddress.setIp(networkConnection.getIpAddress());
-                        } else {
-                            cimiAddress.setIp(this.getNatRoutedIpAddress(networkConnection.getIpAddress())); 
-                        }*/
                         cimiAddress.setAllocation(cimiIpAddressAllocationMode);
                         cimiAddress.setProtocol("IPv4");
                         // cimiAddress.setNetwork(network);
@@ -984,8 +869,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         }
 
         private NatServiceType getNatService() throws ConnectorException {
-            for (JAXBElement<? extends NetworkServiceType> jaxbElement : this.edgeGateway.getResource().getConfiguration()
-                .getEdgeGatewayServiceConfiguration().getNetworkService()) {
+            for (JAXBElement<? extends NetworkServiceType> jaxbElement : this.vCloudContext.getEdgeGateway().getResource()
+                .getConfiguration().getEdgeGatewayServiceConfiguration().getNetworkService()) {
                 if (jaxbElement.getValue() instanceof NatServiceType) {
                     return (NatServiceType) jaxbElement.getValue();
                 }
@@ -1011,7 +896,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 }
 
                 // refresh the vapp (otherwise no childrenVms is visible! - TBC)
-                Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient, vapp.getReference());
+                Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vCloudContext.getVcloudClient(),
+                    vapp.getReference());
                 /*VcdCloudProviderConnectorFactory.logger.info("nbr de vms: " + vappFresh.getChildrenVms().size());
                 for (VM childVm : vappFresh.getChildrenVms()) {
                     VcdCloudProviderConnectorFactory.logger.info("  vm: " + childVm.getResource().getName());
@@ -1042,8 +928,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
                         // refresh the vapp (otherwise no childrenVms is
                         // visible! - TBC)
-                        Vapp vappFresh = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
-                            vapp.getReference());
+                        Vapp vappFresh = Vapp.getVappByReference(
+                            VcdCloudProviderConnector.this.vCloudContext.getVcloudClient(), vapp.getReference());
                         /*for (VM childVm : vappFresh.getChildrenVms()) {
                             VcdCloudProviderConnectorFactory.logger.info("deploying  vm: " + childVm.getResource().getName());
                             childVm.deploy(false, 1000000, true).waitForTask(waitTimeInMilliSeconds);
@@ -1116,7 +1002,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                         vm.delete().waitForTask(waitTimeInMilliSeconds);*/
 
                         vm.getParentVappReference();
-                        Vapp vapp = Vapp.getVappByReference(VcdCloudProviderConnector.this.vcloudClient,
+                        Vapp vapp = Vapp.getVappByReference(VcdCloudProviderConnector.this.vCloudContext.getVcloudClient(),
                             vm.getParentVappReference());
                         if (vapp.getChildrenVms().size() != 1) {
                             // check if the vapp has one and only one vm
@@ -1330,8 +1216,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
             Network cimiPublicNetwork = new Network();
             // cimiPublicNetwork.setName(this.cimiPublicOrgVdcNetworkName);
-            cimiPublicNetwork.setName(this.cimiPublicOrgVdcNetwork.getResource().getName());
-            cimiPublicNetwork.setProviderAssignedId(this.cimiPublicOrgVdcNetwork.getResource().getHref());
+            cimiPublicNetwork.setName(this.vCloudContext.getCimiPublicOrgVdcNetwork().getResource().getName());
+            cimiPublicNetwork.setProviderAssignedId(this.vCloudContext.getCimiPublicOrgVdcNetwork().getResource().getHref());
             cimiPublicNetwork.setState(Network.State.STARTED);
             cimiPublicNetwork.setNetworkType(Network.Type.PUBLIC);
             networks.add(cimiPublicNetwork);
@@ -1416,7 +1302,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             try {
                 ReferenceType vAppRef = new ReferenceType();
                 vAppRef.setHref(id);
-                return Vapp.getVappByReference(this.vcloudClient, vAppRef);
+                return Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vAppRef);
             } catch (VCloudException e) {
                 throw new ConnectorException(e);
             }
@@ -1426,7 +1312,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             try {
                 ReferenceType vmRef = new ReferenceType();
                 vmRef.setHref(id);
-                return VM.getVMByReference(this.vcloudClient, vmRef);
+                return VM.getVMByReference(this.vCloudContext.getVcloudClient(), vmRef);
             } catch (VCloudException e) {
                 throw new ConnectorException(e);
             }
@@ -1436,7 +1322,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             try {
                 ReferenceType vappNetworkRef = new ReferenceType();
                 vappNetworkRef.setHref(id);
-                return VappNetwork.getVappNetworkByReference(this.vcloudClient, vappNetworkRef);
+                return VappNetwork.getVappNetworkByReference(this.vCloudContext.getVcloudClient(), vappNetworkRef);
             } catch (VCloudException e) {
                 throw new ConnectorException(e);
             }
@@ -1445,7 +1331,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         private VappNetwork getVappNetworkByName(final Vapp vapp, final String networkName) throws ConnectorException {
             try {
                 ReferenceType vappNetworkReferenceType = vapp.getVappNetworkRefsByName().get(networkName);
-                VappNetwork vappNetwork = VappNetwork.getVappNetworkByReference(this.vcloudClient, vappNetworkReferenceType);
+                VappNetwork vappNetwork = VappNetwork.getVappNetworkByReference(this.vCloudContext.getVcloudClient(),
+                    vappNetworkReferenceType);
                 return vappNetwork;
             } catch (VCloudException e) {
                 throw new ConnectorException(e);
@@ -1501,19 +1388,9 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                     int networkConnectionIndex = 0;
                     for (MachineTemplateNetworkInterface nic : mt.getNetworkInterfaces()) {
                         NetworkConnectionType networkConnectionType = new NetworkConnectionType();
-                        /*if (nic.getNetwork() != null) {
-                            networkConnectionType.setNetwork(nic.getNetwork().getName()); 
-                        } else if (nic.getNetworkTemplateComponentDescriptor() != null) {
-                            NetworkTemplate nt = (NetworkTemplate) nic.getNetworkTemplateComponentDescriptor()
-                                .getComponentTemplate();
-                            networkConnectionType.setNetwork(nt.getName());
-                        } else {
-                            throw new ConnectorException(
-                                "validation error on a nic template: configuration should refer either to a Network ressource xor a NetworkTemplateComponentDescriptor");
-                        }*/
                         if (nic.getNetwork() != null) {
                             if (nic.getNetwork().getNetworkType() == Network.Type.PUBLIC) {
-                                networkConnectionType.setNetwork(this.cimiPublicOrgVdcNetworkName);
+                                networkConnectionType.setNetwork(this.vCloudContext.getCimiPublicOrgVdcNetworkName());
                             } else {
                                 VappNetwork vappNetwork = this.getVappNetworkByProviderAssignedId(nic.getNetwork()
                                     .getProviderAssignedId());
@@ -1540,7 +1417,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             }
 
             // make the composition request, and get a vApp in return
-            return this.vdc.composeVapp(composeVAppParamsType);
+            return this.vCloudContext.getVdc().composeVapp(composeVAppParamsType);
         }
 
         private Set<ComponentDescriptor> getComponentDescriptorsOfType(final SystemCreate systemCreate,
@@ -1560,10 +1437,11 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             // add CIMI Public Network
             VAppNetworkConfigurationType vAppNetworkConfigurationType = new VAppNetworkConfigurationType();
             NetworkConfigurationType networkConfigurationType = new NetworkConfigurationType();
-            VcdCloudProviderConnectorFactory.logger
-                .info("vAppNetworkConfiguration Bridged:" + this.cimiPublicOrgVdcNetworkName);
-            vAppNetworkConfigurationType.setNetworkName(this.cimiPublicOrgVdcNetworkName);
-            networkConfigurationType.setParentNetwork(this.vdc.getAvailableNetworkRefByName(this.cimiPublicOrgVdcNetworkName));
+            VcdCloudProviderConnectorFactory.logger.info("vAppNetworkConfiguration Bridged:"
+                + this.vCloudContext.getCimiPublicOrgVdcNetworkName());
+            vAppNetworkConfigurationType.setNetworkName(this.vCloudContext.getCimiPublicOrgVdcNetworkName());
+            networkConfigurationType.setParentNetwork(this.vCloudContext.getVdc().getAvailableNetworkRefByName(
+                this.vCloudContext.getCimiPublicOrgVdcNetworkName()));
             networkConfigurationType.setFenceMode(FenceModeValuesType.BRIDGED.value());
             networkConfigurationType.setRetainNetInfoAcrossDeployments(true);
             vAppNetworkConfigurationType.setConfiguration(networkConfigurationType);
@@ -1631,7 +1509,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
         private void configureVmSections(Vapp vapp, final Map<String, MachineTemplate> machineTemplateMap)
             throws VCloudException, TimeoutException {
             // refresh the vapp (TBC)
-            vapp = Vapp.getVappByReference(this.vcloudClient, vapp.getReference());
+            vapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
 
             // set virtual hardware
             VcdCloudProviderConnectorFactory.logger.info("Configuring virtual hardware");
@@ -1790,8 +1668,10 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         private void logAdminOrgVdcNetwork() throws VCloudException, ConnectorException {
             // require orgAdmin role
-            ReferenceType adminOrgRef = this.vcloudClient.getVcloudAdmin().getAdminOrgRefByName(this.orgName);
-            AdminOrganization adminOrg = AdminOrganization.getAdminOrgByReference(this.vcloudClient, adminOrgRef);
+            ReferenceType adminOrgRef = this.vCloudContext.getVcloudClient().getVcloudAdmin()
+                .getAdminOrgRefByName(this.vCloudContext.getOrgName());
+            AdminOrganization adminOrg = AdminOrganization.getAdminOrgByReference(this.vCloudContext.getVcloudClient(),
+                adminOrgRef);
             AdminOrgVdcNetwork adminOrgVdcNetwork = null;
             // ---- get the OrgVdcNetwork (VDC 1.5)
             /*ReferenceType adminOrgVdcNetworkRef = adminOrg.getAdminOrgNetworkRefByName(this.orgVdcNetworkName);
@@ -1808,19 +1688,19 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             adminOrgVdcNetwork = AdminOrgVdcNetwork.getOrgVdcNetworkById(this.vcloudClient, result.getReferences().get(0)
                 .getId());*/
             // ---- get the OrgVdcNetwork (VDC 5.1)
-            ReferenceType adminVdcRef = adminOrg.getAdminVdcRefByName(this.vdcName);
-            AdminVdc adminVdc2 = AdminVdc.getAdminVdcByReference(this.vcloudClient, adminVdcRef); // !!!
+            ReferenceType adminVdcRef = adminOrg.getAdminVdcRefByName(this.vCloudContext.getVdcName());
+            AdminVdc adminVdc2 = AdminVdc.getAdminVdcByReference(this.vCloudContext.getVcloudClient(), adminVdcRef); // !!!
             for (ReferenceType adminOrgVdcNetworkRef : adminVdc2.getOrgVdcNetworkRefs().getReferences()) {
-                AdminOrgVdcNetwork adminOrgVdcNetwork2 = AdminOrgVdcNetwork.getOrgVdcNetworkByReference(this.vcloudClient,
-                    adminOrgVdcNetworkRef);
+                AdminOrgVdcNetwork adminOrgVdcNetwork2 = AdminOrgVdcNetwork.getOrgVdcNetworkByReference(
+                    this.vCloudContext.getVcloudClient(), adminOrgVdcNetworkRef);
                 VcdCloudProviderConnectorFactory.logger.info("adminOrgVdcNetwork2 name="
                     + adminOrgVdcNetwork2.getResource().getName());
-                if (adminOrgVdcNetwork2.getResource().getName().equals(this.cimiPublicOrgVdcNetworkName)) {
+                if (adminOrgVdcNetwork2.getResource().getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
                     adminOrgVdcNetwork = adminOrgVdcNetwork2;
                 }
             }
             if (adminOrgVdcNetwork == null) {
-                throw new ConnectorException("No OrgVdcNetwork : " + this.cimiPublicOrgVdcNetworkName);
+                throw new ConnectorException("No OrgVdcNetwork : " + this.vCloudContext.getCimiPublicOrgVdcNetworkName());
             }
 
             VcdCloudProviderConnectorFactory.logger.info("adminOrgVdcNetwork name="
@@ -1844,14 +1724,16 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         private void logEdgeGatewayByQuery() throws VCloudException, ConnectorException {
             QueryParams<QueryReferenceField> params = new QueryParams<QueryReferenceField>();
-            Filter filter = new Filter(new Expression(QueryReferenceField.NAME, this.edgeGatewayName, ExpressionType.EQUALS));
+            Filter filter = new Filter(new Expression(QueryReferenceField.NAME, this.vCloudContext.getEdgeGatewayName(),
+                ExpressionType.EQUALS));
             params.setFilter(filter);
-            ReferenceResult result = this.vcloudClient.getQueryService()
+            ReferenceResult result = this.vCloudContext.getVcloudClient().getQueryService()
                 .queryReferences(QueryReferenceType.EDGEGATEWAY, params);
             if (result.getReferences().size() == 0) {
-                throw new ConnectorException("No edgeGateway : " + this.edgeGatewayName);
+                throw new ConnectorException("No edgeGateway : " + this.vCloudContext.getEdgeGatewayName());
             }
-            EdgeGateway edgeGateway = EdgeGateway.getEdgeGatewayByReference(this.vcloudClient, result.getReferences().get(0));
+            EdgeGateway edgeGateway = EdgeGateway.getEdgeGatewayByReference(this.vCloudContext.getVcloudClient(), result
+                .getReferences().get(0));
             VcdCloudProviderConnectorFactory.logger.info("edgeGateway name=" + edgeGateway.getResource().getName());
 
             if (edgeGateway.getResource().getConfiguration() != null) {
@@ -1868,20 +1750,23 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
 
         private void logEdgeGateway() throws VCloudException, ConnectorException {
             // require orgAdmin role
-            ReferenceType adminOrgRef = this.vcloudClient.getVcloudAdmin().getAdminOrgRefByName(this.orgName);
-            AdminOrganization adminOrg = AdminOrganization.getAdminOrgByReference(this.vcloudClient, adminOrgRef);
-            ReferenceType adminVdcRef = adminOrg.getAdminVdcRefByName(this.vdcName);
-            AdminVdc adminVdc2 = AdminVdc.getAdminVdcByReference(this.vcloudClient, adminVdcRef); // !!!
+            ReferenceType adminOrgRef = this.vCloudContext.getVcloudClient().getVcloudAdmin()
+                .getAdminOrgRefByName(this.vCloudContext.getOrgName());
+            AdminOrganization adminOrg = AdminOrganization.getAdminOrgByReference(this.vCloudContext.getVcloudClient(),
+                adminOrgRef);
+            ReferenceType adminVdcRef = adminOrg.getAdminVdcRefByName(this.vCloudContext.getVdcName());
+            AdminVdc adminVdc2 = AdminVdc.getAdminVdcByReference(this.vCloudContext.getVcloudClient(), adminVdcRef); // !!!
             EdgeGateway edgeGateway = null;
             for (ReferenceType edgeGatewayRef : adminVdc2.getEdgeGatewayRefs().getReferences()) {
-                EdgeGateway edgeGateway2 = EdgeGateway.getEdgeGatewayByReference(this.vcloudClient, edgeGatewayRef);
+                EdgeGateway edgeGateway2 = EdgeGateway.getEdgeGatewayByReference(this.vCloudContext.getVcloudClient(),
+                    edgeGatewayRef);
                 VcdCloudProviderConnectorFactory.logger.info("edgeGateway name=" + edgeGateway2.getResource().getName());
-                if (edgeGateway2.getResource().getName().equals(this.edgeGatewayName)) {
+                if (edgeGateway2.getResource().getName().equals(this.vCloudContext.getEdgeGatewayName())) {
                     edgeGateway = edgeGateway2;
                 }
             }
             if (edgeGateway == null) {
-                throw new ConnectorException("No edgeGateway : " + this.edgeGatewayName);
+                throw new ConnectorException("No edgeGateway : " + this.vCloudContext.getEdgeGatewayName());
             }
 
             if (edgeGateway.getResource().getConfiguration() != null) {
@@ -1951,18 +1836,18 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
             // specify the NetworkConfiguration for the vApp network.
             if (fenceMode.equals(FenceModeValuesType.BRIDGED.value())) {
                 VcdCloudProviderConnectorFactory.logger.info("vAppNetworkConfiguration Bridged:"
-                    + this.cimiPublicOrgVdcNetworkName);
-                vAppNetworkConfigurationType.setNetworkName(this.cimiPublicOrgVdcNetworkName);
-                networkConfigurationType.setParentNetwork(this.vdc
-                    .getAvailableNetworkRefByName(this.cimiPublicOrgVdcNetworkName));
+                    + this.vCloudContext.getCimiPublicOrgVdcNetworkName());
+                vAppNetworkConfigurationType.setNetworkName(this.vCloudContext.getCimiPublicOrgVdcNetworkName());
+                networkConfigurationType.setParentNetwork(this.vCloudContext.getVdc().getAvailableNetworkRefByName(
+                    this.vCloudContext.getCimiPublicOrgVdcNetworkName()));
                 networkConfigurationType.setFenceMode(fenceMode);
                 networkConfigurationType.setRetainNetInfoAcrossDeployments(true);
             } else if (fenceMode.equals(FenceModeValuesType.NATROUTED.value())) {
                 VcdCloudProviderConnectorFactory.logger.info("vAppNetworkConfiguration NATROUTED:"
                     + Constants.VAPP_NETWORK_NAME);
                 vAppNetworkConfigurationType.setNetworkName(Constants.VAPP_NETWORK_NAME);
-                networkConfigurationType.setParentNetwork(this.vdc
-                    .getAvailableNetworkRefByName(this.cimiPublicOrgVdcNetworkName));
+                networkConfigurationType.setParentNetwork(this.vCloudContext.getVdc().getAvailableNetworkRefByName(
+                    this.vCloudContext.getCimiPublicOrgVdcNetworkName()));
                 networkConfigurationType.setFenceMode(fenceMode);
                 networkConfigurationType.setRetainNetInfoAcrossDeployments(false); // ???
 
@@ -2023,7 +1908,8 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                 List<NetworkConnectionType> networkConnections = networkConnectionSectionType.getNetworkConnection();
                 for (NetworkConnectionType networkConnection : networkConnections) {
                     networkConnection.setIpAddressAllocationMode(IpAddressAllocationModeType.POOL.value());
-                    networkConnection.setNetwork(this.vdc.getAvailableNetworkRefs().iterator().next().getName());
+                    networkConnection.setNetwork(this.vCloudContext.getVdc().getAvailableNetworkRefs().iterator().next()
+                        .getName());
                 }
                 childVm.updateSection(networkConnectionSectionType).waitForTask(
                     VcdCloudProviderConnectorFactory.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
