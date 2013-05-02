@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -179,6 +180,14 @@ public class Job extends CloudEntity implements Serializable {
 
     public void setNestedJobs(final List<Job> nestedJobs) {
         this.nestedJobs = nestedJobs;
+    }
+
+    public void addNestedJob(final Job nestedJob) {
+        if (this.nestedJobs == null) {
+            this.nestedJobs = new ArrayList<Job>();
+        }
+        this.nestedJobs.add(nestedJob);
+        nestedJob.setParentJob(this);
     }
 
     @ManyToOne
