@@ -54,6 +54,9 @@ public class CloudProviderCreateCommand implements Command {
     @Parameter(names = "-properties", variableArity = true, description = "key value pairs", required = false)
     private List<String> properties;
 
+    @Parameter(names = "-v", description = "verbose", required = false)
+    private boolean verbose;
+
     @Override
     public String getName() {
         return CloudProviderCreateCommand.COMMAND_NAME;
@@ -79,17 +82,21 @@ public class CloudProviderCreateCommand implements Command {
 
         provider = cloudProviderManager.createCloudProvider(provider);
 
-        Table table = new Table(4);
-        table.addCell("Cloud Provider ID");
-        table.addCell("Type");
-        table.addCell("Endpoint");
-        table.addCell("Description");
+        if (this.verbose) {
+            Table table = new Table(4);
+            table.addCell("Cloud Provider ID");
+            table.addCell("Type");
+            table.addCell("Endpoint");
+            table.addCell("Description");
 
-        table.addCell(provider.getId().toString());
-        table.addCell(provider.getCloudProviderType());
-        table.addCell(provider.getEndpoint());
-        table.addCell(provider.getDescription());
+            table.addCell(provider.getId().toString());
+            table.addCell(provider.getCloudProviderType());
+            table.addCell(provider.getEndpoint());
+            table.addCell(provider.getDescription());
 
-        System.out.println(table.render());
+            System.out.println(table.render());
+        } else {
+            System.out.println(provider.getId().toString());
+        }
     }
 }

@@ -50,6 +50,9 @@ public class CloudProviderLocationCreateCommand implements Command {
     @Parameter(names = "-region", description = "region name", required = false)
     private String stateName;
 
+    @Parameter(names = "-v", description = "verbose", required = false)
+    private boolean verbose;
+
     @Override
     public String getName() {
         return CloudProviderLocationCreateCommand.COMMAND_NAME;
@@ -68,19 +71,23 @@ public class CloudProviderLocationCreateCommand implements Command {
 
         location = cloudProviderManager.createCloudProviderLocation(location);
 
-        Table table = new Table(5);
-        table.addCell("Cloud Provider Location ID");
-        table.addCell("iso3166_1");
-        table.addCell("iso3166_2");
-        table.addCell("Country");
-        table.addCell("Region");
+        if (this.verbose) {
+            Table table = new Table(5);
+            table.addCell("Cloud Provider Location ID");
+            table.addCell("iso3166_1");
+            table.addCell("iso3166_2");
+            table.addCell("Country");
+            table.addCell("Region");
 
-        table.addCell(location.getId().toString());
-        table.addCell(location.getIso3166_1());
-        table.addCell(location.getIso3166_2());
-        table.addCell(location.getCountryName());
-        table.addCell(location.getStateName());
+            table.addCell(location.getId().toString());
+            table.addCell(location.getIso3166_1());
+            table.addCell(location.getIso3166_2());
+            table.addCell(location.getCountryName());
+            table.addCell(location.getStateName());
 
-        System.out.println(table.render());
+            System.out.println(table.render());
+        } else {
+            System.out.println(location.getId().toString());
+        }
     }
 }

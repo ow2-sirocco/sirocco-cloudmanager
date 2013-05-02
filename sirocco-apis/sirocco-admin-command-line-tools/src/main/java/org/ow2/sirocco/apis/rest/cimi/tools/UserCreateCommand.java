@@ -49,6 +49,9 @@ public class UserCreateCommand implements Command {
     @Parameter(names = "-password", description = "password", required = true)
     private String userPassword;
 
+    @Parameter(names = "-v", description = "verbose", required = false)
+    private boolean verbose;
+
     @Override
     public String getName() {
         return UserCreateCommand.COMMAND_NAME;
@@ -63,16 +66,20 @@ public class UserCreateCommand implements Command {
         user.setPassword(this.userPassword);
         user = userManager.createUser(user);
 
-        Table table = new Table(3);
-        table.addCell("User ID");
-        table.addCell("Login");
-        table.addCell("Password");
+        if (this.verbose) {
+            Table table = new Table(3);
+            table.addCell("User ID");
+            table.addCell("Login");
+            table.addCell("Password");
 
-        table.addCell(user.getId().toString());
-        table.addCell(user.getUsername());
-        table.addCell(user.getPassword());
+            table.addCell(user.getId().toString());
+            table.addCell(user.getUsername());
+            table.addCell(user.getPassword());
 
-        System.out.println(table.render());
+            System.out.println(table.render());
+        } else {
+            System.out.println(user.getId().toString());
+        }
     }
 
     public static void main(final String[] args) {

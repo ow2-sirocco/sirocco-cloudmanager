@@ -46,6 +46,9 @@ public class CloudProviderAccountCreateCommand implements Command {
     @Parameter(names = "-login", description = "login", required = true)
     private String login;
 
+    @Parameter(names = "-v", description = "verbose", required = false)
+    private boolean verbose;
+
     @Parameter(names = "-password", description = "password", required = true)
     private String password;
 
@@ -83,17 +86,21 @@ public class CloudProviderAccountCreateCommand implements Command {
 
         account = cloudProviderManager.createCloudProviderAccount(account);
 
-        Table table = new Table(4);
-        table.addCell("Cloud Provider Account ID");
-        table.addCell("Provider");
-        table.addCell("Login");
-        table.addCell("Password");
+        if (this.verbose) {
+            Table table = new Table(4);
+            table.addCell("Cloud Provider Account ID");
+            table.addCell("Provider");
+            table.addCell("Login");
+            table.addCell("Password");
 
-        table.addCell(account.getId().toString());
-        table.addCell(account.getCloudProvider().getId().toString());
-        table.addCell(account.getLogin());
-        table.addCell(account.getPassword());
+            table.addCell(account.getId().toString());
+            table.addCell(account.getCloudProvider().getId().toString());
+            table.addCell(account.getLogin());
+            table.addCell(account.getPassword());
 
-        System.out.println(table.render());
+            System.out.println(table.render());
+        } else {
+            System.out.println(account.getId().toString());
+        }
     }
 }
