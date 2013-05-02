@@ -119,7 +119,9 @@ public class NetworkManager implements INetworkManager {
     //
 
     public Network getPublicNetwork() {
-        List<Network> publicNetworks = this.em.createQuery("FROM Network n WHERE networkType='PUBLIC'").getResultList();
+        List<Network> publicNetworks = this.em.createQuery(
+            "SELECT n FROM Network n WHERE networkType=org.ow2.sirocco.cloudmanager.model.cimi.Network$Type.PUBLIC")
+            .getResultList();
         return publicNetworks.get(0);
     }
 
@@ -268,7 +270,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<Network> getNetworks() throws CloudProviderException {
-        return QueryHelper.getEntityList("Network", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("Network", this.em, this.getUser().getUsername(), Network.State.DELETED);
     }
 
     @SuppressWarnings("unchecked")
@@ -278,7 +280,7 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Network", Network.class);
         return QueryHelper.getEntityList(this.em,
             params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
-                .verifyDeletedState());
+                .stateToIgnore(Network.State.DELETED));
     }
 
     @Override
@@ -419,7 +421,7 @@ public class NetworkManager implements INetworkManager {
         User user = this.getUser();
 
         if (networkConfig.getName() != null) {
-            if (!this.em.createQuery("FROM NetworkConfiguration v WHERE v.user.username=:username AND v.name=:name")
+            if (!this.em.createQuery("SELECT v FROM NetworkConfiguration v WHERE v.user.username=:username AND v.name=:name")
                 .setParameter("username", user.getUsername()).setParameter("name", networkConfig.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("NetworkConfiguration already exists with name " + networkConfig.getName());
@@ -434,7 +436,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkConfiguration> getNetworkConfigurations() throws CloudProviderException {
-        return this.em.createQuery("FROM NetworkConfiguration v WHERE v.user.username=:username ORDER BY v.id")
+        return this.em.createQuery("SELECT v FROM NetworkConfiguration v WHERE v.user.username=:username ORDER BY v.id")
             .setParameter("username", this.getUser().getUsername()).getResultList();
     }
 
@@ -477,7 +479,7 @@ public class NetworkManager implements INetworkManager {
     @Override
     public void deleteNetworkConfiguration(final String networkConfigId) throws ResourceNotFoundException,
         CloudProviderException, ResourceConflictException {
-        if (!this.em.createQuery("FROM NetworkTemplate n WHERE n.networkConfig.id=:networkConfigId")
+        if (!this.em.createQuery("SELECT n FROM NetworkTemplate n WHERE n.networkConfig.id=:networkConfigId")
             .setParameter("networkConfigId", Integer.valueOf(networkConfigId)).getResultList().isEmpty()) {
             throw new ResourceConflictException("Cannot delete NetworkConfiguration with id " + networkConfigId
                 + " used by a NetworkTemplate");
@@ -499,7 +501,7 @@ public class NetworkManager implements INetworkManager {
         User user = this.getUser();
 
         if (networkTemplate.getName() != null) {
-            if (!this.em.createQuery("FROM NetworkTemplate v WHERE v.user.username=:username AND v.name=:name")
+            if (!this.em.createQuery("SELECT  v FROM NetworkTemplate v WHERE v.user.username=:username AND v.name=:name")
                 .setParameter("username", user.getUsername()).setParameter("name", networkTemplate.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("NetworkTemplate already exists with name " + networkTemplate.getName());
@@ -516,7 +518,7 @@ public class NetworkManager implements INetworkManager {
     public List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException {
         return this.em
             .createQuery(
-                "FROM NetworkTemplate v WHERE v.user.username=:username AND v.isEmbeddedInSystemTemplate=false ORDER BY v.id")
+                "SELECT v FROM NetworkTemplate v WHERE v.user.username=:username AND v.isEmbeddedInSystemTemplate=false ORDER BY v.id")
             .setParameter("username", this.getUser().getUsername()).getResultList();
     }
 
@@ -738,7 +740,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPort> getNetworkPorts() throws CloudProviderException {
-        return QueryHelper.getEntityList("NetworkPort", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("NetworkPort", this.em, this.getUser().getUsername(), NetworkPort.State.DELETED);
     }
 
     @Override
@@ -762,7 +764,7 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPort", NetworkPort.class);
         return QueryHelper.getEntityList(this.em,
             params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
-                .verifyDeletedState());
+                .stateToIgnore(NetworkPort.State.DELETED));
     }
 
     @Override
@@ -794,7 +796,8 @@ public class NetworkManager implements INetworkManager {
         User user = this.getUser();
 
         if (networkPortConfiguration.getName() != null) {
-            if (!this.em.createQuery("FROM NetworkPortConfiguration v WHERE v.user.username=:username AND v.name=:name")
+            if (!this.em
+                .createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.user.username=:username AND v.name=:name")
                 .setParameter("username", user.getUsername()).setParameter("name", networkPortConfiguration.getName())
                 .getResultList().isEmpty()) {
                 throw new CloudProviderException("NetworkPortConfiguration already exists with name "
@@ -810,7 +813,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPortConfiguration> getNetworkPortConfigurations() throws CloudProviderException {
-        return this.em.createQuery("FROM NetworkPortConfiguration v WHERE v.user.username=:username ORDER BY v.id")
+        return this.em.createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.user.username=:username ORDER BY v.id")
             .setParameter("username", this.getUser().getUsername()).getResultList();
     }
 
@@ -856,7 +859,8 @@ public class NetworkManager implements INetworkManager {
     @Override
     public void deleteNetworkPortConfiguration(final String networkPortConfigurationId) throws ResourceNotFoundException,
         CloudProviderException {
-        if (!this.em.createQuery("FROM NetworkPortTemplate n WHERE n.networkPortConfig.id=:networkPortConfigurationId")
+        if (!this.em
+            .createQuery("SELECT n FROM NetworkPortTemplate n WHERE n.networkPortConfig.id=:networkPortConfigurationId")
             .setParameter("networkPortConfigurationId", Integer.valueOf(networkPortConfigurationId)).getResultList().isEmpty()) {
             throw new ResourceConflictException("Cannot delete NetworkPortConfiguration with id " + networkPortConfigurationId
                 + " used by a NetworkPortTemplate");
@@ -879,7 +883,7 @@ public class NetworkManager implements INetworkManager {
         User user = this.getUser();
 
         if (networkPortTemplate.getName() != null) {
-            if (!this.em.createQuery("FROM NetworkPortTemplate v WHERE v.user.username=:username AND v.name=:name")
+            if (!this.em.createQuery("SELECT v FROM NetworkPortTemplate v WHERE v.user.username=:username AND v.name=:name")
                 .setParameter("username", user.getUsername()).setParameter("name", networkPortTemplate.getName())
                 .getResultList().isEmpty()) {
                 throw new CloudProviderException("NetworkPortTemplate already exists with name "
@@ -895,7 +899,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPortTemplate> getNetworkPortTemplates() throws CloudProviderException {
-        return this.em.createQuery("FROM NetworkPortTemplate v WHERE v.user.username=:username ORDER BY v.id")
+        return this.em.createQuery("SELECT v FROM NetworkPortTemplate v WHERE v.user.username=:username ORDER BY v.id")
             .setParameter("username", this.getUser().getUsername()).getResultList();
     }
 
@@ -959,7 +963,8 @@ public class NetworkManager implements INetworkManager {
         User user = this.getUser();
 
         if (forwardingGroupTemplate.getName() != null) {
-            if (!this.em.createQuery("FROM ForwardingGroupTemplate v WHERE v.user.username=:username AND v.name=:name")
+            if (!this.em
+                .createQuery("SELECT v FROM ForwardingGroupTemplate v WHERE v.user.username=:username AND v.name=:name")
                 .setParameter("username", user.getUsername()).setParameter("name", forwardingGroupTemplate.getName())
                 .getResultList().isEmpty()) {
                 throw new CloudProviderException("ForwardingGroupTemplate already exists with name "
@@ -974,7 +979,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<ForwardingGroupTemplate> getForwardingGroupTemplates() throws CloudProviderException {
-        return this.em.createQuery("FROM ForwardingGroupTemplate v WHERE v.user.username=:username ORDER BY v.id")
+        return this.em.createQuery("SELECT v FROM ForwardingGroupTemplate v WHERE v.user.username=:username ORDER BY v.id")
             .setParameter("username", this.getUser().getUsername()).getResultList();
     }
 
@@ -1110,7 +1115,8 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<ForwardingGroup> getForwardingGroups() throws CloudProviderException {
-        return QueryHelper.getEntityList("ForwardingGroup", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("ForwardingGroup", this.em, this.getUser().getUsername(),
+            ForwardingGroup.State.DELETED);
     }
 
     @Override
@@ -1136,7 +1142,7 @@ public class NetworkManager implements INetworkManager {
             .builder("ForwardingGroup", ForwardingGroup.class);
         return QueryHelper.getEntityList(this.em,
             params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
-                .verifyDeletedState());
+                .stateToIgnore(ForwardingGroup.State.DELETED));
     }
 
     @Override
@@ -1332,7 +1338,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<Address> getAddresses() throws CloudProviderException {
-        return this.em.createQuery("FROM Address v WHERE v.user.username=:username ORDER BY v.id")
+        return this.em.createQuery("SELECT v FROM Address v WHERE v.user.username=:username ORDER BY v.id")
             .setParameter("username", this.getUser().getUsername()).getResultList();
     }
 
@@ -1389,7 +1395,7 @@ public class NetworkManager implements INetworkManager {
         User user = this.getUser();
 
         if (addressTemplate.getName() != null) {
-            if (!this.em.createQuery("FROM AddressTemplate v WHERE v.user.username=:username AND v.name=:name")
+            if (!this.em.createQuery("SELECT v FROM AddressTemplate v WHERE v.user.username=:username AND v.name=:name")
                 .setParameter("username", user.getUsername()).setParameter("name", addressTemplate.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("AddressTemplate already exists with name " + addressTemplate.getName());
@@ -1404,7 +1410,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<AddressTemplate> getAddressTemplates() throws CloudProviderException {
-        return this.em.createQuery("FROM AddressTemplate v WHERE v.user.username=:username ORDER BY v.id")
+        return this.em.createQuery("SELECT v FROM AddressTemplate v WHERE v.user.username=:username ORDER BY v.id")
             .setParameter("username", this.getUser().getUsername()).getResultList();
     }
 

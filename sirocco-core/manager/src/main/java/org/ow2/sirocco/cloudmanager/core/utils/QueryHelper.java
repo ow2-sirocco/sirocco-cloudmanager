@@ -57,7 +57,7 @@ public class QueryHelper {
 
         private List<String> attributes;
 
-        private boolean verifyDeletedState = false;
+        private Enum<?> stateToIgnore = null;
 
         private boolean filterEmbbededTemplate;
 
@@ -114,8 +114,8 @@ public class QueryHelper {
             return this;
         }
 
-        public QueryParamsBuilder verifyDeletedState() {
-            this.verifyDeletedState = true;
+        public QueryParamsBuilder stateToIgnore(final Enum<?> stateToIgnore) {
+            this.stateToIgnore = stateToIgnore;
             return this;
         }
 
@@ -160,8 +160,8 @@ public class QueryHelper {
             return this.attributes;
         }
 
-        public boolean isVerifyDeletedState() {
-            return this.verifyDeletedState;
+        public Enum<?> getStateToIgnore() {
+            return this.stateToIgnore;
         }
 
         public boolean isFilterEmbbededTemplate() {
@@ -194,35 +194,20 @@ public class QueryHelper {
      */
     @SuppressWarnings({"rawtypes"})
     public static List getEntityList(final String entityType, final EntityManager em, final String username,
-        final boolean verifyDeletedState) {
+        final Enum stateToIgnore) {
         String userQuery = "", stateQuery = "";
 
         if (!(("".equals(username) || username == null))) {
             userQuery = " v.user.username=:username ";
         }
-        if (verifyDeletedState) {
+        if (stateToIgnore != null) {
             if (userQuery.length() > 0) {
                 stateQuery = " AND ";
             }
-            stateQuery = stateQuery + " v.state<>'DELETED' ";
+            stateQuery = stateQuery + " v.state<>" + stateToIgnore.getClass().getName() + "." + stateToIgnore.name() + " ";
         }
-        return em.createQuery("FROM " + entityType + " v WHERE " + userQuery + stateQuery + " ORDER BY v.id")
+        return em.createQuery("SELECT v FROM " + entityType + " v WHERE " + userQuery + stateQuery + " ORDER BY v.id")
             .setParameter("username", username).getResultList();
-
-    }
-
-    /**
-     * same as full getEntityList, but automatically sets verifyDeletedState to
-     * true
-     * 
-     * @param entityType
-     * @param em
-     * @param username
-     * @return
-     */
-    @SuppressWarnings({"rawtypes"})
-    public static List getEntityList(final String entityType, final EntityManager em, final String username) {
-        return QueryHelper.getEntityList(entityType, em, username, true);
 
     }
 
@@ -232,11 +217,12 @@ public class QueryHelper {
         if (params.getUsername() != null) {
             whereClauseSB.append(" v.user.username=:username ");
         }
-        if (params.isVerifyDeletedState()) {
+        if (params.getStateToIgnore() != null) {
             if (whereClauseSB.length() > 0) {
                 whereClauseSB.append(" AND ");
             }
-            whereClauseSB.append(" v.state<>'DELETED' ");
+            whereClauseSB.append(" v.state<>" + params.getStateToIgnore().getClass().getName() + "."
+                + params.getStateToIgnore().name() + " ");
         }
         if (params.isFilterEmbbededTemplate()) {
             if (whereClauseSB.length() > 0) {
@@ -265,8 +251,9 @@ public class QueryHelper {
         try {
             int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + params.getEntityType() + " v WHERE " + whereClause)
                 .setParameter("username", params.getUsername()).getSingleResult()).intValue();
-            Query query = em.createQuery("FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.id")
-                .setParameter("username", params.getUsername());
+            Query query = em.createQuery(
+                "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.id").setParameter(
+                "username", params.getUsername());
             if (params.getFirst() != null) {
                 query.setFirstResult(params.getFirst());
             }
@@ -316,11 +303,12 @@ public class QueryHelper {
         if (params.getUsername() != null) {
             whereClauseSB.append(" v.user.username=:username ");
         }
-        if (params.isVerifyDeletedState()) {
+        if (params.getStateToIgnore() != null) {
             if (whereClauseSB.length() > 0) {
                 whereClauseSB.append(" AND ");
             }
-            whereClauseSB.append(" vv.state<>'DELETED' ");
+            whereClauseSB.append(" vv.state<>" + params.getStateToIgnore().getClass().getName() + "."
+                + params.getStateToIgnore().name() + " ");
         }
         if (whereClauseSB.length() > 0) {
             whereClauseSB.append(" AND ");
@@ -423,8 +411,8 @@ public class QueryHelper {
     public static CloudCollectionItem getCloudCollectionById(final EntityManager em, final String entityId)
         throws CloudProviderException {
         CloudCollectionItem obj = (CloudCollectionItem) em
-            .createQuery("FROM " + CloudCollectionItem.class.getName() + " WHERE v.id=:idd").setParameter("idd", entityId)
-            .getSingleResult();
+            .createQuery("SELECT v FROM " + CloudCollectionItem.class.getName() + "v  WHERE v.id=:idd")
+            .setParameter("idd", entityId).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
         }
@@ -441,7 +429,8 @@ public class QueryHelper {
      */
     public static CloudResource getCloudResourceById(final EntityManager em, final String resourceId)
         throws CloudProviderException {
-        CloudResource obj = (CloudResource) em.createQuery("FROM " + CloudResource.class.getName() + " v WHERE v.id=:idd")
+        CloudResource obj = (CloudResource) em
+            .createQuery("SELECT v FROM " + CloudResource.class.getName() + " v WHERE v.id=:idd")
             .setParameter("idd", new Integer(resourceId)).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
@@ -460,7 +449,7 @@ public class QueryHelper {
     public static CloudCollectionItem getCloudCollectionFromCloudResource(final EntityManager em, final CloudResource ce)
         throws CloudProviderException {
         CloudCollectionItem obj = (CloudCollectionItem) em
-            .createQuery("FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId")
+            .createQuery("SELECT v FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId")
             .setParameter("resourceId", ce.getId()).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
@@ -471,7 +460,7 @@ public class QueryHelper {
     public static CloudResource getResourceFromProviderId(final EntityManager em, final String providerAsynchId)
         throws CloudProviderException {
         CloudResource obj = (CloudResource) em
-            .createQuery("FROM " + CloudResource.class.getName() + " v WHERE v.providerAssignedId=:provid")
+            .createQuery("SELECT v FROM " + CloudResource.class.getName() + " v WHERE v.providerAssignedId=:provid")
             .setParameter("provid", providerAsynchId).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");

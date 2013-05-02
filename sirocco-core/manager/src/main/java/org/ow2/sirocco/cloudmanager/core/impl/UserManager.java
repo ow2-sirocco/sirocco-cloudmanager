@@ -81,7 +81,7 @@ public class UserManager implements IUserManager {
     public User createUser(final String firstName, final String lastName, final String email, final String username,
         final String password) throws CloudProviderException {
         try {
-            this.em.createQuery("FROM User u WHERE u.username=:name").setParameter("name", username).getSingleResult();
+            this.em.createQuery("SELECT u FROM User u WHERE u.username=:name").setParameter("name", username).getSingleResult();
             throw new CloudProviderException("User with username " + username + " already exists");
         } catch (NoResultException e) {
         }
@@ -152,7 +152,7 @@ public class UserManager implements IUserManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<User> getUsers() throws CloudProviderException {
-        return this.em.createQuery("Select u From User u").getResultList();
+        return this.em.createQuery("SELECT  u From User u").getResultList();
     }
 
     @SuppressWarnings("unchecked")
@@ -161,7 +161,7 @@ public class UserManager implements IUserManager {
 
         User u = null;
 
-        List<User> l = this.em.createQuery("FROM User u WHERE u.username=:usrname").setParameter("usrname", userName)
+        List<User> l = this.em.createQuery("SELECT u FROM User u WHERE u.username=:usrname").setParameter("usrname", userName)
             .getResultList();
 
         if (!l.isEmpty()) {

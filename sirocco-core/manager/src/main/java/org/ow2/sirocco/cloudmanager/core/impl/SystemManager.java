@@ -242,8 +242,7 @@ public class SystemManager implements ISystemManager {
 
         SiroccoConfiguration config = null;
         try {
-            config = (SiroccoConfiguration) this.em.createQuery("FROM " + SiroccoConfiguration.class.getName())
-                .getSingleResult();
+            config = (SiroccoConfiguration) this.em.createQuery("SELECT s FROM SiroccoConfiguration s").getSingleResult();
         } catch (NoResultException e) {
             config = null;
         }
@@ -266,8 +265,7 @@ public class SystemManager implements ISystemManager {
 
         SiroccoConfiguration config = null;
         try {
-            config = (SiroccoConfiguration) this.em.createQuery("FROM " + SiroccoConfiguration.class.getName())
-                .getSingleResult();
+            config = (SiroccoConfiguration) this.em.createQuery("SELECT s FROM SiroccoConfiguration s").getSingleResult();
         } catch (NoResultException e) {
             config = null;
         }
@@ -437,7 +435,7 @@ public class SystemManager implements ISystemManager {
             system.setProviderAssignedId(job.getTargetResource().getProviderAssignedId());
 
             job.setTargetResource(system);
-            job.setParentJob(parentJob);
+            parentJob.addNestedJob(job);
 
             this.setJobProperty(parentJob, SystemManager.PROP_SYSTEM_SUPPORTED_IN_CONNECTOR, "ok");
 
@@ -482,7 +480,7 @@ public class SystemManager implements ISystemManager {
                         mc.setProperties(props);
 
                         Job j = this.machineManager.createMachine(mc);
-                        j.setParentJob(parentJob);
+                        parentJob.addNestedJob(j);
 
                         SystemMachine sc = (SystemMachine) this.createCollection(SystemMachine.class, j.getTargetResource(),
                             SystemMachine.State.NOT_AVAILABLE);
@@ -512,7 +510,7 @@ public class SystemManager implements ISystemManager {
                         vc.setProperties(props);
 
                         Job j = this.volumeManager.createVolume(vc);
-                        j.setParentJob(parentJob);
+                        parentJob.addNestedJob(j);
 
                         SystemVolume sc = (SystemVolume) this.createCollection(SystemVolume.class, j.getTargetResource(),
                             SystemVolume.State.NOT_AVAILABLE);
@@ -542,7 +540,7 @@ public class SystemManager implements ISystemManager {
                         sc.setProperties(props);
 
                         Job j = this.createSystem(sc);
-                        j.setParentJob(parentJob);
+                        parentJob.addNestedJob(j);
 
                         SystemSystem ss = (SystemSystem) this.createCollection(SystemSystem.class, j.getTargetResource(),
                             SystemSystem.State.NOT_AVAILABLE);
@@ -579,7 +577,7 @@ public class SystemManager implements ISystemManager {
                         nc.setProperties(props);
 
                         Job j = this.networkManager.createNetwork(nc);
-                        j.setParentJob(parentJob);
+                        parentJob.addNestedJob(j);
 
                         SystemNetwork sc = (SystemNetwork) this.createCollection(SystemNetwork.class, j.getTargetResource(),
                             SystemNetwork.State.NOT_AVAILABLE);
@@ -721,7 +719,7 @@ public class SystemManager implements ISystemManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<System> getSystems() throws CloudProviderException {
-        return QueryHelper.getEntityList("System", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("System", this.em, this.getUser().getUsername(), System.State.DELETED);
     }
 
     @Override
@@ -730,7 +728,7 @@ public class SystemManager implements ISystemManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("System", System.class);
         return QueryHelper.getEntityList(this.em,
             params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
-                .verifyDeletedState());
+                .stateToIgnore(System.State.DELETED));
     }
 
     @Override
@@ -777,7 +775,7 @@ public class SystemManager implements ISystemManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<SystemTemplate> getSystemTemplates() throws CloudProviderException {
-        return QueryHelper.getEntityList("SystemTemplate", this.em, this.getUser().getUsername(), false);
+        return QueryHelper.getEntityList("SystemTemplate", this.em, this.getUser().getUsername(), null);
     }
 
     @Override
@@ -897,7 +895,7 @@ public class SystemManager implements ISystemManager {
                     + s.getProviderAssignedId() + " " + s.getId());
             }
 
-            j.setParentJob(parentJob);
+            parentJob.addNestedJob(j);
             j.setUser(this.getUser());
             this.em.persist(j);
 
@@ -1145,14 +1143,14 @@ public class SystemManager implements ISystemManager {
             for (SystemMachine m : s.getMachines()) {
                 try {
                     Job j = this.machineManager.startMachine(m.getResource().getId().toString(), properties);
-                    j.setParentJob(parentJob);
+                    parentJob.addNestedJob(j);
                 } catch (BadStateException e) {
                     SystemManager.logger.debug("bad state exception:" + e.getMessage());
                 }
             }
             for (SystemSystem sy : s.getSystems()) {
                 Job j = this.startSystem(sy.getResource().getId().toString(), properties);
-                j.setParentJob(parentJob);
+                parentJob.addNestedJob(j);
             }
         }
         return parentJob;
@@ -1181,14 +1179,14 @@ public class SystemManager implements ISystemManager {
             for (SystemMachine m : s.getMachines()) {
                 try {
                     Job j = this.machineManager.stopMachine(m.getResource().getId().toString(), force, properties);
-                    j.setParentJob(parentJob);
+                    parentJob.addNestedJob(j);
                 } catch (BadStateException e) {
                     SystemManager.logger.info("bad state exception:" + e.getMessage());
                 }
             }
             for (SystemSystem sy : s.getSystems()) {
                 Job j = this.stopSystem(sy.getResource().getId().toString(), force, properties);
-                j.setParentJob(parentJob);
+                parentJob.addNestedJob(j);
             }
         }
         return parentJob;
@@ -1216,14 +1214,14 @@ public class SystemManager implements ISystemManager {
             for (SystemMachine m : s.getMachines()) {
                 try {
                     Job j = this.machineManager.suspendMachine(m.getResource().getId().toString(), properties);
-                    j.setParentJob(parentJob);
+                    parentJob.addNestedJob(j);
                 } catch (BadStateException e) {
                     SystemManager.logger.debug("bad state exception:" + e.getMessage());
                 }
             }
             for (SystemSystem sy : s.getSystems()) {
                 Job j = this.suspendSystem(sy.getResource().getId().toString(), properties);
-                j.setParentJob(parentJob);
+                parentJob.addNestedJob(j);
             }
         }
         return parentJob;
@@ -1251,14 +1249,14 @@ public class SystemManager implements ISystemManager {
             for (SystemMachine m : s.getMachines()) {
                 try {
                     Job j = this.machineManager.pauseMachine(m.getResource().getId().toString(), properties);
-                    j.setParentJob(parentJob);
+                    parentJob.addNestedJob(j);
                 } catch (BadStateException e) {
                     SystemManager.logger.debug("bad state exception:" + e.getMessage());
                 }
             }
             for (SystemSystem sy : s.getSystems()) {
                 Job j = this.pauseSystem(sy.getResource().getId().toString(), properties);
-                j.setParentJob(parentJob);
+                parentJob.addNestedJob(j);
             }
         }
         return parentJob;
@@ -1287,14 +1285,14 @@ public class SystemManager implements ISystemManager {
             for (SystemMachine m : s.getMachines()) {
                 try {
                     Job j = this.machineManager.restartMachine(m.getResource().getId().toString(), force, properties);
-                    j.setParentJob(parentJob);
+                    parentJob.addNestedJob(j);
                 } catch (BadStateException e) {
                     SystemManager.logger.debug("bad state exception:" + e.getMessage());
                 }
             }
             for (SystemSystem sy : s.getSystems()) {
                 Job j = this.restartSystem(sy.getResource().getId().toString(), force, properties);
-                j.setParentJob(parentJob);
+                parentJob.addNestedJob(j);
             }
         }
         return parentJob;
@@ -1325,19 +1323,19 @@ public class SystemManager implements ISystemManager {
             // in a clean way
             for (SystemMachine m : s.getMachines()) {
                 Job j = this.machineManager.deleteMachine(m.getResource().getId().toString());
-                j.setParentJob(parentJob);
+                parentJob.addNestedJob(j);
             }
             for (SystemVolume v : s.getVolumes()) {
                 Job j = this.volumeManager.deleteVolume(v.getResource().getId().toString());
-                j.setParentJob(parentJob);
+                parentJob.addNestedJob(j);
             }
             for (SystemSystem sy : s.getSystems()) {
                 Job j = this.deleteSystem(sy.getResource().getId().toString());
-                j.setParentJob(parentJob);
+                parentJob.addNestedJob(j);
             }
             for (SystemNetwork n : s.getNetworks()) {
                 Job j = this.networkManager.deleteNetwork(n.getResource().getId().toString());
-                j.setParentJob(parentJob);
+                parentJob.addNestedJob(j);
             }
             for (SystemCredentials c : s.getCredentials()) {
                 this.credentialsManager.deleteCredentials(c.getResource().getId().toString());
@@ -1397,34 +1395,30 @@ public class SystemManager implements ISystemManager {
         this.em.persist(parentJob);
         this.em.flush();
 
+        User user = this.getUser();
+
         Job j;
         try {
             if (detailedAction.equals(SystemManager.START_ACTION)) {
                 j = connector.getSystemService().startSystem(s.getProviderAssignedId(), properties);
                 s.setState(System.State.STARTING);
-                j.setParentJob(parentJob);
             } else if (detailedAction.equals(SystemManager.STOP_ACTION)) {
                 boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
                 j = connector.getSystemService().stopSystem(s.getProviderAssignedId(), force, properties);
                 s.setState(System.State.STOPPING);
-                j.setParentJob(parentJob);
             } else if (detailedAction.equals(SystemManager.SUSPEND_ACTION)) {
                 j = connector.getSystemService().suspendSystem(s.getProviderAssignedId(), properties);
                 s.setState(System.State.SUSPENDING);
-                j.setParentJob(parentJob);
             } else if (detailedAction.equals(SystemManager.PAUSE_ACTION)) {
                 j = connector.getSystemService().pauseSystem(s.getProviderAssignedId(), properties);
                 s.setState(System.State.PAUSING);
-                j.setParentJob(parentJob);
             } else if (detailedAction.equals(SystemManager.RESTART_ACTION)) {
                 boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
                 j = connector.getSystemService().restartSystem(s.getProviderAssignedId(), force, properties);
                 s.setState(System.State.STARTING);
-                j.setParentJob(parentJob);
             } else if (detailedAction.equals(SystemManager.DELETE_ACTION)) {
                 j = connector.getSystemService().deleteSystem(s.getProviderAssignedId());
                 s.setState(System.State.DELETING);
-                j.setParentJob(parentJob);
             } else {
                 throw new ServiceUnavailableException("Unsupported operation action " + detailedAction + " on system id "
                     + s.getProviderAssignedId() + " " + s.getId());
@@ -1435,8 +1429,10 @@ public class SystemManager implements ISystemManager {
         }
 
         j.setTargetResource(s);
-        j.setUser(this.getUser());
+        j.setUser(user);
         this.em.persist(j);
+        parentJob.addNestedJob(j);
+
         // this.em.flush();
 
         // Ask for connector to notify when job completes
@@ -1471,7 +1467,7 @@ public class SystemManager implements ISystemManager {
     }
 
     private CloudProvider selectCloudProvider() {
-        Query q = this.em.createQuery("FROM CloudProvider c WHERE c.cloudProviderType=:type");
+        Query q = this.em.createQuery("SELECT c FROM CloudProvider c WHERE c.cloudProviderType=:type");
         q.setParameter("type", "mock");
 
         q.setMaxResults(1);
@@ -2004,7 +2000,7 @@ public class SystemManager implements ISystemManager {
         CloudCollectionItem obj = null;
         try {
             obj = (CloudCollectionItem) this.em
-                .createQuery("FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId")
+                .createQuery("SELECT v FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId")
                 .setParameter("resourceId", new Integer(entityId)).getSingleResult();
         } catch (NoResultException e) {
             obj = null;
@@ -2017,11 +2013,18 @@ public class SystemManager implements ISystemManager {
         // object in a system collection
         System sys = null;
         try {
+            String collection = null;
+            if (obj instanceof SystemMachine) {
+                collection = "v.machines";
+            } else if (obj instanceof SystemSystem) {
+                collection = "v.systems";
+            } else if (obj instanceof SystemVolume) {
+                collection = "v.volumes";
+            } else if (obj instanceof SystemNetwork) {
+                collection = "v.networks";
+            }
             sys = (System) this.em
-                .createQuery(
-                    "FROM "
-                        + System.class.getName()
-                        + " v WHERE :resource member of v.machines or :resource member of v.systems or :resource member of v.volumes or :resource member of v.networks")
+                .createQuery("SELECT v FROM " + System.class.getName() + " v WHERE :resource member " + collection)
                 .setParameter("resource", obj).getSingleResult();
         } catch (NoResultException e) {
             sys = null;

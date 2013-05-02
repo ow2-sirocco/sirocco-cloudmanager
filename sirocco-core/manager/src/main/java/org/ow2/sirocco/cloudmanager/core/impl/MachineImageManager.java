@@ -121,7 +121,7 @@ public class MachineImageManager implements IMachineImageManager {
 
     @Override
     public List<MachineImage> getMachineImages() throws CloudProviderException {
-        return QueryHelper.getEntityList("MachineImage", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("MachineImage", this.em, this.getUser().getUsername(), MachineImage.State.DELETED);
     }
 
     public MachineImage getMachineImageById(final String imageId) throws CloudProviderException {
@@ -156,7 +156,7 @@ public class MachineImageManager implements IMachineImageManager {
         /** if a machine template referernces the image do not permit deletion */
         List<MachineTemplate> templates = null;
         try {
-            templates = this.em.createQuery("FROM MachineTemplate t WHERE t.machineImage.id=:mid")
+            templates = this.em.createQuery("SELECT  t FROM MachineTemplate t WHERE t.machineImage.id=:mid")
                 .setParameter("mid", Integer.valueOf(imageId)).getResultList();
         } catch (Exception e) {
             throw new CloudProviderException("Internal query error" + e.getMessage());
@@ -176,7 +176,7 @@ public class MachineImageManager implements IMachineImageManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineImage", MachineImage.class);
         return QueryHelper.getEntityList(this.em,
             params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
-                .verifyDeletedState());
+                .stateToIgnore(MachineImage.State.DELETED));
     }
 
     @Override

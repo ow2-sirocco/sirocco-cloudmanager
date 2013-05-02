@@ -215,7 +215,7 @@ public class VolumeManager implements IVolumeManager {
         User user = this.getUser();
 
         if (volumeConfig.getName() != null) {
-            if (!this.em.createQuery("FROM VolumeConfiguration v WHERE v.user.username=:username AND v.name=:name")
+            if (!this.em.createQuery("SELECT v FROM VolumeConfiguration v WHERE v.user.username=:username AND v.name=:name")
                 .setParameter("username", user.getUsername()).setParameter("name", volumeConfig.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("VolumeConfiguration already exists with name " + volumeConfig.getName());
@@ -233,7 +233,7 @@ public class VolumeManager implements IVolumeManager {
         User user = this.getUser();
 
         if (volumeTemplate.getName() != null) {
-            if (!this.em.createQuery("FROM VolumeTemplate v WHERE v.user.username=:username AND v.name=:name")
+            if (!this.em.createQuery("SELECT v FROM VolumeTemplate v WHERE v.user.username=:username AND v.name=:name")
                 .setParameter("username", user.getUsername()).setParameter("name", volumeTemplate.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("VolumeTemplate already exists with name " + volumeTemplate.getName());
@@ -305,7 +305,7 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<Volume> getVolumes() throws CloudProviderException {
-        return QueryHelper.getEntityList("Volume", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("Volume", this.em, this.getUser().getUsername(), Volume.State.DELETED);
     }
 
     @SuppressWarnings("unchecked")
@@ -315,7 +315,7 @@ public class VolumeManager implements IVolumeManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Volume", Volume.class);
         return QueryHelper.getEntityList(this.em,
             params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
-                .verifyDeletedState());
+                .stateToIgnore(Volume.State.DELETED));
     }
 
     @Override
@@ -659,8 +659,8 @@ public class VolumeManager implements IVolumeManager {
                     this.em.persist(volumeImage);
 
                     VolumeVolumeImage volumeVolumeImage = (VolumeVolumeImage) this.em
-                        .createQuery("FROM VolumeVolumeImage v WHERE v.volumeImage=:vi").setParameter("vi", volumeImage)
-                        .getSingleResult();
+                        .createQuery("SELECT v FROM VolumeVolumeImage v WHERE v.volumeImage=:vi")
+                        .setParameter("vi", volumeImage).getSingleResult();
                     if (volumeVolumeImage != null) {
                         volumeVolumeImage.setState(VolumeVolumeImage.State.AVAILABLE);
                         volumeVolumeImage.setCreated(new Date());
@@ -824,7 +824,7 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<VolumeImage> getVolumeImages() throws CloudProviderException {
-        return QueryHelper.getEntityList("VolumeImage", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("VolumeImage", this.em, this.getUser().getUsername(), VolumeImage.State.DELETED);
     }
 
     @Override

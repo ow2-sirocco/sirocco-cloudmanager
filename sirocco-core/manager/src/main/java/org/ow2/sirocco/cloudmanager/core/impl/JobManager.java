@@ -135,7 +135,7 @@ public class JobManager implements IJobManager {
             if (parent == null) {
                 throw new CloudProviderException();
             } else {
-                j.setParentJob(parent);
+                parent.addNestedJob(j);
             }
 
         }

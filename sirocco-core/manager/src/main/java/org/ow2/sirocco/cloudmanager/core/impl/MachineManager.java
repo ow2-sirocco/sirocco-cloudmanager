@@ -150,7 +150,7 @@ public class MachineManager implements IMachineManager {
     @Override
     public CloudEntryPoint getCloudEntryPoint() throws CloudProviderException {
         Integer userid = this.getUser().getId();
-        CloudEntryPoint cep = (CloudEntryPoint) this.em.createQuery("FROM CloudEntryPoint c WHERE c.user.id=:userid")
+        CloudEntryPoint cep = (CloudEntryPoint) this.em.createQuery("SELECT c FROM CloudEntryPoint c WHERE c.user.id=:userid")
             .setParameter("userid", userid).getSingleResult();
         return cep;
     }
@@ -283,7 +283,9 @@ public class MachineManager implements IMachineManager {
         j.setUser(this.getUser());
         j.setCreated(new Date());
         j.setProperties(new HashMap<String, String>());
-        j.setParentJob(parent);
+        if (parent != null) {
+            parent.addNestedJob(j);
+        }
 
         this.em.persist(j);
         return j;
@@ -318,7 +320,7 @@ public class MachineManager implements IMachineManager {
                 MachineManager.logger.info(" Error in creating volume from template " + mvt.getVolumeTemplate().getId());
             }
 
-            connJob.setParentJob(parent);
+            parent.addNestedJob(connJob);
             this.updateJob(connJob);
 
             MachineManager.logger.info("addVolumes job " + connJob.getId());
@@ -333,7 +335,7 @@ public class MachineManager implements IMachineManager {
     }
 
     private boolean volumeShareable(final Volume volume) {
-        Query q = this.em.createQuery("FROM MachineVolume v WHERE v.volume.id=:vid");
+        Query q = this.em.createQuery("SELECT v FROM MachineVolume v WHERE v.volume.id=:vid");
         q.setParameter("vid", volume.getId());
         List<MachineVolume> list = q.getResultList();
         for (MachineVolume mv : list) {
@@ -477,12 +479,12 @@ public class MachineManager implements IMachineManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Machine", Machine.class);
         return QueryHelper.getEntityList(this.em,
             params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
-                .verifyDeletedState());
+                .stateToIgnore(Machine.State.DELETED));
     }
 
     @Override
     public List<Machine> getMachines() throws CloudProviderException {
-        return QueryHelper.getEntityList("Machine", this.em, this.getUser().getUsername());
+        return QueryHelper.getEntityList("Machine", this.em, this.getUser().getUsername(), Machine.State.DELETED);
     }
 
     private Machine checkOps(final String machineId, final String action) throws CloudProviderException {
@@ -906,7 +908,7 @@ public class MachineManager implements IMachineManager {
             /**
              * Refuse delete if configuration is being used.
              */
-            mts = this.em.createQuery("FROM MachineTemplate m WHERE m.machineConfiguration.id=:mcid")
+            mts = this.em.createQuery("SELECT m FROM MachineTemplate m WHERE m.machineConfiguration.id=:mcid")
                 .setParameter("mcid", Integer.valueOf(mcId)).getResultList();
         } catch (Exception e) {
             return;
@@ -954,7 +956,7 @@ public class MachineManager implements IMachineManager {
         boolean exists = true;
         try {
             MachineConfiguration mc = (MachineConfiguration) this.em
-                .createQuery("FROM MachineConfiguration m WHERE m.user.id=:userid AND m.name=:name")
+                .createQuery("SELECT m FROM MachineConfiguration m WHERE m.user.id=:userid AND m.name=:name")
                 .setParameter("userid", userid).setParameter("name", machineConfig.getName()).getSingleResult();
         } catch (NoResultException e) {
             exists = false;
@@ -1192,7 +1194,7 @@ public class MachineManager implements IMachineManager {
         Integer userid = this.getUser().getId();
         boolean exists = true;
         try {
-            this.em.createQuery("FROM MachineTemplate m WHERE m.user.id=:userid AND m.name=:name")
+            this.em.createQuery("SELECT m FROM MachineTemplate m WHERE m.user.id=:userid AND m.name=:name")
                 .setParameter("userid", userid).setParameter("name", mt.getName()).getSingleResult();
         } catch (NoResultException e) {
             exists = false;
