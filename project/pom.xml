@@ -35,7 +35,7 @@
 	</parent>
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
 	<artifactId>sirocco-cloudmanager-project</artifactId>
-	<version>0.5.5</version>
+	<version>0.6.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>SIROCCO :: CloudManager :: Project</name>
 	
@@ -229,10 +229,4 @@
 			<scope>provided</scope>
 		</dependency>
 	 </dependencies>
-
-
-
-  <scm>
-    <tag>cloudmanager-0.5.5</tag>
-  </scm>
 </project>

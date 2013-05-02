@@ -30,7 +30,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager-project</artifactId>
-		<version>0.5.5</version>
+		<version>0.6.0-SNAPSHOT</version>
         	<relativePath>project/pom.xml</relativePath>
 	</parent>
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
@@ -60,7 +60,7 @@
                 <connection>scm:git:git://gitorious.ow2.org/ow2-sirocco/sirocco-cloudmanager.git</connection>
                 <developerConnection>scm:git:git@gitorious.ow2.org:ow2-sirocco/sirocco-cloudmanager.git</developerConnection>
                 <url>http://gitorious.ow2.org/ow2-sirocco/sirocco-cloudmanager/trees</url>
-          <tag>cloudmanager-0.5.5</tag>
+          <tag>HEAD</tag>
   </scm>
 	
 </project>
