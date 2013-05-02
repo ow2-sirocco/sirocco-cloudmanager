@@ -32,7 +32,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager-connectors</artifactId>
-		<version>0.5.5-SNAPSHOT</version>
+		<version>0.5.5</version>
 	</parent>
 
 	<artifactId>sirocco-cloudmanager-connector-api</artifactId>
