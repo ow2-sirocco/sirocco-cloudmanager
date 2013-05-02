@@ -35,7 +35,6 @@
 	</parent>
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
 	<artifactId>cloudmanager-multi</artifactId>
-	<version>0.5.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>SIROCCO :: CloudManager :: Parent</name>
 	
