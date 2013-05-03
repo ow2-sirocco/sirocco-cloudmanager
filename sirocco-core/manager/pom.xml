@@ -155,6 +155,7 @@
 		<profile>
 			<id>test</id>
   			<properties>
+  				<authRequired>false</authRequired>
   				<datasource>jdbc/H2InMemory</datasource>
     			<database>org.eclipse.persistence.platform.database.H2Platform</database>
     			<creationSuffix></creationSuffix>
@@ -163,6 +164,7 @@
 		<profile>
 			<id>production</id>
   			<properties>
+  				<authRequired>true</authRequired>
     			<datasource>jdbc/MySQLDataSource</datasource>
     			<database>MySQL4</database>
     			<creationSuffix>engine=InnoDB</creationSuffix>

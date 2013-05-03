@@ -8,7 +8,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -21,7 +21,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -34,7 +34,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -47,7 +47,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -60,7 +60,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -73,7 +73,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -86,7 +86,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -99,7 +99,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -112,7 +112,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -125,7 +125,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
@@ -138,7 +138,7 @@
 				<as-context>
 					<auth-method>USERNAME_PASSWORD</auth-method>
 					<realm>jdbc</realm>
-					<required>true</required>
+					<required>${authRequired}</required>
 				</as-context>
 				<sas-context>
 					<caller-propagation>SUPPORTED</caller-propagation>
