@@ -4,11 +4,12 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.ow2.sirocco.cloudmanager</groupId>
-		<artifactId>sirocco-cloudmanager-project</artifactId>
-		<version>0.5.5-SNAPSHOT</version>
-		<relativePath>../project/pom.xml</relativePath>
-	</parent>
+    	<groupId>org.ow2.sirocco.cloudmanager</groupId>
+        <artifactId>sirocco-cloudmanager-project</artifactId>
+        <version>0.6.0-SNAPSHOT</version>
+        <relativePath>../project/pom.xml</relativePath>
+    </parent>
+
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
 	<artifactId>sirocco-cloudmanager-itest</artifactId>
 	<name>SIROCCO :: CloudManager :: Integration Tests</name>
@@ -182,6 +183,23 @@
 				</executions>
 			</plugin>
 			<plugin>
+        <groupId>org.codehaus.groovy.maven</groupId>
+        <artifactId>gmaven-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <source>
+                System.setProperty("versionWithoutDash", "${project.version}".replace('-SNAPSHOT', '.SNAPSHOT'))
+              </source>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+			<plugin>
 				<artifactId>maven-antrun-plugin</artifactId>
 				<executions>
 					<execution>
@@ -189,12 +207,16 @@
 						<phase>pre-integration-test</phase>
 						<configuration>
 							<tasks>
+								<delete>
+   									 <fileset dir="${glassfish.root}/modules" includes="org.eclipse.persistence.*"/>
+  								</delete>
 								<copy todir="${glassfish.bundles}" overwrite="true">
 									<fileset dir="etc/bundles" />
 								</copy>
 								<copy todir="${glassfish.root}/modules" overwrite="true">
 									<fileset dir="etc/modules" />
 								</copy>
+								<copy tofile="${glassfish.root}/config/osgi.properties" file="src/test/resources/config/osgi.properties" />
 								<copy todir="${glassfish.domain}/config" overwrite="true">
 									<fileset dir="src/test/resources/glassfish-config" />
 								</copy>
@@ -218,6 +240,7 @@
 									token="@JMS.PORT@" value="${jms.port}" />
 								<replace file="${glassfish.domain}/config/domain.xml"
 									token="@IIOP.PORT@" value="${iiop.port}" />
+								<mkdir dir="${glassfish.domain}/generated/ejb/org.ow2.sirocco.cloudmanager.sirocco-cloudmanager-core-manager_${versionWithoutDash}/org.ow2.sirocco.cloudmanager.sirocco-cloudmanager-core-manager_${versionWithoutDash}_persistence-unit"/>
 							</tasks>
 						</configuration>
 						<goals>
@@ -229,8 +252,6 @@
 						<phase>integration-test</phase>
 						<configuration>
 							<tasks>
-								<echo>Waiting 1 mn</echo>
-								<sleep seconds="60" />
 								<echo>Installing EJB application bundle</echo>
 								<copy tofile="${glassfish.bundles}/sirocco-cloudmanager-core-manager.jar" file="${project.build.directory}/sirocco-cloudmanager-core-manager.jar" />
 							</tasks>
