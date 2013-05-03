@@ -36,20 +36,24 @@
 		<jta-data-source>${datasource}</jta-data-source>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>
 		<properties>
-            <!-- <property name="eclipselink.target-database" value="MySQL4"/> -->
-            <property name="eclipselink.ddl-generation.table-creation-suffix" value="engine=InnoDB" />
+			<property name="eclipselink.target-database" value="${database}"/>
+            <property name="eclipselink.ddl-generation" value="create-tables"/>
+            <property name="eclipselink.ddl-generation.table-creation-suffix" value="${creationSuffix}" />
+            
+            <!-- 
             <property name="eclipselink.ddl-generation.output-mode" value="both"/>
             <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/>
             <property name="eclipselink.application-location" value="/tmp"/> 
             <property name="eclipselink.create-ddl-jdbc-file-name" value="create.sql"/> 
             <property name="eclipselink.drop-ddl-jdbc-file-name" value="drop.sql"/> 
-			<property name="eclipselink.deploy-on-startup" value="true"/>
-			<!-- <property name="eclipselink.logging.level" value="FINEST"/>
-			<property name="eclipselink.logging.parameters" value="true"/> -->
+			<property name="eclipselink.deploy-on-startup" value="true"/> -->
 			
-			<!-- <property name="eclipselink.target-database" value="MySQL"/> -->
-            <!-- <property name="eclipselink.ddl-generation" value="drop-and-create-tables"/> -->
-            <!-- <property name="eclipselink.ddl-generation.output-mode" value="both"/> -->
+			
+			<!-- 
+			<property name="eclipselink.logging.level" value="FINEST"/>
+			<property name="eclipselink.logging.parameters" value="true"/> 
+			-->
+			
 		</properties>
 	</persistence-unit>
 

@@ -156,14 +156,16 @@
 			<id>test</id>
   			<properties>
   				<datasource>jdbc/H2InMemory</datasource>
-    			<dialect>H2Dialect</dialect>
+    			<database>org.eclipse.persistence.platform.database.H2Platform</database>
+    			<creationSuffix></creationSuffix>
 			</properties>
 		</profile>
 		<profile>
 			<id>production</id>
   			<properties>
     			<datasource>jdbc/MySQLDataSource</datasource>
-    			<dialect>MySQLDialect</dialect>
+    			<database>MySQL4</database>
+    			<creationSuffix>engine=InnoDB</creationSuffix>
 			</properties>
 			<activation>
       			<activeByDefault>true</activeByDefault>
