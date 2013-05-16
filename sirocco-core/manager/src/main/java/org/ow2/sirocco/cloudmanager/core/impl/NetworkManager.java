@@ -19,6 +19,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceContextType;
 import javax.persistence.PersistenceException;
 
 import org.glassfish.osgicdi.OSGiService;
@@ -71,7 +72,7 @@ import org.slf4j.LoggerFactory;
 public class NetworkManager implements INetworkManager {
     private static Logger logger = LoggerFactory.getLogger(NetworkManager.class.getName());
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource
@@ -1730,7 +1731,7 @@ public class NetworkManager implements INetworkManager {
             if (affectedNetwork == null) {
                 if (providerJob.getState() == Job.Status.SUCCESS) {
                     forwardingGroup.setState(ForwardingGroup.State.DELETED);
-                    forwardingGroup.setNetworks(Collections.<ForwardingGroupNetwork> emptySet());
+                    forwardingGroup.setNetworks(new HashSet<ForwardingGroupNetwork>());
                     this.em.persist(forwardingGroup);
                     this.em.flush();
                 } else if (providerJob.getState() == Job.Status.FAILED) {
