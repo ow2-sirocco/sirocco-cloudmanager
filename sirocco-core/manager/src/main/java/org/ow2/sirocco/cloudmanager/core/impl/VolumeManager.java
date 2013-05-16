@@ -15,6 +15,7 @@ import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceContextType;
 import javax.persistence.PersistenceException;
 
 import org.glassfish.osgicdi.OSGiService;
@@ -58,7 +59,7 @@ import org.slf4j.LoggerFactory;
 public class VolumeManager implements IVolumeManager {
     private static Logger logger = LoggerFactory.getLogger(VolumeManager.class.getName());
 
-    @PersistenceContext
+    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource
@@ -460,7 +461,9 @@ public class VolumeManager implements IVolumeManager {
         }
         boolean updated = this.updateCloudEntityAttributes(volumeTemplate, attributes);
         if (attributes.containsKey("volumeConfig")) {
-            volumeTemplate.setVolumeConfig((VolumeConfiguration) attributes.get("volumeConfig"));
+            VolumeConfiguration config = (VolumeConfiguration) attributes.get("volumeConfig");
+            config = this.getVolumeConfigurationById(config.getId().toString());
+            volumeTemplate.setVolumeConfig(config);
             updated = true;
         }
         if (updated) {
