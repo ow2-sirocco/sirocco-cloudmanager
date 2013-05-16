@@ -26,12 +26,11 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderCapability;
 
-
 public interface IProviderCapability {
-    
-    boolean hasCapability(CloudProviderCapability capability);
-    
-    void addCapability(CloudProviderCapability capability);
-    
-    void removeCapability(CloudProviderCapability capability);
+
+    boolean hasCapability(CloudProviderCapability capability, ProviderTarget target);
+
+    void addCapability(CloudProviderCapability capability, ProviderTarget target);
+
+    void removeCapability(CloudProviderCapability capability, ProviderTarget target);
 }

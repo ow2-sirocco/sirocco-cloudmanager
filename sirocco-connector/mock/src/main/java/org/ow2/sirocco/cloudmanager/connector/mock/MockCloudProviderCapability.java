@@ -25,48 +25,49 @@
 
 package org.ow2.sirocco.cloudmanager.connector.mock;
 
-import java.util.Set;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
+import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderCapability;
 
 public class MockCloudProviderCapability implements IProviderCapability {
-   
+
     private Set<CloudProviderCapability> capabilities = new HashSet<CloudProviderCapability>() {
-    {
-        add(CloudProviderCapability.MACHINE);
-        add(CloudProviderCapability.SYSTEM);
-        add(CloudProviderCapability.NETWORK);
-        add(CloudProviderCapability.VOLUME);
-    }};
+        {
+            this.add(CloudProviderCapability.MACHINE);
+            this.add(CloudProviderCapability.SYSTEM);
+            this.add(CloudProviderCapability.NETWORK);
+            this.add(CloudProviderCapability.VOLUME);
+        }
+    };
 
     public MockCloudProviderCapability() {
     }
 
-    
     @Override
-    public boolean hasCapability(CloudProviderCapability capability) {
-        return  capabilities.contains(capability);
+    public boolean hasCapability(final CloudProviderCapability capability, final ProviderTarget target) {
+        return this.capabilities.contains(capability);
     }
 
     @Override
-    public void addCapability(CloudProviderCapability capability) {
+    public void addCapability(final CloudProviderCapability capability, final ProviderTarget target) {
         // TODO Auto-generated method stub
-        if (capabilities.contains(capability) == true) {
+        if (this.capabilities.contains(capability) == true) {
             return;
         }
         if (capability.hasParent() == true) {
-            if (hasCapability(capability.getParent()) == false) {
-                capabilities.add(capability.getParent());
+            if (this.hasCapability(capability.getParent(), target) == false) {
+                this.capabilities.add(capability.getParent());
             }
         }
-        capabilities.add(capability);
+        this.capabilities.add(capability);
     }
 
     @Override
-    public void removeCapability(CloudProviderCapability capability) {
-        capabilities.remove(capability);
+    public void removeCapability(final CloudProviderCapability capability, final ProviderTarget target) {
+        this.capabilities.remove(capability);
     }
-    
+
 }

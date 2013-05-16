@@ -25,27 +25,26 @@
 
 package org.ow2.sirocco.cloudmanager.connector.api;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 
 public interface IVolumeService {
 
-    Job createVolume(VolumeCreate volumeCreate) throws ConnectorException;
+    Volume createVolume(VolumeCreate volumeCreate, ProviderTarget target) throws ConnectorException;
 
-    Job deleteVolume(String volumeId) throws ConnectorException;
+    void deleteVolume(String volumeId, ProviderTarget target) throws ConnectorException;
 
-    Volume.State getVolumeState(String volumeId) throws ConnectorException;
+    Volume.State getVolumeState(String volumeId, ProviderTarget target) throws ConnectorException;
 
-    Volume getVolume(String volumeId) throws ConnectorException;
+    Volume getVolume(String volumeId, ProviderTarget target) throws ConnectorException;
 
-    Job createVolumeImage(VolumeImage volumeImage) throws ConnectorException;
+    VolumeImage createVolumeImage(VolumeImage volumeImage, ProviderTarget target) throws ConnectorException;
 
-    Job createVolumeSnapshot(String volumeId, VolumeImage volumeImage) throws ConnectorException;
+    VolumeImage createVolumeSnapshot(String volumeId, VolumeImage volumeImage, ProviderTarget target) throws ConnectorException;
 
-    VolumeImage getVolumeImage(String volumeImageId) throws ConnectorException;
+    VolumeImage getVolumeImage(String volumeImageId, ProviderTarget target) throws ConnectorException;
 
-    Job deleteVolumeImage(String volumeImageId) throws ConnectorException;
+    void deleteVolumeImage(String volumeImageId, ProviderTarget target) throws ConnectorException;
 
 }

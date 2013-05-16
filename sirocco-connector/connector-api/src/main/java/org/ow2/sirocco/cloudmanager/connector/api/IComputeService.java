@@ -25,7 +25,6 @@
 
 package org.ow2.sirocco.cloudmanager.connector.api;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
@@ -33,27 +32,29 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 
 public interface IComputeService {
 
-    Job createMachine(MachineCreate machineCreate) throws ConnectorException;
+    Machine createMachine(MachineCreate machineCreate, ProviderTarget target) throws ConnectorException;
 
-    Job startMachine(final String machineId) throws ConnectorException;
+    void startMachine(final String machineId, ProviderTarget target) throws ConnectorException;
 
-    Job stopMachine(final String machineId, boolean force) throws ConnectorException;
+    void stopMachine(final String machineId, boolean force, ProviderTarget target) throws ConnectorException;
 
-    Job suspendMachine(final String machineId) throws ConnectorException;
+    void suspendMachine(final String machineId, ProviderTarget target) throws ConnectorException;
 
-    Job restartMachine(final String machineId, boolean force) throws ConnectorException;
+    void restartMachine(final String machineId, boolean force, ProviderTarget target) throws ConnectorException;
 
-    Job pauseMachine(final String machineId) throws ConnectorException;
+    void pauseMachine(final String machineId, ProviderTarget target) throws ConnectorException;
 
-    Job deleteMachine(final String machineId) throws ConnectorException;
+    void deleteMachine(final String machineId, ProviderTarget target) throws ConnectorException;
 
-    Job captureMachine(String machineId, MachineImage machineImage) throws ConnectorException;
+    void captureMachine(String machineId, MachineImage machineImage, ProviderTarget target) throws ConnectorException;
 
-    Machine.State getMachineState(final String machineId) throws ConnectorException;
+    Machine.State getMachineState(final String machineId, ProviderTarget target) throws ConnectorException;
 
-    Machine getMachine(final String machineId) throws ConnectorException;
+    Machine getMachine(final String machineId, ProviderTarget target) throws ConnectorException;
 
-    Job addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException;
+    void addVolumeToMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target)
+        throws ConnectorException;
 
-    Job removeVolumeFromMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException;
+    void removeVolumeFromMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target)
+        throws ConnectorException;
 }

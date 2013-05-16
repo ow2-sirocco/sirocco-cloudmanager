@@ -24,11 +24,10 @@
  */
 package org.ow2.sirocco.cloudmanager.connector.api;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
 public interface IImageService {
-    Job destroyImage(final String imageId) throws ConnectorException;
+    void destroyImage(final String imageId, ProviderTarget target) throws ConnectorException;
 
-    Job uploadImage(MachineImage imageUpload) throws ConnectorException;
+    void uploadImage(MachineImage imageUpload, ProviderTarget target) throws ConnectorException;
 }

@@ -29,33 +29,36 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 
 public interface ISystemService {
-    Job createSystem(SystemCreate systemCreate) throws ConnectorException;
+    System createSystem(SystemCreate systemCreate, ProviderTarget target) throws ConnectorException;
 
-    Job deleteSystem(String systemId) throws ConnectorException;
+    void deleteSystem(String systemId, ProviderTarget target) throws ConnectorException;
 
-    Job startSystem(String systemId, Map<String, String> properties) throws ConnectorException;
+    void startSystem(String systemId, Map<String, String> properties, ProviderTarget target) throws ConnectorException;
 
-    Job stopSystem(String systemId, boolean force, Map<String, String> properties) throws ConnectorException;
+    void stopSystem(String systemId, boolean force, Map<String, String> properties, ProviderTarget target)
+        throws ConnectorException;
 
-    Job restartSystem(String systemId, boolean force, Map<String, String> properties) throws ConnectorException;
+    void restartSystem(String systemId, boolean force, Map<String, String> properties, ProviderTarget target)
+        throws ConnectorException;
 
-    Job pauseSystem(String systemId, Map<String, String> properties) throws ConnectorException;
+    void pauseSystem(String systemId, Map<String, String> properties, ProviderTarget target) throws ConnectorException;
 
-    Job suspendSystem(String systemId, Map<String, String> properties) throws ConnectorException;
+    void suspendSystem(String systemId, Map<String, String> properties, ProviderTarget target) throws ConnectorException;
 
-    System getSystem(String systemId) throws ConnectorException;
+    System getSystem(String systemId, ProviderTarget target) throws ConnectorException;
 
-    List<? extends CloudCollectionItem> getEntityListFromSystem(String systemId, String entityType) throws ConnectorException;
+    List<? extends CloudCollectionItem> getEntityListFromSystem(String systemId, String entityType, ProviderTarget target)
+        throws ConnectorException;
 
-    Job deleteEntityInSystem(String systemId, String entityId, String entityType) throws ConnectorException;
+    void deleteEntityInSystem(String systemId, String entityId, String entityType, ProviderTarget target)
+        throws ConnectorException;
 
-    Job removeEntityFromSystem(String systemId, String entityId) throws ConnectorException;
+    void removeEntityFromSystem(String systemId, String entityId, ProviderTarget target) throws ConnectorException;
 
-    Job addEntityToSystem(final String systemId, final String entityId) throws ConnectorException;
+    void addEntityToSystem(final String systemId, final String entityId, ProviderTarget target) throws ConnectorException;
 
 }

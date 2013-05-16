@@ -32,7 +32,7 @@ import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.Constants;
 import org.osgi.framework.ServiceRegistration;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +44,11 @@ public class Activator implements BundleActivator {
 
     public void start(final BundleContext context) {
         Dictionary<String, String> props = new Hashtable<String, String>();
-        props.put(Constants.SERVICE_PID, "MockCloudProviderConnectorFactory");
-        props.put(ICloudProviderConnectorFactory.CLOUD_PROVIDER_TYPE_PROPERTY, "mock");
-        MockCloudProviderConnectorFactory mockCloudProviderConnectorFactory = new MockCloudProviderConnectorFactory(context);
-        this.serviceRegistration = context.registerService(ICloudProviderConnectorFactory.class.getCanonicalName(),
-            mockCloudProviderConnectorFactory, props);
+        props.put(Constants.SERVICE_PID, "MockCloudProviderConnector");
+        props.put(ICloudProviderConnector.CLOUD_PROVIDER_TYPE_PROPERTY, "mock");
+        MockCloudProviderConnector mockCloudProviderConnector = new MockCloudProviderConnector();
+        this.serviceRegistration = context.registerService(ICloudProviderConnector.class.getCanonicalName(),
+            mockCloudProviderConnector, props);
     }
 
     public void stop(final BundleContext context) {

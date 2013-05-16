@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2011 France Telecom
+ * Copyright (C) 2013 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -19,23 +19,34 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id$
  *
  */
 package org.ow2.sirocco.cloudmanager.connector.api;
 
-public interface ICloudProviderConnector {
-    final String CLOUD_PROVIDER_TYPE_PROPERTY = "cloudprovider.type";
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
-    IComputeService getComputeService() throws ConnectorException;
+public class ProviderTarget {
+    private CloudProviderAccount account;
 
-    IVolumeService getVolumeService() throws ConnectorException;
+    private CloudProviderLocation location;
 
-    IImageService getImageService() throws ConnectorException;
+    CloudProviderAccount getAccount() {
+        return this.account;
+    }
 
-    INetworkService getNetworkService() throws ConnectorException;
+    CloudProviderLocation getLocation() {
+        return this.location;
+    }
 
-    ISystemService getSystemService() throws ConnectorException;
+    public ProviderTarget account(final CloudProviderAccount account) {
+        this.account = account;
+        return this;
+    }
 
-    IProviderCapability getProviderCapability() throws ConnectorException;
+    public ProviderTarget account(final CloudProviderLocation location) {
+        this.location = location;
+        return this;
+    }
+
 }

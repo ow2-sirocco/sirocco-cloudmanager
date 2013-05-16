@@ -30,7 +30,6 @@ import java.util.List;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
@@ -41,44 +40,47 @@ public interface INetworkService {
     // Network operations
     //
 
-    Job createNetwork(NetworkCreate networkCreate) throws ConnectorException;
+    Network createNetwork(NetworkCreate networkCreate, ProviderTarget target) throws ConnectorException;
 
-    Network getNetwork(String networkId) throws ConnectorException;
+    Network getNetwork(String networkId, ProviderTarget target) throws ConnectorException;
 
-    List<Network> getNetworks() throws ConnectorException;
+    List<Network> getNetworks(ProviderTarget target) throws ConnectorException;
 
-    Job deleteNetwork(String networkId) throws ConnectorException;
+    void deleteNetwork(String networkId, ProviderTarget target) throws ConnectorException;
 
-    Job startNetwork(String networkId) throws ConnectorException;
+    void startNetwork(String networkId, ProviderTarget target) throws ConnectorException;
 
-    Job stopNetwork(String networkId) throws ConnectorException;
+    void stopNetwork(String networkId, ProviderTarget target) throws ConnectorException;
 
     //
     // NetworkPort operations
     //
 
-    Job createNetworkPort(NetworkPortCreate networkPortCreate) throws ConnectorException;
+    NetworkPort createNetworkPort(NetworkPortCreate networkPortCreate, ProviderTarget target) throws ConnectorException;
 
-    NetworkPort getNetworkPort(String networkPortId) throws ConnectorException;
+    NetworkPort getNetworkPort(String networkPortId, ProviderTarget target) throws ConnectorException;
 
-    Job deleteNetworkPort(String networkPortId) throws ConnectorException;
+    void deleteNetworkPort(String networkPortId, ProviderTarget target) throws ConnectorException;
 
-    Job startNetworkPort(String networkPortId) throws ConnectorException;
+    void startNetworkPort(String networkPortId, ProviderTarget target) throws ConnectorException;
 
-    Job stopNetworkPort(String networkPortId) throws ConnectorException;
+    void stopNetworkPort(String networkPortId, ProviderTarget target) throws ConnectorException;
 
     //
     // ForwardingGroup operations
     //
 
-    Job createForwardingGroup(ForwardingGroupCreate forwardingGroupCreate) throws ConnectorException;
+    ForwardingGroup createForwardingGroup(ForwardingGroupCreate forwardingGroupCreate, ProviderTarget target)
+        throws ConnectorException;
 
-    ForwardingGroup getForwardingGroup(String forwardingGroupId) throws ConnectorException;
+    ForwardingGroup getForwardingGroup(String forwardingGroupId, ProviderTarget target) throws ConnectorException;
 
-    Job deleteForwardingGroup(String forwardingGroupId) throws ConnectorException;
+    void deleteForwardingGroup(String forwardingGroupId, ProviderTarget target) throws ConnectorException;
 
-    Job addNetworkToForwardingGroup(String forwardingGroupId, ForwardingGroupNetwork fgNetwork) throws ConnectorException;
+    void addNetworkToForwardingGroup(String forwardingGroupId, ForwardingGroupNetwork fgNetwork, ProviderTarget target)
+        throws ConnectorException;
 
-    Job removeNetworkFromForwardingGroup(String forwardingGroupId, String networkId) throws ConnectorException;
+    void removeNetworkFromForwardingGroup(String forwardingGroupId, String networkId, ProviderTarget target)
+        throws ConnectorException;
 
 }
