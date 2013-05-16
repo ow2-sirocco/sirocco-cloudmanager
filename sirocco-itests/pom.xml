@@ -207,14 +207,8 @@
 						<phase>pre-integration-test</phase>
 						<configuration>
 							<tasks>
-								<delete>
-   									 <fileset dir="${glassfish.root}/modules" includes="org.eclipse.persistence.*"/>
-  								</delete>
 								<copy todir="${glassfish.bundles}" overwrite="true">
 									<fileset dir="etc/bundles" />
-								</copy>
-								<copy todir="${glassfish.root}/modules" overwrite="true">
-									<fileset dir="etc/modules" />
 								</copy>
 								<copy tofile="${glassfish.root}/config/osgi.properties" file="src/test/resources/config/osgi.properties" />
 								<copy todir="${glassfish.domain}/config" overwrite="true">
