@@ -24,7 +24,8 @@
  */
 package org.ow2.sirocco.cloudmanager.itests;
 
-import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -46,13 +47,22 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 
 public class NetworkManagerTest extends AbstractTestBase {
 
+    Map<String, String> singletonMap(final String key, final String value) {
+        // XXX cannot use Collections.singletonMap that returns a non-cloneable
+        // map
+        // see https://bugs.eclipse.org/bugs/show_bug.cgi?id=241322
+        Map<String, String> props = new HashMap<String, String>();
+        props.put(key, value);
+        return props;
+    }
+
     NetworkConfiguration newNetworkConfiguration(final String name) {
         NetworkConfiguration netConfig = new NetworkConfiguration();
         netConfig.setName(name);
         netConfig.setDescription("dummy net config");
-        netConfig.setProperties(Collections.singletonMap("color", "blue"));
+        netConfig.setProperties(this.singletonMap("color", "blue"));
         netConfig.setClassOfService("silver");
-        netConfig.setNetworkType(Network.Type.PUBLIC);
+        netConfig.setNetworkType(Network.Type.PRIVATE);
         return netConfig;
     }
 
@@ -67,7 +77,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         Assert.assertEquals("dummy net config", netConfig.getDescription());
         Assert.assertEquals("blue", netConfig.getProperties().get("color"));
         Assert.assertEquals("silver", netConfig.getClassOfService());
-        Assert.assertEquals(Network.Type.PUBLIC, netConfig.getNetworkType());
+        Assert.assertEquals(Network.Type.PRIVATE, netConfig.getNetworkType());
 
         // attempt to create netconfig with same name
 
@@ -85,7 +95,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         Assert.assertEquals("dummy net config", netConfig.getDescription());
         Assert.assertEquals("blue", netConfig.getProperties().get("color"));
         Assert.assertEquals("silver", netConfig.getClassOfService());
-        Assert.assertEquals(Network.Type.PUBLIC, netConfig.getNetworkType());
+        Assert.assertEquals(Network.Type.PRIVATE, netConfig.getNetworkType());
 
         // update
 
@@ -105,7 +115,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         NetworkTemplate netTemplate = new NetworkTemplate();
         netTemplate.setName(name);
         netTemplate.setDescription("dummy net template");
-        netTemplate.setProperties(Collections.singletonMap("color", "blue"));
+        netTemplate.setProperties(this.singletonMap("color", "blue"));
         netTemplate.setNetworkConfig(netConfig);
         netTemplate.setForwardingGroup(forwardingGroup);
         return netTemplate;
@@ -178,7 +188,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         NetworkCreate networkCreate = new NetworkCreate();
         networkCreate.setName("myNetwork");
         networkCreate.setDescription("dummy network");
-        networkCreate.setProperties(Collections.singletonMap("color", "blue"));
+        networkCreate.setProperties(this.singletonMap("color", "blue"));
 
         networkCreate.setNetworkTemplate(netTemplate);
 
@@ -206,7 +216,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         NetworkCreate networkCreate = new NetworkCreate();
         networkCreate.setName("myNetwork");
         networkCreate.setDescription("dummy network");
-        networkCreate.setProperties(Collections.singletonMap("color", "blue"));
+        networkCreate.setProperties(this.singletonMap("color", "blue"));
 
         networkCreate.setNetworkTemplate(netTemplate);
 
@@ -249,7 +259,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         NetworkPortConfiguration netPortConfig = new NetworkPortConfiguration();
         netPortConfig.setName(name);
         netPortConfig.setDescription("my net port");
-        netPortConfig.setProperties(Collections.singletonMap("color", "blue"));
+        netPortConfig.setProperties(this.singletonMap("color", "blue"));
         netPortConfig.setClassOfService("silver");
         netPortConfig.setPortType("ACCESS");
         return netPortConfig;
@@ -304,7 +314,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         NetworkPortTemplate netTemplate = new NetworkPortTemplate();
         netTemplate.setName(name);
         netTemplate.setDescription("my net port template");
-        netTemplate.setProperties(Collections.singletonMap("color", "blue"));
+        netTemplate.setProperties(this.singletonMap("color", "blue"));
         netTemplate.setNetworkPortConfig(netPortConfig);
         netTemplate.setNetwork(network);
         return netTemplate;
@@ -324,7 +334,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         NetworkCreate networkCreate = new NetworkCreate();
         networkCreate.setName("myNetwork");
         networkCreate.setDescription("dummy network");
-        networkCreate.setProperties(Collections.singletonMap("color", "blue"));
+        networkCreate.setProperties(this.singletonMap("color", "blue"));
 
         networkCreate.setNetworkTemplate(netTemplate);
         Job job = this.networkManager.createNetwork(networkCreate);
@@ -401,7 +411,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         NetworkCreate networkCreate = new NetworkCreate();
         networkCreate.setName("myNetwork");
         networkCreate.setDescription("dummy network");
-        networkCreate.setProperties(Collections.singletonMap("color", "blue"));
+        networkCreate.setProperties(this.singletonMap("color", "blue"));
 
         networkCreate.setNetworkTemplate(netTemplate);
         Job job = this.networkManager.createNetwork(networkCreate);
@@ -421,7 +431,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         NetworkPortCreate networkPortCreate = new NetworkPortCreate();
         networkPortCreate.setName("myNetworkPort");
         networkPortCreate.setDescription("my network port");
-        networkPortCreate.setProperties(Collections.singletonMap("color", "blue"));
+        networkPortCreate.setProperties(this.singletonMap("color", "blue"));
 
         networkPortCreate.setNetworkPortTemplate(netPortTemplate);
 
@@ -470,13 +480,13 @@ public class NetworkManagerTest extends AbstractTestBase {
         ForwardingGroupTemplate forwardingGroupTemplate = new ForwardingGroupTemplate();
         forwardingGroupTemplate.setName("myForwardingGroupTemplate");
         forwardingGroupTemplate.setDescription("my forwarding group template");
-        forwardingGroupTemplate.setProperties(Collections.singletonMap("color", "blue"));
+        forwardingGroupTemplate.setProperties(this.singletonMap("color", "blue"));
 
         ForwardingGroupCreate forwardingGroupCreate = new ForwardingGroupCreate();
         forwardingGroupCreate.setForwardingGroupTemplate(forwardingGroupTemplate);
         forwardingGroupCreate.setName("myForwardingGroup");
         forwardingGroupCreate.setDescription("my forwarding group");
-        forwardingGroupCreate.setProperties(Collections.singletonMap("color", "blue"));
+        forwardingGroupCreate.setProperties(this.singletonMap("color", "blue"));
 
         Job job = this.networkManager.createForwardingGroup(forwardingGroupCreate);
         Assert.assertEquals("add", job.getAction());
@@ -506,7 +516,7 @@ public class NetworkManagerTest extends AbstractTestBase {
         NetworkCreate networkCreate = new NetworkCreate();
         networkCreate.setName("myNetwork1");
         networkCreate.setDescription("dummy network");
-        networkCreate.setProperties(Collections.singletonMap("color", "blue"));
+        networkCreate.setProperties(this.singletonMap("color", "blue"));
 
         networkCreate.setNetworkTemplate(netTemplate);
 
