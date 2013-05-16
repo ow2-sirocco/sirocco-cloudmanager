@@ -43,14 +43,8 @@
 	<name>SIROCCO :: CloudManager :: Connectors </name>
 
 	<modules>
-		<module>util</module> 
 		<module>connector-api</module> 
-		<module>connector</module> 
 		<module>mock</module> 
-		<module>openstack</module> 
-		<module>amazon</module> 
-		<module>vcd</module> 
-		<module>test</module>  
 	</modules>
 
 	<build>
