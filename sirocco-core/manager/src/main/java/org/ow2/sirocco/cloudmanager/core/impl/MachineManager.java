@@ -2355,8 +2355,10 @@ public class MachineManager implements IMachineManager {
         if (vols != null) {
             for (MachineVolume v : vols) {
                 Volume volume = v.getVolume();
-                if (volume.getId() == null) {
-                    this.em.persist(volume);
+                if (volume != null) {
+                    if (volume.getId() == null) {
+                        this.em.persist(volume);
+                    }
                 }
                 if (v.getId() == null) {
                     this.em.persist(v);
