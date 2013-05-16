@@ -637,7 +637,7 @@ public class SystemManager implements ISystemManager {
                                     throw new InvalidRequestException("Invalid network interface: component #"
                                         + nic.getSystemNetworkName() + " not found");
                                 }
-                            } else if (nic.getNetwork() == null) {
+                            } else if (nic.getNetworkType() == null && nic.getNetwork() == null) {
                                 throw new InvalidRequestException("Invalid network interface: missing network");
                             }
 
@@ -2000,7 +2000,7 @@ public class SystemManager implements ISystemManager {
         CloudCollectionItem obj = null;
         try {
             obj = (CloudCollectionItem) this.em
-                .createQuery("SELECT v FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId")
+                .createQuery("SELECT v FROM CloudCollectionItem v WHERE v.resource.id=:resourceId")
                 .setParameter("resourceId", new Integer(entityId)).getSingleResult();
         } catch (NoResultException e) {
             obj = null;
@@ -2023,8 +2023,7 @@ public class SystemManager implements ISystemManager {
             } else if (obj instanceof SystemNetwork) {
                 collection = "v.networks";
             }
-            sys = (System) this.em
-                .createQuery("SELECT v FROM " + System.class.getName() + " v WHERE :resource member " + collection)
+            sys = (System) this.em.createQuery("SELECT v FROM System v WHERE :resource member " + collection)
                 .setParameter("resource", obj).getSingleResult();
         } catch (NoResultException e) {
             sys = null;

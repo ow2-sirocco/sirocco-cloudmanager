@@ -410,8 +410,7 @@ public class QueryHelper {
      */
     public static CloudCollectionItem getCloudCollectionById(final EntityManager em, final String entityId)
         throws CloudProviderException {
-        CloudCollectionItem obj = (CloudCollectionItem) em
-            .createQuery("SELECT v FROM " + CloudCollectionItem.class.getName() + "v  WHERE v.id=:idd")
+        CloudCollectionItem obj = (CloudCollectionItem) em.createQuery("SELECT v FROM CloudCollectionItem v  WHERE v.id=:idd")
             .setParameter("idd", entityId).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
@@ -429,8 +428,7 @@ public class QueryHelper {
      */
     public static CloudResource getCloudResourceById(final EntityManager em, final String resourceId)
         throws CloudProviderException {
-        CloudResource obj = (CloudResource) em
-            .createQuery("SELECT v FROM " + CloudResource.class.getName() + " v WHERE v.id=:idd")
+        CloudResource obj = (CloudResource) em.createQuery("SELECT v FROM CloudResource v WHERE v.id=:idd")
             .setParameter("idd", new Integer(resourceId)).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
@@ -449,7 +447,7 @@ public class QueryHelper {
     public static CloudCollectionItem getCloudCollectionFromCloudResource(final EntityManager em, final CloudResource ce)
         throws CloudProviderException {
         CloudCollectionItem obj = (CloudCollectionItem) em
-            .createQuery("SELECT v FROM " + CloudCollectionItem.class.getName() + " v WHERE v.resource.id=:resourceId")
+            .createQuery("SELECT v FROM CloudCollectionItem v WHERE v.resource.id=:resourceId")
             .setParameter("resourceId", ce.getId()).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
@@ -459,8 +457,7 @@ public class QueryHelper {
 
     public static CloudResource getResourceFromProviderId(final EntityManager em, final String providerAsynchId)
         throws CloudProviderException {
-        CloudResource obj = (CloudResource) em
-            .createQuery("SELECT v FROM " + CloudResource.class.getName() + " v WHERE v.providerAssignedId=:provid")
+        CloudResource obj = (CloudResource) em.createQuery("SELECT v FROM CloudResource v WHERE v.providerAssignedId=:provid")
             .setParameter("provid", providerAsynchId).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
