@@ -44,7 +44,7 @@
     <jdbc-connection-pool driver-classname="" datasource-classname="org.h2.jdbcx.JdbcDataSource" res-type="javax.sql.DataSource" description="" name="H2InMemory">
       <property name="User" value="sa"></property>
       <property name="Password" value=""></property>
-      <property name="URL" value="jdbc:h2:mem:sirocco"></property>
+      <property name="URL" value="jdbc:h2:mem:sirocco;MVCC=TRUE"></property>
       <property name="LoginTimeout" value="0"></property>
     </jdbc-connection-pool>
     <jdbc-resource pool-name="H2InMemory" description="" jndi-name="jdbc/H2InMemory"></jdbc-resource>
