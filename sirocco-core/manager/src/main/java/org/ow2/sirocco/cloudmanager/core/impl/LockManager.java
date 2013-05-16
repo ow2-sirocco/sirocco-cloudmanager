@@ -129,7 +129,7 @@ public class LockManager implements ILockManager {
 
         try {
             this.em.persist(lock);
-        } catch (RuntimeException e) {
+        } catch (Exception e) {
             throw new CloudProviderException("unable to lock object " + targetId + " of type " + targetType
                 + " because of exception " + e.getMessage());
         }
