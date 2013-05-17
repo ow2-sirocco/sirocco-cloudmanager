@@ -31,11 +31,11 @@ public class ProviderTarget {
 
     private CloudProviderLocation location;
 
-    CloudProviderAccount getAccount() {
+    public CloudProviderAccount getAccount() {
         return this.account;
     }
 
-    CloudProviderLocation getLocation() {
+    public CloudProviderLocation getLocation() {
         return this.location;
     }
 
@@ -44,7 +44,7 @@ public class ProviderTarget {
         return this;
     }
 
-    public ProviderTarget account(final CloudProviderLocation location) {
+    public ProviderTarget location(final CloudProviderLocation location) {
         this.location = location;
         return this;
     }

@@ -46,7 +46,7 @@ public interface IComputeService {
 
     void deleteMachine(final String machineId, ProviderTarget target) throws ConnectorException;
 
-    void captureMachine(String machineId, MachineImage machineImage, ProviderTarget target) throws ConnectorException;
+    MachineImage captureMachine(String machineId, MachineImage machineImage, ProviderTarget target) throws ConnectorException;
 
     Machine.State getMachineState(final String machineId, ProviderTarget target) throws ConnectorException;
 

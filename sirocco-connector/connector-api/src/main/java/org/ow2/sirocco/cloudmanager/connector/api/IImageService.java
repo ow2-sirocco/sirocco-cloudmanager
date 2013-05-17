@@ -27,7 +27,8 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
 public interface IImageService {
-    void destroyImage(final String imageId, ProviderTarget target) throws ConnectorException;
+    MachineImage getMachineImage(final String machineImageId, ProviderTarget target) throws ConnectorException;
 
-    void uploadImage(MachineImage imageUpload, ProviderTarget target) throws ConnectorException;
+    void deleteMachineImage(final String imageId, ProviderTarget target) throws ConnectorException;
+
 }

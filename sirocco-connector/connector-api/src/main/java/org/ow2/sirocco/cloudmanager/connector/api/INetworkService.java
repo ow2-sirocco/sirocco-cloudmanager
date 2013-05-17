@@ -44,6 +44,8 @@ public interface INetworkService {
 
     Network getNetwork(String networkId, ProviderTarget target) throws ConnectorException;
 
+    Network.State getNetworkState(String networkId, ProviderTarget target) throws ConnectorException;
+
     List<Network> getNetworks(ProviderTarget target) throws ConnectorException;
 
     void deleteNetwork(String networkId, ProviderTarget target) throws ConnectorException;

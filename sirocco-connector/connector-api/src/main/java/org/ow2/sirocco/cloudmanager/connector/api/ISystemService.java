@@ -51,6 +51,8 @@ public interface ISystemService {
 
     System getSystem(String systemId, ProviderTarget target) throws ConnectorException;
 
+    System.State getSystemState(String systemId, ProviderTarget target) throws ConnectorException;
+
     List<? extends CloudCollectionItem> getEntityListFromSystem(String systemId, String entityType, ProviderTarget target)
         throws ConnectorException;
 
