@@ -46,6 +46,7 @@ public class Activator implements BundleActivator {
         Dictionary<String, String> props = new Hashtable<String, String>();
         props.put(Constants.SERVICE_PID, "MockCloudProviderConnector");
         props.put(ICloudProviderConnector.CLOUD_PROVIDER_TYPE_PROPERTY, "mock");
+
         MockCloudProviderConnector mockCloudProviderConnector = new MockCloudProviderConnector();
         this.serviceRegistration = context.registerService(ICloudProviderConnector.class.getCanonicalName(),
             mockCloudProviderConnector, props);
