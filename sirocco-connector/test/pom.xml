@@ -66,21 +66,6 @@
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-openstack-nova</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-amazon</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-util-jobmanager</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.apache.felix.ipojo.annotations</artifactId>
 			<version>1.6.0</version>
