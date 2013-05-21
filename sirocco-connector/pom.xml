@@ -44,6 +44,7 @@
 
 	<modules>
 		<module>connector-api</module> 
+		<module>connector-finder</module> 
 		<module>mock</module> 
 		<module>test</module> 
 	</modules>
