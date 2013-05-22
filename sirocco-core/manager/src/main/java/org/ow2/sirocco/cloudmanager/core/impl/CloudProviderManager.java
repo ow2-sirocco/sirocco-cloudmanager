@@ -61,7 +61,7 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     private static Logger logger = LoggerFactory.getLogger(CloudProviderManager.class.getName());
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource

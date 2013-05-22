@@ -87,7 +87,7 @@ public class JobManager implements IJobManager {
 
     public long lockWaitTimeInSeconds = 0;
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @EJB

@@ -174,7 +174,7 @@ public class SystemManager implements ISystemManager {
 
     private static String PROP_JOB_COLLECTION_ID = "_JobCollectionId";
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource

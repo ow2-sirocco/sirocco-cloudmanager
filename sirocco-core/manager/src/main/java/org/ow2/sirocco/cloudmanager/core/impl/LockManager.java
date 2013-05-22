@@ -56,7 +56,7 @@ public class LockManager implements ILockManager {
 
     public long lockTimeoutInSeconds = 600;
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource

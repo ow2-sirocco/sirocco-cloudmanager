@@ -57,7 +57,7 @@ public class UserManager implements IUserManager {
 
     private static Logger logger = LoggerFactory.getLogger(UserManager.class.getName());
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource

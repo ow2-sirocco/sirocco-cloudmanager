@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
 public class NetworkManager implements INetworkManager {
     private static Logger logger = LoggerFactory.getLogger(NetworkManager.class.getName());
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource

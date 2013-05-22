@@ -68,7 +68,7 @@ public class MachineImageManager implements IMachineImageManager {
 
     private static Logger logger = LoggerFactory.getLogger(MachineImageManager.class.getName());
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @EJB

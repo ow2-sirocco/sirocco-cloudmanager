@@ -64,7 +64,7 @@ public class CredentialsManager implements ICredentialsManager {
 
     private static Logger logger = LoggerFactory.getLogger(CredentialsManager.class.getName());
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource
