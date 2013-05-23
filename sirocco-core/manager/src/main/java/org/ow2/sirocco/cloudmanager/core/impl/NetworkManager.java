@@ -121,7 +121,7 @@ public class NetworkManager implements INetworkManager {
 
     public Network getPublicNetwork() {
         List<Network> publicNetworks = this.em.createQuery(
-            "SELECT n FROM Network n WHERE networkType=org.ow2.sirocco.cloudmanager.model.cimi.Network$Type.PUBLIC")
+            "SELECT n FROM Network n WHERE n.networkType=org.ow2.sirocco.cloudmanager.model.cimi.Network$Type.PUBLIC")
             .getResultList();
         return publicNetworks.get(0);
     }
