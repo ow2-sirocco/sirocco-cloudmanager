@@ -87,6 +87,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
@@ -390,6 +391,12 @@ public class MachineManager implements IMachineManager {
 
         try {
             computeService = connector.getComputeService();
+            // XXX tentative fix to set the public network of nics
+            for (MachineTemplateNetworkInterface nic : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
+                if (nic.getNetworkType() == Type.PUBLIC && nic.getNetwork() == null) {
+                    nic.setNetwork(this.networkManager.getPublicNetwork());
+                }
+            }
             jobCreateMachine = computeService.createMachine(machineCreate);
         } catch (Exception e) {
             MachineManager.logger.error("Failed to create machine", e);
