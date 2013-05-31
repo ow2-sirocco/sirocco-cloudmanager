@@ -36,7 +36,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
@@ -725,11 +724,7 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
     @Test
     public void testScenarioOne() throws Exception {
         this.initDatabase();
-        /**
-         * Retrieve the CEP
-         */
 
-        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
         System.out.println(" test machinetemplate create");
         this.testMachineTemplateCreate();
         System.out.println(" test machine create ");
@@ -794,7 +789,6 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Retrieve the CEP
          */
         System.out.println("testScenarioTwo ");
-        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
         System.out.println(" testScenarioTwo: create machine ");
         String machineId = this.createMachine();
         System.out.println(" testScenarioTwo: create volumes ");
@@ -879,7 +873,6 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Retrieve the CEP
          */
         System.out.println("testScenarioThree with volume attachment during machine create ");
-        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
         System.out.println(" test machinetemplate create");
         this.testMachineTemplateCreate();
         System.out.println(" test machine create with volumes ");
@@ -1024,7 +1017,6 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Retrieve the CEP
          */
         System.out.println("testScenarioFour with volume creation during machine create ");
-        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
         System.out.println(" test machinetemplate create");
         this.testMachineTemplateCreate();
         System.out.println(" test machine create with volumes ");
@@ -1090,7 +1082,6 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Retrieve the CEP
          */
         System.out.println("testScenarioFive with volume creation during machine create ");
-        CloudEntryPoint cep = this.machineManager.getCloudEntryPoint();
         System.out.println(" test machinetemplate create");
         this.testMachineTemplateCreate();
         System.out.println(" test machine create with volumes ");

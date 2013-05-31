@@ -302,7 +302,7 @@ public class SystemManagerTest extends AbstractTestBase {
         java.lang.System.out.println("testing gets on system templates");
         SystemTemplate systemTemplate1_2 = this.systemManager.getSystemTemplateById(systemTemplate1_1.getId().toString());
         Assert.assertEquals("systemTemplateTest1", systemTemplate1_2.getName());
-        Assert.assertEquals(this.user.getId(), systemTemplate1_2.getUser().getId());
+        Assert.assertEquals(this.tenant.getId(), systemTemplate1_2.getTenant().getId());
         Iterator<ComponentDescriptor> it = systemTemplate1_2.getComponentDescriptors().iterator();
         int tot = 0;
         while (it.hasNext()) {
