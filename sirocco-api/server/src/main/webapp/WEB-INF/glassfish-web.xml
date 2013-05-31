@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE glassfish-web-app PUBLIC "-//GlassFish.org//DTD GlassFish Application Server 3.1 Servlet 3.0//EN" "http://glassfish.org/dtds/glassfish-web-app_3_0-1.dtd">
+<glassfish-web-app>
+	<context-root>/api</context-root>
+	<security-role-mapping>
+		<role-name>sirocco-user</role-name>
+		<group-name>sirocco-user</group-name>
+	</security-role-mapping>
+	<security-role-mapping>
+		<role-name>sirocco-admin</role-name>
+		<group-name>sirocco-admin</group-name>
+	</security-role-mapping>
+	<class-loader delegate="false" />
+</glassfish-web-app>
