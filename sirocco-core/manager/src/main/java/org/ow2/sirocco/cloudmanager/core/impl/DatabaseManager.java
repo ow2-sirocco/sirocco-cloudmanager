@@ -61,6 +61,7 @@ public class DatabaseManager implements IDatabaseManager {
             this.em.createNativeQuery("DELETE FROM NetworkPortTemplate").executeUpdate();
 
             this.em.createNativeQuery("DELETE FROM Users").executeUpdate();
+            this.em.createNativeQuery("DELETE FROM Tenant").executeUpdate();
         } catch (Exception e) {
             DatabaseManager.logger.error("Failed to delete some entities", e);
         } finally {

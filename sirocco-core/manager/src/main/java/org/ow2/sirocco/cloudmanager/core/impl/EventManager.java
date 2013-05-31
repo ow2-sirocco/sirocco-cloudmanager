@@ -46,6 +46,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 @Stateless
 @Remote(IRemoteEventManager.class)
 @Local(IEventManager.class)
+@IdentityInterceptorBinding
 public class EventManager implements IEventManager {
 
     @Override

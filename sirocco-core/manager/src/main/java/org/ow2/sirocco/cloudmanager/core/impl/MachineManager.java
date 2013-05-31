@@ -58,8 +58,9 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
-import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.BadStateException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -70,7 +71,6 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableExcepti
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
@@ -93,13 +93,14 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteMachineManager.class)
 @Local(IMachineManager.class)
+@IdentityInterceptorBinding
 public class MachineManager implements IMachineManager {
 
     static final String EJB_JNDI_NAME = "MachineManager";
@@ -110,7 +111,7 @@ public class MachineManager implements IMachineManager {
     private EntityManager em;
 
     @EJB
-    private IUserManager userManager;
+    private ITenantManager tenantManager;
 
     @EJB
     private ICloudProviderManager cloudProviderManager;
@@ -131,32 +132,17 @@ public class MachineManager implements IMachineManager {
     @OSGiService(dynamic = true)
     private ICloudProviderConnectorFactoryFinder cloudProviderConnectorFactoryFinder;
 
+    @Inject
+    private IdentityContext identityContext;
+
     @Resource
     private SessionContext ctx;
 
-    @Resource
-    public void setSessionContext(final SessionContext ctx) {
-        this.ctx = ctx;
+    private Tenant getTenant() throws CloudProviderException {
+        return this.tenantManager.getTenant(this.identityContext);
     }
 
-    private User getUser() throws CloudProviderException {
-        String username = this.ctx.getCallerPrincipal().getName();
-        return this.userManager.getUserByUsername(username);
-    }
-
-    /**
-     * Operations on CloudProviderEntryPoint
-     */
-
-    @Override
-    public CloudEntryPoint getCloudEntryPoint() throws CloudProviderException {
-        Integer userid = this.getUser().getId();
-        CloudEntryPoint cep = (CloudEntryPoint) this.em.createQuery("SELECT c FROM CloudEntryPoint c WHERE c.user.id=:userid")
-            .setParameter("userid", userid).getSingleResult();
-        return cep;
-    }
-
-    private boolean checkQuota(final User u, final MachineConfiguration mc) {
+    private boolean checkQuota(final Tenant t, final MachineConfiguration mc) {
         return true;
     }
 
@@ -214,7 +200,7 @@ public class MachineManager implements IMachineManager {
      * User could have passed by value or by reference. Validation is expected
      * to be done by REST layer
      */
-    private void checkVolumes(final MachineTemplate mt, final User u) throws CloudProviderException {
+    private void checkVolumes(final MachineTemplate mt, final Tenant tenant) throws CloudProviderException {
 
         List<MachineVolume> volumes = mt.getVolumes();
         if (volumes != null && volumes.size() != 0) {
@@ -254,7 +240,7 @@ public class MachineManager implements IMachineManager {
         }
     }
 
-    private void validateMachineImage(final MachineTemplate mt, final User u) throws InvalidRequestException {
+    private void validateMachineImage(final MachineTemplate mt, final Tenant tenant) throws InvalidRequestException {
         MachineImage mi = mt.getMachineImage();
         if ((mi == null) || (mi.getId() == null)) {
             throw new InvalidRequestException(" MachineImage should be set");
@@ -266,11 +252,11 @@ public class MachineManager implements IMachineManager {
         }
     }
 
-    private void validateCreationParameters(final MachineTemplate mt, final User u) throws CloudProviderException {
+    private void validateCreationParameters(final MachineTemplate mt, final Tenant tenant) throws CloudProviderException {
         // TODO check all references
-        this.checkVolumes(mt, u);
+        this.checkVolumes(mt, tenant);
         this.validateMachineConfiguration(mt.getMachineConfig());
-        this.validateMachineImage(mt, u);
+        this.validateMachineImage(mt, tenant);
     }
 
     private Job createJob(final CloudResource targetResource, final List<CloudResource> affectedResources, final String action,
@@ -281,7 +267,7 @@ public class MachineManager implements IMachineManager {
         j.setAffectedResources(affectedResources);
         j.setAction(action);
         j.setState(status);
-        j.setUser(this.getUser());
+        j.setTenant(this.getTenant());
         j.setCreated(new Date());
         j.setProperties(new HashMap<String, String>());
         if (parent != null) {
@@ -370,16 +356,17 @@ public class MachineManager implements IMachineManager {
     }
 
     public Job createMachine(final MachineCreate machineCreate) throws CloudProviderException {
+        Tenant tenant = this.getTenant();
 
         MachineTemplate mt = machineCreate.getMachineTemplate();
 
-        this.validateCreationParameters(mt, this.getUser());
+        this.validateCreationParameters(mt, tenant);
 
-        if (this.checkQuota(this.getUser(), mt.getMachineConfig()) == false) {
-            throw new CloudProviderException("User exceeded quota ");
+        if (this.checkQuota(this.getTenant(), mt.getMachineConfig()) == false) {
+            throw new CloudProviderException("Tenant exceeded quota ");
         }
 
-        Placement placement = this.cloudProviderManager.placeResource(machineCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), machineCreate.getProperties());
         ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         if (connector == null) {
             throw new CloudProviderException("Cannot retrieve cloud provider connector "
@@ -415,7 +402,7 @@ public class MachineManager implements IMachineManager {
             machineCreate.getProperties()));
 
         m.setState(Machine.State.CREATING);
-        m.setUser(this.getUser());
+        m.setTenant(this.getTenant());
         m.setCpu(mt.getMachineConfig().getCpu());
         m.setMemory(mt.getMachineConfig().getMemory());
 
@@ -485,13 +472,13 @@ public class MachineManager implements IMachineManager {
         final List<String> attributes) throws CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Machine", Machine.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(Machine.State.DELETED));
     }
 
     @Override
     public List<Machine> getMachines() throws CloudProviderException {
-        return QueryHelper.getEntityList("Machine", this.em, this.getUser().getUsername(), Machine.State.DELETED);
+        return QueryHelper.getEntityList("Machine", this.em, this.getTenant().getId(), Machine.State.DELETED);
     }
 
     private Machine checkOps(final String machineId, final String action) throws CloudProviderException {
@@ -582,7 +569,7 @@ public class MachineManager implements IMachineManager {
                 + m.getProviderAssignedId());
         }
         MachineImage capturedMachineImage = new MachineImage();
-        capturedMachineImage.setUser(this.getUser());
+        capturedMachineImage.setTenant(this.getTenant());
         capturedMachineImage.setName(machineImage.getName());
         capturedMachineImage.setDescription(machineImage.getDescription());
         capturedMachineImage.setProperties(machineImage.getProperties());
@@ -838,7 +825,7 @@ public class MachineManager implements IMachineManager {
         j.setParentJob(null);
         j.setNestedJobs(null);
         j.setReturnCode(0);
-        j.setUser(this.getUser());
+        j.setTenant(this.getTenant());
         this.em.persist(j);
         this.em.flush();
         return j;
@@ -923,7 +910,7 @@ public class MachineManager implements IMachineManager {
         if ((mts != null) && (mts.size() > 0)) {
             throw new ResourceConflictException("MachineTemplates " + mts.get(0).getId() + " uses the configuration " + mcId);
         }
-        config.setUser(null);
+        config.setTenant(null);
 
         this.em.remove(config);
         this.em.flush();
@@ -932,8 +919,8 @@ public class MachineManager implements IMachineManager {
     @Override
     public List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException {
         List<MachineConfiguration> machineConfigs = this.em
-            .createQuery("SELECT c FROM MachineConfiguration c WHERE c.user.id=:userid")
-            .setParameter("userid", this.getUser().getId()).getResultList();
+            .createQuery("SELECT c FROM MachineConfiguration c WHERE c.tenant.id=:tenantId")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
         for (MachineConfiguration machineConfig : machineConfigs) {
             machineConfig.getDisks().size();
         }
@@ -946,7 +933,7 @@ public class MachineManager implements IMachineManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineConfiguration",
             MachineConfiguration.class);
         QueryResult<MachineConfiguration> machineConfigs = QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
         for (MachineConfiguration machineConfig : machineConfigs.getItems()) {
             if (machineConfig.getDisks() != null) {
                 machineConfig.getDisks().size();
@@ -958,20 +945,20 @@ public class MachineManager implements IMachineManager {
     public MachineConfiguration createMachineConfiguration(final MachineConfiguration machineConfig)
         throws CloudProviderException {
 
-        Integer userid = this.getUser().getId();
+        Integer tenantId = this.getTenant().getId();
         this.validateMachineConfiguration(machineConfig);
         boolean exists = true;
         try {
             MachineConfiguration mc = (MachineConfiguration) this.em
-                .createQuery("SELECT m FROM MachineConfiguration m WHERE m.user.id=:userid AND m.name=:name")
-                .setParameter("userid", userid).setParameter("name", machineConfig.getName()).getSingleResult();
+                .createQuery("SELECT m FROM MachineConfiguration m WHERE m.tenant.id=:tenantId AND m.name=:name")
+                .setParameter("tenantId", tenantId).setParameter("name", machineConfig.getName()).getSingleResult();
         } catch (NoResultException e) {
             exists = false;
         }
         if (exists == true) {
             throw new CloudProviderException("MachineConfiguration by name already exists " + machineConfig.getName());
         }
-        machineConfig.setUser(this.getUser());
+        machineConfig.setTenant(this.getTenant());
         machineConfig.setCreated(new Date());
         this.em.persist(machineConfig);
         this.em.flush();
@@ -1085,7 +1072,7 @@ public class MachineManager implements IMachineManager {
     }
 
     private void deleteMachineTemplateFromDb(final MachineTemplate mt) {
-        mt.setUser(null);
+        mt.setTenant(null);
         List<MachineVolume> vColl = mt.getVolumes();
         mt.setVolumes(null);
         if (vColl != null) {
@@ -1113,7 +1100,7 @@ public class MachineManager implements IMachineManager {
         if (mt == null) {
             throw new ResourceNotFoundException("Cannot find machine template " + mtId);
         }
-        if (mt.getUser().equals(this.getUser()) == false) {
+        if (mt.getTenant().equals(this.getTenant()) == false) {
             throw new CloudProviderException("Not owner, cannot delete machine template ");
         }
 
@@ -1198,11 +1185,11 @@ public class MachineManager implements IMachineManager {
      */
     public MachineTemplate createMachineTemplate(final MachineTemplate mt) throws CloudProviderException {
 
-        Integer userid = this.getUser().getId();
+        Integer tenantId = this.getTenant().getId();
         boolean exists = true;
         try {
-            this.em.createQuery("SELECT m FROM MachineTemplate m WHERE m.user.id=:userid AND m.name=:name")
-                .setParameter("userid", userid).setParameter("name", mt.getName()).getSingleResult();
+            this.em.createQuery("SELECT m FROM MachineTemplate m WHERE m.tenant.id=:tenantId AND m.name=:name")
+                .setParameter("tenantId", tenantId).setParameter("name", mt.getName()).getSingleResult();
         } catch (NoResultException e) {
             exists = false;
         }
@@ -1237,7 +1224,7 @@ public class MachineManager implements IMachineManager {
         this.createVolumeTemplateCollectionForMt(mt);
         this.createNetworkInterfaces(mt);
 
-        mt.setUser(this.getUser());
+        mt.setTenant(this.getTenant());
         mt.setCreated(new Date());
         this.em.persist(mt);
         this.em.flush();
@@ -1259,15 +1246,15 @@ public class MachineManager implements IMachineManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
             .builder("MachineTemplate", MachineTemplate.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .filterEmbbededTemplate());
     }
 
     @Override
     public List<MachineTemplate> getMachineTemplates() throws CloudProviderException {
         List<MachineTemplate> machineTemplates = this.em
-            .createQuery("SELECT c FROM MachineTemplate c WHERE c.user.id=:userid AND c.isEmbeddedInSystemTemplate=false")
-            .setParameter("userid", this.getUser().getId()).getResultList();
+            .createQuery("SELECT c FROM MachineTemplate c WHERE c.tenant.id=:tenantId AND c.isEmbeddedInSystemTemplate=false")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
         for (MachineTemplate machineTemplate : machineTemplates) {
             machineTemplate.getMachineConfig().getDisks().size();
         }
@@ -1854,7 +1841,7 @@ public class MachineManager implements IMachineManager {
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineVolume", MachineVolume.class);
         return QueryHelper.getCollectionItemList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .containerType("Machine").containerId(machineId).containerAttributeName("volumes"));
     }
 
@@ -2190,7 +2177,7 @@ public class MachineManager implements IMachineManager {
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineDisk", MachineDisk.class);
         return QueryHelper.getCollectionItemList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .containerType("Machine").containerId(machineId).containerAttributeName("disks"));
     }
 
@@ -2308,7 +2295,7 @@ public class MachineManager implements IMachineManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineNetworkInterface",
             MachineNetworkInterface.class);
         return QueryHelper.getCollectionItemList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .containerType("Machine").containerId(machineId).containerAttributeName("networkInterfaces"));
     }
 
@@ -2343,7 +2330,7 @@ public class MachineManager implements IMachineManager {
                             addr.getAddress().setNetwork(null);
                             addr.getAddress().setResource(null);
                             addr.getAddress().setCreated(new Date());
-                            addr.getAddress().setUser(machine.getUser());
+                            addr.getAddress().setTenant(this.getTenant());
                             this.em.persist(addr.getAddress());
                         } else {
                             MachineManager.logger

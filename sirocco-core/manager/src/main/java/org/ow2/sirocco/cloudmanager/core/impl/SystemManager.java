@@ -60,8 +60,9 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
-import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.BadStateException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -95,7 +96,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
@@ -114,6 +115,7 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteSystemManager.class)
 @Local(ISystemManager.class)
 @SuppressWarnings("unused")
+@IdentityInterceptorBinding
 public class SystemManager implements ISystemManager {
 
     private static Logger logger = LoggerFactory.getLogger(SystemManager.class.getName());
@@ -177,6 +179,9 @@ public class SystemManager implements ISystemManager {
     @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
+    @Inject
+    private IdentityContext identityContext;
+
     @Resource
     private EJBContext ctx;
 
@@ -185,7 +190,7 @@ public class SystemManager implements ISystemManager {
     private ICloudProviderConnectorFactoryFinder cloudProviderConnectorFactoryFinder;
 
     @EJB
-    private IUserManager userManager;
+    private ITenantManager tenantManager;
 
     @EJB
     private IMachineManager machineManager;
@@ -205,9 +210,8 @@ public class SystemManager implements ISystemManager {
     @EJB
     private ICloudProviderManager cloudProviderManager;
 
-    private User getUser() throws CloudProviderException {
-        String username = this.ctx.getCallerPrincipal().getName();
-        return this.userManager.getUserByUsername(username);
+    private Tenant getTenant() throws CloudProviderException {
+        return this.tenantManager.getTenant(this.identityContext);
     }
 
     private boolean isSystemSupportedInConnector(final ICloudProviderConnector connector) {
@@ -317,8 +321,8 @@ public class SystemManager implements ISystemManager {
 
     @Override
     public Job createSystem(final SystemCreate systemCreate) throws CloudProviderException {
-
-        // this.checkQuota(userManager.getUserByUsername(this.user), system);
+        Tenant tenant = this.getTenant();
+        // this.checkQuota(userManager.getTenantByUsername(this.user), system);
 
         // creation of entities in the base
         System system = new System();
@@ -329,7 +333,7 @@ public class SystemManager implements ISystemManager {
         system.setProperties(systemCreate.getProperties() == null ? new HashMap<String, String>()
             : new HashMap<String, String>(systemCreate.getProperties()));
         system.setState(State.CREATING);
-        system.setUser(this.getUser());
+        system.setTenant(this.getTenant());
         this.em.persist(system);
         // this.em.flush();
 
@@ -403,7 +407,7 @@ public class SystemManager implements ISystemManager {
         // CloudProviderAccount cpa =
         // this.selectCloudProviderAccount(this.selectCloudProvider());
 
-        Placement placement = this.cloudProviderManager.placeResource(systemCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), systemCreate.getProperties());
         ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         if (connector == null) {
             throw new CloudProviderException("Cannot retrieve cloud provider connector "
@@ -429,7 +433,7 @@ public class SystemManager implements ISystemManager {
             // job returned by connector is a copy of the real connector job
             // so we can directly persist it
             job.setDescription("System creation");
-            job.setUser(this.getUser());
+            job.setTenant(this.getTenant());
             this.em.persist(job);
 
             system.setProviderAssignedId(job.getTargetResource().getProviderAssignedId());
@@ -669,13 +673,13 @@ public class SystemManager implements ISystemManager {
         CloudProviderException {
         SystemManager.logger.info("Creating SystemTemplate name=" + systemT.getName());
         this.validateSystemTemplate(systemT);
-        systemT.setUser(this.getUser());
+        systemT.setTenant(this.getTenant());
         systemT.setCreated(new Date());
 
         for (ComponentDescriptor cd : systemT.getComponentDescriptors()) {
             if (cd.getId() == null) {
                 // no id, will be persisted as jpa entity
-                cd.setUser(this.getUser());
+                cd.setTenant(this.getTenant());
                 cd.setCreated(new Date());
                 CloudTemplate ct = cd.getComponentTemplate();
 
@@ -719,7 +723,7 @@ public class SystemManager implements ISystemManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<System> getSystems() throws CloudProviderException {
-        return QueryHelper.getEntityList("System", this.em, this.getUser().getUsername(), System.State.DELETED);
+        return QueryHelper.getEntityList("System", this.em, this.getTenant().getId(), System.State.DELETED);
     }
 
     @Override
@@ -727,7 +731,7 @@ public class SystemManager implements ISystemManager {
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("System", System.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(System.State.DELETED));
     }
 
@@ -775,7 +779,7 @@ public class SystemManager implements ISystemManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<SystemTemplate> getSystemTemplates() throws CloudProviderException {
-        return QueryHelper.getEntityList("SystemTemplate", this.em, this.getUser().getUsername(), null);
+        return QueryHelper.getEntityList("SystemTemplate", this.em, this.getTenant().getId(), null);
     }
 
     @Override
@@ -783,7 +787,7 @@ public class SystemManager implements ISystemManager {
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("SystemTemplate", SystemTemplate.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .filterEmbbededTemplate());
     }
 
@@ -896,7 +900,7 @@ public class SystemManager implements ISystemManager {
             }
 
             parentJob.addNestedJob(j);
-            j.setUser(this.getUser());
+            j.setTenant(this.getTenant());
             this.em.persist(j);
 
         } else {
@@ -1042,7 +1046,7 @@ public class SystemManager implements ISystemManager {
                 // existing template
                 Integer templateId = componentDescriptor.getComponentTemplate().getId();
                 componentDescriptor.setComponentTemplate(this.em.find(CloudTemplate.class, templateId));
-                componentDescriptor.setUser(this.getUser());
+                componentDescriptor.setTenant(this.getTenant());
                 // validate componentDescriptor before persisting
                 if (componentDescriptor.getName() == null || "".equals(componentDescriptor.getName())) {
                     throw new CloudProviderException("ComponentDescriptor name should not be void");
@@ -1395,7 +1399,7 @@ public class SystemManager implements ISystemManager {
         this.em.persist(parentJob);
         this.em.flush();
 
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
         Job j;
         try {
@@ -1429,7 +1433,7 @@ public class SystemManager implements ISystemManager {
         }
 
         j.setTargetResource(s);
-        j.setUser(user);
+        j.setTenant(tenant);
         this.em.persist(j);
         parentJob.addNestedJob(j);
 
@@ -1446,7 +1450,7 @@ public class SystemManager implements ISystemManager {
 
     }
 
-    private boolean checkQuota(final User u, final System sys) {
+    private boolean checkQuota(final Tenant tenant, final System sys) {
         /**
          * TODO Check current quota
          */
@@ -1576,7 +1580,7 @@ public class SystemManager implements ISystemManager {
         job.setParentJob(null);
         job.setState(Status.RUNNING);
         job.setTargetResource(targetEntity);
-        job.setUser(this.getUser());
+        job.setTenant(this.getTenant());
         job.setProperties(new HashMap<String, String>());
 
         return job;
@@ -1590,7 +1594,7 @@ public class SystemManager implements ISystemManager {
      * @param providerSystem
      * @throws CloudProviderException
      */
-    private void persistSystemContent(final System providerSystem, final User user, final CloudProviderAccount account,
+    private void persistSystemContent(final System providerSystem, final Tenant tenant, final CloudProviderAccount account,
         final CloudProviderLocation location) throws CloudProviderException {
         // getting system owned object lists from connector
         System s = providerSystem;
@@ -1608,7 +1612,7 @@ public class SystemManager implements ISystemManager {
         // creating and adding objects
         for (SystemNetwork sn : networks) {
             sn.getResource().setId(null);
-            sn.getNetwork().setUser(user);
+            sn.getNetwork().setTenant(tenant);
             sn.getNetwork().setCloudProviderAccount(account);
             sn.getNetwork().setLocation(location);
             // TODO: replace with dedicated method from related manager!
@@ -1622,7 +1626,7 @@ public class SystemManager implements ISystemManager {
 
         for (SystemVolume sv : volumes) {
             sv.getResource().setId(null);
-            sv.getVolume().setUser(user);
+            sv.getVolume().setTenant(tenant);
             sv.getVolume().setCloudProviderAccount(account);
             sv.getVolume().setLocation(location);
             // TODO: replace with dedicated method from related manager!
@@ -1635,7 +1639,7 @@ public class SystemManager implements ISystemManager {
         if (machines != null) {
             for (SystemMachine sm : machines) {
                 Machine mach = sm.getMachine();
-                mach.setUser(user);
+                mach.setTenant(tenant);
                 mach.setCloudProviderAccount(account);
                 mach.setLocation(location);
                 mach.setCreated(new Date());
@@ -1672,8 +1676,8 @@ public class SystemManager implements ISystemManager {
             ss.setId(null);
             ss.getSystem().setCloudProviderAccount(account);
             ss.getSystem().setLocation(location);
-            ss.getSystem().setUser(user);
-            this.persistSystemContent((System) ss.getResource(), user, account, location);
+            ss.getSystem().setTenant(tenant);
+            this.persistSystemContent((System) ss.getResource(), tenant, account, location);
             this.em.persist(ss.getResource());
             this.updateCollectionFromProvider(ss, ss.getResource(), SystemSystem.State.AVAILABLE);
             this.em.persist(ss);
@@ -1808,7 +1812,7 @@ public class SystemManager implements ISystemManager {
                 }
 
                 if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                    this.persistSystemContent(s, managedSystem.getUser(), cpa, location);
+                    this.persistSystemContent(s, managedSystem.getTenant(), cpa, location);
 
                     managedSystem.setMachines(s.getMachines());
                     managedSystem.setNetworks(s.getNetworks());

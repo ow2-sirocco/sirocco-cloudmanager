@@ -30,12 +30,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
@@ -43,7 +42,8 @@ import javax.persistence.PersistenceContextType;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
-import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
+import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -56,7 +56,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +64,7 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteMachineImageManager.class)
 @Local(IMachineImageManager.class)
 @SuppressWarnings("unused")
+@IdentityInterceptorBinding
 public class MachineImageManager implements IMachineImageManager {
 
     private static Logger logger = LoggerFactory.getLogger(MachineImageManager.class.getName());
@@ -72,22 +73,16 @@ public class MachineImageManager implements IMachineImageManager {
     private EntityManager em;
 
     @EJB
-    private IUserManager userManager;
+    private ITenantManager tenantManager;
 
     @EJB
     private IJobManager jobManager;
 
-    @Resource
-    private SessionContext ctx;
+    @Inject
+    private IdentityContext identityContext;
 
-    @Resource
-    public void setSessionContext(final SessionContext ctx) {
-        this.ctx = ctx;
-    }
-
-    private User getUser() throws CloudProviderException {
-        String username = this.ctx.getCallerPrincipal().getName();
-        return this.userManager.getUserByUsername(username);
+    private Tenant getTenant() throws CloudProviderException {
+        return this.tenantManager.getTenant(this.identityContext);
     }
 
     public Job createMachineImage(final MachineImage mi) throws CloudProviderException {
@@ -96,7 +91,7 @@ public class MachineImageManager implements IMachineImageManager {
         // TODO : check whether imageLocation points to a Machine
         mi.setType(MachineImage.Type.IMAGE);
 
-        mi.setUser(this.getUser());
+        mi.setTenant(this.getTenant());
         mi.setCreated(new Date());
         mi.setState(MachineImage.State.AVAILABLE);
         this.em.persist(mi);
@@ -113,7 +108,7 @@ public class MachineImageManager implements IMachineImageManager {
         j.setParentJob(null);
         j.setNestedJobs(null);
         j.setReturnCode(0);
-        j.setUser(this.getUser());
+        j.setTenant(this.getTenant());
         this.em.persist(j);
         this.em.flush();
         return j;
@@ -121,7 +116,7 @@ public class MachineImageManager implements IMachineImageManager {
 
     @Override
     public List<MachineImage> getMachineImages() throws CloudProviderException {
-        return QueryHelper.getEntityList("MachineImage", this.em, this.getUser().getUsername(), MachineImage.State.DELETED);
+        return QueryHelper.getEntityList("MachineImage", this.em, this.getTenant().getId(), MachineImage.State.DELETED);
     }
 
     public MachineImage getMachineImageById(final String imageId) throws CloudProviderException {
@@ -175,7 +170,7 @@ public class MachineImageManager implements IMachineImageManager {
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineImage", MachineImage.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(MachineImage.State.DELETED));
     }
 

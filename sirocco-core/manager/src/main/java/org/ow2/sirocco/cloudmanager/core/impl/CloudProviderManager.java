@@ -28,7 +28,6 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -36,20 +35,23 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
+import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,6 +59,7 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteCloudProviderManager.class)
 @Local(ICloudProviderManager.class)
 @SuppressWarnings("unused")
+@IdentityInterceptorBinding
 public class CloudProviderManager implements ICloudProviderManager {
 
     private static Logger logger = LoggerFactory.getLogger(CloudProviderManager.class.getName());
@@ -70,10 +73,11 @@ public class CloudProviderManager implements ICloudProviderManager {
     @EJB
     private IUserManager userManager;
 
-    private User getUser() throws CloudProviderException {
-        String username = this.ctx.getCallerPrincipal().getName();
-        return this.userManager.getUserByUsername(username);
-    }
+    @EJB
+    private ITenantManager tenantManager;
+
+    @Inject
+    private IdentityContext identityContext;
 
     @Override
     public CloudProvider createCloudProvider(final String type, final String description) throws CloudProviderException {
@@ -104,9 +108,7 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     @Override
     public CloudProvider getCloudProviderById(final String cloudProviderId) throws CloudProviderException {
-
         CloudProvider result = this.em.find(CloudProvider.class, new Integer(cloudProviderId));
-
         return result;
     }
 
@@ -123,28 +125,16 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProviderAccount createCloudProviderAccount(final String cloudProviderId, final String login,
-        final String password) throws CloudProviderException {
-
-        CloudProviderAccount cpa = new CloudProviderAccount();
-
-        cpa.setCloudProvider(this.getCloudProviderById(cloudProviderId));
-        cpa.setLogin(login);
-        cpa.setPassword(password);
-
-        cpa = this.createCloudProviderAccount(cpa);
-
-        return cpa;
-    }
-
-    @Override
-    public CloudProviderAccount createCloudProviderAccount(final CloudProviderAccount cpa) throws CloudProviderException {
-
+    public CloudProviderAccount createCloudProviderAccount(final String providerId, final CloudProviderAccount account)
+        throws CloudProviderException {
         // if (!isCloudProviderAccountValid(cpa)){throw new
         // CloudProviderException("CloudProviderAccount validation failed");};
-
-        this.em.persist(cpa);
-        return cpa;
+        CloudProvider provider = this.getCloudProviderById(providerId);
+        account.setCloudProvider(provider);
+        this.em.persist(account);
+        provider.getCloudProviderAccounts().add(account);
+        this.em.flush();
+        return account;
 
     }
 
@@ -176,7 +166,7 @@ public class CloudProviderManager implements ICloudProviderManager {
 
         CloudProviderAccount result = this.em.find(CloudProviderAccount.class, new Integer(cloudProviderAccountId));
         if (result != null) {
-            result.getUsers().size();
+            result.getTenants().size();
         }
         return result;
     }
@@ -188,36 +178,18 @@ public class CloudProviderManager implements ICloudProviderManager {
      *      java.lang.String)
      */
     @Override
-    public void addCloudProviderAccountToUser(final String userId, final String cloudProviderAccountId)
+    public void addCloudProviderAccountToTenant(final String tenantId, final String cloudProviderAccountId)
         throws CloudProviderException {
 
-        CloudProviderAccount cpa = this.getCloudProviderAccountById(cloudProviderAccountId);
-        User u = this.userManager.getUserById(userId);
-        Set<User> users = cpa.getUsers();
-        users.add(u);
-        cpa.setUsers(users);
+        CloudProviderAccount account = this.getCloudProviderAccountById(cloudProviderAccountId);
+        Tenant tenant = this.tenantManager.getTenantById(tenantId);
+        account.getTenants().add(tenant);
+        tenant.getCloudProviderAccounts().add(account);
 
-        u.getCloudProviderAccounts().add(cpa);
+        this.em.merge(account);
 
-        this.em.merge(cpa);
-
-        CloudProviderManager.logger.info("Added CloudProvider account " + cpa.getCloudProvider().getCloudProviderType()
-            + " to user " + u.getUsername());
-
-    }
-
-    /**
-     * add a provider to user by providing an user name
-     * 
-     * @see org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager#addCloudProviderAccountToUserByName(java.lang.String,
-     *      java.lang.String)
-     */
-    @Override
-    public void addCloudProviderAccountToUserByName(final String userName, final String cloudProviderAccountId)
-        throws CloudProviderException {
-
-        this.addCloudProviderAccountToUser(this.userManager.getUserByUsername(userName).getId().toString(),
-            cloudProviderAccountId);
+        CloudProviderManager.logger.info("Added CloudProvider account " + account.getCloudProvider().getCloudProviderType()
+            + " to tenant " + tenant.getName());
 
     }
 
@@ -228,50 +200,36 @@ public class CloudProviderManager implements ICloudProviderManager {
      *      java.lang.String)
      */
     @Override
-    public void removeCloudProviderAccountFromUser(final String userId, final String cloudProviderAccountId)
+    public void removeCloudProviderAccountFromTenant(final String tenantId, final String cloudProviderAccountId)
         throws CloudProviderException {
 
-        CloudProviderAccount cpa = this.getCloudProviderAccountById(cloudProviderAccountId);
-        User u = this.userManager.getUserById(userId);
-        Set<User> users = cpa.getUsers();
-        users.remove(u);
-        cpa.setUsers(users);
-        this.em.merge(cpa);
-
-    }
-
-    /**
-     * add a provider to user by providing an user name
-     * 
-     * @see org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager#addCloudProviderAccountToUserByName(java.lang.String,
-     *      java.lang.String)
-     */
-    @Override
-    public void removeCloudProviderAccountFromUserByName(final String userName, final String cloudProviderAccountId)
-        throws CloudProviderException {
-
-        this.removeCloudProviderAccountFromUser(this.userManager.getUserByUsername(userName).getId().toString(),
-            cloudProviderAccountId);
-
+        CloudProviderAccount account = this.getCloudProviderAccountById(cloudProviderAccountId);
+        Tenant tenant = this.tenantManager.getTenantById(tenantId);
+        account.getTenants().remove(account);
+        this.em.merge(account);
     }
 
     @Override
     public void deleteCloudProviderAccount(final String cloudProviderAccountId) throws CloudProviderException {
-        CloudProviderAccount result = this.em.find(CloudProviderAccount.class, new Integer(cloudProviderAccountId));
-        this.em.remove(result);
-
+        CloudProviderAccount account = this.em.find(CloudProviderAccount.class, new Integer(cloudProviderAccountId));
+        if (account == null) {
+            throw new ResourceNotFoundException();
+        }
+        account.getCloudProvider().getCloudProviderAccounts().remove(account);
+        this.em.remove(account);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<CloudProviderAccount> getCloudProviderAccounts() throws CloudProviderException {
-        return this.em.createQuery("Select p From CloudProviderAccount p").getResultList();
+    public List<CloudProviderAccount> getCloudProviderAccountsByProvider(final String providerId) throws CloudProviderException {
+        return this.em.createQuery("Select p From CloudProviderAccount p where p.cloudProvider.id=:providerId")
+            .setParameter("providerId", new Integer(providerId)).getResultList();
     }
 
     @Override
-    public List<CloudProviderAccount> getCloudProviderAccountsByUser(final String userId) throws CloudProviderException {
-        User user = this.userManager.getUserById(userId);
-        return new ArrayList<CloudProviderAccount>(user.getCloudProviderAccounts());
+    public List<CloudProviderAccount> getCloudProviderAccountsByTenant(final String tenantId) throws CloudProviderException {
+        Tenant tenant = this.tenantManager.getTenantById(tenantId);
+        return new ArrayList<CloudProviderAccount>(tenant.getCloudProviderAccounts());
     }
 
     @Override
@@ -501,9 +459,6 @@ public class CloudProviderManager implements ICloudProviderManager {
     @Override
     public void addLocationToCloudProvider(final String cloudProviderId, final String locationId) throws CloudProviderException {
         CloudProvider provider = this.getCloudProviderById(cloudProviderId);
-        if (provider == null) {
-            throw new ResourceNotFoundException("Wrong provider id: " + cloudProviderId);
-        }
         CloudProviderLocation location = this.getCloudProviderLocationById(locationId);
         if (location == null) {
             throw new ResourceNotFoundException("Wrong location id: " + locationId);
@@ -513,8 +468,16 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public Placement placeResource(final Map<String, String> properties) throws CloudProviderException {
-        User user = this.getUser();
+    public void addLocationToCloudProvider(final String cloudProviderId, CloudProviderLocation location)
+        throws CloudProviderException {
+        CloudProvider provider = this.getCloudProviderById(cloudProviderId);
+        location = this.createCloudProviderLocation(location);
+        provider.getCloudProviderLocations().add(location);
+    }
+
+    @Override
+    public Placement placeResource(final String tenantId, final Map<String, String> properties) throws CloudProviderException {
+        Tenant tenant = this.tenantManager.getTenantById(tenantId);
         String cloudProviderType = null;
         String cloudProviderLocationCountry = null;
         if (properties != null) {
@@ -525,7 +488,7 @@ public class CloudProviderManager implements ICloudProviderManager {
             cloudProviderType = "mock";
         }
         CloudProviderAccount targetAccount = null;
-        for (CloudProviderAccount account : user.getCloudProviderAccounts()) {
+        for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
             CloudProviderManager.logger.info("Account " + account.getCloudProvider().getCloudProviderType());
             if (account.getCloudProvider().getCloudProviderType().equals(cloudProviderType)) {
                 targetAccount = account;
@@ -533,7 +496,7 @@ public class CloudProviderManager implements ICloudProviderManager {
             }
         }
         if (targetAccount == null) {
-            throw new CloudProviderException("No provider account for user " + user.getUsername() + " and provider type "
+            throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider type "
                 + cloudProviderType);
         }
         CloudProviderLocation targetLocation = null;

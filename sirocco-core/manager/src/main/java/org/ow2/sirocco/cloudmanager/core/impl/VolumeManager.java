@@ -28,8 +28,9 @@ import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
-import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -49,18 +50,22 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteVolumeManager.class)
 @Local(IVolumeManager.class)
+@IdentityInterceptorBinding
 public class VolumeManager implements IVolumeManager {
     private static Logger logger = LoggerFactory.getLogger(VolumeManager.class.getName());
 
     @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
+
+    @Inject
+    private IdentityContext identityContext;
 
     @Resource
     private EJBContext context;
@@ -70,7 +75,7 @@ public class VolumeManager implements IVolumeManager {
     private ICloudProviderConnectorFactoryFinder connectorFactoryFinder;
 
     @EJB
-    private IUserManager userManager;
+    private ITenantManager tenantManager;
 
     @EJB
     private ICloudProviderManager cloudProviderManager;
@@ -96,23 +101,18 @@ public class VolumeManager implements IVolumeManager {
         }
     }
 
-    private User getUser() throws CloudProviderException {
-        String username = this.context.getCallerPrincipal().getName();
-        User user = this.userManager.getUserByUsername(username);
-        if (user == null) {
-            throw new CloudProviderException("unknown user: " + username);
-        }
-        return user;
+    private Tenant getTenant() throws CloudProviderException {
+        return this.tenantManager.getTenant(this.identityContext);
     }
 
     @Override
     public Job createVolume(final VolumeCreate volumeCreate) throws CloudProviderException {
         VolumeManager.logger.info("Creating Volume");
 
-        // retrieve user
-        User user = this.getUser();
+        // retrieve tenant
+        Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(volumeCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), volumeCreate.getProperties());
         ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         if (connector == null) {
             throw new CloudProviderException("Cannot retrieve cloud provider connector "
@@ -152,7 +152,7 @@ public class VolumeManager implements IVolumeManager {
         volume.setDescription(volumeCreate.getDescription());
         volume.setProperties(volumeCreate.getProperties() == null ? new HashMap<String, String>()
             : new HashMap<String, String>(volumeCreate.getProperties()));
-        volume.setUser(user);
+        volume.setTenant(tenant);
 
         if (providerJob.getState() == Job.Status.RUNNING) {
             // job is running: persist volume+job and set up notification on job
@@ -162,7 +162,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             Job job = new Job();
-            job.setUser(user);
+            job.setTenant(tenant);
             job.setTargetResource(volume);
             List<CloudResource> affectedResources = new ArrayList<CloudResource>();
             affectedResources.add(volume);
@@ -213,16 +213,16 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public VolumeConfiguration createVolumeConfiguration(final VolumeConfiguration volumeConfig) throws CloudProviderException {
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
         if (volumeConfig.getName() != null) {
-            if (!this.em.createQuery("SELECT v FROM VolumeConfiguration v WHERE v.user.username=:username AND v.name=:name")
-                .setParameter("username", user.getUsername()).setParameter("name", volumeConfig.getName()).getResultList()
+            if (!this.em.createQuery("SELECT v FROM VolumeConfiguration v WHERE v.tenant.id=:tenantId AND v.name=:name")
+                .setParameter("tenantId", tenant.getId()).setParameter("name", volumeConfig.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("VolumeConfiguration already exists with name " + volumeConfig.getName());
             }
         }
-        volumeConfig.setUser(user);
+        volumeConfig.setTenant(tenant);
         volumeConfig.setCreated(new Date());
         this.em.persist(volumeConfig);
         this.em.flush();
@@ -231,16 +231,16 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public VolumeTemplate createVolumeTemplate(final VolumeTemplate volumeTemplate) throws CloudProviderException {
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
         if (volumeTemplate.getName() != null) {
-            if (!this.em.createQuery("SELECT v FROM VolumeTemplate v WHERE v.user.username=:username AND v.name=:name")
-                .setParameter("username", user.getUsername()).setParameter("name", volumeTemplate.getName()).getResultList()
+            if (!this.em.createQuery("SELECT v FROM VolumeTemplate v WHERE v.tenant.id=:tenantId AND v.name=:name")
+                .setParameter("tenantId", tenant.getId()).setParameter("name", volumeTemplate.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("VolumeTemplate already exists with name " + volumeTemplate.getName());
             }
         }
-        volumeTemplate.setUser(user);
+        volumeTemplate.setTenant(tenant);
         volumeTemplate.setCreated(new Date());
         this.em.persist(volumeTemplate);
         this.em.flush();
@@ -306,7 +306,7 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<Volume> getVolumes() throws CloudProviderException {
-        return QueryHelper.getEntityList("Volume", this.em, this.getUser().getUsername(), Volume.State.DELETED);
+        return QueryHelper.getEntityList("Volume", this.em, this.getTenant().getId(), Volume.State.DELETED);
     }
 
     @SuppressWarnings("unchecked")
@@ -315,14 +315,14 @@ public class VolumeManager implements IVolumeManager {
         final List<String> attributes) throws CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Volume", Volume.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(Volume.State.DELETED));
     }
 
     @Override
     public List<VolumeConfiguration> getVolumeConfigurations() throws CloudProviderException {
-        return this.em.createQuery("SELECT c FROM VolumeConfiguration c WHERE c.user.id=:userid")
-            .setParameter("userid", this.getUser().getId()).getResultList();
+        return this.em.createQuery("SELECT c FROM VolumeConfiguration c WHERE c.tenant.id=:tenantId")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @SuppressWarnings("unchecked")
@@ -332,13 +332,13 @@ public class VolumeManager implements IVolumeManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeConfiguration",
             VolumeConfiguration.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
     public List<VolumeTemplate> getVolumeTemplates() throws CloudProviderException {
-        return this.em.createQuery("SELECT c FROM VolumeTemplate c WHERE c.user.id=:userid")
-            .setParameter("userid", this.getUser().getId()).getResultList();
+        return this.em.createQuery("SELECT c FROM VolumeTemplate c WHERE c.tenant.id=:tenantId")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @SuppressWarnings("unchecked")
@@ -347,7 +347,7 @@ public class VolumeManager implements IVolumeManager {
         final List<String> attributes) throws CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeTemplate", VolumeTemplate.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .filterEmbbededTemplate());
     }
 
@@ -504,7 +504,7 @@ public class VolumeManager implements IVolumeManager {
             this.em.flush();
 
             Job job = new Job();
-            job.setUser(this.getUser());
+            job.setTenant(this.getTenant());
             job.setTargetResource(volume);
             job.setCreated(new Date());
             job.setDescription("Volume deletion");
@@ -734,8 +734,8 @@ public class VolumeManager implements IVolumeManager {
         CloudProviderException {
         VolumeManager.logger.info("Creating VolumeImage");
 
-        // retrieve user
-        User user = this.getUser();
+        // retrieve tenant
+        Tenant tenant = this.getTenant();
 
         ICloudProviderConnector connector = null;
         Placement placement;
@@ -745,7 +745,7 @@ public class VolumeManager implements IVolumeManager {
                 volumeToSnapshot.getLocation());
             placement = new Placement(volumeToSnapshot.getCloudProviderAccount(), volumeToSnapshot.getLocation());
         } else {
-            placement = this.cloudProviderManager.placeResource(volumeImage.getProperties());
+            placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), volumeImage.getProperties());
             connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         }
         if (connector == null) {
@@ -779,7 +779,7 @@ public class VolumeManager implements IVolumeManager {
         volumeImage.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         volumeImage.setCloudProviderAccount(placement.getAccount());
         volumeImage.setLocation(placement.getLocation());
-        volumeImage.setUser(user);
+        volumeImage.setTenant(tenant);
 
         volumeImage.setState(VolumeImage.State.CREATING);
         this.em.persist(volumeImage);
@@ -795,7 +795,7 @@ public class VolumeManager implements IVolumeManager {
         this.em.flush();
 
         Job job = new Job();
-        job.setUser(user);
+        job.setTenant(tenant);
         job.setTargetResource(volumeImage);
         List<CloudResource> affectedResources = new ArrayList<CloudResource>();
         affectedResources.add(volumeImage);
@@ -822,12 +822,12 @@ public class VolumeManager implements IVolumeManager {
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeImage", VolumeImage.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
     public List<VolumeImage> getVolumeImages() throws CloudProviderException {
-        return QueryHelper.getEntityList("VolumeImage", this.em, this.getUser().getUsername(), VolumeImage.State.DELETED);
+        return QueryHelper.getEntityList("VolumeImage", this.em, this.getTenant().getId(), VolumeImage.State.DELETED);
     }
 
     @Override
@@ -891,7 +891,7 @@ public class VolumeManager implements IVolumeManager {
         this.em.flush();
 
         Job job = new Job();
-        job.setUser(this.getUser());
+        job.setTenant(this.getTenant());
         job.setTargetResource(volumeImage);
         job.setCreated(new Date());
         job.setDescription("VolumeImage deletion");
@@ -937,7 +937,7 @@ public class VolumeManager implements IVolumeManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeVolumeImage",
             VolumeVolumeImage.class);
         return QueryHelper.getCollectionItemList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .containerType("Volume").containerId(volumeId).containerAttributeName("images"));
     }
 

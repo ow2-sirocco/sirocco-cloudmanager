@@ -31,13 +31,13 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
-import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -50,8 +50,9 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
-import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -68,7 +69,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -77,6 +78,7 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteJobManager.class)
 @Local(IJobManager.class)
 @SuppressWarnings("unused")
+@IdentityInterceptorBinding
 public class JobManager implements IJobManager {
 
     private static Logger logger = LoggerFactory.getLogger(JobManager.class);
@@ -109,17 +111,16 @@ public class JobManager implements IJobManager {
     private ILockManager lockManager;
 
     @EJB
-    private IUserManager userManager;
+    private ITenantManager tenantManager;
 
-    @Resource
-    private EJBContext ctx;
+    @Inject
+    private IdentityContext identityContext;
 
     @Resource
     private SessionContext sessionContext;
 
-    private User getUser() throws CloudProviderException {
-        String username = this.ctx.getCallerPrincipal().getName();
-        return this.userManager.getUserByUsername(username);
+    private Tenant getTenant() throws CloudProviderException {
+        return this.tenantManager.getTenant(this.identityContext);
     }
 
     public Job createJob(final CloudResource targetEntity, final String action, final String parentJob)
@@ -197,8 +198,8 @@ public class JobManager implements IJobManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<Job> getJobs() throws CloudProviderException {
-        return this.em.createQuery("SELECT j FROM Job j WHERE j.user.id=:userid")
-            .setParameter("userid", this.getUser().getId()).getResultList();
+        return this.em.createQuery("SELECT j FROM Job j WHERE j.tenant.id=:tenantId")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -206,7 +207,7 @@ public class JobManager implements IJobManager {
         throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Job", Job.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
