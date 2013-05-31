@@ -48,8 +48,6 @@ import javax.persistence.Query;
 import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
@@ -126,10 +124,6 @@ public class MachineManager implements IMachineManager {
     @EJB
     private IJobManager jobManager;
 
-    @Inject
-    @OSGiService(dynamic = true)
-    private ICloudProviderConnectorFactoryFinder cloudProviderConnectorFactoryFinder;
-
     @Resource
     private SessionContext ctx;
 
@@ -159,55 +153,7 @@ public class MachineManager implements IMachineManager {
         return true;
     }
 
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount account,
-        final CloudProviderLocation location) throws CloudProviderException {
-
-        if (account == null) {
-            throw new CloudProviderException("Cloud provider account ");
-        }
-        ICloudProviderConnectorFactory connectorFactory = this.cloudProviderConnectorFactoryFinder
-            .getCloudProviderConnectorFactory(account.getCloudProvider().getCloudProviderType());
-        if (connectorFactory == null) {
-            throw new CloudProviderException(" Internal error in connector factory ");
-        }
-        try {
-            return connectorFactory.getCloudProviderConnector(account, location);
-        } catch (ConnectorException e) {
-            throw new CloudProviderException(e.getMessage());
-        }
-    }
-
-    private void relConnector(final Machine m, final ICloudProviderConnector connector) throws CloudProviderException {
-        String cpType = m.getCloudProviderAccount().getCloudProvider().getCloudProviderType();
-        ICloudProviderConnectorFactory cFactory = null;
-        try {
-            cFactory = this.cloudProviderConnectorFactoryFinder.getCloudProviderConnectorFactory(cpType);
-            String connectorId = connector.getCloudProviderId();
-            cFactory.disposeCloudProviderConnector(connectorId);
-        } catch (ConnectorException e) {
-            throw new CloudProviderException(e.getMessage());
-        }
-    }
-
-    private void relConnector(final String cpType, final ICloudProviderConnector connector) throws CloudProviderException {
-
-        ICloudProviderConnectorFactory cFactory = null;
-        try {
-            cFactory = this.cloudProviderConnectorFactoryFinder.getCloudProviderConnectorFactory(cpType);
-            String connectorId = connector.getCloudProviderId();
-            cFactory.disposeCloudProviderConnector(connectorId);
-        } catch (ConnectorException e) {
-            throw new CloudProviderException(e.getMessage());
-        }
-    }
-
-    private ICloudProviderConnector getConnector(final Machine m) throws CloudProviderException {
-
-        ICloudProviderConnector connector = null;
-
-        connector = this.getCloudProviderConnector(m.getCloudProviderAccount(), m.getLocation());
-        return connector;
-    }
+   
 
     /**
      * User could have passed by value or by reference. Validation is expected
@@ -379,22 +325,22 @@ public class MachineManager implements IMachineManager {
         }
 
         Placement placement = this.cloudProviderManager.placeResource(machineCreate.getProperties());
-        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
+      //TODO:workflowif (connector == null) {
+      //TODO:workflow    throw new CloudProviderException("Cannot retrieve cloud provider connector "
+      //TODO:workflow       + placement.getAccount().getCloudProvider().getCloudProviderType());
+      //TODO:workflow}
 
         Job jobCreateMachine = null;
         IComputeService computeService = null;
 
-        try {
-            computeService = connector.getComputeService();
-            jobCreateMachine = computeService.createMachine(machineCreate);
-        } catch (Exception e) {
-            MachineManager.logger.error("Failed to create machine", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow    computeService = connector.getComputeService();
+      //TODO:workflow  jobCreateMachine = computeService.createMachine(machineCreate);
+      //TODO:workflow} catch (Exception e) {
+      //TODO:workflow   MachineManager.logger.error("Failed to create machine", e);
+      //TODO:workflow  throw new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         if (jobCreateMachine.getState() == Job.Status.FAILED) {
             throw new ServiceUnavailableException("Machine creation failed ");
@@ -565,15 +511,15 @@ public class MachineManager implements IMachineManager {
     public Job captureMachine(final String machineId, final MachineImage machineImage) throws CloudProviderException {
         Job j;
         Machine m = this.checkOps(machineId, "capture");
-        ICloudProviderConnector connector = this.getConnector(m);
+      //TODO:workflowICloudProviderConnector connector = this.getConnector(m);
         IComputeService computeService;
-        try {
-            computeService = connector.getComputeService();
-        } catch (ConnectorException e) {
-            String eee = e.getMessage();
-            throw new ServiceUnavailableException(" " + eee + " action capture machine " + machineId + " "
-                + m.getProviderAssignedId());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow   computeService = connector.getComputeService();
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow   String eee = e.getMessage();
+      //TODO:workflow   throw new ServiceUnavailableException(" " + eee + " action capture machine " + machineId + " "
+      //TODO:workflow       + m.getProviderAssignedId());
+      //TODO:workflow}
         MachineImage capturedMachineImage = new MachineImage();
         capturedMachineImage.setUser(this.getUser());
         capturedMachineImage.setName(machineImage.getName());
@@ -582,15 +528,15 @@ public class MachineManager implements IMachineManager {
         capturedMachineImage.setState(MachineImage.State.CREATING);
         capturedMachineImage.setType(MachineImage.Type.IMAGE);
 
-        try {
-            j = computeService.captureMachine(m.getProviderAssignedId(), capturedMachineImage);
-        } catch (org.ow2.sirocco.cloudmanager.connector.api.BadStateException e) {
-            throw new BadStateException(e.getMessage() + " action capture machine id " + m.getProviderAssignedId() + " "
-                + m.getId());
-        } catch (ConnectorException e) {
-            throw new ServiceUnavailableException(e.getMessage() + " action capture machine id " + m.getProviderAssignedId()
-                + " " + m.getId());
-        }
+      //TODO:workflowtry {
+        	//TODO:workflowj = computeService.captureMachine(m.getProviderAssignedId(), capturedMachineImage);
+        	//TODO:workflow} catch (org.ow2.sirocco.cloudmanager.connector.api.BadStateException e) {
+        	//TODO:workflow   throw new BadStateException(e.getMessage() + " action capture machine id " + m.getProviderAssignedId() + " "
+        	//TODO:workflow       + m.getId());
+        	//TODO:workflow} catch (ConnectorException e) {
+        	//TODO:workflow   throw new ServiceUnavailableException(e.getMessage() + " action capture machine id " + m.getProviderAssignedId()
+        	//TODO:workflow       + " " + m.getId());
+      //TODO:workflow}
 
         this.em.persist(capturedMachineImage);
         this.em.flush();
@@ -598,86 +544,88 @@ public class MachineManager implements IMachineManager {
         List<CloudResource> affectedResources = new ArrayList<CloudResource>();
         affectedResources.add(capturedMachineImage);
         affectedResources.add(m);
-        Job job = this.createJob(capturedMachineImage, affectedResources, "add", j.getState(), null);
-        job.setProviderAssignedId(j.getProviderAssignedId());
-        this.updateJob(job);
-        job.setDescription("Machine capture");
+      //TODO:workflowJob job = this.createJob(capturedMachineImage, affectedResources, "add", j.getState(), null);
+      //TODO:workflowjob.setProviderAssignedId(j.getProviderAssignedId());
+      //TODO:workflowthis.updateJob(job);
+      //TODO:workflowjob.setDescription("Machine capture");
 
-        if (j.getState() != Job.Status.FAILED) {
-            try {
-                UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
-            } catch (Exception e) {
-                throw new ServiceUnavailableException(e.getMessage() + "  capture");
-            }
-        }
-        MachineManager.logger.info("operation capture requested " + j.getState());
-        this.relConnector(m, connector);
-        return job;
+      //TODO:workflowif (j.getState() != Job.Status.FAILED) {
+      //TODO:workflow    try {
+      //TODO:workflow      UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
+      //TODO:workflow } catch (Exception e) {
+      //TODO:workflow     throw new ServiceUnavailableException(e.getMessage() + "  capture");
+      //TODO:workflow }
+      //TODO:workflow}
+      //TODO:workflowMachineManager.logger.info("operation capture requested " + j.getState());
+      //TODO:workflowthis.relConnector(m, connector);
+      //TODO:workflowreturn job;
+        return null;
     }
 
     private Job doService(final String machineId, final String action, final Object... params) throws CloudProviderException {
 
         Job j;
         Machine m = this.checkOps(machineId, action);
-        ICloudProviderConnector connector = this.getConnector(m);
+      //TODO:workflow ICloudProviderConnector connector = this.getConnector(m);
         IComputeService computeService;
-        try {
-            computeService = connector.getComputeService();
-        } catch (ConnectorException e) {
-            String eee = e.getMessage();
-            throw new ServiceUnavailableException(" " + eee + " action " + action + " machine " + machineId + " "
-                + m.getProviderAssignedId());
-        }
-        try {
-            if (action.equals("start")) {
-                j = computeService.startMachine(m.getProviderAssignedId());
-                m.setState(Machine.State.STARTING);
-            } else if (action.equals("stop")) {
-                boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
-                j = computeService.stopMachine(m.getProviderAssignedId(), force);
-                m.setState(Machine.State.STOPPING);
-            } else if (action.equals("suspend")) {
-                j = computeService.suspendMachine(m.getProviderAssignedId());
-                m.setState(Machine.State.SUSPENDING);
-            } else if (action.equals("pause")) {
-                j = computeService.pauseMachine(m.getProviderAssignedId());
-                m.setState(Machine.State.PAUSING);
-            } else if (action.equals("capture")) {
-                j = computeService.captureMachine(m.getProviderAssignedId(), ((MachineImage) params[0]));
-            } else if (action.equals("restart")) {
-                boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
-                j = computeService.restartMachine(m.getProviderAssignedId(), force);
-            } else {
-                throw new ServiceUnavailableException("Unsupported operation action " + action + " on machine id "
-                    + m.getProviderAssignedId() + " " + m.getId());
-            }
-        } catch (org.ow2.sirocco.cloudmanager.connector.api.BadStateException e) {
-            throw new BadStateException(e.getMessage() + " action " + action + " machine id " + m.getProviderAssignedId() + " "
-                + m.getId());
-        } catch (ConnectorException e) {
-            throw new ServiceUnavailableException(e.getMessage() + " action " + action + " machine id "
-                + m.getProviderAssignedId() + " " + m.getId());
-        }
-        MachineManager.logger.info("operation " + action + " for machine " + m.getId() + " job status " + j.getState());
+      //TODO:workflowtry {
+      //TODO:workflow computeService = connector.getComputeService();
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow  String eee = e.getMessage();
+      //TODO:workflow throw new ServiceUnavailableException(" " + eee + " action " + action + " machine " + machineId + " "
+      //TODO:workflow     + m.getProviderAssignedId());
+      //TODO:workflow}
+      //TODO:workflowtry {
+      //TODO:workflow if (action.equals("start")) {
+            	//TODO:workflowj = computeService.startMachine(m.getProviderAssignedId());
+      //TODO:workflow     m.setState(Machine.State.STARTING);
+      //TODO:workflow } else if (action.equals("stop")) {
+      //TODO:workflow    boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
+              //TODO:workflowj = computeService.stopMachine(m.getProviderAssignedId(), force);
+      //TODO:workflow   m.setState(Machine.State.STOPPING);
+      //TODO:workflow } else if (action.equals("suspend")) {
+            	//TODO:workflowj = computeService.suspendMachine(m.getProviderAssignedId());
+      //TODO:workflow    m.setState(Machine.State.SUSPENDING);
+      //TODO:workflow } else if (action.equals("pause")) {
+            	//TODO:workflowj = computeService.pauseMachine(m.getProviderAssignedId());
+      //TODO:workflow   m.setState(Machine.State.PAUSING);
+      //TODO:workflow} else if (action.equals("capture")) {
+            	//TODO:workflowj = computeService.captureMachine(m.getProviderAssignedId(), ((MachineImage) params[0]));
+      //TODO:workflow} else if (action.equals("restart")) {
+      //TODO:workflow    boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
+              //TODO:workflowj = computeService.restartMachine(m.getProviderAssignedId(), force);
+      //TODO:workflow} else {
+      //TODO:workflow    throw new ServiceUnavailableException("Unsupported operation action " + action + " on machine id "
+      //TODO:workflow        + m.getProviderAssignedId() + " " + m.getId());
+      //TODO:workflow}
+          //TODO:workflow} catch (org.ow2.sirocco.cloudmanager.connector.api.BadStateException e) {
+          //TODO:workflow    throw new BadStateException(e.getMessage() + " action " + action + " machine id " + m.getProviderAssignedId() + " "
+          //TODO:workflow        + m.getId());
+          //TODO:workflow} catch (ConnectorException e) {
+          //TODO:workflow  throw new ServiceUnavailableException(e.getMessage() + " action " + action + " machine id "
+          //TODO:workflow       + m.getProviderAssignedId() + " " + m.getId());
+      //TODO:workflow}
+  //TODO:workflowMachineManager.logger.info("operation " + action + " for machine " + m.getId() + " job status " + j.getState());
 
-        Job job = this.createJob(m, null, action, j.getState(), null);
-        job.setProviderAssignedId(j.getProviderAssignedId());
-        this.updateJob(job);
-        Map<String, String> map = job.getProperties();
-        map.put("parent-machine", "ok");
-        job.setProperties(map);
-        job.setDescription("Machine " + action);
+  //TODO:workflow Job job = this.createJob(m, null, action, j.getState(), null);
+  //TODO:workflowjob.setProviderAssignedId(j.getProviderAssignedId());
+  //TODO:workflow this.updateJob(job);
+  //TODO:workflow Map<String, String> map = job.getProperties();
+  //TODO:workflowmap.put("parent-machine", "ok");
+  //TODO:workflowjob.setProperties(map);
+  //TODO:workflowjob.setDescription("Machine " + action);
 
-        if (j.getState() != Job.Status.FAILED) {
-            try {
-                UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
-            } catch (Exception e) {
-                throw new ServiceUnavailableException(e.getMessage() + "  " + action);
-            }
-        }
-        MachineManager.logger.info("operation " + action + " requested " + j.getState());
-        this.relConnector(m, connector);
-        return job;
+  //TODO:workflowif (j.getState() != Job.Status.FAILED) {
+  //TODO:workflow   try {
+  //TODO:workflow      UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
+  //TODO:workflow  } catch (Exception e) {
+  //TODO:workflow      throw new ServiceUnavailableException(e.getMessage() + "  " + action);
+  //TODO:workflow  }
+  //TODO:workflow }
+  //TODO:workflow MachineManager.logger.info("operation " + action + " requested " + j.getState());
+      //TODO:workflowthis.relConnector(m, connector);
+  //TODO:workflowreturn job;
+    return null;
     }
 
     // Delete may be done in any state of the machine
@@ -704,48 +652,49 @@ public class MachineManager implements IMachineManager {
             }
         }
 
-        ICloudProviderConnector connector = this.getConnector(m);
+      //TODO:workflowICloudProviderConnector connector = this.getConnector(m);
         IComputeService computeService;
 
         m.setState(Machine.State.DELETING);
 
-        try {
-            computeService = connector.getComputeService();
-        } catch (ConnectorException e) {
-            throw new ServiceUnavailableException(e.getMessage());
-        }
-        try {
-            j = computeService.deleteMachine(m.getProviderAssignedId());
-        } catch (ConnectorException e) {
-            throw new ServiceUnavailableException(e.getMessage());
-        }
+      //TODO:workflow try {
+      //TODO:workflow   computeService = connector.getComputeService();
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow   throw new ServiceUnavailableException(e.getMessage());
+      //TODO:workflow}
+      //TODO:workflow try {
+      //TODO:workflow   j = computeService.deleteMachine(m.getProviderAssignedId());
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow    throw new ServiceUnavailableException(e.getMessage());
+      //TODO:workflow }
         if (j.getState() != Job.Status.RUNNING) {
             Machine.State s = m.getState();
-            try {
-                s = computeService.getMachineState(m.getProviderAssignedId());
-            } catch (ConnectorException e) {
+          //TODO:workflowtry {
+          //TODO:workflow  s = computeService.getMachineState(m.getProviderAssignedId());
+          //TODO:workflow} catch (ConnectorException e) {
             }
-            m.setState(s);
-        }
+      //TODO:workflow m.setState(s);
+      //TODO:workflow}
 
-        Job job = this.createJob(m, null, "delete", j.getState(), null);
-        job.setDescription("Machine deletion");
-        job.setProviderAssignedId(j.getProviderAssignedId());
-        this.updateJob(job);
-        Map<String, String> map = job.getProperties();
-        map.put("parent-machine", "ok");
-        job.setProperties(map);
+  //TODO:workflowJob job = this.createJob(m, null, "delete", j.getState(), null);
+  //TODO:workflowjob.setDescription("Machine deletion");
+  //TODO:workflowjob.setProviderAssignedId(j.getProviderAssignedId());
+      //TODO:workflowthis.updateJob(job);
+      //TODO:workflowMap<String, String> map = job.getProperties();
+      //TODO:workflowmap.put("parent-machine", "ok");
+      //TODO:workflowjob.setProperties(map);
 
         if (j.getState() != Job.Status.FAILED) {
-            try {
-                UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
-            } catch (Exception e) {
-                throw new ServiceUnavailableException(e.getMessage());
-            }
+        	//TODO:workflow try {
+        	//TODO:workflow   UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
+        	//TODO:workflow } catch (Exception e) {
+        	//TODO:workflow    throw new ServiceUnavailableException(e.getMessage());
+        	//TODO:workflow}
         }
 
-        this.relConnector(m, connector);
-        return job;
+      //TODO:workflowthis.relConnector(m, connector);
+      //TODO:workflowreturn job;
+        return null;
     }
 
     private Machine getMachineFromId(final String machineId) throws ResourceNotFoundException, CloudProviderException {
@@ -1484,28 +1433,28 @@ public class MachineManager implements IMachineManager {
         final String providerAssignedMachineId) {
         ICloudProviderConnector connector;
 
-        try {
-            connector = this.getCloudProviderConnector(cpa, loc);
-        } catch (CloudProviderException e) {
+      //TODO:workflowtry {
+      //TODO:workflow    connector = this.getCloudProviderConnector(cpa, loc);
+      //TODO:workflow } catch (CloudProviderException e) {
             /** no point to return false? */
-            MachineManager.logger.info("Could not get cloud connector " + e.getMessage());
-            return null;
-        }
+      //TODO:workflow MachineManager.logger.info("Could not get cloud connector " + e.getMessage());
+      //TODO:workflow return null;
+      //TODO:workflow }
         IComputeService computeService = null;
         Machine m = null;
-        try {
-            computeService = connector.getComputeService();
-            m = computeService.getMachine(providerAssignedMachineId);
-        } catch (ConnectorException e) {
-            MachineManager.logger.info(" Could not get compute service " + e.getMessage());
-            return null;
-        }
+      //TODO:workflowtry {
+        	//TODO:workflowcomputeService = connector.getComputeService();
+          //TODO:workflowm = computeService.getMachine(providerAssignedMachineId);
+        	//TODO:workflow} catch (ConnectorException e) {
+        	//TODO:workflow  MachineManager.logger.info(" Could not get compute service " + e.getMessage());
+        	//TODO:workflow  return null;
+      //TODO:workflow}
         String cpType = cpa.getCloudProvider().getCloudProviderType();
-        try {
-            this.relConnector(cpType, connector);
-        } catch (CloudProviderException e) {
-            MachineManager.logger.info(" Could not release connector ");
-        }
+      //TODO:workflowtry {
+        	//TODO:workflowthis.relConnector(cpType, connector);
+      //TODO:workflow} catch (CloudProviderException e) {
+      //TODO:workflow   MachineManager.logger.info(" Could not release connector ");
+      //TODO:workflow}
         return m;
     }
 
@@ -1856,32 +1805,32 @@ public class MachineManager implements IMachineManager {
          * Invoke the connector to add volume to machine
          */
         ICloudProviderConnector connector = null;
-        try {
-            connector = this.getConnector(m);
-        } catch (Exception e) {
-            throw new ServiceUnavailableException(" " + e.getMessage() + " getting connector to add volume to machine "
-                + m.getId() + " " + m.getProviderAssignedId());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow   connector = this.getConnector(m);
+      //TODO:workflow} catch (Exception e) {
+      //TODO:workflow   throw new ServiceUnavailableException(" " + e.getMessage() + " getting connector to add volume to machine "
+      //TODO:workflow       + m.getId() + " " + m.getProviderAssignedId());
+      //TODO:workflow}
         IComputeService computeService;
 
-        try {
-            computeService = connector.getComputeService();
-        } catch (ConnectorException e) {
-            String eee = e.getMessage();
-            throw new ServiceUnavailableException(" " + eee + " getting compute service to add volume to machine " + m.getId()
-                + " " + m.getProviderAssignedId());
-        }
+      //TODO:workflowtry {
+      //TODO:workflowcomputeService = connector.getComputeService();
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow  String eee = e.getMessage();
+      //TODO:workflow throw new ServiceUnavailableException(" " + eee + " getting compute service to add volume to machine " + m.getId()
+      //TODO:workflow    + " " + m.getProviderAssignedId());
+      //TODO:workflow}
 
         /**
          * action = addVolume targetEntity = machine affectedEntity = volume
          */
         Job j = null;
         mv.setState(MachineVolume.State.ATTACHING);
-        try {
-            j = computeService.addVolumeToMachine(m.getProviderAssignedId(), mv);
-        } catch (ConnectorException e) {
-            throw new ServiceUnavailableException(e.getMessage() + " in add volume to machine " + m.getId());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow j = computeService.addVolumeToMachine(m.getProviderAssignedId(), mv);
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow throw new ServiceUnavailableException(e.getMessage() + " in add volume to machine " + m.getId());
+      //TODO:workflow}
         if (j.getState() != Job.Status.FAILED) {
             try {
                 UtilsForManagers.emitJobListenerMessage(j.getProviderAssignedId(), this.ctx);
@@ -1979,16 +1928,16 @@ public class MachineManager implements IMachineManager {
         /**
          * Invoke the connector to add volume to machine
          */
-        ICloudProviderConnector connector = this.getConnector(m);
+      //TODO:workflowICloudProviderConnector connector = this.getConnector(m);
         IComputeService computeService;
 
-        try {
-            computeService = connector.getComputeService();
-        } catch (ConnectorException e) {
-            String eee = e.getMessage();
-            throw new ServiceUnavailableException(" " + eee + " removing volume from machine " + m.getId() + " "
-                + m.getProviderAssignedId());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow    computeService = connector.getComputeService();
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow   String eee = e.getMessage();
+      //TODO:workflow  throw new ServiceUnavailableException(" " + eee + " removing volume from machine " + m.getId() + " "
+      //TODO:workflow      + m.getProviderAssignedId());
+      //TODO:workflow}
 
         /**
          * action = addVolume targetEntity = machine affectedEntity = volume
@@ -1996,11 +1945,11 @@ public class MachineManager implements IMachineManager {
          */
         Job j = null;
         mv.setState(MachineVolume.State.DETACHING);
-        try {
-            j = computeService.removeVolumeFromMachine(m.getProviderAssignedId(), mv);
-        } catch (ConnectorException e) {
-            throw new ServiceUnavailableException(e.getMessage() + " in remove volume from machine " + m.getId());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow j = computeService.removeVolumeFromMachine(m.getProviderAssignedId(), mv);
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow throw new ServiceUnavailableException(e.getMessage() + " in remove volume from machine " + m.getId());
+      //TODO:workflow}
 
         if (j.getState() == Job.Status.FAILED) {
             throw new CloudProviderException("Could not remove volume to machine " + m.getId());

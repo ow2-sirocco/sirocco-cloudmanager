@@ -25,8 +25,6 @@ import javax.persistence.PersistenceException;
 import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
@@ -81,30 +79,8 @@ public class NetworkManager implements INetworkManager {
     @EJB
     private ICloudProviderManager cloudProviderManager;
 
-    @Inject
-    @OSGiService(dynamic = true)
-    private ICloudProviderConnectorFactoryFinder connectorFactoryFinder;
-
     @EJB
     private IUserManager userManager;
-
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount,
-        final CloudProviderLocation location) throws CloudProviderException {
-        NetworkManager.logger.info("Getting connector for cloud provider type "
-            + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-        ICloudProviderConnectorFactory connectorFactory = this.connectorFactoryFinder
-            .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
-        if (connectorFactory == null) {
-            NetworkManager.logger.error("Cannot find connector for cloud provider type "
-                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-            return null;
-        }
-        try {
-            return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
-        } catch (ConnectorException e) {
-            throw new CloudProviderException(e.getMessage());
-        }
-    }
 
     private User getUser() throws CloudProviderException {
         String username = this.context.getCallerPrincipal().getName();
@@ -169,22 +145,22 @@ public class NetworkManager implements INetworkManager {
         User user = this.getUser();
 
         Placement placement = this.cloudProviderManager.placeResource(networkCreate.getProperties());
-        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
+      //TODO:workflowif (connector == null) {
+      //TODO:workflow    throw new CloudProviderException("Cannot retrieve cloud provider connector "
+      //TODO:workflow        + placement.getAccount().getCloudProvider().getCloudProviderType());
+      //TODO:workflow}
 
         // delegates network creation to cloud provider connector
         Job providerJob = null;
 
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            providerJob = networkService.createNetwork(networkCreate);
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to create network: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflowtry {
+        	//TODO:workflow INetworkService networkService = connector.getNetworkService();
+        	//TODO:workflowproviderJob = networkService.createNetwork(networkCreate);
+        	//TODO:workflow} catch (ConnectorException e) {
+        	//TODO:workflow    NetworkManager.logger.error("Failed to create network: ", e);
+        	//TODO:workflow    throw new CloudProviderException(e.getMessage());
+        	//TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -314,23 +290,23 @@ public class NetworkManager implements INetworkManager {
         }
 
         // delegates volume deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount(),
-            network.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount(),
+      //TODO:workflow    network.getLocation());
         Job providerJob = null;
 
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            if (action.equals("delete")) {
-                providerJob = networkService.deleteNetwork(network.getProviderAssignedId());
-            } else if (action.equals("start")) {
-                providerJob = networkService.startNetwork(network.getProviderAssignedId());
-            } else if (action.equals("stop")) {
-                providerJob = networkService.stopNetwork(network.getProviderAssignedId());
-            }
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to " + action + " network: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflow try {
+      //TODO:workflow    INetworkService networkService = connector.getNetworkService();
+      //TODO:workflow   if (action.equals("delete")) {
+      //TODO:workflow       providerJob = networkService.deleteNetwork(network.getProviderAssignedId());
+      //TODO:workflow   } else if (action.equals("start")) {
+      //TODO:workflow      providerJob = networkService.startNetwork(network.getProviderAssignedId());
+      //TODO:workflow   } else if (action.equals("stop")) {
+      //TODO:workflow      providerJob = networkService.stopNetwork(network.getProviderAssignedId());
+      //TODO:workflow  }
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow   NetworkManager.logger.error("Failed to " + action + " network: ", e);
+      //TODO:workflow   throw new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         // if by change the job is done and has failed, bail out
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
@@ -595,22 +571,22 @@ public class NetworkManager implements INetworkManager {
         User user = this.getUser();
 
         Placement placement = this.cloudProviderManager.placeResource(networkPortCreate.getProperties());
-        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
+      //TODO:workflowif (connector == null) {
+      //TODO:workflow    throw new CloudProviderException("Cannot retrieve cloud provider connector "
+      //TODO:workflow       + placement.getAccount().getCloudProvider().getCloudProviderType());
+      //TODO:workflow}
 
         // delegates network port creation to cloud provider connector
         Job providerJob = null;
 
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            providerJob = networkService.createNetworkPort(networkPortCreate);
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to create network port: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow    INetworkService networkService = connector.getNetworkService();
+      //TODO:workflow    providerJob = networkService.createNetworkPort(networkPortCreate);
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow    NetworkManager.logger.error("Failed to create network port: ", e);
+      //TODO:workflow    throw new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -665,23 +641,23 @@ public class NetworkManager implements INetworkManager {
         }
 
         // delegates volume deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
-            networkPort.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
+      //TODO:workflow    networkPort.getLocation());
         Job providerJob = null;
 
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            if (action.equals("delete")) {
-                providerJob = networkService.deleteNetworkPort(networkPort.getProviderAssignedId());
-            } else if (action.equals("start")) {
-                providerJob = networkService.startNetworkPort(networkPort.getProviderAssignedId());
-            } else if (action.equals("stop")) {
-                providerJob = networkService.stopNetworkPort(networkPort.getProviderAssignedId());
-            }
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to " + action + " network: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflow try {
+      //TODO:workflow   INetworkService networkService = connector.getNetworkService();
+      //TODO:workflow  if (action.equals("delete")) {
+      //TODO:workflow     providerJob = networkService.deleteNetworkPort(networkPort.getProviderAssignedId());
+      //TODO:workflow } else if (action.equals("start")) {
+      //TODO:workflow     providerJob = networkService.startNetworkPort(networkPort.getProviderAssignedId());
+      //TODO:workflow } else if (action.equals("stop")) {
+      //TODO:workflow     providerJob = networkService.stopNetworkPort(networkPort.getProviderAssignedId());
+      //TODO:workflow }
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow    NetworkManager.logger.error("Failed to " + action + " network: ", e);
+      //TODO:workflow   throw new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         // if by change the job is done and has failed, bail out
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
@@ -1048,22 +1024,22 @@ public class NetworkManager implements INetworkManager {
         User user = this.getUser();
 
         Placement placement = this.cloudProviderManager.placeResource(forwardingGroupCreate.getProperties());
-        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
+      //TODO:workflowif (connector == null) {
+      //TODO:workflow    throw new CloudProviderException("Cannot retrieve cloud provider connector "
+      //TODO:workflow       + placement.getAccount().getCloudProvider().getCloudProviderType());
+      //TODO:workflow}
 
         // delegates network port creation to cloud provider connector
         Job providerJob = null;
 
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            providerJob = networkService.createForwardingGroup(forwardingGroupCreate);
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to create ForwardingGroup: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow    INetworkService networkService = connector.getNetworkService();
+      //TODO:workflow    providerJob = networkService.createForwardingGroup(forwardingGroupCreate);
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow    NetworkManager.logger.error("Failed to create ForwardingGroup: ", e);
+      //TODO:workflow    throw new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -1168,17 +1144,17 @@ public class NetworkManager implements INetworkManager {
         }
 
         // delegates ForwardingGroup deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-            forwardingGroup.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+      //TODO:workflow    forwardingGroup.getLocation());
         Job providerJob = null;
 
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            providerJob = networkService.deleteForwardingGroup(forwardingGroup.getProviderAssignedId());
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to delete forwarding group: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflow try {
+      //TODO:workflow    INetworkService networkService = connector.getNetworkService();
+      //TODO:workflow    providerJob = networkService.deleteForwardingGroup(forwardingGroup.getProviderAssignedId());
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow    NetworkManager.logger.error("Failed to delete forwarding group: ", e);
+      //TODO:workflow   throw new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         // if by change the job is done and has failed, bail out
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
@@ -1229,18 +1205,18 @@ public class NetworkManager implements INetworkManager {
         this.em.persist(forwardingGroup);
 
         // delegates ForwardingGroup add to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-            forwardingGroup.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+      //TODO:workflow     forwardingGroup.getLocation());
         Job providerJob = null;
 
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            providerJob = networkService.addNetworkToForwardingGroup(forwardingGroup.getProviderAssignedId(),
-                forwardingGroupNetwork);
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to add network to forwarding group: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflow try {
+      //TODO:workflow   INetworkService networkService = connector.getNetworkService();
+      //TODO:workflow   providerJob = networkService.addNetworkToForwardingGroup(forwardingGroup.getProviderAssignedId(),
+      //TODO:workflow       forwardingGroupNetwork);
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow     NetworkManager.logger.error("Failed to add network to forwarding group: ", e);
+      //TODO:workflow    throw new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -1285,18 +1261,18 @@ public class NetworkManager implements INetworkManager {
         forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.DETACHING);
 
         // delegates ForwardingGroup deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-            forwardingGroup.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+      //TODO:workflow    forwardingGroup.getLocation());
         Job providerJob = null;
 
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            providerJob = networkService.removeNetworkFromForwardingGroup(forwardingGroup.getProviderAssignedId(),
-                forwardingGroupNetwork.getNetwork().getProviderAssignedId());
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to remove network from forwarding group: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow   INetworkService networkService = connector.getNetworkService();
+      //TODO:workflow    providerJob = networkService.removeNetworkFromForwardingGroup(forwardingGroup.getProviderAssignedId(),
+      //TODO:workflow       forwardingGroupNetwork.getNetwork().getProviderAssignedId());
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow   NetworkManager.logger.error("Failed to remove network from forwarding group: ", e);
+      //TODO:workflow    throw new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -1509,13 +1485,13 @@ public class NetworkManager implements INetworkManager {
         }
 
         // update Network entity
-        ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount(),
-            network.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount(),
+      //TODO:workflow    network.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                    network.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
+                	//TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
                     network.setCreated(new Date());
                     this.em.persist(network);
                 } catch (Exception ex) {
@@ -1531,7 +1507,7 @@ public class NetworkManager implements INetworkManager {
         if (providerJob.getAction().equals("start")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                    network.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
+                	//TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
                     network.setUpdated(new Date());
                     this.em.persist(network);
                 } catch (Exception ex) {
@@ -1547,7 +1523,7 @@ public class NetworkManager implements INetworkManager {
         if (providerJob.getAction().equals("stop")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                    network.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
+                	//TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
                     network.setUpdated(new Date());
                     this.em.persist(network);
                 } catch (Exception ex) {
@@ -1588,14 +1564,14 @@ public class NetworkManager implements INetworkManager {
         }
 
         // update NetworkPort entity
-        ICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
-            networkPort.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
+      //TODO:workflow   networkPort.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                    networkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
-                        .getState());
+                	//TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
+                	//TODO:workflow    .getState());
                     networkPort.setCreated(new Date());
                     this.em.persist(networkPort);
                 } catch (Exception ex) {
@@ -1611,8 +1587,8 @@ public class NetworkManager implements INetworkManager {
         if (providerJob.getAction().equals("start")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                    networkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
-                        .getState());
+                	//TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
+                	//TODO:workflow    .getState());
                     networkPort.setUpdated(new Date());
                     this.em.persist(networkPort);
                 } catch (Exception ex) {
@@ -1628,8 +1604,8 @@ public class NetworkManager implements INetworkManager {
         if (providerJob.getAction().equals("stop")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                    networkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
-                        .getState());
+                	//TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
+                	//TODO:workflow    .getState());
                     networkPort.setUpdated(new Date());
                     this.em.persist(networkPort);
                 } catch (Exception ex) {
@@ -1669,8 +1645,8 @@ public class NetworkManager implements INetworkManager {
             return false;
         }
 
-        ICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-            forwardingGroup.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+      //TODO:workflow  forwardingGroup.getLocation());
 
         Network affectedNetwork = null;
         if (providerJob.getAffectedResources().size() == 1
@@ -1683,8 +1659,8 @@ public class NetworkManager implements INetworkManager {
             if (affectedNetwork == null) {
                 if (providerJob.getState() == Job.Status.SUCCESS) {
                     try {
-                        forwardingGroup.setState(connector.getNetworkService()
-                            .getForwardingGroup(forwardingGroup.getProviderAssignedId()).getState());
+                    	//TODO:workflowforwardingGroup.setState(connector.getNetworkService()
+                    	//TODO:workflow   .getForwardingGroup(forwardingGroup.getProviderAssignedId()).getState());
                         forwardingGroup.setCreated(new Date());
                         this.em.persist(forwardingGroup);
                     } catch (Exception ex) {

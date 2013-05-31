@@ -21,8 +21,6 @@ import javax.persistence.PersistenceException;
 import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactoryFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
@@ -65,10 +63,6 @@ public class VolumeManager implements IVolumeManager {
     @Resource
     private EJBContext context;
 
-    @Inject
-    @OSGiService(dynamic = true, waitTimeout = 20000)
-    private ICloudProviderConnectorFactoryFinder connectorFactoryFinder;
-
     @EJB
     private IUserManager userManager;
 
@@ -78,23 +72,6 @@ public class VolumeManager implements IVolumeManager {
     @EJB
     private IJobManager jobManager;
 
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount,
-        final CloudProviderLocation location) throws CloudProviderException {
-        VolumeManager.logger.info("Getting connector for cloud provider type "
-            + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-        ICloudProviderConnectorFactory connectorFactory = this.connectorFactoryFinder
-            .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
-        if (connectorFactory == null) {
-            VolumeManager.logger.error("Cannot find connector for cloud provider type "
-                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-            return null;
-        }
-        try {
-            return connectorFactory.getCloudProviderConnector(cloudProviderAccount, location);
-        } catch (ConnectorException e) {
-            throw new CloudProviderException(e.getMessage());
-        }
-    }
 
     private User getUser() throws CloudProviderException {
         String username = this.context.getCallerPrincipal().getName();
@@ -113,22 +90,22 @@ public class VolumeManager implements IVolumeManager {
         User user = this.getUser();
 
         Placement placement = this.cloudProviderManager.placeResource(volumeCreate.getProperties());
-        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
+      //TODO:workflowif (connector == null) {
+      //TODO:workflow    throw new CloudProviderException("Cannot retrieve cloud provider connector "
+      //TODO:workflow        + placement.getAccount().getCloudProvider().getCloudProviderType());
+      //TODO:workflow}
 
         // delegates volume creation to cloud provider connector
         Job providerJob = null;
 
-        try {
-            IVolumeService volumeService = connector.getVolumeService();
-            providerJob = volumeService.createVolume(volumeCreate);
-        } catch (ConnectorException e) {
-            VolumeManager.logger.error("Failed to create volume: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflow try {
+      //TODO:workflow    IVolumeService volumeService = connector.getVolumeService();
+      //TODO:workflow     providerJob = volumeService.createVolume(volumeCreate);
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflow    VolumeManager.logger.error("Failed to create volume: ", e);
+      //TODO:workflow    throw new CloudProviderException(e.getMessage());
+      //TODO:workflow }
 
         // if by chance the job is done and has failed, bail out
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
@@ -185,12 +162,12 @@ public class VolumeManager implements IVolumeManager {
         } else {
             // job is done and successful: retrieve the state of the volume and
             // persist volume+job
-            try {
-                volume.setState(connector.getVolumeService().getVolumeState(
-                    providerJob.getTargetResource().getProviderAssignedId()));
-            } catch (ConnectorException e) {
-                throw new CloudProviderException(e.getMessage());
-            }
+        	//TODO:workflow try {
+        	//TODO:workflow    volume.setState(connector.getVolumeService().getVolumeState(
+        	//TODO:workflow        providerJob.getTargetResource().getProviderAssignedId()));
+        	//TODO:workflow} catch (ConnectorException e) {
+        	//TODO:workflow    throw new CloudProviderException(e.getMessage());
+        	//TODO:workflow}
             volume.setCreated(new Date());
             this.em.persist(volume);
 
@@ -479,17 +456,17 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // delegates volume deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount(),
-            volume.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount(),
+      //TODO:workflow    volume.getLocation());
         Job providerJob = null;
 
-        try {
-            IVolumeService volumeService = connector.getVolumeService();
-            providerJob = volumeService.deleteVolume(volume.getProviderAssignedId());
-        } catch (ConnectorException e) {
-            VolumeManager.logger.error("Failed to delete volume: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflowtry {
+      //TODO:workflow    IVolumeService volumeService = connector.getVolumeService();
+      //TODO:workflow    providerJob = volumeService.deleteVolume(volume.getProviderAssignedId());
+      //TODO:workflow } catch (ConnectorException e) {
+      //TODO:workflow    VolumeManager.logger.error("Failed to delete volume: ", e);
+      //TODO:workflow     throw new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         // if by change the job is done and has failed, bail out
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
@@ -606,13 +583,13 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // update Volume entity
-        ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount(),
-            volume.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount(),
+      //TODO:workflow     volume.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                    volume.setState(connector.getVolumeService().getVolumeState(volume.getProviderAssignedId()));
+                	//TODO:workflowvolume.setState(connector.getVolumeService().getVolumeState(volume.getProviderAssignedId()));
                     volume.setCreated(new Date());
                     this.em.persist(volume);
                 } catch (Exception ex) {
@@ -650,14 +627,14 @@ public class VolumeManager implements IVolumeManager {
             return false;
         }
 
-        ICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount(),
-            volumeImage.getLocation());
+      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount(),
+      //TODO:workflow     volumeImage.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                    volumeImage.setState(connector.getVolumeService().getVolumeImage(volumeImage.getProviderAssignedId())
-                        .getState());
+                	//TODO:workflowvolumeImage.setState(connector.getVolumeService().getVolumeImage(volumeImage.getProviderAssignedId())
+                	//TODO:workflow    .getState());
                     volumeImage.setCreated(new Date());
                     this.em.persist(volumeImage);
 
@@ -741,12 +718,12 @@ public class VolumeManager implements IVolumeManager {
         Placement placement;
 
         if (volumeToSnapshot != null) {
-            connector = this.getCloudProviderConnector(volumeToSnapshot.getCloudProviderAccount(),
-                volumeToSnapshot.getLocation());
+        	//TODO:workflowconnector = this.getCloudProviderConnector(volumeToSnapshot.getCloudProviderAccount(),
+        	//TODO:workflow    volumeToSnapshot.getLocation());
             placement = new Placement(volumeToSnapshot.getCloudProviderAccount(), volumeToSnapshot.getLocation());
         } else {
             placement = this.cloudProviderManager.placeResource(volumeImage.getProperties());
-            connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
+          //TODO:workflowconnector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
         }
         if (connector == null) {
             throw new CloudProviderException("Cannot retrieve cloud provider connector "
@@ -759,10 +736,10 @@ public class VolumeManager implements IVolumeManager {
         try {
             IVolumeService volumeService = connector.getVolumeService();
             if (volumeToSnapshot == null) {
-                providerJob = volumeService.createVolumeImage(volumeImage);
+            	//TODO:workflowproviderJob = volumeService.createVolumeImage(volumeImage);
             } else {
                 volumeToSnapshot = this.getVolumeById(volumeToSnapshot.getId().toString());
-                providerJob = volumeService.createVolumeSnapshot(volumeToSnapshot.getProviderAssignedId(), volumeImage);
+              //TODO:workflowproviderJob = volumeService.createVolumeSnapshot(volumeToSnapshot.getProviderAssignedId(), volumeImage);
             }
         } catch (ConnectorException e) {
             VolumeManager.logger.error("Failed to create volume: ", e);
@@ -869,17 +846,17 @@ public class VolumeManager implements IVolumeManager {
         }
 
         // delegates volume deletion to cloud provider connector
-        ICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount(),
-            volumeImage.getLocation());
+      //TODO:workflow ICloudProviderConnector connector = this.getCloudProviderConnector(volumeImage.getCloudProviderAccount(),
+      //TODO:workflow    volumeImage.getLocation());
         Job providerJob = null;
 
-        try {
-            IVolumeService volumeService = connector.getVolumeService();
-            providerJob = volumeService.deleteVolumeImage(volumeImage.getProviderAssignedId());
-        } catch (ConnectorException e) {
-            VolumeManager.logger.error("Failed to delete volumeImage: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+      //TODO:workflowtry {
+        	//TODO:workflowIVolumeService volumeService = connector.getVolumeService();
+        	//TODO:workflowproviderJob = volumeService.deleteVolumeImage(volumeImage.getProviderAssignedId());
+      //TODO:workflow} catch (ConnectorException e) {
+      //TODO:workflowVolumeManager.logger.error("Failed to delete volumeImage: ", e);
+      //TODO:workflowthrow new CloudProviderException(e.getMessage());
+      //TODO:workflow}
 
         // if by change the job is done and has failed, bail out
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {

@@ -35,7 +35,6 @@ import javax.jms.MessageListener;
 import javax.jms.ObjectMessage;
 
 import org.glassfish.osgicdi.OSGiService;
-import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,9 +54,7 @@ public class JobSendHandlerBean implements MessageListener {
     @Resource
     private EJBContext ctx;
 
-    @Inject
-    @OSGiService(dynamic = true)
-    IJobManager jobManager;
+
 
     @Override
     public void onMessage(final Message msg) {
@@ -68,7 +65,7 @@ public class JobSendHandlerBean implements MessageListener {
 
                 Object payload = objectMessage.getObject();
                 JobSendHandlerBean.logger.debug("setting up Job completion listener");
-                this.jobManager.setNotificationOnJobCompletion((String) payload);
+              //TODO:workflowthis.jobManager.setNotificationOnJobCompletion((String) payload);
             } catch (Exception e2) {
                 JobSendHandlerBean.logger.warn("Exception " + e2.getMessage() + " - message rollback");
                 this.ctx.setRollbackOnly();
