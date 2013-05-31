@@ -50,7 +50,7 @@ public class CloudProviderAccount implements Serializable {
 
     private Map<String, String> properties;
 
-    private Set<User> users;
+    private Set<Tenant> tenants;
 
     private CloudProvider cloudProvider;
 
@@ -102,12 +102,12 @@ public class CloudProviderAccount implements Serializable {
     }
 
     @ManyToMany(fetch = FetchType.EAGER)
-    public Set<User> getUsers() {
-        return this.users;
+    public Set<Tenant> getTenants() {
+        return this.tenants;
     }
 
-    public void setUsers(final Set<User> users) {
-        this.users = users;
+    public void setTenants(final Set<Tenant> tenants) {
+        this.tenants = tenants;
     }
 
 }
