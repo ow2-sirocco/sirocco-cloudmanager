@@ -175,7 +175,7 @@
 									<destFileName>sirocco-cloudmanager-core-manager.jar</destFileName>
 								</artifactItem>
 							</artifactItems>
-							<outputDirectory>${project.build.directory}</outputDirectory>
+							<outputDirectory>${glassfish.bundles}</outputDirectory>
 							<overWriteReleases>true</overWriteReleases>
 							<overWriteSnapshots>true</overWriteSnapshots>
 						</configuration>
@@ -241,7 +241,7 @@
 							<goal>run</goal>
 						</goals>
 					</execution>
-					<execution>
+					<!-- <execution>
 						<id>install-core-ejb</id>
 						<phase>integration-test</phase>
 						<configuration>
@@ -253,7 +253,7 @@
 						<goals>
 							<goal>run</goal>
 						</goals>
-					</execution>
+					</execution> -->
 				</executions>
 			</plugin>
 
@@ -295,6 +295,7 @@
 						<type>existing</type>
 						<home>${glassfish.root}/domains</home>
 						<properties>
+							<cargo.jvmargs>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</cargo.jvmargs>
 							<cargo.remote.username>admin</cargo.remote.username>
 							<cargo.remote.password>admin</cargo.remote.password>
 							<cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
