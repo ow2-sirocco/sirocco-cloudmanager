@@ -295,7 +295,7 @@
 						<type>existing</type>
 						<home>${glassfish.root}/domains</home>
 						<properties>
-							<cargo.jvmargs>-Xms512m -Xmx1024m -XX:MaxPermSize=512m</cargo.jvmargs>
+							<cargo.jvmargs>-Xms512m -Xmx512m -XX:MaxPermSize=192m</cargo.jvmargs>
 							<cargo.remote.username>admin</cargo.remote.username>
 							<cargo.remote.password>admin</cargo.remote.password>
 							<cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
