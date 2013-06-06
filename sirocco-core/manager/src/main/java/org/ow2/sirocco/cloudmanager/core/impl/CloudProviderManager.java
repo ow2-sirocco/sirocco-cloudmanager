@@ -61,7 +61,7 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     private static Logger logger = LoggerFactory.getLogger(CloudProviderManager.class.getName());
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistence", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
     @Resource
@@ -91,6 +91,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         // CloudProviderException("CloudProvider validation failed");};
 
         this.em.persist(cp);
+        this.em.flush();
         return cp;
     }
 
@@ -144,6 +145,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         // CloudProviderException("CloudProviderAccount validation failed");};
 
         this.em.persist(cpa);
+        this.em.flush();
         return cpa;
 
     }
