@@ -206,7 +206,8 @@ public class QueryHelper {
             }
             stateQuery = stateQuery + " v.state<>" + stateToIgnore.getClass().getName() + "." + stateToIgnore.name() + " ";
         }
-        return em.createQuery("SELECT v FROM " + entityType + " v WHERE " + tenantQuery + stateQuery + " ORDER BY v.id")
+        return em
+            .createQuery("SELECT v FROM " + entityType + " v WHERE " + tenantQuery + stateQuery + " ORDER BY v.created DESC")
             .setParameter("tenantId", tenantId).getResultList();
 
     }
@@ -252,8 +253,8 @@ public class QueryHelper {
             int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + params.getEntityType() + " v WHERE " + whereClause)
                 .setParameter("tenantId", params.getTenantId()).getSingleResult()).intValue();
             Query query = em.createQuery(
-                "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.id").setParameter(
-                "tenantId", params.getTenantId());
+                "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.created DESC")
+                .setParameter("tenantId", params.getTenantId());
             if (params.getFirst() != null) {
                 query.setFirstResult(params.getFirst());
             }
