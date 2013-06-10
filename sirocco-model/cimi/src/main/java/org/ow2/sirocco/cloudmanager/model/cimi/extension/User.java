@@ -43,6 +43,7 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "Users")
 public class User implements Serializable {
+    public final static String ADMIN_ROLE = "sirocco-admin";
 
     private static final long serialVersionUID = 1L;
 
@@ -136,6 +137,10 @@ public class User implements Serializable {
 
     public void setRole(final String role) {
         this.role = role;
+    }
+
+    public boolean isAdmin() {
+        return User.ADMIN_ROLE.equals(this.role);
     }
 
     @ManyToMany(fetch = FetchType.EAGER)

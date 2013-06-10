@@ -1,11 +1,13 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 @Stateless
 @Local(ITenantManager.class)
 @Remote(IRemoteTenantManager.class)
+@IdentityInterceptorBinding
 public class TenantManager implements ITenantManager {
     private static Logger logger = LoggerFactory.getLogger(UserManager.class.getName());
 
@@ -33,6 +36,9 @@ public class TenantManager implements ITenantManager {
 
     @EJB
     private IUserManager userManager;
+
+    @Inject
+    private IdentityContext identityContext;
 
     @Override
     public Tenant createTenant(final Tenant tenant) throws CloudProviderException {
@@ -65,7 +71,12 @@ public class TenantManager implements ITenantManager {
 
     @Override
     public List<Tenant> getTenants() throws CloudProviderException {
-        return this.em.createQuery("SELECT t FROM Tenant t").getResultList();
+        User user = this.userManager.getUserByUsername(this.identityContext.getUserName());
+        if (user.isAdmin()) {
+            return this.em.createQuery("SELECT t FROM Tenant t").getResultList();
+        } else {
+            return new ArrayList<Tenant>(user.getTenants());
+        }
     }
 
     @Override
