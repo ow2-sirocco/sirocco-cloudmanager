@@ -5,9 +5,15 @@ import java.util.List;
 public class AccountAccess {
     private String tenantId;
 
+    private String providerName;
+
+    private String providerApi;
+
     private String providerId;
 
     private String accountId;
+
+    private List<Location> locations;
 
     public String getTenantId() {
         return this.tenantId;
@@ -31,6 +37,30 @@ public class AccountAccess {
 
     public void setAccountId(final String accountId) {
         this.accountId = accountId;
+    }
+
+    public String getProviderName() {
+        return this.providerName;
+    }
+
+    public void setProviderName(final String providerName) {
+        this.providerName = providerName;
+    }
+
+    public String getProviderApi() {
+        return this.providerApi;
+    }
+
+    public void setProviderApi(final String providerApi) {
+        this.providerApi = providerApi;
+    }
+
+    public List<Location> getLocations() {
+        return this.locations;
+    }
+
+    public void setLocations(final List<Location> locations) {
+        this.locations = locations;
     }
 
     public static class Collection {

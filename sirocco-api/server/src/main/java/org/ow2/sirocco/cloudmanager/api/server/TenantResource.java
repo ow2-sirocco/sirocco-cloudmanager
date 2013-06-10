@@ -43,6 +43,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.ow2.sirocco.cloudmanager.api.model.AccountAccess;
+import org.ow2.sirocco.cloudmanager.api.model.Location;
 import org.ow2.sirocco.cloudmanager.api.model.MultiCloudTenant;
 import org.ow2.sirocco.cloudmanager.api.model.UserTenantMembership;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
@@ -51,6 +52,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
@@ -134,8 +136,16 @@ public class TenantResource extends ResourceBase {
         try {
             for (CloudProviderAccount account : this.providerManager.getCloudProviderAccountsByTenant(tenantId)) {
                 AccountAccess access = new AccountAccess();
+                access.setTenantId(tenantId);
                 access.setAccountId(account.getId().toString());
                 access.setProviderId(account.getCloudProvider().getId().toString());
+                access.setProviderName(account.getCloudProvider().getDescription());
+                access.setProviderApi(account.getCloudProvider().getCloudProviderType());
+                List<Location> locations = new ArrayList<Location>();
+                for (CloudProviderLocation loc : account.getCloudProvider().getCloudProviderLocations()) {
+                    locations.add(ProviderResource.toLocation(loc));
+                }
+                access.setLocations(locations);
                 accountAccesses.add(access);
             }
         } catch (CloudProviderException e) {

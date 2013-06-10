@@ -26,6 +26,7 @@ import java.util.List;
 
 import org.nocrala.tools.texttablefmt.Table;
 import org.ow2.sirocco.cloudmanager.api.model.AccountAccess;
+import org.ow2.sirocco.cloudmanager.api.model.Location;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -47,11 +48,21 @@ public class AccountAccessListCommand implements Command {
         AccountAccess.Collection memberships = restClient.getRequest("tenants/" + this.tenantIds.get(0) + "/accounts",
             AccountAccess.Collection.class);
 
-        Table table = new Table(1);
+        Table table = new Table(4);
         table.addCell("Account Id");
+        table.addCell("Provider API");
+        table.addCell("Provider Name");
+        table.addCell("Locations");
 
         for (AccountAccess membership : memberships.getAccountAccesses()) {
             table.addCell(membership.getAccountId());
+            table.addCell(membership.getProviderApi());
+            table.addCell(membership.getProviderName());
+            StringBuilder sb = new StringBuilder();
+            for (Location location : membership.getLocations()) {
+                sb.append(location.getCountryName() + " ");
+            }
+            table.addCell(sb.toString());
         }
         System.out.println(table.render());
     }

@@ -133,7 +133,7 @@ public class ProviderResource extends ResourceBase {
         try {
             CloudProvider provider = this.providerManager.getCloudProviderById(providerId);
             for (CloudProviderLocation loc : provider.getCloudProviderLocations()) {
-                locations.add(this.toLocation(loc));
+                locations.add(ProviderResource.toLocation(loc));
             }
         } catch (ResourceNotFoundException e) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -257,7 +257,7 @@ public class ProviderResource extends ResourceBase {
         return account;
     }
 
-    private Location toLocation(final CloudProviderLocation location) {
+    static Location toLocation(final CloudProviderLocation location) {
         Location result = new Location();
         result.setIso3166_1(location.getIso3166_1());
         result.setIso3166_2(location.getIso3166_2());
