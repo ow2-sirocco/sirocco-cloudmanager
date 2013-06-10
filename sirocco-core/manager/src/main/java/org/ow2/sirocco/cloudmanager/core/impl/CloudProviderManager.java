@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -473,6 +474,8 @@ public class CloudProviderManager implements ICloudProviderManager {
         CloudProvider provider = this.getCloudProviderById(cloudProviderId);
         location = this.createCloudProviderLocation(location);
         provider.getCloudProviderLocations().add(location);
+        location.setCloudProviders(new HashSet<CloudProvider>());
+        location.getCloudProviders().add(provider);
     }
 
     @Override
