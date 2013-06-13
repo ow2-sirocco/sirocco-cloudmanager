@@ -38,10 +38,6 @@
 	<packaging>bundle</packaging>
 
 	<name>SIROCCO :: CloudManager :: Connector :: OpenStack Nova</name>
-	
-	<properties>
-		<jclouds.version>1.5.2</jclouds.version>
-	</properties>
 
 	<build>
 		<plugins>
@@ -59,20 +55,6 @@
 					</instructions>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-ipojo-plugin</artifactId>
-				<version>1.6.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>ipojo-bundle</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-
 		</plugins>
 	</build>
 
@@ -81,38 +63,46 @@
 			<groupId>org.apache.felix</groupId>
 			<artifactId>org.osgi.core</artifactId>
 			<version>1.4.0</version>
+			<scope>provided</scope>
 		</dependency>
-
+		
 		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.ipojo.annotations</artifactId>
-			<version>1.6.0</version>
+			<groupId>org.osgi</groupId>
+			<artifactId>org.osgi.compendium</artifactId>
+			<version>4.2.0</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-connector-api</artifactId>
 			<version>0.6.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-util-jobmanager</artifactId>
-			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
-			<groupId>org.jclouds.api</groupId>
-			<artifactId>openstack-nova</artifactId>
-			<version>${jclouds.version}</version>
+			<groupId>org.openstack</groupId>
+			<artifactId>keystone-client</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.openstack</groupId>
+			<artifactId>nova-client</artifactId>
+			<version>3.0.0-SNAPSHOT</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.5.8</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-jdk14</artifactId>
+			<version>1.5.6</version>
 		</dependency>
 		
 		<dependency>
@@ -122,5 +112,39 @@
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
-
+  <profiles>
+	<profile>
+		<id>jersey</id>
+		<dependencies>
+			<dependency>
+				<groupId>org.openstack</groupId>
+				<artifactId>jersey-connector</artifactId>
+				<version>3.0.0-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</profile>
+	<profile>
+		<id>jersey2</id>
+		<activation>
+			<activeByDefault>true</activeByDefault>
+		</activation>
+		<dependencies>
+			<dependency>
+				<groupId>org.openstack</groupId>
+				<artifactId>jersey2-connector</artifactId>
+				<version>3.0.0-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</profile>
+	<profile>
+		<id>resteasy</id>
+		<dependencies>
+			<dependency>
+				<groupId>org.openstack</groupId>
+				<artifactId>resteasy-connector</artifactId>
+				<version>3.0.0-SNAPSHOT</version>
+			</dependency>
+		</dependencies>
+	</profile>
+  </profiles>
 </project>
