@@ -2330,7 +2330,7 @@ public class MachineManager implements IMachineManager {
                             addr.getAddress().setNetwork(null);
                             addr.getAddress().setResource(null);
                             addr.getAddress().setCreated(new Date());
-                            addr.getAddress().setTenant(this.getTenant());
+                            addr.getAddress().setTenant(machine.getTenant());
                             this.em.persist(addr.getAddress());
                         } else {
                             MachineManager.logger
