@@ -235,6 +235,7 @@ public class ProviderResource extends ResourceBase {
         provider.setDescription(apiProvider.getDescription());
         provider.setEndpoint(apiProvider.getEndpoint());
         provider.setCloudProviderType(apiProvider.getApi());
+        provider.setProperties(apiProvider.getProperties());
         return provider;
     }
 
