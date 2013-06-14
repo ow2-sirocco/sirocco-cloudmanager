@@ -35,32 +35,37 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 public interface ISystemService {
     System createSystem(SystemCreate systemCreate, ProviderTarget target) throws ConnectorException;
 
-    void deleteSystem(String systemId, ProviderTarget target) throws ConnectorException;
+    void deleteSystem(String systemId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    void startSystem(String systemId, Map<String, String> properties, ProviderTarget target) throws ConnectorException;
+    void startSystem(String systemId, Map<String, String> properties, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
     void stopSystem(String systemId, boolean force, Map<String, String> properties, ProviderTarget target)
-        throws ConnectorException;
+        throws ResourceNotFoundException, ConnectorException;
 
     void restartSystem(String systemId, boolean force, Map<String, String> properties, ProviderTarget target)
-        throws ConnectorException;
+        throws ResourceNotFoundException, ConnectorException;
 
-    void pauseSystem(String systemId, Map<String, String> properties, ProviderTarget target) throws ConnectorException;
+    void pauseSystem(String systemId, Map<String, String> properties, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
-    void suspendSystem(String systemId, Map<String, String> properties, ProviderTarget target) throws ConnectorException;
+    void suspendSystem(String systemId, Map<String, String> properties, ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException;
 
-    System getSystem(String systemId, ProviderTarget target) throws ConnectorException;
+    System getSystem(String systemId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    System.State getSystemState(String systemId, ProviderTarget target) throws ConnectorException;
+    System.State getSystemState(String systemId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
     List<? extends CloudCollectionItem> getEntityListFromSystem(String systemId, String entityType, ProviderTarget target)
-        throws ConnectorException;
+        throws ResourceNotFoundException, ConnectorException;
 
     void deleteEntityInSystem(String systemId, String entityId, String entityType, ProviderTarget target)
-        throws ConnectorException;
+        throws ResourceNotFoundException, ConnectorException;
 
-    void removeEntityFromSystem(String systemId, String entityId, ProviderTarget target) throws ConnectorException;
+    void removeEntityFromSystem(String systemId, String entityId, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
-    void addEntityToSystem(final String systemId, final String entityId, ProviderTarget target) throws ConnectorException;
+    void addEntityToSystem(final String systemId, final String entityId, ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException;
 
 }

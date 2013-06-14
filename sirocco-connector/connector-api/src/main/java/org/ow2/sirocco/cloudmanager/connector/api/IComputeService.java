@@ -34,27 +34,31 @@ public interface IComputeService {
 
     Machine createMachine(MachineCreate machineCreate, ProviderTarget target) throws ConnectorException;
 
-    void startMachine(final String machineId, ProviderTarget target) throws ConnectorException;
+    void startMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    void stopMachine(final String machineId, boolean force, ProviderTarget target) throws ConnectorException;
+    void stopMachine(final String machineId, boolean force, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
-    void suspendMachine(final String machineId, ProviderTarget target) throws ConnectorException;
+    void suspendMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    void restartMachine(final String machineId, boolean force, ProviderTarget target) throws ConnectorException;
+    void restartMachine(final String machineId, boolean force, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
-    void pauseMachine(final String machineId, ProviderTarget target) throws ConnectorException;
+    void pauseMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    void deleteMachine(final String machineId, ProviderTarget target) throws ConnectorException;
+    void deleteMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    MachineImage captureMachine(String machineId, MachineImage machineImage, ProviderTarget target) throws ConnectorException;
+    MachineImage captureMachine(String machineId, MachineImage machineImage, ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException;
 
-    Machine.State getMachineState(final String machineId, ProviderTarget target) throws ConnectorException;
+    Machine.State getMachineState(final String machineId, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
-    Machine getMachine(final String machineId, ProviderTarget target) throws ConnectorException;
+    Machine getMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
     void addVolumeToMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target)
-        throws ConnectorException;
+        throws ResourceNotFoundException, ConnectorException;
 
     void removeVolumeFromMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target)
-        throws ConnectorException;
+        throws ResourceNotFoundException, ConnectorException;
 }

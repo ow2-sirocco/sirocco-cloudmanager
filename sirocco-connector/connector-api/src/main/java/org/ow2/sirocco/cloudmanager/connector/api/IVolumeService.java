@@ -33,18 +33,21 @@ public interface IVolumeService {
 
     Volume createVolume(VolumeCreate volumeCreate, ProviderTarget target) throws ConnectorException;
 
-    void deleteVolume(String volumeId, ProviderTarget target) throws ConnectorException;
+    void deleteVolume(String volumeId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    Volume.State getVolumeState(String volumeId, ProviderTarget target) throws ConnectorException;
+    Volume.State getVolumeState(String volumeId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    Volume getVolume(String volumeId, ProviderTarget target) throws ConnectorException;
+    Volume getVolume(String volumeId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    VolumeImage createVolumeImage(VolumeImage volumeImage, ProviderTarget target) throws ConnectorException;
+    VolumeImage createVolumeImage(VolumeImage volumeImage, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
-    VolumeImage createVolumeSnapshot(String volumeId, VolumeImage volumeImage, ProviderTarget target) throws ConnectorException;
+    VolumeImage createVolumeSnapshot(String volumeId, VolumeImage volumeImage, ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException;
 
-    VolumeImage getVolumeImage(String volumeImageId, ProviderTarget target) throws ConnectorException;
+    VolumeImage getVolumeImage(String volumeImageId, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
-    void deleteVolumeImage(String volumeImageId, ProviderTarget target) throws ConnectorException;
+    void deleteVolumeImage(String volumeImageId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
 }

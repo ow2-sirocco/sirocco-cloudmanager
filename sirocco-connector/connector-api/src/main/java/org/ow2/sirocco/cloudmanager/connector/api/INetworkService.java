@@ -42,17 +42,17 @@ public interface INetworkService {
 
     Network createNetwork(NetworkCreate networkCreate, ProviderTarget target) throws ConnectorException;
 
-    Network getNetwork(String networkId, ProviderTarget target) throws ConnectorException;
+    Network getNetwork(String networkId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
     Network.State getNetworkState(String networkId, ProviderTarget target) throws ConnectorException;
 
     List<Network> getNetworks(ProviderTarget target) throws ConnectorException;
 
-    void deleteNetwork(String networkId, ProviderTarget target) throws ConnectorException;
+    void deleteNetwork(String networkId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    void startNetwork(String networkId, ProviderTarget target) throws ConnectorException;
+    void startNetwork(String networkId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    void stopNetwork(String networkId, ProviderTarget target) throws ConnectorException;
+    void stopNetwork(String networkId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
     //
     // NetworkPort operations
@@ -60,13 +60,14 @@ public interface INetworkService {
 
     NetworkPort createNetworkPort(NetworkPortCreate networkPortCreate, ProviderTarget target) throws ConnectorException;
 
-    NetworkPort getNetworkPort(String networkPortId, ProviderTarget target) throws ConnectorException;
+    NetworkPort getNetworkPort(String networkPortId, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
-    void deleteNetworkPort(String networkPortId, ProviderTarget target) throws ConnectorException;
+    void deleteNetworkPort(String networkPortId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    void startNetworkPort(String networkPortId, ProviderTarget target) throws ConnectorException;
+    void startNetworkPort(String networkPortId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
-    void stopNetworkPort(String networkPortId, ProviderTarget target) throws ConnectorException;
+    void stopNetworkPort(String networkPortId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
     //
     // ForwardingGroup operations
@@ -75,14 +76,16 @@ public interface INetworkService {
     ForwardingGroup createForwardingGroup(ForwardingGroupCreate forwardingGroupCreate, ProviderTarget target)
         throws ConnectorException;
 
-    ForwardingGroup getForwardingGroup(String forwardingGroupId, ProviderTarget target) throws ConnectorException;
+    ForwardingGroup getForwardingGroup(String forwardingGroupId, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
-    void deleteForwardingGroup(String forwardingGroupId, ProviderTarget target) throws ConnectorException;
+    void deleteForwardingGroup(String forwardingGroupId, ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException;
 
     void addNetworkToForwardingGroup(String forwardingGroupId, ForwardingGroupNetwork fgNetwork, ProviderTarget target)
-        throws ConnectorException;
+        throws ResourceNotFoundException, ConnectorException;
 
     void removeNetworkFromForwardingGroup(String forwardingGroupId, String networkId, ProviderTarget target)
-        throws ConnectorException;
+        throws ResourceNotFoundException, ConnectorException;
 
 }

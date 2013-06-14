@@ -48,6 +48,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
@@ -492,7 +493,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public synchronized void deleteVolume(final String volumeId) throws ConnectorException {
             Volume volume = this.volumes.get(volumeId);
             if (volume == null) {
-                throw new ConnectorException("Volume " + volumeId + " doesn't exist");
+                throw new ResourceNotFoundException("Volume " + volumeId + " doesn't exist");
             }
             volume.setState(Volume.State.DELETING);
             volume.setUpdated(new Date());
@@ -506,7 +507,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public synchronized Volume getVolume(final String volumeId) throws ConnectorException {
             Volume volume = this.volumes.get(volumeId);
             if (volume == null) {
-                throw new ConnectorException("Volume " + volumeId + " does not exist");
+                throw new ResourceNotFoundException("Volume " + volumeId + " does not exist");
             }
             if (this.actionDone(volume)) {
                 if (volume.getState() == Volume.State.CREATING) {
@@ -588,7 +589,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Starting machine with providerAssignedId " + machineId);
             final Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " doesn't exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
             }
             if (machine.getState() == State.CREATING || machine.getState() == State.STARTED
                 || machine.getState() == State.DELETING) {
@@ -602,7 +603,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Stopping machine with providerAssignedId " + machineId);
             final Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " doesn't exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
             }
             if (machine.getState() == State.CREATING || machine.getState() == State.STOPPED
                 || machine.getState() == State.PAUSING || machine.getState() == State.PAUSED
@@ -617,7 +618,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public synchronized void suspendMachine(final String machineId) throws ConnectorException {
             final Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " doesn't exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
             }
             if (machine.getState() == State.CREATING || machine.getState() == State.STARTING
                 || machine.getState() == State.STOPPING || machine.getState() == State.STOPPED
@@ -633,14 +634,14 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public synchronized void restartMachine(final String machineId, final boolean force) throws ConnectorException {
             final Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " doesn't exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
             }
         }
 
         public synchronized void pauseMachine(final String machineId) throws ConnectorException {
             final Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " doesn't exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
             }
             if (machine.getState() == State.CREATING || machine.getState() == State.STARTING
                 || machine.getState() == State.STOPPING || machine.getState() == State.STOPPED
@@ -656,7 +657,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public MachineImage captureMachine(final String machineId, final MachineImage machineImage) throws ConnectorException {
             final Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " doesn't exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
             }
             final MachineImage capturedMachineImage = new MachineImage();
             capturedMachineImage.setProviderAssignedId(UUID.randomUUID().toString());
@@ -675,7 +676,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public MachineImage getMachineImage(final String machineImageId) throws ConnectorException {
             MachineImage machineImage = this.machineImages.get(machineImageId);
             if (machineImage == null) {
-                throw new ConnectorException("MachineImage " + machineImageId + " does not exist");
+                throw new ResourceNotFoundException("MachineImage " + machineImageId + " does not exist");
             }
             if (this.actionDone(machineImage)) {
                 if (machineImage.getState() == MachineImage.State.CREATING) {
@@ -693,7 +694,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public void deleteMachineImage(final String machineImageId) throws ConnectorException {
             MachineImage machineImage = this.machineImages.get(machineImageId);
             if (machineImage == null) {
-                throw new ConnectorException("MachineImage " + machineImageId + " does not exist");
+                throw new ResourceNotFoundException("MachineImage " + machineImageId + " does not exist");
             }
             machineImage.setState(MachineImage.State.DELETING);
             machineImage.setUpdated(new Date());
@@ -703,7 +704,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Deleting machine with providerAssignedId " + machineId);
             Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " doesn't exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
             }
             machine.setState(Machine.State.DELETING);
             machine.setUpdated(new Date());
@@ -716,7 +717,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public synchronized Machine getMachine(final String machineId) throws ConnectorException {
             Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " does not exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " does not exist");
             }
             if (this.actionDone(machine)) {
                 if (machine.getState() == Machine.State.CREATING) {
@@ -767,7 +768,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public synchronized System getSystem(final String systemId) throws ConnectorException {
             System system = this.systems.get(systemId);
             if (system == null) {
-                throw new ConnectorException("System " + systemId + " does not exist");
+                throw new ResourceNotFoundException("System " + systemId + " does not exist");
             }
             if (this.actionDone(system)) {
                 if (system.getState() == System.State.CREATING) {
@@ -798,7 +799,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             final String entityType) throws ConnectorException {
             System system = this.systems.get(systemId);
             if (system == null) {
-                throw new ConnectorException("System " + systemId + " does not exist");
+                throw new ResourceNotFoundException("System " + systemId + " does not exist");
             }
             if (entityType.equals(SystemMachine.class.getName())) {
                 return new ArrayList<SystemMachine>(system.getMachines());
@@ -1251,7 +1252,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info(action + " system with providerAssignedId " + systemId);
             final System system = this.systems.get(systemId);
             if (system == null) {
-                throw new ConnectorException("System " + systemId + " doesn't exist");
+                throw new ResourceNotFoundException("System " + systemId + " doesn't exist");
             }
             if (forbiddenStates.contains(system.getState())) {
                 throw new BadStateException("Illegal operation");
@@ -1304,7 +1305,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
             final System system = this.systems.get(systemId);
             if (system == null) {
-                throw new ConnectorException("System " + systemId + " doesn't exist");
+                throw new ResourceNotFoundException("System " + systemId + " doesn't exist");
             }
 
             boolean failedCancelled = false;
@@ -1329,7 +1330,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public void addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException {
             final Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " doesn't exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
             }
             machineVolume.setState(MachineVolume.State.ATTACHING);
             machineVolume.setUpdated(new Date());
@@ -1340,7 +1341,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             throws ConnectorException {
             final Machine machine = this.machines.get(machineId);
             if (machine == null) {
-                throw new ConnectorException("Machine " + machineId + " doesn't exist");
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
             }
             MachineVolume targetMachineVolume = null;
             for (MachineVolume mv : machine.getVolumes()) {
@@ -1369,7 +1370,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public VolumeImage createVolumeSnapshot(final String volumeId, final VolumeImage from) throws ConnectorException {
             final Volume volume = this.volumes.get(volumeId);
             if (volume == null) {
-                throw new ConnectorException("Volume " + volumeId + " doesn't exist");
+                throw new ResourceNotFoundException("Volume " + volumeId + " doesn't exist");
             }
             final String volumeImageProviderAssignedId = UUID.randomUUID().toString();
             final VolumeImage volumeImage = new VolumeImage();
@@ -1385,7 +1386,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public VolumeImage getVolumeImage(final String volumeImageId) throws ConnectorException {
             final VolumeImage volumeImage = this.volumeImages.get(volumeImageId);
             if (volumeImage == null) {
-                throw new ConnectorException("VolumeImage " + volumeImageId + " doesn't exist");
+                throw new ResourceNotFoundException("VolumeImage " + volumeImageId + " doesn't exist");
             }
             if (this.actionDone(volumeImage)) {
                 if (volumeImage.getState() == VolumeImage.State.CREATING) {
@@ -1403,7 +1404,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public void deleteVolumeImage(final String volumeImageId) throws ConnectorException {
             VolumeImage volumeImage = this.volumeImages.get(volumeImageId);
             if (volumeImage == null) {
-                throw new ConnectorException("VolumeImage " + volumeImageId + " doesn't exist");
+                throw new ResourceNotFoundException("VolumeImage " + volumeImageId + " doesn't exist");
             }
             volumeImage.setState(VolumeImage.State.DELETING);
             volumeImage.setUpdated(new Date());
@@ -1431,7 +1432,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public Network getNetwork(final String networkId) throws ConnectorException {
             final Network network = this.networks.get(networkId);
             if (network == null) {
-                throw new ConnectorException("Network " + networkId + " doesn't exist");
+                throw new ResourceNotFoundException("Network " + networkId + " doesn't exist");
             }
             if (this.actionDone(network)) {
                 if (network.getState() == Network.State.CREATING) {
@@ -1464,7 +1465,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Deleting network with providerAssignedId " + networkId);
             Network network = this.networks.get(networkId);
             if (network == null) {
-                throw new ConnectorException("Network " + networkId + " doesn't exist");
+                throw new ResourceNotFoundException("Network " + networkId + " doesn't exist");
             }
             network.setState(Network.State.DELETING);
             network.setUpdated(new Date());
@@ -1474,7 +1475,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Starting network with providerAssignedId " + networkId);
             final Network network = this.networks.get(networkId);
             if (network == null) {
-                throw new ConnectorException("Network " + networkId + " doesn't exist");
+                throw new ResourceNotFoundException("Network " + networkId + " doesn't exist");
             }
             if (network.getState() != Network.State.STOPPED) {
                 throw new ConnectorException("Illegal operation");
@@ -1487,7 +1488,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Stopping network with providerAssignedId " + networkId);
             final Network network = this.networks.get(networkId);
             if (network == null) {
-                throw new ConnectorException("Network " + networkId + " doesn't exist");
+                throw new ResourceNotFoundException("Network " + networkId + " doesn't exist");
             }
             if (network.getState() != Network.State.STARTED) {
                 throw new ConnectorException("Illegal operation");
@@ -1498,13 +1499,13 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         public NetworkPort createNetworkPort(final NetworkPortCreate networkPortCreate) throws ConnectorException {
             if (networkPortCreate.getNetworkPortTemplate().getNetwork() == null) {
-                throw new ConnectorException("Wrong network port template: null network");
+                throw new ResourceNotFoundException("Wrong network port template: null network");
             }
             final Network network;
             String networkId = networkPortCreate.getNetworkPortTemplate().getNetwork().getProviderAssignedId();
             network = this.networks.get(networkId);
             if (network == null) {
-                throw new ConnectorException("Unknown network with id=" + networkId);
+                throw new ResourceNotFoundException("Unknown network with id=" + networkId);
             }
             final String networkPortProviderAssignedId = UUID.randomUUID().toString();
             final NetworkPort networkPort = new NetworkPort();
@@ -1522,7 +1523,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public NetworkPort getNetworkPort(final String networkPortId) throws ConnectorException {
             final NetworkPort networkPort = this.networkPorts.get(networkPortId);
             if (networkPort == null) {
-                throw new ConnectorException("NetworkPort " + networkPortId + " doesn't exist");
+                throw new ResourceNotFoundException("NetworkPort " + networkPortId + " doesn't exist");
             }
             if (this.actionDone(networkPort)) {
                 if (networkPort.getState() == NetworkPort.State.CREATING) {
@@ -1551,7 +1552,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Deleting network port with providerAssignedId " + networkPortId);
             NetworkPort networkPort = this.networkPorts.get(networkPortId);
             if (networkPort == null) {
-                throw new ConnectorException("NetworkPort " + networkPortId + " doesn't exist");
+                throw new ResourceNotFoundException("NetworkPort " + networkPortId + " doesn't exist");
             }
             networkPort.setState(NetworkPort.State.DELETING);
             networkPort.setUpdated(new Date());
@@ -1561,7 +1562,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Starting network port with providerAssignedId " + networkPortId);
             final NetworkPort networkPort = this.networkPorts.get(networkPortId);
             if (networkPort == null) {
-                throw new ConnectorException("Network " + networkPortId + " doesn't exist");
+                throw new ResourceNotFoundException("Network " + networkPortId + " doesn't exist");
             }
             if (networkPort.getState() != NetworkPort.State.STOPPED) {
                 throw new ConnectorException("Illegal operation");
@@ -1574,7 +1575,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Stopping network port with providerAssignedId " + networkPortId);
             final NetworkPort networkPort = this.networkPorts.get(networkPortId);
             if (networkPort == null) {
-                throw new ConnectorException("Network " + networkPortId + " doesn't exist");
+                throw new ResourceNotFoundException("Network " + networkPortId + " doesn't exist");
             }
             if (networkPort.getState() != NetworkPort.State.STARTED) {
                 throw new ConnectorException("Illegal operation");
@@ -1591,7 +1592,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     String netId = net.getProviderAssignedId();
                     Network providerNetwork = this.networks.get(netId);
                     if (providerNetwork == null) {
-                        throw new ConnectorException("Unknown network with id " + netId);
+                        throw new ResourceNotFoundException("Unknown network with id " + netId);
                     }
                     ForwardingGroupNetwork fgNetwork = new ForwardingGroupNetwork();
                     fgNetwork.setNetwork(providerNetwork);
@@ -1613,7 +1614,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public ForwardingGroup getForwardingGroup(final String forwardingGroupId) throws ConnectorException {
             final ForwardingGroup forwardingGroup = this.forwardingGroups.get(forwardingGroupId);
             if (forwardingGroup == null) {
-                throw new ConnectorException("ForwardingGroup " + forwardingGroupId + " doesn't exist");
+                throw new ResourceNotFoundException("ForwardingGroup " + forwardingGroupId + " doesn't exist");
             }
             if (this.actionDone(forwardingGroup)) {
                 if (forwardingGroup.getState() == ForwardingGroup.State.CREATING) {
@@ -1644,7 +1645,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MockCloudProviderConnector.logger.info("Deleting forwarding group with providerAssignedId " + forwardingGroupId);
             ForwardingGroup forwardingGroup = this.forwardingGroups.get(forwardingGroupId);
             if (forwardingGroup == null) {
-                throw new ConnectorException("NetworkPort " + forwardingGroupId + " doesn't exist");
+                throw new ResourceNotFoundException("NetworkPort " + forwardingGroupId + " doesn't exist");
             }
             forwardingGroup.setState(ForwardingGroup.State.DELETING);
             forwardingGroup.setUpdated(new Date());
@@ -1654,11 +1655,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             throws ConnectorException {
             final ForwardingGroup forwardingGroup = this.forwardingGroups.get(forwardingGroupId);
             if (forwardingGroup == null) {
-                throw new ConnectorException("NetworkPort " + forwardingGroupId + " doesn't exist");
+                throw new ResourceNotFoundException("NetworkPort " + forwardingGroupId + " doesn't exist");
             }
             final Network network = this.networks.get(fgNetwork.getNetwork().getProviderAssignedId());
             if (network == null) {
-                throw new ConnectorException("Unknown network with id=" + fgNetwork.getNetwork().getProviderAssignedId());
+                throw new ResourceNotFoundException("Unknown network with id=" + fgNetwork.getNetwork().getProviderAssignedId());
             }
             fgNetwork.setState(ForwardingGroupNetwork.State.ATTACHING);
             fgNetwork.setUpdated(new Date());
@@ -1669,11 +1670,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             throws ConnectorException {
             final ForwardingGroup forwardingGroup = this.forwardingGroups.get(forwardingGroupId);
             if (forwardingGroup == null) {
-                throw new ConnectorException("NetworkPort " + forwardingGroupId + " doesn't exist");
+                throw new ResourceNotFoundException("NetworkPort " + forwardingGroupId + " doesn't exist");
             }
             final Network network = this.networks.get(networkId);
             if (network == null) {
-                throw new ConnectorException("Unknown network with id=" + networkId);
+                throw new ResourceNotFoundException("Unknown network with id=" + networkId);
             }
             ForwardingGroupNetwork fgNetwork = null;
             for (ForwardingGroupNetwork net : forwardingGroup.getNetworks()) {
