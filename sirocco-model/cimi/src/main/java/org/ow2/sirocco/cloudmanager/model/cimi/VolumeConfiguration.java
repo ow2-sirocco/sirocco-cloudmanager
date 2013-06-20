@@ -28,7 +28,8 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
-
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 
 @Entity
 public class VolumeConfiguration extends CloudEntity implements Serializable {
@@ -39,6 +40,17 @@ public class VolumeConfiguration extends CloudEntity implements Serializable {
     private String format;
 
     private Integer capacity;
+
+    private Visibility visibility = Visibility.PRIVATE;
+
+    @Enumerated(EnumType.STRING)
+    public Visibility getVisibility() {
+        return this.visibility;
+    }
+
+    public void setVisibility(final Visibility visibility) {
+        this.visibility = visibility;
+    }
 
     public String getType() {
         return this.type;

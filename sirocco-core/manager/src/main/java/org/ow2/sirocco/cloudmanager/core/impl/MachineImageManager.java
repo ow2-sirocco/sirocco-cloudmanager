@@ -116,7 +116,7 @@ public class MachineImageManager implements IMachineImageManager {
 
     @Override
     public List<MachineImage> getMachineImages() throws CloudProviderException {
-        return QueryHelper.getEntityList("MachineImage", this.em, this.getTenant().getId(), MachineImage.State.DELETED);
+        return QueryHelper.getEntityList("MachineImage", this.em, this.getTenant().getId(), MachineImage.State.DELETED, true);
     }
 
     public MachineImage getMachineImageById(final String imageId) throws CloudProviderException {
@@ -171,7 +171,7 @@ public class MachineImageManager implements IMachineImageManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineImage", MachineImage.class);
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
-                .stateToIgnore(MachineImage.State.DELETED));
+                .stateToIgnore(MachineImage.State.DELETED).returnPublicEntities());
     }
 
     @Override

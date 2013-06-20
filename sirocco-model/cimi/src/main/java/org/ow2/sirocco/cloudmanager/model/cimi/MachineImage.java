@@ -60,6 +60,17 @@ public class MachineImage extends CloudResource implements Serializable, ICloudP
 
     private CloudProviderAccount cloudProviderAccount;
 
+    private Visibility visibility = Visibility.PRIVATE;
+
+    @Enumerated(EnumType.STRING)
+    public Visibility getVisibility() {
+        return this.visibility;
+    }
+
+    public void setVisibility(final Visibility visibility) {
+        this.visibility = visibility;
+    }
+
     @Enumerated(EnumType.STRING)
     public State getState() {
         return this.state;

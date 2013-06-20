@@ -30,6 +30,8 @@ import java.util.List;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 
 @Entity
@@ -41,6 +43,17 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
     private Integer memory;
 
     private List<DiskTemplate> disks;
+
+    private Visibility visibility = Visibility.PRIVATE;
+
+    @Enumerated(EnumType.STRING)
+    public Visibility getVisibility() {
+        return this.visibility;
+    }
+
+    public void setVisibility(final Visibility visibility) {
+        this.visibility = visibility;
+    }
 
     public Integer getCpu() {
         return this.cpu;

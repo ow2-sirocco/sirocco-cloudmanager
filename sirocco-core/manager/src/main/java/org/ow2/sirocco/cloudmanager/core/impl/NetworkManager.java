@@ -271,7 +271,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<Network> getNetworks() throws CloudProviderException {
-        return QueryHelper.getEntityList("Network", this.em, this.getTenant().getId(), Network.State.DELETED);
+        return QueryHelper.getEntityList("Network", this.em, this.getTenant().getId(), Network.State.DELETED, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -462,7 +462,8 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkConfiguration",
             NetworkConfiguration.class);
         return QueryHelper.getEntityList(this.em,
-            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
+                .returnPublicEntities());
     }
 
     @Override
@@ -547,7 +548,7 @@ public class NetworkManager implements INetworkManager {
 
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
-                .filterEmbbededTemplate());
+                .filterEmbbededTemplate().returnPublicEntities());
         // return UtilsForManagers.getEntityList("NetworkTemplate",
         // NetworkTemplate.class, this.em, user.getId(), first,
         // last, filters, attributes, false);
@@ -742,7 +743,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPort> getNetworkPorts() throws CloudProviderException {
-        return QueryHelper.getEntityList("NetworkPort", this.em, this.getTenant().getId(), NetworkPort.State.DELETED);
+        return QueryHelper.getEntityList("NetworkPort", this.em, this.getTenant().getId(), NetworkPort.State.DELETED, false);
     }
 
     @Override
@@ -841,7 +842,8 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPortConfiguration",
             NetworkPortConfiguration.class);
         return QueryHelper.getEntityList(this.em,
-            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
+                .returnPublicEntities());
     }
 
     @Override
@@ -927,7 +929,7 @@ public class NetworkManager implements INetworkManager {
             NetworkPortTemplate.class);
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
-                .filterEmbbededTemplate());
+                .filterEmbbededTemplate().returnPublicEntities());
     }
 
     @Override
@@ -1116,7 +1118,8 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<ForwardingGroup> getForwardingGroups() throws CloudProviderException {
-        return QueryHelper.getEntityList("ForwardingGroup", this.em, this.getTenant().getId(), ForwardingGroup.State.DELETED);
+        return QueryHelper.getEntityList("ForwardingGroup", this.em, this.getTenant().getId(), ForwardingGroup.State.DELETED,
+            false);
     }
 
     @Override

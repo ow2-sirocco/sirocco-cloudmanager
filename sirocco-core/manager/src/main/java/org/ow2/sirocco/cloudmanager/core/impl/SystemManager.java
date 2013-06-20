@@ -723,7 +723,7 @@ public class SystemManager implements ISystemManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<System> getSystems() throws CloudProviderException {
-        return QueryHelper.getEntityList("System", this.em, this.getTenant().getId(), System.State.DELETED);
+        return QueryHelper.getEntityList("System", this.em, this.getTenant().getId(), System.State.DELETED, false);
     }
 
     @Override
@@ -779,7 +779,7 @@ public class SystemManager implements ISystemManager {
     @SuppressWarnings("unchecked")
     @Override
     public List<SystemTemplate> getSystemTemplates() throws CloudProviderException {
-        return QueryHelper.getEntityList("SystemTemplate", this.em, this.getTenant().getId(), null);
+        return QueryHelper.getEntityList("SystemTemplate", this.em, this.getTenant().getId(), null, true);
     }
 
     @Override
@@ -788,7 +788,7 @@ public class SystemManager implements ISystemManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("SystemTemplate", SystemTemplate.class);
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
-                .filterEmbbededTemplate());
+                .filterEmbbededTemplate().returnPublicEntities());
     }
 
     private ComponentDescriptor getComponentDescriptorById(final String componentDescriptorId) throws CloudProviderException {

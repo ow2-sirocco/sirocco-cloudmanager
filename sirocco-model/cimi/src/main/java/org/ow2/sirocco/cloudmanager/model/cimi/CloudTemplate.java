@@ -28,6 +28,8 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
@@ -37,6 +39,17 @@ public abstract class CloudTemplate extends CloudEntity implements Serializable 
     private static final long serialVersionUID = 1L;
 
     private Boolean isEmbeddedInSystemTemplate = false;
+
+    private Visibility visibility = Visibility.PRIVATE;
+
+    @Enumerated(EnumType.STRING)
+    public Visibility getVisibility() {
+        return this.visibility;
+    }
+
+    public void setVisibility(final Visibility visibility) {
+        this.visibility = visibility;
+    }
 
     public Boolean getIsEmbeddedInSystemTemplate() {
         return this.isEmbeddedInSystemTemplate;

@@ -67,6 +67,8 @@ public class QueryHelper {
 
         private String containerId;
 
+        private boolean returnPublicEntities = false;
+
         private QueryParamsBuilder(final String entityType, final Class<?> clazz) {
             this.entityType = entityType;
             this.clazz = clazz;
@@ -121,6 +123,11 @@ public class QueryHelper {
 
         public QueryParamsBuilder filterEmbbededTemplate() {
             this.filterEmbbededTemplate = true;
+            return this;
+        }
+
+        public QueryParamsBuilder returnPublicEntities() {
+            this.returnPublicEntities = true;
             return this;
         }
 
@@ -180,6 +187,10 @@ public class QueryHelper {
             return this.containerId;
         }
 
+        public boolean isReturnPublicEntities() {
+            return this.returnPublicEntities;
+        }
+
     }
 
     /**
@@ -194,11 +205,15 @@ public class QueryHelper {
      */
     @SuppressWarnings({"rawtypes"})
     public static List getEntityList(final String entityType, final EntityManager em, final Integer tenantId,
-        final Enum stateToIgnore) {
+        final Enum stateToIgnore, final boolean returnPublicEntities) {
         String tenantQuery = "", stateQuery = "";
 
         if (tenantId != null) {
-            tenantQuery = " v.tenant.id=:tenantId ";
+            if (!returnPublicEntities) {
+                tenantQuery = " v.tenant.id=:tenantId ";
+            } else {
+                tenantQuery = " (v.tenant.id=:tenantId OR v.visibility = org.ow2.sirocco.cloudmanager.model.cimi.Visibility.PUBLIC) ";
+            }
         }
         if (stateToIgnore != null) {
             if (tenantQuery.length() > 0) {
@@ -216,7 +231,12 @@ public class QueryHelper {
         throws InvalidRequestException {
         StringBuffer whereClauseSB = new StringBuffer();
         if (params.getTenantId() != null) {
-            whereClauseSB.append(" v.tenant.id=:tenantId ");
+            if (!params.isReturnPublicEntities()) {
+                whereClauseSB.append(" v.tenant.id=:tenantId ");
+            } else {
+                whereClauseSB
+                    .append("( v.tenant.id=:tenantId OR v.visibility = org.ow2.sirocco.cloudmanager.model.cimi.Visibility.PUBLIC) ");
+            }
         }
         if (params.getStateToIgnore() != null) {
             if (whereClauseSB.length() > 0) {

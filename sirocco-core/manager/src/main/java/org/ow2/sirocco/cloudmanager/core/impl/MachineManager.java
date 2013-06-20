@@ -88,6 +88,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
+import org.ow2.sirocco.cloudmanager.model.cimi.Visibility;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
@@ -478,7 +479,7 @@ public class MachineManager implements IMachineManager {
 
     @Override
     public List<Machine> getMachines() throws CloudProviderException {
-        return QueryHelper.getEntityList("Machine", this.em, this.getTenant().getId(), Machine.State.DELETED);
+        return QueryHelper.getEntityList("Machine", this.em, this.getTenant().getId(), Machine.State.DELETED, false);
     }
 
     private Machine checkOps(final String machineId, final String action) throws CloudProviderException {
@@ -919,8 +920,8 @@ public class MachineManager implements IMachineManager {
     @Override
     public List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException {
         List<MachineConfiguration> machineConfigs = this.em
-            .createQuery("SELECT c FROM MachineConfiguration c WHERE c.tenant.id=:tenantId")
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+            .createQuery("SELECT c FROM MachineConfiguration c WHERE c.tenant.id=:tenantId OR c.visibility=:visibility")
+            .setParameter("tenantId", this.getTenant().getId()).setParameter("visibility", Visibility.PUBLIC).getResultList();
         for (MachineConfiguration machineConfig : machineConfigs) {
             machineConfig.getDisks().size();
         }
@@ -933,7 +934,8 @@ public class MachineManager implements IMachineManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineConfiguration",
             MachineConfiguration.class);
         QueryResult<MachineConfiguration> machineConfigs = QueryHelper.getEntityList(this.em,
-            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
+                .returnPublicEntities());
         for (MachineConfiguration machineConfig : machineConfigs.getItems()) {
             if (machineConfig.getDisks() != null) {
                 machineConfig.getDisks().size();
@@ -1247,14 +1249,15 @@ public class MachineManager implements IMachineManager {
             .builder("MachineTemplate", MachineTemplate.class);
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
-                .filterEmbbededTemplate());
+                .filterEmbbededTemplate().returnPublicEntities());
     }
 
     @Override
     public List<MachineTemplate> getMachineTemplates() throws CloudProviderException {
         List<MachineTemplate> machineTemplates = this.em
-            .createQuery("SELECT c FROM MachineTemplate c WHERE c.tenant.id=:tenantId AND c.isEmbeddedInSystemTemplate=false")
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+            .createQuery(
+                "SELECT c FROM MachineTemplate c WHERE (c.tenant.id=:tenantId OR c.visibility=:visibility) AND c.isEmbeddedInSystemTemplate=false")
+            .setParameter("tenantId", this.getTenant().getId()).setParameter("visibility", Visibility.PUBLIC).getResultList();
         for (MachineTemplate machineTemplate : machineTemplates) {
             machineTemplate.getMachineConfig().getDisks().size();
         }

@@ -306,7 +306,7 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<Volume> getVolumes() throws CloudProviderException {
-        return QueryHelper.getEntityList("Volume", this.em, this.getTenant().getId(), Volume.State.DELETED);
+        return QueryHelper.getEntityList("Volume", this.em, this.getTenant().getId(), Volume.State.DELETED, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -332,7 +332,8 @@ public class VolumeManager implements IVolumeManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeConfiguration",
             VolumeConfiguration.class);
         return QueryHelper.getEntityList(this.em,
-            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
+                .returnPublicEntities());
     }
 
     @Override
@@ -348,7 +349,7 @@ public class VolumeManager implements IVolumeManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeTemplate", VolumeTemplate.class);
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
-                .filterEmbbededTemplate());
+                .filterEmbbededTemplate().returnPublicEntities());
     }
 
     @SuppressWarnings("unchecked")
@@ -827,7 +828,7 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<VolumeImage> getVolumeImages() throws CloudProviderException {
-        return QueryHelper.getEntityList("VolumeImage", this.em, this.getTenant().getId(), VolumeImage.State.DELETED);
+        return QueryHelper.getEntityList("VolumeImage", this.em, this.getTenant().getId(), VolumeImage.State.DELETED, false);
     }
 
     @Override
