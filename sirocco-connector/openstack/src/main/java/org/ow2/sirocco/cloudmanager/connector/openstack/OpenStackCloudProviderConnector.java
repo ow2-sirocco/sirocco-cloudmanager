@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import org.openstack.base.client.OpenStackResponseException;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
@@ -13,6 +14,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
@@ -27,7 +29,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     
     private List<OpenStackCloudProvider> openstackCPs = new ArrayList<OpenStackCloudProvider>();
 
-    private synchronized OpenStackCloudProvider getProvider(final ProviderTarget target) throws ConnectorException {
+    private synchronized OpenStackCloudProvider getProvider(final ProviderTarget target) throws ConnectorException { // FIXME exception
         for (OpenStackCloudProvider provider : this.openstackCPs) {
             if (provider.getCloudProviderAccount().equals(target.getAccount())
                 && provider.getCloudProviderLocation().equals(target.getLocation())) {
@@ -42,7 +44,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     /* TODO
      * - connector cache
      * - code format
-     * - trace appels REST
+     * - REST call trace (On/Off)
      */
 
     
@@ -94,43 +96,85 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	@Override
 	public Machine createMachine(MachineCreate machineCreate,
 			ProviderTarget target) throws ConnectorException {
-        return this.getProvider(target).createMachine(machineCreate);
+        try {
+			return this.getProvider(target).createMachine(machineCreate); // TODO check the exception returned with wrong parameters (imageId...)!
+		} catch (OpenStackResponseException e) {
+			throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void deleteMachine(String machineId, ProviderTarget target)
+			throws ConnectorException {
+        try {
+			this.getProvider(target).deleteMachine(machineId);
+		} catch (OpenStackResponseException e) {
+	        if (e.getStatus() == 404){
+				throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+	        else{
+				throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+		}
+	}
+
+	@Override
+	public Machine getMachine(String machineId, ProviderTarget target)
+			 throws ConnectorException {
+        try {
+			return this.getProvider(target).getMachine(machineId);
+		} catch (OpenStackResponseException e) {
+	        if (e.getStatus() == 404){
+				throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+	        else{
+				throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+		}
+	}
+
+	@Override
+	public State getMachineState(String machineId, ProviderTarget target)
+			throws ConnectorException {
+        try {
+			return this.getProvider(target).getMachineState(machineId);
+		} catch (OpenStackResponseException e) {
+	        if (e.getStatus() == 404){
+				throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+	        else{
+				throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+		}
+	}
+
+	@Override
+	public void restartMachine(String machineId, boolean force,
+			ProviderTarget target) throws ConnectorException {
+		// TODO
+        throw new ConnectorException("unsupported operation");
 	}
 
 	@Override
 	public MachineImage captureMachine(String machineId,
 			MachineImage machineImage, ProviderTarget target)
 			throws ConnectorException {
+		// TODO
         throw new ConnectorException("unsupported operation");
 	}
 
 	@Override
-	public void deleteMachine(String machineId, ProviderTarget target)
+	public void addVolumeToMachine(String arg0, MachineVolume arg1,
+			ProviderTarget arg2) throws ConnectorException {
+		// TODO
+        throw new ConnectorException("unsupported operation");
+	}
+
+	@Override
+	public void removeVolumeFromMachine(String machineId,
+			MachineVolume machineVolume, ProviderTarget target)
 			throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-	}
-
-	@Override
-	public Machine getMachine(String machineId, ProviderTarget target)
-			throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-	}
-
-	@Override
-	public State getMachineState(String machineId, ProviderTarget target)
-			throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-	}
-
-	@Override
-	public void pauseMachine(String machineId, ProviderTarget target)
-			throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-	}
-
-	@Override
-	public void restartMachine(String machineId, boolean force,
-			ProviderTarget target) throws ConnectorException {
+		// TODO
         throw new ConnectorException("unsupported operation");
 	}
 
@@ -147,20 +191,13 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	}
 
 	@Override
-	public void suspendMachine(String machineId, ProviderTarget target)
+	public void pauseMachine(String machineId, ProviderTarget target)
 			throws ConnectorException {
         throw new ConnectorException("unsupported operation");
 	}
 
 	@Override
-	public void addVolumeToMachine(String arg0, MachineVolume arg1,
-			ProviderTarget arg2) throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-	}
-
-	@Override
-	public void removeVolumeFromMachine(String machineId,
-			MachineVolume machineVolume, ProviderTarget target)
+	public void suspendMachine(String machineId, ProviderTarget target)
 			throws ConnectorException {
         throw new ConnectorException("unsupported operation");
 	}
