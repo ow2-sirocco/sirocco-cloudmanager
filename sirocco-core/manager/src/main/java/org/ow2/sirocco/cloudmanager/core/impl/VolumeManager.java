@@ -42,6 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -997,6 +998,13 @@ public class VolumeManager implements IVolumeManager {
         CloudProviderException {
         // TODO Auto-generated method stub
         return null;
+    }
+
+    @Override
+    public List<MachineVolume> getVolumeAttachments(final String volumeId) throws CloudProviderException {
+        int vid = Integer.valueOf(volumeId);
+        return this.em.createQuery("SELECT mv FROM MachineVolume mv WHERE mv.volume.id=:vid AND mv.state!=:state")
+            .setParameter("vid", vid).setParameter("state", MachineVolume.State.DELETED).getResultList();
     }
 
 }

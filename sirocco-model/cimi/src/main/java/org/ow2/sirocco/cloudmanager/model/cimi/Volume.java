@@ -36,7 +36,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -66,7 +66,7 @@ public class Volume extends CloudResource implements Serializable, ICloudProvide
 
     private CloudProviderAccount cloudProviderAccount;
 
-    private MachineVolume attachment;
+    private List<MachineVolume> attachments;
 
     public Volume() {
     }
@@ -131,13 +131,13 @@ public class Volume extends CloudResource implements Serializable, ICloudProvide
         this.location = location;
     }
 
-    @OneToOne(mappedBy = "volume")
-    public MachineVolume getAttachment() {
-        return this.attachment;
+    @Transient
+    public List<MachineVolume> getAttachments() {
+        return this.attachments;
     }
 
-    public void setAttachment(final MachineVolume attachment) {
-        this.attachment = attachment;
+    public void setAttachments(final List<MachineVolume> attachments) {
+        this.attachments = attachments;
     }
 
     @Override
