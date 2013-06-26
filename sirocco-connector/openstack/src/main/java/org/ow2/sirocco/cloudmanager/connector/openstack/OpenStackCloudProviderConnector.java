@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.openstack.base.client.OpenStackResponseException;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
@@ -23,6 +22,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.woorea.openstack.base.client.OpenStackResponseException;
 
 public class OpenStackCloudProviderConnector implements ICloudProviderConnector, IComputeService {
     private static Logger logger = LoggerFactory.getLogger(OpenStackCloudProviderConnector.class);
@@ -97,7 +98,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	public Machine createMachine(MachineCreate machineCreate,
 			ProviderTarget target) throws ConnectorException {
         try {
-			return this.getProvider(target).createMachine(machineCreate); // TODO check the exception returned with wrong parameters (imageId...)!
+			return this.getProvider(target).createMachine(machineCreate); 
 		} catch (OpenStackResponseException e) {
 			throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
 		}

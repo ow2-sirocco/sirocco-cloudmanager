@@ -7,18 +7,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
-import org.openstack.base.client.OpenStackResponseException;
-import org.openstack.keystone.Keystone;
-import org.openstack.keystone.model.Access;
-import org.openstack.keystone.model.authentication.UsernamePassword;
-import org.openstack.keystone.utils.KeystoneUtils;
-import org.openstack.nova.Nova;
-import org.openstack.nova.model.Flavor;
-import org.openstack.nova.model.Image;
-import org.openstack.nova.model.Images;
-import org.openstack.nova.model.KeyPairs;
-import org.openstack.nova.model.Server;
-import org.openstack.nova.model.ServerForCreate;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
@@ -31,6 +19,18 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.woorea.openstack.base.client.OpenStackResponseException;
+import com.woorea.openstack.keystone.Keystone;
+import com.woorea.openstack.keystone.model.Access;
+import com.woorea.openstack.keystone.model.authentication.UsernamePassword;
+import com.woorea.openstack.keystone.utils.KeystoneUtils;
+import com.woorea.openstack.nova.Nova;
+import com.woorea.openstack.nova.model.Flavor;
+import com.woorea.openstack.nova.model.KeyPair;
+import com.woorea.openstack.nova.model.KeyPairs;
+import com.woorea.openstack.nova.model.Server;
+import com.woorea.openstack.nova.model.ServerForCreate;
 
 public class OpenStackCloudProvider {
     private static Logger logger = LoggerFactory.getLogger(OpenStackCloudProvider.class);
@@ -103,17 +103,8 @@ public class OpenStackCloudProvider {
 
 	public Machine createMachine(MachineCreate machineCreate) throws ConnectorException {
         logger.info("creating Machine for " + cloudProviderAccount.getLogin());
-        
-        String flavorId = this.findSuitableFlavor(machineCreate.getMachineTemplate().getMachineConfig());
-        if (flavorId == null) {
-            throw new ConnectorException("Cannot find Nova flavor matching machineConfig");
-        }
 
-        String imageIdKey = "openstack";
-        String imageId = machineCreate.getMachineTemplate().getMachineImage().getProperties().get(imageIdKey);
-        if (imageId == null) {
-            throw new ConnectorException("Cannot find imageId for key " + imageIdKey);
-        }
+        ServerForCreate serverForCreate = new ServerForCreate();
 
         String serverName = null;
         if (machineCreate.getName() != null) {
@@ -121,15 +112,29 @@ public class OpenStackCloudProvider {
         } else {
             serverName = "sirocco-" + UUID.randomUUID();
         }
-        
-        KeyPairs keysPairs = novaClient.keyPairs().list().execute(); // tmp        
-
-        ServerForCreate serverForCreate = new ServerForCreate();
         serverForCreate.setName(serverName);
+        
+        String flavorId = this.findSuitableFlavor(machineCreate.getMachineTemplate().getMachineConfig());
+        if (flavorId == null) {
+            throw new ConnectorException("Cannot find Nova flavor matching machineConfig");
+        }
         serverForCreate.setFlavorRef(flavorId);
+
+        String imageIdKey = "openstack";
+        String imageId = machineCreate.getMachineTemplate().getMachineImage().getProperties().get(imageIdKey);
+        if (imageId == null) {
+            throw new ConnectorException("Cannot find imageId for key " + imageIdKey);
+        }
         serverForCreate.setImageRef(imageId);
         
-        /*serverForCreate.setKeyName(keysPairs.getList().get(0).getName());*/
+        String keyPairName = null;
+        if (machineCreate.getMachineTemplate().getCredential() != null) {
+            String publicKey = new String(machineCreate.getMachineTemplate().getCredential().getPublicKey());
+            keyPairName = this.getKeyPair(publicKey);
+        }
+        if (keyPairName != null) {
+        	serverForCreate.setKeyName(keyPairName);
+        }
         serverForCreate.getSecurityGroups()
             .add(new ServerForCreate.SecurityGroup("default"));
         // serverForCreate.getSecurityGroups().add(new
@@ -143,20 +148,17 @@ public class OpenStackCloudProvider {
         }
         
         Server server = novaClient.servers().boot(serverForCreate).execute();
-        //System.out.println(server);
+        //logger.info(server);
+        server = novaClient.servers().show(server.getId()).execute(); // to get detailed information about the server
+        //logger.info(server);
 
         final Machine machine = new Machine();
         fromServerToMachine(server, machine); 
         return machine;
         
         /* FIXME 
-         * jcloud /woorea ? 
-         * - ApiForZone
-         * - keypair, 
          * - security group, 
-         * - user data
-         * 
-         * check if flavorId, imageId exist in OpenStack instance
+         * - IP
          * */        
 	}
 
@@ -209,7 +211,7 @@ public class OpenStackCloudProvider {
     }
 
     private void fromServerToMachine(final Server server, final Machine machine) {
-        /*logger.info("fromServerToMachine: id=" + server.getId() 
+        logger.info("fromServerToMachine: id=" + server.getId() 
         		+ ", name=" + server.getName() 
         		+ ", state=" + server.getStatus() 
         		+ ", flavor id=" + server.getFlavor().getId() 
@@ -217,7 +219,7 @@ public class OpenStackCloudProvider {
         		+ ", mem=" + server.getFlavor().getRam()
         		+ ", disk=" + server.getFlavor().getDisk()
         		+ ", ephemeral=" + server.getFlavor().getEphemeral()
-        		);*/
+        		);
         /*logger.info("server: " + server);*/		
 
     	
@@ -225,7 +227,7 @@ public class OpenStackCloudProvider {
         machine.setState(this.fromServerStatusToMachineState(server)); 
 
         // HW
-        //Flavor flavor = server.getFlavor(); // WARNING: doesn't work (check if woorea support a lazy instantiation of the object of the model) 
+        //Flavor flavor = server.getFlavor(); // doesn't work (check if woorea support a lazy instantiation mode (of the object of the model) 
         Flavor flavor = novaClient.flavors().show(server.getFlavor().getId()).execute();
         //System.out.println(flavor);
         /*logger.info("flavor: " + flavor);*/		
@@ -300,21 +302,21 @@ public class OpenStackCloudProvider {
         for (Flavor flavor : novaClient.flavors().list(true).execute()) {
             long memoryInKBytes = machineConfig.getMemory();
             long flavorMemoryInKBytes = flavor.getRam() * 1024;
-            System.out.println(
+            /*System.out.println(
             		"memoryInKBytes=" + memoryInKBytes 
             		+ ", flavorMemoryInKBytes=" + flavorMemoryInKBytes
-            		);
+            		);*/
             if (memoryInKBytes == flavorMemoryInKBytes) {
             	Integer flavorCpu = new Integer(flavor.getVcpus());
                 //if (machineConfig.getCpu() == flavor.getVcpus()) {
-            	System.out.println(
+            	/*System.out.println(
                 		"Cpu()=" + machineConfig.getCpu() 
                 		+ ", flavorCpu=" + flavorCpu
-                		);
+                		);*/
                 if (machineConfig.getCpu().intValue() == flavorCpu.intValue()) {
-                	System.out.println(
+                	/*System.out.println(
                     		"machineConfig.getDisks().size()=" + machineConfig.getDisks().size()
-                    		);
+                    		);*/
                 	if (machineConfig.getDisks().size() == 0) { // FIXME tmp
                 		return flavor.getId();
                 	}
@@ -339,5 +341,23 @@ public class OpenStackCloudProvider {
             }
         }
         return null;
+    }
+
+    private String getKeyPair(final String publicKey) {
+        String keyPairName = OpenStackCloudProvider.this.keyPairMap.get(publicKey);
+        if (keyPairName != null) {
+            return keyPairName;
+        }
+
+        for (KeyPair keyPair : novaClient.keyPairs().list().execute()) {
+            if (keyPair.getPublicKey().equals(publicKey)) {
+            	OpenStackCloudProvider.this.keyPairMap.put(publicKey, keyPair.getName());
+                return keyPair.getName();
+            }
+        }
+
+        KeyPair newKeyPair = novaClient.keyPairs().create("keypair-" + UUID.randomUUID().toString(), publicKey).execute();
+        OpenStackCloudProvider.this.keyPairMap.put(publicKey, newKeyPair.getName());
+        return newKeyPair.getName();
     }
 }
