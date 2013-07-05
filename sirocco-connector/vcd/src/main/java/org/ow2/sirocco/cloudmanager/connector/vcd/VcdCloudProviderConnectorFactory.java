@@ -36,6 +36,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeoutException;
 
+import javax.lang.model.type.ReferenceType;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
@@ -45,14 +46,12 @@ import org.apache.felix.ipojo.annotations.Requires;
 import org.apache.felix.ipojo.annotations.ServiceProperty;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFactory;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
-import org.ow2.sirocco.cloudmanager.connector.util.jobmanager.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
@@ -89,66 +88,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
-import com.vmware.vcloud.api.rest.schema.ComposeVAppParamsType;
-import com.vmware.vcloud.api.rest.schema.FirewallRuleType;
-import com.vmware.vcloud.api.rest.schema.FirewallServiceType;
-import com.vmware.vcloud.api.rest.schema.GuestCustomizationSectionType;
-import com.vmware.vcloud.api.rest.schema.InstantiationParamsType;
-import com.vmware.vcloud.api.rest.schema.IpRangeType;
-import com.vmware.vcloud.api.rest.schema.IpRangesType;
-import com.vmware.vcloud.api.rest.schema.IpScopeType;
-import com.vmware.vcloud.api.rest.schema.IpScopesType;
-import com.vmware.vcloud.api.rest.schema.NatRuleType;
-import com.vmware.vcloud.api.rest.schema.NatServiceType;
-import com.vmware.vcloud.api.rest.schema.NetworkConfigSectionType;
-import com.vmware.vcloud.api.rest.schema.NetworkConfigurationType;
-import com.vmware.vcloud.api.rest.schema.NetworkConnectionSectionType;
-import com.vmware.vcloud.api.rest.schema.NetworkConnectionType;
-import com.vmware.vcloud.api.rest.schema.NetworkFeaturesType;
-import com.vmware.vcloud.api.rest.schema.NetworkServiceType;
-import com.vmware.vcloud.api.rest.schema.ObjectFactory;
-import com.vmware.vcloud.api.rest.schema.ReferenceType;
-import com.vmware.vcloud.api.rest.schema.SourcedCompositionItemParamType;
-import com.vmware.vcloud.api.rest.schema.VAppNetworkConfigurationType;
-import com.vmware.vcloud.api.rest.schema.VAppType;
-import com.vmware.vcloud.api.rest.schema.VmType;
-import com.vmware.vcloud.api.rest.schema.ovf.CimString;
-import com.vmware.vcloud.api.rest.schema.ovf.MsgType;
-import com.vmware.vcloud.api.rest.schema.ovf.ProductSectionProperty;
-import com.vmware.vcloud.api.rest.schema.ovf.ProductSectionType;
-import com.vmware.vcloud.api.rest.schema.ovf.RASDType;
-import com.vmware.vcloud.api.rest.schema.ovf.ResourceType;
-import com.vmware.vcloud.api.rest.schema.ovf.SectionType;
-import com.vmware.vcloud.sdk.Expression;
-import com.vmware.vcloud.sdk.Filter;
-import com.vmware.vcloud.sdk.QueryParams;
-import com.vmware.vcloud.sdk.ReferenceResult;
-import com.vmware.vcloud.sdk.Task;
-import com.vmware.vcloud.sdk.VCloudException;
-import com.vmware.vcloud.sdk.VM;
-import com.vmware.vcloud.sdk.Vapp;
-import com.vmware.vcloud.sdk.VappNetwork;
-import com.vmware.vcloud.sdk.VirtualCpu;
-import com.vmware.vcloud.sdk.VirtualDisk;
-import com.vmware.vcloud.sdk.VirtualMemory;
-import com.vmware.vcloud.sdk.admin.AdminOrgVdcNetwork;
-import com.vmware.vcloud.sdk.admin.AdminOrganization;
-import com.vmware.vcloud.sdk.admin.AdminVdc;
-import com.vmware.vcloud.sdk.admin.EdgeGateway;
-import com.vmware.vcloud.sdk.constants.FenceModeValuesType;
-import com.vmware.vcloud.sdk.constants.IpAddressAllocationModeType;
-import com.vmware.vcloud.sdk.constants.NatPolicyType;
-import com.vmware.vcloud.sdk.constants.NatTypeType;
-import com.vmware.vcloud.sdk.constants.UndeployPowerActionType;
-import com.vmware.vcloud.sdk.constants.VMStatus;
-import com.vmware.vcloud.sdk.constants.VappStatus;
-import com.vmware.vcloud.sdk.constants.query.ExpressionType;
-import com.vmware.vcloud.sdk.constants.query.QueryReferenceField;
-import com.vmware.vcloud.sdk.constants.query.QueryReferenceType;
 
 @Component(public_factory = false)
 @Provides
@@ -1400,7 +1339,7 @@ public class VcdCloudProviderConnectorFactory implements ICloudProviderConnector
                             networkConnectionType.setNetwork(nic.getSystemNetworkName());
                         } else {
                             throw new ConnectorException(
-                                "validation error on nic template : should refer either to a Network ressource xor a SystemNetworkName");
+                                "validation error on nic template : should refer either to a Network resource xor a SystemNetworkName");
                         }
                         networkConnectionType.setIpAddressAllocationMode(IpAddressAllocationModeType.POOL.value());
                         networkConnectionType.setIsConnected(true);

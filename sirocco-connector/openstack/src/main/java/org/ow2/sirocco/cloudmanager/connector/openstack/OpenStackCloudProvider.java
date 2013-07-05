@@ -1,7 +1,9 @@
 package org.ow2.sirocco.cloudmanager.connector.openstack;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -15,6 +17,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.slf4j.Logger;
@@ -27,13 +33,17 @@ import com.woorea.openstack.keystone.model.authentication.UsernamePassword;
 import com.woorea.openstack.keystone.utils.KeystoneUtils;
 import com.woorea.openstack.nova.Nova;
 import com.woorea.openstack.nova.model.Flavor;
+import com.woorea.openstack.nova.model.FloatingIp;
 import com.woorea.openstack.nova.model.KeyPair;
 import com.woorea.openstack.nova.model.KeyPairs;
 import com.woorea.openstack.nova.model.Server;
+import com.woorea.openstack.nova.model.Server.Addresses.Address;
 import com.woorea.openstack.nova.model.ServerForCreate;
 
 public class OpenStackCloudProvider {
     private static Logger logger = LoggerFactory.getLogger(OpenStackCloudProvider.class);
+
+    private static int DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS = 240;
 
     private CloudProviderAccount cloudProviderAccount;
 
@@ -46,6 +56,8 @@ public class OpenStackCloudProvider {
     //private String novaEndPointName;
     
     private Nova novaClient;
+
+    private Network cimiPrivateNetwork, cimiPublicNetwork;
 
 	public OpenStackCloudProvider(final ProviderTarget target) throws ConnectorException {
 		this.cloudProviderAccount = target.getAccount();
@@ -87,6 +99,16 @@ public class OpenStackCloudProvider {
 			System.out.println(image);
 		}*/
 
+        this.cimiPrivateNetwork = new Network();
+        this.cimiPrivateNetwork.setProviderAssignedId("0");
+        this.cimiPrivateNetwork.setState(Network.State.STARTED);
+        this.cimiPrivateNetwork.setNetworkType(Network.Type.PRIVATE);
+
+        this.cimiPublicNetwork = new Network();
+        this.cimiPublicNetwork.setProviderAssignedId("1");
+        this.cimiPublicNetwork.setState(Network.State.STARTED);
+        this.cimiPublicNetwork.setNetworkType(Network.Type.PUBLIC);
+
 	}
 
     public CloudProviderAccount getCloudProviderAccount() {
@@ -101,7 +123,7 @@ public class OpenStackCloudProvider {
     // Compute Service
     //
 
-	public Machine createMachine(MachineCreate machineCreate) throws ConnectorException {
+	public Machine createMachine(MachineCreate machineCreate) throws ConnectorException, InterruptedException {
         logger.info("creating Machine for " + cloudProviderAccount.getLogin());
 
         ServerForCreate serverForCreate = new ServerForCreate();
@@ -129,16 +151,16 @@ public class OpenStackCloudProvider {
         
         String keyPairName = null;
         if (machineCreate.getMachineTemplate().getCredential() != null) {
-            String publicKey = new String(machineCreate.getMachineTemplate().getCredential().getPublicKey());
+            //String publicKey = new String(machineCreate.getMachineTemplate().getCredential().getPublicKey());
+            String publicKey = machineCreate.getMachineTemplate().getCredential().getPublicKey();
             keyPairName = this.getKeyPair(publicKey);
         }
         if (keyPairName != null) {
         	serverForCreate.setKeyName(keyPairName);
         }
+        
         serverForCreate.getSecurityGroups()
-            .add(new ServerForCreate.SecurityGroup("default"));
-        // serverForCreate.getSecurityGroups().add(new
-        // ServerForCreate.SecurityGroup(securityGroup.getName()));
+            .add(new ServerForCreate.SecurityGroup("default")); // default security group
 
         String userData = machineCreate.getMachineTemplate().getUserData();
         if (userData != null) {
@@ -147,21 +169,41 @@ public class OpenStackCloudProvider {
         	serverForCreate.setUserData(userData);
         }
         
-        Server server = novaClient.servers().boot(serverForCreate).execute();
+        Server server = novaClient.servers().boot(serverForCreate).execute(); // to get the server id
         //logger.info(server);
-        server = novaClient.servers().show(server.getId()).execute(); // to get detailed information about the server
+        server = novaClient.servers().show(server.getId()).execute(); // to get detailed information about the server 
         //logger.info(server);
+
+        // public IP
+        int waitTimeInSeconds = DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
+        String serverId = server.getId();
+        boolean allocateFloatingIp = false;
+        if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
+            for (MachineTemplateNetworkInterface nic : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
+                // NB: nic template could refer either to a Network resource xor a SystemNetworkName
+            	// In practice templates (generated by Sirocco) should refer to a Network resource when using an OpenStack connector 
+                if (nic.getNetwork().getNetworkType() == Network.Type.PUBLIC) {
+                    allocateFloatingIp = true;
+                    break;
+                }
+            }
+        }
+        if (allocateFloatingIp) {
+            do {
+                server = novaClient.servers().show(serverId).execute();  
+                if (!server.getStatus().equalsIgnoreCase("BUILD")) {
+                    break;
+                }
+                Thread.sleep(1000);
+            } while (waitTimeInSeconds-- > 0);
+
+            addFloatingIPToMachine(serverId);
+        }
 
         final Machine machine = new Machine();
         fromServerToMachine(server, machine); 
         return machine;
-        
-        /* FIXME 
-         * - security group, 
-         * - IP
-         * */        
 	}
-
 
 	public Machine getMachine(String machineId)  {
         
@@ -181,14 +223,16 @@ public class OpenStackCloudProvider {
 	}
 
 	public void deleteMachine(String machineId) {
-        novaClient.servers().delete(machineId).execute(); 
+		this.freeFloatingIpsFromServer(machineId);
+        novaClient.servers().delete(machineId).execute(); // FIXME floating IPs 
 	}	
 
     //
     // mix
     //
 
-    private Machine.State fromServerStatusToMachineState(final Server server) {
+    private Machine.State fromServerStatusToMachineState(final Server serverIn) {
+        Server server = novaClient.servers().show(serverIn.getId()).execute(); // refresh the server
     	String status = server.getStatus();
     	
     	if (status.equalsIgnoreCase("ACTIVE")){
@@ -210,18 +254,9 @@ public class OpenStackCloudProvider {
     	}
     }
 
-    private void fromServerToMachine(final Server server, final Machine machine) {
-        logger.info("fromServerToMachine: id=" + server.getId() 
-        		+ ", name=" + server.getName() 
-        		+ ", state=" + server.getStatus() 
-        		+ ", flavor id=" + server.getFlavor().getId() 
-        		+ ", cpu=" + server.getFlavor().getVcpus() 
-        		+ ", mem=" + server.getFlavor().getRam()
-        		+ ", disk=" + server.getFlavor().getDisk()
-        		+ ", ephemeral=" + server.getFlavor().getEphemeral()
-        		);
+    private void fromServerToMachine(final Server serverIn, final Machine machine) {
+        Server server = novaClient.servers().show(serverIn.getId()).execute(); // refresh the server
         /*logger.info("server: " + server);*/		
-
     	
     	machine.setProviderAssignedId(server.getId());        
         machine.setState(this.fromServerStatusToMachineState(server)); 
@@ -229,7 +264,6 @@ public class OpenStackCloudProvider {
         // HW
         //Flavor flavor = server.getFlavor(); // doesn't work (check if woorea support a lazy instantiation mode (of the object of the model) 
         Flavor flavor = novaClient.flavors().show(server.getFlavor().getId()).execute();
-        //System.out.println(flavor);
         /*logger.info("flavor: " + flavor);*/		
 
         machine.setCpu(new Integer(flavor.getVcpus()));
@@ -240,23 +274,23 @@ public class OpenStackCloudProvider {
         machineDisks.add(machineDisk);
         machine.setDisks(machineDisks);
 
-        // TODO Network
-        /* List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
+        // FIXME Network with Quantum (
+        List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
         machine.setNetworkInterfaces(nics);
         MachineNetworkInterface privateNic = new MachineNetworkInterface();
         privateNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
-        privateNic.setNetworkType(Network.Type.PRIVATE);
+        privateNic.setNetwork(this.cimiPrivateNetwork);
+        //privateNic.setNetworkType(Network.Type.PRIVATE);
         privateNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
         MachineNetworkInterface publicNic = new MachineNetworkInterface();
         publicNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
-        publicNic.setNetworkType(Network.Type.PUBLIC);
+        publicNic.setNetwork(this.cimiPublicNetwork);
+        //publicNic.setNetworkType(Network.Type.PUBLIC);
         publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
 
-        // TODO
-        // assumption: first IP address is private, next addresses are
-        // public (floating IPs)
-        for (String networkType : server.getAddresses().keySet()) {
-            Collection<Address> addresses = server.getAddresses().get(networkType);
+        // FIXME assumption: first IP address is private, next addresses are public (floating IPs)
+         for (String networkType : server.getAddresses().getAddresses().keySet()) {
+            Collection<Address> addresses = server.getAddresses().getAddresses().get(networkType);
             Iterator<Address> iterator = addresses.iterator();
             if (iterator.hasNext()) {
                 this.addAddress(iterator.next(), this.cimiPrivateNetwork, privateNic);
@@ -271,13 +305,23 @@ public class OpenStackCloudProvider {
         }
         if (publicNic.getAddresses().size() > 0) {
             nics.add(publicNic);
-        }*/
+        }
         
         /* FIXME 
-         * - disk / ephemeral 
          * - volume
-         * - ApiForZone
          * */        
+    }
+    
+    private void addAddress(final Address address, final Network cimiNetwork, final MachineNetworkInterface nic) {
+        org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
+        cimiAddress.setIp(address.getAddr());
+        cimiAddress.setNetwork(cimiNetwork);
+        cimiAddress.setAllocation("dynamic");
+        cimiAddress.setProtocol("IPv4");
+        cimiAddress.setResource(cimiNetwork);
+        MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+        entry.setAddress(cimiAddress);
+        nic.getAddresses().add(entry);
     }
 	
 	public Server getServer(String machineId) throws ConnectorException {
@@ -359,5 +403,47 @@ public class OpenStackCloudProvider {
         KeyPair newKeyPair = novaClient.keyPairs().create("keypair-" + UUID.randomUUID().toString(), publicKey).execute();
         OpenStackCloudProvider.this.keyPairMap.put(publicKey, newKeyPair.getName());
         return newKeyPair.getName();
+    }
+    
+    private String addFloatingIPToMachine(final String serverId) throws InterruptedException {
+    	FloatingIp floatingIp = novaClient.floatingIps().allocate(null).execute();
+        logger.info("Allocating floating IP " + floatingIp.getIp());
+        novaClient.servers().associateFloatingIp(serverId, floatingIp.getIp()).execute();
+        
+        // TODO check if it is safe not to wait that the floating IP shows up in the server detail
+        /*int waitTimeInSeconds = DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
+        do {
+            Server server = novaClient.servers().show(serverId).execute();  
+            if (this.findIpAddressOnServer(server, floatingIp.getIp())) {
+            	logger.info("Floating IP " + floatingIp.getIp() + " attached to server " + serverId);
+                break;
+            }
+            Thread.sleep(1000);
+        } while (waitTimeInSeconds-- > 0);*/
+        
+        return floatingIp.getIp();
+    }
+
+    private boolean findIpAddressOnServer(final Server server, final String ip) {
+        for (String networkType : server.getAddresses().getAddresses().keySet()) {
+            Collection<Address> addresses = server.getAddresses().getAddresses().get(networkType);
+            for (Address address : addresses) {
+                if (address.getAddr().equals(ip)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void freeFloatingIpsFromServer(final String serverId) {
+        for (FloatingIp floatingIp : novaClient.floatingIps().list().execute()) {
+            if (floatingIp.getInstanceId() != null && floatingIp.getInstanceId().equals(serverId)) {
+                logger.info("Releasing floating IP " + floatingIp.getIp()
+                    + " from server " + serverId);
+                novaClient.servers().disassociateFloatingIp(serverId, floatingIp.getIp()).execute();
+                novaClient.floatingIps().deallocate(floatingIp.getId()).execute();
+            }
+        }
     }
 }

@@ -31,6 +31,9 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     private List<OpenStackCloudProvider> openstackCPs = new ArrayList<OpenStackCloudProvider>();
 
     private synchronized OpenStackCloudProvider getProvider(final ProviderTarget target) throws ConnectorException { // FIXME exception
+    	if (target.getAccount() == null || target.getLocation() == null){
+            throw new ConnectorException("target.account or target.location is null");
+    	}
         for (OpenStackCloudProvider provider : this.openstackCPs) {
             if (provider.getCloudProviderAccount().equals(target.getAccount())
                 && provider.getCloudProviderLocation().equals(target.getLocation())) {
@@ -43,9 +46,18 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
     
     /* TODO
+     * MIX
      * - connector cache
      * - code format
      * - REST call trace (On/Off)
+     * - woorea exception handling
+     * - availability_zone (API for zone)
+     * 
+     * COMPUTE, VOLUME, NETWORK
+     * - disk / ephemeral 
+     * - network : simple mode convention (name...)
+     * - Network : Quantum
+     * - volume
      */
 
     
@@ -101,6 +113,8 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 			return this.getProvider(target).createMachine(machineCreate); 
 		} catch (OpenStackResponseException e) {
 			throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+		} catch (InterruptedException e) {
+			throw new ConnectorException("message=" + e.getMessage(), e);
 		}
 	}
 
