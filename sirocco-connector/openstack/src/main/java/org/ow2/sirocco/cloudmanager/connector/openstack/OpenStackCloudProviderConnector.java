@@ -30,7 +30,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     
     private List<OpenStackCloudProvider> openstackCPs = new ArrayList<OpenStackCloudProvider>();
 
-    private synchronized OpenStackCloudProvider getProvider(final ProviderTarget target) throws ConnectorException { // FIXME exception
+    private synchronized OpenStackCloudProvider getProvider(final ProviderTarget target) throws ConnectorException { 
     	if (target.getAccount() == null || target.getLocation() == null){
             throw new ConnectorException("target.account or target.location is null");
     	}
@@ -46,18 +46,18 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
     
     /* TODO
-     * MIX
+     * Services
+     * - Volume
+     * - Network : Quantum & convention without Quantum
+     * - reboot: when supported by woorea 
+     * - fromServerToMachine: ephemeral, network, volume
+     * 
+     * Mix
      * - connector cache
      * - code format
      * - REST call trace (On/Off)
      * - woorea exception handling
      * - availability_zone (API for zone)
-     * 
-     * COMPUTE, VOLUME, NETWORK
-     * - disk / ephemeral 
-     * - network : simple mode convention (name...)
-     * - Network : Quantum
-     * - volume
      */
 
     
@@ -166,8 +166,16 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	@Override
 	public void restartMachine(String machineId, boolean force,
 			ProviderTarget target) throws ConnectorException {
-		// TODO
-        throw new ConnectorException("unsupported operation");
+        try {
+			this.getProvider(target).restartMachine(machineId, force);
+		} catch (OpenStackResponseException e) {
+	        if (e.getStatus() == 404){
+				throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+	        else{
+				throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+		}
 	}
 
 	@Override

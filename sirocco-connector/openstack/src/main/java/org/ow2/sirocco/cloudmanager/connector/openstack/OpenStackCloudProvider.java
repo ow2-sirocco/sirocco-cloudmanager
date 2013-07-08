@@ -175,8 +175,6 @@ public class OpenStackCloudProvider {
         //logger.info(server);
 
         // public IP
-        int waitTimeInSeconds = DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
-        String serverId = server.getId();
         boolean allocateFloatingIp = false;
         if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
             for (MachineTemplateNetworkInterface nic : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
@@ -189,20 +187,16 @@ public class OpenStackCloudProvider {
             }
         }
         if (allocateFloatingIp) {
-            do {
-                server = novaClient.servers().show(serverId).execute();  
-                if (!server.getStatus().equalsIgnoreCase("BUILD")) {
-                    break;
-                }
-                Thread.sleep(1000);
-            } while (waitTimeInSeconds-- > 0);
-
-            addFloatingIPToMachine(serverId);
+            addFloatingIPToMachine(server.getId());
         }
 
         final Machine machine = new Machine();
         fromServerToMachine(server, machine); 
         return machine;
+        
+        /* FIXME 
+         * - Network with Quantum
+         * */        
 	}
 
 	public Machine getMachine(String machineId)  {
@@ -224,7 +218,12 @@ public class OpenStackCloudProvider {
 
 	public void deleteMachine(String machineId) {
 		this.freeFloatingIpsFromServer(machineId);
-        novaClient.servers().delete(machineId).execute(); // FIXME floating IPs 
+        novaClient.servers().delete(machineId).execute();  
+	}	
+
+	public void restartMachine(String machineId, boolean force) throws ConnectorException {
+		//novaClient.servers().reboot(machineId, << force ? Reboot HARD : Reboot SOFT >>).execute(); // TODO when supported by woorea (RebootAction, RebootType)
+        throw new ConnectorException("unsupported operation");
 	}	
 
     //
@@ -274,7 +273,7 @@ public class OpenStackCloudProvider {
         machineDisks.add(machineDisk);
         machine.setDisks(machineDisks);
 
-        // FIXME Network with Quantum (
+        // FIXME Network with Quantum 
         List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
         machine.setNetworkInterfaces(nics);
         MachineNetworkInterface privateNic = new MachineNetworkInterface();
@@ -291,6 +290,7 @@ public class OpenStackCloudProvider {
         // FIXME assumption: first IP address is private, next addresses are public (floating IPs)
          for (String networkType : server.getAddresses().getAddresses().keySet()) {
             Collection<Address> addresses = server.getAddresses().getAddresses().get(networkType);
+            logger.info("-- " + addresses);
             Iterator<Address> iterator = addresses.iterator();
             if (iterator.hasNext()) {
                 this.addAddress(iterator.next(), this.cimiPrivateNetwork, privateNic);
@@ -361,10 +361,11 @@ public class OpenStackCloudProvider {
                 	/*System.out.println(
                     		"machineConfig.getDisks().size()=" + machineConfig.getDisks().size()
                     		);*/
-                	if (machineConfig.getDisks().size() == 0) { // FIXME tmp
+                	/*if (machineConfig.getDisks().size() == 0) { 
                 		return flavor.getId();
                 	}
-                	else if (machineConfig.getDisks().size() == 1 && flavor.getEphemeral() == 0) {
+                	else */
+                	if (machineConfig.getDisks().size() == 1 && flavor.getEphemeral() == 0) {
                         long diskSizeInKBytes = machineConfig.getDisks().get(0).getCapacity();
                         long flavorDiskSizeInKBytes = Long.parseLong(flavor.getDisk()) * 1000 * 1000;
                         if (diskSizeInKBytes == flavorDiskSizeInKBytes) {
@@ -406,13 +407,21 @@ public class OpenStackCloudProvider {
     }
     
     private String addFloatingIPToMachine(final String serverId) throws InterruptedException {
+    	int waitTimeInSeconds = DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;    	
+        do {
+            Server server = novaClient.servers().show(serverId).execute();  
+            if (!server.getStatus().equalsIgnoreCase("BUILD")) {
+                break;
+            }
+            Thread.sleep(1000);
+        } while (waitTimeInSeconds-- > 0);
+        
     	FloatingIp floatingIp = novaClient.floatingIps().allocate(null).execute();
         logger.info("Allocating floating IP " + floatingIp.getIp());
         novaClient.servers().associateFloatingIp(serverId, floatingIp.getIp()).execute();
         
-        // TODO check if it is safe not to wait that the floating IP shows up in the server detail
-        /*int waitTimeInSeconds = DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS;
-        do {
+        // Check if it is safe not to wait that the floating IP shows up in the server detail
+        /*do {
             Server server = novaClient.servers().show(serverId).execute();  
             if (this.findIpAddressOnServer(server, floatingIp.getIp())) {
             	logger.info("Floating IP " + floatingIp.getIp() + " attached to server " + serverId);
