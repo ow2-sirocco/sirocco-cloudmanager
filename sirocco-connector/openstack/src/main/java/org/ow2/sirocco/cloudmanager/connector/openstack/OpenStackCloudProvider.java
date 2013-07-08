@@ -11,22 +11,23 @@ import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
-import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.woorea.openstack.base.client.OpenStackResponseException;
 import com.woorea.openstack.keystone.Keystone;
 import com.woorea.openstack.keystone.model.Access;
 import com.woorea.openstack.keystone.model.authentication.UsernamePassword;
@@ -35,10 +36,10 @@ import com.woorea.openstack.nova.Nova;
 import com.woorea.openstack.nova.model.Flavor;
 import com.woorea.openstack.nova.model.FloatingIp;
 import com.woorea.openstack.nova.model.KeyPair;
-import com.woorea.openstack.nova.model.KeyPairs;
 import com.woorea.openstack.nova.model.Server;
 import com.woorea.openstack.nova.model.Server.Addresses.Address;
 import com.woorea.openstack.nova.model.ServerForCreate;
+import com.woorea.openstack.nova.model.VolumeForCreate;
 
 public class OpenStackCloudProvider {
     private static Logger logger = LoggerFactory.getLogger(OpenStackCloudProvider.class);
@@ -191,47 +192,24 @@ public class OpenStackCloudProvider {
         }
 
         final Machine machine = new Machine();
-        fromServerToMachine(server, machine); 
+        fromServerToMachine(server.getId(), machine); 
         return machine;
         
         /* FIXME 
+         * - volume / template ?
          * - Network with Quantum
          * */        
 	}
 
 	public Machine getMachine(String machineId)  {
-        
-        //Server server = getServer(machineId);
-        Server server = novaClient.servers().show(machineId).execute();
-        //System.out.println(server);
-
         final Machine machine = new Machine();
-        fromServerToMachine(server, machine); 
+        fromServerToMachine(machineId, machine); 
         return machine;
 	} 
 
-	public State getMachineState(String machineId) {
+	public Machine.State getMachineState(String machineId) {
         //Server server = getServer(machineId);
-        Server server = novaClient.servers().show(machineId).execute();
-		return this.fromServerStatusToMachineState(server);
-	}
-
-	public void deleteMachine(String machineId) {
-		this.freeFloatingIpsFromServer(machineId);
-        novaClient.servers().delete(machineId).execute();  
-	}	
-
-	public void restartMachine(String machineId, boolean force) throws ConnectorException {
-		//novaClient.servers().reboot(machineId, << force ? Reboot HARD : Reboot SOFT >>).execute(); // TODO when supported by woorea (RebootAction, RebootType)
-        throw new ConnectorException("unsupported operation");
-	}	
-
-    //
-    // mix
-    //
-
-    private Machine.State fromServerStatusToMachineState(final Server serverIn) {
-        Server server = novaClient.servers().show(serverIn.getId()).execute(); // refresh the server
+        Server server = novaClient.servers().show(machineId).execute(); 
     	String status = server.getStatus();
     	
     	if (status.equalsIgnoreCase("ACTIVE")){
@@ -251,14 +229,35 @@ public class OpenStackCloudProvider {
     	} else {
             return Machine.State.ERROR; // CIMI mapping!
     	}
-    }
+	}
 
-    private void fromServerToMachine(final Server serverIn, final Machine machine) {
-        Server server = novaClient.servers().show(serverIn.getId()).execute(); // refresh the server
-        /*logger.info("server: " + server);*/		
+	public void deleteMachine(String machineId) {
+		this.freeFloatingIpsFromServer(machineId);
+        novaClient.servers().delete(machineId).execute();  
+	}	
+
+	public void restartMachine(String machineId, boolean force) throws ConnectorException {
+		//novaClient.servers().reboot(machineId, << force ? Reboot HARD : Reboot SOFT >>).execute(); // TODO when supported by woorea (RebootAction, RebootType)
+        throw new ConnectorException("unsupported operation");
+	}
+	
+	public void addVolumeToMachine(String machineId, MachineVolume machineVolume) throws ConnectorException {
+        String device = machineVolume.getInitialLocation(); // FIXME to be validated 
+        if (device == null) {
+            throw new ConnectorException("device not specified");
+        }
+		novaClient.servers().attachVolume(machineId, machineVolume.getProviderAssignedId(), device);
+	}
+	
+	public void removeVolumeFromMachine(String machineId, MachineVolume machineVolume) {
+		novaClient.servers().detachVolume(machineId, machineVolume.getProviderAssignedId());
+	}
+
+    private void fromServerToMachine(final String serverId, final Machine machine) {
+        Server server = novaClient.servers().show(serverId).execute(); // get a fresh server
     	
-    	machine.setProviderAssignedId(server.getId());        
-        machine.setState(this.fromServerStatusToMachineState(server)); 
+    	machine.setProviderAssignedId(serverId);        
+        machine.setState(this.getMachineState(serverId)); 
 
         // HW
         //Flavor flavor = server.getFlavor(); // doesn't work (check if woorea support a lazy instantiation mode (of the object of the model) 
@@ -273,7 +272,7 @@ public class OpenStackCloudProvider {
         machineDisks.add(machineDisk);
         machine.setDisks(machineDisks);
 
-        // FIXME Network with Quantum 
+        // Network 
         List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
         machine.setNetworkInterfaces(nics);
         MachineNetworkInterface privateNic = new MachineNetworkInterface();
@@ -309,6 +308,7 @@ public class OpenStackCloudProvider {
         
         /* FIXME 
          * - volume
+         * - Network with Quantum
          * */        
     }
     
@@ -324,15 +324,15 @@ public class OpenStackCloudProvider {
         nic.getAddresses().add(entry);
     }
 	
-	public Server getServer(String machineId) throws ConnectorException {
+	/*public Server getServer(String machineId) throws ConnectorException {
 		try {
 			return novaClient.servers().show(machineId).execute();
 		} catch (OpenStackResponseException e) {
-	        /*System.out.println("- " + e.getMessage() 
+	        System.out.println("- " + e.getMessage() 
 	        		+ ", " + e.getStatus()
 	        		+ ", " + e.getLocalizedMessage()
 	        		+ ", " + e.getCause()
-	        		);*/
+	        		);
 	        if (e.getStatus() == 404){
 				throw new ResourceNotFoundException(e);	        	
 	        }
@@ -340,7 +340,7 @@ public class OpenStackCloudProvider {
 				throw new ConnectorException(e);	        	
 	        }
 		}
-	}
+	}*/
 
     private String findSuitableFlavor(final MachineConfiguration machineConfig) {
         for (Flavor flavor : novaClient.flavors().list(true).execute()) {
@@ -454,5 +454,53 @@ public class OpenStackCloudProvider {
                 novaClient.floatingIps().deallocate(floatingIp.getId()).execute();
             }
         }
+    }
+
+    //
+    // Volume
+    //
+    
+	public Volume createVolume(VolumeCreate volumeCreate) throws ConnectorException{
+        logger.info("creating Machine for " + cloudProviderAccount.getLogin());
+        
+        throw new ConnectorException("unsupported operation");
+
+
+        /*VolumeForCreate volumeForCreate = new VolumeForCreate();
+
+        VolumeConfiguration volumeConfig = volumeCreate.getVolumeTemplate().getVolumeConfig();
+        int sizeInGB = volumeConfig.getCapacity() / (1000 * 1000);
+        
+        com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().create(XXX).execute(); // // TODO when supported by woorea (VolumeForCreate)
+		
+        final Volume cimiVolume = new Volume();
+        fromNovaVolumeToCimiVolume(novaVolume.getId(), cimiVolume); 
+        return cimiVolume;*/
+	}
+
+	public Volume.State getVolumeState(final String volumeId) {
+		com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().show(volumeId).execute();
+		String status = novaVolume.getStatus();
+		
+    	if (status.equalsIgnoreCase("AVAILABLE")){
+            return Volume.State.AVAILABLE;
+    	} else if (status.equalsIgnoreCase("CREATING")){
+            return Volume.State.CREATING;
+    	} else if (status.equalsIgnoreCase("DELETING")){
+            return Volume.State.DELETING;
+    	} else if (status.equalsIgnoreCase("IN_USE")){
+            return Volume.State.AVAILABLE; // XXX
+    	} else {
+            return Volume.State.ERROR; // CIMI mapping!
+    	}
+	}
+
+    private void fromNovaVolumeToCimiVolume(final String volumeId, final Volume cimiVolume) {
+		com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().show(volumeId).execute();
+
+		cimiVolume.setProviderAssignedId(novaVolume.getId());
+        cimiVolume.setState(this.getVolumeState(volumeId));
+        // GB to KB
+        cimiVolume.setCapacity(novaVolume.getSize() * 1000 * 1000);
     }
 }

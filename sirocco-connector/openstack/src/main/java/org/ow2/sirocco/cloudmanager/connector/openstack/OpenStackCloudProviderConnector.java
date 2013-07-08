@@ -15,17 +15,19 @@ import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.woorea.openstack.base.client.OpenStackResponseException;
 
-public class OpenStackCloudProviderConnector implements ICloudProviderConnector, IComputeService {
+public class OpenStackCloudProviderConnector implements ICloudProviderConnector, IComputeService, IVolumeService {
     private static Logger logger = LoggerFactory.getLogger(OpenStackCloudProviderConnector.class);
     
     private List<OpenStackCloudProvider> openstackCPs = new ArrayList<OpenStackCloudProvider>();
@@ -46,13 +48,17 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
     
     /* TODO
+     * Volume
+     * - implem & test
+     * 
      * Services
-     * - Volume
      * - Network : Quantum & convention without Quantum
+     * 
+     * Compute
      * - reboot: when supported by woorea 
-     * - fromServerToMachine: ephemeral, network, volume
      * 
      * Mix
+     * - fromServerToMachine: ephemeral, network, volume
      * - connector cache
      * - code format
      * - REST call trace (On/Off)
@@ -71,6 +77,17 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	}
 
 	@Override
+	public IVolumeService getVolumeService() throws ConnectorException {
+		return this;
+	}
+
+	@Override
+	public INetworkService getNetworkService() throws ConnectorException {
+		// TODO
+        throw new ConnectorException("unsupported operation");
+	}
+
+	@Override
 	public Set<CloudProviderLocation> getLocations() {
 		return null;
 	}
@@ -78,16 +95,6 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	@Override
 	public IProviderCapability getProviderCapability()
 			throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-	}
-
-	@Override
-	public IVolumeService getVolumeService() throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-	}
-
-	@Override
-	public INetworkService getNetworkService() throws ConnectorException {
         throw new ConnectorException("unsupported operation");
 	}
 
@@ -120,7 +127,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 
 	@Override
 	public void deleteMachine(String machineId, ProviderTarget target)
-			throws ConnectorException {
+			throws ResourceNotFoundException, ConnectorException {
         try {
 			this.getProvider(target).deleteMachine(machineId);
 		} catch (OpenStackResponseException e) {
@@ -135,7 +142,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 
 	@Override
 	public Machine getMachine(String machineId, ProviderTarget target)
-			 throws ConnectorException {
+			 throws ResourceNotFoundException, ConnectorException {
         try {
 			return this.getProvider(target).getMachine(machineId);
 		} catch (OpenStackResponseException e) {
@@ -149,8 +156,8 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	}
 
 	@Override
-	public State getMachineState(String machineId, ProviderTarget target)
-			throws ConnectorException {
+	public Machine.State getMachineState(String machineId, ProviderTarget target)
+			throws ResourceNotFoundException, ConnectorException {
         try {
 			return this.getProvider(target).getMachineState(machineId);
 		} catch (OpenStackResponseException e) {
@@ -165,7 +172,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 
 	@Override
 	public void restartMachine(String machineId, boolean force,
-			ProviderTarget target) throws ConnectorException {
+			ProviderTarget target) ResourceNotFoundException, throws ConnectorException {
         try {
 			this.getProvider(target).restartMachine(machineId, force);
 		} catch (OpenStackResponseException e) {
@@ -187,18 +194,33 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	}
 
 	@Override
-	public void addVolumeToMachine(String arg0, MachineVolume arg1,
-			ProviderTarget arg2) throws ConnectorException {
-		// TODO
-        throw new ConnectorException("unsupported operation");
+	public void addVolumeToMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target) throws ConnectorException {
+        try {
+			this.getProvider(target).addVolumeToMachine(machineId, machineVolume);
+		} catch (OpenStackResponseException e) {
+	        if (e.getStatus() == 404){
+				throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+	        else{
+				throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+		}
 	}
 
 	@Override
 	public void removeVolumeFromMachine(String machineId,
 			MachineVolume machineVolume, ProviderTarget target)
 			throws ConnectorException {
-		// TODO
-        throw new ConnectorException("unsupported operation");
+        try {
+			this.getProvider(target).removeVolumeFromMachine(machineId, machineVolume);
+		} catch (OpenStackResponseException e) {
+	        if (e.getStatus() == 404){
+				throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+	        else{
+				throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+		}
 	}
 
 	@Override
@@ -224,4 +246,74 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 			throws ConnectorException {
         throw new ConnectorException("unsupported operation");
 	}
+
+    //
+    // Volume Service
+    //
+
+	@Override
+	public Volume createVolume(VolumeCreate volumeCreate, ProviderTarget target)
+			throws ConnectorException {
+        try {
+			return this.getProvider(target).createVolume(volumeCreate); 
+		} catch (OpenStackResponseException e) {
+			throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+		}
+	}
+
+	@Override
+	public void deleteVolume(String volumeId, ProviderTarget target)
+			throws ResourceNotFoundException, ConnectorException {
+		// TODO 
+        throw new ConnectorException("unsupported operation");
+	}
+
+	@Override
+	public Volume.State getVolumeState(String volumeId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        try {
+			return this.getProvider(target).getVolumeState(volumeId);
+		} catch (OpenStackResponseException e) {
+	        if (e.getStatus() == 404){
+				throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+	        else{
+				throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+		}
+	}
+
+	@Override
+	public Volume getVolume(String volumeId, ProviderTarget target)
+			throws ResourceNotFoundException, ConnectorException {
+		// TODO 
+        throw new ConnectorException("unsupported operation");
+	}
+
+	@Override
+	public VolumeImage createVolumeImage(VolumeImage volumeImage,
+			ProviderTarget target) throws ResourceNotFoundException,
+			ConnectorException {
+        throw new ConnectorException("unsupported operation");
+	}
+
+	@Override
+	public VolumeImage createVolumeSnapshot(String volumeId,
+			VolumeImage volumeImage, ProviderTarget target)
+			throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+	}
+
+	@Override
+	public VolumeImage getVolumeImage(String volumeImageId,
+			ProviderTarget target) throws ResourceNotFoundException,
+			ConnectorException {
+        throw new ConnectorException("unsupported operation");
+	}
+
+	@Override
+	public void deleteVolumeImage(String volumeImageId, ProviderTarget target)
+			throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+	}
+
 }
