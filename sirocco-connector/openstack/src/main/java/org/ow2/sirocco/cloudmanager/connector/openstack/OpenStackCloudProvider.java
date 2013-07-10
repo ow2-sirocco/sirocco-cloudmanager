@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
@@ -28,6 +29,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.woorea.openstack.base.client.OpenStackResponseException;
 import com.woorea.openstack.keystone.Keystone;
 import com.woorea.openstack.keystone.model.Access;
 import com.woorea.openstack.keystone.model.authentication.UsernamePassword;
@@ -196,8 +198,7 @@ public class OpenStackCloudProvider {
         return machine;
         
         /* FIXME 
-         * - volume / template ?
-         * - Network with Quantum
+         * - Network : with Quantum & conventions without Quantum
          * */        
 	}
 
@@ -242,7 +243,7 @@ public class OpenStackCloudProvider {
 	}
 	
 	public void addVolumeToMachine(String machineId, MachineVolume machineVolume) throws ConnectorException {
-        String device = machineVolume.getInitialLocation(); // FIXME to be validated 
+        String device = machineVolume.getInitialLocation();  
         if (device == null) {
             throw new ConnectorException("device not specified");
         }
@@ -256,7 +257,8 @@ public class OpenStackCloudProvider {
     private void fromServerToMachine(final String serverId, final Machine machine) {
         Server server = novaClient.servers().show(serverId).execute(); // get a fresh server
     	
-    	machine.setProviderAssignedId(serverId);        
+    	machine.setProviderAssignedId(serverId);
+    	machine.setName(server.getName());
         machine.setState(this.getMachineState(serverId)); 
 
         // HW
@@ -268,8 +270,14 @@ public class OpenStackCloudProvider {
         machine.setMemory(flavor.getRam() * 1024);
         List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
         MachineDisk machineDisk = new MachineDisk();
-        machineDisk.setCapacity(new Integer(flavor.getDisk()) * 1000); // FIXME ephemeral 
+        machineDisk.setCapacity(new Integer(flavor.getDisk()) * 1000);  
         machineDisks.add(machineDisk);
+        if (flavor.getEphemeral() > 0){
+            MachineDisk machineEphemeralDisk = new MachineDisk();
+            machineEphemeralDisk.setCapacity(flavor.getEphemeral() * 1000);  
+            machineDisks.add(machineEphemeralDisk);
+        	
+        }
         machine.setDisks(machineDisks);
 
         // Network 
@@ -307,7 +315,7 @@ public class OpenStackCloudProvider {
         }
         
         /* FIXME 
-         * - volume
+         * - volume & machineVolume
          * - Network with Quantum
          * */        
     }
@@ -462,23 +470,36 @@ public class OpenStackCloudProvider {
     
 	public Volume createVolume(VolumeCreate volumeCreate) throws ConnectorException{
         logger.info("creating Machine for " + cloudProviderAccount.getLogin());
+
+        VolumeForCreate volumeForCreate = new VolumeForCreate();
         
-        throw new ConnectorException("unsupported operation");
-
-
-        /*VolumeForCreate volumeForCreate = new VolumeForCreate();
+        String volumeName = null;
+        if (volumeCreate.getName() != null) {
+        	volumeName = volumeCreate.getName() + "-" + UUID.randomUUID();
+        } else {
+        	volumeName = "sirocco-" + UUID.randomUUID();
+        }
+        volumeForCreate.setName(volumeName);
+        volumeForCreate.setDescription(volumeCreate.getDescription()); 
 
         VolumeConfiguration volumeConfig = volumeCreate.getVolumeTemplate().getVolumeConfig();
         int sizeInGB = volumeConfig.getCapacity() / (1000 * 1000);
+        volumeForCreate.setSize(new Integer(sizeInGB));
         
-        com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().create(XXX).execute(); // // TODO when supported by woorea (VolumeForCreate)
+        com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().create(volumeForCreate).execute(); // // TODO when supported by woorea (VolumeForCreate)
 		
         final Volume cimiVolume = new Volume();
         fromNovaVolumeToCimiVolume(novaVolume.getId(), cimiVolume); 
-        return cimiVolume;*/
+        return cimiVolume;
+	}
+	
+	public Volume getVolume(String volumeId) {
+        final Volume volume = new Volume();
+        fromNovaVolumeToCimiVolume(volumeId, volume); 
+        return volume;
 	}
 
-	public Volume.State getVolumeState(final String volumeId) {
+	public Volume.State getVolumeState(final String volumeId) { // FIXME pattern de refresh
 		com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().show(volumeId).execute();
 		String status = novaVolume.getStatus();
 		
@@ -489,15 +510,21 @@ public class OpenStackCloudProvider {
     	} else if (status.equalsIgnoreCase("DELETING")){
             return Volume.State.DELETING;
     	} else if (status.equalsIgnoreCase("IN_USE")){
-            return Volume.State.AVAILABLE; // XXX
+            return Volume.State.AVAILABLE; 
     	} else {
             return Volume.State.ERROR; // CIMI mapping!
     	}
 	}
+	
+	public void deleteVolume(String volumeId) {
+        novaClient.volumes().delete(volumeId).execute(); 
+	}
 
-    private void fromNovaVolumeToCimiVolume(final String volumeId, final Volume cimiVolume) {
+    private void fromNovaVolumeToCimiVolume(final String volumeId, final Volume cimiVolume) { 
 		com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().show(volumeId).execute();
 
+		cimiVolume.setName(novaVolume.getName());
+		cimiVolume.setDescription(novaVolume.getDescription());
 		cimiVolume.setProviderAssignedId(novaVolume.getId());
         cimiVolume.setState(this.getVolumeState(volumeId));
         // GB to KB

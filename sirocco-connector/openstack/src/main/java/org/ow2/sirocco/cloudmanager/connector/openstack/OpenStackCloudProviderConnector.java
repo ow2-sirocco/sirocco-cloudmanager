@@ -37,10 +37,22 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
             throw new ConnectorException("target.account or target.location is null");
     	}
         for (OpenStackCloudProvider provider : this.openstackCPs) {
-            if (provider.getCloudProviderAccount().equals(target.getAccount())
+            /*if (provider.getCloudProviderAccount().equals(target.getAccount())
                 && provider.getCloudProviderLocation().equals(target.getLocation())) {
                 return provider;
-            }
+            }*/
+            if (provider.getCloudProviderAccount().getId().equals(target.getAccount().getId())) {
+            	// location can be null?
+            	if (provider.getCloudProviderLocation() != target.getLocation()) {
+            		if (target.getLocation() != null) {
+            			if (provider.getCloudProviderLocation().getId().equals(target.getLocation().getId())) {
+            				return provider;
+            				}
+            			}
+            		}
+            	} else {
+            		return provider;
+            	}
         }
         OpenStackCloudProvider provider = new OpenStackCloudProvider(target);
         this.openstackCPs.add(provider);
@@ -51,14 +63,15 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
      * Volume
      * - implem & test
      * 
-     * Services
-     * - Network : Quantum & convention without Quantum
+     * Network
+     * - Quantum 
+     * - Convention without Quantum
      * 
      * Compute
      * - reboot: when supported by woorea 
+     * - getMachine: ephemeral, network, volume
      * 
      * Mix
-     * - fromServerToMachine: ephemeral, network, volume
      * - connector cache
      * - code format
      * - REST call trace (On/Off)
@@ -89,7 +102,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 
 	@Override
 	public Set<CloudProviderLocation> getLocations() {
-		return null;
+		return null; 
 	}
 
 	@Override
@@ -172,7 +185,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 
 	@Override
 	public void restartMachine(String machineId, boolean force,
-			ProviderTarget target) ResourceNotFoundException, throws ConnectorException {
+			ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
         try {
 			this.getProvider(target).restartMachine(machineId, force);
 		} catch (OpenStackResponseException e) {
@@ -188,13 +201,14 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	@Override
 	public MachineImage captureMachine(String machineId,
 			MachineImage machineImage, ProviderTarget target)
-			throws ConnectorException {
+					throws ResourceNotFoundException, ConnectorException {
 		// TODO
         throw new ConnectorException("unsupported operation");
 	}
 
 	@Override
-	public void addVolumeToMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target) throws ConnectorException {
+	public void addVolumeToMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target) 
+			throws ResourceNotFoundException, ConnectorException {
         try {
 			this.getProvider(target).addVolumeToMachine(machineId, machineVolume);
 		} catch (OpenStackResponseException e) {
@@ -210,7 +224,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	@Override
 	public void removeVolumeFromMachine(String machineId,
 			MachineVolume machineVolume, ProviderTarget target)
-			throws ConnectorException {
+					throws ResourceNotFoundException, ConnectorException {
         try {
 			this.getProvider(target).removeVolumeFromMachine(machineId, machineVolume);
 		} catch (OpenStackResponseException e) {
@@ -225,25 +239,25 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 
 	@Override
 	public void startMachine(String machineId, ProviderTarget target)
-			throws ConnectorException {
+			throws ResourceNotFoundException, ConnectorException {
         throw new ConnectorException("unsupported operation");
 	}
 
 	@Override
 	public void stopMachine(String machineId, boolean force,
-			ProviderTarget target) throws ConnectorException {
+			ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
         throw new ConnectorException("unsupported operation");
 	}
 
 	@Override
 	public void pauseMachine(String machineId, ProviderTarget target)
-			throws ConnectorException {
+			throws ResourceNotFoundException, ConnectorException {
         throw new ConnectorException("unsupported operation");
 	}
 
 	@Override
 	public void suspendMachine(String machineId, ProviderTarget target)
-			throws ConnectorException {
+			throws ResourceNotFoundException, ConnectorException {
         throw new ConnectorException("unsupported operation");
 	}
 
@@ -264,8 +278,16 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	@Override
 	public void deleteVolume(String volumeId, ProviderTarget target)
 			throws ResourceNotFoundException, ConnectorException {
-		// TODO 
-        throw new ConnectorException("unsupported operation");
+        try {
+			this.getProvider(target).deleteVolume(volumeId);
+		} catch (OpenStackResponseException e) {
+	        if (e.getStatus() == 404){
+				throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+	        else{
+				throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+		}
 	}
 
 	@Override
@@ -285,8 +307,16 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 	@Override
 	public Volume getVolume(String volumeId, ProviderTarget target)
 			throws ResourceNotFoundException, ConnectorException {
-		// TODO 
-        throw new ConnectorException("unsupported operation");
+        try { 
+			return this.getProvider(target).getVolume(volumeId);
+		} catch (OpenStackResponseException e) {
+	        if (e.getStatus() == 404){
+				throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+	        else{
+				throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);	        	
+	        }
+		}
 	}
 
 	@Override
