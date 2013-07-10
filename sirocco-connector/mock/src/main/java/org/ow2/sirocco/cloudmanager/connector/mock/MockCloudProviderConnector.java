@@ -100,7 +100,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static Logger logger = LoggerFactory.getLogger(MockCloudProviderConnector.class);
 
-    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS = 100;
+    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS = 10000;
 
     private List<MockProvider> mockProviders = new ArrayList<MockProvider>();
 
@@ -108,11 +108,20 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private synchronized MockProvider getProvider(final ProviderTarget target) {
         for (MockProvider provider : this.mockProviders) {
-            if (provider.cloudProviderAccount.equals(target.getAccount())
-                && provider.cloudProviderLocation.equals(target.getLocation())) {
-                return provider;
+            if (provider.cloudProviderAccount.getId().equals(target.getAccount().getId())) {
+                // location can be null?
+                if (provider.cloudProviderLocation != target.getLocation()) {
+                    if (target.getLocation() != null) {
+                        if (provider.cloudProviderLocation.getId().equals(target.getLocation().getId())) {
+                            return provider;
+                        }
+                    }
+                } else {
+                    return provider;
+                }
             }
         }
+
         MockProvider provider = new MockProvider();
         provider.cloudProviderAccount = target.getAccount();
         provider.cloudProviderLocation = target.getLocation();
@@ -487,6 +496,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             this.volumes.put(volumeProviderAssignedId, volume);
             volume.setState(Volume.State.CREATING);
             volume.setUpdated(new Date());
+            MockCloudProviderConnector.logger.info("Created Volume with id " + volume.getProviderAssignedId());
             return volume;
         }
 
@@ -507,6 +517,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         public synchronized Volume getVolume(final String volumeId) throws ConnectorException {
             Volume volume = this.volumes.get(volumeId);
             if (volume == null) {
+                MockCloudProviderConnector.logger.info("Volume with id " + volumeId + " not found");
                 throw new ResourceNotFoundException("Volume " + volumeId + " does not exist");
             }
             if (this.actionDone(volume)) {

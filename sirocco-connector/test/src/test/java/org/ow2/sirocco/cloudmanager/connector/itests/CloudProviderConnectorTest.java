@@ -166,6 +166,7 @@ public class CloudProviderConnectorTest {
             throw new Exception("Cannot find suitable provider location for country " + country);
         }
         this.cloudProviderAccount = new CloudProviderAccount();
+        this.cloudProviderAccount.setId(1234);
         this.cloudProviderAccount.setLogin(login);
         this.cloudProviderAccount.setPassword(password);
 
