@@ -38,7 +38,11 @@
 	<name>SIROCCO :: CloudManager :: CORE :: Manager</name>
 
 	<dependencies>
-
+		<dependency>
+                        <groupId>org.activiti</groupId>
+                        <artifactId>activiti-engine</artifactId>
+                        <version>5.13</version>
+                </dependency>
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
