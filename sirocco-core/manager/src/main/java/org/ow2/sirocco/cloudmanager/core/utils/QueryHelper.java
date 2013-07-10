@@ -47,7 +47,7 @@ public class QueryHelper {
 
         private Class<?> clazz;
 
-        private String username;
+        private Integer tenantId;
 
         private Integer first;
 
@@ -67,6 +67,8 @@ public class QueryHelper {
 
         private String containerId;
 
+        private boolean returnPublicEntities = false;
+
         private QueryParamsBuilder(final String entityType, final Class<?> clazz) {
             this.entityType = entityType;
             this.clazz = clazz;
@@ -76,8 +78,8 @@ public class QueryHelper {
             return new QueryParamsBuilder(entityType, clazz);
         }
 
-        public QueryParamsBuilder userName(final String username) {
-            this.username = username;
+        public QueryParamsBuilder tenantId(final Integer tenantId) {
+            this.tenantId = tenantId;
             return this;
         }
 
@@ -124,6 +126,11 @@ public class QueryHelper {
             return this;
         }
 
+        public QueryParamsBuilder returnPublicEntities() {
+            this.returnPublicEntities = true;
+            return this;
+        }
+
         public QueryParamsBuilder last(final int last) {
             this.last = last;
             if (last == -1) {
@@ -140,8 +147,8 @@ public class QueryHelper {
             return this.clazz;
         }
 
-        public String getUsername() {
-            return this.username;
+        public Integer getTenantId() {
+            return this.tenantId;
         }
 
         public Integer getFirst() {
@@ -180,6 +187,10 @@ public class QueryHelper {
             return this.containerId;
         }
 
+        public boolean isReturnPublicEntities() {
+            return this.returnPublicEntities;
+        }
+
     }
 
     /**
@@ -187,35 +198,45 @@ public class QueryHelper {
      * 
      * @param entityType
      * @param em
-     * @param username optionnal, filter request to given user
+     * @param tenantId optional, filter request to given tenant
      * @param verifyDeletedState if the query should ignore deleted entities.<br>
      *        Must be set to false if an entity doesn't have a state field
      * @return
      */
     @SuppressWarnings({"rawtypes"})
-    public static List getEntityList(final String entityType, final EntityManager em, final String username,
-        final Enum stateToIgnore) {
-        String userQuery = "", stateQuery = "";
+    public static List getEntityList(final String entityType, final EntityManager em, final Integer tenantId,
+        final Enum stateToIgnore, final boolean returnPublicEntities) {
+        String tenantQuery = "", stateQuery = "";
 
-        if (!(("".equals(username) || username == null))) {
-            userQuery = " v.user.username=:username ";
+        if (tenantId != null) {
+            if (!returnPublicEntities) {
+                tenantQuery = " v.tenant.id=:tenantId ";
+            } else {
+                tenantQuery = " (v.tenant.id=:tenantId OR v.visibility = org.ow2.sirocco.cloudmanager.model.cimi.Visibility.PUBLIC) ";
+            }
         }
         if (stateToIgnore != null) {
-            if (userQuery.length() > 0) {
+            if (tenantQuery.length() > 0) {
                 stateQuery = " AND ";
             }
             stateQuery = stateQuery + " v.state<>" + stateToIgnore.getClass().getName() + "." + stateToIgnore.name() + " ";
         }
-        return em.createQuery("SELECT v FROM " + entityType + " v WHERE " + userQuery + stateQuery + " ORDER BY v.id")
-            .setParameter("username", username).getResultList();
+        return em
+            .createQuery("SELECT v FROM " + entityType + " v WHERE " + tenantQuery + stateQuery + " ORDER BY v.created DESC")
+            .setParameter("tenantId", tenantId).getResultList();
 
     }
 
     public static <E> QueryResult<E> getEntityList(final EntityManager em, final QueryParamsBuilder params)
         throws InvalidRequestException {
         StringBuffer whereClauseSB = new StringBuffer();
-        if (params.getUsername() != null) {
-            whereClauseSB.append(" v.user.username=:username ");
+        if (params.getTenantId() != null) {
+            if (!params.isReturnPublicEntities()) {
+                whereClauseSB.append(" v.tenant.id=:tenantId ");
+            } else {
+                whereClauseSB
+                    .append("( v.tenant.id=:tenantId OR v.visibility = org.ow2.sirocco.cloudmanager.model.cimi.Visibility.PUBLIC) ");
+            }
         }
         if (params.getStateToIgnore() != null) {
             if (whereClauseSB.length() > 0) {
@@ -250,10 +271,10 @@ public class QueryHelper {
 
         try {
             int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + params.getEntityType() + " v WHERE " + whereClause)
-                .setParameter("username", params.getUsername()).getSingleResult()).intValue();
+                .setParameter("tenantId", params.getTenantId()).getSingleResult()).intValue();
             Query query = em.createQuery(
-                "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.id").setParameter(
-                "username", params.getUsername());
+                "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.created DESC")
+                .setParameter("tenantId", params.getTenantId());
             if (params.getFirst() != null) {
                 query.setFirstResult(params.getFirst());
             }
@@ -300,8 +321,8 @@ public class QueryHelper {
     public static <E> QueryResult<E> getCollectionItemList(final EntityManager em, final QueryParamsBuilder params)
         throws InvalidRequestException {
         StringBuffer whereClauseSB = new StringBuffer();
-        if (params.getUsername() != null) {
-            whereClauseSB.append(" v.user.username=:username ");
+        if (params.getTenantId() != null) {
+            whereClauseSB.append(" v.tenant.id=:tenantId ");
         }
         if (params.getStateToIgnore() != null) {
             if (whereClauseSB.length() > 0) {
@@ -336,11 +357,11 @@ public class QueryHelper {
             + " v WHERE vv MEMBER OF v." + params.getContainerAttributeName() + " AND " + whereClause;
         try {
             int count = ((Number) em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(params.getContainerId()))
-                .setParameter("username", params.getUsername()).getSingleResult()).intValue();
+                .setParameter("tenantId", params.getTenantId()).getSingleResult()).intValue();
             queryExpression = "SELECT vv FROM " + params.getEntityType() + " vv, " + params.getContainerType()
                 + " v WHERE vv MEMBER OF v." + params.getContainerAttributeName() + " AND " + whereClause + " ORDER BY vv.id";
             Query query = em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(params.getContainerId()))
-                .setParameter("username", params.getUsername());
+                .setParameter("tenantId", params.getTenantId());
 
             if (params.getFirst() != null) {
                 query.setFirstResult(params.getFirst());

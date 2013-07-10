@@ -43,12 +43,13 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "Users")
 public class User implements Serializable {
+    public final static String ADMIN_ROLE = "sirocco-admin";
 
     private static final long serialVersionUID = 1L;
 
     private Integer id;
 
-    private Date createDate;
+    private Date created;
 
     private String email;
 
@@ -65,7 +66,7 @@ public class User implements Serializable {
 
     private String role;
 
-    private Set<CloudProviderAccount> cloudProviderAccounts;
+    private Set<Tenant> tenants;
 
     public User() {
     }
@@ -77,8 +78,8 @@ public class User implements Serializable {
     }
 
     @Temporal(TemporalType.TIMESTAMP)
-    public Date getCreateDate() {
-        return this.createDate;
+    public Date getCreated() {
+        return this.created;
     }
 
     public String getEmail() {
@@ -97,8 +98,8 @@ public class User implements Serializable {
         return this.password;
     }
 
-    public void setCreateDate(final Date createDate) {
-        this.createDate = createDate;
+    public void setCreated(final Date created) {
+        this.created = created;
     }
 
     public void setEmail(final String email) {
@@ -138,13 +139,17 @@ public class User implements Serializable {
         this.role = role;
     }
 
-    @ManyToMany(mappedBy = "users", fetch = FetchType.EAGER)
-    public Set<CloudProviderAccount> getCloudProviderAccounts() {
-        return this.cloudProviderAccounts;
+    public boolean isAdmin() {
+        return User.ADMIN_ROLE.equals(this.role);
     }
 
-    public void setCloudProviderAccounts(final Set<CloudProviderAccount> cloudProviderAccounts) {
-        this.cloudProviderAccounts = cloudProviderAccounts;
+    @ManyToMany(fetch = FetchType.EAGER)
+    public Set<Tenant> getTenants() {
+        return this.tenants;
+    }
+
+    public void setTenants(final Set<Tenant> tenants) {
+        this.tenants = tenants;
     }
 
 }

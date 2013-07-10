@@ -45,7 +45,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
 
 @Entity
@@ -55,7 +55,7 @@ public abstract class CloudResource implements Serializable, Resource {
 
     protected Integer id;
 
-    protected User user;
+    protected Tenant tenant;
 
     protected String name;
 
@@ -181,12 +181,12 @@ public abstract class CloudResource implements Serializable, Resource {
     }
 
     @ManyToOne
-    public User getUser() {
-        return this.user;
+    public Tenant getTenant() {
+        return this.tenant;
     }
 
-    public void setUser(final User user) {
-        this.user = user;
+    public void setTenant(final Tenant tenant) {
+        this.tenant = tenant;
     }
 
     @OneToMany(mappedBy = "targetResource")

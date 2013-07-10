@@ -32,6 +32,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -354,5 +355,7 @@ public interface IVolumeManager extends IJobListener {
     List<VolumeImage> getVolumeImages() throws CloudProviderException;
 
     List<VolumeTemplate> getVolumeTemplates() throws CloudProviderException;
+
+    List<MachineVolume> getVolumeAttachments(String volumeId) throws CloudProviderException;
 
 }

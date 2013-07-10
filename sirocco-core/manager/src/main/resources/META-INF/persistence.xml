@@ -31,7 +31,7 @@
 	http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd"
 	version="1.0">
 
-	<persistence-unit name="persistence-unit/main" transaction-type="JTA">
+	<persistence-unit name="siroccoPersistenceUnit" transaction-type="JTA">
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 		<jta-data-source>${datasource}</jta-data-source>
 		<exclude-unlisted-classes>false</exclude-unlisted-classes>

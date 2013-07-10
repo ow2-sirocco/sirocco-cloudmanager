@@ -30,19 +30,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
-import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCredentialsManager;
-import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
+import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -53,34 +53,29 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteCredentialsManager.class)
 @Local(ICredentialsManager.class)
+@IdentityInterceptorBinding
 public class CredentialsManager implements ICredentialsManager {
 
     private static Logger logger = LoggerFactory.getLogger(CredentialsManager.class.getName());
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
-    @Resource
-    private SessionContext ctx;
+    @Inject
+    private IdentityContext identityContext;
 
     @EJB
-    private IUserManager userManager;
+    private ITenantManager tenantManager;
 
-    @Resource
-    public void setSessionContext(final SessionContext ctx) {
-        this.ctx = ctx;
-    }
-
-    private User getUser() throws CloudProviderException {
-        String username = this.ctx.getCallerPrincipal().getName();
-        return this.userManager.getUserByUsername(username);
+    private Tenant getTenant() throws CloudProviderException {
+        return this.tenantManager.getTenant(this.identityContext);
     }
 
     private void validateCredentials(final Credentials cred) throws CloudProviderException {
@@ -113,7 +108,7 @@ public class CredentialsManager implements ICredentialsManager {
         credentials.setName(credentialsCreate.getName());
         credentials.setDescription(credentialsCreate.getDescription());
         credentials.setProperties(credentialsCreate.getProperties());
-        credentials.setUser(this.getUser());
+        credentials.setTenant(this.getTenant());
         credentials.setUserName(credentialsCreate.getCredentialsTemplate().getUserName());
         credentials.setPassword(credentialsCreate.getCredentialsTemplate().getPassword());
         credentials.setPublicKey(credentialsCreate.getCredentialsTemplate().getPublicKey());
@@ -128,14 +123,9 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     public void updateCredentials(final Credentials credentials) throws CloudProviderException {
-        User user = this.getUser();
-
         Credentials c = this.em.find(Credentials.class, credentials.getId());
         if (c == null) {
             throw new ResourceNotFoundException(" Could not find credential " + credentials.getId());
-        }
-        if (c.getUser().getUsername() != user.getUsername()) {
-            throw new CloudProviderException(" Unauthorized to change creds " + user.getUsername());
         }
         this.validateCredentials(credentials);
         this.em.merge(credentials);
@@ -143,7 +133,6 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     public Credentials getCredentialsById(final String credentialsId) throws CloudProviderException {
-        User user = this.getUser();
         if (credentialsId == null) {
             throw new InvalidRequestException("null credentials id");
         }
@@ -163,7 +152,6 @@ public class CredentialsManager implements ICredentialsManager {
 
     public void deleteCredentials(final String credentialsId) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException {
-        User user = this.getUser();
         if (credentialsId == null) {
             throw new InvalidRequestException("null credentials id");
         }
@@ -213,8 +201,8 @@ public class CredentialsManager implements ICredentialsManager {
 
     @Override
     public List<Credentials> getCredentials() throws CloudProviderException {
-        return this.em.createQuery("SELECT c FROM Credentials c WHERE c.user.id=:userid")
-            .setParameter("userid", this.getUser().getId()).getResultList();
+        return this.em.createQuery("SELECT c FROM Credentials c WHERE c.tenant.id=:tenantId")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -222,15 +210,14 @@ public class CredentialsManager implements ICredentialsManager {
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Credentials", Credentials.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
     public CredentialsTemplate createCredentialsTemplate(final CredentialsTemplate credentialsTemplate)
         throws CloudProviderException {
-        User user = this.getUser();
 
-        credentialsTemplate.setUser(user);
+        credentialsTemplate.setTenant(this.getTenant());
         credentialsTemplate.setCreated(new Date());
 
         CredentialsManager.logger.info("Persist credentialsTemplate  " + credentialsTemplate.getName());
@@ -273,8 +260,8 @@ public class CredentialsManager implements ICredentialsManager {
 
     @Override
     public List<CredentialsTemplate> getCredentialsTemplates() throws CloudProviderException {
-        return this.em.createQuery("SELECT c FROM CredentialsTemplate c WHERE c.user.id=:userid")
-            .setParameter("userid", this.getUser().getId()).getResultList();
+        return this.em.createQuery("SELECT c FROM CredentialsTemplate c WHERE c.tenant.id=:tenantId")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -283,7 +270,7 @@ public class CredentialsManager implements ICredentialsManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("CredentialsTemplate",
             CredentialsTemplate.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .filterEmbbededTemplate());
     }
 }

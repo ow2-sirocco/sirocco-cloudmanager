@@ -28,11 +28,10 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -41,10 +40,11 @@ import javax.persistence.PersistenceContextType;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.PasswordValidator;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,15 +53,16 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteUserManager.class)
 @Local(IUserManager.class)
 @SuppressWarnings("unused")
+@IdentityInterceptorBinding
 public class UserManager implements IUserManager {
 
     private static Logger logger = LoggerFactory.getLogger(UserManager.class.getName());
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
 
-    @Resource
-    private EJBContext context;
+    @Inject
+    private IdentityContext identityContext;
 
     public String md5(final String md5) {
         try {
@@ -103,9 +104,6 @@ public class UserManager implements IUserManager {
         u.setRole("sirocco-user");
         u.setPassword(this.md5(u.getPassword()));
         this.em.persist(u);
-        CloudEntryPoint cep = new CloudEntryPoint();
-        cep.setUser(u);
-        this.em.persist(cep);
         return u;
     }
 
@@ -143,9 +141,10 @@ public class UserManager implements IUserManager {
 
     @Override
     public User getUserById(final String userId) throws CloudProviderException {
-
         User result = this.em.find(User.class, new Integer(userId));
-
+        if (result == null) {
+            throw new ResourceNotFoundException();
+        }
         return result;
     }
 

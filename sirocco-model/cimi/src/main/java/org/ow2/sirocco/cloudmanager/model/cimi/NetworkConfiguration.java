@@ -41,6 +41,17 @@ public class NetworkConfiguration extends CloudEntity implements Serializable {
 
     private String classOfService;
 
+    private Visibility visibility = Visibility.PRIVATE;
+
+    @Enumerated(EnumType.STRING)
+    public Visibility getVisibility() {
+        return this.visibility;
+    }
+
+    public void setVisibility(final Visibility visibility) {
+        this.visibility = visibility;
+    }
+
     @Enumerated(EnumType.STRING)
     public Network.Type getNetworkType() {
         return this.networkType;

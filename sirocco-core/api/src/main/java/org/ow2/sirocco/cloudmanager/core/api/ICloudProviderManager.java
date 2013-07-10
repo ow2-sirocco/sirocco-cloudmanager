@@ -69,10 +69,7 @@ public interface ICloudProviderManager {
 
     void deleteCloudProvider(String cloudProviderId) throws CloudProviderException;
 
-    CloudProviderAccount createCloudProviderAccount(String cloudProviderId, String login, String password)
-        throws CloudProviderException;
-
-    CloudProviderAccount createCloudProviderAccount(CloudProviderAccount cpa) throws CloudProviderException;
+    CloudProviderAccount createCloudProviderAccount(String providerId, CloudProviderAccount cpa) throws CloudProviderException;
 
     CloudProviderAccount getCloudProviderAccountById(String cloudProviderAccountId) throws CloudProviderException;
 
@@ -100,24 +97,22 @@ public interface ICloudProviderManager {
 
     void addLocationToCloudProvider(String cloudProviderId, String locationId) throws CloudProviderException;
 
-    void addCloudProviderAccountToUser(String userId, String cloudProviderAccountId) throws CloudProviderException;
+    void addLocationToCloudProvider(String cloudProviderId, CloudProviderLocation location) throws CloudProviderException;
 
-    void addCloudProviderAccountToUserByName(String userName, String cloudProviderAccountId) throws CloudProviderException;
+    void addCloudProviderAccountToTenant(String tenantId, String cloudProviderAccountId) throws CloudProviderException;
 
-    void removeCloudProviderAccountFromUser(String userId, String cloudProviderAccountId) throws CloudProviderException;
-
-    void removeCloudProviderAccountFromUserByName(String userName, String cloudProviderAccountId) throws CloudProviderException;
+    void removeCloudProviderAccountFromTenant(String tenantId, String cloudProviderAccountId) throws CloudProviderException;
 
     double locationDistance(CloudProviderLocation pointA, CloudProviderLocation pointB) throws CloudProviderException;
 
-    List<CloudProviderAccount> getCloudProviderAccounts() throws CloudProviderException;
+    List<CloudProviderAccount> getCloudProviderAccountsByProvider(String providerId) throws CloudProviderException;
 
-    List<CloudProviderAccount> getCloudProviderAccountsByUser(String userId) throws CloudProviderException;
+    List<CloudProviderAccount> getCloudProviderAccountsByTenant(String tenantId) throws CloudProviderException;
 
     List<CloudProviderLocation> getCloudProviderLocations() throws CloudProviderException;
 
     List<CloudProvider> getCloudProviders() throws CloudProviderException;
 
-    Placement placeResource(final Map<String, String> properties) throws CloudProviderException;
+    Placement placeResource(String tenantId, final Map<String, String> properties) throws CloudProviderException;
 
 }

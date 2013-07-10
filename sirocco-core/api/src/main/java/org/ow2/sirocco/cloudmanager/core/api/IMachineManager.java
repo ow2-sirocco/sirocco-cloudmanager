@@ -32,7 +32,6 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntryPoint;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -50,11 +49,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 public interface IMachineManager extends IJobListener {
 
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/MachineManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager";
-
-    /**
-     * Operations on CEP
-     */
-    CloudEntryPoint getCloudEntryPoint() throws CloudProviderException;
 
     /**
      * Operations on Machine

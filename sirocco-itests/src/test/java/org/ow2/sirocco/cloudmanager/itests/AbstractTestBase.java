@@ -15,11 +15,13 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteNetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager;
+import org.ow2.sirocco.cloudmanager.core.api.IRemoteTenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 public class AbstractTestBase {
@@ -54,9 +56,13 @@ public class AbstractTestBase {
 
     protected IRemoteUserManager userManager;
 
+    protected IRemoteTenantManager tenantManager;
+
     protected IRemoteJobManager jobManager;
 
     protected IRemoteDatabaseManager databaseManager;
+
+    protected Tenant tenant;
 
     protected User user;
 
@@ -77,6 +83,7 @@ public class AbstractTestBase {
                 this.cloudProviderManager = (IRemoteCloudProviderManager) context.lookup(this
                     .getJndiName("CloudProviderManager"));
                 this.userManager = (IRemoteUserManager) context.lookup(this.getJndiName("UserManager"));
+                this.tenantManager = (IRemoteTenantManager) context.lookup(this.getJndiName("TenantManager"));
                 this.credManager = (IRemoteCredentialsManager) context.lookup(this.getJndiName("CredentialsManager"));
                 this.machineImageManager = (IRemoteMachineImageManager) context.lookup(this.getJndiName("MachineImageManager"));
                 this.systemManager = (IRemoteSystemManager) context.lookup(this.getJndiName("SystemManager"));
@@ -99,11 +106,17 @@ public class AbstractTestBase {
     @Before
     public void setUp() throws Exception {
         this.connectToCloudManager();
+        this.tenant = new Tenant();
+        this.tenant.setName("MOCK");
+        this.tenant = this.tenantManager.createTenant(this.tenant);
         this.user = this.userManager.createUser("Lov", "Maps", "lov@maps.com", AbstractTestBase.USER_NAME, "232908Ivry");
+        this.tenantManager.addUserToTenant(this.tenant.getId().toString(), this.user.getId().toString());
         CloudProvider provider = this.cloudProviderManager.createCloudProvider(AbstractTestBase.CLOUD_PROVIDER_TYPE, "mock");
-        CloudProviderAccount account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(),
-            AbstractTestBase.ACCOUNT_LOGIN, AbstractTestBase.ACCOUNT_CREDENTIALS);
-        this.cloudProviderManager.addCloudProviderAccountToUser(this.user.getId().toString(), account.getId().toString());
+        CloudProviderAccount account = new CloudProviderAccount();
+        account.setLogin(AbstractTestBase.ACCOUNT_LOGIN);
+        account.setPassword(AbstractTestBase.ACCOUNT_CREDENTIALS);
+        account = this.cloudProviderManager.createCloudProviderAccount(provider.getId().toString(), account);
+        this.cloudProviderManager.addCloudProviderAccountToTenant(this.tenant.getId().toString(), account.getId().toString());
     }
 
     @After

@@ -22,15 +22,13 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.PersistenceException;
 
-import org.glassfish.osgicdi.OSGiService;
-import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
-import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteNetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
+import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
+import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -58,20 +56,22 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
 @Remote(IRemoteNetworkManager.class)
 @Local(INetworkManager.class)
+@IdentityInterceptorBinding
 public class NetworkManager implements INetworkManager {
     private static Logger logger = LoggerFactory.getLogger(NetworkManager.class.getName());
 
-    @PersistenceContext(unitName = "persistence-unit/main", type = PersistenceContextType.TRANSACTION)
+    @PersistenceContext(unitName = "siroccoPersistenceUnit", type = PersistenceContextType.TRANSACTION)
     private EntityManager em;
+
+    @Inject
+    private IdentityContext identityContext;
 
     @Resource
     private EJBContext context;
@@ -80,16 +80,31 @@ public class NetworkManager implements INetworkManager {
     private ICloudProviderManager cloudProviderManager;
 
     @EJB
-    private IUserManager userManager;
+    private ITenantManager tenantManager;
 
-    private User getUser() throws CloudProviderException {
-        String username = this.context.getCallerPrincipal().getName();
-        User user = this.userManager.getUserByUsername(username);
-        if (user == null) {
-            throw new CloudProviderException("unknown user: " + username);
-        }
-        return user;
+    private Tenant getTenant() throws CloudProviderException {
+        return this.tenantManager.getTenant(this.identityContext);
     }
+
+    // private ICloudProviderConnector getCloudProviderConnector(final
+    // CloudProviderAccount cloudProviderAccount,
+    // final CloudProviderLocation location) throws CloudProviderException {
+    // NetworkManager.logger.info("Getting connector for cloud provider type "
+    // + cloudProviderAccount.getCloudProvider().getCloudProviderType());
+    // ICloudProviderConnectorFactory connectorFactory = this.connectorFinder
+    // .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
+    // if (connectorFactory == null) {
+    // NetworkManager.logger.error("Cannot find connector for cloud provider type "
+    // + cloudProviderAccount.getCloudProvider().getCloudProviderType());
+    // return null;
+    // }
+    // try {
+    // return connectorFactory.getCloudProviderConnector(cloudProviderAccount,
+    // location);
+    // } catch (ConnectorException e) {
+    // throw new CloudProviderException(e.getMessage());
+    // }
+    // }
 
     //
     // Network operations
@@ -97,7 +112,7 @@ public class NetworkManager implements INetworkManager {
 
     public Network getPublicNetwork() {
         List<Network> publicNetworks = this.em.createQuery(
-            "SELECT n FROM Network n WHERE networkType=org.ow2.sirocco.cloudmanager.model.cimi.Network$Type.PUBLIC")
+            "SELECT n FROM Network n WHERE n.networkType=org.ow2.sirocco.cloudmanager.model.cimi.Network$Type.PUBLIC")
             .getResultList();
         return publicNetworks.get(0);
     }
@@ -105,13 +120,13 @@ public class NetworkManager implements INetworkManager {
     private Job createPublicNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
         NetworkManager.logger.info("Creating Public Network");
         // TODO only one public network can be created
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
         Network network = new Network();
         network.setName(networkCreate.getName());
         network.setDescription(networkCreate.getDescription());
         network.setProperties(networkCreate.getProperties() == null ? new HashMap<String, String>()
             : new HashMap<String, String>(networkCreate.getProperties()));
-        network.setUser(user);
+        network.setTenant(tenant);
 
         network.setNetworkType(Type.PUBLIC);
 
@@ -142,25 +157,29 @@ public class NetworkManager implements INetworkManager {
         }
 
         // retrieve user
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(networkCreate.getProperties());
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
-      //TODO:workflowif (connector == null) {
-      //TODO:workflow    throw new CloudProviderException("Cannot retrieve cloud provider connector "
-      //TODO:workflow        + placement.getAccount().getCloudProvider().getCloudProviderType());
-      //TODO:workflow}
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), networkCreate.getProperties());
+        ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
+                                                 // placement.getLocation());
+        if (connector == null) {
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
+        }
 
         // delegates network creation to cloud provider connector
         Job providerJob = null;
 
-      //TODO:workflowtry {
-        	//TODO:workflow INetworkService networkService = connector.getNetworkService();
-        	//TODO:workflowproviderJob = networkService.createNetwork(networkCreate);
-        	//TODO:workflow} catch (ConnectorException e) {
-        	//TODO:workflow    NetworkManager.logger.error("Failed to create network: ", e);
-        	//TODO:workflow    throw new CloudProviderException(e.getMessage());
-        	//TODO:workflow}
+        // TODO:workflowtry {
+        // TODO:workflow INetworkService networkService =
+        // connector.getNetworkService();
+        // TODO:workflowproviderJob =
+        // networkService.createNetwork(networkCreate);
+        // TODO:workflow} catch (ConnectorException e) {
+        // TODO:workflow
+        // NetworkManager.logger.error("Failed to create network: ", e);
+        // TODO:workflow throw new CloudProviderException(e.getMessage());
+        // TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -173,7 +192,7 @@ public class NetworkManager implements INetworkManager {
         network.setDescription(networkCreate.getDescription());
         network.setProperties(networkCreate.getProperties() == null ? new HashMap<String, String>()
             : new HashMap<String, String>(networkCreate.getProperties()));
-        network.setUser(user);
+        network.setTenant(tenant);
 
         network.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         network.setCloudProviderAccount(placement.getAccount());
@@ -247,7 +266,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<Network> getNetworks() throws CloudProviderException {
-        return QueryHelper.getEntityList("Network", this.em, this.getUser().getUsername(), Network.State.DELETED);
+        return QueryHelper.getEntityList("Network", this.em, this.getTenant().getId(), Network.State.DELETED, false);
     }
 
     @SuppressWarnings("unchecked")
@@ -256,7 +275,7 @@ public class NetworkManager implements INetworkManager {
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Network", Network.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(Network.State.DELETED));
     }
 
@@ -290,23 +309,29 @@ public class NetworkManager implements INetworkManager {
         }
 
         // delegates volume deletion to cloud provider connector
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount(),
-      //TODO:workflow    network.getLocation());
+        // TODO:workflowICloudProviderConnector connector =
+        // this.getCloudProviderConnector(network.getCloudProviderAccount(),
+        // TODO:workflow network.getLocation());
         Job providerJob = null;
 
-      //TODO:workflow try {
-      //TODO:workflow    INetworkService networkService = connector.getNetworkService();
-      //TODO:workflow   if (action.equals("delete")) {
-      //TODO:workflow       providerJob = networkService.deleteNetwork(network.getProviderAssignedId());
-      //TODO:workflow   } else if (action.equals("start")) {
-      //TODO:workflow      providerJob = networkService.startNetwork(network.getProviderAssignedId());
-      //TODO:workflow   } else if (action.equals("stop")) {
-      //TODO:workflow      providerJob = networkService.stopNetwork(network.getProviderAssignedId());
-      //TODO:workflow  }
-      //TODO:workflow} catch (ConnectorException e) {
-      //TODO:workflow   NetworkManager.logger.error("Failed to " + action + " network: ", e);
-      //TODO:workflow   throw new CloudProviderException(e.getMessage());
-      //TODO:workflow}
+        // TODO:workflow try {
+        // TODO:workflow INetworkService networkService =
+        // connector.getNetworkService();
+        // TODO:workflow if (action.equals("delete")) {
+        // TODO:workflow providerJob =
+        // networkService.deleteNetwork(network.getProviderAssignedId());
+        // TODO:workflow } else if (action.equals("start")) {
+        // TODO:workflow providerJob =
+        // networkService.startNetwork(network.getProviderAssignedId());
+        // TODO:workflow } else if (action.equals("stop")) {
+        // TODO:workflow providerJob =
+        // networkService.stopNetwork(network.getProviderAssignedId());
+        // TODO:workflow }
+        // TODO:workflow} catch (ConnectorException e) {
+        // TODO:workflow NetworkManager.logger.error("Failed to " + action +
+        // " network: ", e);
+        // TODO:workflow throw new CloudProviderException(e.getMessage());
+        // TODO:workflow}
 
         // if by change the job is done and has failed, bail out
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
@@ -395,16 +420,16 @@ public class NetworkManager implements INetworkManager {
     @Override
     public NetworkConfiguration createNetworkConfiguration(final NetworkConfiguration networkConfig)
         throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
         if (networkConfig.getName() != null) {
-            if (!this.em.createQuery("SELECT v FROM NetworkConfiguration v WHERE v.user.username=:username AND v.name=:name")
-                .setParameter("username", user.getUsername()).setParameter("name", networkConfig.getName()).getResultList()
+            if (!this.em.createQuery("SELECT v FROM NetworkConfiguration v WHERE v.tenant.id=:tenantId AND v.name=:name")
+                .setParameter("tenantId", tenant.getId()).setParameter("name", networkConfig.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("NetworkConfiguration already exists with name " + networkConfig.getName());
             }
         }
-        networkConfig.setUser(user);
+        networkConfig.setTenant(tenant);
         networkConfig.setCreated(new Date());
         this.em.persist(networkConfig);
         this.em.flush();
@@ -413,8 +438,8 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkConfiguration> getNetworkConfigurations() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM NetworkConfiguration v WHERE v.user.username=:username ORDER BY v.id")
-            .setParameter("username", this.getUser().getUsername()).getResultList();
+        return this.em.createQuery("SELECT v FROM NetworkConfiguration v WHERE v.tenant.id=:tenantId ORDER BY v.id")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -438,7 +463,8 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkConfiguration",
             NetworkConfiguration.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
+                .returnPublicEntities());
     }
 
     @Override
@@ -475,16 +501,16 @@ public class NetworkManager implements INetworkManager {
     @Override
     public NetworkTemplate createNetworkTemplate(final NetworkTemplate networkTemplate) throws InvalidRequestException,
         CloudProviderException {
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
         if (networkTemplate.getName() != null) {
-            if (!this.em.createQuery("SELECT  v FROM NetworkTemplate v WHERE v.user.username=:username AND v.name=:name")
-                .setParameter("username", user.getUsername()).setParameter("name", networkTemplate.getName()).getResultList()
+            if (!this.em.createQuery("SELECT  v FROM NetworkTemplate v WHERE v.tenant.id=:tenantId AND v.name=:name")
+                .setParameter("tenantId", tenant.getId()).setParameter("name", networkTemplate.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("NetworkTemplate already exists with name " + networkTemplate.getName());
             }
         }
-        networkTemplate.setUser(user);
+        networkTemplate.setTenant(tenant);
         networkTemplate.setCreated(new Date());
         this.em.persist(networkTemplate);
         this.em.flush();
@@ -495,8 +521,8 @@ public class NetworkManager implements INetworkManager {
     public List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException {
         return this.em
             .createQuery(
-                "SELECT v FROM NetworkTemplate v WHERE v.user.username=:username AND v.isEmbeddedInSystemTemplate=false ORDER BY v.id")
-            .setParameter("username", this.getUser().getUsername()).getResultList();
+                "SELECT v FROM NetworkTemplate v WHERE v.tenant.id=:tenantId AND v.isEmbeddedInSystemTemplate=false ORDER BY v.id")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -517,15 +543,15 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<NetworkTemplate> getNetworkTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
             .builder("NetworkTemplate", NetworkTemplate.class);
 
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
-                .filterEmbbededTemplate());
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate().returnPublicEntities());
         // return UtilsForManagers.getEntityList("NetworkTemplate",
-        // NetworkTemplate.class, this.em, user.getUsername(), first,
+        // NetworkTemplate.class, this.em, user.getId(), first,
         // last, filters, attributes, false);
     }
 
@@ -567,26 +593,31 @@ public class NetworkManager implements INetworkManager {
 
         this.validateNetworkPortTemplate(networkPortCreate.getNetworkPortTemplate());
 
-        // retrieve user
-        User user = this.getUser();
+        // retrieve tenant
+        Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(networkPortCreate.getProperties());
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
-      //TODO:workflowif (connector == null) {
-      //TODO:workflow    throw new CloudProviderException("Cannot retrieve cloud provider connector "
-      //TODO:workflow       + placement.getAccount().getCloudProvider().getCloudProviderType());
-      //TODO:workflow}
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(),
+            networkPortCreate.getProperties());
+        ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
+                                                 // placement.getLocation());
+        if (connector == null) {
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
+        }
 
         // delegates network port creation to cloud provider connector
         Job providerJob = null;
 
-      //TODO:workflowtry {
-      //TODO:workflow    INetworkService networkService = connector.getNetworkService();
-      //TODO:workflow    providerJob = networkService.createNetworkPort(networkPortCreate);
-      //TODO:workflow} catch (ConnectorException e) {
-      //TODO:workflow    NetworkManager.logger.error("Failed to create network port: ", e);
-      //TODO:workflow    throw new CloudProviderException(e.getMessage());
-      //TODO:workflow}
+        // TODO:workflowtry {
+        // TODO:workflow INetworkService networkService =
+        // connector.getNetworkService();
+        // TODO:workflow providerJob =
+        // networkService.createNetworkPort(networkPortCreate);
+        // TODO:workflow} catch (ConnectorException e) {
+        // TODO:workflow
+        // NetworkManager.logger.error("Failed to create network port: ", e);
+        // TODO:workflow throw new CloudProviderException(e.getMessage());
+        // TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -599,7 +630,7 @@ public class NetworkManager implements INetworkManager {
         networkPort.setDescription(networkPortCreate.getDescription());
         networkPort.setProperties(networkPortCreate.getProperties() == null ? new HashMap<String, String>()
             : new HashMap<String, String>(networkPortCreate.getProperties()));
-        networkPort.setUser(user);
+        networkPort.setTenant(tenant);
 
         networkPort.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         networkPort.setCloudProviderAccount(placement.getAccount());
@@ -641,23 +672,29 @@ public class NetworkManager implements INetworkManager {
         }
 
         // delegates volume deletion to cloud provider connector
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
-      //TODO:workflow    networkPort.getLocation());
+        // TODO:workflowICloudProviderConnector connector =
+        // this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
+        // TODO:workflow networkPort.getLocation());
         Job providerJob = null;
 
-      //TODO:workflow try {
-      //TODO:workflow   INetworkService networkService = connector.getNetworkService();
-      //TODO:workflow  if (action.equals("delete")) {
-      //TODO:workflow     providerJob = networkService.deleteNetworkPort(networkPort.getProviderAssignedId());
-      //TODO:workflow } else if (action.equals("start")) {
-      //TODO:workflow     providerJob = networkService.startNetworkPort(networkPort.getProviderAssignedId());
-      //TODO:workflow } else if (action.equals("stop")) {
-      //TODO:workflow     providerJob = networkService.stopNetworkPort(networkPort.getProviderAssignedId());
-      //TODO:workflow }
-      //TODO:workflow} catch (ConnectorException e) {
-      //TODO:workflow    NetworkManager.logger.error("Failed to " + action + " network: ", e);
-      //TODO:workflow   throw new CloudProviderException(e.getMessage());
-      //TODO:workflow}
+        // TODO:workflow try {
+        // TODO:workflow INetworkService networkService =
+        // connector.getNetworkService();
+        // TODO:workflow if (action.equals("delete")) {
+        // TODO:workflow providerJob =
+        // networkService.deleteNetworkPort(networkPort.getProviderAssignedId());
+        // TODO:workflow } else if (action.equals("start")) {
+        // TODO:workflow providerJob =
+        // networkService.startNetworkPort(networkPort.getProviderAssignedId());
+        // TODO:workflow } else if (action.equals("stop")) {
+        // TODO:workflow providerJob =
+        // networkService.stopNetworkPort(networkPort.getProviderAssignedId());
+        // TODO:workflow }
+        // TODO:workflow} catch (ConnectorException e) {
+        // TODO:workflow NetworkManager.logger.error("Failed to " + action +
+        // " network: ", e);
+        // TODO:workflow throw new CloudProviderException(e.getMessage());
+        // TODO:workflow}
 
         // if by change the job is done and has failed, bail out
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
@@ -717,7 +754,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPort> getNetworkPorts() throws CloudProviderException {
-        return QueryHelper.getEntityList("NetworkPort", this.em, this.getUser().getUsername(), NetworkPort.State.DELETED);
+        return QueryHelper.getEntityList("NetworkPort", this.em, this.getTenant().getId(), NetworkPort.State.DELETED, false);
     }
 
     @Override
@@ -740,7 +777,7 @@ public class NetworkManager implements INetworkManager {
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPort", NetworkPort.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(NetworkPort.State.DELETED));
     }
 
@@ -770,18 +807,17 @@ public class NetworkManager implements INetworkManager {
     @Override
     public NetworkPortConfiguration createNetworkPortConfiguration(final NetworkPortConfiguration networkPortConfiguration)
         throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
         if (networkPortConfiguration.getName() != null) {
-            if (!this.em
-                .createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.user.username=:username AND v.name=:name")
-                .setParameter("username", user.getUsername()).setParameter("name", networkPortConfiguration.getName())
+            if (!this.em.createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.tenant.id=:tenantId AND v.name=:name")
+                .setParameter("tenantId", tenant.getId()).setParameter("name", networkPortConfiguration.getName())
                 .getResultList().isEmpty()) {
                 throw new CloudProviderException("NetworkPortConfiguration already exists with name "
                     + networkPortConfiguration.getName());
             }
         }
-        networkPortConfiguration.setUser(user);
+        networkPortConfiguration.setTenant(tenant);
         networkPortConfiguration.setCreated(new Date());
         this.em.persist(networkPortConfiguration);
         this.em.flush();
@@ -790,8 +826,8 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPortConfiguration> getNetworkPortConfigurations() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.user.username=:username ORDER BY v.id")
-            .setParameter("username", this.getUser().getUsername()).getResultList();
+        return this.em.createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.tenant.id=:tenantId ORDER BY v.id")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -817,7 +853,8 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPortConfiguration",
             NetworkPortConfiguration.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
+                .returnPublicEntities());
     }
 
     @Override
@@ -857,17 +894,17 @@ public class NetworkManager implements INetworkManager {
     @Override
     public NetworkPortTemplate createNetworkPortTemplate(final NetworkPortTemplate networkPortTemplate)
         throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
         if (networkPortTemplate.getName() != null) {
-            if (!this.em.createQuery("SELECT v FROM NetworkPortTemplate v WHERE v.user.username=:username AND v.name=:name")
-                .setParameter("username", user.getUsername()).setParameter("name", networkPortTemplate.getName())
-                .getResultList().isEmpty()) {
+            if (!this.em.createQuery("SELECT v FROM NetworkPortTemplate v WHERE v.tenant.id=:tenantId AND v.name=:name")
+                .setParameter("tenantId", tenant.getId()).setParameter("name", networkPortTemplate.getName()).getResultList()
+                .isEmpty()) {
                 throw new CloudProviderException("NetworkPortTemplate already exists with name "
                     + networkPortTemplate.getName());
             }
         }
-        networkPortTemplate.setUser(user);
+        networkPortTemplate.setTenant(tenant);
         networkPortTemplate.setCreated(new Date());
         this.em.persist(networkPortTemplate);
         this.em.flush();
@@ -876,8 +913,8 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPortTemplate> getNetworkPortTemplates() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM NetworkPortTemplate v WHERE v.user.username=:username ORDER BY v.id")
-            .setParameter("username", this.getUser().getUsername()).getResultList();
+        return this.em.createQuery("SELECT v FROM NetworkPortTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -902,8 +939,8 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPortTemplate",
             NetworkPortTemplate.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
-                .filterEmbbededTemplate());
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
+                .filterEmbbededTemplate().returnPublicEntities());
     }
 
     @Override
@@ -937,18 +974,17 @@ public class NetworkManager implements INetworkManager {
     @Override
     public ForwardingGroupTemplate createForwardingGroupTemplate(final ForwardingGroupTemplate forwardingGroupTemplate)
         throws InvalidRequestException, CloudProviderException {
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
         if (forwardingGroupTemplate.getName() != null) {
-            if (!this.em
-                .createQuery("SELECT v FROM ForwardingGroupTemplate v WHERE v.user.username=:username AND v.name=:name")
-                .setParameter("username", user.getUsername()).setParameter("name", forwardingGroupTemplate.getName())
+            if (!this.em.createQuery("SELECT v FROM ForwardingGroupTemplate v WHERE v.tenant.id=:tenantId AND v.name=:name")
+                .setParameter("tenantId", tenant.getId()).setParameter("name", forwardingGroupTemplate.getName())
                 .getResultList().isEmpty()) {
                 throw new CloudProviderException("ForwardingGroupTemplate already exists with name "
                     + forwardingGroupTemplate.getName());
             }
         }
-        forwardingGroupTemplate.setUser(user);
+        forwardingGroupTemplate.setTenant(tenant);
         this.em.persist(forwardingGroupTemplate);
         this.em.flush();
         return forwardingGroupTemplate;
@@ -956,8 +992,8 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<ForwardingGroupTemplate> getForwardingGroupTemplates() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM ForwardingGroupTemplate v WHERE v.user.username=:username ORDER BY v.id")
-            .setParameter("username", this.getUser().getUsername()).getResultList();
+        return this.em.createQuery("SELECT v FROM ForwardingGroupTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -983,7 +1019,7 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("ForwardingGroupTemplate",
             ForwardingGroupTemplate.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .filterEmbbededTemplate());
     }
 
@@ -1021,25 +1057,30 @@ public class NetworkManager implements INetworkManager {
         NetworkManager.logger.info("Creating ForwardingGroup");
 
         // retrieve user
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(forwardingGroupCreate.getProperties());
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount(), placement.getLocation());
-      //TODO:workflowif (connector == null) {
-      //TODO:workflow    throw new CloudProviderException("Cannot retrieve cloud provider connector "
-      //TODO:workflow       + placement.getAccount().getCloudProvider().getCloudProviderType());
-      //TODO:workflow}
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(),
+            forwardingGroupCreate.getProperties());
+        ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
+                                                 // placement.getLocation());
+        if (connector == null) {
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
+        }
 
         // delegates network port creation to cloud provider connector
         Job providerJob = null;
 
-      //TODO:workflowtry {
-      //TODO:workflow    INetworkService networkService = connector.getNetworkService();
-      //TODO:workflow    providerJob = networkService.createForwardingGroup(forwardingGroupCreate);
-      //TODO:workflow} catch (ConnectorException e) {
-      //TODO:workflow    NetworkManager.logger.error("Failed to create ForwardingGroup: ", e);
-      //TODO:workflow    throw new CloudProviderException(e.getMessage());
-      //TODO:workflow}
+        // TODO:workflowtry {
+        // TODO:workflow INetworkService networkService =
+        // connector.getNetworkService();
+        // TODO:workflow providerJob =
+        // networkService.createForwardingGroup(forwardingGroupCreate);
+        // TODO:workflow} catch (ConnectorException e) {
+        // TODO:workflow
+        // NetworkManager.logger.error("Failed to create ForwardingGroup: ", e);
+        // TODO:workflow throw new CloudProviderException(e.getMessage());
+        // TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -1052,7 +1093,7 @@ public class NetworkManager implements INetworkManager {
         forwardingGroup.setDescription(forwardingGroupCreate.getDescription());
         forwardingGroup.setProperties(forwardingGroupCreate.getProperties() == null ? new HashMap<String, String>()
             : new HashMap<String, String>(forwardingGroupCreate.getProperties()));
-        forwardingGroup.setUser(user);
+        forwardingGroup.setTenant(tenant);
 
         forwardingGroup.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         forwardingGroup.setCloudProviderAccount(placement.getAccount());
@@ -1092,8 +1133,8 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<ForwardingGroup> getForwardingGroups() throws CloudProviderException {
-        return QueryHelper.getEntityList("ForwardingGroup", this.em, this.getUser().getUsername(),
-            ForwardingGroup.State.DELETED);
+        return QueryHelper.getEntityList("ForwardingGroup", this.em, this.getTenant().getId(), ForwardingGroup.State.DELETED,
+            false);
     }
 
     @Override
@@ -1118,7 +1159,7 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
             .builder("ForwardingGroup", ForwardingGroup.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(ForwardingGroup.State.DELETED));
     }
 
@@ -1144,17 +1185,22 @@ public class NetworkManager implements INetworkManager {
         }
 
         // delegates ForwardingGroup deletion to cloud provider connector
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-      //TODO:workflow    forwardingGroup.getLocation());
+        // TODO:workflowICloudProviderConnector connector =
+        // this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+        // TODO:workflow forwardingGroup.getLocation());
         Job providerJob = null;
 
-      //TODO:workflow try {
-      //TODO:workflow    INetworkService networkService = connector.getNetworkService();
-      //TODO:workflow    providerJob = networkService.deleteForwardingGroup(forwardingGroup.getProviderAssignedId());
-      //TODO:workflow} catch (ConnectorException e) {
-      //TODO:workflow    NetworkManager.logger.error("Failed to delete forwarding group: ", e);
-      //TODO:workflow   throw new CloudProviderException(e.getMessage());
-      //TODO:workflow}
+        // TODO:workflow try {
+        // TODO:workflow INetworkService networkService =
+        // connector.getNetworkService();
+        // TODO:workflow providerJob =
+        // networkService.deleteForwardingGroup(forwardingGroup.getProviderAssignedId());
+        // TODO:workflow} catch (ConnectorException e) {
+        // TODO:workflow
+        // NetworkManager.logger.error("Failed to delete forwarding group: ",
+        // e);
+        // TODO:workflow throw new CloudProviderException(e.getMessage());
+        // TODO:workflow}
 
         // if by change the job is done and has failed, bail out
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
@@ -1205,18 +1251,23 @@ public class NetworkManager implements INetworkManager {
         this.em.persist(forwardingGroup);
 
         // delegates ForwardingGroup add to cloud provider connector
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-      //TODO:workflow     forwardingGroup.getLocation());
+        // TODO:workflowICloudProviderConnector connector =
+        // this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+        // TODO:workflow forwardingGroup.getLocation());
         Job providerJob = null;
 
-      //TODO:workflow try {
-      //TODO:workflow   INetworkService networkService = connector.getNetworkService();
-      //TODO:workflow   providerJob = networkService.addNetworkToForwardingGroup(forwardingGroup.getProviderAssignedId(),
-      //TODO:workflow       forwardingGroupNetwork);
-      //TODO:workflow} catch (ConnectorException e) {
-      //TODO:workflow     NetworkManager.logger.error("Failed to add network to forwarding group: ", e);
-      //TODO:workflow    throw new CloudProviderException(e.getMessage());
-      //TODO:workflow}
+        // TODO:workflow try {
+        // TODO:workflow INetworkService networkService =
+        // connector.getNetworkService();
+        // TODO:workflow providerJob =
+        // networkService.addNetworkToForwardingGroup(forwardingGroup.getProviderAssignedId(),
+        // TODO:workflow forwardingGroupNetwork);
+        // TODO:workflow} catch (ConnectorException e) {
+        // TODO:workflow
+        // NetworkManager.logger.error("Failed to add network to forwarding group: ",
+        // e);
+        // TODO:workflow throw new CloudProviderException(e.getMessage());
+        // TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -1261,18 +1312,24 @@ public class NetworkManager implements INetworkManager {
         forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.DETACHING);
 
         // delegates ForwardingGroup deletion to cloud provider connector
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-      //TODO:workflow    forwardingGroup.getLocation());
+        // TODO:workflowICloudProviderConnector connector =
+        // this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+        // TODO:workflow forwardingGroup.getLocation());
         Job providerJob = null;
 
-      //TODO:workflowtry {
-      //TODO:workflow   INetworkService networkService = connector.getNetworkService();
-      //TODO:workflow    providerJob = networkService.removeNetworkFromForwardingGroup(forwardingGroup.getProviderAssignedId(),
-      //TODO:workflow       forwardingGroupNetwork.getNetwork().getProviderAssignedId());
-      //TODO:workflow} catch (ConnectorException e) {
-      //TODO:workflow   NetworkManager.logger.error("Failed to remove network from forwarding group: ", e);
-      //TODO:workflow    throw new CloudProviderException(e.getMessage());
-      //TODO:workflow}
+        // TODO:workflowtry {
+        // TODO:workflow INetworkService networkService =
+        // connector.getNetworkService();
+        // TODO:workflow providerJob =
+        // networkService.removeNetworkFromForwardingGroup(forwardingGroup.getProviderAssignedId(),
+        // TODO:workflow
+        // forwardingGroupNetwork.getNetwork().getProviderAssignedId());
+        // TODO:workflow} catch (ConnectorException e) {
+        // TODO:workflow
+        // NetworkManager.logger.error("Failed to remove network from forwarding group: ",
+        // e);
+        // TODO:workflow throw new CloudProviderException(e.getMessage());
+        // TODO:workflow}
 
         if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
             throw new CloudProviderException(providerJob.getStatusMessage());
@@ -1315,8 +1372,8 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<Address> getAddresses() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM Address v WHERE v.user.username=:username ORDER BY v.id")
-            .setParameter("username", this.getUser().getUsername()).getResultList();
+        return this.em.createQuery("SELECT v FROM Address v WHERE v.tenant.id=:tenantId ORDER BY v.id")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -1339,7 +1396,7 @@ public class NetworkManager implements INetworkManager {
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Address", Address.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes));
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
     @Override
@@ -1369,16 +1426,16 @@ public class NetworkManager implements INetworkManager {
     @Override
     public AddressTemplate createAddressTemplate(final AddressTemplate addressTemplate) throws InvalidRequestException,
         CloudProviderException {
-        User user = this.getUser();
+        Tenant tenant = this.getTenant();
 
         if (addressTemplate.getName() != null) {
-            if (!this.em.createQuery("SELECT v FROM AddressTemplate v WHERE v.user.username=:username AND v.name=:name")
-                .setParameter("username", user.getUsername()).setParameter("name", addressTemplate.getName()).getResultList()
+            if (!this.em.createQuery("SELECT v FROM AddressTemplate v WHERE v.tenant.id=:tenantId AND v.name=:name")
+                .setParameter("tenantId", tenant.getId()).setParameter("name", addressTemplate.getName()).getResultList()
                 .isEmpty()) {
                 throw new CloudProviderException("AddressTemplate already exists with name " + addressTemplate.getName());
             }
         }
-        addressTemplate.setUser(user);
+        addressTemplate.setTenant(tenant);
         addressTemplate.setCreated(new Date());
         this.em.persist(addressTemplate);
         this.em.flush();
@@ -1387,8 +1444,8 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<AddressTemplate> getAddressTemplates() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM AddressTemplate v WHERE v.user.username=:username ORDER BY v.id")
-            .setParameter("username", this.getUser().getUsername()).getResultList();
+        return this.em.createQuery("SELECT v FROM AddressTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id")
+            .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
@@ -1412,7 +1469,7 @@ public class NetworkManager implements INetworkManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
             .builder("AddressTemplate", AddressTemplate.class);
         return QueryHelper.getEntityList(this.em,
-            params.userName(this.getUser().getUsername()).first(first).last(last).filter(filters).attributes(attributes)
+            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .filterEmbbededTemplate());
     }
 
@@ -1485,13 +1542,14 @@ public class NetworkManager implements INetworkManager {
         }
 
         // update Network entity
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount(),
-      //TODO:workflow    network.getLocation());
+        // TODO:workflowICloudProviderConnector connector =
+        // this.getCloudProviderConnector(network.getCloudProviderAccount(),
+        // TODO:workflow network.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                	//TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
+                    // TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
                     network.setCreated(new Date());
                     this.em.persist(network);
                 } catch (Exception ex) {
@@ -1507,7 +1565,7 @@ public class NetworkManager implements INetworkManager {
         if (providerJob.getAction().equals("start")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                	//TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
+                    // TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
                     network.setUpdated(new Date());
                     this.em.persist(network);
                 } catch (Exception ex) {
@@ -1523,7 +1581,7 @@ public class NetworkManager implements INetworkManager {
         if (providerJob.getAction().equals("stop")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                	//TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
+                    // TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
                     network.setUpdated(new Date());
                     this.em.persist(network);
                 } catch (Exception ex) {
@@ -1564,14 +1622,15 @@ public class NetworkManager implements INetworkManager {
         }
 
         // update NetworkPort entity
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
-      //TODO:workflow   networkPort.getLocation());
+        // TODO:workflowICloudProviderConnector connector =
+        // this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
+        // TODO:workflow networkPort.getLocation());
 
         if (providerJob.getAction().equals("add")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                	//TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
-                	//TODO:workflow    .getState());
+                    // TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
+                    // TODO:workflow .getState());
                     networkPort.setCreated(new Date());
                     this.em.persist(networkPort);
                 } catch (Exception ex) {
@@ -1587,8 +1646,8 @@ public class NetworkManager implements INetworkManager {
         if (providerJob.getAction().equals("start")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                	//TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
-                	//TODO:workflow    .getState());
+                    // TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
+                    // TODO:workflow .getState());
                     networkPort.setUpdated(new Date());
                     this.em.persist(networkPort);
                 } catch (Exception ex) {
@@ -1604,8 +1663,8 @@ public class NetworkManager implements INetworkManager {
         if (providerJob.getAction().equals("stop")) {
             if (providerJob.getState() == Job.Status.SUCCESS) {
                 try {
-                	//TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
-                	//TODO:workflow    .getState());
+                    // TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
+                    // TODO:workflow .getState());
                     networkPort.setUpdated(new Date());
                     this.em.persist(networkPort);
                 } catch (Exception ex) {
@@ -1645,8 +1704,9 @@ public class NetworkManager implements INetworkManager {
             return false;
         }
 
-      //TODO:workflowICloudProviderConnector connector = this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-      //TODO:workflow  forwardingGroup.getLocation());
+        // TODO:workflowICloudProviderConnector connector =
+        // this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
+        // TODO:workflow forwardingGroup.getLocation());
 
         Network affectedNetwork = null;
         if (providerJob.getAffectedResources().size() == 1
@@ -1659,8 +1719,9 @@ public class NetworkManager implements INetworkManager {
             if (affectedNetwork == null) {
                 if (providerJob.getState() == Job.Status.SUCCESS) {
                     try {
-                    	//TODO:workflowforwardingGroup.setState(connector.getNetworkService()
-                    	//TODO:workflow   .getForwardingGroup(forwardingGroup.getProviderAssignedId()).getState());
+                        // TODO:workflowforwardingGroup.setState(connector.getNetworkService()
+                        // TODO:workflow
+                        // .getForwardingGroup(forwardingGroup.getProviderAssignedId()).getState());
                         forwardingGroup.setCreated(new Date());
                         this.em.persist(forwardingGroup);
                     } catch (Exception ex) {
@@ -1762,7 +1823,7 @@ public class NetworkManager implements INetworkManager {
         CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("ForwardingGroupNetwork",
             ForwardingGroupNetwork.class);
-        return QueryHelper.getCollectionItemList(this.em, params.userName(this.getUser().getUsername()).first(first).last(last)
+        return QueryHelper.getCollectionItemList(this.em, params.tenantId(this.getTenant().getId()).first(first).last(last)
             .filter(filters).attributes(attributes).containerType("ForwardingGroup").containerId(forwardingGroupId)
             .containerAttributeName("networks"));
     }

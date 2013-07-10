@@ -93,30 +93,25 @@
                         </execution>
                     </executions>
                 </plugin>
-		 <plugin> <!-- Need to use this plugin to build war files -->
+<!--                
+		 <plugin> 
                     <artifactId>maven-war-plugin</artifactId>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <!-- Use version 2.1-beta-1, as it supports the new property failOnMissingWebXml -->
                     <version>2.1-beta-1</version>
                     <configuration>
                         <archive>
-                            <!-- add bundle plugin generated manifest to the war -->
                             <manifestFile>
                                 ${project.build.outputDirectory}/META-INF/MANIFEST.MF
                             </manifestFile>
-                            <!-- For some reason, adding Bundle-ClassPath in maven-bundle-plugin
-                            confuses that plugin and it generates wrong Import-Package, etc.
-                            So, we generate it here.
-                            -->
                             <manifestEntries>
                                 <Bundle-ClassPath>WEB-INF/classes/
                                 </Bundle-ClassPath>
                             </manifestEntries>
                         </archive>
-                    <!-- We don't have a web.xml -->
                     <failOnMissingWebXml>false</failOnMissingWebXml>
                     </configuration>
                 </plugin>
+-->              
 <!--
 		  <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
