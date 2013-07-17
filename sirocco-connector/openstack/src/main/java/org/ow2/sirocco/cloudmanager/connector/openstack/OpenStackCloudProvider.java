@@ -12,6 +12,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
@@ -41,6 +42,8 @@ import com.woorea.openstack.nova.model.KeyPair;
 import com.woorea.openstack.nova.model.Server;
 import com.woorea.openstack.nova.model.Server.Addresses.Address;
 import com.woorea.openstack.nova.model.ServerForCreate;
+import com.woorea.openstack.nova.model.VolumeAttachment;
+import com.woorea.openstack.nova.model.VolumeAttachments;
 import com.woorea.openstack.nova.model.VolumeForCreate;
 
 public class OpenStackCloudProvider {
@@ -125,6 +128,105 @@ public class OpenStackCloudProvider {
     //
     // Compute Service
     //
+
+	public Machine.State fromServerStatusToMachineState(final String novaStatus) {
+    	if (novaStatus.equalsIgnoreCase("ACTIVE")){
+            return Machine.State.STARTED;
+    	} else if (novaStatus.equalsIgnoreCase("BUILD")){
+            return Machine.State.CREATING;
+    	} else if (novaStatus.equalsIgnoreCase("DELETED")){
+            return Machine.State.DELETED;
+    	} else if (novaStatus.equalsIgnoreCase("HARD_REBOOT")){
+            return Machine.State.STARTED;
+    	} else if (novaStatus.equalsIgnoreCase("PASSWORD")){
+            return Machine.State.STARTED;
+    	} else if (novaStatus.equalsIgnoreCase("REBOOT")){
+            return Machine.State.STARTED;
+    	} else if (novaStatus.equalsIgnoreCase("SUSPENDED")){
+            return Machine.State.STOPPED;
+    	} else {
+            return Machine.State.ERROR; // CIMI mapping!
+    	}
+	}
+
+    private void fromServerToMachine(final String serverId, final Machine machine) {
+        Server server = novaClient.servers().show(serverId).execute(); // get a fresh server
+    	
+    	machine.setProviderAssignedId(serverId);
+    	machine.setName(server.getName());
+        machine.setState(this.fromServerStatusToMachineState(server.getStatus())); 
+
+        // HW
+        //Flavor flavor = server.getFlavor(); // doesn't work (check if woorea support a lazy instantiation mode (of the object of the model) 
+        Flavor flavor = novaClient.flavors().show(server.getFlavor().getId()).execute();
+        /*logger.info("flavor: " + flavor);*/		
+
+        machine.setCpu(new Integer(flavor.getVcpus()));
+        machine.setMemory(flavor.getRam() * 1024);
+        List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
+        MachineDisk machineDisk = new MachineDisk();
+        machineDisk.setCapacity(new Integer(flavor.getDisk()) * 1000);  
+        machineDisks.add(machineDisk);
+        if (flavor.getEphemeral() > 0){
+            MachineDisk machineEphemeralDisk = new MachineDisk();
+            machineEphemeralDisk.setCapacity(flavor.getEphemeral() * 1000);  
+            machineDisks.add(machineEphemeralDisk);
+        	
+        }
+        machine.setDisks(machineDisks);
+
+        // Network without Quantum
+        // assumption: first IP address is private, next addresses are public (floating IPs)
+        List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
+        machine.setNetworkInterfaces(nics);
+        MachineNetworkInterface privateNic = new MachineNetworkInterface();
+        privateNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
+        privateNic.setNetwork(this.cimiPrivateNetwork);
+        //privateNic.setNetworkType(Network.Type.PRIVATE);
+        privateNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
+        MachineNetworkInterface publicNic = new MachineNetworkInterface();
+        publicNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
+        publicNic.setNetwork(this.cimiPublicNetwork);
+        //publicNic.setNetworkType(Network.Type.PUBLIC);
+        publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
+         for (String networkType : server.getAddresses().getAddresses().keySet()) {
+            Collection<Address> addresses = server.getAddresses().getAddresses().get(networkType);
+            logger.info("-- " + addresses);
+            Iterator<Address> iterator = addresses.iterator();
+            if (iterator.hasNext()) {
+                this.addAddress(iterator.next(), this.cimiPrivateNetwork, privateNic);
+            }
+            while (iterator.hasNext()) {
+                this.addAddress(iterator.next(), this.cimiPublicNetwork, publicNic);
+            }
+        }
+        if (privateNic.getAddresses().size() > 0) {
+            nics.add(privateNic);
+        }
+        if (publicNic.getAddresses().size() > 0) {
+            nics.add(publicNic);
+        }
+        
+        // Volume
+        List<MachineVolume> machineVolumes = new ArrayList<MachineVolume>();
+        machine.setVolumes(machineVolumes);
+        VolumeAttachments volumeAttachments = novaClient.servers().listVolumeAttachments(serverId).execute();
+        Iterator<VolumeAttachment> iterator = volumeAttachments.iterator();
+        while (iterator.hasNext()) {
+        	VolumeAttachment volumeAttachment = iterator.next();
+            MachineVolume machineVolume = new MachineVolume(); 
+            Volume volume = this.getVolume(volumeAttachment.getVolumeId()); 
+            machineVolume.setVolume(volume);
+            machineVolume.setProviderAssignedId(volumeAttachment.getId());
+            machineVolume.setState(MachineVolume.State.ATTACHED);
+            machineVolume.setInitialLocation(volumeAttachment.getDevice());
+            machineVolumes.add(machineVolume);
+        }
+        
+        /* FIXME 
+         * - Network with Quantum
+         * */        
+    }
 
 	public Machine createMachine(MachineCreate machineCreate) throws ConnectorException, InterruptedException {
         logger.info("creating Machine for " + cloudProviderAccount.getLogin());
@@ -211,25 +313,7 @@ public class OpenStackCloudProvider {
 	public Machine.State getMachineState(String machineId) {
         //Server server = getServer(machineId);
         Server server = novaClient.servers().show(machineId).execute(); 
-    	String status = server.getStatus();
-    	
-    	if (status.equalsIgnoreCase("ACTIVE")){
-            return Machine.State.STARTED;
-    	} else if (status.equalsIgnoreCase("BUILD")){
-            return Machine.State.CREATING;
-    	} else if (status.equalsIgnoreCase("DELETED")){
-            return Machine.State.DELETED;
-    	} else if (status.equalsIgnoreCase("HARD_REBOOT")){
-            return Machine.State.STARTED;
-    	} else if (status.equalsIgnoreCase("PASSWORD")){
-            return Machine.State.STARTED;
-    	} else if (status.equalsIgnoreCase("REBOOT")){
-            return Machine.State.STARTED;
-    	} else if (status.equalsIgnoreCase("SUSPENDED")){
-            return Machine.State.STOPPED;
-    	} else {
-            return Machine.State.ERROR; // CIMI mapping!
-    	}
+		return fromServerStatusToMachineState(server.getStatus());
 	}
 
 	public void deleteMachine(String machineId) {
@@ -247,78 +331,12 @@ public class OpenStackCloudProvider {
         if (device == null) {
             throw new ConnectorException("device not specified");
         }
-		novaClient.servers().attachVolume(machineId, machineVolume.getProviderAssignedId(), device);
+		novaClient.servers().attachVolume(machineId, machineVolume.getVolume().getProviderAssignedId(), device).execute();
 	}
 	
 	public void removeVolumeFromMachine(String machineId, MachineVolume machineVolume) {
 		novaClient.servers().detachVolume(machineId, machineVolume.getProviderAssignedId());
 	}
-
-    private void fromServerToMachine(final String serverId, final Machine machine) {
-        Server server = novaClient.servers().show(serverId).execute(); // get a fresh server
-    	
-    	machine.setProviderAssignedId(serverId);
-    	machine.setName(server.getName());
-        machine.setState(this.getMachineState(serverId)); 
-
-        // HW
-        //Flavor flavor = server.getFlavor(); // doesn't work (check if woorea support a lazy instantiation mode (of the object of the model) 
-        Flavor flavor = novaClient.flavors().show(server.getFlavor().getId()).execute();
-        /*logger.info("flavor: " + flavor);*/		
-
-        machine.setCpu(new Integer(flavor.getVcpus()));
-        machine.setMemory(flavor.getRam() * 1024);
-        List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
-        MachineDisk machineDisk = new MachineDisk();
-        machineDisk.setCapacity(new Integer(flavor.getDisk()) * 1000);  
-        machineDisks.add(machineDisk);
-        if (flavor.getEphemeral() > 0){
-            MachineDisk machineEphemeralDisk = new MachineDisk();
-            machineEphemeralDisk.setCapacity(flavor.getEphemeral() * 1000);  
-            machineDisks.add(machineEphemeralDisk);
-        	
-        }
-        machine.setDisks(machineDisks);
-
-        // Network 
-        List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
-        machine.setNetworkInterfaces(nics);
-        MachineNetworkInterface privateNic = new MachineNetworkInterface();
-        privateNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
-        privateNic.setNetwork(this.cimiPrivateNetwork);
-        //privateNic.setNetworkType(Network.Type.PRIVATE);
-        privateNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
-        MachineNetworkInterface publicNic = new MachineNetworkInterface();
-        publicNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
-        publicNic.setNetwork(this.cimiPublicNetwork);
-        //publicNic.setNetworkType(Network.Type.PUBLIC);
-        publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
-
-        // FIXME assumption: first IP address is private, next addresses are public (floating IPs)
-         for (String networkType : server.getAddresses().getAddresses().keySet()) {
-            Collection<Address> addresses = server.getAddresses().getAddresses().get(networkType);
-            logger.info("-- " + addresses);
-            Iterator<Address> iterator = addresses.iterator();
-            if (iterator.hasNext()) {
-                this.addAddress(iterator.next(), this.cimiPrivateNetwork, privateNic);
-            }
-            while (iterator.hasNext()) {
-                this.addAddress(iterator.next(), this.cimiPublicNetwork, publicNic);
-            }
-        }
-
-        if (privateNic.getAddresses().size() > 0) {
-            nics.add(privateNic);
-        }
-        if (publicNic.getAddresses().size() > 0) {
-            nics.add(publicNic);
-        }
-        
-        /* FIXME 
-         * - volume & machineVolume
-         * - Network with Quantum
-         * */        
-    }
     
     private void addAddress(final Address address, final Network cimiNetwork, final MachineNetworkInterface nic) {
         org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
@@ -467,6 +485,32 @@ public class OpenStackCloudProvider {
     //
     // Volume
     //
+
+    private Volume.State fromNovaVolumeStatusToCimiVolumeState(final String novaStatus) {
+    	if (novaStatus.equalsIgnoreCase("AVAILABLE")){
+            return Volume.State.AVAILABLE;
+    	} else if (novaStatus.equalsIgnoreCase("CREATING")){
+            return Volume.State.CREATING;
+    	} else if (novaStatus.equalsIgnoreCase("DELETING")){
+            return Volume.State.DELETING;
+    	} else if (novaStatus.equalsIgnoreCase("IN-USE")){ // FIXME IN_USE vs IN-USE
+            return Volume.State.AVAILABLE; 
+    	} else {
+            return Volume.State.ERROR; // CIMI mapping!
+    	}
+    }
+
+    private void fromNovaVolumeToCimiVolume(final String volumeId, final Volume cimiVolume) { 
+		com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().show(volumeId).execute();
+
+		cimiVolume.setName(novaVolume.getName());
+		cimiVolume.setDescription(novaVolume.getDescription());
+		cimiVolume.setProviderAssignedId(novaVolume.getId());
+        //cimiVolume.setState(this.getVolumeState(volumeId));
+        cimiVolume.setState(fromNovaVolumeStatusToCimiVolumeState(novaVolume.getStatus()));
+        // GB to KB
+        cimiVolume.setCapacity(novaVolume.getSize() * 1000 * 1000);
+    }
     
 	public Volume createVolume(VolumeCreate volumeCreate) throws ConnectorException{
         logger.info("creating Machine for " + cloudProviderAccount.getLogin());
@@ -486,7 +530,7 @@ public class OpenStackCloudProvider {
         int sizeInGB = volumeConfig.getCapacity() / (1000 * 1000);
         volumeForCreate.setSize(new Integer(sizeInGB));
         
-        com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().create(volumeForCreate).execute(); // // TODO when supported by woorea (VolumeForCreate)
+        com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().create(volumeForCreate).execute(); 
 		
         final Volume cimiVolume = new Volume();
         fromNovaVolumeToCimiVolume(novaVolume.getId(), cimiVolume); 
@@ -499,35 +543,13 @@ public class OpenStackCloudProvider {
         return volume;
 	}
 
-	public Volume.State getVolumeState(final String volumeId) { // FIXME pattern de refresh
+	public Volume.State getVolumeState(final String volumeId) { 
 		com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().show(volumeId).execute();
-		String status = novaVolume.getStatus();
-		
-    	if (status.equalsIgnoreCase("AVAILABLE")){
-            return Volume.State.AVAILABLE;
-    	} else if (status.equalsIgnoreCase("CREATING")){
-            return Volume.State.CREATING;
-    	} else if (status.equalsIgnoreCase("DELETING")){
-            return Volume.State.DELETING;
-    	} else if (status.equalsIgnoreCase("IN_USE")){
-            return Volume.State.AVAILABLE; 
-    	} else {
-            return Volume.State.ERROR; // CIMI mapping!
-    	}
+		return fromNovaVolumeStatusToCimiVolumeState(novaVolume.getStatus());
 	}
 	
 	public void deleteVolume(String volumeId) {
         novaClient.volumes().delete(volumeId).execute(); 
 	}
 
-    private void fromNovaVolumeToCimiVolume(final String volumeId, final Volume cimiVolume) { 
-		com.woorea.openstack.nova.model.Volume novaVolume = novaClient.volumes().show(volumeId).execute();
-
-		cimiVolume.setName(novaVolume.getName());
-		cimiVolume.setDescription(novaVolume.getDescription());
-		cimiVolume.setProviderAssignedId(novaVolume.getId());
-        cimiVolume.setState(this.getVolumeState(volumeId));
-        // GB to KB
-        cimiVolume.setCapacity(novaVolume.getSize() * 1000 * 1000);
-    }
 }

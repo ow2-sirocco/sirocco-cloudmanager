@@ -37,22 +37,22 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
             throw new ConnectorException("target.account or target.location is null");
     	}
         for (OpenStackCloudProvider provider : this.openstackCPs) {
-            /*if (provider.getCloudProviderAccount().equals(target.getAccount())
+            if (provider.getCloudProviderAccount().equals(target.getAccount())
                 && provider.getCloudProviderLocation().equals(target.getLocation())) {
                 return provider;
-            }*/
-            if (provider.getCloudProviderAccount().getId().equals(target.getAccount().getId())) {
+            }
+            /*if (provider.getCloudProviderAccount().getId().equals(target.getAccount().getId())) { // FIXME nullpointerException if ID == null 
             	// location can be null?
             	if (provider.getCloudProviderLocation() != target.getLocation()) {
             		if (target.getLocation() != null) {
             			if (provider.getCloudProviderLocation().getId().equals(target.getLocation().getId())) {
             				return provider;
-            				}
             			}
             		}
-            	} else {
-            		return provider;
             	}
+            } else {
+            	return provider;
+            }*/
         }
         OpenStackCloudProvider provider = new OpenStackCloudProvider(target);
         this.openstackCPs.add(provider);
@@ -60,16 +60,12 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
     
     /* TODO
-     * Volume
-     * - implem & test
-     * 
      * Network
      * - Quantum 
-     * - Convention without Quantum
      * 
      * Compute
      * - reboot: when supported by woorea 
-     * - getMachine: ephemeral, network, volume
+     * - Network with/without Quantum
      * 
      * Mix
      * - connector cache
