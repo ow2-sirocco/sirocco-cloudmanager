@@ -105,7 +105,8 @@ public class OpenStackCloudProvider {
 			System.out.println(image);
 		}*/
 
-        this.cimiPrivateNetwork = new Network();
+        // FIXME without Quantum: mapping to a backend network
+		this.cimiPrivateNetwork = new Network();
         this.cimiPrivateNetwork.setProviderAssignedId("0");
         this.cimiPrivateNetwork.setState(Network.State.STARTED);
         this.cimiPrivateNetwork.setNetworkType(Network.Type.PRIVATE);
@@ -175,7 +176,7 @@ public class OpenStackCloudProvider {
         }
         machine.setDisks(machineDisks);
 
-        // Network without Quantum
+        // Network (without Quantum)
         // assumption: first IP address is private, next addresses are public (floating IPs)
         List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
         machine.setNetworkInterfaces(nics);
@@ -300,7 +301,7 @@ public class OpenStackCloudProvider {
         return machine;
         
         /* FIXME 
-         * - Network : with Quantum & conventions without Quantum
+         * - Network with Quantum & conventions without Quantum
          * */        
 	}
 
@@ -493,7 +494,7 @@ public class OpenStackCloudProvider {
             return Volume.State.CREATING;
     	} else if (novaStatus.equalsIgnoreCase("DELETING")){
             return Volume.State.DELETING;
-    	} else if (novaStatus.equalsIgnoreCase("IN-USE")){ // FIXME IN_USE vs IN-USE
+    	} else if (novaStatus.equalsIgnoreCase("IN-USE")){ 
             return Volume.State.AVAILABLE; 
     	} else {
             return Volume.State.ERROR; // CIMI mapping!
