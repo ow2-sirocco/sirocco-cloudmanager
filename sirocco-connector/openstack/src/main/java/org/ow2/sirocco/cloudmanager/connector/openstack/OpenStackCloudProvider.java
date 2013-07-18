@@ -192,7 +192,7 @@ public class OpenStackCloudProvider {
         publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
          for (String networkType : server.getAddresses().getAddresses().keySet()) {
             Collection<Address> addresses = server.getAddresses().getAddresses().get(networkType);
-            logger.info("-- " + addresses);
+            //logger.info("-- " + addresses);
             Iterator<Address> iterator = addresses.iterator();
             if (iterator.hasNext()) {
                 this.addAddress(iterator.next(), this.cimiPrivateNetwork, privateNic);
@@ -514,7 +514,7 @@ public class OpenStackCloudProvider {
     }
     
 	public Volume createVolume(VolumeCreate volumeCreate) throws ConnectorException{
-        logger.info("creating Machine for " + cloudProviderAccount.getLogin());
+        logger.info("creating Volume for " + cloudProviderAccount.getLogin());
 
         VolumeForCreate volumeForCreate = new VolumeForCreate();
         
