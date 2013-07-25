@@ -58,8 +58,6 @@ public interface IJobManager {
 
     String getTopmostJobId(String jobId) throws CloudProviderException;
 
-    void handleWorkflowEvent(Job j) throws Exception;
-
     String getJobIdFromProvider(Job providerJob);
 
     List<Job> getJobs() throws CloudProviderException;

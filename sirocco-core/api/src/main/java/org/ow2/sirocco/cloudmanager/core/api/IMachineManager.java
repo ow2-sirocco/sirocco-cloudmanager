@@ -46,7 +46,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 /**
  * Machine management operations
  */
-public interface IMachineManager extends IJobListener {
+public interface IMachineManager {
 
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/MachineManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager";
 
@@ -98,6 +98,10 @@ public interface IMachineManager extends IJobListener {
 
     Job createMachine(MachineCreate machineCreate) throws ResourceConflictException, InvalidRequestException,
         CloudProviderException;
+
+    void syncMachine(String machineId, Machine machine, String jobId) throws CloudProviderException;
+
+    void syncVolumeAttachment(String machineId, MachineVolume volumeAttachment, String jobId);
 
     // List<Machine> getMachines(int first, int last, List<String> attributes)
     // throws InvalidRequestException,

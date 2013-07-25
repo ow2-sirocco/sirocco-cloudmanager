@@ -44,11 +44,13 @@ import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
-import javax.persistence.Query;
 
+import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
+import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
@@ -56,12 +58,12 @@ import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager;
+import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
-import org.ow2.sirocco.cloudmanager.core.api.exception.BadStateException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
@@ -77,20 +79,16 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CredentialsTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.SiroccoConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
@@ -117,19 +115,19 @@ public class SystemManager implements ISystemManager {
 
     private static Logger logger = LoggerFactory.getLogger(SystemManager.class.getName());
 
-    private static String CREATE_ACTION = "system creation";
-
-    private static String START_ACTION = "system start";
-
-    private static String STOP_ACTION = "system stop";
-
-    private static String SUSPEND_ACTION = "system suspend";
-
-    private static String PAUSE_ACTION = "system pause";
-
-    private static String RESTART_ACTION = "system restart";
-
-    private static String DELETE_ACTION = "system delete";
+    // private static String CREATE_ACTION = "system creation";
+    //
+    // private static String START_ACTION = "system start";
+    //
+    // private static String STOP_ACTION = "system stop";
+    //
+    // private static String SUSPEND_ACTION = "system suspend";
+    //
+    // private static String PAUSE_ACTION = "system pause";
+    //
+    // private static String RESTART_ACTION = "system restart";
+    //
+    // private static String DELETE_ACTION = "system delete";
 
     private static String REMOVE_ENTITY_ACTION = "removeEntityFromSystem";
 
@@ -202,6 +200,13 @@ public class SystemManager implements ISystemManager {
 
     @EJB
     private ICloudProviderManager cloudProviderManager;
+
+    @EJB
+    private IResourceWatcher resourceWatcher;
+
+    @Inject
+    @OSGiService(dynamic = true)
+    private ICloudProviderConnectorFinder connectorFinder;
 
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
@@ -312,33 +317,30 @@ public class SystemManager implements ISystemManager {
         return sc;
     }
 
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
+        throws CloudProviderException {
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(cloudProviderAccount
+            .getCloudProvider().getCloudProviderType());
+        if (connector == null) {
+            SystemManager.logger.error("Cannot find connector for cloud provider type "
+                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
+            return null;
+        }
+        return connector;
+    }
+
     @Override
     public Job createSystem(final SystemCreate systemCreate) throws CloudProviderException {
+        SystemManager.logger.info("Creating System " + systemCreate.getName());
+
         Tenant tenant = this.getTenant();
-        // this.checkQuota(userManager.getTenantByUsername(this.user), system);
 
-        // creation of entities in the base
-        System system = new System();
-        system.setCreated(new Date());
-        system.setDescription(systemCreate.getDescription());
-        system.setLocation(null);
-        system.setName(systemCreate.getName());
-        system.setProperties(systemCreate.getProperties() == null ? new HashMap<String, String>()
-            : new HashMap<String, String>(systemCreate.getProperties()));
-        system.setState(State.CREATING);
-        system.setTenant(this.getTenant());
-        this.em.persist(system);
-        // this.em.flush();
-
-        // creation of main system job
-        Job parentJob = this.createJob("add", system);
-        this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.CREATE_ACTION);
-        parentJob.setTargetResource(system);
-        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
-        affectedResources.add(system);
-        parentJob.setAffectedResources(affectedResources);
-        this.em.persist(parentJob);
-        this.em.flush();
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), systemCreate.getProperties());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount());
+        if (connector == null) {
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
+        }
 
         // creating credentials if necessary
         // iterating through descriptors
@@ -375,7 +377,6 @@ public class SystemManager implements ISystemManager {
                 }
             }
         }
-        system.setCredentials(creds);
 
         // resolve MachineTemplate credential component references if any
         for (ComponentDescriptor component : systemCreate.getSystemTemplate().getComponentDescriptors()) {
@@ -393,216 +394,76 @@ public class SystemManager implements ISystemManager {
             }
         }
 
-        // ICloudProviderConnector connector = this.getCloudProviderConnector();
-        // if (connector == null) {
-        // throw new CloudProviderException("no connector found");
-        // }
-        // CloudProviderAccount cpa =
-        // this.selectCloudProviderAccount(this.selectCloudProvider());
+        System systemFromProvider;
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), systemCreate.getProperties());
-        ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
-                                                 // placement.getLocation());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
+        try {
+            ISystemService systemService = connector.getSystemService();
+            systemFromProvider = systemService.createSystem(systemCreate, new ProviderTarget().account(placement.getAccount())
+                .location(placement.getLocation()));
+        } catch (ConnectorException e) {
+            SystemManager.logger.error("Failed to create system: ", e);
+            throw new CloudProviderException(e.getMessage());
         }
 
-        SystemManager.logger.info("cpa id: " + placement.getAccount().getId());
+        System system = new System();
+        system.setProviderAssignedId(systemFromProvider.getProviderAssignedId());
+        system.setName(systemCreate.getName());
+        system.setDescription(systemCreate.getDescription());
+        system.setProperties(systemCreate.getProperties() == null ? new HashMap<String, String>()
+            : new HashMap<String, String>(systemCreate.getProperties()));
+        system.setState(State.CREATING);
+        system.setTenant(this.getTenant());
         system.setCloudProviderAccount(placement.getAccount());
         system.setLocation(placement.getLocation());
 
-        // this.em.flush();
+        system.setCredentials(creds);
 
-        // TODO:workflowif (this.isSystemSupportedInConnector(connector))
-        {
+        this.em.persist(system);
 
-            // sending command to selected connector
-            Job job = null;
-            // TODO:workflowtry {
-            // TODO:workflow job =
-            // connector.getSystemService().createSystem(systemCreate);
-            // TODO:workflow} catch (ConnectorException e) {
-            // TODO:workflowSystemManager.logger.info("system creation failed",
-            // e);
-            // TODO:workflowthrow new
-            // CloudProviderException("system creation failed");
-            // TODO:workflow}
-            // job returned by connector is a copy of the real connector job
-            // so we can directly persist it
-            job.setDescription("System creation");
-            job.setTenant(this.getTenant());
-            this.em.persist(job);
+        Job job = new Job();
+        job.setTenant(tenant);
+        job.setTargetResource(system);
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(system);
+        job.setAffectedResources(affectedResources);
+        job.setCreated(new Date());
+        job.setDescription("System creation");
+        job.setState(Job.Status.RUNNING);
+        job.setAction("add");// TODO: normalize!!
+        job.setTimeOfStatusChange(new Date());// now
+        this.em.persist(job);
+        this.em.flush();
 
-            system.setProviderAssignedId(job.getTargetResource().getProviderAssignedId());
+        this.resourceWatcher.watchSystem(system, job);
 
-            job.setTargetResource(system);
-            parentJob.addNestedJob(job);
+        return job;
 
-            this.setJobProperty(parentJob, SystemManager.PROP_SYSTEM_SUPPORTED_IN_CONNECTOR, "ok");
+    }
 
-            // Ask for connector to notify when job completes
-            try {
-                UtilsForManagers.emitJobListenerMessage(job.getProviderAssignedId(), this.ctx);
-            } catch (Exception e) {
-                throw new ServiceUnavailableException(e.getMessage());
+    @Override
+    public void syncSystem(final String systemId, final System updatedSystem, final String jobId) throws CloudProviderException {
+        System system = this.em.find(System.class, Integer.valueOf(systemId));
+        Job job = this.em.find(Job.class, Integer.valueOf(jobId));
+        if (updatedSystem == null) {
+            system.setState(System.State.DELETED);
+            this.updateSystemContentState(updatedSystem, "delete");
+        } else {
+            system.setState(updatedSystem.getState());
+            if (system.getCreated() == null) {
+                system.setCreated(new Date());
+                this.persistSystemContent(updatedSystem, system.getTenant(), system.getCloudProviderAccount(),
+                    system.getLocation());
+
+                system.setMachines(updatedSystem.getMachines());
+                system.setNetworks(updatedSystem.getNetworks());
+                system.setSystems(updatedSystem.getSystems());
+                system.setVolumes(updatedSystem.getVolumes());
+            } else {
+                this.updateSystemContentState(updatedSystem, job.getAction());
             }
-            // TODO:workflowthis.relConnector(system.getCloudProviderAccount(),
-            // connector);
-
+            system.setUpdated(new Date());
         }
-        // TODO:workflowelse
-        {
-            // implementation when System is not supported by underlying
-            // connector
-            Set<ComponentDescriptor> componentDescriptors = systemCreate.getSystemTemplate().getComponentDescriptors();
-
-            // iterating through descriptors
-            Iterator<ComponentDescriptor> iter = componentDescriptors.iterator();
-            while (iter.hasNext()) {
-                ComponentDescriptor cd = iter.next();
-
-                if (cd.getComponentType() == ComponentType.MACHINE) {
-                    // creating new machines
-                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                        MachineCreate mc = new MachineCreate();
-                        if (cd.getComponentQuantity() > 1) {
-                            String name = cd.getName() == null ? "" : cd.getName();
-                            mc.setName(name + new Integer(i + 1).toString());
-                        } else {
-                            mc.setName(cd.getName());
-                        }
-                        MachineTemplate mt = (MachineTemplate) cd.getComponentTemplate();
-                        mc.setMachineTemplate(mt);
-                        mc.setDescription(cd.getDescription());
-                        Map<String, String> props = cd.getProperties() == null ? new HashMap<String, String>()
-                            : new HashMap<String, String>(cd.getProperties());
-
-                        props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
-                        if (placement.getLocation() != null) {
-                            props.put("location", placement.getLocation().getCountryName());
-                        }
-                        mc.setProperties(props);
-
-                        Job j = this.machineManager.createMachine(mc);
-                        parentJob.addNestedJob(j);
-
-                        SystemMachine sc = (SystemMachine) this.createCollection(SystemMachine.class, j.getTargetResource(),
-                            SystemMachine.State.NOT_AVAILABLE);
-                        this.em.persist(sc);
-                    }
-                }
-                if (cd.getComponentType() == ComponentType.VOLUME) {
-                    // creating new volumes
-                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                        VolumeCreate vc = new VolumeCreate();
-                        if (cd.getComponentQuantity() > 1) {
-                            String name = cd.getName() == null ? "" : cd.getName();
-                            vc.setName(name + new Integer(i + 1).toString());
-                        } else {
-                            vc.setName(cd.getName());
-                        }
-                        VolumeTemplate vt = (VolumeTemplate) cd.getComponentTemplate();
-                        vc.setVolumeTemplate(vt);
-                        vc.setDescription(cd.getDescription());
-                        Map<String, String> props = cd.getProperties() == null ? new HashMap<String, String>()
-                            : new HashMap<String, String>(cd.getProperties());
-
-                        props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
-                        if (placement.getLocation() != null) {
-                            props.put("location", placement.getLocation().getCountryName());
-                        }
-                        vc.setProperties(props);
-
-                        Job j = this.volumeManager.createVolume(vc);
-                        parentJob.addNestedJob(j);
-
-                        SystemVolume sc = (SystemVolume) this.createCollection(SystemVolume.class, j.getTargetResource(),
-                            SystemVolume.State.NOT_AVAILABLE);
-                        this.em.persist(sc);
-                    }
-                }
-                if (cd.getComponentType() == ComponentType.SYSTEM) {
-                    // creating new systems
-                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                        SystemCreate sc = new SystemCreate();
-                        if (cd.getComponentQuantity() > 1) {
-                            String name = cd.getName() == null ? "" : cd.getName();
-                            sc.setName(name + new Integer(i + 1).toString());
-                        } else {
-                            sc.setName(cd.getName());
-                        }
-                        SystemTemplate st = (SystemTemplate) cd.getComponentTemplate();
-                        sc.setSystemTemplate(st);
-                        sc.setDescription(cd.getDescription());
-                        Map<String, String> props = cd.getProperties() == null ? new HashMap<String, String>()
-                            : new HashMap<String, String>(cd.getProperties());
-
-                        props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
-                        if (placement.getLocation() != null) {
-                            props.put("location", placement.getLocation().getCountryName());
-                        }
-                        sc.setProperties(props);
-
-                        Job j = this.createSystem(sc);
-                        parentJob.addNestedJob(j);
-
-                        SystemSystem ss = (SystemSystem) this.createCollection(SystemSystem.class, j.getTargetResource(),
-                            SystemSystem.State.NOT_AVAILABLE);
-                        this.em.persist(ss);
-
-                        // special case: created system is in mixed state,
-                        // because it has no childs
-                        // =>parent system must be in mixed state as well
-                        if (((System) ss.getResource()).getState().equals(System.State.MIXED)) {
-                            system.setState(System.State.MIXED);
-                        }
-                    }
-                }
-                if (cd.getComponentType() == ComponentType.NETWORK) {
-                    // creating new networks
-                    for (int i = 0; i < cd.getComponentQuantity(); i++) {
-                        NetworkCreate nc = new NetworkCreate();
-                        if (cd.getComponentQuantity() > 1) {
-                            String name = cd.getName() == null ? "" : cd.getName();
-                            nc.setName(name + new Integer(i + 1).toString());
-                        } else {
-                            nc.setName(cd.getName());
-                        }
-                        NetworkTemplate nt = (NetworkTemplate) cd.getComponentTemplate();
-                        nc.setNetworkTemplate(nt);
-                        nc.setDescription(cd.getDescription());
-                        Map<String, String> props = cd.getProperties() == null ? new HashMap<String, String>()
-                            : new HashMap<String, String>(cd.getProperties());
-
-                        props.put("provider", placement.getAccount().getCloudProvider().getCloudProviderType());
-                        if (placement.getLocation() != null) {
-                            props.put("location", placement.getLocation().getCountryName());
-                        }
-                        nc.setProperties(props);
-
-                        Job j = this.networkManager.createNetwork(nc);
-                        parentJob.addNestedJob(j);
-
-                        SystemNetwork sc = (SystemNetwork) this.createCollection(SystemNetwork.class, j.getTargetResource(),
-                            SystemNetwork.State.NOT_AVAILABLE);
-                        this.em.persist(sc);
-                    }
-                }
-            }
-            // has this system any running job?
-            List<Job> nestedJobs = parentJob.getNestedJobs();
-            if (nestedJobs != null && nestedJobs.size() == 0) {
-                // no job handling, job finished instantly and system in mixed
-                // state
-                parentJob.setState(Status.SUCCESS);
-                system.setState(State.MIXED);
-            }
-
-        }
-
-        return parentJob;
-
+        job.setState(Job.Status.SUCCESS);
     }
 
     private void setJobProperty(final Job j, final String key, final String value) {
@@ -1134,243 +995,34 @@ public class SystemManager implements ISystemManager {
     @Override
     public Job startSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
         Job parentJob = null;
-
-        System s = this.getSystemById(systemId);
-
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getConnector(s);
-
-        // TODO:workflowif (this.isSystemSupportedInConnector(connector)) {
-        // TODO:workflow parentJob = this.doService(systemId, "start",
-        // SystemManager.START_ACTION, properties);
-        // TODO:workflow } else
-        {
-            // implementation for system not supported by underlying connector
-            s.setState(State.STARTING);
-            // creation of main system job
-            parentJob = this.createJob("start", s);
-            this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.START_ACTION);
-            this.em.persist(parentJob);
-            this.em.flush();
-
-            for (SystemMachine m : s.getMachines()) {
-                try {
-                    Job j = this.machineManager.startMachine(m.getResource().getId().toString(), properties);
-                    parentJob.addNestedJob(j);
-                } catch (BadStateException e) {
-                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
-                }
-            }
-            for (SystemSystem sy : s.getSystems()) {
-                Job j = this.startSystem(sy.getResource().getId().toString(), properties);
-                parentJob.addNestedJob(j);
-            }
-        }
-        return parentJob;
+        return this.doService(systemId, "start", properties);
     }
 
     @Override
     public Job stopSystem(final String systemId, final boolean force, final Map<String, String> properties)
         throws CloudProviderException {
-        Job parentJob = null;
-
-        System s = this.getSystemById(systemId);
-
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getConnector(s);
-
-        // TODO:workflowif (this.isSystemSupportedInConnector(connector)) {
-        // TODO:workflow parentJob = this.doService(systemId, "stop",
-        // SystemManager.STOP_ACTION, properties);
-        // TODO:workflow } else
-        {
-            // implementation for system not supported by underlying connector
-            s.setState(State.STOPPING);
-            // creation of main system job
-            parentJob = this.createJob("stop", s);
-            this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.STOP_ACTION);
-            this.em.persist(parentJob);
-            this.em.flush();
-
-            for (SystemMachine m : s.getMachines()) {
-                try {
-                    Job j = this.machineManager.stopMachine(m.getResource().getId().toString(), force, properties);
-                    parentJob.addNestedJob(j);
-                } catch (BadStateException e) {
-                    SystemManager.logger.info("bad state exception:" + e.getMessage());
-                }
-            }
-            for (SystemSystem sy : s.getSystems()) {
-                Job j = this.stopSystem(sy.getResource().getId().toString(), force, properties);
-                parentJob.addNestedJob(j);
-            }
-        }
-        return parentJob;
+        return this.doService(systemId, "stop", properties);
     }
 
     @Override
     public Job suspendSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
-        Job parentJob = null;
-
-        System s = this.getSystemById(systemId);
-
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getConnector(s);
-
-        // TODO:workflowif (this.isSystemSupportedInConnector(connector)) {
-        // TODO:workflow parentJob = this.doService(systemId, "suspend",
-        // SystemManager.SUSPEND_ACTION, properties);
-        // TODO:workflow } else
-        {
-            // implementation for system not supported by underlying connector
-            s.setState(State.SUSPENDING);
-            // creation of main system job
-            parentJob = this.createJob("suspend", s);
-            this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.SUSPEND_ACTION);
-            this.em.persist(parentJob);
-            this.em.flush();
-
-            for (SystemMachine m : s.getMachines()) {
-                try {
-                    Job j = this.machineManager.suspendMachine(m.getResource().getId().toString(), properties);
-                    parentJob.addNestedJob(j);
-                } catch (BadStateException e) {
-                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
-                }
-            }
-            for (SystemSystem sy : s.getSystems()) {
-                Job j = this.suspendSystem(sy.getResource().getId().toString(), properties);
-                parentJob.addNestedJob(j);
-            }
-        }
-        return parentJob;
+        return this.doService(systemId, "suspend", properties);
     }
 
     @Override
     public Job pauseSystem(final String systemId, final Map<String, String> properties) throws CloudProviderException {
-        Job parentJob = null;
-
-        System s = this.getSystemById(systemId);
-
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getConnector(s);
-
-        // TODO:workflowif (this.isSystemSupportedInConnector(connector)) {
-        // TODO:workflow parentJob = this.doService(systemId, "pause",
-        // SystemManager.PAUSE_ACTION, properties);
-        // TODO:workflow } else
-        {
-            // implementation for system not supported by underlying connector
-            s.setState(State.PAUSING);
-            // creation of main system job
-            parentJob = this.createJob("pause", s);
-            this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.PAUSE_ACTION);
-            this.em.persist(parentJob);
-            this.em.flush();
-
-            for (SystemMachine m : s.getMachines()) {
-                try {
-                    Job j = this.machineManager.pauseMachine(m.getResource().getId().toString(), properties);
-                    parentJob.addNestedJob(j);
-                } catch (BadStateException e) {
-                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
-                }
-            }
-            for (SystemSystem sy : s.getSystems()) {
-                Job j = this.pauseSystem(sy.getResource().getId().toString(), properties);
-                parentJob.addNestedJob(j);
-            }
-        }
-        return parentJob;
+        return this.doService(systemId, "pause", properties);
     }
 
     @Override
     public Job restartSystem(final String systemId, final boolean force, final Map<String, String> properties)
         throws CloudProviderException {
-        Job parentJob = null;
-
-        System s = this.getSystemById(systemId);
-
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getConnector(s);
-
-        // TODO:workflowif (this.isSystemSupportedInConnector(connector)) {
-        // TODO:workflow parentJob = this.doService(systemId, "restart",
-        // SystemManager.RESTART_ACTION, properties);
-        // TODO:workflow } else
-        {
-            // implementation for system not supported by underlying connector
-            s.setState(State.STARTING);
-            // creation of main system job
-            parentJob = this.createJob("restart", s);
-            this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.RESTART_ACTION);
-            this.em.persist(parentJob);
-            this.em.flush();
-
-            for (SystemMachine m : s.getMachines()) {
-                try {
-                    Job j = this.machineManager.restartMachine(m.getResource().getId().toString(), force, properties);
-                    parentJob.addNestedJob(j);
-                } catch (BadStateException e) {
-                    SystemManager.logger.debug("bad state exception:" + e.getMessage());
-                }
-            }
-            for (SystemSystem sy : s.getSystems()) {
-                Job j = this.restartSystem(sy.getResource().getId().toString(), force, properties);
-                parentJob.addNestedJob(j);
-            }
-        }
-        return parentJob;
+        return this.doService(systemId, "restart", properties);
     }
 
     @Override
     public Job deleteSystem(final String systemId) throws CloudProviderException {
-        Job parentJob = null;
-
-        System s = this.getSystemById(systemId);
-
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getConnector(s);
-
-        // TODO:workflowif (this.isSystemSupportedInConnector(connector)) {
-        // TODO:workflow parentJob = this.doService(systemId, "delete",
-        // SystemManager.DELETE_ACTION, null);
-        // TODO:workflow} else
-        {
-            // implementation for system not supported by underlying connector
-            s.setState(State.DELETING);
-            // creation of main system job
-            parentJob = this.createJob("delete", s);
-            this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, SystemManager.DELETE_ACTION);
-            this.em.persist(parentJob);
-            this.em.flush();
-
-            // CASCADE remove is enabled for System so all SystemXXX will be
-            // deleted automatically. But SystemXXX has no cascade for
-            // Machine,etc because we must call related managers to remove them
-            // in a clean way
-            for (SystemMachine m : s.getMachines()) {
-                Job j = this.machineManager.deleteMachine(m.getResource().getId().toString());
-                parentJob.addNestedJob(j);
-            }
-            for (SystemVolume v : s.getVolumes()) {
-                Job j = this.volumeManager.deleteVolume(v.getResource().getId().toString());
-                parentJob.addNestedJob(j);
-            }
-            for (SystemSystem sy : s.getSystems()) {
-                Job j = this.deleteSystem(sy.getResource().getId().toString());
-                parentJob.addNestedJob(j);
-            }
-            for (SystemNetwork n : s.getNetworks()) {
-                Job j = this.networkManager.deleteNetwork(n.getResource().getId().toString());
-                parentJob.addNestedJob(j);
-            }
-            for (SystemCredentials c : s.getCredentials()) {
-                this.credentialsManager.deleteCredentials(c.getResource().getId().toString());
-                // j.setParentJob(parentJob);
-            }
-        }
-        return parentJob;
+        return this.doService(systemId, "delete", null);
     }
 
     @Override
@@ -1405,90 +1057,67 @@ public class SystemManager implements ISystemManager {
 
     // private methods
 
-    private Job doService(final String systemId, final String basicAction, final String detailedAction,
-        final Map<String, String> properties, final Object... params) throws CloudProviderException {
+    private Job doService(final String systemId, final String action, final Map<String, String> properties,
+        final Object... params) throws CloudProviderException {
+        System system = this.getSystemById(systemId);
 
-        System s = this.getSystemById(systemId);
+        ICloudProviderConnector connector = this.getCloudProviderConnector(system.getCloudProviderAccount());
 
-        // implementation for system supported by underlying connector
+        try {
+            ISystemService systemService = connector.getSystemService();
+            ProviderTarget target = new ProviderTarget().account(system.getCloudProviderAccount()).location(
+                system.getLocation());
+            if (action.equals("start")) {
+                systemService.startSystem(system.getProviderAssignedId(), properties, target);
+            } else if (action.equals("stop")) {
+                boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
+                systemService.stopSystem(system.getProviderAssignedId(), force, properties, target);
+            } else if (action.equals("suspend")) {
+                systemService.suspendSystem(system.getProviderAssignedId(), properties, target);
+            } else if (action.equals("pause")) {
+                systemService.pauseSystem(system.getProviderAssignedId(), properties, target);
+            } else if (action.equals("delete")) {
+                systemService.deleteSystem(system.getProviderAssignedId(), target);
+            }
+        } catch (ConnectorException e) {
+            SystemManager.logger.error("Failed to " + action + " system: ", e);
+            throw new CloudProviderException(e.getMessage());
+        }
 
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getConnector(s);
-        // TODO:workflowif (connector == null) {
-        // TODO:workflow throw new CloudProviderException("no connector found");
-        // TODO:workflow }
-
-        Job parentJob = this.createJob(basicAction, s);
-        this.setJobProperty(parentJob, SystemManager.PROP_JOB_DETAILED_ACTION, detailedAction);
-        this.setJobProperty(parentJob, SystemManager.PROP_SYSTEM_SUPPORTED_IN_CONNECTOR, "ok");
-        this.em.persist(parentJob);
-        this.em.flush();
+        // choosing the right action
+        if (action.equals("start")) {
+            system.setState(System.State.STARTING);
+        } else if (action.equals("stop")) {
+            system.setState(System.State.STOPPING);
+        } else if (action.equals("suspend")) {
+            system.setState(System.State.SUSPENDING);
+        } else if (action.equals("pause")) {
+            system.setState(System.State.PAUSING);
+        } else if (action.equals("delete")) {
+            system.setState(System.State.DELETING);
+        }
+        this.em.merge(system);
 
         Tenant tenant = this.getTenant();
 
-        Job j = null;
+        // creating Job
+        Job job = new Job();
+        job.setTenant(tenant);
+        job.setTargetResource(system);
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(system);
+        job.setAffectedResources(affectedResources);
+        job.setCreated(new Date());
+        job.setDescription("System " + action);
+        job.setState(Job.Status.RUNNING);
+        job.setAction(action);// TODO: normalize!!
+        job.setTimeOfStatusChange(new Date());// now
+        this.em.persist(job);
+        this.em.flush();
 
-        // try {
-        if (detailedAction.equals(SystemManager.START_ACTION)) {
-            // j =
-            // connector.getSystemService().startSystem(s.getProviderAssignedId(),
-            // properties);
-            s.setState(System.State.STARTING);
-        } else if (detailedAction.equals(SystemManager.STOP_ACTION)) {
-            boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
-            // j =
-            // connector.getSystemService().stopSystem(s.getProviderAssignedId(),
-            // force, properties);
-            s.setState(System.State.STOPPING);
-        } else if (detailedAction.equals(SystemManager.SUSPEND_ACTION)) {
-            // j =
-            // connector.getSystemService().suspendSystem(s.getProviderAssignedId(),
-            // properties);
-            s.setState(System.State.SUSPENDING);
-        } else if (detailedAction.equals(SystemManager.PAUSE_ACTION)) {
-            // j =
-            // connector.getSystemService().pauseSystem(s.getProviderAssignedId(),
-            // properties);
-            s.setState(System.State.PAUSING);
-        } else if (detailedAction.equals(SystemManager.RESTART_ACTION)) {
-            boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
-            // j =
-            // connector.getSystemService().restartSystem(s.getProviderAssignedId(),
-            // force, properties);
-            s.setState(System.State.STARTING);
-        } else if (detailedAction.equals(SystemManager.DELETE_ACTION)) {
-            // j =
-            // connector.getSystemService().deleteSystem(s.getProviderAssignedId());
-            s.setState(System.State.DELETING);
-        } else {
-            throw new ServiceUnavailableException("Unsupported operation action " + detailedAction + " on system id "
-                + s.getProviderAssignedId() + " " + s.getId());
-        }
-        // }
-        // catch (ConnectorException e) {
-        // throw new ServiceUnavailableException(e.getMessage() + " action " +
-        // detailedAction + " system id "
-        // + s.getProviderAssignedId() + " " + s.getId());
-        // }
+        this.resourceWatcher.watchSystem(system, job);
 
-        j.setTargetResource(s);
-        j.setTenant(tenant);
-        this.em.persist(j);
-        parentJob.addNestedJob(j);
-
-        // this.em.flush();
-
-        // Ask for connector to notify when job completes
-        try {
-            // TODO:workflow
-            // UtilsForManagers.emitJobListenerMessage(j.getProviderAssignedId(),
-            // this.ctx);
-        } catch (Exception e) {
-            throw new ServiceUnavailableException(e.getMessage());
-        }
-
-        return parentJob;
-
+        return job;
     }
 
     private boolean checkQuota(final Tenant tenant, final System sys) {
@@ -1496,43 +1125,6 @@ public class SystemManager implements ISystemManager {
          * TODO Check current quota
          */
         return true;
-    }
-
-    private void relConnector(final CloudProviderAccount cpa, final ICloudProviderConnector connector)
-        throws CloudProviderException {
-        String cpType = cpa.getCloudProvider().getCloudProviderType();
-        // TODO:workflowICloudProviderConnectorFactory cFactory = null;
-        // TODO:workflowtry {
-        // TODO:workflow cFactory =
-        // this.cloudProviderConnectorFactoryFinder.getCloudProviderConnectorFactory(cpType);
-        // TODO:workflow String connectorId = connector.getCloudProviderId();
-        // TODO:workflow cFactory.disposeCloudProviderConnector(connectorId);
-        // TODO:workflow} catch (ConnectorException e) {
-        // TODO:workflow throw new CloudProviderException(e.getMessage());
-        // TODO:workflow}
-    }
-
-    private CloudProvider selectCloudProvider() {
-        Query q = this.em.createQuery("SELECT c FROM CloudProvider c WHERE c.cloudProviderType=:type");
-        q.setParameter("type", "mock");
-
-        q.setMaxResults(1);
-
-        CloudProvider cp = null;
-        @SuppressWarnings("unchecked")
-        List<CloudProvider> l = q.getResultList();
-        if (l.size() > 0) {
-            return l.get(0);
-        }
-        return null;
-    }
-
-    private CloudProviderAccount selectCloudProviderAccount(final CloudProvider provider) {
-        Set<CloudProviderAccount> accounts = provider.getCloudProviderAccounts();
-        if (accounts.isEmpty() == false) {
-            return accounts.iterator().next();
-        }
-        return null;
     }
 
     private Job createJob(final String action, final CloudResource targetEntity) throws CloudProviderException {
@@ -1660,8 +1252,7 @@ public class SystemManager implements ISystemManager {
      * @param jobAction
      * @throws CloudProviderException
      */
-    private void updateSystemContentState(final ICloudProviderConnector connector, final System providerSystem,
-        final String jobAction) throws CloudProviderException {
+    private void updateSystemContentState(final System providerSystem, final String jobAction) throws CloudProviderException {
         // getting system owned object lists from connector
         System s = providerSystem;
 
@@ -1679,7 +1270,7 @@ public class SystemManager implements ISystemManager {
         for (SystemMachine sn : machines) {
             Machine lmanaged = (Machine) QueryHelper.getResourceFromProviderId(this.em, sn.getResource()
                 .getProviderAssignedId());
-            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+            if (jobAction.equals("delete")) {
                 // lmanaged.setState(Machine.State.DELETED);
                 this.machineManager.deleteMachineInSystem(lmanaged);
             } else {
@@ -1689,7 +1280,7 @@ public class SystemManager implements ISystemManager {
 
         for (SystemVolume sn : volumes) {
             Volume lmanaged = (Volume) QueryHelper.getResourceFromProviderId(this.em, sn.getResource().getProviderAssignedId());
-            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+            if (jobAction.equals("delete")) {
                 lmanaged.setState(Volume.State.DELETED);
             } else {
                 lmanaged.setState(((Volume) sn.getResource()).getState());
@@ -1699,7 +1290,7 @@ public class SystemManager implements ISystemManager {
         for (SystemNetwork sn : networks) {
             Network lmanaged = (Network) QueryHelper.getResourceFromProviderId(this.em, sn.getResource()
                 .getProviderAssignedId());
-            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+            if (jobAction.equals("delete")) {
                 lmanaged.setState(Network.State.DELETED);
             } else {
                 lmanaged.setState(((Network) sn.getResource()).getState());
@@ -1708,9 +1299,9 @@ public class SystemManager implements ISystemManager {
 
         for (SystemSystem sn : systems) {
             // recursion rules!
-            this.updateSystemContentState(connector, (System) sn.getResource(), jobAction);
+            this.updateSystemContentState((System) sn.getResource(), jobAction);
             System lmanaged = (System) QueryHelper.getResourceFromProviderId(this.em, sn.getResource().getProviderAssignedId());
-            if (jobAction.equals(SystemManager.DELETE_ACTION)) {
+            if (jobAction.equals("delete")) {
                 lmanaged.setState(System.State.DELETED);
                 sn.setState(SystemSystem.State.DELETED);
                 this.removeItemFromSystemCollection(s, sn);
@@ -1718,252 +1309,6 @@ public class SystemManager implements ISystemManager {
                 lmanaged.setState(((System) sn.getResource()).getState());
             }
         }
-    }
-
-    @Override
-    public boolean jobCompletionHandler(final String notification_id, final CloudResource... resources)
-        throws CloudProviderException {
-
-        Job job;
-        try {
-            job = this.jobManager.getJobById(notification_id);
-        } catch (ResourceNotFoundException e1) {
-            SystemManager.logger.error("Could not find job " + notification_id);
-            throw new CloudProviderException("Could not find job " + notification_id);
-        } catch (CloudProviderException e1) {
-            SystemManager.logger.error("unable to get job " + notification_id);
-            throw new CloudProviderException("unable to get job " + notification_id);
-        }
-
-        SystemManager.logger.info(" System Notification for job " + job.getId());
-
-        if (job.getNestedJobs().size() == 0) {
-            // job is a connector job, waiting parent call
-            SystemManager.logger.info(" connector job " + job.getId() + ", do nothing...");
-            return true;
-        }
-
-        // system supported connector mode?
-        String connectorMode = this.getJobProperty(job, SystemManager.PROP_SYSTEM_SUPPORTED_IN_CONNECTOR);
-
-        if (connectorMode != null) {
-            // connector supports systems
-            Job connectorJob = job.getNestedJobs().get(0);
-
-            if (connectorJob.getState().equals(Status.SUCCESS)) {
-                // success!
-                job.setState(Status.SUCCESS);
-
-                // getting system owned object lists from connector
-                System s = null;
-                System managedSystem = (System) job.getTargetResource();
-                CloudProviderAccount cpa = managedSystem.getCloudProviderAccount();
-                CloudProviderLocation location = managedSystem.getLocation();
-                // querying connector
-                // TODO:workflowICloudProviderConnector connector =
-                // this.getCloudProviderConnector(cpa, location);
-                // TODO:workflowif (connector == null) {
-                // TODO:workflow throw new
-                // CloudProviderException("no connector found");
-                // TODO:workflow}
-
-                // which action?
-                String jobDetailedAction = this.getJobProperty(job, SystemManager.PROP_JOB_DETAILED_ACTION);
-
-                if (!jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
-                    // TODO:workflowtry {
-                    // TODO:workflow s =
-                    // connector.getSystemService().getSystem(job.getTargetResource().getProviderAssignedId().toString());
-                    // TODO:workflow } catch (ConnectorException e) {
-                    // TODO:workflow throw new
-                    // CloudProviderException("unable to get system from provider");
-                    // TODO:workflow}
-                }
-
-                if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                    this.persistSystemContent(s, managedSystem.getTenant(), cpa, location);
-
-                    managedSystem.setMachines(s.getMachines());
-                    managedSystem.setNetworks(s.getNetworks());
-                    managedSystem.setState(s.getState());
-                    managedSystem.setSystems(s.getSystems());
-                    managedSystem.setVolumes(s.getVolumes());
-
-                } else if (jobDetailedAction.equals(SystemManager.START_ACTION)
-                    || jobDetailedAction.equals(SystemManager.STOP_ACTION)) {
-
-                    // TODO:workflowthis.updateSystemContentState(connector, s,
-                    // jobDetailedAction);
-                    // updating parent system state
-                    ((System) job.getTargetResource()).setState(s.getState());
-
-                } else if (jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
-
-                    // TODO:workflowthis.updateSystemContentState(connector,
-                    // (System) job.getTargetResource(), jobDetailedAction);
-                    ((System) job.getTargetResource()).setState(System.State.DELETED);
-
-                } else if (jobDetailedAction.equals(SystemManager.REMOVE_ENTITY_ACTION)) {
-                    // removing entity
-                    this.removeEntityFromSystem_Final(job, s);
-                }
-
-                if (!jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
-                    this.updateSystemStatus(managedSystem.getId().toString());
-                }
-                ;
-
-                // TODO:workflow this.relConnector(cpa, connector);
-            } else {
-                // error
-                job.setState(connectorJob.getState());
-                System s = (System) job.getTargetResource();
-                s.setState(State.ERROR);
-                SystemManager.logger.error(" SystemHandler - connector job failed " + job.getId().toString());
-                throw new CloudProviderException(" SystemHandler - connector job failed " + job.getId().toString());
-            }
-        } else {
-            // connector doesn't support systems
-            Status state = Status.SUCCESS;
-
-            boolean failed = false;
-            boolean cancelled = false;
-            boolean running = false;
-
-            try {
-                job = this.jobManager.getJobById(job.getId().toString());
-            } catch (ResourceNotFoundException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            } catch (CloudProviderException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-
-            String jobDetailedAction = this.getJobProperty(job, SystemManager.PROP_JOB_DETAILED_ACTION);
-            SystemManager.logger.info("jobDetailedAction: " + jobDetailedAction);
-
-            // looking at child jobs status
-            for (Job j : job.getNestedJobs()) {
-                if (j.getState().equals(Status.FAILED)) {
-                    failed = true;
-                    SystemManager.logger.info(j.getId().toString() + " failed");
-                }
-                if (j.getState().equals(Status.CANCELLED)) {
-                    cancelled = true;
-                    SystemManager.logger.info(j.getId().toString() + " cancelled");
-                }
-                if (j.getState().equals(Status.RUNNING)) {
-                    running = true;
-                    SystemManager.logger.info(j.getId().toString() + " running");
-                }
-                if (j.getState().equals(Status.SUCCESS)) {
-                    // update System in database if not already done
-                    SystemManager.logger.info(job.getId().toString() + " containsKey " + j.getId().toString() + ":  "
-                        + job.getProperties().containsKey(j.getId().toString()));
-                    if (!(job.getProperties().containsKey(j.getId().toString()))) {
-                        SystemManager.logger.info(" SystemHandler updating successful job " + j.getId() + " for main job "
-                            + job.getId().toString());
-                        System s = (System) job.getTargetResource();
-
-                        if (j.getTargetResource() instanceof Machine) {
-                            if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                                SystemMachine sc = (SystemMachine) QueryHelper.getCloudCollectionFromCloudResource(this.em,
-                                    j.getTargetResource());
-                                sc.setState(SystemMachine.State.AVAILABLE);
-                                s.getMachines().add(sc);
-                            }
-                            job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
-
-                        }
-                        if (j.getTargetResource() instanceof Volume) {
-                            if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                                SystemVolume sc = (SystemVolume) QueryHelper.getCloudCollectionFromCloudResource(this.em,
-                                    j.getTargetResource());
-                                sc.setState(SystemVolume.State.AVAILABLE);
-                                s.getVolumes().add(sc);
-                            }
-                            job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
-                        }
-                        if (j.getTargetResource() instanceof System) {
-                            if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                                SystemSystem sc = (SystemSystem) QueryHelper.getCloudCollectionFromCloudResource(this.em,
-                                    j.getTargetResource());
-                                sc.setState(SystemSystem.State.AVAILABLE);
-                                s.getSystems().add(sc);
-                            }
-                            job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
-                        }
-                        if (j.getTargetResource() instanceof Network) {
-                            if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                                SystemNetwork sc = (SystemNetwork) QueryHelper.getCloudCollectionFromCloudResource(this.em,
-                                    j.getTargetResource());
-                                sc.setState(SystemNetwork.State.AVAILABLE);
-                                s.getNetworks().add(sc);
-                            }
-                            job.getProperties().put(j.getId().toString(), SystemManager.HANDLED_JOB);
-                        }
-
-                        SystemManager.logger.info(job.getId().toString() + " contains2Key " + j.getId().toString() + ":  "
-                            + job.getProperties().containsKey(j.getId().toString()));
-                    }
-                }
-            }
-            // this.em.flush();
-
-            if (failed) {
-                // one or more jobs are failed, so all is failed
-                job.setState(Status.FAILED);
-                System s = (System) job.getTargetResource();
-                s.setState(State.ERROR);
-                SystemManager.logger.info(" SystemHandler one or more jobs are failed " + job.getId().toString());
-                return true;
-            }
-            if (cancelled) {
-                // one or more jobs are cancelled, so all is cancelled
-                job.setState(Status.CANCELLED);
-                System s = (System) job.getTargetResource();
-                s.setState(State.ERROR);
-                SystemManager.logger.info(" SystemHandler one or more jobs are cancelled " + job.getId().toString());
-                return true;
-            }
-            if (running) {
-                // one or more jobs are running, so all is running
-                job.setState(Status.RUNNING);
-                SystemManager.logger.info(" SystemHandler one or more jobs are running " + job.getId().toString());
-                return true;
-            }
-
-            // job success
-            job.setState(Status.SUCCESS);
-            System s = (System) job.getTargetResource();
-            SystemManager.logger.info(" SystemHandler all jobs are successful " + job.getId().toString());
-
-            if (jobDetailedAction.equals(SystemManager.REMOVE_ENTITY_ACTION)) {
-                // removing entity
-                this.removeEntityFromSystem_Final(job, s);
-            }
-
-            if (jobDetailedAction.equals(SystemManager.DELETE_ACTION)) {
-                s.setState(System.State.DELETED);
-                this.handleEntityStateChange(System.class, s.getId().toString(), true);
-            } else {
-                if (!this.updateSystemStatus(s.getId().toString())) {
-                    // no update, setting generic system state
-                    if (jobDetailedAction.equals(SystemManager.CREATE_ACTION)) {
-                        s.setState(State.STOPPED);
-                    }
-                    if (jobDetailedAction.equals(SystemManager.START_ACTION)) {
-                        s.setState(State.STARTED);
-                    }
-                    if (jobDetailedAction.equals(SystemManager.STOP_ACTION)) {
-                        s.setState(State.STOPPED);
-                    }
-                }
-            }
-        }
-
-        return true;
     }
 
     @Override
@@ -2106,27 +1451,23 @@ public class SystemManager implements ISystemManager {
     @Override
     public Job exportSystem(final String systemId, final String format, final String destination,
         final Map<String, String> properties) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ServiceUnavailableException("Unsupported operation");
     }
 
     @Override
     public Job importSystem(final String source, final Map<String, String> properties) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ServiceUnavailableException("Unsupported operation");
     }
 
     @Override
     public Job exportSystemTemplate(final String systemTemplateId, final String format, final String destination,
         final Map<String, String> properties) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ServiceUnavailableException("Unsupported operation");
     }
 
     @Override
     public Job importSystemTemplate(final String source, final Map<String, String> properties) throws CloudProviderException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ServiceUnavailableException("Unsupported operation");
     }
 
 }

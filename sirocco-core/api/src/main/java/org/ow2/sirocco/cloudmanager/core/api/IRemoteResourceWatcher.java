@@ -19,26 +19,11 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: LockManager.java 913 2012-02-20 09:34:20Z ycas7461 $
+ *  $Id$
  *
  */
 package org.ow2.sirocco.cloudmanager.core.api;
 
-import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
-
-/**
- * Lock management operations
- */
-public interface ILockManager {
-
-    static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/LockManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteLockManager";
-
-    void lock(String targetId, String targetType) throws CloudProviderException;
-
-    void lock(String targetId, String targetType, int maxRetryDelayInSeconds) throws CloudProviderException;
-
-    void unlockUntransacted(String targetId, String targetType) throws CloudProviderException;
-
-    void unlock(String targetId, String targetType) throws CloudProviderException;
-
+public interface IRemoteResourceWatcher extends IResourceWatcher {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteResourceWatcher#org.ow2.sirocco.cloudmanager.core.api.IRemoteResourceWatcher";
 }

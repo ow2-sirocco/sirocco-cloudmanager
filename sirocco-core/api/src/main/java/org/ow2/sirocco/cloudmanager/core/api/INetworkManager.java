@@ -57,6 +57,8 @@ public interface INetworkManager {
 
     Job createNetwork(NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException;
 
+    void syncNetwork(String networkId, Network network, String jobId);
+
     Job startNetwork(String networkId, Map<String, String> properties) throws ResourceNotFoundException, CloudProviderException;
 
     Job stopNetwork(String networkId, Map<String, String> properties) throws ResourceNotFoundException, CloudProviderException;

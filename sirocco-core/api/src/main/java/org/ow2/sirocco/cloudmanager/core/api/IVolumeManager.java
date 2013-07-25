@@ -43,7 +43,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
 /**
  * Volume management operations
  */
-public interface IVolumeManager extends IJobListener {
+public interface IVolumeManager {
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/VolumeManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager";
 
     /**
@@ -56,6 +56,8 @@ public interface IVolumeManager extends IJobListener {
      * @throws CloudProviderException raised if the creation fails
      */
     Job createVolume(VolumeCreate volumeCreate) throws InvalidRequestException, CloudProviderException;
+
+    void syncVolume(String volumeId, Volume updatedVolume, String jobId) throws CloudProviderException;
 
     /**
      * Creates a new Volume Configuration
@@ -87,7 +89,7 @@ public interface IVolumeManager extends IJobListener {
      * @return if successful, the Volume instance
      * @throws ResourceNotFoundException raised if the provided id is invalid
      */
-    Volume getVolumeById(final String volumeId) throws ResourceNotFoundException;
+    Volume getVolumeById(final String volumeId) throws ResourceNotFoundException, CloudProviderException;
 
     /**
      * Returns the VolumeTemplate instance with the supplied id

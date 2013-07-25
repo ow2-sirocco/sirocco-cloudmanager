@@ -52,7 +52,6 @@ import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
-import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
@@ -203,37 +202,6 @@ public class MachineImageManager implements IMachineImageManager {
         image.setUpdated(new Date());
         this.em.merge(image);
         this.em.flush();
-    }
-
-    @Override
-    public boolean jobCompletionHandler(final String jobId, final CloudResource... resources) throws CloudProviderException {
-        Job job;
-
-        try {
-            job = this.jobManager.getJobById(jobId);
-        } catch (ResourceNotFoundException e) {
-            MachineImageManager.logger.info("Could not find job " + jobId);
-            return false;
-        }
-
-        MachineImage machineImage = this.em.find(MachineImage.class, job.getTargetResource().getId());
-        if (machineImage == null) {
-            throw new CloudProviderException("Internal error: cannot find MachineImage with id "
-                + job.getTargetResource().getId());
-        }
-
-        if (job.getAction().equals("add")) {
-            if (job.getState() == Status.SUCCESS) {
-                machineImage.setState(MachineImage.State.AVAILABLE);
-                machineImage.setCreated(new Date());
-                MachineImage machineImageFromProvider = (MachineImage) resources[0];
-                machineImage.setProviderAssignedId(machineImageFromProvider.getProviderAssignedId());
-            } else {
-                machineImage.setState(MachineImage.State.ERROR);
-            }
-        }
-
-        return false;
     }
 
 }

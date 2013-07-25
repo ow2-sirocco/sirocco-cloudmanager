@@ -37,7 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 /**
  * Machine Image management operations
  */
-public interface IMachineImageManager extends IJobListener {
+public interface IMachineImageManager {
 
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/MachineImageManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager";
 

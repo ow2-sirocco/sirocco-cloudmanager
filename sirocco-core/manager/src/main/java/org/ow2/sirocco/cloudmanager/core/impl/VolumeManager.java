@@ -38,18 +38,20 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
-import javax.persistence.PersistenceException;
 
+import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
+import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
+import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
-import org.ow2.sirocco.cloudmanager.core.api.IWorkflowManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -57,7 +59,6 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
-import org.ow2.sirocco.cloudmanager.core.process.common.OrchestratorUtils;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
@@ -71,6 +72,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,18 +103,51 @@ public class VolumeManager implements IVolumeManager {
     private IJobManager jobManager;
 
     @EJB
-    private IWorkflowManager workflowManager;
+    private IResourceWatcher resourceWatcher;
+
+    @Inject
+    @OSGiService(dynamic = true)
+    private ICloudProviderConnectorFinder connectorFinder;
 
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
+    }
+
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
+        throws CloudProviderException {
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(cloudProviderAccount
+            .getCloudProvider().getCloudProviderType());
+        if (connector == null) {
+            VolumeManager.logger.error("Cannot find connector for cloud provider type "
+                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
+            return null;
+        }
+        return connector;
     }
 
     @Override
     public Job createVolume(final VolumeCreate volumeCreate) throws CloudProviderException {
         VolumeManager.logger.info("Creating Volume");
 
-        // creating main object in database with basic props
-        Volume volume = new Volume();
+        Tenant tenant = this.getTenant();
+
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), volumeCreate.getProperties());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount());
+        if (connector == null) {
+            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+                + placement.getAccount().getCloudProvider().getCloudProviderType());
+        }
+
+        Volume volume;
+
+        try {
+            IVolumeService volumeService = connector.getVolumeService();
+            volume = volumeService.createVolume(volumeCreate,
+                new ProviderTarget().account(placement.getAccount()).location(placement.getLocation()));
+        } catch (ConnectorException e) {
+            VolumeManager.logger.error("Failed to create volume: ", e);
+            throw new CloudProviderException(e.getMessage());
+        }
 
         volume.setCapacity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity());
         volume.setType(volumeCreate.getVolumeTemplate().getVolumeConfig().getType());
@@ -122,7 +157,9 @@ public class VolumeManager implements IVolumeManager {
         volume.setDescription(volumeCreate.getDescription());
         volume.setProperties(volumeCreate.getProperties() == null ? new HashMap<String, String>()
             : new HashMap<String, String>(volumeCreate.getProperties()));
-        volume.setTenant(this.getTenant());
+        volume.setCloudProviderAccount(placement.getAccount());
+        volume.setLocation(placement.getLocation());
+        volume.setTenant(tenant);
         volume.setState(Volume.State.CREATING);
         this.em.persist(volume);
 
@@ -141,16 +178,32 @@ public class VolumeManager implements IVolumeManager {
         this.em.persist(job);
         this.em.flush();
 
-        // delegating work to orchestrator
-        HashMap<String, Object> vars = new HashMap<String, Object>();
-        vars.put(OrchestratorUtils.INPUT_JOBID, job.getId().toString());
-        vars.put(OrchestratorUtils.INPUT_OBJECTID, volume.getId().toString());
-        vars.put(OrchestratorUtils.INPUT_USERID, this.getTenant().getId().toString());
-        vars.put(OrchestratorUtils.INPUT_PROCESSKEY, OrchestratorUtils.CREATE_VOLUME_PROCESS);
-        vars.put(OrchestratorUtils.INPUT_OBJECTCREATE, volumeCreate);
-        this.workflowManager.startProcess(OrchestratorUtils.CREATE_VOLUME_PROCESS, vars);
+        this.resourceWatcher.watchVolume(volume, job);
 
         return job;
+    }
+
+    @Override
+    public void syncVolume(final String volumeId, final Volume updatedVolume, final String jobId) throws CloudProviderException {
+        Volume volume = this.em.find(Volume.class, Integer.valueOf(volumeId));
+        Job job = this.em.find(Job.class, Integer.valueOf(jobId));
+        if (updatedVolume == null) {
+            volume.setState(Volume.State.DELETED);
+            // detach deleted volume from machines if any
+            List<MachineVolume> attachments = this.getVolumeAttachments(volumeId);
+            for (MachineVolume attachment : attachments) {
+                attachment.getOwner().removeMachineVolume(attachment);
+                attachment.setState(MachineVolume.State.DELETED);
+                attachment.setOwner(null);
+            }
+        } else {
+            volume.setState(updatedVolume.getState());
+            if (volume.getCreated() == null) {
+                volume.setCreated(new Date());
+            }
+            volume.setUpdated(new Date());
+        }
+        job.setState(Job.Status.SUCCESS);
     }
 
     @Override
@@ -190,11 +243,12 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public Volume getVolumeById(final String volumeId) throws ResourceNotFoundException {
+    public Volume getVolumeById(final String volumeId) throws CloudProviderException {
         Volume volume = this.em.find(Volume.class, Integer.valueOf(volumeId));
         if (volume == null || volume.getState() == Volume.State.DELETED) {
             throw new ResourceNotFoundException(" Invalid volume id " + volumeId);
         }
+        volume.setAttachments(this.getVolumeAttachments(volume.getId().toString()));
         return volume;
     }
 
@@ -248,7 +302,13 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<Volume> getVolumes() throws CloudProviderException {
-        return QueryHelper.getEntityList("Volume", this.em, this.getTenant().getId(), Volume.State.DELETED, false);
+        List<Volume> result = QueryHelper.getEntityList("Volume", this.em, this.getTenant().getId(), Volume.State.DELETED,
+            false);
+        // FIXME
+        for (Volume vol : result) {
+            vol.setAttachments(this.getVolumeAttachments(vol.getId().toString()));
+        }
+        return result;
     }
 
     @SuppressWarnings("unchecked")
@@ -424,6 +484,19 @@ public class VolumeManager implements IVolumeManager {
 
         if (!volume.getAttachments().isEmpty()) {
             throw new ResourceConflictException("Volume in use");
+	}
+
+        ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount());
+
+        try {
+            IVolumeService volumeService = connector.getVolumeService();
+            volumeService.deleteVolume(volume.getProviderAssignedId(),
+                new ProviderTarget().account(volume.getCloudProviderAccount()).location(volume.getLocation()));
+        } catch (org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException e) {
+            // ignore
+        } catch (ConnectorException e) {
+            VolumeManager.logger.error("Failed to delete volume: ", e);
+            throw new CloudProviderException(e.getMessage());
         }
 
         volume.setState(Volume.State.DELETING);
@@ -446,13 +519,7 @@ public class VolumeManager implements IVolumeManager {
         this.em.persist(job);
         this.em.flush();
 
-        // delegating work to orchestrator
-        HashMap<String, Object> vars = new HashMap<String, Object>();
-        vars.put(OrchestratorUtils.INPUT_JOBID, job.getId().toString());
-        vars.put(OrchestratorUtils.INPUT_OBJECTID, volume.getId().toString());
-        vars.put(OrchestratorUtils.INPUT_USERID, tenant.getId().toString());
-        vars.put(OrchestratorUtils.INPUT_PROCESSKEY, OrchestratorUtils.DELETE_VOLUME_PROCESS);
-        this.workflowManager.startProcess(OrchestratorUtils.DELETE_VOLUME_PROCESS, vars);
+        this.resourceWatcher.watchVolume(volume, job);
 
         return job;
     }
@@ -485,128 +552,6 @@ public class VolumeManager implements IVolumeManager {
         VolumeImage volumeImage = (VolumeImage) this.em.createNamedQuery(VolumeImage.GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID)
             .setParameter("providerAssignedId", providerAssignedId).getSingleResult();
         return volumeImage;
-    }
-
-    @Override
-    public boolean jobCompletionHandler(final String job_id, final CloudResource... resources) throws CloudProviderException {
-        Job job;
-        try {
-            job = this.jobManager.getJobById(job_id);
-        } catch (ResourceNotFoundException e1) {
-            VolumeManager.logger.info("Could not find job " + job_id);
-            return false;
-        } catch (CloudProviderException e1) {
-            VolumeManager.logger.info("unable to get job " + job_id);
-            return false;
-        }
-
-        if (job.getTargetResource() instanceof Volume) {
-            return this.volumeCompletionHandler(job);
-        } else if (job.getTargetResource() instanceof VolumeImage) {
-            return this.volumeImageCompletionHandler(job);
-        }
-        return false;
-    }
-
-    public boolean volumeCompletionHandler(final Job providerJob) throws CloudProviderException {
-        // retrieve the Volume whose providerAssignedId is job.getTargetEntity()
-        Volume volume = null;
-
-        try {
-            volume = this.getVolumeByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
-        } catch (PersistenceException e) {
-            VolumeManager.logger.error("Cannot find Volume with provider-assigned id " + providerJob.getTargetResource());
-            return false;
-        }
-
-        // update Volume entity
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getCloudProviderConnector(volume.getCloudProviderAccount(),
-        // TODO:workflow volume.getLocation());
-
-        if (providerJob.getAction().equals("add")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                try {
-                    // TODO:workflowvolume.setState(connector.getVolumeService().getVolumeState(volume.getProviderAssignedId()));
-                    volume.setCreated(new Date());
-                    this.em.persist(volume);
-                } catch (Exception ex) {
-                    VolumeManager.logger.error("Failed to create volume " + volume.getName(), ex);
-                }
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                volume.setState(Volume.State.ERROR);
-                VolumeManager.logger.error("Failed to create volume  " + volume.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(volume);
-            }
-        } else if (providerJob.getAction().equals("delete")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                volume.setState(Volume.State.DELETED);
-                this.em.persist(volume);
-                this.em.flush();
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                volume.setState(Volume.State.ERROR);
-                VolumeManager.logger.error("Failed to delete volume  " + volume.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(volume);
-            }
-        }
-
-        return true;
-    }
-
-    public boolean volumeImageCompletionHandler(final Job providerJob) throws CloudProviderException {
-        VolumeImage volumeImage = null;
-
-        try {
-            volumeImage = this.getVolumeImageByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
-        } catch (PersistenceException e) {
-            VolumeManager.logger.error("Cannot find VolumeImage with provider-assigned id " + providerJob.getTargetResource());
-            return false;
-        }
-
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getCloudProviderConnector(volumeImage.getCloudProviderAccount(),
-        // TODO:workflow volumeImage.getLocation());
-
-        if (providerJob.getAction().equals("add")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                try {
-                    // TODO:workflowvolumeImage.setState(connector.getVolumeService().getVolumeImage(volumeImage.getProviderAssignedId())
-                    // TODO:workflow .getState());
-                    volumeImage.setCreated(new Date());
-                    this.em.persist(volumeImage);
-
-                    VolumeVolumeImage volumeVolumeImage = (VolumeVolumeImage) this.em
-                        .createQuery("SELECT v FROM VolumeVolumeImage v WHERE v.volumeImage=:vi")
-                        .setParameter("vi", volumeImage).getSingleResult();
-                    if (volumeVolumeImage != null) {
-                        volumeVolumeImage.setState(VolumeVolumeImage.State.AVAILABLE);
-                        volumeVolumeImage.setCreated(new Date());
-                    }
-                } catch (Exception ex) {
-                    VolumeManager.logger.error("Failed to create volume image " + volumeImage.getName(), ex);
-                }
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                volumeImage.setState(VolumeImage.State.ERROR);
-                VolumeManager.logger.error("Failed to create volume image  " + volumeImage.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(volumeImage);
-            }
-        } else if (providerJob.getAction().equals("delete")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                volumeImage.setState(VolumeImage.State.DELETED);
-                this.em.persist(volumeImage);
-                this.em.flush();
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                volumeImage.setState(VolumeImage.State.ERROR);
-                VolumeManager.logger.error("Failed to delete volume image  " + volumeImage.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(volumeImage);
-            }
-        }
-
-        return true;
     }
 
     @Override

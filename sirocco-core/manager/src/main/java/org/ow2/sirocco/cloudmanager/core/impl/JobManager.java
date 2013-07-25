@@ -44,7 +44,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.core.api.ILockManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
@@ -60,17 +59,9 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
-import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
-import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
-import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
-import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,9 +97,6 @@ public class JobManager implements IJobManager {
 
     @EJB
     private INetworkManager networkManager;
-
-    @EJB
-    private ILockManager lockManager;
 
     @EJB
     private ITenantManager tenantManager;
@@ -277,71 +265,6 @@ public class JobManager implements IJobManager {
 
         JobManager.logger.debug(" got persisted job " + job.getId());
         return job.getId().toString();
-    }
-
-    @Override
-    public void handleWorkflowEvent(final Job providerJob) throws Exception {
-
-        // attemting to obtain a lock on the topmost job
-        String topmostid = this.getThis().getTopmostJobId(this.getThis().getJobIdFromProvider(providerJob));
-        String lockId = "";
-
-        try {
-            this.lockManager.lock(topmostid, Job.class.getCanonicalName(), 10);
-        } catch (CloudProviderException e) {
-            JobManager.logger.warn("Unable to lock Job " + topmostid + " - " + e.getMessage());
-            throw e;
-        }
-
-        try {
-            Job job = this.updateProviderJob(providerJob);
-
-            Job topmost = this.getJobById(topmostid);
-
-            // dispatch event to related managers and parent jobs
-            while (job != null) {
-                // find manager
-                CloudResource target = job.getTargetResource();
-
-                if (target instanceof Machine) {
-                    JobManager.logger.info("calling  machineManager jobCompletionHandler with Job " + job.getId().toString());
-                    this.machineManager.jobCompletionHandler(job.getId().toString());
-                }
-                if (target instanceof MachineImage) {
-                    JobManager.logger.info("calling  machineImageManager jobCompletionHandler with Job "
-                        + job.getId().toString());
-                    this.machineImageManager.jobCompletionHandler(job.getId().toString(), providerJob.getTargetResource());
-                }
-                if ((target instanceof Volume) || (target instanceof VolumeImage)) {
-                    this.volumeManager.jobCompletionHandler(job.getId().toString());
-                }
-                if (target instanceof System) {
-                    JobManager.logger.info("calling  systemManager jobCompletionHandler with Job " + job.getId().toString());
-                    this.systemManager.jobCompletionHandler(job.getId().toString());
-                }
-                if ((target instanceof Network) || (target instanceof NetworkPort) || (target instanceof ForwardingGroup)) {
-                    this.networkManager.jobCompletionHandler(job);
-                }
-
-                // find parent
-                job = job.getParentJob();
-            }
-
-            // no exception: unlocking in current transaction
-            try {
-                this.lockManager.unlock(topmostid, Job.class.getCanonicalName());
-            } catch (CloudProviderException e) {
-                // if an exception occurs for unlocking, don't rollback!
-            }
-
-        } catch (Exception e) {
-            // exception, will be rollbacked: unlocking in separate transaction
-            // to ensure unlocking is done
-            // this.lockManager.unlockUntransacted(topmostid,
-            // Job.class.getCanonicalName());
-            throw e;
-        }
-
     }
 
     /**

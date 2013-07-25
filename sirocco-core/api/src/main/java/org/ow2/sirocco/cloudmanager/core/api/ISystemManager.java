@@ -41,7 +41,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 /**
  * System management operations
  */
-public interface ISystemManager extends IJobListener, IEntityStateListener {
+public interface ISystemManager extends IEntityStateListener {
 
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/SystemManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager";
 
@@ -148,5 +148,7 @@ public interface ISystemManager extends IJobListener, IEntityStateListener {
     void setConfiguration(String paramName, Object paramValue) throws CloudProviderException;
 
     Object getConfiguration(String paramName) throws CloudProviderException;
+
+    void syncSystem(String systemId, System system, String jobId) throws CloudProviderException;
 
 }

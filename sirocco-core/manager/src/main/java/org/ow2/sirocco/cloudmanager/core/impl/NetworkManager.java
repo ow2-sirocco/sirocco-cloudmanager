@@ -22,11 +22,17 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.PersistenceException;
 
+import org.glassfish.osgicdi.OSGiService;
+import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
+import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
+import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteNetworkManager;
+import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
@@ -56,6 +62,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,29 +89,28 @@ public class NetworkManager implements INetworkManager {
     @EJB
     private ITenantManager tenantManager;
 
+    @EJB
+    private IResourceWatcher resourceWatcher;
+
+    @Inject
+    @OSGiService(dynamic = true)
+    private ICloudProviderConnectorFinder connectorFinder;
+
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
     }
 
-    // private ICloudProviderConnector getCloudProviderConnector(final
-    // CloudProviderAccount cloudProviderAccount,
-    // final CloudProviderLocation location) throws CloudProviderException {
-    // NetworkManager.logger.info("Getting connector for cloud provider type "
-    // + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-    // ICloudProviderConnectorFactory connectorFactory = this.connectorFinder
-    // .getCloudProviderConnectorFactory(cloudProviderAccount.getCloudProvider().getCloudProviderType());
-    // if (connectorFactory == null) {
-    // NetworkManager.logger.error("Cannot find connector for cloud provider type "
-    // + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-    // return null;
-    // }
-    // try {
-    // return connectorFactory.getCloudProviderConnector(cloudProviderAccount,
-    // location);
-    // } catch (ConnectorException e) {
-    // throw new CloudProviderException(e.getMessage());
-    // }
-    // }
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
+        throws CloudProviderException {
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(cloudProviderAccount
+            .getCloudProvider().getCloudProviderType());
+        if (connector == null) {
+            NetworkManager.logger.error("Cannot find connector for cloud provider type "
+                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
+            return null;
+        }
+        return connector;
+    }
 
     //
     // Network operations
@@ -160,42 +166,33 @@ public class NetworkManager implements INetworkManager {
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), networkCreate.getProperties());
-        ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
-                                                 // placement.getLocation());
+        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount());
         if (connector == null) {
             throw new CloudProviderException("Cannot retrieve cloud provider connector "
                 + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
 
-        // delegates network creation to cloud provider connector
-        Job providerJob = null;
+        Network network;
 
-        // TODO:workflowtry {
-        // TODO:workflow INetworkService networkService =
-        // connector.getNetworkService();
-        // TODO:workflowproviderJob =
-        // networkService.createNetwork(networkCreate);
-        // TODO:workflow} catch (ConnectorException e) {
-        // TODO:workflow
-        // NetworkManager.logger.error("Failed to create network: ", e);
-        // TODO:workflow throw new CloudProviderException(e.getMessage());
-        // TODO:workflow}
-
-        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
-            throw new CloudProviderException(providerJob.getStatusMessage());
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            network = networkService.createNetwork(networkCreate, new ProviderTarget().account(placement.getAccount())
+                .location(placement.getLocation()));
+        } catch (ConnectorException e) {
+            NetworkManager.logger.error("Failed to create network: ", e);
+            throw new CloudProviderException(e.getMessage());
         }
 
         // prepare the Network entity to be persisted
 
-        Network network = new Network();
         network.setName(networkCreate.getName());
         network.setDescription(networkCreate.getDescription());
         network.setProperties(networkCreate.getProperties() == null ? new HashMap<String, String>()
             : new HashMap<String, String>(networkCreate.getProperties()));
         network.setTenant(tenant);
 
-        network.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         network.setCloudProviderAccount(placement.getAccount());
+        network.setLocation(placement.getLocation());
 
         network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
         network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
@@ -212,19 +209,30 @@ public class NetworkManager implements INetworkManager {
         affectedResources.add(network);
         job.setAffectedResources(affectedResources);
         job.setCreated(new Date());
-        job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setState(providerJob.getState());
-        job.setAction(providerJob.getAction());
-        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
+        job.setState(Job.Status.RUNNING);
+        job.setAction("add");
         this.em.persist(job);
         this.em.flush();
 
-        try {
-            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
-        } catch (Exception e) {
-            NetworkManager.logger.error(e.getMessage(), e);
-        }
+        this.resourceWatcher.watchNetwork(network, job);
+
         return job;
+    }
+
+    @Override
+    public void syncNetwork(final String networkId, final Network updatedNetwork, final String jobId) {
+        Network network = this.em.find(Network.class, Integer.valueOf(networkId));
+        Job job = this.em.find(Job.class, Integer.valueOf(jobId));
+        if (updatedNetwork == null) {
+            network.setState(Network.State.DELETED);
+        } else {
+            network.setState(updatedNetwork.getState());
+            if (network.getCreated() == null) {
+                network.setCreated(new Date());
+            }
+            network.setUpdated(new Date());
+        }
+        job.setState(Job.Status.SUCCESS);
     }
 
     @Override
