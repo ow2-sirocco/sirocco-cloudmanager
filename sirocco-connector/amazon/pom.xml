@@ -40,7 +40,7 @@
 	<name>SIROCCO :: CloudManager :: Connector :: Amazon</name>
 	
 	<properties>
-		<jclouds.version>1.5.2</jclouds.version>
+		<jclouds.version>1.6.0</jclouds.version>
 	</properties>
 
 	<build>
@@ -59,19 +59,6 @@
 					</instructions>
 				</configuration>
 			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-ipojo-plugin</artifactId>
-				<version>1.6.0</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>ipojo-bundle</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
 		</plugins>
 	</build>
 
@@ -84,23 +71,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.apache.felix.ipojo.annotations</artifactId>
-			<version>1.6.0</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-connector-api</artifactId>
 			<version>0.6.0-SNAPSHOT</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-util-jobmanager</artifactId>
-			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 
