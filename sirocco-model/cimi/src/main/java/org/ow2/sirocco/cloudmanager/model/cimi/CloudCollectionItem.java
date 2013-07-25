@@ -55,7 +55,7 @@ public abstract class CloudCollectionItem implements Serializable, Resource {
 
     private Integer id;
 
-    private String name;
+    private String name="systemComponent";
 
     private String description;
 
