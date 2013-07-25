@@ -118,6 +118,9 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     }
 
     public void addMachineDisk(final MachineDisk disk) {
+        if (this.disks == null) {
+            this.disks = new ArrayList<MachineDisk>();
+        }
         if (!this.getDisks().contains(disk)) {
             this.getDisks().add(disk);
         }
