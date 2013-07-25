@@ -31,5 +31,7 @@ Export-Package
 
 Import-Package  !org.slf4j, !org.apache.avalon.framework.*,org.apache.log;resolution:=optional,*
 
+Bundle-Activator org.ow2.sirocco.cloudmanager.connector.vcd.Activator
+
 
 

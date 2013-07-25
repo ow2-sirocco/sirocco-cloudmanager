@@ -1,0 +1,376 @@
+package org.ow2.sirocco.cloudmanager.connector.vcd;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
+import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
+import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
+import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
+import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
+import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
+import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
+import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
+
+public class VcdCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, INetworkService {
+    // private static Logger logger =
+    // LoggerFactory.getLogger(VcdCloudProviderConnector.class);
+
+    private List<VcdCloudProvider> vcdCPs = new ArrayList<VcdCloudProvider>();
+
+    private synchronized VcdCloudProvider getProvider(final ProviderTarget target) throws ConnectorException {
+        if (target.getAccount() == null || target.getLocation() == null) {
+            throw new ConnectorException("target.account or target.location is null");
+        }
+        for (VcdCloudProvider provider : this.vcdCPs) {
+            /*if (provider.getCloudProviderAccount().equals(target.getAccount())
+                && provider.getCloudProviderLocation().equals(target.getLocation())) {
+                return provider;
+            }*/
+            if (provider.getCloudProviderAccount().getId().equals(target.getAccount().getId())) {
+                // location can be null?
+                if (provider.getCloudProviderLocation() != target.getLocation()) {
+                    if (target.getLocation() != null) {
+                        if (provider.getCloudProviderLocation().getId().equals(target.getLocation().getId())) {
+                            return provider;
+                        }
+                    }
+                } else {
+                    return provider;
+                }
+            }
+        }
+        VcdCloudProvider provider = new VcdCloudProvider(target);
+        this.vcdCPs.add(provider);
+        return provider;
+    }
+
+    //
+    // ICloudProviderConnector
+    //
+
+    @Override
+    public IComputeService getComputeService() throws ConnectorException {
+        return this;
+    }
+
+    @Override
+    public ISystemService getSystemService() throws ConnectorException {
+        return this;
+    }
+
+    @Override
+    public INetworkService getNetworkService() throws ConnectorException {
+        // return this;
+        return this;
+    }
+
+    @Override
+    public IVolumeService getVolumeService() throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public Set<CloudProviderLocation> getLocations() {
+        return null;
+    }
+
+    @Override
+    public IProviderCapability getProviderCapability() throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public IImageService getImageService() throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    //
+    // System Service
+    //
+
+    @Override
+    public System createSystem(final SystemCreate systemCreate, final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).createSystem(systemCreate);
+    }
+
+    @Override
+    public void deleteSystem(final String systemId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        this.getProvider(target).deleteSystem(systemId);
+
+    }
+
+    @Override
+    public void startSystem(final String systemId, final Map<String, String> properties, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        this.getProvider(target).startSystem(systemId, properties);
+
+    }
+
+    @Override
+    public void stopSystem(final String systemId, final boolean force, final Map<String, String> properties,
+        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        this.getProvider(target).stopSystem(systemId, force, properties);
+
+    }
+
+    @Override
+    public void restartSystem(final String systemId, final boolean force, final Map<String, String> properties,
+        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        this.getProvider(target).restartSystem(systemId, force, properties);
+
+    }
+
+    @Override
+    public void pauseSystem(final String systemId, final Map<String, String> properties, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void suspendSystem(final String systemId, final Map<String, String> properties, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        this.getProvider(target).suspendSystem(systemId, properties);
+
+    }
+
+    @Override
+    public System getSystem(final String systemId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        return this.getProvider(target).getSystem(systemId);
+    }
+
+    @Override
+    public System.State getSystemState(final String systemId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        return this.getProvider(target).getSystemState(systemId);
+    }
+
+    @Override
+    public List<? extends CloudCollectionItem> getEntityListFromSystem(final String systemId, final String entityType,
+        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        return this.getProvider(target).getEntityListFromSystem(systemId, entityType);
+    }
+
+    @Override
+    public void deleteEntityInSystem(final String systemId, final String entityId, final String entityType,
+        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        this.getProvider(target).deleteEntityInSystem(systemId, entityId, entityType);
+
+    }
+
+    @Override
+    public void removeEntityFromSystem(final String systemId, final String entityId, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+
+    }
+
+    @Override
+    public void addEntityToSystem(final String systemId, final String entityId, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+
+    }
+
+    //
+    // Compute Service
+    //
+
+    @Override
+    public Machine createMachine(final MachineCreate machineCreate, final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).createMachine(machineCreate);
+    }
+
+    @Override
+    public void deleteMachine(final String machineId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        this.getProvider(target).deleteMachine(machineId);
+    }
+
+    @Override
+    public void startMachine(final String machineId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        this.getProvider(target).startMachine(machineId);
+    }
+
+    @Override
+    public void stopMachine(final String machineId, final boolean force, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        this.getProvider(target).stopMachine(machineId, force);
+    }
+
+    @Override
+    public void suspendMachine(final String machineId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        this.getProvider(target).suspendMachine(machineId);
+    }
+
+    @Override
+    public void restartMachine(final String machineId, final boolean force, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        this.getProvider(target).restartMachine(machineId, force);
+    }
+
+    @Override
+    public State getMachineState(final String machineId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        return this.getProvider(target).getMachineState(machineId);
+    }
+
+    @Override
+    public Machine getMachine(final String machineId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        return this.getProvider(target).getMachine(machineId);
+    }
+
+    @Override
+    public void pauseMachine(final String machineId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public MachineImage captureMachine(final String machineId, final MachineImage machineImage, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void addVolumeToMachine(final String machineId, final MachineVolume machineVolume, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void removeVolumeFromMachine(final String machineId, final MachineVolume machineVolume, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    //
+    // Network Service
+    //
+
+    @Override
+    public List<Network> getNetworks(final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).getNetworks();
+    }
+
+    @Override
+    public Network createNetwork(final NetworkCreate networkCreate, final ProviderTarget target) throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public Network getNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public org.ow2.sirocco.cloudmanager.model.cimi.Network.State getNetworkState(final String networkId,
+        final ProviderTarget target) throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void deleteNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void startNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void stopNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public NetworkPort createNetworkPort(final NetworkPortCreate networkPortCreate, final ProviderTarget target)
+        throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public NetworkPort getNetworkPort(final String networkPortId, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void deleteNetworkPort(final String networkPortId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void startNetworkPort(final String networkPortId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void stopNetworkPort(final String networkPortId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate, final ProviderTarget target)
+        throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public ForwardingGroup getForwardingGroup(final String forwardingGroupId, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void deleteForwardingGroup(final String forwardingGroupId, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void addNetworkToForwardingGroup(final String forwardingGroupId, final ForwardingGroupNetwork fgNetwork,
+        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void removeNetworkFromForwardingGroup(final String forwardingGroupId, final String networkId,
+        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+}
