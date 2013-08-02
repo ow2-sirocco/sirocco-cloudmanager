@@ -40,6 +40,10 @@
 	<packaging>bundle</packaging>
 
 	<name>SIROCCO :: CloudManager :: Connector :: OpenStack Nova</name>
+	
+	<properties>
+		<woorea.version>3.2.2-SNAPSHOT</woorea.version>
+	</properties>
 
 	<build>
 		<plugins>
@@ -83,18 +87,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>com.woorea</groupId>
-			<artifactId>keystone-client</artifactId>
-			<version>3.1.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
-			<groupId>com.woorea</groupId>
-			<artifactId>nova-client</artifactId>
-			<version>3.1.0-SNAPSHOT</version>
-		</dependency>
-
-		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.5.8</version>
@@ -120,6 +112,24 @@
 			<version>1.4</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.woorea</groupId>
+			<artifactId>keystone-client</artifactId>
+			<version>${woorea.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.woorea</groupId>
+			<artifactId>nova-client</artifactId>
+			<version>${woorea.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.woorea</groupId>
+			<artifactId>quantum-client</artifactId>
+			<version>${woorea.version}</version>
+		</dependency>
+
 	</dependencies>
 	<profiles>
 		<profile>
@@ -128,7 +138,7 @@
 				<dependency>
 					<groupId>com.woorea</groupId>
 					<artifactId>jersey-connector</artifactId>
-					<version>3.1.0-SNAPSHOT</version>
+					<version>${woorea.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -141,7 +151,7 @@
 				<dependency>
 					<groupId>com.woorea</groupId>
 					<artifactId>jersey2-connector</artifactId>
-					<version>3.1.0-SNAPSHOT</version>
+					<version>${woorea.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>
@@ -151,7 +161,7 @@
 				<dependency>
 					<groupId>org.openstack</groupId>
 					<artifactId>resteasy-connector</artifactId>
-					<version>3.1.0-SNAPSHOT</version>
+					<version>${woorea.version}</version>
 				</dependency>
 			</dependencies>
 		</profile>

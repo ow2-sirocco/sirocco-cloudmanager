@@ -1,3 +1,26 @@
+/**
+ *
+ * SIROCCO
+ * Copyright (C) 2013 France Telecom
+ * Contact: sirocco@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ */
+
 package org.ow2.sirocco.cloudmanager.connector.openstack;
 
 import java.util.ArrayList;
@@ -31,20 +54,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.woorea.openstack.base.client.OpenStackResponseException;
+import com.woorea.openstack.base.client.OpenStackSimpleTokenProvider;
 import com.woorea.openstack.keystone.Keystone;
 import com.woorea.openstack.keystone.model.Access;
 import com.woorea.openstack.keystone.model.authentication.UsernamePassword;
 import com.woorea.openstack.keystone.utils.KeystoneUtils;
 import com.woorea.openstack.nova.Nova;
+import com.woorea.openstack.nova.api.extensions.FloatingIpPoolsExtension;
 import com.woorea.openstack.nova.model.Flavor;
 import com.woorea.openstack.nova.model.FloatingIp;
+import com.woorea.openstack.nova.model.FloatingIpPools;
 import com.woorea.openstack.nova.model.KeyPair;
 import com.woorea.openstack.nova.model.Server;
+import com.woorea.openstack.nova.model.Servers;
 import com.woorea.openstack.nova.model.Server.Addresses.Address;
 import com.woorea.openstack.nova.model.ServerForCreate;
 import com.woorea.openstack.nova.model.VolumeAttachment;
 import com.woorea.openstack.nova.model.VolumeAttachments;
 import com.woorea.openstack.nova.model.VolumeForCreate;
+import com.woorea.openstack.quantum.Quantum;
+import com.woorea.openstack.quantum.model.Networks;
 
 public class OpenStackCloudProvider {
     private static Logger logger = LoggerFactory.getLogger(OpenStackCloudProvider.class);
@@ -62,6 +91,8 @@ public class OpenStackCloudProvider {
     //private String novaEndPointName;
     
     private Nova novaClient;
+    
+    private Quantum quantum;
 
     private Network cimiPrivateNetwork, cimiPublicNetwork;
 
@@ -73,12 +104,11 @@ public class OpenStackCloudProvider {
         if (properties == null || properties.get("tenantName") == null) {
             throw new ConnectorException("No access to properties: tenantName");
         }
-        this.tenantName = properties.get("tenantName");
+        this.tenantName = properties.get("tenantName"); 
         logger.info("connect: " + cloudProviderAccount.getLogin() + ":" + cloudProviderAccount.getPassword() 
         		+ " to tenant=" + this.tenantName 
         		+ ", KEYSTONE_AUTH_URL=" + cloudProviderAccount.getCloudProvider().getEndpoint());		
         
-        //
 		Keystone keystone = new Keystone(cloudProviderAccount.getCloudProvider().getEndpoint());
 		Access access = keystone.tokens().authenticate(new UsernamePassword(cloudProviderAccount.getLogin(), cloudProviderAccount.getPassword()))
 				.withTenantName(this.tenantName)
@@ -92,8 +122,23 @@ public class OpenStackCloudProvider {
 		//this.novaClient = new Nova("http://10.192.133.101:8774/v2".concat("/").concat(access.getToken().getTenant().getId())); /// tmp 
 		this.novaClient = new Nova(KeystoneUtils.findEndpointURL(access.getServiceCatalog(), "compute", null, "public"));  
 		this.novaClient.token(access.getToken().getId());
+		
+        this.quantum = new Quantum(KeystoneUtils.findEndpointURL(access.getServiceCatalog(), "network", null, "public"));
+        //this.quantum = new Quantum(KeystoneUtils.findEndpointURL(access.getServiceCatalog(), "network", null, "public").concat("v2.0/"));
+        this.quantum.setTokenProvider(new OpenStackSimpleTokenProvider(access.getToken().getId()));
+        //this.quantum.token(access.getToken().getId());
 				
 		//novaClient.enableLogging(Logger.getLogger("nova"), 100 * 1024); // check how to trace REST call (On/Off)
+
+        /*Servers servers = novaClient.servers().list(true).execute();
+        for(Server server : servers) {
+            System.out.println("--- server:" + server);
+        }*/
+        
+		com.woorea.openstack.quantum.model.Networks networks = quantum.networks().list().execute();
+        for (com.woorea.openstack.quantum.model.Network network : networks) {
+            System.out.println("--- network: " + network);
+        }
 		
 		/*Flavors flavors = novaClient.flavors().list(true).execute();
 		for(Flavor flavor : flavors) {
@@ -166,11 +211,11 @@ public class OpenStackCloudProvider {
         machine.setMemory(flavor.getRam() * 1024);
         List<MachineDisk> machineDisks = new ArrayList<MachineDisk>();
         MachineDisk machineDisk = new MachineDisk();
-        machineDisk.setCapacity(new Integer(flavor.getDisk()) * 1000);  
+        machineDisk.setCapacity(new Integer(flavor.getDisk()) * 1000 * 1000);  
         machineDisks.add(machineDisk);
         if (flavor.getEphemeral() > 0){
             MachineDisk machineEphemeralDisk = new MachineDisk();
-            machineEphemeralDisk.setCapacity(flavor.getEphemeral() * 1000);  
+            machineEphemeralDisk.setCapacity(flavor.getEphemeral() * 1000 * 1000);  
             machineDisks.add(machineEphemeralDisk);
         	
         }
@@ -219,7 +264,7 @@ public class OpenStackCloudProvider {
             Volume volume = this.getVolume(volumeAttachment.getVolumeId()); 
             machineVolume.setVolume(volume);
             machineVolume.setProviderAssignedId(volumeAttachment.getId());
-            machineVolume.setState(MachineVolume.State.ATTACHED);
+            machineVolume.setState(MachineVolume.State.ATTACHED);  // FIXME attaching/detaching state (openStack volume state)
             machineVolume.setInitialLocation(volumeAttachment.getDevice());
             machineVolumes.add(machineVolume);
         }
@@ -267,6 +312,19 @@ public class OpenStackCloudProvider {
         
         serverForCreate.getSecurityGroups()
             .add(new ServerForCreate.SecurityGroup("default")); // default security group
+        
+        List<ServerForCreate.Network> networks = serverForCreate.getNetworks();
+        boolean allocateFloatingIp = false;
+        if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
+            for (MachineTemplateNetworkInterface nic : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
+                // NB: nic template could refer either to a Network resource xor a SystemNetworkName
+                // In practice templates (generated by Sirocco) should refer to a Network resource when using an OpenStack connector 
+                networks.add(new ServerForCreate.Network(nic.getNetwork().getProviderAssignedId(), null, null));
+                if (nic.getNetwork().getNetworkType() == Network.Type.PUBLIC) {
+                    allocateFloatingIp = true;
+                }
+            }
+        }
 
         String userData = machineCreate.getMachineTemplate().getUserData();
         if (userData != null) {
@@ -275,23 +333,10 @@ public class OpenStackCloudProvider {
         	serverForCreate.setUserData(userData);
         }
         
-        Server server = novaClient.servers().boot(serverForCreate).execute(); // to get the server id
-        //logger.info(server);
-        server = novaClient.servers().show(server.getId()).execute(); // to get detailed information about the server 
-        //logger.info(server);
+        Server server = novaClient.servers().boot(serverForCreate).execute(); // get the server id
+        server = novaClient.servers().show(server.getId()).execute(); // get detailed information about the server 
 
         // public IP
-        boolean allocateFloatingIp = false;
-        if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
-            for (MachineTemplateNetworkInterface nic : machineCreate.getMachineTemplate().getNetworkInterfaces()) {
-                // NB: nic template could refer either to a Network resource xor a SystemNetworkName
-            	// In practice templates (generated by Sirocco) should refer to a Network resource when using an OpenStack connector 
-                if (nic.getNetwork().getNetworkType() == Network.Type.PUBLIC) {
-                    allocateFloatingIp = true;
-                    break;
-                }
-            }
-        }
         if (allocateFloatingIp) {
             addFloatingIPToMachine(server.getId());
         }
@@ -299,10 +344,6 @@ public class OpenStackCloudProvider {
         final Machine machine = new Machine();
         fromServerToMachine(server.getId(), machine); 
         return machine;
-        
-        /* FIXME 
-         * - Network with Quantum & conventions without Quantum
-         * */        
 	}
 
 	public Machine getMachine(String machineId)  {
@@ -336,7 +377,7 @@ public class OpenStackCloudProvider {
 	}
 	
 	public void removeVolumeFromMachine(String machineId, MachineVolume machineVolume) {
-		novaClient.servers().detachVolume(machineId, machineVolume.getProviderAssignedId());
+		novaClient.servers().detachVolume(machineId, machineVolume.getProviderAssignedId()).execute();
 	}
     
     private void addAddress(final Address address, final Network cimiNetwork, final MachineNetworkInterface nic) {
@@ -443,9 +484,13 @@ public class OpenStackCloudProvider {
             Thread.sleep(1000);
         } while (waitTimeInSeconds-- > 0);
         
-    	FloatingIp floatingIp = novaClient.floatingIps().allocate(null).execute();
-        logger.info("Allocating floating IP " + floatingIp.getIp());
-        novaClient.servers().associateFloatingIp(serverId, floatingIp.getIp()).execute();
+        // assumption: first FloatingIpPools is used to allocate floating IP
+        FloatingIpPoolsExtension floatingIpPoolsExtension = new FloatingIpPoolsExtension(this.novaClient);
+        FloatingIpPools pools = floatingIpPoolsExtension.list().execute();
+        FloatingIp floatingIp = this.novaClient.floatingIps().allocate(pools.getList().get(0).getName()).execute();
+        OpenStackCloudProvider.logger.info("Allocating floating IP " + floatingIp.getIp());
+        this.novaClient.servers().associateFloatingIp(serverId, floatingIp.getIp()).execute();
+
         
         // Check if it is safe not to wait that the floating IP shows up in the server detail
         /*do {
@@ -553,4 +598,21 @@ public class OpenStackCloudProvider {
         novaClient.volumes().delete(volumeId).execute(); 
 	}
 
+
+    //
+    // Network
+    //
+
+    private Network.State fromNovaNetworkStatusToCimiNetworkState(final String novaStatus) {
+        if (novaStatus.equalsIgnoreCase("ACTIVE")){
+            return Network.State.STARTED;
+        } else {
+            return Network.State.ERROR; // CIMI mapping!
+        }
+    }
+
+    public Network.State getNetworkState(final String networkId) { 
+        com.woorea.openstack.quantum.model.Network novaNetwork = quantum.networks().show(networkId).execute();
+        return fromNovaNetworkStatusToCimiNetworkState(novaNetwork.getStatus());
+    }
 }
