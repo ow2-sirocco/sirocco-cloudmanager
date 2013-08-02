@@ -23,6 +23,7 @@
 #
 #
 
+Embed-Dependency *;scope=!provided
 
 Private-Package org.ow2.sirocco.cloudmanager.connector.openstack
 
