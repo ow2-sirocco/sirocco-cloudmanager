@@ -92,7 +92,7 @@ public class OpenStackCloudProvider {
 
     private Quantum quantum;
 
-    private Network cimiPrivateNetwork, cimiPublicNetwork;
+    // private Network cimiPrivateNetwork, cimiPublicNetwork;
 
     public OpenStackCloudProvider(final ProviderTarget target) throws ConnectorException {
         this.cloudProviderAccount = target.getAccount();
@@ -152,7 +152,7 @@ public class OpenStackCloudProvider {
         }*/
 
         // FIXME without Quantum: mapping to a backend network
-        this.cimiPrivateNetwork = new Network();
+        /*this.cimiPrivateNetwork = new Network();
         this.cimiPrivateNetwork.setProviderAssignedId("0");
         this.cimiPrivateNetwork.setState(Network.State.STARTED);
         this.cimiPrivateNetwork.setNetworkType(Network.Type.PRIVATE);
@@ -160,7 +160,7 @@ public class OpenStackCloudProvider {
         this.cimiPublicNetwork = new Network();
         this.cimiPublicNetwork.setProviderAssignedId("1");
         this.cimiPublicNetwork.setState(Network.State.STARTED);
-        this.cimiPublicNetwork.setNetworkType(Network.Type.PUBLIC);
+        this.cimiPublicNetwork.setNetworkType(Network.Type.PUBLIC);*/
 
     }
 
@@ -197,10 +197,7 @@ public class OpenStackCloudProvider {
     }
 
     private void fromServerToMachine(final String serverId, final Machine machine) {
-        Server server = this.novaClient.servers().show(serverId).execute(); // get
-                                                                            // a
-                                                                            // fresh
-                                                                            // server
+        Server server = this.novaClient.servers().show(serverId).execute(); /*get a fresh server*/
 
         machine.setProviderAssignedId(serverId);
         machine.setName(server.getName());
@@ -228,7 +225,7 @@ public class OpenStackCloudProvider {
 
         // Network (without Quantum)
         /*assumption: first IP address is private, next addresses are public (floating IPs)*/
-        List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
+        /*List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
         machine.setNetworkInterfaces(nics);
         MachineNetworkInterface privateNic = new MachineNetworkInterface();
         privateNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
@@ -240,6 +237,7 @@ public class OpenStackCloudProvider {
         publicNic.setNetwork(this.cimiPublicNetwork);
         // publicNic.setNetworkType(Network.Type.PUBLIC);
         publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
+        OpenStackCloudProvider.logger.info("-- " + server.getAddresses().getAddresses().keySet());
         for (String networkType : server.getAddresses().getAddresses().keySet()) {
             Collection<Address> addresses = server.getAddresses().getAddresses().get(networkType);
             // logger.info("-- " + addresses);
@@ -256,6 +254,33 @@ public class OpenStackCloudProvider {
         }
         if (publicNic.getAddresses().size() > 0) {
             nics.add(publicNic);
+        }*/
+
+        // Network
+        List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
+        machine.setNetworkInterfaces(nics);
+        OpenStackCloudProvider.logger.info("-- " + server.getAddresses().getAddresses().keySet());
+        for (String networkName : server.getAddresses().getAddresses().keySet()) {
+            /* FIXME find network providerAssignedId by network name and get the CIMI network */
+            Network cimiNetwork = new Network();
+            cimiNetwork.setProviderAssignedId(networkName); // XXX
+            cimiNetwork.setName(networkName);
+            cimiNetwork.setState(Network.State.STARTED);
+            // Nic
+            MachineNetworkInterface machineNetworkInterface = new MachineNetworkInterface();
+            machineNetworkInterface.setName(networkName);
+            machineNetworkInterface.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
+            machineNetworkInterface.setNetwork(cimiNetwork);
+            machineNetworkInterface.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
+            // Addresses
+            Collection<Address> addresses = server.getAddresses().getAddresses().get(networkName);
+            Iterator<Address> iterator = addresses.iterator();
+            while (iterator.hasNext()) {
+                this.addAddress(iterator.next(), cimiNetwork, machineNetworkInterface);
+            }
+            if (machineNetworkInterface.getAddresses().size() > 0) {
+                nics.add(machineNetworkInterface);
+            }
         }
 
         // Volume
@@ -390,8 +415,9 @@ public class OpenStackCloudProvider {
         org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
         cimiAddress.setIp(address.getAddr());
         cimiAddress.setNetwork(cimiNetwork);
-        cimiAddress.setAllocation("dynamic");
-        cimiAddress.setProtocol("IPv4");
+        cimiAddress.setAllocation("dynamic"); // FIXME mapping openstack / CIMI
+        // cimiAddress.setProtocol("IPv4");
+        cimiAddress.setProtocol(address.getVersion());
         cimiAddress.setResource(cimiNetwork);
         MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
         entry.setAddress(cimiAddress);
