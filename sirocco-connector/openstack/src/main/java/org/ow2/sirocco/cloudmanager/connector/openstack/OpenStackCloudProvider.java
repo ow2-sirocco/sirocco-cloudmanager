@@ -43,6 +43,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -69,6 +70,8 @@ import com.woorea.openstack.nova.model.VolumeAttachment;
 import com.woorea.openstack.nova.model.VolumeAttachments;
 import com.woorea.openstack.nova.model.VolumeForCreate;
 import com.woorea.openstack.quantum.Quantum;
+import com.woorea.openstack.quantum.model.NetworkForCreate;
+import com.woorea.openstack.quantum.model.SubnetForCreate;
 
 public class OpenStackCloudProvider {
     private static Logger logger = LoggerFactory.getLogger(OpenStackCloudProvider.class);
@@ -621,6 +624,52 @@ public class OpenStackCloudProvider {
         // CIMI mapping : NetworkType, MTU... !
     }
 
+    public Network createNetwork(final NetworkCreate networkCreate) throws ConnectorException, InterruptedException {
+        OpenStackCloudProvider.logger.info("creating Network for " + this.cloudProviderAccount.getLogin());
+
+        NetworkForCreate networkForCreate = new NetworkForCreate();
+
+        String networkName = null;
+        if (networkCreate.getName() != null) {
+            networkName = networkCreate.getName() + "-" + UUID.randomUUID();
+        } else {
+            networkName = "sirocco-" + UUID.randomUUID();
+        }
+        networkForCreate.setName(networkName);
+        networkForCreate.setAdminStateUp(true); /* set the administrative status of the network to UP */
+
+        com.woorea.openstack.quantum.model.Network novaNetwork = this.quantum.networks().create(networkForCreate).execute();
+
+        /* FIXME
+         * - add implicit/explicit subnet
+         * - conflict between cidr?
+         * - Woorea bug: SubnetForCreate: networkId/networkid
+         * - Woorea bug: Subnet deserialization
+         */
+        do {
+            novaNetwork = this.quantum.networks().show(novaNetwork.getId()).execute();
+            if (novaNetwork.getStatus().equalsIgnoreCase("ACTIVE")) {
+                break;
+            }
+            Thread.sleep(1000);
+        } while (OpenStackCloudProvider.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS-- > 0);
+
+        SubnetForCreate subnetForCreate = new SubnetForCreate();
+        subnetForCreate.setNetworkId(novaNetwork.getId());
+        subnetForCreate.setCidr("10.0.1.0/24");
+        subnetForCreate.setIpVersion(4);
+        subnetForCreate.setName("defaultSubnet");
+        try { // catch block to be removed : Woorea bug: Subnet deserialization
+            this.quantum.subnets().create(subnetForCreate).execute();
+        } catch (Exception e) {
+            /*e.printStackTrace();*/
+        }
+
+        final Network cimiNetwork = new Network();
+        this.fromNovaNetworkToCimiNetwork(novaNetwork.getId(), cimiNetwork);
+        return cimiNetwork;
+    }
+
     public Network getNetwork(final String networkId) {
         final Network network = new Network();
         this.fromNovaNetworkToCimiNetwork(networkId, network);
@@ -644,6 +693,7 @@ public class OpenStackCloudProvider {
     }
 
     public void deleteNetwork(final String networkId) {
-        this.quantum.networks().delete(networkId);
+        /* FIXME woorea Bug : err 409 ignored */
+        this.quantum.networks().delete(networkId).execute();
     }
 }

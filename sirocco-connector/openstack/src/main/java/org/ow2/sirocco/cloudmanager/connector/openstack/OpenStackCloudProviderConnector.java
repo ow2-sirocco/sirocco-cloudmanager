@@ -362,8 +362,13 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 
     @Override
     public Network createNetwork(final NetworkCreate networkCreate, final ProviderTarget target) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            return this.getProvider(target).createNetwork(networkCreate);
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+        } catch (InterruptedException e) {
+            throw new ConnectorException("message=" + e.getMessage(), e);
+        }
     }
 
     @Override
