@@ -176,6 +176,7 @@ public class OpenStackCloudProvider {
     // Compute Service
     //
 
+    /* proposed mapping: see http://docs.openstack.org/api/openstack-compute/2/content/List_Servers-d1e2078.html */
     public Machine.State fromServerStatusToMachineState(final String novaStatus) {
         if (novaStatus.equalsIgnoreCase("ACTIVE")) {
             return Machine.State.STARTED;
@@ -565,6 +566,7 @@ public class OpenStackCloudProvider {
     // Volume
     //
 
+    /* proposed mapping: see http://docs.openstack.org/api/openstack-block-storage/2.0/content/Volumes.html */
     private Volume.State fromNovaVolumeStatusToCimiVolumeState(final String novaStatus) {
         if (novaStatus.equalsIgnoreCase("AVAILABLE")) {
             return Volume.State.AVAILABLE;
@@ -579,6 +581,7 @@ public class OpenStackCloudProvider {
         }
     }
 
+    /* proposed mapping: see http://docs.openstack.org/api/openstack-block-storage/2.0/content/Volumes.html */
     private MachineVolume.State fromNovaVolumeStatusToCimiMachineVolumeState(final String novaStatus) {
         if (novaStatus.equalsIgnoreCase("AVAILABLE")) {
             return MachineVolume.State.ATTACHED;
@@ -586,9 +589,11 @@ public class OpenStackCloudProvider {
             return MachineVolume.State.ATTACHED;
         } else if (novaStatus.equalsIgnoreCase("ATTACHING")) {
             return MachineVolume.State.ATTACHING;
-        } else if (novaStatus.equalsIgnoreCase("DETACHING")) {
+        }
+        /*else if (novaStatus.equalsIgnoreCase("DETACHING")) { // undocumented state!
             return MachineVolume.State.DETACHING;
-        } else {
+        }*/
+        else {
             return MachineVolume.State.ERROR; // CIMI mapping!
         }
     }
@@ -648,9 +653,12 @@ public class OpenStackCloudProvider {
     // Network
     //
 
+    /* proposed mapping: see http://docs.openstack.org/api/openstack-network/2.0/content/Concepts-d1e369.html */
     private Network.State fromNovaNetworkStatusToCimiNetworkState(final String novaStatus) {
         if (novaStatus.equalsIgnoreCase("ACTIVE")) {
             return Network.State.STARTED;
+        } else if (novaStatus.equalsIgnoreCase("BUILD")) {
+            return Network.State.CREATING;
         } else {
             return Network.State.ERROR; // CIMI mapping!
         }
