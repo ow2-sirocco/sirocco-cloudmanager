@@ -98,7 +98,6 @@ public class OpenStackCloudProvider {
         this.cloudProviderAccount = target.getAccount();
         this.cloudProviderLocation = target.getLocation();
 
-        /*Map<String, String> properties = this.cloudProviderAccount.getCloudProvider().getProperties();*/
         Map<String, String> properties = this.cloudProviderAccount.getProperties();
         if (properties == null || properties.get("tenantName") == null) {
             throw new ConnectorException("No access to properties: tenantName");
@@ -295,7 +294,9 @@ public class OpenStackCloudProvider {
             Volume volume = this.getVolume(volumeAttachment.getVolumeId());
             machineVolume.setVolume(volume);
             machineVolume.setProviderAssignedId(volumeAttachment.getId());
-            machineVolume.setState(MachineVolume.State.ATTACHED); /*FIXME attaching/detaching state (openStack volume state)*/
+            com.woorea.openstack.nova.model.Volume novaVolume = this.novaClient.volumes().show(volumeAttachment.getVolumeId())
+                .execute();
+            machineVolume.setState(this.fromNovaVolumeStatusToCimiMachineVolumeState(novaVolume.getStatus()));
             machineVolume.setInitialLocation(volumeAttachment.getDevice());
             machineVolumes.add(machineVolume);
         }
@@ -567,14 +568,28 @@ public class OpenStackCloudProvider {
     private Volume.State fromNovaVolumeStatusToCimiVolumeState(final String novaStatus) {
         if (novaStatus.equalsIgnoreCase("AVAILABLE")) {
             return Volume.State.AVAILABLE;
+        } else if (novaStatus.equalsIgnoreCase("IN-USE")) {
+            return Volume.State.AVAILABLE;
         } else if (novaStatus.equalsIgnoreCase("CREATING")) {
             return Volume.State.CREATING;
         } else if (novaStatus.equalsIgnoreCase("DELETING")) {
             return Volume.State.DELETING;
-        } else if (novaStatus.equalsIgnoreCase("IN-USE")) {
-            return Volume.State.AVAILABLE;
         } else {
             return Volume.State.ERROR; // CIMI mapping!
+        }
+    }
+
+    private MachineVolume.State fromNovaVolumeStatusToCimiMachineVolumeState(final String novaStatus) {
+        if (novaStatus.equalsIgnoreCase("AVAILABLE")) {
+            return MachineVolume.State.ATTACHED;
+        } else if (novaStatus.equalsIgnoreCase("IN-USE")) {
+            return MachineVolume.State.ATTACHED;
+        } else if (novaStatus.equalsIgnoreCase("ATTACHING")) {
+            return MachineVolume.State.ATTACHING;
+        } else if (novaStatus.equalsIgnoreCase("DETACHING")) {
+            return MachineVolume.State.DETACHING;
+        } else {
+            return MachineVolume.State.ERROR; // CIMI mapping!
         }
     }
 
