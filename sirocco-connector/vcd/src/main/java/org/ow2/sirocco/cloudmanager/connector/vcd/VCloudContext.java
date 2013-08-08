@@ -81,7 +81,6 @@ public class VCloudContext {
 
     public VCloudContext(final CloudProviderAccount cloudProviderAccount, final Logger logger) throws ConnectorException {
 
-        /*Map<String, String> properties = cloudProviderAccount.getCloudProvider().getProperties();*/
         Map<String, String> properties = cloudProviderAccount.getProperties();
         if (properties == null || properties.get("orgName") == null || properties.get("vdcName") == null
             || properties.get("cimiPublicOrgVdcNetworkName") == null) {
@@ -133,8 +132,6 @@ public class VCloudContext {
 
             this.cimiPublicNetwork = new Network();
             // this.cimiPublicNetwork.setName(this.cimiPublicOrgVdcNetworkName);
-            // this.cimiPublicNetwork.setName(this.getCimiPublicOrgVdcNetwork().getResource().getName());
-            // this.cimiPublicNetwork.setProviderAssignedId(this.getCimiPublicOrgVdcNetwork().getResource().getHref());
             this.cimiPublicNetwork.setName(this.cimiPublicOrgVdcNetwork.getResource().getName());
             this.cimiPublicNetwork.setProviderAssignedId(this.cimiPublicOrgVdcNetwork.getResource().getHref());
             this.cimiPublicNetwork.setState(Network.State.STARTED);
@@ -182,65 +179,29 @@ public class VCloudContext {
         return this.vcloudClient;
     }
 
-    /*public void setVcloudClient(final VcloudClient vcloudClient) {
-        this.vcloudClient = vcloudClient;
-    }*/
-
     public String getOrgName() {
         return this.orgName;
     }
-
-    /*public void setOrgName(final String orgName) {
-        this.orgName = orgName;
-    }*/
 
     public Organization getOrg() {
         return this.org;
     }
 
-    /*public void setOrg(final Organization org) {
-        this.org = org;
-    }*/
-
     public String getVdcName() {
         return this.vdcName;
     }
-
-    /*public void setVdcName(final String vdcName) {
-        this.vdcName = vdcName;
-    }*/
 
     public Vdc getVdc() {
         return this.vdc;
     }
 
-    /*public void setVdc(final Vdc vdc) {
-        this.vdc = vdc;
-    }*/
-
     public String getCimiPublicOrgVdcNetworkName() {
         return this.cimiPublicOrgVdcNetworkName;
     }
 
-    /*public void setCimiPublicOrgVdcNetworkName(final String cimiPublicOrgVdcNetworkName) {
-        this.cimiPublicOrgVdcNetworkName = cimiPublicOrgVdcNetworkName;
-    }*/
-
-    /*public OrgVdcNetwork getCimiPublicOrgVdcNetwork() {
-        return this.cimiPublicOrgVdcNetwork;
-    }*/
-
-    /*public void setCimiPublicOrgVdcNetwork(final OrgVdcNetwork cimiPublicOrgVdcNetwork) {
-        this.cimiPublicOrgVdcNetwork = cimiPublicOrgVdcNetwork;
-    }*/
-
     public boolean isCimiPublicOrgVdcNetworkIsRouted() {
         return this.cimiPublicOrgVdcNetworkIsRouted;
     }
-
-    /*public void setCimiPublicOrgVdcNetworkIsRouted(final boolean cimiPublicOrgVdcNetworkIsRouted) {
-        this.cimiPublicOrgVdcNetworkIsRouted = cimiPublicOrgVdcNetworkIsRouted;
-    }*/
 
     public Network getCimiPublicNetwork() {
         return this.cimiPublicNetwork;
@@ -250,15 +211,7 @@ public class VCloudContext {
         return this.edgeGatewayName;
     }
 
-    /*public void setEdgeGatewayName(final String edgeGatewayName) {
-        this.edgeGatewayName = edgeGatewayName;
-    }*/
-
     public EdgeGateway getEdgeGateway() {
         return this.edgeGateway;
     }
-
-    /*public void setEdgeGateway(final EdgeGateway edgeGateway) {
-        this.edgeGateway = edgeGateway;
-    }*/
 }

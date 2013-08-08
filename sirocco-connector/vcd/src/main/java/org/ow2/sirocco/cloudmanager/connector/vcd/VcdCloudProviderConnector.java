@@ -56,8 +56,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 
 public class VcdCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, INetworkService {
-    // private static Logger logger =
-    // LoggerFactory.getLogger(VcdCloudProviderConnector.class);
 
     private List<VcdCloudProvider> vcdCPs = new ArrayList<VcdCloudProvider>();
 
