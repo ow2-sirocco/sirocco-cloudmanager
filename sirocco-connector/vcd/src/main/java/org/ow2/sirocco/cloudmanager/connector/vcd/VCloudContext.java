@@ -81,7 +81,8 @@ public class VCloudContext {
 
     public VCloudContext(final CloudProviderAccount cloudProviderAccount, final Logger logger) throws ConnectorException {
 
-        Map<String, String> properties = cloudProviderAccount.getCloudProvider().getProperties();
+        /*Map<String, String> properties = cloudProviderAccount.getCloudProvider().getProperties();*/
+        Map<String, String> properties = cloudProviderAccount.getProperties();
         if (properties == null || properties.get("orgName") == null || properties.get("vdcName") == null
             || properties.get("cimiPublicOrgVdcNetworkName") == null) {
             throw new ConnectorException("No access to properties: orgName or vdcName or cimiPublicOrgVdcNetworkName");

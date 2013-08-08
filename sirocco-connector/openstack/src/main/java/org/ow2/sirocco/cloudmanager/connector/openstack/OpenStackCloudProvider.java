@@ -98,7 +98,8 @@ public class OpenStackCloudProvider {
         this.cloudProviderAccount = target.getAccount();
         this.cloudProviderLocation = target.getLocation();
 
-        Map<String, String> properties = this.cloudProviderAccount.getCloudProvider().getProperties();
+        /*Map<String, String> properties = this.cloudProviderAccount.getCloudProvider().getProperties();*/
+        Map<String, String> properties = this.cloudProviderAccount.getProperties();
         if (properties == null || properties.get("tenantName") == null) {
             throw new ConnectorException("No access to properties: tenantName");
         }
@@ -259,7 +260,7 @@ public class OpenStackCloudProvider {
         // Network
         List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
         machine.setNetworkInterfaces(nics);
-        OpenStackCloudProvider.logger.info("-- " + server.getAddresses().getAddresses().keySet());
+        /*OpenStackCloudProvider.logger.info("-- " + server.getAddresses().getAddresses().keySet());*/
         for (String networkName : server.getAddresses().getAddresses().keySet()) {
             /* FIXME find network providerAssignedId by network name and get the CIMI network */
             Network cimiNetwork = new Network();
