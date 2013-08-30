@@ -92,20 +92,23 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
 
     /* TODO
-     * Network
-     * - Quantum
-     * 
-     * Compute
-     * - reboot: when supported by woorea 
-     * - Network with/without Quantum
      * 
      * Mix
+     * - a CIMI create operation should not leave a created CP entity if it throws an exception
      * - connector cache 
-     * - code format
      * - REST call trace (On/Off)
      * - woorea exception handling
      * - availability_zone (API for zone)
-     * - CIMI mapping : status of server, volume, network
+     * 
+     * Compute
+     * - reboot: not supported by woorea 
+     * - getMachine : fromServerToMachine : network mapping part : see fixme
+     * 
+     * Network
+     * - createNetwork : add implicit/explicit subnet ; conflict between cidr
+     * - createNetwork/deleteNetwork: woorea bugs : see fixme
+     * - Forwarding groups / BagPipe
+     * 
      */
 
     //

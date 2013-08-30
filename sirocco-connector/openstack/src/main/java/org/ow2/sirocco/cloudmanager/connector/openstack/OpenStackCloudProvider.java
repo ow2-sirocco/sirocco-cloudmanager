@@ -197,7 +197,7 @@ public class OpenStackCloudProvider {
         }
     }
 
-    private void fromServerToMachine(final String serverId, final Machine machine) {
+    private void fromServerToMachine(final String serverId, final Machine machine) throws ConnectorException {
         Server server = this.novaClient.servers().show(serverId).execute(); /*get a fresh server*/
 
         machine.setProviderAssignedId(serverId);
@@ -262,11 +262,7 @@ public class OpenStackCloudProvider {
         machine.setNetworkInterfaces(nics);
         /*OpenStackCloudProvider.logger.info("-- " + server.getAddresses().getAddresses().keySet());*/
         for (String networkName : server.getAddresses().getAddresses().keySet()) {
-            /* FIXME find network providerAssignedId by network name and get the CIMI network */
-            Network cimiNetwork = new Network();
-            cimiNetwork.setProviderAssignedId(networkName); // XXX
-            cimiNetwork.setName(networkName);
-            cimiNetwork.setState(Network.State.STARTED);
+            Network cimiNetwork = this.getNetworkByName(networkName);
             // Nic
             MachineNetworkInterface machineNetworkInterface = new MachineNetworkInterface();
             machineNetworkInterface.setName(networkName);
@@ -301,10 +297,6 @@ public class OpenStackCloudProvider {
             machineVolume.setInitialLocation(volumeAttachment.getDevice());
             machineVolumes.add(machineVolume);
         }
-
-        /* FIXME 
-         * - Network with Quantum
-         * */
     }
 
     public Machine createMachine(final MachineCreate machineCreate) throws ConnectorException, InterruptedException {
@@ -379,7 +371,7 @@ public class OpenStackCloudProvider {
         return machine;
     }
 
-    public Machine getMachine(final String machineId) {
+    public Machine getMachine(final String machineId) throws ConnectorException {
         final Machine machine = new Machine();
         this.fromServerToMachine(machineId, machine);
         return machine;
@@ -421,7 +413,7 @@ public class OpenStackCloudProvider {
         cimiAddress.setAllocation("dynamic"); // FIXME mapping openstack / CIMI
         // cimiAddress.setProtocol("IPv4");
         cimiAddress.setProtocol(address.getVersion());
-        cimiAddress.setResource(cimiNetwork);
+        cimiAddress.setResource(cimiNetwork); // ???
         MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
         entry.setAddress(cimiAddress);
         nic.getAddresses().add(entry);
@@ -670,8 +662,20 @@ public class OpenStackCloudProvider {
         cimiNetwork.setName(novaNetwork.getName());
         cimiNetwork.setProviderAssignedId(novaNetwork.getId());
         cimiNetwork.setState(this.fromNovaNetworkStatusToCimiNetworkState(novaNetwork.getStatus()));
+        // cimiNetwork.setNetworkType(???); // CIMI mapping unclear :
+        // Network.Type.PRIVATE or Network.Type.PUBLIC
 
         // CIMI mapping : NetworkType, MTU... !
+    }
+
+    private Network getNetworkByName(final String networkName) throws ConnectorException {
+        com.woorea.openstack.quantum.model.Networks novaNetworks = this.quantum.networks().list().execute();
+        for (com.woorea.openstack.quantum.model.Network novaNetwork : novaNetworks) {
+            if (novaNetwork.getName().equals(networkName)) {
+                return this.getNetwork(novaNetwork.getId());
+            }
+        }
+        throw new ConnectorException("Cannot find network for network name:" + networkName);
     }
 
     public Network createNetwork(final NetworkCreate networkCreate) throws ConnectorException, InterruptedException {
@@ -691,8 +695,7 @@ public class OpenStackCloudProvider {
         com.woorea.openstack.quantum.model.Network novaNetwork = this.quantum.networks().create(networkForCreate).execute();
 
         /* FIXME
-         * - add implicit/explicit subnet
-         * - conflict between cidr?
+         * - subnet: add implicit/explicit subnet ; conflict between cidr?
          * - Woorea bug: SubnetForCreate: networkId/networkid
          * - Woorea bug: Subnet deserialization
          */
