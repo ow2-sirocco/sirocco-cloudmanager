@@ -19,6 +19,7 @@ import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.ec2.compute.domain.EC2HardwareBuilder;
 import org.jclouds.ec2.domain.Attachment;
+import org.jclouds.ec2.domain.BlockDevice;
 import org.jclouds.ec2.domain.InstanceState;
 import org.jclouds.ec2.domain.InstanceStateChange;
 import org.jclouds.ec2.domain.InstanceType;
@@ -36,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
@@ -581,6 +583,41 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
                 }
             }
             machine.setDisks(machineDisks);
+
+            // volumes
+
+            List<MachineVolume> volumeAttachments = new ArrayList<MachineVolume>();
+            machine.setVolumes(volumeAttachments);
+
+            for (Map.Entry<String, BlockDevice> entry : runningInstance.getEbsBlockDevices().entrySet()) {
+                BlockDevice blockDevice = entry.getValue();
+                MachineVolume attachment = new MachineVolume();
+                Volume volume = new Volume();
+                volume.setProviderAssignedId(blockDevice.getVolumeId());
+                attachment.setVolume(volume);
+                MachineVolume.State attachmentState = null;
+                switch (blockDevice.getAttachmentStatus()) {
+                case ATTACHED:
+                    attachmentState = MachineVolume.State.ATTACHED;
+                    break;
+                case ATTACHING:
+                    attachmentState = MachineVolume.State.ATTACHING;
+                    break;
+                case DETACHED:
+                    attachmentState = MachineVolume.State.DELETED;
+                    break;
+                case DETACHING:
+                    attachmentState = MachineVolume.State.DETACHING;
+                    break;
+                case BUSY:
+                case UNRECOGNIZED:
+                    attachmentState = MachineVolume.State.PENDING;
+                    break;
+                }
+                attachment.setState(attachmentState);
+                volumeAttachments.add(attachment);
+            }
+
         }
 
         private KeyPair findOrInstallKeyPair(final String publicKey) {
@@ -707,15 +744,15 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
             try {
                 Reservation<? extends AWSRunningInstance> reservation = Iterables.getFirst(this.syncClient
                     .getInstanceServices().describeInstancesInRegion(this.amazonRegionCode, machineId), null);
-                if (reservation.isEmpty()) {
-                    throw new ConnectorException("Machine with id " + machineId + " does not exist");
+                if (!reservation.isEmpty()) {
+                    Machine machine = new Machine();
+                    this.fromAWSRunningInstanceToMachine(Iterables.getFirst(reservation, null), machine);
+                    return machine;
                 }
-                Machine machine = new Machine();
-                this.fromAWSRunningInstanceToMachine(Iterables.getFirst(reservation, null), machine);
-                return machine;
             } catch (Exception ex) {
                 throw new ConnectorException(ex.getMessage());
             }
+            throw new ResourceNotFoundException("Machine with id " + machineId + " does not exist");
         }
 
         public void addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException {
@@ -818,16 +855,16 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
             try {
                 Set<org.jclouds.ec2.domain.Volume> ebsVolumes = this.syncClient.getElasticBlockStoreServices()
                     .describeVolumesInRegion(this.amazonRegionCode, volumeId);
-                if (ebsVolumes.isEmpty()) {
-                    return null;
+                if (!ebsVolumes.isEmpty()) {
+                    org.jclouds.ec2.domain.Volume ebsVolume = ebsVolumes.iterator().next();
+                    Volume cimiVolume = new Volume();
+                    this.fromEbsVolumetToCimiVolume(ebsVolume, cimiVolume);
+                    return cimiVolume;
                 }
-                org.jclouds.ec2.domain.Volume ebsVolume = ebsVolumes.iterator().next();
-                Volume cimiVolume = new Volume();
-                this.fromEbsVolumetToCimiVolume(ebsVolume, cimiVolume);
-                return cimiVolume;
             } catch (Exception ex) {
                 throw new ConnectorException(ex.getMessage());
             }
+            throw new ResourceNotFoundException("volume with id " + volumeId + " not found");
         }
 
         public void createVolumeImage(final VolumeImage volumeImage) throws ConnectorException {
