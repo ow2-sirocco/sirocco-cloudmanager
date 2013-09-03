@@ -774,16 +774,6 @@ public class VcdCloudProvider {
 
     public List<Network> getNetworks() throws ConnectorException {
         ArrayList<Network> networks = new ArrayList<Network>();
-
-        // TODO remove after test
-        /*Network cimiPublicNetwork = new Network();
-        // cimiPublicNetwork.setName(this.cimiPublicOrgVdcNetworkName);
-        cimiPublicNetwork.setName(this.vCloudContext.getCimiPublicOrgVdcNetwork().getResource().getName());
-        cimiPublicNetwork.setProviderAssignedId(this.vCloudContext.getCimiPublicOrgVdcNetwork().getResource().getHref());
-        cimiPublicNetwork.setState(Network.State.STARTED);
-        cimiPublicNetwork.setNetworkType(Network.Type.PUBLIC);
-        networks.add(cimiPublicNetwork);*/
-
         networks.add(this.vCloudContext.getCimiPublicNetwork());
 
         // TODO add private networks
@@ -800,7 +790,7 @@ public class VcdCloudProvider {
             ReferenceType vAppRef = new ReferenceType();
             vAppRef.setHref(id);
             return Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vAppRef);
-        } catch (VCloudException e) { /*FIXME mapping to ResourceNotFoundException*/
+        } catch (VCloudException e) { /*mapping to ResourceNotFoundException!*/
             /*VcdCloudProvider.logger.info("VCloudException: " + e.getVcloudError() + ", "
             + e.getVcloudError().getMajorErrorCode() + ", " + e.getVcloudError().getMinorErrorCode() + ", "
             + e.getVcloudError().getVendorSpecificErrorCode() + ", " + e.getVcloudError().getOtherAttributes());*/
@@ -813,7 +803,7 @@ public class VcdCloudProvider {
             ReferenceType vmRef = new ReferenceType();
             vmRef.setHref(id);
             return VM.getVMByReference(this.vCloudContext.getVcloudClient(), vmRef);
-        } catch (VCloudException e) { /*FIXME mapping to ResourceNotFoundException*/
+        } catch (VCloudException e) { /*mapping to ResourceNotFoundException!*/
             /*VcdCloudProvider.logger.info("VCloudException: " + e.getVcloudError() + ", "
                 + e.getVcloudError().getMajorErrorCode() + ", " + e.getVcloudError().getMinorErrorCode() + ", "
                 + e.getVcloudError().getVendorSpecificErrorCode() + ", " + e.getVcloudError().getOtherAttributes());*/
@@ -857,7 +847,7 @@ public class VcdCloudProvider {
         // set default vApp instantiation parameters
         InstantiationParamsType instantiationParamsType = this.createVappInstantiationParamsType(systemCreate);
         composeVAppParamsType.setInstantiationParams(instantiationParamsType);
-        // TODO: startup, lease... sections (vs CIMI?)
+        // startup, lease... sections (vs CIMI?)
 
         // source items (VMs)
         Set<ComponentDescriptor> machineComponentDescriptors = this.getComponentDescriptorsOfType(systemCreate,
@@ -1153,7 +1143,6 @@ public class VcdCloudProvider {
 
     private void configureGuestCustomization(final Vapp vapp) throws VCloudException, TimeoutException {
         for (VM childVm : vapp.getChildrenVms()) {
-            // FIXME: GuestCustomization (v 1.5)
             GuestCustomizationSectionType guestCustomizationSection = childVm.getGuestCustomizationSection();
             guestCustomizationSection.setEnabled(true);
             childVm.updateSection(guestCustomizationSection).waitForTask(0);
@@ -1372,7 +1361,7 @@ public class VcdCloudProvider {
             features.getNetworkService().add(new ObjectFactory().createNatService(natServiceType));
             networkConfigurationType.setFeatures(features);
 
-        } else { // TODO ISOLATED
+        } else { // ISOLATED !!!
             throw new ConnectorException("Unsupported fence mode: " + fenceMode);
         }
         vAppNetworkConfigurationType.setConfiguration(networkConfigurationType);
