@@ -75,10 +75,6 @@ public class VCloudContext {
 
     private EdgeGateway edgeGateway;
 
-    /* TODO
-     * remove useless setters
-     * */
-
     public VCloudContext(final CloudProviderAccount cloudProviderAccount, final Logger logger) throws ConnectorException {
 
         Map<String, String> properties = cloudProviderAccount.getProperties();

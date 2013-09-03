@@ -235,9 +235,10 @@ public class VcdCloudProvider {
         final int waitTimeInMilliSeconds = VcdCloudProvider.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
         final Map<String, MachineTemplate> machineTemplateMap = new HashMap<String, MachineTemplate>();
         final System system = new System();
+        Vapp vapp = null;
 
         try {
-            Vapp vapp = this.createVapp(systemCreate, machineTemplateMap);
+            vapp = this.createVapp(systemCreate, machineTemplateMap);
             List<Task> tasks = vapp.getTasks();
             if (tasks.size() > 0) { // wait for all tasks
                 tasks.get(0).waitForTask(waitTimeInMilliSeconds);
@@ -247,10 +248,16 @@ public class VcdCloudProvider {
             this.configureVmSections(vapp, machineTemplateMap);
 
             // refresh the vapp (otherwise no childrenVms is visible!
-            Vapp vappFresh = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
-            this.fromvAppToSystem(vappFresh, system);
+            vapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
+            this.fromvAppToSystem(vapp, system);
 
         } catch (Exception ex) {
+            try {
+                if (vapp != null) {
+                    vapp.delete();
+                }
+            } catch (VCloudException e) {
+            }
             throw new ConnectorException(ex);
         }
         return system;
@@ -563,9 +570,10 @@ public class VcdCloudProvider {
         final int waitTimeInMilliSeconds = VcdCloudProvider.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
         final Map<String, MachineTemplate> machineTemplateMap = new HashMap<String, MachineTemplate>();
         final Machine machine = new Machine();
+        Vapp vapp = null;
 
         try {
-            Vapp vapp = this.createVapp(machineCreate, machineTemplateMap);
+            vapp = this.createVapp(machineCreate, machineTemplateMap);
 
             List<Task> tasks = vapp.getTasks();
             if (tasks.size() > 0) { // wait for all tasks
@@ -573,24 +581,30 @@ public class VcdCloudProvider {
             }
 
             // refresh the vapp (otherwise no childrenVms is visible! - TBC)
-            Vapp vappFresh = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
-            /*VcdCloudProvider.logger.info("nbr de vms: " + vappFresh.getChildrenVms().size());
-            for (VM childVm : vappFresh.getChildrenVms()) {
+            vapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
+            /*VcdCloudProvider.logger.info("nbr de vms: " + vapp.getChildrenVms().size());
+            for (VM childVm : vapp.getChildrenVms()) {
                 VcdCloudProvider.logger.info("  vm: " + childVm.getResource().getName());
             }*/
-            if (vappFresh.getChildrenVms().size() != 1) {
+            if (vapp.getChildrenVms().size() != 1) {
                 throw new ConnectorException("only one vm is expected!");
             }
 
             // configure vms
             this.configureVmSections(vapp, machineTemplateMap);
 
-            /*refresh the vapp (otherwise no childrenVms is visible! (TBC if this second refresh is required XXX)*/
-            vappFresh = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
+            /*refresh the vapp (otherwise no childrenVms is visible! (TBC if this second refresh is required)*/
+            vapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
 
-            this.fromVmToMachine(vappFresh.getChildrenVms().get(0), machine);
+            this.fromVmToMachine(vapp.getChildrenVms().get(0), machine);
 
         } catch (Exception ex) {
+            try {
+                if (vapp != null) {
+                    vapp.delete();
+                }
+            } catch (VCloudException e) {
+            }
             throw new ConnectorException(ex);
         }
         return machine;
