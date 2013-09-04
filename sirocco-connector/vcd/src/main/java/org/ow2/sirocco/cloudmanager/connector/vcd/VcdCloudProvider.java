@@ -254,9 +254,11 @@ public class VcdCloudProvider {
         } catch (Exception ex) {
             try {
                 if (vapp != null) {
-                    vapp.delete();
+                    VcdCloudProvider.logger.info("createSystem failed. Try to delete the created vapp");
+                    this.deleteVapp(vapp);
                 }
             } catch (VCloudException e) {
+            } catch (TimeoutException e) {
             }
             throw new ConnectorException(ex);
         }
@@ -264,25 +266,29 @@ public class VcdCloudProvider {
     }
 
     public void deleteSystem(final String systemId) throws ConnectorException {
-        final int waitTimeInMilliSeconds = VcdCloudProvider.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
         VcdCloudProvider.logger.info("deleting system with providerAssignedId " + systemId);
         Vapp vapp = this.getVappByProviderAssignedId(systemId);
 
         try {
-            if (vapp.isDeployed()) {
-                VcdCloudProvider.logger.info("Undeploying " + vapp.getResource().getName());
-                if (vapp.getVappStatus() == VappStatus.POWERED_ON) {
-                    vapp.undeploy(UndeployPowerActionType.POWEROFF).waitForTask(waitTimeInMilliSeconds);
-                } else {
-                    vapp.undeploy(UndeployPowerActionType.DEFAULT).waitForTask(waitTimeInMilliSeconds);
-                }
-            }
-            VcdCloudProvider.logger.info("deleting " + vapp.getResource().getName());
-            // vapp.delete().waitForTask(waitTimeInMilliSeconds);
-            vapp.delete();
+            this.deleteVapp(vapp);
         } catch (Exception ex) {
             throw new ConnectorException(ex);
         }
+    }
+
+    private void deleteVapp(final Vapp vapp) throws VCloudException, TimeoutException {
+        final int waitTimeInMilliSeconds = VcdCloudProvider.DEFAULT_WAIT_TIME_IN_MILLISECONDS;
+        if (vapp.isDeployed()) {
+            VcdCloudProvider.logger.info("Undeploying vapp: " + vapp.getResource().getName());
+            if (vapp.getVappStatus() == VappStatus.POWERED_ON) {
+                vapp.undeploy(UndeployPowerActionType.POWEROFF).waitForTask(waitTimeInMilliSeconds);
+            } else {
+                vapp.undeploy(UndeployPowerActionType.DEFAULT).waitForTask(waitTimeInMilliSeconds);
+            }
+        }
+        VcdCloudProvider.logger.info("deleting vapp: " + vapp.getResource().getName());
+        // vapp.delete().waitForTask(waitTimeInMilliSeconds);
+        vapp.delete();
     }
 
     public void startSystem(final String systemId, final Map<String, String> properties) throws ConnectorException {
@@ -601,9 +607,11 @@ public class VcdCloudProvider {
         } catch (Exception ex) {
             try {
                 if (vapp != null) {
-                    vapp.delete();
+                    VcdCloudProvider.logger.info("createMachine failed. Try to delete the created vapp");
+                    this.deleteVapp(vapp);
                 }
             } catch (VCloudException e) {
+            } catch (TimeoutException e) {
             }
             throw new ConnectorException(ex);
         }
