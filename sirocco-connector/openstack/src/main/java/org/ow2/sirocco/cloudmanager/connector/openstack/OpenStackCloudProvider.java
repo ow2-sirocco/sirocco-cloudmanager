@@ -299,7 +299,7 @@ public class OpenStackCloudProvider {
         }
     }
 
-    public Machine createMachineOld(final MachineCreate machineCreate) throws ConnectorException, InterruptedException {
+    public Machine createMachine(final MachineCreate machineCreate) throws ConnectorException, InterruptedException {
         OpenStackCloudProvider.logger.info("creating Machine for " + this.cloudProviderAccount.getLogin());
 
         ServerForCreate serverForCreate = new ServerForCreate();
@@ -371,7 +371,7 @@ public class OpenStackCloudProvider {
         return machine;
     }
 
-    public Machine createMachine(final MachineCreate machineCreate) throws Exception {
+    public Machine createMachineTmp(final MachineCreate machineCreate) throws Exception {
         OpenStackCloudProvider.logger.info("creating Machine for " + this.cloudProviderAccount.getLogin());
 
         ServerForCreate serverForCreate = new ServerForCreate();
