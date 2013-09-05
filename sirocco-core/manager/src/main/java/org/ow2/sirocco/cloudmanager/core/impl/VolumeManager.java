@@ -54,6 +54,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.core.process.common.OrchestratorUtils;
@@ -419,6 +420,10 @@ public class VolumeManager implements IVolumeManager {
         Volume volume = this.getVolumeById(volumeId);
         if (volume == null) {
             throw new ResourceNotFoundException("Volume " + volumeId + " doesn't not exist");
+        }
+
+        if (!volume.getAttachments().isEmpty()) {
+            throw new ResourceConflictException("Volume in use");
         }
 
         volume.setState(Volume.State.DELETING);
