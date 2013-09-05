@@ -152,17 +152,6 @@ public class OpenStackCloudProvider {
         	System.out.println(image);
         }*/
 
-        // FIXME without Quantum: mapping to a backend network
-        /*this.cimiPrivateNetwork = new Network();
-        this.cimiPrivateNetwork.setProviderAssignedId("0");
-        this.cimiPrivateNetwork.setState(Network.State.STARTED);
-        this.cimiPrivateNetwork.setNetworkType(Network.Type.PRIVATE);
-
-        this.cimiPublicNetwork = new Network();
-        this.cimiPublicNetwork.setProviderAssignedId("1");
-        this.cimiPublicNetwork.setState(Network.State.STARTED);
-        this.cimiPublicNetwork.setNetworkType(Network.Type.PUBLIC);*/
-
     }
 
     public CloudProviderAccount getCloudProviderAccount() {
@@ -224,39 +213,6 @@ public class OpenStackCloudProvider {
 
         }
         machine.setDisks(machineDisks);
-
-        // Network (without Quantum)
-        /*assumption: first IP address is private, next addresses are public (floating IPs)*/
-        /*List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
-        machine.setNetworkInterfaces(nics);
-        MachineNetworkInterface privateNic = new MachineNetworkInterface();
-        privateNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
-        privateNic.setNetwork(this.cimiPrivateNetwork);
-        // privateNic.setNetworkType(Network.Type.PRIVATE);
-        privateNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
-        MachineNetworkInterface publicNic = new MachineNetworkInterface();
-        publicNic.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
-        publicNic.setNetwork(this.cimiPublicNetwork);
-        // publicNic.setNetworkType(Network.Type.PUBLIC);
-        publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
-        OpenStackCloudProvider.logger.info("-- " + server.getAddresses().getAddresses().keySet());
-        for (String networkType : server.getAddresses().getAddresses().keySet()) {
-            Collection<Address> addresses = server.getAddresses().getAddresses().get(networkType);
-            // logger.info("-- " + addresses);
-            Iterator<Address> iterator = addresses.iterator();
-            if (iterator.hasNext()) {
-                this.addAddress(iterator.next(), this.cimiPrivateNetwork, privateNic);
-            }
-            while (iterator.hasNext()) {
-                this.addAddress(iterator.next(), this.cimiPublicNetwork, publicNic);
-            }
-        }
-        if (privateNic.getAddresses().size() > 0) {
-            nics.add(privateNic);
-        }
-        if (publicNic.getAddresses().size() > 0) {
-            nics.add(publicNic);
-        }*/
 
         // Network
         List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
@@ -377,7 +333,7 @@ public class OpenStackCloudProvider {
             this.cleanUpGhostServer(server);
             throw (ex);
         }
-        return machine; // XXX
+        return machine;
     }
 
     private void cleanUpGhostServer(final Server server) {
