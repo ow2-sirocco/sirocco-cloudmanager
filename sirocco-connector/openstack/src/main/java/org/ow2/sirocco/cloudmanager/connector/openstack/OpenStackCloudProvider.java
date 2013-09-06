@@ -93,8 +93,6 @@ public class OpenStackCloudProvider {
 
     private Quantum quantum;
 
-    // private Network cimiPrivateNetwork, cimiPublicNetwork;
-
     public OpenStackCloudProvider(final ProviderTarget target) throws ConnectorException {
         this.cloudProviderAccount = target.getAccount();
         this.cloudProviderLocation = target.getLocation();
@@ -384,7 +382,7 @@ public class OpenStackCloudProvider {
         org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
         cimiAddress.setIp(address.getAddr());
         cimiAddress.setNetwork(cimiNetwork);
-        cimiAddress.setAllocation("dynamic"); // FIXME mapping openstack / CIMI
+        cimiAddress.setAllocation("dynamic"); /*FIXME address allocation mode (dynamic / fixed)*/
         // cimiAddress.setProtocol("IPv4");
         cimiAddress.setProtocol(address.getVersion());
         cimiAddress.setResource(cimiNetwork); // ???
@@ -421,8 +419,8 @@ public class OpenStackCloudProvider {
             		);*/
             if (memoryInKBytes == flavorMemoryInKBytes) {
                 Integer flavorCpu = new Integer(flavor.getVcpus());
-                // if (machineConfig.getCpu() == flavor.getVcpus()) {
-                /*System.out.println(
+                /*if (machineConfig.getCpu() == flavor.getVcpus()) {
+                  System.out.println(
                 		"Cpu()=" + machineConfig.getCpu() 
                 		+ ", flavorCpu=" + flavorCpu
                 		);*/
@@ -667,34 +665,51 @@ public class OpenStackCloudProvider {
         networkForCreate.setAdminStateUp(true); /* set the administrative status of the network to UP */
 
         com.woorea.openstack.quantum.model.Network novaNetwork = this.quantum.networks().create(networkForCreate).execute();
-
-        /* FIXME
-         * - subnet: add implicit/explicit subnet ; conflict between cidr?
-         * - Woorea bug: SubnetForCreate: networkId/networkid
-         * - Woorea bug: Subnet deserialization
-         */
-        do {
-            novaNetwork = this.quantum.networks().show(novaNetwork.getId()).execute();
-            if (novaNetwork.getStatus().equalsIgnoreCase("ACTIVE")) {
-                break;
-            }
-            Thread.sleep(1000);
-        } while (OpenStackCloudProvider.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS-- > 0);
-
-        SubnetForCreate subnetForCreate = new SubnetForCreate();
-        subnetForCreate.setNetworkId(novaNetwork.getId());
-        subnetForCreate.setCidr("10.0.1.0/24");
-        subnetForCreate.setIpVersion(4);
-        subnetForCreate.setName("defaultSubnet");
-        try { // catch block to be removed : Woorea bug: Subnet deserialization
-            this.quantum.subnets().create(subnetForCreate).execute();
-        } catch (Exception e) {
-            /*e.printStackTrace();*/
-        }
-
         final Network cimiNetwork = new Network();
-        this.fromNovaNetworkToCimiNetwork(novaNetwork.getId(), cimiNetwork);
+
+        try {
+            /* FIXME
+             * - subnet: add implicit/explicit subnet ; conflict between cidr?
+             * - Woorea bug: SubnetForCreate: networkId/networkid
+             * - Woorea bug: Subnet deserialization
+             */
+            do {
+                novaNetwork = this.quantum.networks().show(novaNetwork.getId()).execute();
+                if (novaNetwork.getStatus().equalsIgnoreCase("ACTIVE")) {
+                    break;
+                }
+                Thread.sleep(1000);
+            } while (OpenStackCloudProvider.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS-- > 0);
+
+            SubnetForCreate subnetForCreate = new SubnetForCreate();
+            subnetForCreate.setNetworkId(novaNetwork.getId());
+            subnetForCreate.setCidr("10.0.1.0/24");
+            subnetForCreate.setIpVersion(4);
+            subnetForCreate.setName("defaultSubnet");
+            try { /* catch block to be removed : Woorea bug: Subnet deserialization*/
+                this.quantum.subnets().create(subnetForCreate).execute();
+            } catch (Exception e) {
+                /*e.printStackTrace();*/
+            }
+
+            this.fromNovaNetworkToCimiNetwork(novaNetwork.getId(), cimiNetwork);
+        } catch (OpenStackResponseException ex) {
+            this.cleanUpGhostNetwork(novaNetwork);
+            throw (ex);
+        } catch (InterruptedException ex) {
+            this.cleanUpGhostNetwork(novaNetwork);
+            throw (ex);
+        }
         return cimiNetwork;
+    }
+
+    private void cleanUpGhostNetwork(final com.woorea.openstack.quantum.model.Network novaNetwork) {
+        try {
+            if (novaNetwork != null) {
+                this.deleteNetwork(novaNetwork.getId());
+            }
+        } catch (OpenStackResponseException e) {
+        }
     }
 
     public Network getNetwork(final String networkId) {
