@@ -97,6 +97,7 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-jdk14</artifactId>
 			<version>1.5.6</version>
+			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -120,7 +121,19 @@
 
 		<dependency>
 			<groupId>com.woorea</groupId>
+			<artifactId>keystone-model</artifactId>
+			<version>${woorea.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.woorea</groupId>
 			<artifactId>nova-client</artifactId>
+			<version>${woorea.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.woorea</groupId>
+			<artifactId>nova-model</artifactId>
 			<version>${woorea.version}</version>
 		</dependency>
 
@@ -129,6 +142,18 @@
 			<artifactId>quantum-client</artifactId>
 			<version>${woorea.version}</version>
 		</dependency>
+
+		<dependency>
+			<groupId>com.woorea</groupId>
+			<artifactId>quantum-model</artifactId>
+			<version>${woorea.version}</version>
+		</dependency>
+
+		<dependency>
+                        <groupId>com.woorea</groupId>
+                        <artifactId>openstack-client</artifactId>
+                        <version>${woorea.version}</version>
+                </dependency>
 
 	</dependencies>
 	<profiles>
