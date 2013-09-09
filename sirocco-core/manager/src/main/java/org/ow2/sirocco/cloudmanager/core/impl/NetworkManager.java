@@ -210,7 +210,7 @@ public class NetworkManager implements INetworkManager {
     public Job createNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
         NetworkManager.logger.info("Creating Network");
 
-        if (networkCreate.getProperties().get("providerAccountId") != null
+        if (networkCreate.getProperties() != null && networkCreate.getProperties().get("providerAccountId") != null
             && networkCreate.getProperties().get("networkProviderAssignedId") != null) {
             return this.importNetworkFromProvider(networkCreate);
         }
