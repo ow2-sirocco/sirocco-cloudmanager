@@ -46,7 +46,9 @@
 		<module>connector-api</module> 
 		<module>connector-finder</module> 
 		<module>mock</module> 
-		<!--<module>openstack</module> -->
+		<module>openstack</module>
+		<module>vcd</module>
+		<module>amazon</module>
 		<module>test</module> 
 	</modules>
 
