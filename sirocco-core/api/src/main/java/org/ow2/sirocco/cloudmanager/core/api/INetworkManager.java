@@ -69,6 +69,8 @@ public interface INetworkManager {
 
     Network getNetworkById(String networkId) throws ResourceNotFoundException;
 
+    Network getNetworkByProviderAssignedId(String providerAssignedId);
+
     Network getNetworkAttributes(final String networkId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
 

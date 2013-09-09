@@ -88,6 +88,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.Visibility;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -1350,10 +1352,17 @@ public class MachineManager implements IMachineManager {
         }
         MachineManager.logger.info("createNetworkInterfaces machine " + persisted.getId() + " has nics " + nics.size());
         for (MachineNetworkInterface nic : nics) {
-            // TODO
             nic.setId(null);
-            nic.setNetwork(null);
             nic.setNetworkPort(null);
+
+            if (nic.getNetwork() != null) {
+                if (nic.getNetwork().getProviderAssignedId() != null) {
+                    Network net = this.networkManager.getNetworkByProviderAssignedId(nic.getNetwork().getProviderAssignedId());
+                    nic.setNetwork(net);
+                } else if (nic.getNetwork().getNetworkType() == Type.PUBLIC) {
+                    nic.setNetwork(this.networkManager.getPublicNetwork());
+                }
+            }
 
             List<MachineNetworkInterfaceAddress> entries = nic.getAddresses();
             if (entries != null) {
