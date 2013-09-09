@@ -26,10 +26,13 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 
 @Entity
 public class NetworkConfiguration extends CloudEntity implements Serializable {
@@ -42,6 +45,8 @@ public class NetworkConfiguration extends CloudEntity implements Serializable {
     private String classOfService;
 
     private Visibility visibility = Visibility.PRIVATE;
+
+    private List<Subnet> subnets;
 
     @Enumerated(EnumType.STRING)
     public Visibility getVisibility() {
@@ -75,6 +80,15 @@ public class NetworkConfiguration extends CloudEntity implements Serializable {
 
     public void setClassOfService(final String classOfService) {
         this.classOfService = classOfService;
+    }
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    public List<Subnet> getSubnets() {
+        return this.subnets;
+    }
+
+    public void setSubnets(final List<Subnet> subnets) {
+        this.subnets = subnets;
     }
 
 }
