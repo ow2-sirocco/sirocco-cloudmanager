@@ -32,6 +32,8 @@ public class Subnet {
 
     private String cidr;
 
+    private String protocol;
+
     private boolean enableDhcp;
 
     public String getName() {
@@ -66,10 +68,18 @@ public class Subnet {
         this.enableDhcp = enableDhcp;
     }
 
+    public String getProtocol() {
+        return this.protocol;
+    }
+
+    public void setProtocol(final String protocol) {
+        this.protocol = protocol;
+    }
+
     @Override
     public String toString() {
         return "Subnet [name=" + this.name + ", providerAssignedId=" + this.providerAssignedId + ", cidr=" + this.cidr
-            + ", enableDhcp=" + this.enableDhcp + "]";
+            + ", protocol=" + this.protocol + ", enableDhcp=" + this.enableDhcp + "]";
     }
 
 }
