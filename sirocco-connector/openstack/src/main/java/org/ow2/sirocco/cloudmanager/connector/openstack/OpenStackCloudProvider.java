@@ -44,6 +44,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -142,12 +143,12 @@ public class OpenStackCloudProvider {
 
         /*Flavors flavors = novaClient.flavors().list(true).execute();
         for(Flavor flavor : flavors) {
-        	System.out.println(flavor);
+            System.out.println(flavor);
         }*/
 
         /*Images images = novaClient.images().list(true).execute();
         for(Image image : images) {
-        	System.out.println(image);
+            System.out.println(image);
         }*/
 
     }
@@ -384,7 +385,7 @@ public class OpenStackCloudProvider {
         cimiAddress.setNetwork(cimiNetwork);
         cimiAddress.setAllocation("dynamic"); /*FIXME address allocation mode (dynamic / fixed)*/
         // cimiAddress.setProtocol("IPv4");
-        cimiAddress.setProtocol(address.getVersion());
+        cimiAddress.setProtocol(address.getVersion()); // cimi mapping 4/IPv4 !
         cimiAddress.setResource(cimiNetwork); // ???
         MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
         entry.setAddress(cimiAddress);
@@ -392,21 +393,21 @@ public class OpenStackCloudProvider {
     }
 
     /*public Server getServer(String machineId) throws ConnectorException {
-    	try {
-    		return novaClient.servers().show(machineId).execute();
-    	} catch (OpenStackResponseException e) {
+        try {
+            return novaClient.servers().show(machineId).execute();
+        } catch (OpenStackResponseException e) {
             System.out.println("- " + e.getMessage() 
-            		+ ", " + e.getStatus()
-            		+ ", " + e.getLocalizedMessage()
-            		+ ", " + e.getCause()
-            		);
+                    + ", " + e.getStatus()
+                    + ", " + e.getLocalizedMessage()
+                    + ", " + e.getCause()
+                    );
             if (e.getStatus() == 404){
-    			throw new ResourceNotFoundException(e);	        	
+                throw new ResourceNotFoundException(e);             
             }
             else{
-    			throw new ConnectorException(e);	        	
+                throw new ConnectorException(e);                
             }
-    	}
+        }
     }*/
 
     private String findSuitableFlavor(final MachineConfiguration machineConfig) {
@@ -414,22 +415,22 @@ public class OpenStackCloudProvider {
             long memoryInKBytes = machineConfig.getMemory();
             long flavorMemoryInKBytes = flavor.getRam() * 1024;
             /*System.out.println(
-            		"memoryInKBytes=" + memoryInKBytes 
-            		+ ", flavorMemoryInKBytes=" + flavorMemoryInKBytes
-            		);*/
+                    "memoryInKBytes=" + memoryInKBytes 
+                    + ", flavorMemoryInKBytes=" + flavorMemoryInKBytes
+                    );*/
             if (memoryInKBytes == flavorMemoryInKBytes) {
                 Integer flavorCpu = new Integer(flavor.getVcpus());
                 /*if (machineConfig.getCpu() == flavor.getVcpus()) {
                   System.out.println(
-                		"Cpu()=" + machineConfig.getCpu() 
-                		+ ", flavorCpu=" + flavorCpu
-                		);*/
+                        "Cpu()=" + machineConfig.getCpu() 
+                        + ", flavorCpu=" + flavorCpu
+                        );*/
                 if (machineConfig.getCpu().intValue() == flavorCpu.intValue()) {
                     /*System.out.println(
-                    		"machineConfig.getDisks().size()=" + machineConfig.getDisks().size()
-                    		);*/
+                            "machineConfig.getDisks().size()=" + machineConfig.getDisks().size()
+                            );*/
                     /*if (machineConfig.getDisks().size() == 0) { 
-                    	return flavor.getId();
+                        return flavor.getId();
                     }
                     else */
                     if (machineConfig.getDisks().size() == 1 && flavor.getEphemeral() == 0) {
@@ -495,7 +496,7 @@ public class OpenStackCloudProvider {
         /*do {
             Server server = novaClient.servers().show(serverId).execute();  
             if (this.findIpAddressOnServer(server, floatingIp.getIp())) {
-            	logger.info("Floating IP " + floatingIp.getIp() + " attached to server " + serverId);
+                logger.info("Floating IP " + floatingIp.getIp() + " attached to server " + serverId);
                 break;
             }
             Thread.sleep(1000);
@@ -634,10 +635,40 @@ public class OpenStackCloudProvider {
         cimiNetwork.setName(novaNetwork.getName());
         cimiNetwork.setProviderAssignedId(novaNetwork.getId());
         cimiNetwork.setState(this.fromNovaNetworkStatusToCimiNetworkState(novaNetwork.getStatus()));
-        // cimiNetwork.setNetworkType(???); // CIMI mapping unclear :
+        // CIMI mapping unclear : NetworkType, MTU... !
+        // cimiNetwork.setNetworkType(???);
         // Network.Type.PRIVATE or Network.Type.PUBLIC
 
-        // CIMI mapping : NetworkType, MTU... !
+        List<Subnet> subnets = new ArrayList<Subnet>();
+        cimiNetwork.setSubnets(subnets);
+        // 2 options
+        for (String openStackSubnetId : novaNetwork.getSubnets()) {
+            com.woorea.openstack.quantum.model.Subnet openStackSubnet = this.quantum.subnets().show(openStackSubnetId)
+                .execute();
+            Subnet subnet = new Subnet();
+            subnet.setCidr(openStackSubnet.getCidr());
+            subnet.setEnableDhcp(openStackSubnet.isEnableDHCP());
+            subnet.setName(openStackSubnet.getName());
+            subnet.setProviderAssignedId(openStackSubnet.getId());
+            if (openStackSubnet.getIpversion().toString().equalsIgnoreCase("4")) {
+                subnet.setProtocol("IPv4");
+            } else if (openStackSubnet.getIpversion().toString().equalsIgnoreCase("6")) {
+                subnet.setProtocol("IPv6");
+            } else {
+                subnet.setProtocol(openStackSubnet.getIpversion().toString());
+            }
+            subnets.add(subnet);
+        }
+        /*for (com.woorea.openstack.quantum.model.Subnet openStackSubnet : this.quantum.subnets().list().execute()) {
+            if (openStackSubnet.getNetworkId() == novaNetwork.getId()) {
+                Subnet subnet = new Subnet();
+                subnet.setCidr(openStackSubnet.getCidr());
+                subnet.setEnableDhcp(openStackSubnet.isEnableDHCP());
+                subnet.setName(openStackSubnet.getName());
+                subnet.setProviderAssignedId(openStackSubnet.getId());
+                subnets.add(subnet);
+            }
+        }*/
     }
 
     private Network getNetworkByName(final String networkName) throws ConnectorException {
@@ -652,6 +683,10 @@ public class OpenStackCloudProvider {
 
     public Network createNetwork(final NetworkCreate networkCreate) throws ConnectorException, InterruptedException {
         OpenStackCloudProvider.logger.info("creating Network for " + this.cloudProviderAccount.getLogin());
+
+        if (networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets().size() == 0) {
+            throw new ConnectorException("Cannot find subnet configuration");
+        }
 
         NetworkForCreate networkForCreate = new NetworkForCreate();
 
@@ -670,8 +705,9 @@ public class OpenStackCloudProvider {
         try {
             /* FIXME
              * - subnet: add implicit/explicit subnet ; conflict between cidr?
-             * - Woorea bug: SubnetForCreate: networkId/networkid
-             * - Woorea bug: Subnet deserialization
+             * - Woorea bug: SubnetForCreate: networkId/networkid (ongoing pull4request)
+             * - Woorea bug: Subnet deserialization (pull4request TBD)
+             * - Woorea bug: SubnetForCreate: EnableDhcp not supported (pull4request TBD)
              */
             do {
                 novaNetwork = this.quantum.networks().show(novaNetwork.getId()).execute();
@@ -681,18 +717,47 @@ public class OpenStackCloudProvider {
                 Thread.sleep(1000);
             } while (OpenStackCloudProvider.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS-- > 0);
 
-            SubnetForCreate subnetForCreate = new SubnetForCreate();
+            /*SubnetForCreate subnetForCreate = new SubnetForCreate();
             subnetForCreate.setNetworkId(novaNetwork.getId());
             subnetForCreate.setCidr("10.0.1.0/24");
             subnetForCreate.setIpVersion(4);
             subnetForCreate.setName("defaultSubnet");
-            try { /* catch block to be removed : Woorea bug: Subnet deserialization*/
+            try {  // catch block to be removed : Woorea bug: Subnet deserialization
                 this.quantum.subnets().create(subnetForCreate).execute();
             } catch (Exception e) {
-                /*e.printStackTrace();*/
+                e.printStackTrace();
+            }*/
+
+            for (Subnet subnet : networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets()) {
+                SubnetForCreate subnetForCreate = new SubnetForCreate();
+                subnetForCreate.setName(subnet.getName());
+                subnetForCreate.setNetworkId(novaNetwork.getId());
+                subnetForCreate.setCidr(subnet.getCidr());
+                if (subnet.getProtocol().equalsIgnoreCase("IPv4")) {
+                    subnetForCreate.setIpVersion(4);
+                } else if (subnet.getProtocol().equalsIgnoreCase("IPv6")) {
+                    subnetForCreate.setIpVersion(6);
+                } else {
+                    // subnetForCreate.setIpVersion(subnet.getProtocol());
+                    throw new ConnectorException("Invalid input for ip_version. Reason: " + subnet.getProtocol()
+                        + " is not in [IPv4, IPv6].");
+                }
+                /* XXX mapping cimi/woorea/openStack for EnableDhcp*/
+                // subnetForCreate.setEnableDhcp(subnet.isEnableDhcp());
+
+                this.quantum.subnets().create(subnetForCreate).execute();
+                /* catch block to be removed : Woorea bug: Subnet deserialization
+                try {  
+                    this.quantum.subnets().create(subnetForCreate).execute();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }*/
             }
 
             this.fromNovaNetworkToCimiNetwork(novaNetwork.getId(), cimiNetwork);
+        } catch (ConnectorException ex) {
+            this.cleanUpGhostNetwork(novaNetwork);
+            throw (ex);
         } catch (OpenStackResponseException ex) {
             this.cleanUpGhostNetwork(novaNetwork);
             throw (ex);
@@ -735,7 +800,7 @@ public class OpenStackCloudProvider {
     }
 
     public void deleteNetwork(final String networkId) {
-        /* FIXME woorea Bug : err 409 ignored */
+        /* FIXME woorea Bug : err 409 ignored when trying to delete a network attached to servers */
         this.quantum.networks().delete(networkId).execute();
     }
 }
