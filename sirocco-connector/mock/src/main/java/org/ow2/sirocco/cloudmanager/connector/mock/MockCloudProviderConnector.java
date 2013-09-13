@@ -1441,6 +1441,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             final Network network = new Network();
             network.setName(networkCreate.getName());
             network.setNetworkType(networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType());
+            network.setSubnets(networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets());
             network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
             network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
             network.setProviderAssignedId(networkProviderAssignedId);
@@ -1462,7 +1463,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             }
             if (this.actionDone(network)) {
                 if (network.getState() == Network.State.CREATING) {
-                    network.setState(Network.State.STOPPED);
+                    network.setState(Network.State.STARTED);
                     network.setUpdated(new Date());
                 } else if (network.getState() == Network.State.STARTING) {
                     network.setState(Network.State.STARTED);
