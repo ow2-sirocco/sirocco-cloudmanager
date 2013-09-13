@@ -53,6 +53,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
@@ -255,6 +256,7 @@ public class NetworkManager implements INetworkManager {
         network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
         network.setNetworkType(networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType());
         network.setForwardingGroup(networkCreate.getNetworkTemplate().getForwardingGroup());
+        network.setSubnets(networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets());
 
         network.setState(Network.State.CREATING);
         this.em.persist(network);
@@ -271,7 +273,7 @@ public class NetworkManager implements INetworkManager {
         this.em.persist(job);
         this.em.flush();
 
-        this.resourceWatcher.watchNetwork(network, job);
+        this.resourceWatcher.watchNetwork(network, job, Network.State.STARTED, Network.State.STOPPED);
 
         return job;
     }
@@ -373,62 +375,45 @@ public class NetworkManager implements INetworkManager {
             throw new ResourceNotFoundException("Network " + networkId + " doesn't not exist");
         }
 
-        // delegates volume deletion to cloud provider connector
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getCloudProviderConnector(network.getCloudProviderAccount(),
-        // TODO:workflow network.getLocation());
-        Job providerJob = null;
+        Tenant tenant = this.getTenant();
 
-        // TODO:workflow try {
-        // TODO:workflow INetworkService networkService =
-        // connector.getNetworkService();
-        // TODO:workflow if (action.equals("delete")) {
-        // TODO:workflow providerJob =
-        // networkService.deleteNetwork(network.getProviderAssignedId());
-        // TODO:workflow } else if (action.equals("start")) {
-        // TODO:workflow providerJob =
-        // networkService.startNetwork(network.getProviderAssignedId());
-        // TODO:workflow } else if (action.equals("stop")) {
-        // TODO:workflow providerJob =
-        // networkService.stopNetwork(network.getProviderAssignedId());
-        // TODO:workflow }
-        // TODO:workflow} catch (ConnectorException e) {
-        // TODO:workflow NetworkManager.logger.error("Failed to " + action +
-        // " network: ", e);
-        // TODO:workflow throw new CloudProviderException(e.getMessage());
-        // TODO:workflow}
+        ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount());
 
-        // if by change the job is done and has failed, bail out
-        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
-            throw new CloudProviderException(providerJob.getStatusMessage());
+        Network.State expectedFinalState = null;
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            ProviderTarget target = new ProviderTarget().account(network.getCloudProviderAccount()).location(
+                network.getLocation());
+            if (action.equals("start")) {
+                networkService.startNetwork(network.getProviderAssignedId(), target);
+                network.setState(Network.State.STARTING);
+                expectedFinalState = State.STARTED;
+            } else if (action.equals("stop")) {
+                networkService.stopNetwork(network.getProviderAssignedId(), target);
+                network.setState(Network.State.STOPPING);
+                expectedFinalState = State.STOPPED;
+            } else if (action.equals("delete")) {
+                networkService.deleteNetwork(network.getProviderAssignedId(), target);
+                network.setState(Network.State.DELETING);
+                expectedFinalState = State.DELETED;
+            }
+        } catch (ConnectorException e) {
+            NetworkManager.logger.error("Failed to " + action + " network: ", e);
+            throw new CloudProviderException(e.getMessage());
         }
-
-        if (action.equals("delete")) {
-            network.setState(Network.State.DELETING);
-        } else if (action.equals("start")) {
-            network.setState(Network.State.STARTING);
-        } else if (action.equals("stop")) {
-            network.setState(Network.State.STOPPING);
-        }
-
-        this.em.persist(network);
-        this.em.flush();
 
         Job job = new Job();
+        job.setTenant(tenant);
         job.setTargetResource(network);
         job.setCreated(new Date());
-        job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setState(providerJob.getState());
-        job.setAction(providerJob.getAction());
-        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
+        job.setState(Status.RUNNING);
+        job.setAction(action);
+        job.setTimeOfStatusChange(new Date());
         this.em.persist(job);
         this.em.flush();
 
-        try {
-            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
-        } catch (Exception e) {
-            NetworkManager.logger.error("", e);
-        }
+        this.resourceWatcher.watchNetwork(network, job, expectedFinalState);
+
         return job;
     }
 

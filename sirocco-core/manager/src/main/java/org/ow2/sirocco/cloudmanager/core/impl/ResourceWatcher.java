@@ -106,7 +106,8 @@ public class ResourceWatcher implements IResourceWatcher {
 
     @Override
     @Asynchronous
-    public void watchNetwork(final Network network, final Job job) throws CloudProviderException {
+    public void watchNetwork(final Network network, final Job job, final Network.State... expectedStates)
+        throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(network.getCloudProviderAccount()).location(network.getLocation());
 
@@ -114,9 +115,11 @@ public class ResourceWatcher implements IResourceWatcher {
         mainloop: while (tries-- > 0) {
             try {
                 Network updatedNetwork = connector.getNetworkService().getNetwork(network.getProviderAssignedId(), target);
-                if (!updatedNetwork.getState().toString().endsWith("ING")) {
-                    this.networkManager.syncNetwork(network.getId().toString(), updatedNetwork, job.getId().toString());
-                    break mainloop;
+                for (Network.State expectedFinalState : expectedStates) {
+                    if (updatedNetwork.getState() == expectedFinalState) {
+                        this.networkManager.syncNetwork(network.getId().toString(), updatedNetwork, job.getId().toString());
+                        break mainloop;
+                    }
                 }
             } catch (ResourceNotFoundException e) {
                 this.networkManager.syncNetwork(network.getId().toString(), null, job.getId().toString());

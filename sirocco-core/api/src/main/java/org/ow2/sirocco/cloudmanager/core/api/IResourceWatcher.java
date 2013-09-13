@@ -10,7 +10,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 public interface IResourceWatcher {
     void watchMachine(Machine machine, Job job, Machine.State... expectedStates) throws CloudProviderException;
 
-    void watchNetwork(Network network, Job job) throws CloudProviderException;
+    void watchNetwork(Network network, Job job, Network.State... expectedStates) throws CloudProviderException;
 
     void watchVolume(Volume volume, Job job) throws CloudProviderException;
 
