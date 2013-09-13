@@ -32,9 +32,9 @@ public class Subnet {
 
     private String cidr;
 
-    private String protocol;
+    private String protocol = "IPv4";
 
-    private boolean enableDhcp;
+    private boolean enableDhcp = true;
 
     public String getName() {
         return this.name;
