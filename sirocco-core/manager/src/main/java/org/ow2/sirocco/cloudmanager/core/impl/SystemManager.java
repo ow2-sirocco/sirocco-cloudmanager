@@ -45,7 +45,6 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
@@ -204,8 +203,7 @@ public class SystemManager implements ISystemManager {
     @EJB
     private IResourceWatcher resourceWatcher;
 
-    @Inject
-    @OSGiService(dynamic = true)
+    @EJB
     private ICloudProviderConnectorFinder connectorFinder;
 
     private Tenant getTenant() throws CloudProviderException {

@@ -53,46 +53,6 @@
 	<build>
 		 <pluginManagement>
             <plugins>
-                <plugin>
-                    <groupId>org.apache.felix</groupId>
-                    <artifactId>maven-bundle-plugin</artifactId>
-                    <!-- 2.2.0 and above have new bnd which has wab instruction. 2.3.4 has few important bug fixes. -->
-                    <version>2.3.4</version>
-                    <extensions>true</extensions>
-                    <configuration>
-                        <supportedProjectTypes>
-                            <supportedProjectType>ejb</supportedProjectType>
-                            <supportedProjectType>war</supportedProjectType>
-                            <supportedProjectType>bundle</supportedProjectType>
-                            <supportedProjectType>jar</supportedProjectType>
-                        </supportedProjectTypes>
-                        <instructions>
-                            <!-- Read all OSGi configuration info from this optional file -->
-                            <_include>-osgi.properties</_include>
-                            <!-- No packages are exported by default. Having any pattern is dangerous, as the
-                            plugin will add any package found in dependency chain that matches the pattern as well.
-                            Since there is no easy way to have an include filter for just local packages, we don't
-                            export anything by default.-->
-                            <Export-Package>!*</Export-Package>
-                        </instructions>
-                    </configuration>
-                    <executions>
-                        <execution>
-                            <id>bundle-manifest</id>
-                            <phase>process-classes</phase>
-                            <goals>
-                                <goal>manifest</goal>
-                            </goals>
-                        </execution>
-                        <execution>
-                            <id>bundle-install</id>
-                            <phase>install</phase>
-                            <goals>
-                                <goal>install</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
 <!--                
 		 <plugin> 
                     <artifactId>maven-war-plugin</artifactId>
@@ -124,29 +84,29 @@
                     </configuration>
                 </plugin>
 -->
-                <plugin> <!-- Need to use this plugin to build ejb-jar files -->
+<!--
+                <plugin> 
                     <artifactId>maven-ejb-plugin</artifactId>
                     <groupId>org.apache.maven.plugins</groupId>
-                    <!-- Use version 2.1-beta-1, as it supports the new property failOnMissingWebXml -->
                     <version>2.3</version>
                     <configuration>
                         <configuration>
                             <ejbVersion>3.1</ejbVersion>
                         </configuration>
                         <archive>
-                            <!-- add bundle plugin generated manifest to the war -->
                             <manifestFile>
                                 ${project.build.outputDirectory}/META-INF/MANIFEST.MF
                             </manifestFile>
                         </archive>
                     </configuration>
                 </plugin>
+-->
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
 				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+					<source>1.7</source>
+					<target>1.7</target>
 					<encoding>UTF-8</encoding>
 					<sourceEncoding>UTF-8</sourceEncoding>
 				</configuration>

@@ -35,7 +35,7 @@
 
 	<artifactId>sirocco-cloudmanager-connector-amazon</artifactId>
 
-	<packaging>bundle</packaging>
+	<packaging>jar</packaging>
 
 	<name>SIROCCO :: CloudManager :: Connector :: Amazon</name>
 	
@@ -43,32 +43,7 @@
 		<jclouds.version>1.6.0</jclouds.version>
 	</properties>
 
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
-				<version>2.3.5</version>
-				<extensions>true</extensions>
-				<configuration>
-					<instructions>
-						<_include>-target/classes/META-INF/${project.artifactId}.bnd</_include>
-						<Bundle-Name>${project.name}</Bundle-Name>
-						<Bundle-Vendor>Orange Labs</Bundle-Vendor>
-						<Bundle-SymbolicName>${project.groupId}.${project.artifactId}</Bundle-SymbolicName>
-					</instructions>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
 	<dependencies>
-		<dependency>
-			<groupId>org.apache.felix</groupId>
-			<artifactId>org.osgi.core</artifactId>
-			<version>1.4.0</version>
-			<scope>provided</scope>
-		</dependency>
 
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>

@@ -5,9 +5,7 @@ import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
-import javax.inject.Inject;
 
-import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
@@ -53,8 +51,7 @@ public class ResourceWatcher implements IResourceWatcher {
     @EJB
     ISystemManager systemManager;
 
-    @Inject
-    @OSGiService(dynamic = true)
+    @EJB
     private ICloudProviderConnectorFinder connectorFinder;
 
     private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)

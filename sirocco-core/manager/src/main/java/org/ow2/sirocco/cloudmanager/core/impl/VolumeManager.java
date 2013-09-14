@@ -39,7 +39,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.glassfish.osgicdi.OSGiService;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
@@ -105,8 +104,7 @@ public class VolumeManager implements IVolumeManager {
     @EJB
     private IResourceWatcher resourceWatcher;
 
-    @Inject
-    @OSGiService(dynamic = true)
+    @EJB
     private ICloudProviderConnectorFinder connectorFinder;
 
     private Tenant getTenant() throws CloudProviderException {
@@ -484,7 +482,7 @@ public class VolumeManager implements IVolumeManager {
 
         if (!volume.getAttachments().isEmpty()) {
             throw new ResourceConflictException("Volume in use");
-	}
+        }
 
         ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount());
 
