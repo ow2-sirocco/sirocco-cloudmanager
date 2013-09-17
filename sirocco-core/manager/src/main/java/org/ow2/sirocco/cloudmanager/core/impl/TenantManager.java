@@ -27,7 +27,6 @@ import org.slf4j.LoggerFactory;
 @Stateless
 @Local(ITenantManager.class)
 @Remote(IRemoteTenantManager.class)
-@IdentityInterceptorBinding
 public class TenantManager implements ITenantManager {
     private static Logger logger = LoggerFactory.getLogger(UserManager.class.getName());
 

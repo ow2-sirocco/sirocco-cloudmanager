@@ -26,8 +26,8 @@ package org.ow2.sirocco.cloudmanager.api.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.ManagedBean;
-import javax.inject.Inject;
+import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -48,10 +48,10 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
 @ResourceInterceptorBinding
-@ManagedBean
+@RequestScoped
 @Path("/users")
 public class UserResource extends ResourceBase {
-    @Inject
+    @EJB
     private IUserManager userManager;
 
     @Context

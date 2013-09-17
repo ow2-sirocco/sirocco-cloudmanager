@@ -60,7 +60,6 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteCloudProviderManager.class)
 @Local(ICloudProviderManager.class)
 @SuppressWarnings("unused")
-@IdentityInterceptorBinding
 public class CloudProviderManager implements ICloudProviderManager {
 
     private static Logger logger = LoggerFactory.getLogger(CloudProviderManager.class.getName());

@@ -69,7 +69,6 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteJobManager.class)
 @Local(IJobManager.class)
 @SuppressWarnings("unused")
-@IdentityInterceptorBinding
 public class JobManager implements IJobManager {
 
     private static Logger logger = LoggerFactory.getLogger(JobManager.class);

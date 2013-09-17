@@ -109,7 +109,6 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteSystemManager.class)
 @Local(ISystemManager.class)
 @SuppressWarnings("unused")
-@IdentityInterceptorBinding
 public class SystemManager implements ISystemManager {
 
     private static Logger logger = LoggerFactory.getLogger(SystemManager.class.getName());

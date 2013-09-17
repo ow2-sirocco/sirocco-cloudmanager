@@ -101,7 +101,7 @@ import org.slf4j.LoggerFactory;
 @Stateless
 @Remote(IRemoteMachineManager.class)
 @Local(IMachineManager.class)
-@IdentityInterceptorBinding
+// @IdentityInterceptorBinding
 public class MachineManager implements IMachineManager {
 
     static final String EJB_JNDI_NAME = "MachineManager";

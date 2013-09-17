@@ -63,7 +63,6 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteMachineImageManager.class)
 @Local(IMachineImageManager.class)
 @SuppressWarnings("unused")
-@IdentityInterceptorBinding
 public class MachineImageManager implements IMachineImageManager {
 
     private static Logger logger = LoggerFactory.getLogger(MachineImageManager.class.getName());

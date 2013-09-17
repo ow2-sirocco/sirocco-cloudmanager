@@ -8,7 +8,6 @@ import javax.interceptor.Interceptor;
 import javax.interceptor.InvocationContext;
 
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
-import org.ow2.sirocco.cloudmanager.core.api.IdentityContextHolder;
 
 @Interceptor
 @ResourceInterceptorBinding
@@ -25,7 +24,6 @@ public class IdentityInterceptor implements Serializable {
             IdentityContext idCtx = resourceBase.getIdentityContext();
             this.identityContext.setUserName(idCtx.getUserName());
             this.identityContext.setTenantId(idCtx.getTenantId());
-            IdentityContextHolder.set(idCtx.getTenantId(), idCtx.getUserName());
         }
         return ctx.proceed();
     }

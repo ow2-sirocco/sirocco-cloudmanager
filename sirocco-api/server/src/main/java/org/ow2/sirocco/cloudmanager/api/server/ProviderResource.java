@@ -26,8 +26,8 @@ package org.ow2.sirocco.cloudmanager.api.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.ManagedBean;
-import javax.inject.Inject;
+import javax.ejb.EJB;
+import javax.enterprise.context.RequestScoped;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -45,7 +45,6 @@ import org.ow2.sirocco.cloudmanager.api.model.Location;
 import org.ow2.sirocco.cloudmanager.api.model.Provider;
 import org.ow2.sirocco.cloudmanager.api.model.ProviderAccount;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
-import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
@@ -53,14 +52,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 @ResourceInterceptorBinding
-@ManagedBean
+@RequestScoped
 @Path("/providers")
 public class ProviderResource extends ResourceBase {
-    @Inject
+    @EJB
     private ICloudProviderManager providerManager;
-
-    @Inject
-    private IdentityContext identityContext;
 
     @Context
     UriInfo uri;

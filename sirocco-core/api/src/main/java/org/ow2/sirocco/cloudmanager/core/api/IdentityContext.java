@@ -1,9 +1,13 @@
 package org.ow2.sirocco.cloudmanager.core.api;
 
-import javax.enterprise.context.RequestScoped;
+import java.io.Serializable;
 
-@RequestScoped
-public class IdentityContext {
+import javax.enterprise.context.SessionScoped;
+
+@SessionScoped
+public class IdentityContext implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String tenantId;
 
     private String userName;

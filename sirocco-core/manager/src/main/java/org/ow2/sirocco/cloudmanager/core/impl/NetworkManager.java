@@ -70,7 +70,6 @@ import org.slf4j.LoggerFactory;
 @Stateless
 @Remote(IRemoteNetworkManager.class)
 @Local(INetworkManager.class)
-@IdentityInterceptorBinding
 public class NetworkManager implements INetworkManager {
     private static Logger logger = LoggerFactory.getLogger(NetworkManager.class.getName());
 

@@ -60,7 +60,6 @@ import org.slf4j.LoggerFactory;
 @Stateless
 @Remote(IRemoteCredentialsManager.class)
 @Local(ICredentialsManager.class)
-@IdentityInterceptorBinding
 public class CredentialsManager implements ICredentialsManager {
 
     private static Logger logger = LoggerFactory.getLogger(CredentialsManager.class.getName());

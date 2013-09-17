@@ -53,7 +53,6 @@ import org.slf4j.LoggerFactory;
 @Remote(IRemoteUserManager.class)
 @Local(IUserManager.class)
 @SuppressWarnings("unused")
-@IdentityInterceptorBinding
 public class UserManager implements IUserManager {
 
     private static Logger logger = LoggerFactory.getLogger(UserManager.class.getName());

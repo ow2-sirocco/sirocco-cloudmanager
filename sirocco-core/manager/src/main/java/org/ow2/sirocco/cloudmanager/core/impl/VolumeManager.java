@@ -79,7 +79,6 @@ import org.slf4j.LoggerFactory;
 @Stateless
 @Remote(IRemoteVolumeManager.class)
 @Local(IVolumeManager.class)
-@IdentityInterceptorBinding
 public class VolumeManager implements IVolumeManager {
     private static Logger logger = LoggerFactory.getLogger(VolumeManager.class.getName());
 
