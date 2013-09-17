@@ -34,34 +34,34 @@
 
 	<servlet>
 		<servlet-name>SiroccoRestServlet</servlet-name>
-		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
-	    	<init-param>
-	      		<param-name>com.sun.jersey.config.property.packages</param-name>
-	      		<param-value>org.ow2.sirocco.cloudmanager.api.server</param-value>
-	    	</init-param>
-		<!-- Configure Jersey to use JSON marshalling -->
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
-			<param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+			<param-name>jersey.config.server.provider.packages</param-name>
+			<param-value>org.ow2.sirocco.cloudmanager.api.server</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jersey.config.server.provider.classnames</param-name>
+			<param-value>org.codehaus.jackson.jaxrs.JacksonJsonProvider</param-value>
+		</init-param>
+		<init-param>
+			<param-name>jersey.config.disableMoxyJson</param-name>
 			<param-value>true</param-value>
 		</init-param>
+		<!-- Configure Jersey to use JSON marshalling -->
+		<!-- <init-param> <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name> 
+			<param-value>true</param-value> </init-param> -->
 		<!-- Format serialized data -->
 		<init-param>
 			<param-name>com.sun.jersey.config.feature.Formatted</param-name>
 			<param-value>true</param-value>
 		</init-param>
 		<!-- Logging request/response and entities, remove this in production -->
-		<!-- <init-param>
-			<param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name>
-			<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
-		</init-param>
-		<init-param>
-			<param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name>
-			<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value>
-		</init-param>
-		<init-param>
-         	<param-name>com.sun.jersey.config.feature.logging.DisableEntitylogging</param-name>
-         	<param-value>false</param-value>
-		</init-param> -->
+		<!-- <init-param> <param-name>com.sun.jersey.spi.container.ContainerRequestFilters</param-name> 
+			<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value> 
+			</init-param> <init-param> <param-name>com.sun.jersey.spi.container.ContainerResponseFilters</param-name> 
+			<param-value>com.sun.jersey.api.container.filter.LoggingFilter</param-value> 
+			</init-param> <init-param> <param-name>com.sun.jersey.config.feature.logging.DisableEntitylogging</param-name> 
+			<param-value>false</param-value> </init-param> -->
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	<servlet-mapping>
@@ -83,7 +83,7 @@
 	<security-role>
 		<role-name>sirocco-user</role-name>
 	</security-role>
-	
+
 	<security-role>
 		<role-name>sirocco-admin</role-name>
 	</security-role>
