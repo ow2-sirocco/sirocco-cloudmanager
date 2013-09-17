@@ -105,30 +105,7 @@
 	</dependencies>
 
 	<build>
-		<resources>
-			<resource>
-        		<directory>src/main/resources</directory>
-        		<filtering>true</filtering>
-      		</resource>
-      	</resources>
 		<plugins>
-			<!-- <plugin>
-				<artifactId>maven-dependency-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>copy-entities</id>
-						<phase>process-resources</phase>
-						<goals>
-							<goal>unpack-dependencies</goal>
-						</goals>
-						<configuration>
-							<includeArtifactIds>sirocco-cloudmanager-model-cimi,sirocco-cloudmanager-core-api,sirocco-cloudmanager-connector-api,sirocco-cloudmanager-connector-util-jobmanager-api</includeArtifactIds>
-							<outputDirectory>${project.build.outputDirectory}</outputDirectory>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin> -->
-
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-ejb-plugin</artifactId>
@@ -162,28 +139,4 @@
 		</plugins>
 	</build>
 	
-	<profiles>
-		<profile>
-			<id>test</id>
-  			<properties>
-  				<authRequired>false</authRequired>
-  				<datasource>jdbc/H2InMemory</datasource>
-    			<database>org.eclipse.persistence.platform.database.H2Platform</database>
-    			<creationSuffix></creationSuffix>
-			</properties>
-		</profile>
-		<profile>
-			<id>production</id>
-  			<properties>
-  				<authRequired>true</authRequired>
-    			<datasource>jdbc/MySQLDataSource</datasource>
-    			<database>MySQL4</database>
-    			<creationSuffix>engine=InnoDB</creationSuffix>
-			</properties>
-			<activation>
-      			<activeByDefault>true</activeByDefault>
-    		</activation>
-		</profile>
-	</profiles>
-
 </project>
