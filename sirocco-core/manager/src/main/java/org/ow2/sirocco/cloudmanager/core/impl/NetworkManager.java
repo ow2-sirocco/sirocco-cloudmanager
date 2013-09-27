@@ -1558,9 +1558,12 @@ public class NetworkManager implements INetworkManager {
     }
 
     public Network getNetworkByProviderAssignedId(final String providerAssignedId) {
-        Network network = (Network) this.em.createNamedQuery(Network.GET_NETWORK_BY_PROVIDER_ASSIGNED_ID)
-            .setParameter("providerAssignedId", providerAssignedId).getSingleResult();
-        return network;
+        List<Network> networks = this.em.createNamedQuery(Network.GET_NETWORK_BY_PROVIDER_ASSIGNED_ID)
+            .setParameter("providerAssignedId", providerAssignedId).getResultList();
+        if (!networks.isEmpty()) {
+            return networks.get(0);
+        }
+        return null;
     }
 
     private NetworkPort getNetworkPortByProviderAssignedId(final String providerAssignedId) {

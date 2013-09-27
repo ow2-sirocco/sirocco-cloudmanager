@@ -1356,7 +1356,11 @@ public class MachineManager implements IMachineManager {
             if (nic.getNetwork() != null) {
                 if (nic.getNetwork().getProviderAssignedId() != null) {
                     Network net = this.networkManager.getNetworkByProviderAssignedId(nic.getNetwork().getProviderAssignedId());
-                    nic.setNetwork(net);
+                    if (net != null) {
+                        nic.setNetwork(net);
+                    } else if (nic.getNetwork().getNetworkType() == Type.PUBLIC) {
+                        nic.setNetwork(this.networkManager.getPublicNetwork());
+                    }
                 } else if (nic.getNetwork().getNetworkType() == Type.PUBLIC) {
                     nic.setNetwork(this.networkManager.getPublicNetwork());
                 }
