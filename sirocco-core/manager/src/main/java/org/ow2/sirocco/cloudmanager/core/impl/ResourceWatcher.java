@@ -91,7 +91,6 @@ public class ResourceWatcher implements IResourceWatcher {
                 break;
             } catch (ConnectorException e) {
                 ResourceWatcher.logger.error("Failed to poll machine state: ", e);
-                break;
             }
             try {
                 Thread.sleep(1000 * ResourceWatcher.SLEEP_BETWEEN_POLL_IN_SECONDS);
