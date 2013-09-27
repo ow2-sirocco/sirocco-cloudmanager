@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 
    SIROCCO
@@ -24,20 +23,22 @@
    $Id$
 
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
+
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager-project</artifactId>
 		<version>0.6.0-SNAPSHOT</version>
-        	<relativePath>project/pom.xml</relativePath>
+		<relativePath>project/pom.xml</relativePath>
 	</parent>
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
 	<artifactId>cloudmanager-multi</artifactId>
 	<packaging>pom</packaging>
 	<name>SIROCCO :: CloudManager :: Parent</name>
-	
+
 
 	<modules>
 		<module>project</module>
@@ -48,19 +49,62 @@
 	</modules>
 
 	<profiles>
-                <profile>
-                        <id>test</id>
+		<profile>
+			<id>test</id>
 			<modules>
 				<module>sirocco-itests</module>
 			</modules>
-                </profile>
-        </profiles>
+		</profile>
+	</profiles>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<quiet>true</quiet>
+					<windowtitle>SIROCCO APIs</windowtitle>
+					<doctitle>SIROCCO APIs</doctitle>
+					<use>yes</use>
+					<overview>${project.build.sourceDirectory}/overview.html</overview>
+					<linksource>yes</linksource>
+					<splitindex>yes</splitindex>
+					<outputDirectory>${project.build.directory}/javadoc</outputDirectory>
+					<encoding>UTF-8</encoding>
+					<sourceEncoding>UTF-8</sourceEncoding>
+					<excludePackageNames>org.ow2.sirocco.cloudmanager.api.*:org.ow2.sirocco.cloudmanager.connector.finder.*:org.ow2.sirocco.cloudmanager.connector.mock:org.ow2.sirocco.cloudmanager.connector.amazon:org.ow2.sirocco.cloudmanager.connector.vcd:org.ow2.sirocco.cloudmanager.connector.openstack:org.ow2.sirocco.cloudmanager.core.*:com.vmware.vcloud.sdk</excludePackageNames>
+					<groups>
+						<group>
+							<title>Cloud Provider Connector API</title>
+							<packages>org.ow2.sirocco.cloudmanager.connector.api</packages>
+						</group>
+						<group>
+							<title>CIMI Resource Model API</title>
+							<packages>org.ow2.sirocco.cloudmanager.model*</packages>
+						</group>
+					</groups>
+				</configuration>
+				<executions>
+					<execution>
+						<id>aggregate</id>
+						<goals>
+							<goal>aggregate</goal>
+						</goals>
+						<phase>package</phase>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 
 	<scm>
-                <connection>scm:git:git://gitorious.ow2.org/ow2-sirocco/sirocco-cloudmanager.git</connection>
-                <developerConnection>scm:git:git@gitorious.ow2.org:ow2-sirocco/sirocco-cloudmanager.git</developerConnection>
-                <url>http://gitorious.ow2.org/ow2-sirocco/sirocco-cloudmanager/trees</url>
-          <tag>HEAD</tag>
-  </scm>
-	
+		<connection>scm:git:git://gitorious.ow2.org/ow2-sirocco/sirocco-cloudmanager.git</connection>
+		<developerConnection>scm:git:git@gitorious.ow2.org:ow2-sirocco/sirocco-cloudmanager.git</developerConnection>
+		<url>http://gitorious.ow2.org/ow2-sirocco/sirocco-cloudmanager/trees</url>
+		<tag>HEAD</tag>
+	</scm>
+
 </project>
