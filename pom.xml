@@ -101,9 +101,9 @@
 
 
 	<scm>
-		<connection>scm:git:git://gitorious.ow2.org/ow2-sirocco/sirocco-cloudmanager.git</connection>
-		<developerConnection>scm:git:git@gitorious.ow2.org:ow2-sirocco/sirocco-cloudmanager.git</developerConnection>
-		<url>http://gitorious.ow2.org/ow2-sirocco/sirocco-cloudmanager/trees</url>
+		<connection>scm:git:git://github.com/ow2-sirocco/sirocco-cloudmanager.git</connection>
+		<developerConnection>scm:git:git@github.com:ow2-sirocco/sirocco-cloudmanager.git</developerConnection>
+		<url>https://github.com/ow2-sirocco/sirocco-cloudmanager</url>
 		<tag>HEAD</tag>
 	</scm>
 
