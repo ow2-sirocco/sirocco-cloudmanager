@@ -99,6 +99,7 @@ import com.vmware.vcloud.api.rest.schema.ovf.ResourceType;
 import com.vmware.vcloud.api.rest.schema.ovf.SectionType;
 import com.vmware.vcloud.sdk.Expression;
 import com.vmware.vcloud.sdk.Filter;
+import com.vmware.vcloud.sdk.OrgVdcNetwork;
 import com.vmware.vcloud.sdk.QueryParams;
 import com.vmware.vcloud.sdk.ReferenceResult;
 import com.vmware.vcloud.sdk.Task;
@@ -507,15 +508,17 @@ public class VcdCloudProvider {
 
                 if (networkConnection.getIpAddress() != null && networkConnection.getIpAddress() != "") {
                     Address cimiAddress = new Address();
+                    /* if CIMI.public && CimiPublicOrgVdcNetworkName && NAT routed */
                     if (network.getNetworkType().equals(Network.Type.PUBLIC)
-                        && this.vCloudContext.isCimiPublicOrgVdcNetworkIsRouted()) { /* if CIMI.public && NAT routed */
+                        && network.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())
+                        && this.vCloudContext.isCimiPublicOrgVdcNetworkIsRouted()) {
                         cimiAddress.setIp(this.getNatRoutedIpAddress(networkConnection.getIpAddress()));
                     } else {
                         cimiAddress.setIp(networkConnection.getIpAddress());
                     }
                     cimiAddress.setAllocation(cimiIpAddressAllocationMode);
                     cimiAddress.setProtocol("IPv4");
-                    // cimiAddress.setNetwork(network);
+                    // cimiAddress.setNetwork(network); // ???
                     cimiAddress.setNetwork(null);
                     // cimiAddress.setHostName(???); // ???
                     cimiAddress.setResource(null);
@@ -840,6 +843,16 @@ public class VcdCloudProvider {
         }
     }
 
+    private OrgVdcNetwork getOrgVdcNetworkByProviderAssignedId(final String id) throws ConnectorException {
+        try {
+            ReferenceType orgVdcNetworkRef = new ReferenceType();
+            orgVdcNetworkRef.setHref(id);
+            return OrgVdcNetwork.getOrgVdcNetworkByReference(this.vCloudContext.getVcloudClient(), orgVdcNetworkRef);
+        } catch (VCloudException e) {
+            throw new ConnectorException(e);
+        }
+    }
+
     private Vapp createVapp(final SystemCreate systemCreate, final Map<String, MachineTemplate> machineTemplateMap)
         throws VCloudException, ConnectorException, TimeoutException {
 
@@ -883,20 +896,23 @@ public class VcdCloudProvider {
                 item.setSource(source);
 
                 // Configure connection
-                /*FIXME remove unused CIMI network ? ; set nic index (vs.CIMI ?)*/
+                /* remove unused CIMI network ? ; set nic index (vs.CIMI ?)*/
                 NetworkConnectionSectionType networkConnectionSectionType = new NetworkConnectionSectionType();
                 networkConnectionSectionType.setInfo(new MsgType());
                 int networkConnectionIndex = 0;
                 for (MachineTemplateNetworkInterface nic : mt.getNetworkInterfaces()) {
                     NetworkConnectionType networkConnectionType = new NetworkConnectionType();
                     if (nic.getNetwork() != null) {
-                        if (nic.getNetwork().getNetworkType() == Network.Type.PUBLIC) {
+                        /*if (nic.getNetwork().getNetworkType() == Network.Type.PUBLIC) {
                             networkConnectionType.setNetwork(this.vCloudContext.getCimiPublicOrgVdcNetworkName());
                         } else {
                             VappNetwork vappNetwork = this.getVappNetworkByProviderAssignedId(nic.getNetwork()
                                 .getProviderAssignedId());
                             networkConnectionType.setNetwork(vappNetwork.getResource().getName());
-                        }
+                        }*/
+                        OrgVdcNetwork orgVdcNetwork = this.getOrgVdcNetworkByProviderAssignedId(nic.getNetwork()
+                            .getProviderAssignedId());
+                        networkConnectionType.setNetwork(orgVdcNetwork.getResource().getName());
                     } else if (nic.getSystemNetworkName() != null) {
                         networkConnectionType.setNetwork(nic.getSystemNetworkName());
                     } else {
@@ -933,76 +949,103 @@ public class VcdCloudProvider {
 
     private InstantiationParamsType createVappInstantiationParamsType(final SystemCreate systemCreate)
         throws ConnectorException {
-
-        // add CIMI Public Network
-        VAppNetworkConfigurationType vAppNetworkConfigurationType = new VAppNetworkConfigurationType();
-        NetworkConfigurationType networkConfigurationType = new NetworkConfigurationType();
-        VcdCloudProvider.logger.info("vAppNetworkConfiguration Bridged:" + this.vCloudContext.getCimiPublicOrgVdcNetworkName());
-        vAppNetworkConfigurationType.setNetworkName(this.vCloudContext.getCimiPublicOrgVdcNetworkName());
-        networkConfigurationType.setParentNetwork(this.vCloudContext.getVdc().getAvailableNetworkRefByName(
-            this.vCloudContext.getCimiPublicOrgVdcNetworkName()));
-        networkConfigurationType.setFenceMode(FenceModeValuesType.BRIDGED.value());
-        networkConfigurationType.setRetainNetInfoAcrossDeployments(true);
-        vAppNetworkConfigurationType.setConfiguration(networkConfigurationType);
-        // fill in the NetworkConfigSection
         NetworkConfigSectionType networkConfigSectionType = new NetworkConfigSectionType();
-        MsgType networkInfo = new MsgType();
-        networkConfigSectionType.setInfo(networkInfo);
+        networkConfigSectionType.setInfo(new MsgType());
         List<VAppNetworkConfigurationType> vAppNetworkConfigs = networkConfigSectionType.getNetworkConfig();
-        vAppNetworkConfigs.add(vAppNetworkConfigurationType);
 
-        // add CIMI Private Network
-        Set<ComponentDescriptor> networkComponentDescriptors = this.getComponentDescriptorsOfType(systemCreate,
-            ComponentType.NETWORK);
-        for (ComponentDescriptor ncd : networkComponentDescriptors) {
+        // add bridged vAppNetworks
+        Set<String> bridgedVAppNetworks = new HashSet<String>();
+        for (ComponentDescriptor mcd : this.getComponentDescriptorsOfType(systemCreate, ComponentType.MACHINE)) {
+            MachineTemplate mt = (MachineTemplate) mcd.getComponentTemplate();
+            for (MachineTemplateNetworkInterface nic : mt.getNetworkInterfaces()) {
+                if (nic.getNetwork() != null) {
+                    OrgVdcNetwork orgVdcNetwork = this.getOrgVdcNetworkByProviderAssignedId(nic.getNetwork()
+                        .getProviderAssignedId());
+                    String orgVdcNetworkName = orgVdcNetwork.getResource().getName();
+                    if (bridgedVAppNetworks.contains(orgVdcNetworkName)) {
+                        // do not duplicate
+                        continue;
+                    }
+                    bridgedVAppNetworks.add(orgVdcNetworkName);
+                    VAppNetworkConfigurationType vAppNetworkConfigurationType = this
+                        .createBridgedVAppNetworkConfigurationType(orgVdcNetwork);
+                    // fill in the NetworkConfigSection
+                    vAppNetworkConfigs.add(vAppNetworkConfigurationType);
+                }
+            }
+
+        }
+
+        // add isolated vAppNetworks
+        for (ComponentDescriptor ncd : this.getComponentDescriptorsOfType(systemCreate, ComponentType.NETWORK)) {
             NetworkTemplate nt = (NetworkTemplate) ncd.getComponentTemplate();
             if (ncd.getComponentQuantity() != 1) {
                 throw new ConnectorException(
                     "validation error on field 'Network componentDescriptor.quantity': should be equal to 1");
             }
-            /* FIXME support only CIMI private (system) network at the moment */
             if (nt.getNetworkConfig().getNetworkType() != Network.Type.PRIVATE) {
                 throw new ConnectorException(
                     "validation error on field 'Network componentDescriptor.networkTemplate.networkConfiguration.networkType': should be equal to Private");
             }
-            VAppNetworkConfigurationType private_vAppNetworkConfigurationType = new VAppNetworkConfigurationType();
-            NetworkConfigurationType private_networkConfigurationType = new NetworkConfigurationType();
-            VcdCloudProvider.logger.info("vAppNetworkConfiguration Isolated:" + ncd.getName());
-            private_vAppNetworkConfigurationType.setNetworkName(ncd.getName());
-            // private_networkConfigurationType.setParentNetwork(vdc.getAvailableNetworkRefByName(this.cimiPublicOrgVdcNetworkName));
-            private_networkConfigurationType.setFenceMode(FenceModeValuesType.ISOLATED.value());
-            private_networkConfigurationType.setRetainNetInfoAcrossDeployments(true);
-
-            // Configure Internal IP Settings
-            IpScopeType ipScope = new IpScopeType();
-            ipScope.setNetmask("255.255.255.0");
-            ipScope.setGateway("192.168.2.1");
-            ipScope.setIsEnabled(true);
-            ipScope.setIsInherited(false); // ???
-
-            IpRangesType ipRangesType = new IpRangesType();
-            IpRangeType ipRangeType = new IpRangeType();
-            ipRangeType.setStartAddress("192.168.2.100");
-            ipRangeType.setEndAddress("192.168.2.199");
-
-            ipRangesType.getIpRange().add(ipRangeType);
-
-            ipScope.setIpRanges(ipRangesType);
-            ipScope.setIsEnabled(true);
-            IpScopesType ipScopes = new IpScopesType();
-            ipScopes.getIpScope().add(ipScope);
-            private_networkConfigurationType.setIpScopes(ipScopes);
-
-            private_vAppNetworkConfigurationType.setConfiguration(private_networkConfigurationType);
+            VAppNetworkConfigurationType private_vAppNetworkConfigurationType = this
+                .createIsolatedVAppNetworkConfigurationType(ncd.getName());
+            // fill in the NetworkConfigSection
             vAppNetworkConfigs.add(private_vAppNetworkConfigurationType);
         }
 
-        // fill in InstantiationParams
+        // fill in and return InstantiationParams
         InstantiationParamsType instantiationParamsType = new InstantiationParamsType();
         List<JAXBElement<? extends SectionType>> sections = instantiationParamsType.getSection();
         sections.add(new ObjectFactory().createNetworkConfigSection(networkConfigSectionType));
-
         return instantiationParamsType;
+    }
+
+    VAppNetworkConfigurationType createBridgedVAppNetworkConfigurationType(final OrgVdcNetwork parentOrgVdcNetwork) {
+        VAppNetworkConfigurationType vAppNetworkConfigurationType = new VAppNetworkConfigurationType();
+        NetworkConfigurationType networkConfigurationType = new NetworkConfigurationType();
+        String networkName = parentOrgVdcNetwork.getResource().getName();
+        VcdCloudProvider.logger.info("vAppNetworkConfiguration Bridged:" + networkName);
+        vAppNetworkConfigurationType.setNetworkName(networkName);
+        networkConfigurationType.setParentNetwork(parentOrgVdcNetwork.getReference());
+        /*networkConfigurationType.setParentNetwork(this.vCloudContext.getVdc().getAvailableNetworkRefByName(
+            networkName));*/
+        networkConfigurationType.setFenceMode(FenceModeValuesType.BRIDGED.value());
+        networkConfigurationType.setRetainNetInfoAcrossDeployments(true);
+        vAppNetworkConfigurationType.setConfiguration(networkConfigurationType);
+        return vAppNetworkConfigurationType;
+    }
+
+    VAppNetworkConfigurationType createIsolatedVAppNetworkConfigurationType(final String networkName) {
+        VAppNetworkConfigurationType private_vAppNetworkConfigurationType = new VAppNetworkConfigurationType();
+        NetworkConfigurationType private_networkConfigurationType = new NetworkConfigurationType();
+        VcdCloudProvider.logger.info("vAppNetworkConfiguration Isolated:" + networkName);
+        private_vAppNetworkConfigurationType.setNetworkName(networkName);
+        // private_networkConfigurationType.setParentNetwork(vdc.getAvailableNetworkRefByName(this.cimiPublicOrgVdcNetworkName));
+        private_networkConfigurationType.setFenceMode(FenceModeValuesType.ISOLATED.value());
+        private_networkConfigurationType.setRetainNetInfoAcrossDeployments(true);
+
+        // Configure Internal IP Settings (static config?)
+        IpScopeType ipScope = new IpScopeType();
+        ipScope.setNetmask("255.255.255.0");
+        ipScope.setGateway("192.168.2.1");
+        ipScope.setIsEnabled(true);
+        ipScope.setIsInherited(false); // ???
+
+        IpRangesType ipRangesType = new IpRangesType();
+        IpRangeType ipRangeType = new IpRangeType();
+        ipRangeType.setStartAddress("192.168.2.100");
+        ipRangeType.setEndAddress("192.168.2.199");
+
+        ipRangesType.getIpRange().add(ipRangeType);
+
+        ipScope.setIpRanges(ipRangesType);
+        ipScope.setIsEnabled(true);
+        IpScopesType ipScopes = new IpScopesType();
+        ipScopes.getIpScope().add(ipScope);
+        private_networkConfigurationType.setIpScopes(ipScopes);
+
+        private_vAppNetworkConfigurationType.setConfiguration(private_networkConfigurationType);
+        return private_vAppNetworkConfigurationType;
     }
 
     private void configureVmSections(Vapp vapp, final Map<String, MachineTemplate> machineTemplateMap) throws VCloudException,
