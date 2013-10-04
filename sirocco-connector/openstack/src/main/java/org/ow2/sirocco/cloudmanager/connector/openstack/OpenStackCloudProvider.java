@@ -88,6 +88,8 @@ public class OpenStackCloudProvider {
 
     private String tenantName;
 
+    private String cimiPublicNetworkName;
+
     // private String novaEndPointName;
 
     private Nova novaClient;
@@ -99,13 +101,14 @@ public class OpenStackCloudProvider {
         this.cloudProviderLocation = target.getLocation();
 
         Map<String, String> properties = this.cloudProviderAccount.getProperties();
-        if (properties == null || properties.get("tenantName") == null) {
-            throw new ConnectorException("No access to properties: tenantName");
+        if (properties == null || properties.get("tenantName") == null || properties.get("publicNetworkName") == null) {
+            throw new ConnectorException("No access to properties: tenantName or publicNetworkName");
         }
         this.tenantName = properties.get("tenantName");
+        this.cimiPublicNetworkName = properties.get("publicNetworkName");
         OpenStackCloudProvider.logger.info("connect: " + this.cloudProviderAccount.getLogin() + ":"
-            + this.cloudProviderAccount.getPassword() + " to tenant=" + this.tenantName + ", KEYSTONE_AUTH_URL="
-            + this.cloudProviderAccount.getCloudProvider().getEndpoint());
+            + this.cloudProviderAccount.getPassword() + " to tenant=" + this.tenantName + ", publicNetwork="
+            + this.cimiPublicNetworkName + ", KEYSTONE_AUTH_URL=" + this.cloudProviderAccount.getCloudProvider().getEndpoint());
 
         Keystone keystone = new Keystone(this.cloudProviderAccount.getCloudProvider().getEndpoint());
         Access access = keystone.tokens()
@@ -221,7 +224,7 @@ public class OpenStackCloudProvider {
             Network cimiNetwork = this.getNetworkByName(networkName);
             // Nic
             MachineNetworkInterface machineNetworkInterface = new MachineNetworkInterface();
-            machineNetworkInterface.setName(networkName);
+            // machineNetworkInterface.setName(networkName);
             machineNetworkInterface.setAddresses(new ArrayList<MachineNetworkInterfaceAddress>());
             machineNetworkInterface.setNetwork(cimiNetwork);
             machineNetworkInterface.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
@@ -382,11 +385,16 @@ public class OpenStackCloudProvider {
     private void addAddress(final Address address, final Network cimiNetwork, final MachineNetworkInterface nic) {
         org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
         cimiAddress.setIp(address.getAddr());
-        cimiAddress.setNetwork(cimiNetwork);
-        cimiAddress.setAllocation("dynamic"); /*FIXME address allocation mode (dynamic / fixed)*/
-        // cimiAddress.setProtocol("IPv4");
-        cimiAddress.setProtocol(address.getVersion()); // cimi mapping 4/IPv4 !
-        cimiAddress.setResource(cimiNetwork); // ???
+        cimiAddress.setAllocation("dynamic"); /* static! */
+        // cimiAddress.setProtocol("IPv4"); /*static mapping!*/
+        // cimiAddress.setProtocol(address.getVersion()); //cimi mapping 4/IPv4!
+        if (address.getVersion().equalsIgnoreCase("4")) {
+            cimiAddress.setProtocol("IPv4");
+        } else if (address.getVersion().equalsIgnoreCase("6")) {
+            cimiAddress.setProtocol("IPv6");
+        } else {
+            cimiAddress.setProtocol(address.getVersion()); // default!
+        }
         MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
         entry.setAddress(cimiAddress);
         nic.getAddresses().add(entry);
@@ -635,9 +643,11 @@ public class OpenStackCloudProvider {
         cimiNetwork.setName(novaNetwork.getName());
         cimiNetwork.setProviderAssignedId(novaNetwork.getId());
         cimiNetwork.setState(this.fromNovaNetworkStatusToCimiNetworkState(novaNetwork.getStatus()));
-        // CIMI mapping unclear : NetworkType, MTU... !
-        // cimiNetwork.setNetworkType(???);
-        // Network.Type.PRIVATE or Network.Type.PUBLIC
+        if (novaNetwork.getName().equals(this.cimiPublicNetworkName)) {
+            cimiNetwork.setNetworkType(Network.Type.PUBLIC);
+        } else {
+            cimiNetwork.setNetworkType(Network.Type.PRIVATE);
+        }
 
         List<Subnet> subnets = new ArrayList<Subnet>();
         cimiNetwork.setSubnets(subnets);
