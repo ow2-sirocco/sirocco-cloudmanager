@@ -507,8 +507,8 @@ public class VcdCloudProvider {
                 this.fromVappNetworkToNetwork(vappNetwork, network);
 
                 if (networkConnection.getIpAddress() != null && networkConnection.getIpAddress() != "") {
-                    Address cimiAddress = new Address();
-                    /* if CIMI.public && CimiPublicOrgVdcNetworkName && NAT routed */
+                    /*Address cimiAddress = new Address();
+                    // if CIMI.public && CimiPublicOrgVdcNetworkName && NAT routed 
                     if (network.getNetworkType().equals(Network.Type.PUBLIC)
                         && network.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())
                         && this.vCloudContext.isCimiPublicOrgVdcNetworkIsRouted()) {
@@ -517,16 +517,31 @@ public class VcdCloudProvider {
                         cimiAddress.setIp(networkConnection.getIpAddress());
                     }
                     cimiAddress.setAllocation(cimiIpAddressAllocationMode);
-                    cimiAddress.setProtocol("IPv4");
-                    // cimiAddress.setNetwork(network); // ???
-                    cimiAddress.setNetwork(null);
-                    // cimiAddress.setHostName(???); // ???
-                    cimiAddress.setResource(null);
+                    cimiAddress.setProtocol("IPv4");*/
 
                     List<MachineNetworkInterfaceAddress> cimiAddresses = new ArrayList<MachineNetworkInterfaceAddress>();
+
+                    Address cimiAddress = new Address();
+                    cimiAddress.setIp(networkConnection.getIpAddress());
+                    cimiAddress.setAllocation(cimiIpAddressAllocationMode);
+                    cimiAddress.setProtocol("IPv4");
                     MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
                     entry.setAddress(cimiAddress);
                     cimiAddresses.add(entry);
+
+                    /*if CIMI.public && CimiPublicOrgVdcNetworkName && NAT routed*/
+                    if (network.getNetworkType().equals(Network.Type.PUBLIC)
+                        && network.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())
+                        && this.vCloudContext.isCimiPublicOrgVdcNetworkIsRouted()) {
+                        Address publicCimiAddress = new Address();
+                        publicCimiAddress.setIp(this.getNatRoutedIpAddress(networkConnection.getIpAddress()));
+                        publicCimiAddress.setAllocation("dynamic");
+                        publicCimiAddress.setProtocol("IPv4");
+                        MachineNetworkInterfaceAddress publicEntry = new MachineNetworkInterfaceAddress();
+                        publicEntry.setAddress(publicCimiAddress);
+                        cimiAddresses.add(publicEntry);
+                    }
+
                     MachineNetworkInterface privateNic = new MachineNetworkInterface();
                     privateNic.setAddresses(cimiAddresses);
                     privateNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
@@ -787,7 +802,7 @@ public class VcdCloudProvider {
         ArrayList<Network> networks = new ArrayList<Network>();
         networks.add(this.vCloudContext.getCimiPublicNetwork());
 
-        // TODO add private networks
+        // TODO add orgVcd networks
 
         return networks;
     }
@@ -1024,7 +1039,7 @@ public class VcdCloudProvider {
         private_networkConfigurationType.setFenceMode(FenceModeValuesType.ISOLATED.value());
         private_networkConfigurationType.setRetainNetInfoAcrossDeployments(true);
 
-        // Configure Internal IP Settings (static config?)
+        // Configure Internal IP Settings (XXX static config?)
         IpScopeType ipScope = new IpScopeType();
         ipScope.setNetmask("255.255.255.0");
         ipScope.setGateway("192.168.2.1");

@@ -88,7 +88,6 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
 
     /* TODO
      * 
-     * - getMachine : CIMI address management aligned with openstack 
      * - explicit subnet ; conflict between cidr
      * - CIMI address allocation mode : dynamic / fixed
      * 

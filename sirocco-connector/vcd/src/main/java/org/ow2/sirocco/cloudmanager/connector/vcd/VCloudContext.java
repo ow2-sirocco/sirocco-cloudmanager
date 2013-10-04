@@ -79,14 +79,14 @@ public class VCloudContext {
 
         Map<String, String> properties = cloudProviderAccount.getProperties();
         if (properties == null || properties.get("orgName") == null || properties.get("vdcName") == null
-            || properties.get("cimiPublicOrgVdcNetworkName") == null) {
-            throw new ConnectorException("No access to properties: orgName or vdcName or cimiPublicOrgVdcNetworkName");
+            || properties.get("publicNetworkName") == null) {
+            throw new ConnectorException("No access to properties: orgName or vdcName or publicNetworkName");
         }
         this.orgName = properties.get("orgName");
         this.vdcName = properties.get("vdcName");
-        this.cimiPublicOrgVdcNetworkName = properties.get("cimiPublicOrgVdcNetworkName");
+        this.cimiPublicOrgVdcNetworkName = properties.get("publicNetworkName");
         logger.info("connect: " + cloudProviderAccount.getLogin() + " to Organization=" + this.orgName + ", VirtualDataCenter="
-            + this.vdcName + ", cimiPublicOrgVdcNetwork=" + this.cimiPublicOrgVdcNetworkName);
+            + this.vdcName + ", publicNetwork=" + this.cimiPublicOrgVdcNetworkName);
 
         try {
             VcloudClient.setLogLevel(Level.OFF);
