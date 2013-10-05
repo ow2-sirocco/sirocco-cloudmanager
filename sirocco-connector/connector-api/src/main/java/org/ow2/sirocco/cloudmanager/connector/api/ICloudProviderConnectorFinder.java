@@ -25,9 +25,23 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 
 import java.util.List;
 
+/**
+ * Finder service to look-up connectors
+ */
 public interface ICloudProviderConnectorFinder {
+    /**
+     * Return all available connectors
+     * 
+     * @return all available connectors
+     */
     List<ICloudProviderConnector> listCloudProviderConnectors();
 
+    /**
+     * Return the connector associated with a IaaS provider type
+     * 
+     * @param cloudProviderType IaaS provider type
+     * @return connector associated with the IaaS provider type
+     */
     ICloudProviderConnector getCloudProviderConnector(final String cloudProviderType);
 
 }

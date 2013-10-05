@@ -30,35 +30,142 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 
+/**
+ * Lifecycle operations on Machines
+ */
 public interface IComputeService {
 
+    /**
+     * Creates a machine
+     * 
+     * @param machineCreate
+     * @param target
+     * @return
+     * @throws ConnectorException
+     */
     Machine createMachine(MachineCreate machineCreate, ProviderTarget target) throws ConnectorException;
 
+    /**
+     * Starts a machine
+     * 
+     * @param machineId
+     * @param target
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     void startMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
+    /**
+     * Stops a machine
+     * 
+     * @param machineId
+     * @param force
+     * @param target
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     void stopMachine(final String machineId, boolean force, ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException;
 
+    /**
+     * Suspend a machine
+     * 
+     * @param machineId
+     * @param target
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     void suspendMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
+    /**
+     * Restart a machine
+     * 
+     * @param machineId
+     * @param force
+     * @param target
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     void restartMachine(final String machineId, boolean force, ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException;
 
+    /**
+     * Pause a machine
+     * 
+     * @param machineId
+     * @param target
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     void pauseMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
+    /**
+     * Delete a machine
+     * 
+     * @param machineId
+     * @param target
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     void deleteMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
+    /**
+     * Capture a machine
+     * 
+     * @param machineId
+     * @param machineImage
+     * @param target
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     MachineImage captureMachine(String machineId, MachineImage machineImage, ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException;
 
+    /**
+     * Gets the state of a machine
+     * 
+     * @param machineId
+     * @param target
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     Machine.State getMachineState(final String machineId, ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException;
 
+    /**
+     * Gets a machine
+     * 
+     * @param machineId
+     * @param target
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     Machine getMachine(final String machineId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
+    /**
+     * Attaches a volume to a machine
+     * 
+     * @param machineId
+     * @param machineVolume
+     * @param target
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     void addVolumeToMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException;
 
+    /**
+     * Removes a volume from a machine
+     * 
+     * @param machineId
+     * @param machineVolume
+     * @param target
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     void removeVolumeFromMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException;
 }

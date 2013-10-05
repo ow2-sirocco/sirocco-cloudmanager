@@ -32,7 +32,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
-import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
@@ -69,10 +68,13 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
             throw new ConnectorException("target.account or target.location is null");
         }
         for (OpenStackCloudProvider provider : this.openstackCPs) {
-            /*if (provider.getCloudProviderAccount().equals(target.getAccount())
-                && provider.getCloudProviderLocation().equals(target.getLocation())) {
-                return provider;
-            }*/
+            /*
+             * if
+             * (provider.getCloudProviderAccount().equals(target.getAccount())
+             * &&
+             * provider.getCloudProviderLocation().equals(target.getLocation()))
+             * { return provider; }
+             */
             if (provider.getCloudProviderAccount().getId().equals(target.getAccount().getId())) {
                 // location can be null?
                 if (provider.getCloudProviderLocation() != target.getLocation()) {
@@ -91,24 +93,13 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
         return provider;
     }
 
-    /* TODO
-     * 
-     * Mix
-     * - connector cache 
-     * - REST call trace (On/Off)
-     * - woorea exception handling
-     * - availability_zone (API for zone)
-     * 
-     * Compute
-     * - reboot: not supported by woorea 
-     * - CIMI address allocation mode : dynamic / fixed
-     * - captureMachine
-     * 
-     * Network
-     * - createNetwork : add implicit/explicit subnet ; conflict between cidr
-     * - createNetwork/deleteNetwork: woorea bugs : see fixme
-     * - Forwarding groups / BagPipe
-     * 
+    /*
+     * TODO Mix - connector cache - REST call trace (On/Off) - woorea exception
+     * handling - availability_zone (API for zone) Compute - reboot: not
+     * supported by woorea - CIMI address allocation mode : dynamic / fixed -
+     * captureMachine Network - createNetwork : add implicit/explicit subnet ;
+     * conflict between cidr - createNetwork/deleteNetwork: woorea bugs : see
+     * fixme - Forwarding groups / BagPipe
      */
 
     //
@@ -133,11 +124,6 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public Set<CloudProviderLocation> getLocations() {
         return null;
-    }
-
-    @Override
-    public IProviderCapability getProviderCapability() throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
     }
 
     @Override

@@ -44,7 +44,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
-import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
@@ -80,7 +79,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderCapability;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
@@ -96,15 +94,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, IVolumeService,
-    INetworkService, IImageService, IProviderCapability {
+    INetworkService, IImageService {
 
     private static Logger logger = LoggerFactory.getLogger(MockCloudProviderConnector.class);
 
     private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS = 10;
 
     private List<MockProvider> mockProviders = new ArrayList<MockProvider>();
-
-    private IProviderCapability capabilities = new MockCloudProviderCapability();
 
     private synchronized MockProvider getProvider(final ProviderTarget target) {
         for (MockProvider provider : this.mockProviders) {
@@ -159,26 +155,6 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     @Override
     public INetworkService getNetworkService() throws ConnectorException {
         return this;
-    }
-
-    @Override
-    public IProviderCapability getProviderCapability() throws ConnectorException {
-        return this;
-    }
-
-    @Override
-    public boolean hasCapability(final CloudProviderCapability capability, final ProviderTarget target) {
-        return this.capabilities.hasCapability(capability, target);
-    }
-
-    @Override
-    public void addCapability(final CloudProviderCapability capability, final ProviderTarget target) {
-        this.capabilities.addCapability(capability, target);
-    }
-
-    @Override
-    public void removeCapability(final CloudProviderCapability capability, final ProviderTarget target) {
-        this.capabilities.addCapability(capability, target);
     }
 
     @Override

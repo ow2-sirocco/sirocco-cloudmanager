@@ -23,6 +23,10 @@
  */
 package org.ow2.sirocco.cloudmanager.connector.api;
 
+/**
+ * The ResourceNotFoundException should be thrown by a connector when an attempt
+ * is made to perform an operation upon a resource that cannot be found.
+ */
 public class ResourceNotFoundException extends ConnectorException {
 
     /**

@@ -26,10 +26,30 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
+/**
+ * Lifecycle operations on MachineImages
+ */
 public interface IImageService {
+    /**
+     * Gets a machine image
+     * 
+     * @param machineImageId
+     * @param target
+     * @return
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     MachineImage getMachineImage(final String machineImageId, ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException;
 
+    /**
+     * Deletes a machine image
+     * 
+     * @param imageId
+     * @param target
+     * @throws ResourceNotFoundException
+     * @throws ConnectorException
+     */
     void deleteMachineImage(final String imageId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
 
 }

@@ -33,7 +33,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
-import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
@@ -59,7 +58,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderCapability;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +67,7 @@ import com.google.common.collect.Iterables;
 import com.google.inject.Module;
 
 public class AmazonCloudProviderConnector implements ICloudProviderConnector, IComputeService, IVolumeService, INetworkService,
-    IImageService, IProviderCapability {
+    IImageService {
     private static Logger logger = LoggerFactory.getLogger(AmazonCloudProviderConnector.class);
 
     public static final String CLOUD_PROVIDER_TYPE = "amazon";
@@ -168,27 +166,6 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
     @Override
     public INetworkService getNetworkService() throws ConnectorException {
         return this;
-    }
-
-    @Override
-    public IProviderCapability getProviderCapability() throws ConnectorException {
-        return this;
-    }
-
-    @Override
-    public boolean hasCapability(final CloudProviderCapability capability, final ProviderTarget target) {
-        // TODO
-        return false;
-    }
-
-    @Override
-    public void addCapability(final CloudProviderCapability capability, final ProviderTarget target) {
-        // TODO
-    }
-
-    @Override
-    public void removeCapability(final CloudProviderCapability capability, final ProviderTarget target) {
-        // TODO
     }
 
     @Override
