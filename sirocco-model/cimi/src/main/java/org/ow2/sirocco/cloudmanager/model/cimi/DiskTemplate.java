@@ -35,7 +35,7 @@ public class DiskTemplate implements Serializable {
 
     private Integer capacity;
 
-    private String format;
+    private String format = "";
 
     private String initialLocation;
 
