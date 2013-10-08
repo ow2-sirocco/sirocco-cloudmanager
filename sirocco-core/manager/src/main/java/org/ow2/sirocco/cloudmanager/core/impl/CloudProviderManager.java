@@ -205,6 +205,7 @@ public class CloudProviderManager implements ICloudProviderManager {
                         options.isImportOnlyOwnerMachineImages(), null,
                         new ProviderTarget().account(account).location(location));
                     for (MachineImage image : images) {
+                        image.setLocation(location);
                         this.machineImageManager.createMachineImage(image);
                     }
                 } catch (ConnectorException e) {
@@ -221,6 +222,8 @@ public class CloudProviderManager implements ICloudProviderManager {
                     for (Network net : nets) {
                         net.setTenant(this.getTenant());
                         net.setCreated(new Date());
+                        net.setCloudProviderAccount(account);
+                        net.setLocation(location);
                         this.em.persist(net);
                     }
                 } catch (ConnectorException e) {
@@ -573,25 +576,42 @@ public class CloudProviderManager implements ICloudProviderManager {
     public Placement placeResource(final String tenantId, final Map<String, String> properties) throws CloudProviderException {
         Tenant tenant = this.tenantManager.getTenantById(tenantId);
         String cloudProviderType = null;
+        String cloudProviderAccountId = null;
         String cloudProviderLocationCountry = null;
         if (properties != null) {
             cloudProviderType = properties.get("provider");
+            cloudProviderAccountId = properties.get("providerAccountId");
             cloudProviderLocationCountry = properties.get("location");
         }
         if (cloudProviderType == null) {
             cloudProviderType = "mock";
         }
         CloudProviderAccount targetAccount = null;
-        for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
-            if (account.getCloudProvider().getCloudProviderType().equals(cloudProviderType)) {
-                targetAccount = account;
-                break;
+        if (cloudProviderAccountId != null) {
+            for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
+                if (account.getId().toString().equals(cloudProviderAccountId)) {
+                    targetAccount = account;
+                    break;
+                }
+            }
+            if (targetAccount == null) {
+                throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider id "
+                    + cloudProviderAccountId);
+            }
+
+        } else {
+            for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
+                if (account.getCloudProvider().getCloudProviderType().equals(cloudProviderType)) {
+                    targetAccount = account;
+                    break;
+                }
+            }
+            if (targetAccount == null) {
+                throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider type "
+                    + cloudProviderType);
             }
         }
-        if (targetAccount == null) {
-            throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider type "
-                + cloudProviderType);
-        }
+
         CloudProviderLocation targetLocation = null;
         if (cloudProviderLocationCountry != null) {
             for (CloudProviderLocation loc : targetAccount.getCloudProvider().getCloudProviderLocations()) {
