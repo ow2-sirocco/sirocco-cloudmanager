@@ -25,7 +25,10 @@
 
 package org.ow2.sirocco.cloudmanager.connector.api;
 
+import java.util.List;
+
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
@@ -168,4 +171,12 @@ public interface IComputeService {
      */
     void removeVolumeFromMachine(final String machineId, final MachineVolume machineVolume, ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException;
+
+    /**
+     * Gets machine configurations supported by the provider
+     * 
+     * @param provider provider target
+     * @return list of machine configurations supported by the provider
+     */
+    List<MachineConfiguration> getMachineConfigs(ProviderTarget target) throws ConnectorException;
 }

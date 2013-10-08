@@ -24,6 +24,9 @@
  */
 package org.ow2.sirocco.cloudmanager.connector.api;
 
+import java.util.List;
+import java.util.Map;
+
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 
 /**
@@ -41,6 +44,17 @@ public interface IImageService {
      */
     MachineImage getMachineImage(final String machineImageId, ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException;
+
+    /**
+     * Gets all machine images
+     * 
+     * @param returnPublicImages if true include public images
+     * @param searchCriteria placeholder for search criteria
+     * @param target provider target
+     * @return list of machine images available from the provider account
+     */
+    List<MachineImage> getMachineImages(boolean returnAccountImagesOnly, Map<String, String> searchCriteria,
+        ProviderTarget target) throws ConnectorException;
 
     /**
      * Deletes a machine image
