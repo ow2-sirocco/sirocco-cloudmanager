@@ -121,100 +121,12 @@ public class NetworkManager implements INetworkManager {
         return publicNetworks.get(0);
     }
 
-    private Job createPublicNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
-        NetworkManager.logger.info("Creating Public Network");
-        // TODO only one public network can be created
-        Tenant tenant = this.getTenant();
-        Network network = new Network();
-        network.setName(networkCreate.getName());
-        network.setDescription(networkCreate.getDescription());
-        network.setProperties(networkCreate.getProperties() == null ? new HashMap<String, String>()
-            : new HashMap<String, String>(networkCreate.getProperties()));
-        network.setTenant(tenant);
-
-        network.setNetworkType(Type.PUBLIC);
-
-        network.setState(Network.State.STARTED);
-        this.em.persist(network);
-        this.em.flush();
-
-        Job job = new Job();
-        job.setTargetResource(network);
-        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
-        affectedResources.add(network);
-        job.setAffectedResources(affectedResources);
-        job.setCreated(new Date());
-        job.setState(Status.SUCCESS);
-        job.setAction("add");
-        job.setTimeOfStatusChange(new Date());
-        this.em.persist(job);
-        this.em.flush();
-        return job;
-    }
-
-    private Job importNetworkFromProvider(final NetworkCreate networkCreate) throws InvalidRequestException,
-        CloudProviderException {
-
-        String providerAccountId = networkCreate.getProperties().get("providerAccountId");
-        String networkProviderAssignedId = networkCreate.getProperties().get("networkProviderAssignedId");
-
-        CloudProviderAccount account = this.cloudProviderManager.getCloudProviderAccountById(providerAccountId);
-        if (account == null) {
-            throw new InvalidRequestException("Wrong provider account id " + providerAccountId);
-        }
-
-        // retrieve user
-        Tenant tenant = this.getTenant();
-
-        Network network = new Network();
-
-        network.setCreated(new Date());
-        network.setProviderAssignedId(networkProviderAssignedId);
-        network.setName(networkCreate.getName());
-        network.setDescription(networkCreate.getDescription());
-        network.setProperties(networkCreate.getProperties() == null ? new HashMap<String, String>()
-            : new HashMap<String, String>(networkCreate.getProperties()));
-        network.setTenant(tenant);
-
-        network.setCloudProviderAccount(account);
-        // TODO provider location as input parameter
-        network.setLocation(account.getCloudProvider().getCloudProviderLocations().iterator().next());
-
-        network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
-        network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
-        network.setNetworkType(networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType());
-        network.setForwardingGroup(networkCreate.getNetworkTemplate().getForwardingGroup());
-
-        network.setState(Network.State.STARTED);
-        this.em.persist(network);
-        this.em.flush();
-
-        Job job = new Job();
-        job.setTargetResource(network);
-        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
-        affectedResources.add(network);
-        job.setAffectedResources(affectedResources);
-        job.setCreated(new Date());
-        job.setState(Job.Status.SUCCESS);
-        job.setAction("add");
-        this.em.persist(job);
-        this.em.flush();
-
-        return job;
-
-    }
-
     @Override
     public Job createNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
         NetworkManager.logger.info("Creating Network");
 
-        if (networkCreate.getProperties() != null && networkCreate.getProperties().get("providerAccountId") != null
-            && networkCreate.getProperties().get("networkProviderAssignedId") != null) {
-            return this.importNetworkFromProvider(networkCreate);
-        }
-
         if (networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType() == Type.PUBLIC) {
-            return this.createPublicNetwork(networkCreate);
+            throw new InvalidRequestException("Cannot create public network");
         }
 
         // retrieve user
