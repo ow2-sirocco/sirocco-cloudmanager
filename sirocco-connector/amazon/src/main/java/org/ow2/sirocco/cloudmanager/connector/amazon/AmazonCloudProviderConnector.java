@@ -14,12 +14,14 @@ import org.jclouds.ContextBuilder;
 import org.jclouds.aws.ec2.AWSEC2AsyncClient;
 import org.jclouds.aws.ec2.AWSEC2Client;
 import org.jclouds.aws.ec2.domain.AWSRunningInstance;
+import org.jclouds.aws.ec2.options.AWSDescribeImagesOptions;
 import org.jclouds.aws.ec2.services.AWSKeyPairClient;
 import org.jclouds.compute.ComputeServiceContext;
 import org.jclouds.compute.domain.Hardware;
 import org.jclouds.ec2.compute.domain.EC2HardwareBuilder;
 import org.jclouds.ec2.domain.Attachment;
 import org.jclouds.ec2.domain.BlockDevice;
+import org.jclouds.ec2.domain.Image;
 import org.jclouds.ec2.domain.InstanceState;
 import org.jclouds.ec2.domain.InstanceStateChange;
 import org.jclouds.ec2.domain.InstanceType;
@@ -37,6 +39,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
@@ -45,6 +48,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
@@ -59,11 +63,14 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
+import com.google.common.collect.Multimap;
 import com.google.inject.Module;
 
 public class AmazonCloudProviderConnector implements ICloudProviderConnector, IComputeService, IVolumeService, INetworkService,
@@ -185,7 +192,7 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
 
     @Override
     public List<Network> getNetworks(final ProviderTarget target) throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
+        return this.getProvider(target).getNetworks();
     }
 
     @Override
@@ -373,6 +380,17 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
         throw new ConnectorException("unsupported operation");
     }
 
+    @Override
+    public List<MachineConfiguration> getMachineConfigs(final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).getMachineConfigs();
+    }
+
+    @Override
+    public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria,
+        final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).getMachineImages(returnPublicImages, searchCriteria);
+    }
+
     private static class AmazonProvider {
 
         private final String cloudProviderId;
@@ -393,7 +411,7 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
 
         private AWSEC2AsyncClient asyncClient;
 
-        private Network cimiPrivateNetwork, cimiPublicNetwork;
+        private Network cimiPublicNetwork;
 
         public AmazonProvider(final CloudProviderAccount cloudProviderAccount, final CloudProviderLocation cloudProviderLocation) {
             this.cloudProviderId = UUID.randomUUID().toString();
@@ -426,15 +444,13 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
             this.defaultAvailabilityZone = this.syncClient.getAvailabilityZoneAndRegionServices()
                 .describeAvailabilityZonesInRegion(this.amazonRegionCode).iterator().next().getZone();
 
-            this.cimiPrivateNetwork = new Network();
-            this.cimiPrivateNetwork.setProviderAssignedId("0");
-            this.cimiPrivateNetwork.setState(Network.State.STARTED);
-            this.cimiPrivateNetwork.setNetworkType(Network.Type.PRIVATE);
-
             this.cimiPublicNetwork = new Network();
-            this.cimiPublicNetwork.setProviderAssignedId("1");
+            this.cimiPublicNetwork.setName("Amazon default public network");
+            this.cimiPublicNetwork.setProviderAssignedId("public" + cloudProviderAccount.getLogin());
             this.cimiPublicNetwork.setState(Network.State.STARTED);
             this.cimiPublicNetwork.setNetworkType(Network.Type.PUBLIC);
+            this.cimiPublicNetwork.setCloudProviderAccount(cloudProviderAccount);
+            this.cimiPublicNetwork.setLocation(cloudProviderLocation);
         }
 
         //
@@ -472,6 +488,36 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
             return null;
         }
 
+        public List<MachineConfiguration> getMachineConfigs() {
+            List<MachineConfiguration> result = new ArrayList<>();
+            for (Hardware hardware : AmazonCloudProviderConnector.AWSEC2_HARDWARE_MAP.values()) {
+                MachineConfiguration machineConfig = new MachineConfiguration();
+                machineConfig.setName(hardware.getId());
+                machineConfig.setCpu(hardware.getProcessors().size());
+                machineConfig.setMemory(hardware.getRam() * 1024);
+                List<DiskTemplate> disks = new ArrayList<>();
+                if (hardware.getVolumes().size() == 0) {
+                    DiskTemplate disk = new DiskTemplate();
+                    disk.setCapacity(0);
+                    disks.add(disk);
+                } else {
+                    for (org.jclouds.compute.domain.Volume volume : hardware.getVolumes()) {
+                        DiskTemplate disk = new DiskTemplate();
+                        disk.setCapacity(volume.getSize().intValue() * 1000 * 1000);
+                        disks.add(disk);
+                    }
+                }
+                machineConfig.setDisks(disks);
+
+                ProviderMapping providerMapping = new ProviderMapping();
+                providerMapping.setProviderAssignedId(hardware.getProviderId());
+                providerMapping.setProviderAccount(this.cloudProviderAccount);
+                machineConfig.setProviderMappings(Collections.singletonList(providerMapping));
+                result.add(machineConfig);
+            }
+            return result;
+        }
+
         private Machine.State fromInstanceStateToMachineState(final InstanceState state) {
             switch (state) {
             case PENDING:
@@ -500,46 +546,37 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
             List<MachineNetworkInterface> nics = new ArrayList<MachineNetworkInterface>();
             machine.setNetworkInterfaces(nics);
 
-            if (runningInstance.getPrivateIpAddress() != null) {
-                org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
-                cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
-                cimiAddress.setIp(runningInstance.getPrivateIpAddress());
-                cimiAddress.setNetwork(this.cimiPrivateNetwork);
-                cimiAddress.setAllocation("dynamic");
-                cimiAddress.setProtocol("IPv4");
-                cimiAddress.setHostName(runningInstance.getPrivateDnsName());
-                cimiAddress.setResource(this.cimiPrivateNetwork);
-
-                List<org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress> cimiAddresses = new ArrayList<org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress>();
-                MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
-                entry.setAddress(cimiAddress);
-
-                cimiAddresses.add(entry);
-                MachineNetworkInterface privateNic = new MachineNetworkInterface();
-                privateNic.setAddresses(cimiAddresses);
-                privateNic.setNetworkType(Network.Type.PRIVATE);
-                privateNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
-                nics.add(privateNic);
-            }
-
-            if (runningInstance.getIpAddress() != null) {
-                org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
-                cimiAddress.setIp(runningInstance.getIpAddress());
-                cimiAddress.setNetwork(this.cimiPublicNetwork);
-                cimiAddress.setAllocation("dynamic");
-                cimiAddress.setProtocol("IPv4");
-                cimiAddress.setHostName(runningInstance.getDnsName());
-                cimiAddress.setResource(this.cimiPublicNetwork);
-
+            if (runningInstance.getPrivateIpAddress() != null || runningInstance.getIpAddress() != null) {
                 List<MachineNetworkInterfaceAddress> cimiAddresses = new ArrayList<MachineNetworkInterfaceAddress>();
-                MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
-                entry.setAddress(cimiAddress);
-                cimiAddresses.add(entry);
-                MachineNetworkInterface publicNic = new MachineNetworkInterface();
-                publicNic.setAddresses(cimiAddresses);
-                publicNic.setNetworkType(Network.Type.PUBLIC);
-                publicNic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
-                nics.add(publicNic);
+
+                MachineNetworkInterface nic = new MachineNetworkInterface();
+                nic.setNetwork(this.cimiPublicNetwork);
+                nic.setAddresses(cimiAddresses);
+                nic.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
+                nics.add(nic);
+
+                if (runningInstance.getPrivateIpAddress() != null) {
+                    MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+                    org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
+                    cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
+                    cimiAddress.setIp(runningInstance.getPrivateIpAddress());
+                    cimiAddress.setAllocation("dynamic");
+                    cimiAddress.setProtocol("IPv4");
+                    cimiAddress.setHostName(runningInstance.getPrivateDnsName());
+                    entry.setAddress(cimiAddress);
+                    cimiAddresses.add(entry);
+                }
+
+                if (runningInstance.getIpAddress() != null) {
+                    org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
+                    cimiAddress.setIp(runningInstance.getIpAddress());
+                    cimiAddress.setAllocation("dynamic");
+                    cimiAddress.setProtocol("IPv4");
+                    cimiAddress.setHostName(runningInstance.getDnsName());
+                    MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+                    entry.setAddress(cimiAddress);
+                    cimiAddresses.add(entry);
+                }
             }
 
             Hardware hardware = AmazonCloudProviderConnector.AWSEC2_HARDWARE_MAP.get(runningInstance.getInstanceType());
@@ -568,6 +605,9 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
 
             for (Map.Entry<String, BlockDevice> entry : runningInstance.getEbsBlockDevices().entrySet()) {
                 BlockDevice blockDevice = entry.getValue();
+                if (blockDevice.isDeleteOnTermination()) {
+                    continue;
+                }
                 MachineVolume attachment = new MachineVolume();
                 Volume volume = new Volume();
                 volume.setProviderAssignedId(blockDevice.getVolumeId());
@@ -641,11 +681,13 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
                 options.withUserData(userData.getBytes());
             }
 
-            String imageIdKey = "amazon/" + this.amazonRegionCode;
-            String imageId = machineCreate.getMachineTemplate().getMachineImage().getProperties().get(imageIdKey);
-            if (imageId == null) {
-                throw new ConnectorException("Cannot find imageId for key " + imageIdKey);
+            ProviderMapping mapping = ProviderMapping.find(machineCreate.getMachineTemplate().getMachineImage(),
+                this.cloudProviderAccount, this.cloudProviderLocation);
+            if (mapping == null) {
+                throw new ConnectorException("Cannot find imageId for image "
+                    + machineCreate.getMachineTemplate().getMachineImage().getName());
             }
+            String imageId = mapping.getProviderAssignedId();
 
             Reservation<? extends AWSRunningInstance> reservation = this.syncClient.getInstanceServices().runInstancesInRegion(
                 this.amazonRegionCode, this.defaultAvailabilityZone, imageId, 1, 1, options);
@@ -864,6 +906,50 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
             throw new ConnectorException("unsupported operation");
         }
 
+        public List<MachineImage> getMachineImages(final boolean returnAccountImagesOnly,
+            final Map<String, String> searchCriteria) throws ConnectorException {
+            List<MachineImage> result = new ArrayList<>();
+            AWSDescribeImagesOptions options = new AWSDescribeImagesOptions();
+            if (returnAccountImagesOnly) {
+                options.ownedBy("self");
+            }
+            Multimap<String, String> filters = ArrayListMultimap.create();
+            // filters.put("name", "ubuntu/images/ebs*2013*");
+            filters.put("name", "debian-*2013????");
+            filters.put("root-device-type", "ebs");
+            options.filters(filters);
+            for (Image image : this.syncClient.getAMIServices().describeImagesInRegion(this.amazonRegionCode, options)) {
+                MachineImage machineImage = new MachineImage();
+                machineImage.setName(image.getName());
+                System.out.println(image.getName());
+                machineImage.setType(Type.IMAGE);
+                switch (image.getImageState()) {
+                case AVAILABLE:
+                    machineImage.setState(MachineImage.State.AVAILABLE);
+                    break;
+                case DEREGISTERED:
+                    // ??
+                    continue;
+                case UNRECOGNIZED:
+                    // ??
+                    continue;
+                default:
+                    break;
+
+                }
+                ProviderMapping providerMapping = new ProviderMapping();
+                providerMapping.setProviderAssignedId(image.getId());
+                providerMapping.setProviderAccount(this.cloudProviderAccount);
+                providerMapping.setProviderLocation(this.cloudProviderLocation);
+                machineImage.setProviderMappings(Collections.singletonList(providerMapping));
+                result.add(machineImage);
+            }
+            return result;
+        }
+
+        public List<Network> getNetworks() {
+            return Collections.singletonList(this.cimiPublicNetwork);
+        }
     }
 
 }
