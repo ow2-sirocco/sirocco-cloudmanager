@@ -150,8 +150,7 @@ public class MachineManager implements IMachineManager {
     }
 
     /**
-     * User could have passed by value or by reference. Validation is expected
-     * to be done by REST layer
+     * User could have passed by value or by reference. Validation is expected to be done by REST layer
      */
     private void checkVolumes(final MachineTemplate mt, final Tenant tenant) throws CloudProviderException {
 
@@ -164,8 +163,7 @@ public class MachineManager implements IMachineManager {
                 if (mv.getSystemVolumeName() == null) {
                     Volume v = mv.getVolume();
                     /**
-                     * Volume should not be passed by value. Check that the
-                     * volume id exists.
+                     * Volume should not be passed by value. Check that the volume id exists.
                      */
                     if ((v == null) || (v.getId() == null)) {
                         throw new InvalidRequestException("No volume id ");
@@ -740,8 +738,7 @@ public class MachineManager implements IMachineManager {
     }
 
     /**
-     * for each update operation change the local state of machine only after
-     * having received the new state from server.
+     * for each update operation change the local state of machine only after having received the new state from server.
      */
     /** TEMP: filter out updates not accepted */
     private Map<String, Object> filterUpdates(final Map<String, Object> requested) {
@@ -921,17 +918,6 @@ public class MachineManager implements IMachineManager {
 
         Integer tenantId = this.getTenant().getId();
         this.validateMachineConfiguration(machineConfig);
-        boolean exists = true;
-        try {
-            MachineConfiguration mc = (MachineConfiguration) this.em
-                .createQuery("SELECT m FROM MachineConfiguration m WHERE m.tenant.id=:tenantId AND m.name=:name")
-                .setParameter("tenantId", tenantId).setParameter("name", machineConfig.getName()).getSingleResult();
-        } catch (NoResultException e) {
-            exists = false;
-        }
-        if (exists == true) {
-            throw new CloudProviderException("MachineConfiguration by name already exists " + machineConfig.getName());
-        }
         machineConfig.setTenant(this.getTenant());
         machineConfig.setCreated(new Date());
         this.em.persist(machineConfig);
@@ -1154,8 +1140,7 @@ public class MachineManager implements IMachineManager {
     }
 
     /**
-     * All checks done in CIMI REST layer: REST Layer has validated that
-     * referenced MachineConfiguration etc do really exist.
+     * All checks done in CIMI REST layer: REST Layer has validated that referenced MachineConfiguration etc do really exist.
      */
     public MachineTemplate createMachineTemplate(final MachineTemplate mt) throws CloudProviderException {
 
@@ -1245,9 +1230,6 @@ public class MachineManager implements IMachineManager {
             throw new InvalidRequestException(" Cpu attribute should be set");
         }
 
-        if (mc.getCpu() < 0) {
-            throw new InvalidRequestException("Incorrect MachineConfiguration ");
-        }
         if (mc.getCpu() < 0) {
             throw new InvalidRequestException("Incorrect MachineConfiguration ");
         }
@@ -1458,9 +1440,8 @@ public class MachineManager implements IMachineManager {
     }
 
     /**
-     * Device (volume, disk, network) attachments to machine if creation == true
-     * then attachment is part of machine create otherwise an explicit
-     * attachment request (add machine volume) by user
+     * Device (volume, disk, network) attachments to machine if creation == true then attachment is part of machine create
+     * otherwise an explicit attachment request (add machine volume) by user
      */
     private boolean completeDeviceManagement(final boolean machineCreation, final Job notification, final Machine local,
         final Machine remote) {
@@ -1930,8 +1911,7 @@ public class MachineManager implements IMachineManager {
     }
 
     /**
-     * Methods used by system manager when a system is created, deleted or
-     * operations such as stop and start are performed.
+     * Methods used by system manager when a system is created, deleted or operations such as stop and start are performed.
      */
 
     @Override
