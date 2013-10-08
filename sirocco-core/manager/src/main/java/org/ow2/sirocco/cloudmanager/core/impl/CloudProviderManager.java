@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +42,14 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
+import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
+import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
@@ -49,6 +57,9 @@ import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -75,6 +86,18 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     @EJB
     private ITenantManager tenantManager;
+
+    @EJB
+    private IMachineManager machineManager;
+
+    @EJB
+    private IMachineImageManager machineImageManager;
+
+    @EJB
+    private INetworkManager networkManager;
+
+    @EJB
+    private ICloudProviderConnectorFinder connectorFinder;
 
     @Inject
     private IdentityContext identityContext;
@@ -125,15 +148,87 @@ public class CloudProviderManager implements ICloudProviderManager {
         this.em.remove(result);
     }
 
-    @Override
-    public CloudProviderAccount createCloudProviderAccount(final String providerId, final CloudProviderAccount account)
+    private static CreateCloudProviderAccountOptions defaultCreateCloudProviderAccountOptions = new CreateCloudProviderAccountOptions();
+
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
         throws CloudProviderException {
-        // if (!isCloudProviderAccountValid(cpa)){throw new
-        // CloudProviderException("CloudProviderAccount validation failed");};
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(cloudProviderAccount
+            .getCloudProvider().getCloudProviderType());
+        if (connector == null) {
+            CloudProviderManager.logger.error("Cannot find connector for cloud provider type "
+                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
+            return null;
+        }
+        return connector;
+    }
+
+    private Tenant getTenant() throws CloudProviderException {
+        return this.tenantManager.getTenant(this.identityContext);
+    }
+
+    @Override
+    public CloudProviderAccount createCloudProviderAccount(final String providerId, final CloudProviderAccount account,
+        final CreateCloudProviderAccountOptions... _options) throws CloudProviderException {
         CloudProvider provider = this.getCloudProviderById(providerId);
         account.setCloudProvider(provider);
         this.em.persist(account);
         provider.getCloudProviderAccounts().add(account);
+
+        CreateCloudProviderAccountOptions options = _options.length > 0 ? _options[0]
+            : CloudProviderManager.defaultCreateCloudProviderAccountOptions;
+
+        ICloudProviderConnector connector = this.getCloudProviderConnector(account);
+        if (account == null) {
+            throw new CloudProviderException("Cannot find connector for provider type " + provider.getCloudProviderType());
+        }
+        if (options.isImportMachineConfigs()) {
+            // XXX pick first location only, some providers might offer
+            // different configs per location
+            CloudProviderLocation location = provider.getCloudProviderLocations().iterator().next();
+            try {
+                List<MachineConfiguration> machineConfigs = connector.getComputeService().getMachineConfigs(
+                    new ProviderTarget().account(account).location(location));
+                for (MachineConfiguration config : machineConfigs) {
+                    this.machineManager.createMachineConfiguration(config);
+                }
+            } catch (ConnectorException e) {
+                CloudProviderManager.logger.error("Import MachineConfigs failure", e);
+                throw new CloudProviderException("Cannot import machine configs: " + e.getMessage());
+            } catch (Exception e) {
+                CloudProviderManager.logger.error("", e);
+            }
+        }
+        if (options.isImportMachineImages()) {
+            for (CloudProviderLocation location : provider.getCloudProviderLocations()) {
+                try {
+                    List<MachineImage> images = connector.getImageService().getMachineImages(
+                        options.isImportOnlyOwnerMachineImages(), null,
+                        new ProviderTarget().account(account).location(location));
+                    for (MachineImage image : images) {
+                        this.machineImageManager.createMachineImage(image);
+                    }
+                } catch (ConnectorException e) {
+                    CloudProviderManager.logger.error("Import MachineImages failure", e);
+                    throw new CloudProviderException("Cannot import machine images: " + e.getMessage());
+                }
+            }
+        }
+        if (options.isImportNetworks()) {
+            for (CloudProviderLocation location : provider.getCloudProviderLocations()) {
+                try {
+                    List<Network> nets = connector.getNetworkService().getNetworks(
+                        new ProviderTarget().account(account).location(location));
+                    for (Network net : nets) {
+                        net.setTenant(this.getTenant());
+                        net.setCreated(new Date());
+                        this.em.persist(net);
+                    }
+                } catch (ConnectorException e) {
+                    CloudProviderManager.logger.error("Import Networks failure", e);
+                    throw new CloudProviderException("Cannot import networks: " + e.getMessage());
+                }
+            }
+        }
         this.em.flush();
         return account;
     }
@@ -429,12 +524,9 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     /**
      * Method to evaluate distance between 2 different locations <br>
-     * ** Only works if the points are close enough that you can omit that earth
-     * is not regular shape ** <br>
+     * ** Only works if the points are close enough that you can omit that earth is not regular shape ** <br>
      * <br>
-     * <i>see
-     * http://androidsnippets.com/distance-between-two-gps-coordinates-in-
-     * meter</i>
+     * <i>see http://androidsnippets.com/distance-between-two-gps-coordinates-in- meter</i>
      * 
      * @return
      */

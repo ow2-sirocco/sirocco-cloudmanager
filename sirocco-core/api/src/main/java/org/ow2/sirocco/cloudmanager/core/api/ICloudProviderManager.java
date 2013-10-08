@@ -57,6 +57,53 @@ public interface ICloudProviderManager {
 
     }
 
+    public static class CreateCloudProviderAccountOptions {
+        private boolean importMachineConfigs = true;
+
+        private boolean importMachineImages = true;
+
+        private boolean importOnlyOwnerMachineImages = false;
+
+        private boolean importNetworks = true;
+
+        public CreateCloudProviderAccountOptions importMachineConfigs(final boolean importMachineConfigs) {
+            this.importMachineConfigs = importMachineConfigs;
+            return this;
+        }
+
+        public CreateCloudProviderAccountOptions importMachineImages(final boolean importMachineImages) {
+            this.importMachineImages = importMachineImages;
+            return this;
+        }
+
+        public CreateCloudProviderAccountOptions importOnlyOwnerMachineImages(final boolean importOnlyOwnerMachineImages) {
+            this.importOnlyOwnerMachineImages = importOnlyOwnerMachineImages;
+            return this;
+        }
+
+        public CreateCloudProviderAccountOptions importNetworks(final boolean importNetworks) {
+            this.importNetworks = importNetworks;
+            return this;
+        }
+
+        public boolean isImportMachineConfigs() {
+            return this.importMachineConfigs;
+        }
+
+        public boolean isImportMachineImages() {
+            return this.importMachineImages;
+        }
+
+        public boolean isImportOnlyOwnerMachineImages() {
+            return this.importOnlyOwnerMachineImages;
+        }
+
+        public boolean isImportNetworks() {
+            return this.importNetworks;
+        }
+
+    }
+
     CloudProvider createCloudProvider(String type, String description) throws CloudProviderException;
 
     CloudProvider createCloudProvider(CloudProvider cp) throws CloudProviderException;
@@ -69,7 +116,8 @@ public interface ICloudProviderManager {
 
     void deleteCloudProvider(String cloudProviderId) throws CloudProviderException;
 
-    CloudProviderAccount createCloudProviderAccount(String providerId, CloudProviderAccount cpa) throws CloudProviderException;
+    CloudProviderAccount createCloudProviderAccount(String providerId, CloudProviderAccount cpa,
+        CreateCloudProviderAccountOptions... options) throws CloudProviderException;
 
     CloudProviderAccount getCloudProviderAccountById(String cloudProviderAccountId) throws CloudProviderException;
 
