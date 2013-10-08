@@ -57,6 +57,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
@@ -74,12 +75,14 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
+import org.ow2.sirocco.cloudmanager.model.cimi.Visibility;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
@@ -437,6 +440,17 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         return this.getProvider(target).getMachineImage(machineImageId);
     }
 
+    @Override
+    public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria,
+        final ProviderTarget target) {
+        return this.getProvider(target).getMachineImages(returnPublicImages, searchCriteria);
+    }
+
+    @Override
+    public List<MachineConfiguration> getMachineConfigs(final ProviderTarget provider) {
+        return this.getProvider(provider).getMachineConfigs();
+    }
+
     private static class MockProvider {
         private CloudProviderAccount cloudProviderAccount;
 
@@ -458,7 +472,21 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         private Map<String, ForwardingGroup> forwardingGroups = new ConcurrentHashMap<String, ForwardingGroup>();
 
+        MockProvider() {
+            Network publicNetwork = new Network();
+            publicNetwork.setNetworkType(Network.Type.PUBLIC);
+            publicNetwork.setName("Mock public network");
+            publicNetwork.setState(Network.State.STARTED);
+            publicNetwork.setProviderAssignedId("publicNetwork" + UUID.randomUUID().toString());
+            publicNetwork.setCloudProviderAccount(this.cloudProviderAccount);
+            publicNetwork.setLocation(this.cloudProviderLocation);
+            this.networks.put(publicNetwork.getProviderAssignedId(), publicNetwork);
+        }
+
         private boolean actionDone(final Resource resource) {
+            if (resource.getUpdated() == null) {
+                return false;
+            }
             Date now = new Date();
             return (now.getTime() - resource.getUpdated().getTime()) > MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000;
         }
@@ -678,6 +706,21 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             return machineImage;
         }
 
+        public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria) {
+            List<MachineImage> result = new ArrayList<MachineImage>(this.machineImages.values());
+            MachineImage mockPublicMachineImage = new MachineImage();
+            mockPublicMachineImage.setName("Mock Image");
+            mockPublicMachineImage.setDescription("Mock image");
+            mockPublicMachineImage.setVisibility(Visibility.PUBLIC);
+            ProviderMapping providerMapping = new ProviderMapping();
+            providerMapping.setProviderAssignedId("MockMachineImage");
+            providerMapping.setProviderAccount(this.cloudProviderAccount);
+            providerMapping.setProviderLocation(this.cloudProviderLocation);
+            mockPublicMachineImage.setProviderMappings(Collections.singletonList(providerMapping));
+            result.add(mockPublicMachineImage);
+            return result;
+        }
+
         public void deleteMachineImage(final String machineImageId) throws ConnectorException {
             MachineImage machineImage = this.machineImages.get(machineImageId);
             if (machineImage == null) {
@@ -746,6 +789,22 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 }
             }
             return machine;
+        }
+
+        public List<MachineConfiguration> getMachineConfigs() {
+            MachineConfiguration mockMachineConfiguration = new MachineConfiguration();
+            mockMachineConfiguration.setCpu(1);
+            mockMachineConfiguration.setMemory(1024);
+            DiskTemplate disk = new DiskTemplate();
+            disk.setCapacity(1000 * 1000 * 2);
+            mockMachineConfiguration.setDisks(Collections.singletonList(disk));
+            mockMachineConfiguration.setName("MockMachineConfig");
+            ProviderMapping providerMapping = new ProviderMapping();
+            providerMapping.setProviderAssignedId("MockMachineConfig");
+            providerMapping.setProviderAccount(this.cloudProviderAccount);
+            providerMapping.setProviderLocation(this.cloudProviderLocation);
+            mockMachineConfiguration.setProviderMappings(Collections.singletonList(providerMapping));
+            return Collections.singletonList(mockMachineConfiguration);
         }
 
         public synchronized System.State getSystemState(final String systemId) throws ConnectorException {
