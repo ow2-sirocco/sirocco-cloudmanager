@@ -42,9 +42,9 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
-import org.ow2.sirocco.cloudmanager.model.cimi.ICloudProviderResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 @Entity
