@@ -1,0 +1,7 @@
+Package: sirocco-api-cli
+Version: [[version]]
+Section: misc
+Priority: optional
+Architecture: all
+Description: [[description]]
+Maintainer: Gregoire Lejeune <gregoire.lejeune@enovance.com>
