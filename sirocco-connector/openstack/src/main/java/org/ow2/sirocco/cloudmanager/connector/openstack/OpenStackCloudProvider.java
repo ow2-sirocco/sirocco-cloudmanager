@@ -25,6 +25,7 @@ package org.ow2.sirocco.cloudmanager.connector.openstack;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -34,10 +35,13 @@ import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineDisk;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
@@ -50,6 +54,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +69,8 @@ import com.woorea.openstack.nova.api.extensions.FloatingIpPoolsExtension;
 import com.woorea.openstack.nova.model.Flavor;
 import com.woorea.openstack.nova.model.FloatingIp;
 import com.woorea.openstack.nova.model.FloatingIpPools;
+import com.woorea.openstack.nova.model.Image;
+import com.woorea.openstack.nova.model.Images;
 import com.woorea.openstack.nova.model.KeyPair;
 import com.woorea.openstack.nova.model.Server;
 import com.woorea.openstack.nova.model.Server.Addresses.Address;
@@ -277,12 +284,13 @@ public class OpenStackCloudProvider {
         }
         serverForCreate.setFlavorRef(flavorId);
 
-        String imageIdKey = "openstack";
-        String imageId = machineCreate.getMachineTemplate().getMachineImage().getProperties().get(imageIdKey);
-        if (imageId == null) {
-            throw new ConnectorException("Cannot find imageId for key " + imageIdKey);
+        ProviderMapping mapping = ProviderMapping.find(machineCreate.getMachineTemplate().getMachineImage(),
+            this.cloudProviderAccount, this.cloudProviderLocation);
+        if (mapping == null) {
+            throw new ConnectorException("Cannot find imageId for image "
+                + machineCreate.getMachineTemplate().getMachineImage().getName());
         }
-        serverForCreate.setImageRef(imageId);
+        serverForCreate.setImageRef(mapping.getProviderAssignedId());
 
         String keyPairName = null;
         if (machineCreate.getMachineTemplate().getCredential() != null) {
@@ -462,6 +470,33 @@ public class OpenStackCloudProvider {
             }
         }
         return null;
+    }
+
+    public List<MachineConfiguration> getMachineConfigs() {
+        List<MachineConfiguration> result = new ArrayList<>();
+        for (Flavor flavor : this.novaClient.flavors().list(true).execute()) {
+            MachineConfiguration machineConfig = new MachineConfiguration();
+            machineConfig.setName(flavor.getName());
+            machineConfig.setCpu(Integer.parseInt(flavor.getVcpus()));
+            machineConfig.setMemory(flavor.getRam() * 1024);
+            List<DiskTemplate> disks = new ArrayList<>();
+            DiskTemplate disk = new DiskTemplate();
+            disk.setCapacity(Integer.parseInt(flavor.getDisk()) * 1000 * 1000);
+            disks.add(disk);
+            if (flavor.getEphemeral() > 0) {
+                disk = new DiskTemplate();
+                disk.setCapacity(flavor.getEphemeral() * 1000 * 1000);
+                disks.add(disk);
+            }
+            machineConfig.setDisks(disks);
+
+            ProviderMapping providerMapping = new ProviderMapping();
+            providerMapping.setProviderAssignedId(flavor.getId());
+            providerMapping.setProviderAccount(this.cloudProviderAccount);
+            machineConfig.setProviderMappings(Collections.singletonList(providerMapping));
+            result.add(machineConfig);
+        }
+        return result;
     }
 
     private String getKeyPair(final String publicKey) {
@@ -813,4 +848,38 @@ public class OpenStackCloudProvider {
         /* FIXME woorea Bug : err 409 ignored when trying to delete a network attached to servers */
         this.quantum.networks().delete(networkId).execute();
     }
+
+    private MachineImage.State fromNovaImageStatusToCimiMachineImageState(final String novaStatus) {
+        switch (novaStatus) {
+        case "ACTIVE":
+            return MachineImage.State.AVAILABLE;
+        case "SAVING":
+            return MachineImage.State.CREATING;
+        case "ERROR":
+            return MachineImage.State.ERROR;
+        case "DELETED":
+            return MachineImage.State.DELETED;
+        default:
+            return MachineImage.State.ERROR;
+        }
+    }
+
+    public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria) {
+        List<MachineImage> result = new ArrayList<MachineImage>();
+        Images images = this.novaClient.images().list(true).execute();
+        for (Image image : images) {
+            MachineImage machineImage = new MachineImage();
+            machineImage.setName(image.getName());
+            machineImage.setState(this.fromNovaImageStatusToCimiMachineImageState(image.getStatus()));
+            // no distinction between between images and snaphots in Havana
+            machineImage.setType(Type.IMAGE);
+            ProviderMapping providerMapping = new ProviderMapping();
+            providerMapping.setProviderAssignedId(image.getId());
+            providerMapping.setProviderAccount(this.cloudProviderAccount);
+            machineImage.setProviderMappings(Collections.singletonList(providerMapping));
+            result.add(machineImage);
+        }
+        return result;
+    }
+
 }
