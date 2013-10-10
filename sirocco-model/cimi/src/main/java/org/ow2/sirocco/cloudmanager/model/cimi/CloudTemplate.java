@@ -33,6 +33,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
+
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CloudTemplate extends CloudEntity implements Serializable {

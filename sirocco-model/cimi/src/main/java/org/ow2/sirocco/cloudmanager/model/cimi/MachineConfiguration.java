@@ -36,6 +36,7 @@ import javax.persistence.FetchType;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.IMultiCloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
 
 @Entity
 public class MachineConfiguration extends CloudEntity implements IMultiCloudResource, Serializable {

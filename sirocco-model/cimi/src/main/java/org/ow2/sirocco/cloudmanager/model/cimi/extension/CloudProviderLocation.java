@@ -38,6 +38,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+/**
+ * Geographical location where cloud resources are running
+ */
 @Entity
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"iso3166_1", "iso3166_2", "postal_code"}),
     @UniqueConstraint(columnNames = {"gps_latitude", "gps_longitude", "gps_altitude"})})

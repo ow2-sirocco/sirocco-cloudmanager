@@ -40,6 +40,9 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+/**
+ * Person who uses Sirocco manager
+ */
 @Entity
 @Table(name = "Users")
 public class User implements Serializable {

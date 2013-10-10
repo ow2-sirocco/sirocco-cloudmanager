@@ -38,6 +38,9 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 
+/**
+ * An account on a cloud provider
+ */
 @Entity
 public class CloudProviderAccount implements Serializable {
     private static final long serialVersionUID = 1L;

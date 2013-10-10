@@ -48,6 +48,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
+/**
+ * Machine resource
+ */
 @Entity
 @NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
 public class Machine extends CloudResource implements Serializable, ICloudProviderResource {

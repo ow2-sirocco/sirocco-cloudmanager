@@ -47,6 +47,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
+/**
+ * Resource that consists of one or more Networks, Volumes, Machines, (and
+ * others) that can be connected and associated with each other
+ */
 @Entity
 @Table(name = "SYSTEMINSTANCE")
 public class System extends CloudResource implements Serializable, ICloudProviderResource {

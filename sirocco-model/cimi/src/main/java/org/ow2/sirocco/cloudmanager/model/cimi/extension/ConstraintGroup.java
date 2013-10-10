@@ -39,6 +39,10 @@ import javax.persistence.TemporalType;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
+/**
+ * Represents a placement group where resources are placed according to some
+ * placement constraints
+ */
 @Entity
 public class ConstraintGroup implements Resource, Serializable {
     private static final long serialVersionUID = 1L;

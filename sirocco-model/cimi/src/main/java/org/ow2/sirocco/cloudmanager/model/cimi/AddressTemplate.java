@@ -33,6 +33,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 
+/**
+ * IP address template
+ */
 @Entity
 public class AddressTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
