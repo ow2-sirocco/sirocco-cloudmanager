@@ -54,6 +54,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
@@ -902,11 +903,13 @@ public class VcdCloudProvider {
                 // associate machine instances with templates
                 machineTemplateMap.put(name, mt);
                 // set Href
-                String idKey = "vcd";
-                String vmTmplRef = mt.getMachineImage().getProperties().get(idKey);
-                if (vmTmplRef == null) {
-                    throw new ConnectorException("Cannot find vAppTemplate/vm Id for key " + idKey);
+                ProviderMapping mapping = ProviderMapping.find(mt.getMachineImage(), this.cloudProviderAccount,
+                    this.cloudProviderLocation);
+                if (mapping == null) {
+                    throw new ConnectorException("Cannot find imageId for image " + mt.getMachineImage().getName());
                 }
+                String vmTmplRef = mapping.getProviderAssignedId();
+
                 source.setHref(vmTmplRef);
                 item.setSource(source);
 
