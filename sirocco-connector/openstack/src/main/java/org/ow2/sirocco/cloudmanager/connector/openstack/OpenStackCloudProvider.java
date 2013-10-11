@@ -839,6 +839,9 @@ public class OpenStackCloudProvider {
         com.woorea.openstack.quantum.model.Networks novaNetworks = this.quantum.networks().list().execute();
         for (com.woorea.openstack.quantum.model.Network novaNetwork : novaNetworks) {
             /*System.out.println("--- network: " + novaNetwork);*/
+            if (novaNetwork.getRouterExternal().equalsIgnoreCase("true")) {
+                continue;
+            }
             networks.add(this.getNetwork(novaNetwork.getId()));
         }
         return networks;
