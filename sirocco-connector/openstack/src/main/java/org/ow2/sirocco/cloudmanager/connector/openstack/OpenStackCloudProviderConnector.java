@@ -96,12 +96,24 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
 
     /*
-     * TODO Mix - connector cache - REST call trace (On/Off) - woorea exception
-     * handling - availability_zone (API for zone) Compute - reboot: not
-     * supported by woorea - CIMI address allocation mode : dynamic / fixed -
-     * captureMachine Network - createNetwork : add implicit/explicit subnet ;
-     * conflict between cidr - createNetwork/deleteNetwork: woorea bugs : see
-     * fixme - Forwarding groups / BagPipe
+     * TODO Mix 
+     * - connector cache 
+     * - REST call trace (On/Off) 
+     * - woorea exception handling 
+     * - availability_zone (API for zone) 
+     * 
+     * Compute 
+     * - reboot: not supported by woorea 
+     * - CIMI address allocation mode : dynamic / fixed 
+     * - captureMachine 
+     * 
+     * Network 
+     * - createNetwork : add implicit/explicit subnet ;  conflict between cidr 
+     * - createNetwork/deleteNetwork: woorea bugs : see fixme 
+     * - Forwarding groups / BagPipe
+     * 
+     * Image
+     * - getMachineImage
      */
 
     //
@@ -502,7 +514,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public MachineImage getMachineImage(final String machineImageId, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
-        // TODO Auto-generated method stub
+        // TODO
         return null;
     }
 
@@ -515,7 +527,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public void deleteMachineImage(final String imageId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
-        // TODO Auto-generated method stub
+        throw new ConnectorException("unsupported operation");
 
     }
 

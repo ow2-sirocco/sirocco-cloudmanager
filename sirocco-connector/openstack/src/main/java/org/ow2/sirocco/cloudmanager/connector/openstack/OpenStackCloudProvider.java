@@ -852,6 +852,10 @@ public class OpenStackCloudProvider {
         this.quantum.networks().delete(networkId).execute();
     }
 
+    //
+    // Image
+    //
+
     private MachineImage.State fromNovaImageStatusToCimiMachineImageState(final String novaStatus) {
         switch (novaStatus) {
         case "ACTIVE":
@@ -870,7 +874,7 @@ public class OpenStackCloudProvider {
     public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria) {
         List<MachineImage> result = new ArrayList<MachineImage>();
         Images images = this.novaClient.images().list(true).execute();
-        for (Image image : images) {
+        for (Image image : images) { // TODO getMachineImage
             MachineImage machineImage = new MachineImage();
             machineImage.setName(image.getName());
             machineImage.setState(this.fromNovaImageStatusToCimiMachineImageState(image.getStatus()));

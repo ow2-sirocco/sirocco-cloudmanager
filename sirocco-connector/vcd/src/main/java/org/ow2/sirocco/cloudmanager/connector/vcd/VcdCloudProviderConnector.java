@@ -298,7 +298,6 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
 
     @Override
     public List<MachineConfiguration> getMachineConfigs(final ProviderTarget provider) throws ConnectorException {
-        // TODO
         return Collections.emptyList();
     }
 
@@ -413,7 +412,6 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
     @Override
     public void deleteMachineImage(final String imageId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
-        // TODO
         throw new ConnectorException("unsupported operation");
 
     }
