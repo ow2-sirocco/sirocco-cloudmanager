@@ -212,7 +212,7 @@ public class QueryHelper {
             if (!returnPublicEntities) {
                 tenantQuery = " v.tenant.id=:tenantId ";
             } else {
-                tenantQuery = " (v.tenant.id=:tenantId OR v.visibility = org.ow2.sirocco.cloudmanager.model.cimi.Visibility.PUBLIC) ";
+                tenantQuery = " (v.tenant.id=:tenantId OR v.visibility = org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility.PUBLIC) ";
             }
         }
         if (stateToIgnore != null) {
@@ -235,7 +235,7 @@ public class QueryHelper {
                 whereClauseSB.append(" v.tenant.id=:tenantId ");
             } else {
                 whereClauseSB
-                    .append("( v.tenant.id=:tenantId OR v.visibility = org.ow2.sirocco.cloudmanager.model.cimi.Visibility.PUBLIC) ");
+                    .append("( v.tenant.id=:tenantId OR v.visibility = org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility.PUBLIC) ");
             }
         }
         if (params.getStateToIgnore() != null) {
