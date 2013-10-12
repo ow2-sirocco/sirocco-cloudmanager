@@ -63,6 +63,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -632,6 +633,29 @@ public class CloudProviderManager implements ICloudProviderManager {
         }
 
         return new Placement(targetAccount, targetLocation);
+    }
+
+    @Override
+    public CloudProviderProfile createCloudProviderProfile(final CloudProviderProfile providerProfile) {
+        this.em.persist(providerProfile);
+        return providerProfile;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<CloudProviderProfile> getCloudProviderProfiles() {
+        return this.em.createQuery("Select p From CloudProviderProfile p").getResultList();
+    }
+
+    @Override
+    public void addCloudProviderProfileMetadata(final String profileId,
+        final org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile.AccountParameter metadata)
+        throws ResourceNotFoundException {
+        CloudProviderProfile profile = this.em.find(CloudProviderProfile.class, Integer.parseInt(profileId));
+        if (profile == null) {
+            throw new ResourceNotFoundException();
+        }
+        profile.getAccountParameters().add(metadata);
     }
 
 }

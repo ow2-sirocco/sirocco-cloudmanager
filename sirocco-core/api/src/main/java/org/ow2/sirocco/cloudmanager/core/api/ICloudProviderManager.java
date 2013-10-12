@@ -29,9 +29,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile;
 
 public interface ICloudProviderManager {
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/CloudProviderManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager";
@@ -162,5 +164,12 @@ public interface ICloudProviderManager {
     List<CloudProvider> getCloudProviders() throws CloudProviderException;
 
     Placement placeResource(String tenantId, final Map<String, String> properties) throws CloudProviderException;
+
+    CloudProviderProfile createCloudProviderProfile(CloudProviderProfile providerType);
+
+    void addCloudProviderProfileMetadata(String profileId, CloudProviderProfile.AccountParameter metadata)
+        throws ResourceNotFoundException;
+
+    List<CloudProviderProfile> getCloudProviderProfiles();
 
 }

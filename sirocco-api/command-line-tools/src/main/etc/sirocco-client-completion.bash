@@ -52,6 +52,7 @@ _sirocco_client()
     commands="${commands} provider-location-list provider-location-add"
     commands="${commands} tenant-list tenant-create tenant-delete tenant-show tenant-account-list tenant-account-add tenant-account-remove tenant-user-add tenant-user-remove tenant-user-list"
     commands="${commands} user-list user-create user-delete user-show"
+    commands="${commands} provider-profile-list user-create provider-profile-create provider-profile-metadata-add"
 
     case "${command}" in
 	provider-create)
@@ -59,7 +60,7 @@ _sirocco_client()
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
-	provider-list )
+	provider-list | provider-profile-list)
 	    local opts=""
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
@@ -89,8 +90,18 @@ _sirocco_client()
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;  
+    provider-profile-metadata-add)    
+    	local opts="-profileId -metadata"
+	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;          
     provider-account-create) 
     	local opts="-providerId -clientId -clientSecret -name -description -properties"
+	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;  
+    provider-profile-create) 
+    	local opts="-type -connectorClass -metadata"
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;  
