@@ -597,11 +597,10 @@ public class OpenStackCloudProvider {
             return MachineVolume.State.ATTACHED;
         } else if (novaStatus.equalsIgnoreCase("ATTACHING")) {
             return MachineVolume.State.ATTACHING;
-        }
-        /*else if (novaStatus.equalsIgnoreCase("DETACHING")) { // undocumented state!
+        } else if (novaStatus.equalsIgnoreCase("DETACHING")) {
+            // undocumented state!
             return MachineVolume.State.DETACHING;
-        }*/
-        else {
+        } else {
             return MachineVolume.State.ERROR; // CIMI mapping!
         }
     }
