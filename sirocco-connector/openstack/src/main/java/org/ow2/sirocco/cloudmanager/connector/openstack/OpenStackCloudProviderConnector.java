@@ -108,12 +108,11 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
      * - captureMachine 
      * 
      * Network 
-     * - createNetwork : add implicit/explicit subnet ;  conflict between cidr 
      * - createNetwork/deleteNetwork: woorea bugs : see fixme 
      * - Forwarding groups / BagPipe
      * 
      * Image
-     * - getMachineImage
+     * - deleteMachineImage
      */
 
     //
@@ -224,7 +223,6 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public MachineImage captureMachine(final String machineId, final MachineImage machineImage, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
-        // TODO
         throw new ConnectorException("unsupported operation");
     }
 
@@ -514,8 +512,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public MachineImage getMachineImage(final String machineImageId, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
-        // TODO
-        return null;
+        return this.getProvider(target).getMachineImage(machineImageId);
     }
 
     @Override

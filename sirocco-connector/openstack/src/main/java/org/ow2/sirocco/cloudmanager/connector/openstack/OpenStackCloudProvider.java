@@ -749,7 +749,6 @@ public class OpenStackCloudProvider {
 
         try {
             /* FIXME
-             * - subnet: add implicit/explicit subnet ; conflict between cidr?
              * - Woorea bug: SubnetForCreate: networkId/networkid (ongoing pull4request)
              * - Woorea bug: Subnet deserialization (pull4request TBD)
              * - Woorea bug: SubnetForCreate: EnableDhcp not supported (pull4request TBD)
@@ -871,7 +870,31 @@ public class OpenStackCloudProvider {
         }
     }
 
+    public MachineImage getMachineImage(final String machineImageId) {
+        MachineImage machineImage = new MachineImage();
+        Image image = this.novaClient.images().show(machineImageId).execute();
+        machineImage.setName(image.getName());
+        machineImage.setState(this.fromNovaImageStatusToCimiMachineImageState(image.getStatus()));
+        machineImage.setType(Type.IMAGE);
+        ProviderMapping providerMapping = new ProviderMapping();
+        providerMapping.setProviderAssignedId(image.getId());
+        providerMapping.setProviderAccount(this.cloudProviderAccount);
+        machineImage.setProviderMappings(Collections.singletonList(providerMapping));
+        return machineImage;
+    }
+
     public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria) {
+        List<MachineImage> result = new ArrayList<MachineImage>();
+        Images images = this.novaClient.images().list(true).execute();
+        for (Image image : images) {
+            // no distinction between between images and snaphots in Havana
+            MachineImage machineImage = this.getMachineImage(image.getId());
+            result.add(machineImage);
+        }
+        return result;
+    }
+
+    /*public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria) {
         List<MachineImage> result = new ArrayList<MachineImage>();
         Images images = this.novaClient.images().list(true).execute();
         for (Image image : images) { // TODO getMachineImage
@@ -887,6 +910,6 @@ public class OpenStackCloudProvider {
             result.add(machineImage);
         }
         return result;
-    }
+    }*/
 
 }
