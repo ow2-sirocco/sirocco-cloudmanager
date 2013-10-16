@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -382,14 +383,16 @@ public class MachineManager implements IMachineManager {
     public void syncMachine(final String machineId, final Machine updatedMachine, final String jobId) {
         Machine machine = this.em.find(Machine.class, Integer.valueOf(machineId));
         Job job = this.em.find(Job.class, Integer.valueOf(jobId));
-        if (updatedMachine == null) {
+        if (updatedMachine == null || updatedMachine.getState() == State.DELETED) {
             machine.setState(Machine.State.DELETED);
             // delete volume attachments
-            for (MachineVolume attachment : machine.getVolumes()) {
-                machine.removeMachineVolume(attachment);
+            for (Iterator<MachineVolume> it = machine.getVolumes().iterator(); it.hasNext();) {
+                MachineVolume attachment = it.next();
+                it.remove();
                 attachment.setOwner(null);
                 attachment.setState(MachineVolume.State.DELETED);
                 attachment.setVolume(null);
+                this.em.persist(attachment);
             }
         } else {
             machine.setState(updatedMachine.getState());
