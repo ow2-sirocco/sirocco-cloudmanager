@@ -112,6 +112,8 @@ public interface ICloudProviderManager {
 
     CloudProvider getCloudProviderById(String cloudProviderId) throws CloudProviderException;
 
+    List<CloudProvider> getCloudProviderByType(String type) throws CloudProviderException;
+
     CloudProvider updateCloudProvider(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
 
     CloudProvider updateCloudProvider(CloudProvider CP) throws CloudProviderException;
@@ -120,6 +122,9 @@ public interface ICloudProviderManager {
 
     CloudProviderAccount createCloudProviderAccount(String providerId, CloudProviderAccount cpa,
         CreateCloudProviderAccountOptions... options) throws CloudProviderException;
+
+    CloudProviderAccount createCloudProviderAccount(CloudProvider provider, CloudProviderLocation location,
+        CloudProviderAccount account, CreateCloudProviderAccountOptions... options) throws CloudProviderException;
 
     CloudProviderAccount getCloudProviderAccountById(String cloudProviderAccountId) throws CloudProviderException;
 

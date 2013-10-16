@@ -42,7 +42,6 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
@@ -137,6 +136,12 @@ public class CloudProviderManager implements ICloudProviderManager {
         return result;
     }
 
+    @Override
+    public List<CloudProvider> getCloudProviderByType(final String type) throws CloudProviderException {
+        return this.em.createQuery("Select p From CloudProvider p where p.cloudProviderType=:type").setParameter("type", type)
+            .getResultList();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public List<CloudProvider> getCloudProviders() throws CloudProviderException {
@@ -168,6 +173,14 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
+    public CloudProviderAccount createCloudProviderAccount(final CloudProvider provider, final CloudProviderLocation location,
+        final CloudProviderAccount account, final CreateCloudProviderAccountOptions... options) throws CloudProviderException {
+        CloudProvider newProvider = this.createCloudProvider(provider);
+        this.addLocationToCloudProvider(newProvider.getId().toString(), location);
+        return this.createCloudProviderAccount(newProvider.getId().toString(), account, options);
+    }
+
+    @Override
     public CloudProviderAccount createCloudProviderAccount(final String providerId, final CloudProviderAccount account,
         final CreateCloudProviderAccountOptions... _options) throws CloudProviderException {
         CloudProvider provider = this.getCloudProviderById(providerId);
@@ -192,11 +205,9 @@ public class CloudProviderManager implements ICloudProviderManager {
                 for (MachineConfiguration config : machineConfigs) {
                     this.machineManager.createMachineConfiguration(config);
                 }
-            } catch (ConnectorException e) {
+            } catch (Exception e) {
                 CloudProviderManager.logger.error("Import MachineConfigs failure", e);
                 throw new CloudProviderException("Cannot import machine configs: " + e.getMessage());
-            } catch (Exception e) {
-                CloudProviderManager.logger.error("", e);
             }
         }
         if (options.isImportMachineImages()) {
@@ -209,7 +220,7 @@ public class CloudProviderManager implements ICloudProviderManager {
                         image.setLocation(location);
                         this.machineImageManager.createMachineImage(image);
                     }
-                } catch (ConnectorException e) {
+                } catch (Exception e) {
                     CloudProviderManager.logger.error("Import MachineImages failure", e);
                     throw new CloudProviderException("Cannot import machine images: " + e.getMessage());
                 }
@@ -227,7 +238,7 @@ public class CloudProviderManager implements ICloudProviderManager {
                         net.setLocation(location);
                         this.em.persist(net);
                     }
-                } catch (ConnectorException e) {
+                } catch (Exception e) {
                     CloudProviderManager.logger.error("Import Networks failure", e);
                     throw new CloudProviderException("Cannot import networks: " + e.getMessage());
                 }
