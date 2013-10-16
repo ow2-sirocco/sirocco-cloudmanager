@@ -121,6 +121,9 @@ public class CloudProvider implements Serializable {
 
     @ManyToMany(mappedBy = "cloudProviders", fetch = FetchType.EAGER)
     public Set<CloudProviderLocation> getCloudProviderLocations() {
+        if (this.cloudProviderLocations == null) {
+            this.cloudProviderLocations = new HashSet<>();
+        }
         return this.cloudProviderLocations;
     }
 
