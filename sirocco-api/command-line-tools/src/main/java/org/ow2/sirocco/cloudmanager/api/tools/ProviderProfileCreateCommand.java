@@ -35,6 +35,9 @@ public class ProviderProfileCreateCommand implements Command {
     @Parameter(names = "-type", description = "provider type", required = true)
     private String type;
 
+    @Parameter(names = "-description", description = "description", required = true)
+    private String description;
+
     @Parameter(names = "-connectorClass", description = "java connection class name", required = true)
     private String connectorClass;
 
@@ -47,6 +50,7 @@ public class ProviderProfileCreateCommand implements Command {
     public void execute(final RestClient restClient) throws Exception {
         ProviderProfile providerProfile = new ProviderProfile();
         providerProfile.setType(this.type);
+        providerProfile.setDescription(this.description);
         providerProfile.setConnectorClass(this.connectorClass);
 
         providerProfile = restClient.postCreateRequest("providers/profiles", providerProfile, ProviderProfile.class);

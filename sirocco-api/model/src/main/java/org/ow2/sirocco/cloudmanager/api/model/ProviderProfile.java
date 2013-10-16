@@ -35,6 +35,8 @@ public class ProviderProfile implements Serializable {
 
     private String id;
 
+    private String description;
+
     private String type;
 
     private String connectorClass;
@@ -47,6 +49,14 @@ public class ProviderProfile implements Serializable {
 
     public void setId(final String id) {
         this.id = id;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public String getType() {

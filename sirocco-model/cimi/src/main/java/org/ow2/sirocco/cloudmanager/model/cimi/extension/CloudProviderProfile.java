@@ -39,7 +39,15 @@ import javax.persistence.Id;
 public class CloudProviderProfile implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    public static final String PROVIDER_ENDPOINT = "endpoint";
+
+    public static final String PROVIDER_ACCOUNT_LOGIN = "login";
+
+    public static final String PROVIDER_ACCOUNT_PASSWORD = "password";
+
     private Integer id;
+
+    private String description = "";
 
     private String type;
 
@@ -55,6 +63,14 @@ public class CloudProviderProfile implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     public String getType() {
@@ -80,6 +96,17 @@ public class CloudProviderProfile implements Serializable {
 
     public void setAccountParameters(final List<AccountParameter> accountParameters) {
         this.accountParameters = accountParameters;
+    }
+
+    public AccountParameter findAccountParameter(final String name) {
+        if (this.accountParameters != null) {
+            for (AccountParameter param : this.accountParameters) {
+                if (name.equals(param.getName()) || name.equals(param.getAlias())) {
+                    return param;
+                }
+            }
+        }
+        return null;
     }
 
     @Embeddable

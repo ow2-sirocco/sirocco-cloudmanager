@@ -101,7 +101,7 @@ _sirocco_client()
             return 0
             ;;  
     provider-profile-create) 
-    	local opts="-type -connectorClass -metadata"
+    	local opts="-type -connectorClass -metadata -description"
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;  
