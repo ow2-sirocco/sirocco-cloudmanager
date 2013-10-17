@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -94,6 +95,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
 import org.slf4j.Logger;
@@ -918,11 +920,26 @@ public class MachineManager implements IMachineManager {
 
     public MachineConfiguration createMachineConfiguration(final MachineConfiguration machineConfig)
         throws CloudProviderException {
-
-        Integer tenantId = this.getTenant().getId();
         this.validateMachineConfiguration(machineConfig);
         machineConfig.setTenant(this.getTenant());
         machineConfig.setCreated(new Date());
+
+        if (machineConfig.getProperties() != null) {
+            String providerAccountId = machineConfig.getProperties().get("providerAccountId");
+            String providerAssignedId = machineConfig.getProperties().get("providerAssignedId");
+            if (providerAccountId != null && providerAssignedId != null) {
+                CloudProviderAccount account = this.cloudProviderManager.getCloudProviderAccountById(providerAccountId);
+                if (account == null) {
+                    throw new CloudProviderException("Invalid provider account id: " + providerAccountId);
+                }
+                ProviderMapping providerMapping = new ProviderMapping();
+                providerMapping.setProviderAssignedId(providerAssignedId);
+                providerMapping.setProviderAccount(account);
+                providerMapping.setProviderLocation(account.getCloudProvider().getCloudProviderLocations().iterator().next());
+                machineConfig.setProviderMappings(Collections.singletonList(providerMapping));
+            }
+        }
+
         this.em.persist(machineConfig);
         this.em.flush();
         return machineConfig;
