@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -38,6 +39,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * A CloudProvider can provision compute resources (virtual machines along with
@@ -50,6 +53,8 @@ public class CloudProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+
+    private Date created;
 
     private String cloudProviderType;
 
@@ -75,6 +80,15 @@ public class CloudProvider implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getCreated() {
+        return this.created;
+    }
+
+    public void setCreated(final Date created) {
+        this.created = created;
     }
 
     public String getCloudProviderType() {

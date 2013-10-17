@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -37,6 +38,8 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * An account on a cloud provider
@@ -46,6 +49,8 @@ public class CloudProviderAccount implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+
+    private Date created;
 
     private String login;
 
@@ -68,6 +73,15 @@ public class CloudProviderAccount implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    @Temporal(TemporalType.TIMESTAMP)
+    public Date getCreated() {
+        return this.created;
+    }
+
+    public void setCreated(final Date created) {
+        this.created = created;
     }
 
     public String getLogin() {
