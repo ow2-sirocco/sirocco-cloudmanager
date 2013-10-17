@@ -400,7 +400,6 @@ public class MachineManager implements IMachineManager {
             machine.setState(updatedMachine.getState());
             if (machine.getCreated() == null) {
                 machine.setCreated(new Date());
-                this.createDisks(machine, updatedMachine);
                 this.createNetworkInterfaces(machine, updatedMachine);
             }
             machine.setUpdated(new Date());
@@ -1322,23 +1321,6 @@ public class MachineManager implements IMachineManager {
         this.em.flush();
         this.systemManager.handleEntityStateChange(deleted.getClass(), deleted.getId().toString(), true);
 
-    }
-
-    /**
-     * Initialize disks for newly created machine
-     */
-    private void createDisks(final Machine persisted, final Machine created) {
-        List<MachineDisk> diskColl = created.getDisks();
-        if (diskColl == null) {
-            return;
-        }
-        for (MachineDisk disk : diskColl) {
-            disk.setId(null);
-            disk.setCreated(new Date());
-            this.em.persist(disk);
-            persisted.addMachineDisk(disk);
-        }
-        this.em.flush();
     }
 
     /**
