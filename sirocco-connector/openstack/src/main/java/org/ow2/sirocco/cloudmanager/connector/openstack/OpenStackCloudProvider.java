@@ -878,6 +878,7 @@ public class OpenStackCloudProvider {
         ProviderMapping providerMapping = new ProviderMapping();
         providerMapping.setProviderAssignedId(image.getId());
         providerMapping.setProviderAccount(this.cloudProviderAccount);
+        providerMapping.setProviderLocation(this.cloudProviderLocation);
         machineImage.setProviderMappings(Collections.singletonList(providerMapping));
         return machineImage;
     }
