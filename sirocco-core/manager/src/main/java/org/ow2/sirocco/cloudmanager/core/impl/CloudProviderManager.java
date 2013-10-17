@@ -54,6 +54,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.OperationFailureException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -116,7 +117,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     public CloudProvider createCloudProvider(final CloudProvider cp) throws CloudProviderException {
         // if (!isCloudProviderValid(cp)){throw new
         // CloudProviderException("CloudProvider validation failed");};
-
+        cp.setCreated(new Date());
         this.em.persist(cp);
         this.em.flush();
         return cp;
@@ -185,6 +186,7 @@ public class CloudProviderManager implements ICloudProviderManager {
         final CreateCloudProviderAccountOptions... _options) throws CloudProviderException {
         CloudProvider provider = this.getCloudProviderById(providerId);
         account.setCloudProvider(provider);
+        account.setCreated(new Date());
         this.em.persist(account);
         provider.getCloudProviderAccounts().add(account);
 
@@ -193,7 +195,7 @@ public class CloudProviderManager implements ICloudProviderManager {
 
         ICloudProviderConnector connector = this.getCloudProviderConnector(account);
         if (account == null) {
-            throw new CloudProviderException("Cannot find connector for provider type " + provider.getCloudProviderType());
+            throw new OperationFailureException("Cannot find connector for provider type " + provider.getCloudProviderType());
         }
         if (options.isImportMachineConfigs()) {
             // XXX pick first location only, some providers might offer
@@ -207,7 +209,7 @@ public class CloudProviderManager implements ICloudProviderManager {
                 }
             } catch (Exception e) {
                 CloudProviderManager.logger.error("Import MachineConfigs failure", e);
-                throw new CloudProviderException("Cannot import machine configs: " + e.getMessage());
+                throw new OperationFailureException("Cannot import machine configs: " + e.getMessage());
             }
         }
         if (options.isImportMachineImages()) {
@@ -222,7 +224,7 @@ public class CloudProviderManager implements ICloudProviderManager {
                     }
                 } catch (Exception e) {
                     CloudProviderManager.logger.error("Import MachineImages failure", e);
-                    throw new CloudProviderException("Cannot import machine images: " + e.getMessage());
+                    throw new OperationFailureException("Cannot import machine images: " + e.getMessage());
                 }
             }
         }
@@ -240,7 +242,7 @@ public class CloudProviderManager implements ICloudProviderManager {
                     }
                 } catch (Exception e) {
                     CloudProviderManager.logger.error("Import Networks failure", e);
-                    throw new CloudProviderException("Cannot import networks: " + e.getMessage());
+                    throw new OperationFailureException("Cannot import networks: " + e.getMessage());
                 }
             }
         }
