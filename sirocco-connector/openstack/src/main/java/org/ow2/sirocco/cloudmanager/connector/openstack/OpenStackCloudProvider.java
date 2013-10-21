@@ -113,14 +113,30 @@ public class OpenStackCloudProvider {
         }
         this.tenantName = properties.get("tenantName");
         this.cimiPublicNetworkName = properties.get("publicNetworkName");
-        OpenStackCloudProvider.logger.info("connect: " + this.cloudProviderAccount.getLogin() + ":"
-            + this.cloudProviderAccount.getPassword() + " to tenant=" + this.tenantName + ", publicNetwork="
-            + this.cimiPublicNetworkName + ", KEYSTONE_AUTH_URL=" + this.cloudProviderAccount.getCloudProvider().getEndpoint());
+        OpenStackCloudProvider.logger
+            .info("connect user/pswd=" + this.cloudProviderAccount.getLogin() + "/" + this.cloudProviderAccount.getPassword()
+                + " to tenant=" + this.tenantName + " at KEYSTONE_AUTH_URL="
+                + this.cloudProviderAccount.getCloudProvider().getEndpoint() + ", with publicNetwork="
+                + this.cimiPublicNetworkName);
 
         Keystone keystone = new Keystone(this.cloudProviderAccount.getCloudProvider().getEndpoint());
-        Access access = keystone.tokens()
-            .authenticate(new UsernamePassword(this.cloudProviderAccount.getLogin(), this.cloudProviderAccount.getPassword()))
-            .withTenantName(this.tenantName).execute();
+        Access access;
+        try {
+            access = keystone
+                .tokens()
+                .authenticate(
+                    new UsernamePassword(this.cloudProviderAccount.getLogin(), this.cloudProviderAccount.getPassword()))
+                .withTenantName(this.tenantName).execute();
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("\nCannot connect user/pswd=" + this.cloudProviderAccount.getLogin() + "/"
+                + this.cloudProviderAccount.getPassword() + " to tenant=" + this.tenantName + " at KEYSTONE_AUTH_URL="
+                + this.cloudProviderAccount.getCloudProvider().getEndpoint() + "\ncause=" + e.getStatus() + ", message="
+                + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new ConnectorException("\nCannot connect user/pswd=" + this.cloudProviderAccount.getLogin() + "/"
+                + this.cloudProviderAccount.getPassword() + " to tenant=" + this.tenantName + " at KEYSTONE_AUTH_URL="
+                + this.cloudProviderAccount.getCloudProvider().getEndpoint(), e);
+        }
 
         // use the token in the following requests
         keystone.token(access.getToken().getId());
