@@ -17,16 +17,16 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.JMSContext;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.Topic;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.PersistenceException;
 
-import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
-import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
-import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
@@ -35,10 +35,13 @@ import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.core.api.ResourceStateChangeEvent;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkCreateCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
@@ -52,7 +55,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
@@ -62,7 +64,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,28 +92,34 @@ public class NetworkManager implements INetworkManager {
     @EJB
     private IResourceWatcher resourceWatcher;
 
-    @EJB
-    private ICloudProviderConnectorFinder connectorFinder;
+    @Resource(lookup = "jms/RequestQueue")
+    private Queue requestQueue;
+
+    @Resource(lookup = "jms/ResourceStateChangeTopic")
+    private Topic resourceStateChangeTopic;
+
+    @Inject
+    private JMSContext jmsContext;
 
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
     }
 
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
-        throws CloudProviderException {
-        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(cloudProviderAccount
-            .getCloudProvider().getCloudProviderType());
-        if (connector == null) {
-            NetworkManager.logger.error("Cannot find connector for cloud provider type "
-                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-            return null;
-        }
-        return connector;
-    }
-
     //
     // Network operations
     //
+
+    private void fireNetworkStateChangeEvent(final Network network) {
+        this.jmsContext.createProducer().setProperty("tenantId", network.getTenant().getId().toString())
+            .send(this.resourceStateChangeTopic, new ResourceStateChangeEvent(network));
+    }
+
+    @Override
+    public void updateNetworkState(final String networkId, final Network.State state) throws CloudProviderException {
+        Network network = this.getNetworkById(networkId);
+        network.setState(state);
+        this.fireNetworkStateChangeEvent(network);
+    }
 
     public Network getPublicNetwork() {
         List<Network> publicNetworks = this.em.createQuery(
@@ -133,22 +140,8 @@ public class NetworkManager implements INetworkManager {
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), networkCreate.getProperties());
-        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
 
-        Network network;
-
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            network = networkService.createNetwork(networkCreate, new ProviderTarget().account(placement.getAccount())
-                .location(placement.getLocation()));
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to create network: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+        Network network = new Network();
 
         // prepare the Network entity to be persisted
 
@@ -182,7 +175,10 @@ public class NetworkManager implements INetworkManager {
         this.em.persist(job);
         this.em.flush();
 
-        this.resourceWatcher.watchNetwork(network, job, Network.State.STARTED, Network.State.STOPPED);
+        ObjectMessage message = this.jmsContext.createObjectMessage(new NetworkCreateCommand(networkCreate)
+            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(network.getId().toString())
+            .setJob(job));
+        this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
     }
@@ -200,6 +196,7 @@ public class NetworkManager implements INetworkManager {
             }
             network.setUpdated(new Date());
         }
+        this.fireNetworkStateChangeEvent(network);
         job.setState(Job.Status.SUCCESS);
     }
 
@@ -286,30 +283,15 @@ public class NetworkManager implements INetworkManager {
 
         Tenant tenant = this.getTenant();
 
-        ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount());
-
-        Network.State expectedFinalState = null;
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            ProviderTarget target = new ProviderTarget().account(network.getCloudProviderAccount()).location(
-                network.getLocation());
-            if (action.equals("start")) {
-                networkService.startNetwork(network.getProviderAssignedId(), target);
-                network.setState(Network.State.STARTING);
-                expectedFinalState = State.STARTED;
-            } else if (action.equals("stop")) {
-                networkService.stopNetwork(network.getProviderAssignedId(), target);
-                network.setState(Network.State.STOPPING);
-                expectedFinalState = State.STOPPED;
-            } else if (action.equals("delete")) {
-                networkService.deleteNetwork(network.getProviderAssignedId(), target);
-                network.setState(Network.State.DELETING);
-                expectedFinalState = State.DELETED;
-            }
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to " + action + " network: ", e);
-            throw new CloudProviderException(e.getMessage());
+        if (action.equals("start")) {
+            network.setState(Network.State.STARTING);
+        } else if (action.equals("stop")) {
+            network.setState(Network.State.STOPPING);
+        } else if (action.equals("delete")) {
+            network.setState(Network.State.DELETING);
         }
+
+        this.fireNetworkStateChangeEvent(network);
 
         Job job = new Job();
         job.setTenant(tenant);
@@ -321,7 +303,13 @@ public class NetworkManager implements INetworkManager {
         this.em.persist(job);
         this.em.flush();
 
-        this.resourceWatcher.watchNetwork(network, job, expectedFinalState);
+        if (action.equals("delete")) {
+            ObjectMessage message = this.jmsContext.createObjectMessage(new NetworkDeleteCommand().setResourceId(
+                network.getId().toString()).setJob(job));
+            this.jmsContext.createProducer().send(this.requestQueue, message);
+        } else {
+            // TODO
+        }
 
         return job;
     }

@@ -35,15 +35,17 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.JMSContext;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.Topic;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
-import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
@@ -53,11 +55,14 @@ import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.core.api.ResourceStateChangeEvent;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.impl.command.VolumeCreateCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.VolumeDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntity;
@@ -71,7 +76,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeVolumeImage;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -103,23 +107,17 @@ public class VolumeManager implements IVolumeManager {
     @EJB
     private IResourceWatcher resourceWatcher;
 
-    @EJB
-    private ICloudProviderConnectorFinder connectorFinder;
+    @Resource(lookup = "jms/RequestQueue")
+    private Queue requestQueue;
+
+    @Resource(lookup = "jms/ResourceStateChangeTopic")
+    private Topic resourceStateChangeTopic;
+
+    @Inject
+    private JMSContext jmsContext;
 
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
-    }
-
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
-        throws CloudProviderException {
-        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(cloudProviderAccount
-            .getCloudProvider().getCloudProviderType());
-        if (connector == null) {
-            VolumeManager.logger.error("Cannot find connector for cloud provider type "
-                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-            return null;
-        }
-        return connector;
     }
 
     @Override
@@ -129,22 +127,8 @@ public class VolumeManager implements IVolumeManager {
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), volumeCreate.getProperties());
-        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
 
-        Volume volume;
-
-        try {
-            IVolumeService volumeService = connector.getVolumeService();
-            volume = volumeService.createVolume(volumeCreate,
-                new ProviderTarget().account(placement.getAccount()).location(placement.getLocation()));
-        } catch (ConnectorException e) {
-            VolumeManager.logger.error("Failed to create volume: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+        Volume volume = new Volume();
 
         volume.setCapacity(volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity());
         volume.setType(volumeCreate.getVolumeTemplate().getVolumeConfig().getType());
@@ -175,7 +159,10 @@ public class VolumeManager implements IVolumeManager {
         this.em.persist(job);
         this.em.flush();
 
-        this.resourceWatcher.watchVolume(volume, job);
+        ObjectMessage message = this.jmsContext.createObjectMessage(new VolumeCreateCommand(volumeCreate)
+            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(volume.getId().toString())
+            .setJob(job));
+        this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
     }
@@ -200,6 +187,7 @@ public class VolumeManager implements IVolumeManager {
             }
             volume.setUpdated(new Date());
         }
+        this.fireVolumeStateChangeEvent(volume);
         job.setState(Job.Status.SUCCESS);
     }
 
@@ -471,6 +459,18 @@ public class VolumeManager implements IVolumeManager {
         }
     }
 
+    private void fireVolumeStateChangeEvent(final Volume volume) {
+        this.jmsContext.createProducer().setProperty("tenantId", volume.getTenant().getId().toString())
+            .send(this.resourceStateChangeTopic, new ResourceStateChangeEvent(volume));
+    }
+
+    @Override
+    public void updateVolumeState(final String volumeId, final Volume.State state) throws CloudProviderException {
+        Volume volume = this.getVolumeById(volumeId);
+        volume.setState(state);
+        this.fireVolumeStateChangeEvent(volume);
+    }
+
     @Override
     public Job deleteVolume(final String volumeId) throws ResourceNotFoundException, CloudProviderException {
         VolumeManager.logger.info("Deleting Volume " + volumeId);
@@ -483,20 +483,8 @@ public class VolumeManager implements IVolumeManager {
             throw new ResourceConflictException("Volume in use");
         }
 
-        ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount());
-
-        try {
-            IVolumeService volumeService = connector.getVolumeService();
-            volumeService.deleteVolume(volume.getProviderAssignedId(),
-                new ProviderTarget().account(volume.getCloudProviderAccount()).location(volume.getLocation()));
-        } catch (org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException e) {
-            // ignore
-        } catch (ConnectorException e) {
-            VolumeManager.logger.error("Failed to delete volume: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
-
         volume.setState(Volume.State.DELETING);
+        this.fireVolumeStateChangeEvent(volume);
         this.em.merge(volume);
 
         Tenant tenant = this.getTenant();
@@ -516,7 +504,9 @@ public class VolumeManager implements IVolumeManager {
         this.em.persist(job);
         this.em.flush();
 
-        this.resourceWatcher.watchVolume(volume, job);
+        ObjectMessage message = this.jmsContext.createObjectMessage(new VolumeDeleteCommand().setResourceId(
+            volume.getId().toString()).setJob(job));
+        this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
     }
@@ -579,8 +569,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     /**
-     * Create a new VolumeImage either from binary data (initialLocation) or by
-     * snapshotting a volume
+     * Create a new VolumeImage either from binary data (initialLocation) or by snapshotting a volume
      * 
      * @param volumeImage
      * @param volumeToSnapshot if not null, volume to snapshot

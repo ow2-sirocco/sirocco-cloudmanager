@@ -343,4 +343,6 @@ public interface INetworkManager {
 
     boolean jobCompletionHandler(final Job job) throws CloudProviderException;
 
+    void updateNetworkState(String networkId, Network.State state) throws CloudProviderException;
+
 }

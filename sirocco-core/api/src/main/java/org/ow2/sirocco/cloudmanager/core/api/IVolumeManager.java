@@ -360,4 +360,6 @@ public interface IVolumeManager {
 
     List<MachineVolume> getVolumeAttachments(String volumeId) throws CloudProviderException;
 
+    void updateVolumeState(String volumeId, Volume.State state) throws CloudProviderException;
+
 }

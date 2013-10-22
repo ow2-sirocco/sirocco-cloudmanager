@@ -93,6 +93,10 @@ public interface IMachineManager {
 
     Job updateMachine(final Machine machine) throws ResourceNotFoundException, CloudProviderException;
 
+    void updateMachineState(String machineId, Machine.State state) throws CloudProviderException;
+
+    void updateMachineVolumeState(String machineVolumeId, MachineVolume.State state) throws CloudProviderException;
+
     Job updateMachineAttributes(final String machineId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, CloudProviderException;
 
