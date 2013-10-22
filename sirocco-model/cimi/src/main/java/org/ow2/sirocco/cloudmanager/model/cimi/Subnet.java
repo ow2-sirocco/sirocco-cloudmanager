@@ -22,10 +22,14 @@
  */
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+import java.io.Serializable;
+
 import javax.persistence.Embeddable;
 
 @Embeddable
-public class Subnet {
+public class Subnet implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private String name;
 
     private String providerAssignedId;

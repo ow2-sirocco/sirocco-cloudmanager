@@ -25,6 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.api;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile;
 public interface ICloudProviderManager {
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/CloudProviderManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager";
 
-    public static class Placement {
+    public static class Placement implements Serializable {
+        private static final long serialVersionUID = 1L;
+
         final CloudProviderAccount account;
 
         final CloudProviderLocation location;
