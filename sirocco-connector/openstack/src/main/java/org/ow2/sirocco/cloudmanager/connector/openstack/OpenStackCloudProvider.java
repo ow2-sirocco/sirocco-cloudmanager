@@ -113,11 +113,9 @@ public class OpenStackCloudProvider {
         }
         this.tenantName = properties.get("tenantName");
         this.cimiPublicNetworkName = properties.get("publicNetworkName");
-        OpenStackCloudProvider.logger
-            .info("connect user/pswd=" + this.cloudProviderAccount.getLogin() + "/" + this.cloudProviderAccount.getPassword()
-                + " to tenant=" + this.tenantName + " at KEYSTONE_AUTH_URL="
-                + this.cloudProviderAccount.getCloudProvider().getEndpoint() + ", with publicNetwork="
-                + this.cimiPublicNetworkName);
+        OpenStackCloudProvider.logger.info("connect user=" + this.cloudProviderAccount.getLogin() + " to tenant="
+            + this.tenantName + " at KEYSTONE_AUTH_URL=" + this.cloudProviderAccount.getCloudProvider().getEndpoint()
+            + ", with publicNetwork=" + this.cimiPublicNetworkName);
 
         Keystone keystone = new Keystone(this.cloudProviderAccount.getCloudProvider().getEndpoint());
         Access access;
@@ -128,14 +126,24 @@ public class OpenStackCloudProvider {
                     new UsernamePassword(this.cloudProviderAccount.getLogin(), this.cloudProviderAccount.getPassword()))
                 .withTenantName(this.tenantName).execute();
         } catch (OpenStackResponseException e) {
-            throw new ConnectorException("\nCannot connect user/pswd=" + this.cloudProviderAccount.getLogin() + "/"
-                + this.cloudProviderAccount.getPassword() + " to tenant=" + this.tenantName + " at KEYSTONE_AUTH_URL="
-                + this.cloudProviderAccount.getCloudProvider().getEndpoint() + "\ncause=" + e.getStatus() + ", message="
-                + e.getMessage(), e);
+            if (e.getStatus() == 401) {
+                throw new ConnectorException("Unauthorized: authentication has failed\nCannot connect user="
+                    + this.cloudProviderAccount.getLogin() + " to tenant=" + this.tenantName + " at KEYSTONE_AUTH_URL="
+                    + this.cloudProviderAccount.getCloudProvider().getEndpoint() + "\ncause=" + e.getStatus() + ", message="
+                    + e.getMessage(), e);
+            } else if (e.getStatus() == 404) {
+                throw new ConnectorException("The requested resource could not be found at KEYSTONE_AUTH_URL="
+                    + this.cloudProviderAccount.getCloudProvider().getEndpoint() + "\nCannot connect user="
+                    + this.cloudProviderAccount.getLogin() + " to tenant=" + this.tenantName + "\ncause=" + e.getStatus()
+                    + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("\nCannot connect user=" + this.cloudProviderAccount.getLogin() + " to tenant="
+                    + this.tenantName + " at KEYSTONE_AUTH_URL=" + this.cloudProviderAccount.getCloudProvider().getEndpoint()
+                    + "\ncause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
         } catch (Exception e) {
-            throw new ConnectorException("\nCannot connect user/pswd=" + this.cloudProviderAccount.getLogin() + "/"
-                + this.cloudProviderAccount.getPassword() + " to tenant=" + this.tenantName + " at KEYSTONE_AUTH_URL="
-                + this.cloudProviderAccount.getCloudProvider().getEndpoint(), e);
+            throw new ConnectorException("\nCannot connect user=" + this.cloudProviderAccount.getLogin() + " to tenant="
+                + this.tenantName + " at KEYSTONE_AUTH_URL=" + this.cloudProviderAccount.getCloudProvider().getEndpoint(), e);
         }
 
         // use the token in the following requests
