@@ -30,6 +30,9 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ConstraintGroup;
 
+/**
+ * Constraint group manager
+ */
 public interface IConstraintGroupManager {
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/ConstraintGroupManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteConstraintGroupManager";
 

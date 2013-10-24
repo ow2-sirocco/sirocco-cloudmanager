@@ -74,11 +74,15 @@
 					<outputDirectory>${project.build.directory}/javadoc</outputDirectory>
 					<encoding>UTF-8</encoding>
 					<sourceEncoding>UTF-8</sourceEncoding>
-					<excludePackageNames>org.ow2.sirocco.cloudmanager.api.*:org.ow2.sirocco.cloudmanager.connector.finder.*:org.ow2.sirocco.cloudmanager.connector.mock:org.ow2.sirocco.cloudmanager.connector.amazon:org.ow2.sirocco.cloudmanager.connector.vcd:org.ow2.sirocco.cloudmanager.connector.openstack:org.ow2.sirocco.cloudmanager.core.*:com.vmware.vcloud.sdk</excludePackageNames>
+					<excludePackageNames>org.ow2.sirocco.cloudmanager.api.*:org.ow2.sirocco.cloudmanager.connector.finder.*:org.ow2.sirocco.cloudmanager.connector.mock:org.ow2.sirocco.cloudmanager.connector.amazon:org.ow2.sirocco.cloudmanager.connector.vcd:org.ow2.sirocco.cloudmanager.connector.openstack:org.ow2.sirocco.cloudmanager.core.impl:org.ow2.sirocco.cloudmanager.core.util:org.ow2.sirocco.cloudmanager.core.utils:com.vmware.vcloud.sdk</excludePackageNames>
 					<groups>
 						<group>
 							<title>Cloud Provider Connector API</title>
 							<packages>org.ow2.sirocco.cloudmanager.connector.api</packages>
+						</group>
+						<group>
+							<title>Backend Business  API</title>
+							<packages>org.ow2.sirocco.cloudmanager.core.api*</packages>
 						</group>
 						<group>
 							<title>CIMI Resource Model API</title>

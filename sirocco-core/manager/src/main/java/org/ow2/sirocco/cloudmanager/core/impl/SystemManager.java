@@ -83,7 +83,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
@@ -1141,8 +1140,7 @@ public class SystemManager implements ISystemManager {
     }
 
     /**
-     * used to recursively persist a full system content (with subobjects,
-     * subsub...), but not system object itself
+     * used to recursively persist a full system content (with subobjects, subsub...), but not system object itself
      * 
      * @param connector
      * @param providerSystem
@@ -1201,12 +1199,8 @@ public class SystemManager implements ISystemManager {
                 if (mach.getNetworkInterfaces() != null) {
                     for (MachineNetworkInterface nic : mach.getNetworkInterfaces()) {
                         if (nic.getNetwork() != null) {
-                            if (nic.getNetwork().getNetworkType() == Type.PRIVATE) {
-                                Network persistedNetwork = networkMap.get(nic.getNetwork().getProviderAssignedId());
-                                nic.setNetwork(persistedNetwork);
-                            } else {
-                                nic.setNetwork(this.networkManager.getPublicNetwork());
-                            }
+                            Network persistedNetwork = networkMap.get(nic.getNetwork().getProviderAssignedId());
+                            nic.setNetwork(persistedNetwork);
                         }
                     }
                 }
@@ -1241,8 +1235,7 @@ public class SystemManager implements ISystemManager {
     }
 
     /**
-     * used to recursively update system content state from full provider
-     * system, but not system state itself
+     * used to recursively update system content state from full provider system, but not system state itself
      * 
      * @param connector
      * @param providerSystem

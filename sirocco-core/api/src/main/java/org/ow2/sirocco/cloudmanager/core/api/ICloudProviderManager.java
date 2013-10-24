@@ -36,6 +36,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile;
 
+/**
+ * Cloud provider manager
+ */
 public interface ICloudProviderManager {
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/CloudProviderManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager";
 

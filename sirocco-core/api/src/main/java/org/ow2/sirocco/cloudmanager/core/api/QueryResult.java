@@ -28,6 +28,9 @@ package org.ow2.sirocco.cloudmanager.core.api;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * Query result utility class
+ */
 public class QueryResult<E> implements Serializable {
     private static final long serialVersionUID = 1L;
 

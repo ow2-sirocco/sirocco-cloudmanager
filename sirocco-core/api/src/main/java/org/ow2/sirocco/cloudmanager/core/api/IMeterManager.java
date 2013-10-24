@@ -39,7 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.meter.MeterSample;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.MeterTemplate;
 
 /**
- * Events management operations
+ * Metering management operations
  */
 public interface IMeterManager {
 
