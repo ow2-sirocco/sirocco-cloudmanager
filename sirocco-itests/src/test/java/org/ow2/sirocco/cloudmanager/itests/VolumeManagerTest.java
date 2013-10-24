@@ -242,7 +242,7 @@ public class VolumeManagerTest extends AbstractTestBase {
         Assert.assertNotNull(volumeImage.getProperties());
         Assert.assertTrue(volumeImage.getProperties().get("department").equals("MAPS"));
 
-        List<VolumeImage> volumeImages = this.volumeManager.getVolumeImages();
+        List<VolumeImage> volumeImages = this.volumeManager.getVolumeImages().getItems();
         Assert.assertTrue(volumeImages.contains(volumeImage));
 
         // read
@@ -313,7 +313,7 @@ public class VolumeManagerTest extends AbstractTestBase {
         for (int i = 0; i < 20; i++) {
             this.createVolume();
         }
-        List<Volume> volumes = this.volumeManager.getVolumes();
+        List<Volume> volumes = this.volumeManager.getVolumes().getItems();
         Assert.assertEquals(20, volumes.size());
 
         List<String> attributes = new ArrayList<String>();
@@ -338,7 +338,7 @@ public class VolumeManagerTest extends AbstractTestBase {
             Assert.assertEquals("myVolume" + i, query.getItems().get(i).getName());
             this.deleteVolume(volumes.get(i).getId().toString());
         }
-        volumes = this.volumeManager.getVolumes();
+        volumes = this.volumeManager.getVolumes().getItems();
         Assert.assertEquals(0, volumes.size());
     }
 

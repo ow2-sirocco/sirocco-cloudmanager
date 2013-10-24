@@ -54,6 +54,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
+import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.ResourceStateChangeEvent;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
@@ -285,8 +286,7 @@ public class VolumeManager implements IVolumeManager {
         return result;
     }
 
-    @Override
-    public List<Volume> getVolumes() throws CloudProviderException {
+    private List<Volume> getVolumes() throws CloudProviderException {
         List<Volume> result = QueryHelper.getEntityList("Volume", this.em, this.getTenant().getId(), Volume.State.DELETED,
             false);
         // FIXME
@@ -304,6 +304,19 @@ public class VolumeManager implements IVolumeManager {
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(Volume.State.DELETED));
+    }
+
+    @Override
+    public QueryResult<Volume> getVolumes(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<Volume> volumes = this.getVolumes();
+            return new QueryResult<Volume>(volumes.size(), volumes);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Volume", Volume.class).params(
+            queryParams[0]);
+        return QueryHelper
+            .getEntityList(this.em, params.tenantId(this.getTenant().getId()).stateToIgnore(Volume.State.DELETED));
     }
 
     @Override
@@ -678,7 +691,18 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public List<VolumeImage> getVolumeImages() throws CloudProviderException {
+    public QueryResult<VolumeImage> getVolumeImages(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<VolumeImage> images = this.getVolumeImages();
+            return new QueryResult<VolumeImage>(images.size(), images);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeImage", VolumeImage.class)
+            .params(queryParams[0]);
+        return QueryHelper.getEntityList(this.em, params.tenantId(this.getTenant().getId()));
+    }
+
+    private List<VolumeImage> getVolumeImages() throws CloudProviderException {
         return QueryHelper.getEntityList("VolumeImage", this.em, this.getTenant().getId(), VolumeImage.State.DELETED, false);
     }
 

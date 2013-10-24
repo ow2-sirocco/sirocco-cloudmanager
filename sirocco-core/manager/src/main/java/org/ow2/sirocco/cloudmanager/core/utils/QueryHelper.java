@@ -31,6 +31,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
 import org.apache.commons.beanutils.PropertyUtils;
+import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -39,6 +40,7 @@ import org.ow2.sirocco.cloudmanager.core.util.ParseException;
 import org.ow2.sirocco.cloudmanager.core.util.TokenMgrError;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 
 public class QueryHelper {
 
@@ -52,6 +54,10 @@ public class QueryHelper {
         private Integer first;
 
         private Integer last;
+
+        private String marker;
+
+        private Integer limit;
 
         private List<String> filters;
 
@@ -139,6 +145,16 @@ public class QueryHelper {
             return this;
         }
 
+        public QueryParamsBuilder params(final QueryParams queryParams) {
+            this.first = queryParams.getFirst();
+            this.last = queryParams.getLast();
+            this.filters = queryParams.getFilters();
+            this.attributes = queryParams.getAttributes();
+            this.marker = queryParams.getMarker();
+            this.limit = queryParams.getLimit();
+            return this;
+        }
+
         public String getEntityType() {
             return this.entityType;
         }
@@ -169,6 +185,14 @@ public class QueryHelper {
 
         public Enum<?> getStateToIgnore() {
             return this.stateToIgnore;
+        }
+
+        public String getMarker() {
+            return this.marker;
+        }
+
+        public Integer getLimit() {
+            return this.limit;
         }
 
         public boolean isFilterEmbbededTemplate() {
@@ -267,22 +291,38 @@ public class QueryHelper {
                 whereClauseSB.append(filterClause);
             }
         }
+
+        if (params.getMarker() != null) {
+            Resource resourceAtMarker = (Resource) em.find(params.getClazz(), Integer.valueOf(params.getMarker()));
+            if (resourceAtMarker == null) {
+                throw new InvalidRequestException("Invalid marker " + params.getMarker());
+            }
+            if (whereClauseSB.length() > 0) {
+                whereClauseSB.append(" AND ");
+            }
+            whereClauseSB.append(" v.id>" + resourceAtMarker.getId() + " ");
+        }
+
         String whereClause = whereClauseSB.toString();
 
         try {
             int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + params.getEntityType() + " v WHERE " + whereClause)
                 .setParameter("tenantId", params.getTenantId()).getSingleResult()).intValue();
             Query query = em.createQuery(
-                "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.created DESC")
+                "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.created DESC, v.id DESC")
                 .setParameter("tenantId", params.getTenantId());
-            if (params.getFirst() != null) {
-                query.setFirstResult(params.getFirst());
-            }
-            if (params.getLast() != null) {
+            if (params.getLimit() != null) {
+                query.setMaxResults(params.getLimit());
+            } else {
                 if (params.getFirst() != null) {
-                    query.setMaxResults(params.getLast() - params.getFirst() + 1);
-                } else {
-                    query.setMaxResults(params.getLast() + 1);
+                    query.setFirstResult(params.getFirst());
+                }
+                if (params.getLast() != null) {
+                    if (params.getFirst() != null) {
+                        query.setMaxResults(params.getLast() - params.getFirst() + 1);
+                    } else {
+                        query.setMaxResults(params.getLast() + 1);
+                    }
                 }
             }
             List<E> queryResult = query.getResultList();

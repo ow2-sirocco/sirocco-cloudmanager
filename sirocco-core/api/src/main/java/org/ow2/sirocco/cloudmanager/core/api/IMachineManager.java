@@ -84,8 +84,6 @@ public interface IMachineManager {
 
     Job deleteMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
-    List<Machine> getMachines() throws CloudProviderException;
-
     Machine getMachineById(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
     Machine getMachineAttributes(final String machineId, List<String> attributes) throws ResourceNotFoundException,
@@ -107,16 +105,10 @@ public interface IMachineManager {
 
     void syncVolumeAttachment(String machineId, MachineVolume volumeAttachment, String jobId);
 
-    // List<Machine> getMachines(int first, int last, List<String> attributes)
-    // throws InvalidRequestException,
-    // CloudProviderException;
-    //
-    // List<Machine> getMachines(List<String> attributes, String
-    // queryExpression) throws InvalidRequestException,
-    // CloudProviderException;
-
     QueryResult<Machine> getMachines(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
+
+    QueryResult<Machine> getMachines(QueryParams... queryParams) throws InvalidRequestException, CloudProviderException;
 
     /**
      * Operations on MachineConfiguration
@@ -139,15 +131,8 @@ public interface IMachineManager {
     MachineConfiguration createMachineConfiguration(MachineConfiguration machineConfig) throws InvalidRequestException,
         CloudProviderException;
 
-    List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException;
-
-    // List<MachineConfiguration> getMachineConfigurations(int first, int last,
-    // List<String> attributes)
-    // throws InvalidRequestException, CloudProviderException;
-    //
-    // List<MachineConfiguration> getMachineConfigurations(List<String>
-    // attributes, String queryExpression)
-    // throws InvalidRequestException, CloudProviderException;
+    QueryResult<MachineConfiguration> getMachineConfigurations(QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException;
 
     QueryResult<MachineConfiguration> getMachineConfigurations(int first, int last, List<String> filters,
         List<String> attributes) throws InvalidRequestException, CloudProviderException;
@@ -174,15 +159,8 @@ public interface IMachineManager {
     MachineTemplate createMachineTemplate(MachineTemplate machineTemplate) throws InvalidRequestException,
         CloudProviderException;
 
-    List<MachineTemplate> getMachineTemplates() throws CloudProviderException;
-
-    // List<MachineTemplate> getMachineTemplates(int first, int last,
-    // List<String> attributes) throws InvalidRequestException,
-    // CloudProviderException;
-    //
-    // List<MachineTemplate> getMachineTemplates(List<String> attributes, String
-    // queryExpression) throws InvalidRequestException,
-    // CloudProviderException;
+    QueryResult<MachineTemplate> getMachineTemplates(QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException;
 
     QueryResult<MachineTemplate> getMachineTemplates(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
@@ -191,11 +169,12 @@ public interface IMachineManager {
      * Machine and Machine template volumes
      */
 
-    List<MachineVolume> getMachineVolumes(final String machineId) throws ResourceNotFoundException, CloudProviderException,
-        InvalidRequestException;
+    // List<MachineVolume> getMachineVolumes(final String machineId) throws
+    // ResourceNotFoundException, CloudProviderException,
+    // InvalidRequestException;
 
-    QueryResult<MachineVolume> getMachineVolumes(final String machineId, int first, int last, List<String> filters,
-        List<String> attributes) throws InvalidRequestException, CloudProviderException;
+    QueryResult<MachineVolume> getMachineVolumes(final String machineId, QueryParams... queryParams)
+        throws InvalidRequestException, CloudProviderException;
 
     Job addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException;
@@ -216,11 +195,12 @@ public interface IMachineManager {
     // machine disk operations
     //
 
-    List<MachineDisk> getMachineDisks(final String machineId) throws ResourceNotFoundException, CloudProviderException,
-        InvalidRequestException;
+    // List<MachineDisk> getMachineDisks(final String machineId) throws
+    // ResourceNotFoundException, CloudProviderException,
+    // InvalidRequestException;
 
-    QueryResult<MachineDisk> getMachineDisks(final String machineId, int first, int last, List<String> filters,
-        List<String> attributes) throws InvalidRequestException, CloudProviderException;
+    QueryResult<MachineDisk> getMachineDisks(final String machineId, QueryParams... queryParams)
+        throws InvalidRequestException, CloudProviderException;
 
     Job addDiskToMachine(final String machineId, final MachineDisk disk) throws ResourceNotFoundException,
         CloudProviderException, InvalidRequestException;
@@ -241,11 +221,12 @@ public interface IMachineManager {
     // machine network interface operations
     //
 
-    List<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId) throws ResourceNotFoundException,
-        CloudProviderException, InvalidRequestException;
+    // List<MachineNetworkInterface> getMachineNetworkInterfaces(final String
+    // machineId) throws ResourceNotFoundException,
+    // CloudProviderException, InvalidRequestException;
 
-    QueryResult<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId, int first, int last,
-        List<String> filters, List<String> attributes) throws InvalidRequestException, CloudProviderException;
+    QueryResult<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId, QueryParams... queryParams)
+        throws InvalidRequestException, CloudProviderException;
 
     Job addNetworkInterfaceToMachine(final String machineId, final MachineNetworkInterface nic)
         throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
@@ -262,12 +243,8 @@ public interface IMachineManager {
     Job updateNetworkInterfaceAttributesInMachine(String machineId, String nicId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, CloudProviderException, InvalidRequestException;
 
-    List<MachineNetworkInterfaceAddress> getMachineNetworkInterfaceAddresses(final String machineId, final String nicId)
-        throws InvalidRequestException, CloudProviderException;
-
     QueryResult<MachineNetworkInterfaceAddress> getMachineNetworkInterfaceAddresses(final String machineId, final String nicId,
-        int first, int last, List<String> filters, List<String> attributes) throws InvalidRequestException,
-        CloudProviderException;
+        QueryParams... queryParams) throws InvalidRequestException, CloudProviderException;
 
     Job addAddressToMachineNetworkInterface(final String machineId, final String nicId,
         MachineNetworkInterfaceAddress addressEntry) throws ResourceNotFoundException, CloudProviderException,

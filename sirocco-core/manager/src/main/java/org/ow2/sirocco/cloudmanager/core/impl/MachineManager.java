@@ -63,9 +63,9 @@ import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
+import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.ResourceStateChangeEvent;
-import org.ow2.sirocco.cloudmanager.core.api.exception.BadStateException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
@@ -96,7 +96,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
@@ -442,8 +441,17 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public List<Machine> getMachines() throws CloudProviderException {
-        return QueryHelper.getEntityList("Machine", this.em, this.getTenant().getId(), Machine.State.DELETED, false);
+    public QueryResult<Machine> getMachines(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            @SuppressWarnings("unchecked")
+            List<Machine> machines = QueryHelper.getEntityList("Machine", this.em, this.getTenant().getId(),
+                Machine.State.DELETED, false);
+            return new QueryResult<Machine>(machines.size(), machines);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Machine", Machine.class)
+            .tenantId(this.getTenant().getId()).stateToIgnore(Machine.State.DELETED).params(queryParams[0]);
+        return QueryHelper.getEntityList(this.em, params);
     }
 
     private Machine checkOps(final String machineId, final String action) throws CloudProviderException {
@@ -459,7 +467,7 @@ public class MachineManager implements IMachineManager {
         }
         Set<String> actions = m.getOperations();
         if (actions.contains(action) == false) {
-            throw new BadStateException(" Cannot " + action + "  machine at state " + m.getState());
+            throw new InvalidRequestException(" Cannot " + action + "  machine at state " + m.getState());
         }
 
         return m;
@@ -593,7 +601,7 @@ public class MachineManager implements IMachineManager {
 
         // checking compatible op
         if (machine.getOperations().contains(action) == false) {
-            throw new BadStateException(" Cannot " + action + "  machine at state " + machine.getState());
+            throw new InvalidRequestException(" Cannot " + action + "  machine at state " + machine.getState());
         }
 
         boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
@@ -731,6 +739,7 @@ public class MachineManager implements IMachineManager {
             throw new ResourceNotFoundException("MachineVolume " + machineVolumeId + " nout found");
         }
         machineVolume.setState(state);
+        this.fireResourceStateChangeEvent(machineVolume);
     }
 
     private void fireResourceStateChangeEvent(final CloudResource resource) {
@@ -863,13 +872,31 @@ public class MachineManager implements IMachineManager {
         this.em.flush();
     }
 
-    @Override
-    public List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException {
+    private List<MachineConfiguration> getMachineConfigurations() throws CloudProviderException {
         List<MachineConfiguration> machineConfigs = this.em
             .createQuery("SELECT c FROM MachineConfiguration c WHERE c.tenant.id=:tenantId OR c.visibility=:visibility")
             .setParameter("tenantId", this.getTenant().getId()).setParameter("visibility", Visibility.PUBLIC).getResultList();
         for (MachineConfiguration machineConfig : machineConfigs) {
             machineConfig.getDisks().size();
+        }
+        return machineConfigs;
+    }
+
+    @Override
+    public QueryResult<MachineConfiguration> getMachineConfigurations(final QueryParams... queryParams)
+        throws InvalidRequestException, CloudProviderException {
+        if (queryParams.length == 0) {
+            List<MachineConfiguration> configs = this.getMachineConfigurations();
+            return new QueryResult<MachineConfiguration>(configs.size(), configs);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineConfiguration",
+            MachineConfiguration.class);
+        QueryResult<MachineConfiguration> machineConfigs = QueryHelper.getEntityList(this.em,
+            params.tenantId(this.getTenant().getId()).params(queryParams[0]).returnPublicEntities());
+        for (MachineConfiguration machineConfig : machineConfigs.getItems()) {
+            if (machineConfig.getDisks() != null) {
+                machineConfig.getDisks().size();
+            }
         }
         return machineConfigs;
     }
@@ -1202,7 +1229,19 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public List<MachineTemplate> getMachineTemplates() throws CloudProviderException {
+    public QueryResult<MachineTemplate> getMachineTemplates(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<MachineTemplate> templates = this.getMachineTemplates();
+            return new QueryResult<MachineTemplate>(templates.size(), templates);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
+            .builder("MachineTemplate", MachineTemplate.class);
+        return QueryHelper.getEntityList(this.em, params.tenantId(this.getTenant().getId()).params(queryParams[0])
+            .filterEmbbededTemplate().returnPublicEntities());
+    }
+
+    private List<MachineTemplate> getMachineTemplates() throws CloudProviderException {
         List<MachineTemplate> machineTemplates = this.em
             .createQuery(
                 "SELECT c FROM MachineTemplate c WHERE (c.tenant.id=:tenantId OR c.visibility=:visibility) AND c.isEmbeddedInSystemTemplate=false")
@@ -1315,11 +1354,13 @@ public class MachineManager implements IMachineManager {
                     Network net = this.networkManager.getNetworkByProviderAssignedId(nic.getNetwork().getProviderAssignedId());
                     if (net != null) {
                         nic.setNetwork(net);
-                    } else if (nic.getNetwork().getNetworkType() == Type.PUBLIC) {
-                        nic.setNetwork(this.networkManager.getPublicNetwork());
+                    } else {
+                        MachineManager.logger.error("Unknown network with provider-assigned id "
+                            + nic.getNetwork().getProviderAssignedId());
                     }
-                } else if (nic.getNetwork().getNetworkType() == Type.PUBLIC) {
-                    nic.setNetwork(this.networkManager.getPublicNetwork());
+                } else {
+                    MachineManager.logger.error("Missing provider-assigned id in nic.network for machine with id "
+                        + persisted.getId());
                 }
             }
 
@@ -1501,12 +1542,14 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public QueryResult<MachineVolume> getMachineVolumes(final String machineId, final int first, final int last,
-        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+    public QueryResult<MachineVolume> getMachineVolumes(final String machineId, final QueryParams... queryParams)
+        throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineVolume", MachineVolume.class);
-        return QueryHelper.getCollectionItemList(this.em,
-            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
-                .containerType("Machine").containerId(machineId).containerAttributeName("volumes"));
+        if (queryParams.length > 0) {
+            params.params(queryParams[0]);
+        }
+        return QueryHelper.getCollectionItemList(this.em, params.tenantId(this.getTenant().getId()).containerType("Machine")
+            .containerId(machineId).containerAttributeName("volumes"));
     }
 
     public Job addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ResourceNotFoundException,
@@ -1734,24 +1777,14 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public List<MachineDisk> getMachineDisks(final String machineId) throws ResourceNotFoundException, CloudProviderException,
-        InvalidRequestException {
-        Machine m = this.getMachineById(machineId);
-
-        List<MachineDisk> diskColl = m.getDisks();
-        if (diskColl != null) {
-            diskColl.size();
-        }
-        return diskColl;
-    }
-
-    @Override
-    public QueryResult<MachineDisk> getMachineDisks(final String machineId, final int first, final int last,
-        final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+    public QueryResult<MachineDisk> getMachineDisks(final String machineId, final QueryParams... queryParams)
+        throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineDisk", MachineDisk.class);
-        return QueryHelper.getCollectionItemList(this.em,
-            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
-                .containerType("Machine").containerId(machineId).containerAttributeName("disks"));
+        if (queryParams.length == 0) {
+            params.params(queryParams[0]);
+        }
+        return QueryHelper.getCollectionItemList(this.em, params.tenantId(this.getTenant().getId()).containerType("Machine")
+            .containerId(machineId).containerAttributeName("disks"));
     }
 
     @Override
@@ -1843,33 +1876,35 @@ public class MachineManager implements IMachineManager {
         throw new ResourceNotFoundException(" NetworkInterface  " + nicId + " not found for machine " + machineId);
     }
 
-    @Override
-    public List<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId) throws ResourceNotFoundException,
-        CloudProviderException, InvalidRequestException {
-        Machine m = this.getMachineById(machineId);
+    // @Override
+    // public List<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId) throws
+    // ResourceNotFoundException,
+    // CloudProviderException, InvalidRequestException {
+    // Machine m = this.getMachineById(machineId);
+    //
+    // List<MachineNetworkInterface> nics = m.getNetworkInterfaces();
+    // if (nics != null) {
+    // nics.size();
+    // for (MachineNetworkInterface nic : nics) {
+    // List<MachineNetworkInterfaceAddress> entries = nic.getAddresses();
+    // if (entries != null) {
+    // entries.size();
+    // }
+    // }
+    // }
+    // return nics;
+    // }
 
-        List<MachineNetworkInterface> nics = m.getNetworkInterfaces();
-        if (nics != null) {
-            nics.size();
-            for (MachineNetworkInterface nic : nics) {
-                List<MachineNetworkInterfaceAddress> entries = nic.getAddresses();
-                if (entries != null) {
-                    entries.size();
-                }
-            }
-        }
-        return nics;
-    }
-
     @Override
-    public QueryResult<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId, final int first,
-        final int last, final List<String> filters, final List<String> attributes) throws InvalidRequestException,
-        CloudProviderException {
+    public QueryResult<MachineNetworkInterface> getMachineNetworkInterfaces(final String machineId,
+        final QueryParams... queryParams) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineNetworkInterface",
             MachineNetworkInterface.class);
-        return QueryHelper.getCollectionItemList(this.em,
-            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
-                .containerType("Machine").containerId(machineId).containerAttributeName("networkInterfaces"));
+        if (queryParams.length == 0) {
+            params.params(queryParams[0]);
+        }
+        return QueryHelper.getCollectionItemList(this.em, params.tenantId(this.getTenant().getId()).containerType("Machine")
+            .containerId(machineId).containerAttributeName("networkInterfaces"));
     }
 
     /**
@@ -1977,8 +2012,7 @@ public class MachineManager implements IMachineManager {
 
     @Override
     public QueryResult<MachineNetworkInterfaceAddress> getMachineNetworkInterfaceAddresses(final String machineId,
-        final String nicId, final int first, final int last, final List<String> filters, final List<String> attributes)
-        throws InvalidRequestException, CloudProviderException {
+        final String nicId, final QueryParams... queryParams) throws InvalidRequestException, CloudProviderException {
 
         Machine m = this.em.find(Machine.class, Integer.valueOf(machineId));
         if (m == null || m.getState().equals(Machine.State.DELETED)) {
@@ -2011,14 +2045,6 @@ public class MachineManager implements IMachineManager {
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         throw new InvalidRequestException(" Address cannot be removed from a created machine ");
-    }
-
-    @Override
-    public List<MachineNetworkInterfaceAddress> getMachineNetworkInterfaceAddresses(final String machineId, final String nicId)
-        throws InvalidRequestException, CloudProviderException {
-        QueryResult<MachineNetworkInterfaceAddress> result = this.getMachineNetworkInterfaceAddresses(machineId, nicId, -1, -1,
-            null, null);
-        return result.getItems();
     }
 
     @Override

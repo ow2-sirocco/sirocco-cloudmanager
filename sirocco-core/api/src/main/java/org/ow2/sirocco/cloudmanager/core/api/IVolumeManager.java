@@ -167,6 +167,14 @@ public interface IVolumeManager {
         throws InvalidRequestException, CloudProviderException;
 
     /**
+     * @param params
+     * @return
+     * @throws InvalidRequestException
+     * @throws CloudProviderException
+     */
+    QueryResult<Volume> getVolumes(QueryParams... params) throws InvalidRequestException, CloudProviderException;
+
+    /**
      * Retrieves some attributes of all VolumeConfigurations belonging to the
      * caller within a specific range
      * 
@@ -322,6 +330,8 @@ public interface IVolumeManager {
     QueryResult<VolumeImage> getVolumeImages(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 
+    QueryResult<VolumeImage> getVolumeImages(QueryParams... params) throws InvalidRequestException, CloudProviderException;
+
     Job updateVolumeImage(VolumeImage volumeImage) throws InvalidRequestException, ResourceNotFoundException,
         CloudProviderException;
 
@@ -350,11 +360,7 @@ public interface IVolumeManager {
 
     List<VolumeVolumeImage> getVolumeVolumeImages(String volumeId) throws ResourceNotFoundException, CloudProviderException;
 
-    List<Volume> getVolumes() throws CloudProviderException;
-
     List<VolumeConfiguration> getVolumeConfigurations() throws CloudProviderException;
-
-    List<VolumeImage> getVolumeImages() throws CloudProviderException;
 
     List<VolumeTemplate> getVolumeTemplates() throws CloudProviderException;
 
