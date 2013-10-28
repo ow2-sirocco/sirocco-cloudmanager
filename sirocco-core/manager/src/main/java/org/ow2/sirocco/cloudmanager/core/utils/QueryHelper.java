@@ -41,8 +41,11 @@ import org.ow2.sirocco.cloudmanager.core.util.TokenMgrError;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class QueryHelper {
+    private static Logger logger = LoggerFactory.getLogger(QueryHelper.class.getName());
 
     public static class QueryParamsBuilder {
         private String entityType;
@@ -245,8 +248,7 @@ public class QueryHelper {
             }
             stateQuery = stateQuery + " v.state<>" + stateToIgnore.getClass().getName() + "." + stateToIgnore.name() + " ";
         }
-        return em
-            .createQuery("SELECT v FROM " + entityType + " v WHERE " + tenantQuery + stateQuery + " ORDER BY v.created DESC")
+        return em.createQuery("SELECT v FROM " + entityType + " v WHERE " + tenantQuery + stateQuery + " ORDER BY v.id DESC")
             .setParameter("tenantId", tenantId).getResultList();
 
     }
@@ -309,8 +311,8 @@ public class QueryHelper {
             int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + params.getEntityType() + " v WHERE " + whereClause)
                 .setParameter("tenantId", params.getTenantId()).getSingleResult()).intValue();
             Query query = em.createQuery(
-                "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.created DESC, v.id DESC")
-                .setParameter("tenantId", params.getTenantId());
+                "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.id DESC").setParameter(
+                "tenantId", params.getTenantId());
             if (params.getLimit() != null) {
                 query.setMaxResults(params.getLimit());
             } else {
