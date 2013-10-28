@@ -148,7 +148,7 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations().getItems();
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
@@ -243,7 +243,7 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations().getItems();
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
@@ -327,7 +327,7 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations().getItems();
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
@@ -439,7 +439,7 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations().getItems();
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
@@ -543,7 +543,7 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
         System.out.println(" createMachineWithNewVolumes query address entries for one of " + nics.size()
             + " network interfaces ");
         QueryResult<MachineNetworkInterfaceAddress> addressEntries = this.machineManager.getMachineNetworkInterfaceAddresses(
-            machineId, nics.get(0).getId().toString(), -1, -1, null, null);
+            machineId, nics.get(0).getId().toString());
         Assert.assertNotNull(addressEntries);
         Assert.assertEquals(addressEntries.getItems().size(), 3);
         Assert.assertEquals(addressEntries.getCount(), 3);
@@ -575,7 +575,7 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Retrieve the list of Machine Configurations
          */
 
-        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations();
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations().getItems();
         for (MachineConfiguration machineConfig : machineConfigs) {
             System.out.println("MachineConfiguration id=" + machineConfig.getId());
         }
@@ -849,7 +849,7 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Query the Machine's volume collection to verify the update
          */
         System.out.println(" testScenarioTwo: get machine volumes ");
-        List<MachineVolume> machineVolumes = this.machineManager.getMachineVolumes(machineId);
+        List<MachineVolume> machineVolumes = this.machineManager.getMachineVolumes(machineId).getItems();
         System.out.println(" testScenarioTwo: found " + machineVolumes.size() + " machine volumes ");
         for (MachineVolume mv : machineVolumes) {
             System.out.println(mv);
@@ -859,7 +859,7 @@ public class CimiPrimerScenarioTest extends AbstractTestBase {
          * Detach the volume now
          */
         System.out.println(" testScenarioTwo: detach machine volumes ");
-        machineVolumes = this.machineManager.getMachineVolumes(machineId);
+        machineVolumes = this.machineManager.getMachineVolumes(machineId).getItems();
         for (MachineVolume mv : machineVolumes) {
             System.out.println("testScenarioTwo removing " + mv);
             this.machineManager.removeVolumeFromMachine(machineId, mv.getId().toString());

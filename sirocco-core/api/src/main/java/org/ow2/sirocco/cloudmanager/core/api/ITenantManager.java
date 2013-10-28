@@ -6,6 +6,9 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 
+/**
+ * Tenant management operations
+ */
 public interface ITenantManager {
     Tenant createTenant(Tenant tenant) throws CloudProviderException;
 

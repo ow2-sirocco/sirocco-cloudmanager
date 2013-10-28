@@ -26,24 +26,43 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
+/**
+ * A IaaS provider instance
+ */
 public class ProviderTarget {
     private CloudProviderAccount account;
 
     private CloudProviderLocation location;
 
+    /**
+     * Returns the cloud provider account
+     * 
+     * @return the cloud provider account
+     */
     public CloudProviderAccount getAccount() {
         return this.account;
     }
 
+    /**
+     * Returns the cloud provider location
+     * 
+     * @return the cloud provider location
+     */
     public CloudProviderLocation getLocation() {
         return this.location;
     }
 
+    /**
+     * Sets the cloud provider account
+     */
     public ProviderTarget account(final CloudProviderAccount account) {
         this.account = account;
         return this;
     }
 
+    /**
+     * Sets the cloud provider location
+     */
     public ProviderTarget location(final CloudProviderLocation location) {
         this.location = location;
         return this;

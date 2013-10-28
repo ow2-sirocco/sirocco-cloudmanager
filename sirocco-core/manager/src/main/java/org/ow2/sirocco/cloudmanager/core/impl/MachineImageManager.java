@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
+import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager;
@@ -55,6 +57,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +80,9 @@ public class MachineImageManager implements IMachineImageManager {
     @EJB
     private IJobManager jobManager;
 
+    @EJB
+    private ICloudProviderManager cloudProviderManager;
+
     @Inject
     private IdentityContext identityContext;
 
@@ -84,17 +91,33 @@ public class MachineImageManager implements IMachineImageManager {
     }
 
     public Job createMachineImage(final MachineImage mi) throws CloudProviderException {
-        Job j = new Job();
-
         // TODO : check whether imageLocation points to a Machine
         mi.setType(MachineImage.Type.IMAGE);
 
         mi.setTenant(this.getTenant());
         mi.setCreated(new Date());
         mi.setState(MachineImage.State.AVAILABLE);
+
+        if (mi.getProperties() != null) {
+            String providerAccountId = mi.getProperties().get("providerAccountId");
+            String providerAssignedId = mi.getProperties().get("providerAssignedId");
+            if (providerAccountId != null && providerAssignedId != null) {
+                CloudProviderAccount account = this.cloudProviderManager.getCloudProviderAccountById(providerAccountId);
+                if (account == null) {
+                    throw new CloudProviderException("Invalid provider account id: " + providerAccountId);
+                }
+                ProviderMapping providerMapping = new ProviderMapping();
+                providerMapping.setProviderAssignedId(providerAssignedId);
+                providerMapping.setProviderAccount(account);
+                providerMapping.setProviderLocation(account.getCloudProvider().getCloudProviderLocations().iterator().next());
+                mi.setProviderMappings(Collections.singletonList(providerMapping));
+            }
+        }
+
         this.em.persist(mi);
         this.em.flush();
 
+        Job j = new Job();
         j.setCreated(new Date());
         j.setDescription("MachineImage creation");
         j.setTargetResource(mi);

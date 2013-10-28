@@ -50,6 +50,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 
+/**
+ * Network management operations
+ */
 public interface INetworkManager {
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/NetworkManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteNetworkManager";
 
@@ -74,12 +77,10 @@ public interface INetworkManager {
     Network getNetworkAttributes(final String networkId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
 
-    List<Network> getNetworks() throws CloudProviderException;
-
-    Network getPublicNetwork();
-
     QueryResult<Network> getNetworks(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
+
+    QueryResult<Network> getNetworks(QueryParams... queryParams) throws InvalidRequestException, CloudProviderException;
 
     Job updateNetwork(Network network) throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
@@ -110,8 +111,6 @@ public interface INetworkManager {
     NetworkConfiguration createNetworkConfiguration(NetworkConfiguration networkConfig) throws InvalidRequestException,
         CloudProviderException;
 
-    List<NetworkConfiguration> getNetworkConfigurations() throws CloudProviderException;
-
     NetworkConfiguration getNetworkConfigurationById(String networkConfigId) throws ResourceNotFoundException;
 
     NetworkConfiguration getNetworkConfigurationAttributes(final String networkConfigId, List<String> attributes)
@@ -119,6 +118,9 @@ public interface INetworkManager {
 
     QueryResult<NetworkConfiguration> getNetworkConfigurations(int first, int last, List<String> filters,
         List<String> attributes) throws InvalidRequestException, CloudProviderException;
+
+    QueryResult<NetworkConfiguration> getNetworkConfigurations(QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException;
 
     void updateNetworkConfiguration(NetworkConfiguration networkConfig) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
@@ -134,8 +136,6 @@ public interface INetworkManager {
     NetworkTemplate createNetworkTemplate(NetworkTemplate networkTemplate) throws InvalidRequestException,
         CloudProviderException;
 
-    List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException;
-
     NetworkTemplate getNetworkTemplateById(String networkTemplateId) throws ResourceNotFoundException;
 
     NetworkTemplate getNetworkTemplateAttributes(final String networkTemplateId, List<String> attributes)
@@ -143,6 +143,9 @@ public interface INetworkManager {
 
     QueryResult<NetworkTemplate> getNetworkTemplates(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
+
+    QueryResult<NetworkTemplate> getNetworkTemplates(QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException;
 
     void updateNetworkTemplate(NetworkTemplate networkTemplate) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
@@ -166,8 +169,6 @@ public interface INetworkManager {
 
     Job stopNetworkPort(String networkPortId) throws ResourceNotFoundException, CloudProviderException;
 
-    List<NetworkPort> getNetworkPorts() throws CloudProviderException;
-
     NetworkPort getNetworkPortById(String networkPortId) throws ResourceNotFoundException;
 
     NetworkPort getNetworkPortAttributes(final String networkPortId, List<String> attributes) throws ResourceNotFoundException,
@@ -175,6 +176,8 @@ public interface INetworkManager {
 
     QueryResult<NetworkPort> getNetworkPorts(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
+
+    QueryResult<NetworkPort> getNetworkPorts(QueryParams... params) throws InvalidRequestException, CloudProviderException;
 
     Job updateNetworkPort(NetworkPort networkPort) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
@@ -261,8 +264,6 @@ public interface INetworkManager {
     Job createForwardingGroup(ForwardingGroupCreate forwardingGroupCreate) throws InvalidRequestException,
         CloudProviderException;
 
-    List<ForwardingGroup> getForwardingGroups() throws CloudProviderException;
-
     ForwardingGroup getForwardingGroupById(String forwardingGroupId) throws ResourceNotFoundException;
 
     ForwardingGroup getForwardingGroupAttributes(final String forwardingGroupId, List<String> attributes)
@@ -270,6 +271,9 @@ public interface INetworkManager {
 
     QueryResult<ForwardingGroup> getForwardingGroups(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
+
+    QueryResult<ForwardingGroup> getForwardingGroups(QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException;
 
     Job updateForwardingGroup(ForwardingGroup forwardingGroup) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
@@ -301,15 +305,12 @@ public interface INetworkManager {
 
     Job createAddress(AddressCreate addressCreate) throws InvalidRequestException, CloudProviderException;
 
-    List<Address> getAddresses() throws CloudProviderException;
-
     Address getAddressById(String addressId) throws ResourceNotFoundException;
 
     Address getAddressAttributes(final String addressId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
 
-    QueryResult<Address> getAddresses(int first, int last, List<String> filters, List<String> attributes)
-        throws InvalidRequestException, CloudProviderException;
+    QueryResult<Address> getAddresses(QueryParams... queryParams) throws InvalidRequestException, CloudProviderException;
 
     Job updateAddress(Address address) throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
@@ -342,5 +343,7 @@ public interface INetworkManager {
     void deleteAddressTemplate(String addressTemplateId) throws ResourceNotFoundException, CloudProviderException;
 
     boolean jobCompletionHandler(final Job job) throws CloudProviderException;
+
+    void updateNetworkState(String networkId, Network.State state) throws CloudProviderException;
 
 }

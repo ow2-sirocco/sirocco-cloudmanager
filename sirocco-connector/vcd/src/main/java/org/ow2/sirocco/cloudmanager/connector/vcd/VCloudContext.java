@@ -85,8 +85,9 @@ public class VCloudContext {
         this.orgName = properties.get("orgName");
         this.vdcName = properties.get("vdcName");
         this.cimiPublicOrgVdcNetworkName = properties.get("publicNetworkName");
-        logger.info("connect: " + cloudProviderAccount.getLogin() + " to Organization=" + this.orgName + ", VirtualDataCenter="
-            + this.vdcName + ", publicNetwork=" + this.cimiPublicOrgVdcNetworkName);
+        logger.info("connect user=" + cloudProviderAccount.getLogin() + " to Organization=" + this.orgName + " at "
+            + cloudProviderAccount.getCloudProvider().getEndpoint() + ", with VirtualDataCenter=" + this.vdcName
+            + ", publicNetwork=" + this.cimiPublicOrgVdcNetworkName);
 
         try {
             VcloudClient.setLogLevel(Level.OFF);
@@ -167,7 +168,9 @@ public class VCloudContext {
                 + this.cimiPublicOrgVdcNetworkIsRouted);
 
         } catch (Exception ex) {
-            throw new ConnectorException(ex);
+            throw new ConnectorException("cannot connect user=" + cloudProviderAccount.getLogin() + " to Organization="
+                + this.orgName + " at " + cloudProviderAccount.getCloudProvider().getEndpoint() + ", with VirtualDataCenter="
+                + this.vdcName + ", publicNetwork=" + this.cimiPublicOrgVdcNetworkName, ex);
         }
     }
 

@@ -36,6 +36,7 @@ import javax.persistence.NamedQuery;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 
 @NamedQueries(value = {@NamedQuery(name = "GET_NETWORKPORT_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM NetworkPort n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity

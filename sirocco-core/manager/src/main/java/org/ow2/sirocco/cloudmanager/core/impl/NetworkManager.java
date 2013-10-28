@@ -17,16 +17,16 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.JMSContext;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.Topic;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.persistence.PersistenceException;
 
-import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
-import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
-import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
-import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
@@ -34,11 +34,15 @@ import org.ow2.sirocco.cloudmanager.core.api.IRemoteNetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
+import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.core.api.ResourceStateChangeEvent;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkCreateCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
@@ -52,7 +56,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
@@ -62,7 +65,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,28 +93,34 @@ public class NetworkManager implements INetworkManager {
     @EJB
     private IResourceWatcher resourceWatcher;
 
-    @EJB
-    private ICloudProviderConnectorFinder connectorFinder;
+    @Resource(lookup = "jms/RequestQueue")
+    private Queue requestQueue;
+
+    @Resource(lookup = "jms/ResourceStateChangeTopic")
+    private Topic resourceStateChangeTopic;
+
+    @Inject
+    private JMSContext jmsContext;
 
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
     }
 
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
-        throws CloudProviderException {
-        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(cloudProviderAccount
-            .getCloudProvider().getCloudProviderType());
-        if (connector == null) {
-            NetworkManager.logger.error("Cannot find connector for cloud provider type "
-                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-            return null;
-        }
-        return connector;
-    }
-
     //
     // Network operations
     //
+
+    private void fireNetworkStateChangeEvent(final Network network) {
+        this.jmsContext.createProducer().setProperty("tenantId", network.getTenant().getId().toString())
+            .send(this.resourceStateChangeTopic, new ResourceStateChangeEvent(network));
+    }
+
+    @Override
+    public void updateNetworkState(final String networkId, final Network.State state) throws CloudProviderException {
+        Network network = this.getNetworkById(networkId);
+        network.setState(state);
+        this.fireNetworkStateChangeEvent(network);
+    }
 
     public Network getPublicNetwork() {
         List<Network> publicNetworks = this.em.createQuery(
@@ -121,122 +129,20 @@ public class NetworkManager implements INetworkManager {
         return publicNetworks.get(0);
     }
 
-    private Job createPublicNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
-        NetworkManager.logger.info("Creating Public Network");
-        // TODO only one public network can be created
-        Tenant tenant = this.getTenant();
-        Network network = new Network();
-        network.setName(networkCreate.getName());
-        network.setDescription(networkCreate.getDescription());
-        network.setProperties(networkCreate.getProperties() == null ? new HashMap<String, String>()
-            : new HashMap<String, String>(networkCreate.getProperties()));
-        network.setTenant(tenant);
-
-        network.setNetworkType(Type.PUBLIC);
-
-        network.setState(Network.State.STARTED);
-        this.em.persist(network);
-        this.em.flush();
-
-        Job job = new Job();
-        job.setTargetResource(network);
-        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
-        affectedResources.add(network);
-        job.setAffectedResources(affectedResources);
-        job.setCreated(new Date());
-        job.setState(Status.SUCCESS);
-        job.setAction("add");
-        job.setTimeOfStatusChange(new Date());
-        this.em.persist(job);
-        this.em.flush();
-        return job;
-    }
-
-    private Job importNetworkFromProvider(final NetworkCreate networkCreate) throws InvalidRequestException,
-        CloudProviderException {
-
-        String providerAccountId = networkCreate.getProperties().get("providerAccountId");
-        String networkProviderAssignedId = networkCreate.getProperties().get("networkProviderAssignedId");
-
-        CloudProviderAccount account = this.cloudProviderManager.getCloudProviderAccountById(providerAccountId);
-        if (account == null) {
-            throw new InvalidRequestException("Wrong provider account id " + providerAccountId);
-        }
-
-        // retrieve user
-        Tenant tenant = this.getTenant();
-
-        Network network = new Network();
-
-        network.setCreated(new Date());
-        network.setProviderAssignedId(networkProviderAssignedId);
-        network.setName(networkCreate.getName());
-        network.setDescription(networkCreate.getDescription());
-        network.setProperties(networkCreate.getProperties() == null ? new HashMap<String, String>()
-            : new HashMap<String, String>(networkCreate.getProperties()));
-        network.setTenant(tenant);
-
-        network.setCloudProviderAccount(account);
-        // TODO provider location as input parameter
-        network.setLocation(account.getCloudProvider().getCloudProviderLocations().iterator().next());
-
-        network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
-        network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
-        network.setNetworkType(networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType());
-        network.setForwardingGroup(networkCreate.getNetworkTemplate().getForwardingGroup());
-
-        network.setState(Network.State.STARTED);
-        this.em.persist(network);
-        this.em.flush();
-
-        Job job = new Job();
-        job.setTargetResource(network);
-        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
-        affectedResources.add(network);
-        job.setAffectedResources(affectedResources);
-        job.setCreated(new Date());
-        job.setState(Job.Status.SUCCESS);
-        job.setAction("add");
-        this.em.persist(job);
-        this.em.flush();
-
-        return job;
-
-    }
-
     @Override
     public Job createNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
         NetworkManager.logger.info("Creating Network");
 
-        if (networkCreate.getProperties() != null && networkCreate.getProperties().get("providerAccountId") != null
-            && networkCreate.getProperties().get("networkProviderAssignedId") != null) {
-            return this.importNetworkFromProvider(networkCreate);
-        }
-
         if (networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType() == Type.PUBLIC) {
-            return this.createPublicNetwork(networkCreate);
+            throw new InvalidRequestException("Cannot create public network");
         }
 
         // retrieve user
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), networkCreate.getProperties());
-        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
 
-        Network network;
-
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            network = networkService.createNetwork(networkCreate, new ProviderTarget().account(placement.getAccount())
-                .location(placement.getLocation()));
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to create network: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+        Network network = new Network();
 
         // prepare the Network entity to be persisted
 
@@ -270,7 +176,10 @@ public class NetworkManager implements INetworkManager {
         this.em.persist(job);
         this.em.flush();
 
-        this.resourceWatcher.watchNetwork(network, job, Network.State.STARTED, Network.State.STOPPED);
+        ObjectMessage message = this.jmsContext.createObjectMessage(new NetworkCreateCommand(networkCreate)
+            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(network.getId().toString())
+            .setJob(job));
+        this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
     }
@@ -288,6 +197,7 @@ public class NetworkManager implements INetworkManager {
             }
             network.setUpdated(new Date());
         }
+        this.fireNetworkStateChangeEvent(network);
         job.setState(Job.Status.SUCCESS);
     }
 
@@ -328,8 +238,7 @@ public class NetworkManager implements INetworkManager {
         return this.getNetworkById(networkId);
     }
 
-    @Override
-    public List<Network> getNetworks() throws CloudProviderException {
+    private List<Network> getNetworks() throws CloudProviderException {
         return QueryHelper.getEntityList("Network", this.em, this.getTenant().getId(), Network.State.DELETED, false);
     }
 
@@ -341,6 +250,19 @@ public class NetworkManager implements INetworkManager {
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(Network.State.DELETED));
+    }
+
+    @Override
+    public QueryResult<Network> getNetworks(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<Network> nets = this.getNetworks();
+            return new QueryResult<Network>(nets.size(), nets);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Network", Network.class).params(
+            queryParams[0]);
+        return QueryHelper.getEntityList(this.em, params.tenantId(this.getTenant().getId())
+            .stateToIgnore(Network.State.DELETED));
     }
 
     @Override
@@ -374,30 +296,15 @@ public class NetworkManager implements INetworkManager {
 
         Tenant tenant = this.getTenant();
 
-        ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount());
-
-        Network.State expectedFinalState = null;
-        try {
-            INetworkService networkService = connector.getNetworkService();
-            ProviderTarget target = new ProviderTarget().account(network.getCloudProviderAccount()).location(
-                network.getLocation());
-            if (action.equals("start")) {
-                networkService.startNetwork(network.getProviderAssignedId(), target);
-                network.setState(Network.State.STARTING);
-                expectedFinalState = State.STARTED;
-            } else if (action.equals("stop")) {
-                networkService.stopNetwork(network.getProviderAssignedId(), target);
-                network.setState(Network.State.STOPPING);
-                expectedFinalState = State.STOPPED;
-            } else if (action.equals("delete")) {
-                networkService.deleteNetwork(network.getProviderAssignedId(), target);
-                network.setState(Network.State.DELETING);
-                expectedFinalState = State.DELETED;
-            }
-        } catch (ConnectorException e) {
-            NetworkManager.logger.error("Failed to " + action + " network: ", e);
-            throw new CloudProviderException(e.getMessage());
+        if (action.equals("start")) {
+            network.setState(Network.State.STARTING);
+        } else if (action.equals("stop")) {
+            network.setState(Network.State.STOPPING);
+        } else if (action.equals("delete")) {
+            network.setState(Network.State.DELETING);
         }
+
+        this.fireNetworkStateChangeEvent(network);
 
         Job job = new Job();
         job.setTenant(tenant);
@@ -409,7 +316,13 @@ public class NetworkManager implements INetworkManager {
         this.em.persist(job);
         this.em.flush();
 
-        this.resourceWatcher.watchNetwork(network, job, expectedFinalState);
+        if (action.equals("delete")) {
+            ObjectMessage message = this.jmsContext.createObjectMessage(new NetworkDeleteCommand().setResourceId(
+                network.getId().toString()).setJob(job));
+            this.jmsContext.createProducer().send(this.requestQueue, message);
+        } else {
+            // TODO
+        }
 
         return job;
     }
@@ -483,8 +396,7 @@ public class NetworkManager implements INetworkManager {
         return networkConfig;
     }
 
-    @Override
-    public List<NetworkConfiguration> getNetworkConfigurations() throws CloudProviderException {
+    private List<NetworkConfiguration> getNetworkConfigurations() throws CloudProviderException {
         return this.em.createQuery("SELECT v FROM NetworkConfiguration v WHERE v.tenant.id=:tenantId ORDER BY v.id")
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
@@ -512,6 +424,18 @@ public class NetworkManager implements INetworkManager {
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .returnPublicEntities());
+    }
+
+    @Override
+    public QueryResult<NetworkConfiguration> getNetworkConfigurations(final QueryParams... queryParams)
+        throws InvalidRequestException, CloudProviderException {
+        if (queryParams.length == 0) {
+            List<NetworkConfiguration> netConfigs = this.getNetworkConfigurations();
+            return new QueryResult<NetworkConfiguration>(netConfigs.size(), netConfigs);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkConfiguration",
+            NetworkConfiguration.class).params(queryParams[0]);
+        return QueryHelper.getEntityList(this.em, params.tenantId(this.getTenant().getId()).returnPublicEntities());
     }
 
     @Override
@@ -564,8 +488,7 @@ public class NetworkManager implements INetworkManager {
         return networkTemplate;
     }
 
-    @Override
-    public List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException {
+    private List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException {
         return this.em
             .createQuery(
                 "SELECT v FROM NetworkTemplate v WHERE v.tenant.id=:tenantId AND v.isEmbeddedInSystemTemplate=false ORDER BY v.id")
@@ -590,16 +513,26 @@ public class NetworkManager implements INetworkManager {
     @Override
     public QueryResult<NetworkTemplate> getNetworkTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
-        Tenant tenant = this.getTenant();
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
             .builder("NetworkTemplate", NetworkTemplate.class);
 
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .filterEmbbededTemplate().returnPublicEntities());
-        // return UtilsForManagers.getEntityList("NetworkTemplate",
-        // NetworkTemplate.class, this.em, user.getId(), first,
-        // last, filters, attributes, false);
+    }
+
+    @Override
+    public QueryResult<NetworkTemplate> getNetworkTemplates(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<NetworkTemplate> netTemplates = this.getNetworkTemplates();
+            return new QueryResult<NetworkTemplate>(netTemplates.size(), netTemplates);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
+            .builder("NetworkTemplate", NetworkTemplate.class).params(queryParams[0]);
+
+        return QueryHelper.getEntityList(this.em, params.tenantId(this.getTenant().getId()).filterEmbbededTemplate()
+            .returnPublicEntities());
     }
 
     @Override
@@ -799,8 +732,7 @@ public class NetworkManager implements INetworkManager {
         return this.performActionOnNetworkPort(networkPortId, "stop");
     }
 
-    @Override
-    public List<NetworkPort> getNetworkPorts() throws CloudProviderException {
+    private List<NetworkPort> getNetworkPorts() throws CloudProviderException {
         return QueryHelper.getEntityList("NetworkPort", this.em, this.getTenant().getId(), NetworkPort.State.DELETED, false);
     }
 
@@ -826,6 +758,19 @@ public class NetworkManager implements INetworkManager {
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(NetworkPort.State.DELETED));
+    }
+
+    @Override
+    public QueryResult<NetworkPort> getNetworkPorts(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<NetworkPort> netPorts = this.getNetworkPorts();
+            return new QueryResult<NetworkPort>(netPorts.size(), netPorts);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPort", NetworkPort.class)
+            .params(queryParams[0]);
+        return QueryHelper.getEntityList(this.em,
+            params.tenantId(this.getTenant().getId()).stateToIgnore(NetworkPort.State.DELETED));
     }
 
     @Override
@@ -1178,8 +1123,7 @@ public class NetworkManager implements INetworkManager {
         return job;
     }
 
-    @Override
-    public List<ForwardingGroup> getForwardingGroups() throws CloudProviderException {
+    private List<ForwardingGroup> getForwardingGroups() throws CloudProviderException {
         return QueryHelper.getEntityList("ForwardingGroup", this.em, this.getTenant().getId(), ForwardingGroup.State.DELETED,
             false);
     }
@@ -1208,6 +1152,19 @@ public class NetworkManager implements INetworkManager {
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes)
                 .stateToIgnore(ForwardingGroup.State.DELETED));
+    }
+
+    @Override
+    public QueryResult<ForwardingGroup> getForwardingGroups(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<ForwardingGroup> forwardingGroups = this.getForwardingGroups();
+            return new QueryResult<ForwardingGroup>(forwardingGroups.size(), forwardingGroups);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
+            .builder("ForwardingGroup", ForwardingGroup.class).params(queryParams[0]);
+        return QueryHelper.getEntityList(this.em,
+            params.tenantId(this.getTenant().getId()).stateToIgnore(ForwardingGroup.State.DELETED));
     }
 
     @Override
@@ -1417,8 +1374,7 @@ public class NetworkManager implements INetworkManager {
         return null;
     }
 
-    @Override
-    public List<Address> getAddresses() throws CloudProviderException {
+    private List<Address> getAddresses() throws CloudProviderException {
         return this.em.createQuery("SELECT v FROM Address v WHERE v.tenant.id=:tenantId ORDER BY v.id")
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
@@ -1439,11 +1395,14 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public QueryResult<Address> getAddresses(final int first, final int last, final List<String> filters,
-        final List<String> attributes) throws InvalidRequestException, CloudProviderException {
+    public QueryResult<Address> getAddresses(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<Address> addresses = this.getAddresses();
+            return new QueryResult<Address>(addresses.size(), addresses);
+        }
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Address", Address.class);
-        return QueryHelper.getEntityList(this.em,
-            params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
+        return QueryHelper.getEntityList(this.em, params.tenantId(this.getTenant().getId()).params(queryParams[0]));
     }
 
     @Override

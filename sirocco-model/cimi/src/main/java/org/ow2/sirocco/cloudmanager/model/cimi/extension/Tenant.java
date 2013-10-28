@@ -38,6 +38,9 @@ import javax.persistence.ManyToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+/**
+ * Container used to isolate resources at broker level
+ */
 @Entity
 public class Tenant implements Serializable {
     private static final long serialVersionUID = 1L;

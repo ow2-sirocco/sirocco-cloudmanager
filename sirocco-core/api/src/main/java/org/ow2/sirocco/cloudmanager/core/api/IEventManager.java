@@ -37,7 +37,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 /**
- * Events management operations
+ * Event management operations
  */
 public interface IEventManager {
 

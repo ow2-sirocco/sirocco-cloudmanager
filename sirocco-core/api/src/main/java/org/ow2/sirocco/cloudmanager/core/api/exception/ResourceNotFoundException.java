@@ -26,7 +26,7 @@
 package org.ow2.sirocco.cloudmanager.core.api.exception;
 
 /**
- * Request specified on a resource identifier that does not exist
+ * Request specified on a resource that does not exist
  */
 public class ResourceNotFoundException extends CloudProviderException {
     private static final long serialVersionUID = 5657353511794738070L;
@@ -43,7 +43,7 @@ public class ResourceNotFoundException extends CloudProviderException {
      * 
      * @param message the detail message
      */
-    public ResourceNotFoundException(String message) {
+    public ResourceNotFoundException(final String message) {
         super(message);
     }
 

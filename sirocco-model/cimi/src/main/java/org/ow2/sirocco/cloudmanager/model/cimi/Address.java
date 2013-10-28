@@ -35,6 +35,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+/**
+ * IP address
+ */
 @Entity
 public class Address extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;

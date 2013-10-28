@@ -20,8 +20,18 @@
  * USA
  *
  */
-package org.ow2.sirocco.cloudmanager.model.cimi;
+package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
+/**
+ * Visibility of a resource
+ */
 public enum Visibility {
-    PUBLIC, PRIVATE
+    /**
+     * a public resource can be seen by all tenants
+     */
+    PUBLIC,
+    /**
+     * a private resource can only be seen by the tenant that owns it
+     */
+    PRIVATE
 }

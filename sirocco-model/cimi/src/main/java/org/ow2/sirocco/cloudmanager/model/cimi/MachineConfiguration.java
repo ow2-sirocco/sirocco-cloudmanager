@@ -34,8 +34,12 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.IMultiCloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
+
 @Entity
-public class MachineConfiguration extends CloudEntity implements Serializable {
+public class MachineConfiguration extends CloudEntity implements IMultiCloudResource, Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer cpu;
@@ -45,6 +49,8 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
     private List<DiskTemplate> disks;
 
     private Visibility visibility = Visibility.PRIVATE;
+
+    private List<ProviderMapping> providerMappings;
 
     @Enumerated(EnumType.STRING)
     public Visibility getVisibility() {
@@ -79,4 +85,14 @@ public class MachineConfiguration extends CloudEntity implements Serializable {
     public void setDisks(final List<DiskTemplate> diskTemplates) {
         this.disks = diskTemplates;
     }
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    public List<ProviderMapping> getProviderMappings() {
+        return this.providerMappings;
+    }
+
+    public void setProviderMappings(final List<ProviderMapping> providerMappings) {
+        this.providerMappings = providerMappings;
+    }
+
 }

@@ -25,6 +25,7 @@ package org.ow2.sirocco.cloudmanager.connector.openstack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
@@ -32,7 +33,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
-import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
@@ -41,6 +41,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
@@ -59,7 +60,7 @@ import org.slf4j.LoggerFactory;
 import com.woorea.openstack.base.client.OpenStackResponseException;
 
 public class OpenStackCloudProviderConnector implements ICloudProviderConnector, IComputeService, IVolumeService,
-    INetworkService {
+    INetworkService, IImageService {
     private static Logger logger = LoggerFactory.getLogger(OpenStackCloudProviderConnector.class);
 
     private List<OpenStackCloudProvider> openstackCPs = new ArrayList<OpenStackCloudProvider>();
@@ -69,10 +70,13 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
             throw new ConnectorException("target.account or target.location is null");
         }
         for (OpenStackCloudProvider provider : this.openstackCPs) {
-            /*if (provider.getCloudProviderAccount().equals(target.getAccount())
-                && provider.getCloudProviderLocation().equals(target.getLocation())) {
-                return provider;
-            }*/
+            /*
+             * if
+             * (provider.getCloudProviderAccount().equals(target.getAccount())
+             * &&
+             * provider.getCloudProviderLocation().equals(target.getLocation()))
+             * { return provider; }
+             */
             if (provider.getCloudProviderAccount().getId().equals(target.getAccount().getId())) {
                 // location can be null?
                 if (provider.getCloudProviderLocation() != target.getLocation()) {
@@ -91,24 +95,24 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
         return provider;
     }
 
-    /* TODO
-     * 
-     * Mix
+    /*
+     * TODO Mix 
      * - connector cache 
-     * - REST call trace (On/Off)
-     * - woorea exception handling
-     * - availability_zone (API for zone)
+     * - REST call trace (On/Off) 
+     * - woorea exception handling 
+     * - availability_zone (API for zone) 
      * 
-     * Compute
+     * Compute 
      * - reboot: not supported by woorea 
-     * - CIMI address allocation mode : dynamic / fixed
-     * - captureMachine
+     * - CIMI address allocation mode : dynamic / fixed 
+     * - captureMachine 
      * 
-     * Network
-     * - createNetwork : add implicit/explicit subnet ; conflict between cidr
-     * - createNetwork/deleteNetwork: woorea bugs : see fixme
+     * Network 
+     * - createNetwork/deleteNetwork: woorea bugs : see fixme 
      * - Forwarding groups / BagPipe
      * 
+     * Image
+     * - deleteMachineImage
      */
 
     //
@@ -136,18 +140,13 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
 
     @Override
-    public IProviderCapability getProviderCapability() throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
-
-    @Override
     public ISystemService getSystemService() throws ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public IImageService getImageService() throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
+        return this;
     }
 
     //
@@ -224,7 +223,6 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public MachineImage captureMachine(final String machineId, final MachineImage machineImage, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
-        // TODO
         throw new ConnectorException("unsupported operation");
     }
 
@@ -278,6 +276,11 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     public void suspendMachine(final String machineId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
         throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public List<MachineConfiguration> getMachineConfigs(final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).getMachineConfigs();
     }
 
     //
@@ -501,4 +504,28 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
         ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
+
+    //
+    // Image service
+    //
+
+    @Override
+    public MachineImage getMachineImage(final String machineImageId, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        return this.getProvider(target).getMachineImage(machineImageId);
+    }
+
+    @Override
+    public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria,
+        final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).getMachineImages(returnPublicImages, searchCriteria);
+    }
+
+    @Override
+    public void deleteMachineImage(final String imageId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+
+    }
+
 }

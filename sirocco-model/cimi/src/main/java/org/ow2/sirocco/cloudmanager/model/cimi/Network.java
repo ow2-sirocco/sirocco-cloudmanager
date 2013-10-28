@@ -40,7 +40,11 @@ import javax.persistence.OneToMany;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 
+/**
+ * Network resource
+ */
 @NamedQueries(value = {@NamedQuery(name = "GET_NETWORK_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM Network n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
 public class Network extends CloudResource implements Serializable, ICloudProviderResource {

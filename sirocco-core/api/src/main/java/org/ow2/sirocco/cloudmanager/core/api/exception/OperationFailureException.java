@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2013 France Telecom
+ * Copyright (C) 2011 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -19,21 +19,35 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ *  $Id$
+ *
  */
 
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.core.api.exception;
 
-import java.util.HashMap;
+import javax.ejb.ApplicationException;
 
 /**
- * Workflow management operations
+ * Indicates that a failure has occurred that impacts the current operation
  */
-public interface IWorkflowManager {
+@ApplicationException(rollback = true)
+public class OperationFailureException extends CloudProviderException {
+    private static final long serialVersionUID = 5657353511794738070L;
+
     /**
-     * Starts a BPMN process
-     * 
-     * @param processKey key of the process
-     * @param vars variables of the process
+     * Constructs a OperationFailureException with null as its error detail
+     * message.
      */
-    void startProcess(String processKey, HashMap<String, Object> vars);
+    public OperationFailureException() {
+    }
+
+    /**
+     * Constructs a with a detail message.
+     * 
+     * @param message the detail message
+     */
+    public OperationFailureException(final String message) {
+        super(message);
+    }
+
 }

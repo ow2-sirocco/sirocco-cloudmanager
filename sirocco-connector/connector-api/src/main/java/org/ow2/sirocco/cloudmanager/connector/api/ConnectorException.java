@@ -24,6 +24,9 @@
  */
 package org.ow2.sirocco.cloudmanager.connector.api;
 
+/**
+ * Base exception raised by Cloud provider connectors
+ */
 public class ConnectorException extends Exception {
     private static final long serialVersionUID = 4102349022960352481L;
 

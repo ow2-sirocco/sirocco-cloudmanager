@@ -4,6 +4,9 @@ import java.io.Serializable;
 
 import javax.enterprise.context.SessionScoped;
 
+/**
+ * Identity context
+ */
 @SessionScoped
 public class IdentityContext implements Serializable {
     private static final long serialVersionUID = 1L;

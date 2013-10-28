@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2011 France Telecom
+ * Copyright (C) 2013 Orange
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -19,18 +19,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id: IJobListener.java 913 2012-02-20 09:34:20Z ycas7461 $
- *
  */
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import java.util.List;
 
 /**
- * Entities event handling (now essentially for System state update)
+ * A resource that can be deployed on one or more cloud providers.
  */
-public interface IEntityStateListener {
+public interface IMultiCloudResource {
+    public List<ProviderMapping> getProviderMappings();
 
-    void handleEntityStateChange(Class<? extends CloudResource> entityType, String entityId, boolean deletion);
-
+    public void setProviderMappings(final List<ProviderMapping> providerMappings);
 }

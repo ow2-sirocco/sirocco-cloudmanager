@@ -31,6 +31,8 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
+
 @Entity
 public class VolumeConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;

@@ -26,18 +26,24 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.IMultiCloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
 
 @Entity
-public class MachineImage extends CloudResource implements Serializable, ICloudProviderResource {
+public class MachineImage extends CloudResource implements Serializable, IMultiCloudResource {
     private static final long serialVersionUID = 1L;
 
     private CloudProviderLocation location;
@@ -61,6 +67,8 @@ public class MachineImage extends CloudResource implements Serializable, ICloudP
     private CloudProviderAccount cloudProviderAccount;
 
     private Visibility visibility = Visibility.PRIVATE;
+
+    private List<ProviderMapping> providerMappings;
 
     @Enumerated(EnumType.STRING)
     public Visibility getVisibility() {
@@ -122,6 +130,15 @@ public class MachineImage extends CloudResource implements Serializable, ICloudP
 
     public void setLocation(final CloudProviderLocation location) {
         this.location = location;
+    }
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    public List<ProviderMapping> getProviderMappings() {
+        return this.providerMappings;
+    }
+
+    public void setProviderMappings(final List<ProviderMapping> providerMappings) {
+        this.providerMappings = providerMappings;
     }
 
 }

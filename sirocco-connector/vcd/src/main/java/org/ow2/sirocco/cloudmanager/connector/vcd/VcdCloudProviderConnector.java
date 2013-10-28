@@ -24,6 +24,7 @@
 package org.ow2.sirocco.cloudmanager.connector.vcd;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +34,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
-import org.ow2.sirocco.cloudmanager.connector.api.IProviderCapability;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
@@ -44,6 +44,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
@@ -55,7 +56,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 
-public class VcdCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, INetworkService {
+public class VcdCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, INetworkService,
+    IImageService {
 
     private List<VcdCloudProvider> vcdCPs = new ArrayList<VcdCloudProvider>();
 
@@ -64,10 +66,13 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
             throw new ConnectorException("target.account or target.location is null");
         }
         for (VcdCloudProvider provider : this.vcdCPs) {
-            /*if (provider.getCloudProviderAccount().equals(target.getAccount())
-                && provider.getCloudProviderLocation().equals(target.getLocation())) {
-                return provider;
-            }*/
+            /*
+             * if
+             * (provider.getCloudProviderAccount().equals(target.getAccount())
+             * &&
+             * provider.getCloudProviderLocation().equals(target.getLocation()))
+             * { return provider; }
+             */
             if (provider.getCloudProviderAccount().getId().equals(target.getAccount().getId())) {
                 // location can be null?
                 if (provider.getCloudProviderLocation() != target.getLocation()) {
@@ -86,11 +91,10 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
         return provider;
     }
 
-    /* TODO
-     * 
-     * - explicit subnet ; conflict between cidr
-     * - CIMI address allocation mode : dynamic / fixed
-     * 
+    /*
+     * TODO - getMachine : CIMI address management aligned with openstack -
+     * explicit subnet ; conflict between cidr - CIMI address allocation mode :
+     * dynamic / fixed
      */
 
     //
@@ -124,13 +128,8 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
     }
 
     @Override
-    public IProviderCapability getProviderCapability() throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
-
-    @Override
     public IImageService getImageService() throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
+        return this;
     }
 
     //
@@ -297,6 +296,11 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
         throw new ConnectorException("unsupported operation");
     }
 
+    @Override
+    public List<MachineConfiguration> getMachineConfigs(final ProviderTarget provider) throws ConnectorException {
+        return Collections.emptyList();
+    }
+
     //
     // Network Service
     //
@@ -399,6 +403,30 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
     public void removeNetworkFromForwardingGroup(final String forwardingGroupId, final String networkId,
         final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
         throw new ConnectorException("unsupported operation");
+    }
+
+    //
+    // Image service
+    //
+
+    @Override
+    public void deleteMachineImage(final String imageId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+
+    }
+
+    @Override
+    public MachineImage getMachineImage(final String machineImageId, final ProviderTarget target) throws ConnectorException {
+        // TODO
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria,
+        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        // TODO
+        return Collections.emptyList();
     }
 
 }

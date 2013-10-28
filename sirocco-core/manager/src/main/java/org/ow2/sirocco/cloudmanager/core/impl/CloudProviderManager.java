@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.core.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,17 +42,28 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
+import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
+import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.OperationFailureException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,6 +88,18 @@ public class CloudProviderManager implements ICloudProviderManager {
     @EJB
     private ITenantManager tenantManager;
 
+    @EJB
+    private IMachineManager machineManager;
+
+    @EJB
+    private IMachineImageManager machineImageManager;
+
+    @EJB
+    private INetworkManager networkManager;
+
+    @EJB
+    private ICloudProviderConnectorFinder connectorFinder;
+
     @Inject
     private IdentityContext identityContext;
 
@@ -93,7 +117,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     public CloudProvider createCloudProvider(final CloudProvider cp) throws CloudProviderException {
         // if (!isCloudProviderValid(cp)){throw new
         // CloudProviderException("CloudProvider validation failed");};
-
+        cp.setCreated(new Date());
         this.em.persist(cp);
         this.em.flush();
         return cp;
@@ -113,6 +137,12 @@ public class CloudProviderManager implements ICloudProviderManager {
         return result;
     }
 
+    @Override
+    public List<CloudProvider> getCloudProviderByType(final String type) throws CloudProviderException {
+        return this.em.createQuery("Select p From CloudProvider p where p.cloudProviderType=:type").setParameter("type", type)
+            .getResultList();
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public List<CloudProvider> getCloudProviders() throws CloudProviderException {
@@ -125,15 +155,97 @@ public class CloudProviderManager implements ICloudProviderManager {
         this.em.remove(result);
     }
 
-    @Override
-    public CloudProviderAccount createCloudProviderAccount(final String providerId, final CloudProviderAccount account)
+    private static CreateCloudProviderAccountOptions defaultCreateCloudProviderAccountOptions = new CreateCloudProviderAccountOptions();
+
+    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
         throws CloudProviderException {
-        // if (!isCloudProviderAccountValid(cpa)){throw new
-        // CloudProviderException("CloudProviderAccount validation failed");};
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(cloudProviderAccount
+            .getCloudProvider().getCloudProviderType());
+        if (connector == null) {
+            CloudProviderManager.logger.error("Cannot find connector for cloud provider type "
+                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
+            return null;
+        }
+        return connector;
+    }
+
+    private Tenant getTenant() throws CloudProviderException {
+        return this.tenantManager.getTenant(this.identityContext);
+    }
+
+    @Override
+    public CloudProviderAccount createCloudProviderAccount(final CloudProvider provider, final CloudProviderLocation location,
+        final CloudProviderAccount account, final CreateCloudProviderAccountOptions... options) throws CloudProviderException {
+        CloudProvider newProvider = this.createCloudProvider(provider);
+        this.addLocationToCloudProvider(newProvider.getId().toString(), location);
+        return this.createCloudProviderAccount(newProvider.getId().toString(), account, options);
+    }
+
+    @Override
+    public CloudProviderAccount createCloudProviderAccount(final String providerId, final CloudProviderAccount account,
+        final CreateCloudProviderAccountOptions... _options) throws CloudProviderException {
         CloudProvider provider = this.getCloudProviderById(providerId);
         account.setCloudProvider(provider);
+        account.setCreated(new Date());
         this.em.persist(account);
         provider.getCloudProviderAccounts().add(account);
+
+        CreateCloudProviderAccountOptions options = _options.length > 0 ? _options[0]
+            : CloudProviderManager.defaultCreateCloudProviderAccountOptions;
+
+        ICloudProviderConnector connector = this.getCloudProviderConnector(account);
+        if (account == null) {
+            throw new OperationFailureException("Cannot find connector for provider type " + provider.getCloudProviderType());
+        }
+        if (options.isImportMachineConfigs()) {
+            // XXX pick first location only, some providers might offer
+            // different configs per location
+            CloudProviderLocation location = provider.getCloudProviderLocations().iterator().next();
+            try {
+                List<MachineConfiguration> machineConfigs = connector.getComputeService().getMachineConfigs(
+                    new ProviderTarget().account(account).location(location));
+                for (MachineConfiguration config : machineConfigs) {
+                    this.machineManager.createMachineConfiguration(config);
+                }
+            } catch (Exception e) {
+                CloudProviderManager.logger.error("Import MachineConfigs failure", e);
+                throw new OperationFailureException("Cannot import machine configs: " + e.getMessage());
+            }
+        }
+        if (options.isImportMachineImages()) {
+            for (CloudProviderLocation location : provider.getCloudProviderLocations()) {
+                try {
+                    List<MachineImage> images = connector.getImageService().getMachineImages(
+                        options.isImportOnlyOwnerMachineImages(), null,
+                        new ProviderTarget().account(account).location(location));
+                    for (MachineImage image : images) {
+                        image.setLocation(location);
+                        this.machineImageManager.createMachineImage(image);
+                    }
+                } catch (Exception e) {
+                    CloudProviderManager.logger.error("Import MachineImages failure", e);
+                    throw new OperationFailureException("Cannot import machine images: " + e.getMessage());
+                }
+            }
+        }
+        if (options.isImportNetworks()) {
+            for (CloudProviderLocation location : provider.getCloudProviderLocations()) {
+                try {
+                    List<Network> nets = connector.getNetworkService().getNetworks(
+                        new ProviderTarget().account(account).location(location));
+                    for (Network net : nets) {
+                        net.setTenant(this.getTenant());
+                        net.setCreated(new Date());
+                        net.setCloudProviderAccount(account);
+                        net.setLocation(location);
+                        this.em.persist(net);
+                    }
+                } catch (Exception e) {
+                    CloudProviderManager.logger.error("Import Networks failure", e);
+                    throw new OperationFailureException("Cannot import networks: " + e.getMessage());
+                }
+            }
+        }
         this.em.flush();
         return account;
     }
@@ -429,12 +541,9 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     /**
      * Method to evaluate distance between 2 different locations <br>
-     * ** Only works if the points are close enough that you can omit that earth
-     * is not regular shape ** <br>
+     * ** Only works if the points are close enough that you can omit that earth is not regular shape ** <br>
      * <br>
-     * <i>see
-     * http://androidsnippets.com/distance-between-two-gps-coordinates-in-
-     * meter</i>
+     * <i>see http://androidsnippets.com/distance-between-two-gps-coordinates-in- meter</i>
      * 
      * @return
      */
@@ -481,25 +590,42 @@ public class CloudProviderManager implements ICloudProviderManager {
     public Placement placeResource(final String tenantId, final Map<String, String> properties) throws CloudProviderException {
         Tenant tenant = this.tenantManager.getTenantById(tenantId);
         String cloudProviderType = null;
+        String cloudProviderAccountId = null;
         String cloudProviderLocationCountry = null;
         if (properties != null) {
             cloudProviderType = properties.get("provider");
+            cloudProviderAccountId = properties.get("providerAccountId");
             cloudProviderLocationCountry = properties.get("location");
         }
         if (cloudProviderType == null) {
             cloudProviderType = "mock";
         }
         CloudProviderAccount targetAccount = null;
-        for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
-            if (account.getCloudProvider().getCloudProviderType().equals(cloudProviderType)) {
-                targetAccount = account;
-                break;
+        if (cloudProviderAccountId != null) {
+            for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
+                if (account.getId().toString().equals(cloudProviderAccountId)) {
+                    targetAccount = account;
+                    break;
+                }
+            }
+            if (targetAccount == null) {
+                throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider id "
+                    + cloudProviderAccountId);
+            }
+
+        } else {
+            for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
+                if (account.getCloudProvider().getCloudProviderType().equals(cloudProviderType)) {
+                    targetAccount = account;
+                    break;
+                }
+            }
+            if (targetAccount == null) {
+                throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider type "
+                    + cloudProviderType);
             }
         }
-        if (targetAccount == null) {
-            throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider type "
-                + cloudProviderType);
-        }
+
         CloudProviderLocation targetLocation = null;
         if (cloudProviderLocationCountry != null) {
             for (CloudProviderLocation loc : targetAccount.getCloudProvider().getCloudProviderLocations()) {
@@ -520,6 +646,29 @@ public class CloudProviderManager implements ICloudProviderManager {
         }
 
         return new Placement(targetAccount, targetLocation);
+    }
+
+    @Override
+    public CloudProviderProfile createCloudProviderProfile(final CloudProviderProfile providerProfile) {
+        this.em.persist(providerProfile);
+        return providerProfile;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<CloudProviderProfile> getCloudProviderProfiles() {
+        return this.em.createQuery("Select p From CloudProviderProfile p").getResultList();
+    }
+
+    @Override
+    public void addCloudProviderProfileMetadata(final String profileId,
+        final org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile.AccountParameter metadata)
+        throws ResourceNotFoundException {
+        CloudProviderProfile profile = this.em.find(CloudProviderProfile.class, Integer.parseInt(profileId));
+        if (profile == null) {
+            throw new ResourceNotFoundException();
+        }
+        profile.getAccountParameters().add(metadata);
     }
 
 }

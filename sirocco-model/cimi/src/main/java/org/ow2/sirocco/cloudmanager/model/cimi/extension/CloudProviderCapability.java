@@ -25,44 +25,45 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
-
-
 /**
- * A capability represents a feature or a feature set provided by an IaaS provider.
+ * A capability represents a feature or a feature set provided by a cloud
+ * provider.
  */
 
 public class CloudProviderCapability {
-    
-    
+
     public static final CloudProviderCapability MACHINE = new CloudProviderCapability(null, "machine");
-   
+
     public static final CloudProviderCapability VOLUME = new CloudProviderCapability(null, "volume");
 
     public static final CloudProviderCapability NETWORK = new CloudProviderCapability(null, "network");
-    
+
     public static final CloudProviderCapability SYSTEM = new CloudProviderCapability(null, "system");
-    public static final CloudProviderCapability SYSTEMCOMPOSE = new CloudProviderCapability(SYSTEM, "compose");
 
-    
+    public static final CloudProviderCapability SYSTEMCOMPOSE = new CloudProviderCapability(CloudProviderCapability.SYSTEM,
+        "compose");
+
     private final CloudProviderCapability parent;
-    private final String     name;
 
-    CloudProviderCapability(CloudProviderCapability parent, String name) {
+    private final String name;
+
+    CloudProviderCapability(final CloudProviderCapability parent, final String name) {
         this.parent = parent;
         this.name = name;
     }
 
     public boolean hasParent() {
-        if (parent != null) {
+        if (this.parent != null) {
             return true;
         }
         return false;
     }
 
     public CloudProviderCapability getParent() {
-        return parent;
+        return this.parent;
     }
+
     public String getName() {
-        return name;
+        return this.name;
     }
 }

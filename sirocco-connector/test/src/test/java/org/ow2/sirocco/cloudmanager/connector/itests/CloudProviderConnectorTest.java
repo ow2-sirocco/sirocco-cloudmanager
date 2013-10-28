@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.connector.itests;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,11 +39,12 @@ import org.junit.Test;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
+import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
+import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
-import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
@@ -60,17 +62,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 
 public class CloudProviderConnectorTest {
-    private static final String MACHINE_CONFIG_CPU_PROP = "machineconfig.cpu";
-
-    private static final String MACHINE_CONFIG_MEMORY_PROP = "machineconfig.memory";
-
-    private static final String MACHINE_CONFIG_DISKS_PROP = "machineconfig.disks";
-
-    private static final String MACHINE_IMAGE_ID_PROP = "machineimage.id";
-
-    private static final String MACHINE_IMAGE_KEY_PROP = "machineimage.key";
+    private static final String MACHINE_CONFIG_NAME_PROP = "machineconfig.name";
 
     private static final String MACHINE_STOP_PROP = "machine.stop";
 
@@ -94,19 +89,11 @@ public class CloudProviderConnectorTest {
 
     private String providerName;
 
-    private int machineConfigCpu;
-
-    private int machineConfigMemory;
-
-    private int[] machineConfigDiskSizes;
+    private String machineConfigName;
 
     private int volumeConfigSizeGB;
 
     private String volumeDevice;
-
-    private String imageId;
-
-    private String imageKey;
 
     private String key;
 
@@ -123,15 +110,8 @@ public class CloudProviderConnectorTest {
         prop.load(in);
         in.close();
 
-        this.machineConfigCpu = Integer.valueOf(prop.getProperty(CloudProviderConnectorTest.MACHINE_CONFIG_CPU_PROP));
-        this.machineConfigMemory = Integer.valueOf(prop.getProperty(CloudProviderConnectorTest.MACHINE_CONFIG_MEMORY_PROP));
-        this.imageId = prop.getProperty(CloudProviderConnectorTest.MACHINE_IMAGE_ID_PROP);
-        this.imageKey = prop.getProperty(CloudProviderConnectorTest.MACHINE_IMAGE_KEY_PROP);
-        String diskSizes[] = prop.getProperty(CloudProviderConnectorTest.MACHINE_CONFIG_DISKS_PROP).split(", ");
-        this.machineConfigDiskSizes = new int[diskSizes.length];
-        for (int i = 0; i < diskSizes.length; i++) {
-            this.machineConfigDiskSizes[i] = Integer.valueOf(diskSizes[i]);
-        }
+        this.machineConfigName = prop.getProperty(CloudProviderConnectorTest.MACHINE_CONFIG_NAME_PROP);
+
         this.volumeConfigSizeGB = Integer.valueOf(prop.getProperty(CloudProviderConnectorTest.VOLUME_CONFIG_SIZE_PROP));
         this.volumeDevice = prop.getProperty(CloudProviderConnectorTest.VOLUME_DEVICE_PROP);
 
@@ -152,25 +132,38 @@ public class CloudProviderConnectorTest {
 
         this.location = null;
         String country = prop.getProperty(CloudProviderConnectorTest.LOCATION_COUNTRY_PROP);
-        if (country == null) {
-            this.location = this.connector.getLocations().iterator().next();
-        } else {
+        if (this.connector.getLocations() != null && !this.connector.getLocations().isEmpty()) {
             for (CloudProviderLocation loc : this.connector.getLocations()) {
                 if (loc.getCountryName().equals(country)) {
                     this.location = loc;
                     break;
                 }
             }
+            if (this.location == null) {
+                throw new Exception("Cannot find suitable provider location for country " + country);
+            }
+        } else {
+            this.location = new CloudProviderLocation();
+            this.location.setCountryName(country);
         }
-        if (this.location == null) {
-            throw new Exception("Cannot find suitable provider location for country " + country);
-        }
+
         this.cloudProviderAccount = new CloudProviderAccount();
         this.cloudProviderAccount.setId(1234);
         this.cloudProviderAccount.setLogin(login);
         this.cloudProviderAccount.setPassword(password);
 
+        Map<String, String> accountProperties = new HashMap<>();
+        this.cloudProviderAccount.setProperties(accountProperties);
+        for (String propName : prop.stringPropertyNames()) {
+            if (propName.startsWith("connector.prop.")) {
+                String key = propName.substring("connector.prop.".length());
+                String value = prop.getProperty(propName);
+                accountProperties.put(key, value);
+            }
+        }
+
         CloudProvider cloudProvider = new CloudProvider();
+        cloudProvider.setId(4321);
         cloudProvider.setEndpoint(endpoint);
 
         this.cloudProviderAccount.setCloudProvider(cloudProvider);
@@ -218,34 +211,71 @@ public class CloudProviderConnectorTest {
         ProviderTarget target = new ProviderTarget().account(this.cloudProviderAccount).location(this.location);
         IComputeService computeService = this.connector.getComputeService();
         IVolumeService volumeService = this.connector.getVolumeService();
+        INetworkService networkService = this.connector.getNetworkService();
+        IImageService imageService = this.connector.getImageService();
+
+        // get public network
+        Network publicNetwork = null;
+        for (Network net : networkService.getNetworks(target)) {
+            Assert.assertNotNull(net.getName());
+            Assert.assertNotNull(net.getProviderAssignedId());
+            Assert.assertNotNull(net.getState());
+            Assert.assertNotNull(net.getNetworkType());
+            if (net.getNetworkType() == Network.Type.PUBLIC) {
+                publicNetwork = net;
+            }
+        }
+
+        Assert.assertNotNull("no public network", publicNetwork);
+
+        // get MachineConfigs
+
+        MachineConfiguration selectedMachineConfig = null;
+        List<MachineConfiguration> machineConfigs = computeService.getMachineConfigs(target);
+        for (MachineConfiguration machineConfig : machineConfigs) {
+            Assert.assertNotNull(machineConfig.getName());
+            Assert.assertTrue(machineConfig.getCpu() > 0);
+            Assert.assertTrue(machineConfig.getMemory() > 0);
+            Assert.assertNotNull(machineConfig.getDisks());
+            Assert.assertTrue(!machineConfig.getDisks().isEmpty());
+            Assert.assertNotNull(machineConfig.getProviderMappings());
+            Assert.assertTrue(machineConfig.getProviderMappings().size() == 1);
+            ProviderMapping mapping = machineConfig.getProviderMappings().get(0);
+            Assert.assertNotNull(mapping.getProviderAssignedId());
+            if (machineConfig.getName().equals(this.machineConfigName)) {
+                selectedMachineConfig = machineConfig;
+            }
+        }
+
+        // get images
+
+        List<MachineImage> images = imageService.getMachineImages(false, null, target);
+        for (MachineImage image : images) {
+            Assert.assertNotNull(image.getName());
+            Assert.assertTrue(image.getProviderMappings().size() == 1);
+            ProviderMapping mapping = image.getProviderMappings().get(0);
+            Assert.assertNotNull(mapping.getProviderAssignedId());
+        }
+
+        String imageId = images.get(0).getProviderMappings().get(0).getProviderAssignedId();
+
+        Assert.assertNotNull("cannot find machine config " + this.machineConfigName, selectedMachineConfig);
 
         MachineCreate machineCreate = new MachineCreate();
         MachineTemplate machineTemplate = new MachineTemplate();
-        MachineConfiguration machineConfiguration = new MachineConfiguration();
-        machineConfiguration.setCpu(this.machineConfigCpu);
-        machineConfiguration.setMemory(this.machineConfigMemory * 1024);
-        List<DiskTemplate> disks = new ArrayList<DiskTemplate>();
-        for (int diskSizeGB : this.machineConfigDiskSizes) {
-            DiskTemplate disk = new DiskTemplate();
-            disk.setCapacity(diskSizeGB * 1000 * 1000);
-            disks.add(disk);
-        }
-        machineConfiguration.setDisks(disks);
-        machineTemplate.setMachineConfig(machineConfiguration);
+        machineTemplate.setMachineConfig(selectedMachineConfig);
+
         MachineImage machineImage = new MachineImage();
-        machineImage.setProviderAssignedId(this.imageId);
-        Map<String, String> imageProps = new HashMap<String, String>();
-        if (this.imageKey != null) {
-            imageProps.put(this.imageKey, this.imageId);
-        }
-        machineImage.setProperties(imageProps);
+        ProviderMapping providerMapping = new ProviderMapping();
+        providerMapping.setProviderAssignedId(imageId);
+        providerMapping.setProviderAccount(this.cloudProviderAccount);
+        providerMapping.setProviderLocation(this.location);
+        machineImage.setProviderMappings(Collections.singletonList(providerMapping));
         machineTemplate.setMachineImage(machineImage);
+
         List<MachineTemplateNetworkInterface> nics = new ArrayList<MachineTemplateNetworkInterface>();
         MachineTemplateNetworkInterface nic = new MachineTemplateNetworkInterface();
-        nic.setNetworkType(Network.Type.PRIVATE);
-        nics.add(nic);
-        nic = new MachineTemplateNetworkInterface();
-        nic.setNetworkType(Network.Type.PUBLIC);
+        nic.setNetwork(publicNetwork);
         nics.add(nic);
         machineTemplate.setNetworkInterfaces(nics);
         if (this.key != null) {
@@ -332,6 +362,8 @@ public class CloudProviderConnectorTest {
             }
             Assert.assertEquals(MachineVolume.State.ATTACHED, machine.getVolumes().get(0).getState());
 
+            machineVolume = machine.getVolumes().get(0);
+
             System.out.println("Detaching volume " + volume.getProviderAssignedId() + " from machine " + machineId);
             computeService.removeVolumeFromMachine(machineId, machineVolume, target);
             seconds = CloudProviderConnectorTest.ASYNC_OPERATION_WAIT_TIME_IN_SECONDS;
@@ -368,12 +400,6 @@ public class CloudProviderConnectorTest {
         try {
             this.waitForMachineState(computeService, target, machine.getProviderAssignedId(),
                 CloudProviderConnectorTest.ASYNC_OPERATION_WAIT_TIME_IN_SECONDS, Machine.State.DELETED);
-        } catch (ConnectorException ex) {
-            // OK
-        }
-        try {
-            machine = computeService.getMachine(machineId, target);
-            Assert.fail("Volume still exists after deletion");
         } catch (ConnectorException ex) {
             // OK
         }

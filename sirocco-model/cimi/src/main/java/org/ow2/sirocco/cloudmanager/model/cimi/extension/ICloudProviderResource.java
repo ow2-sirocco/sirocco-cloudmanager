@@ -23,32 +23,41 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.model.cimi;
-
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 /**
- * interface ICloudProvider, implemented by sirocco objects linked to resources
- * in providers, and so have a cloud provider account, location, id
- * 
- * @author ycas7461
+ * A resource deployed on a cloud provider
  */
 public interface ICloudProviderResource {
 
-    // location
+    /**
+     * Gets the resource location
+     */
     CloudProviderLocation getLocation();
 
+    /**
+     * Sets the resource location
+     */
     void setLocation(final CloudProviderLocation location);
 
-    // provider account
+    /**
+     * Gets the cloud provider account on which the resource is deployed
+     */
     CloudProviderAccount getCloudProviderAccount();
 
+    /**
+     * Sets the cloud provider account on which the resource is deployed
+     */
     void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount);
 
-    // id of related provider resource
+    /**
+     * Gets the provider-assigned identifier of the resource
+     */
     String getProviderAssignedId();
 
+    /**
+     * Sets the provider-assigned identifier of the resource
+     */
     void setProviderAssignedId(final String providerAssignedId);
 
 }

@@ -24,6 +24,10 @@
  */
 package org.ow2.sirocco.cloudmanager.connector.api;
 
+/**
+ * The BadStateException should be thrown by a connector to indicate that a
+ * given object is in the inappropriate state for the requested operation.
+ */
 public class BadStateException extends ConnectorException {
 
     /**

@@ -32,6 +32,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
@@ -41,7 +42,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 /**
  * System management operations
  */
-public interface ISystemManager extends IEntityStateListener {
+public interface ISystemManager {
 
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/SystemManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager";
 
@@ -148,6 +149,8 @@ public interface ISystemManager extends IEntityStateListener {
     void setConfiguration(String paramName, Object paramValue) throws CloudProviderException;
 
     Object getConfiguration(String paramName) throws CloudProviderException;
+
+    void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId, final boolean deletion);
 
     void syncSystem(String systemId, System system, String jobId) throws CloudProviderException;
 

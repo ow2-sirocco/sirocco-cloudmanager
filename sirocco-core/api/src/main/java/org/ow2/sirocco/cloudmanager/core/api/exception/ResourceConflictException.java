@@ -26,9 +26,7 @@
 package org.ow2.sirocco.cloudmanager.core.api.exception;
 
 /**
- * Creation or update request could not be completed, , because it would cause 
- * a conflict in the current state of the resources supported by the 
- * platform. 
+ * Thrown when a resource conflict is detected
  */
 public class ResourceConflictException extends CloudProviderException {
     private static final long serialVersionUID = 5657353511794738070L;
@@ -41,11 +39,11 @@ public class ResourceConflictException extends CloudProviderException {
     }
 
     /**
-     * Constructs a  with a detail message.
+     * Constructs a with a detail message.
      * 
      * @param message the detail message
      */
-    public ResourceConflictException(String message) {
+    public ResourceConflictException(final String message) {
         super(message);
     }
 

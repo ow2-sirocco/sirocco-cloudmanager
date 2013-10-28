@@ -25,17 +25,15 @@
 
 package org.ow2.sirocco.cloudmanager.core.api.exception;
 
-//import javax.ejb.ApplicationException;
-
 /**
- * Base class of the exception classes.
+ * Base class of Sirocco business exceptions.
  */
-//@ApplicationException(rollback=true)
 public class CloudProviderException extends Exception {
     private static final long serialVersionUID = 4102349022960352481L;
 
     /**
-     * Constructs a CloudProviderException with null as its error detail message.
+     * Constructs a CloudProviderException with null as its error detail
+     * message.
      */
     public CloudProviderException() {
     }
@@ -45,7 +43,7 @@ public class CloudProviderException extends Exception {
      * 
      * @param message the detail message
      */
-    public CloudProviderException(String message) {
+    public CloudProviderException(final String message) {
         super(message);
     }
 
@@ -54,18 +52,18 @@ public class CloudProviderException extends Exception {
      * 
      * @param cause the cause
      */
-    public CloudProviderException(Throwable cause) {
+    public CloudProviderException(final Throwable cause) {
         super(cause);
     }
 
     /**
-     * Constructs a CloudProviderException with the specified detail message 
-     * and cause.
+     * Constructs a CloudProviderException with the specified detail message and
+     * cause.
      * 
      * @param message the detail message
      * @param cause the cause
      */
-    public CloudProviderException(String message, Throwable cause) {
+    public CloudProviderException(final String message, final Throwable cause) {
         super(message, cause);
     }
 

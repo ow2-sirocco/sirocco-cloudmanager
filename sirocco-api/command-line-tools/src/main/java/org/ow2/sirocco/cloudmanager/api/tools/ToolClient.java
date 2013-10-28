@@ -47,7 +47,8 @@ public class ToolClient {
         new ProviderAccountCreateCommand(), new ProviderAccountDeleteCommand(), new ProviderAccountListCommand(),
         new RemoveAccountFromTenant(), new RemoveUserFromTenantCommand(), new TenantCreateCommand(), new TenantDeleteCommand(),
         new TenantListCommand(), new TenantShowCommand(), new UserCreateCommand(), new UserDeleteCommand(),
-        new UserListCommand(), new UserShowCommand(), new UserTenantMembershipListCommand()};
+        new UserListCommand(), new UserShowCommand(), new UserTenantMembershipListCommand(),
+        new ProviderProfileCreateCommand(), new ProviderProfileListCommand(), new AddProviderProfileMetadataCommand()};
 
     private ToolClient(final String[] args) {
         String userName = System.getenv(ToolClient.SIROCCO_USERNAME_ENV_NAME);
