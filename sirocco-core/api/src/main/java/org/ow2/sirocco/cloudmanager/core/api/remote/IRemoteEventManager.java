@@ -23,10 +23,11 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.core.api.remote;
+
+import org.ow2.sirocco.cloudmanager.core.api.IEventManager;
 
 
-public interface IRemoteMeterManager extends IMeterManager {
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteMeterManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteMeterManager";
-
+public interface IRemoteEventManager extends IEventManager {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteEventManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteEventManager";
 }

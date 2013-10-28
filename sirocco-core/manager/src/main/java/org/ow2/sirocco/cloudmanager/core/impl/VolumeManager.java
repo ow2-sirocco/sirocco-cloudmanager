@@ -49,8 +49,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager;
-import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
@@ -62,6 +60,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.impl.command.VolumeCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.VolumeDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
@@ -104,9 +103,6 @@ public class VolumeManager implements IVolumeManager {
 
     @EJB
     private IJobManager jobManager;
-
-    @EJB
-    private IResourceWatcher resourceWatcher;
 
     @Resource(lookup = "jms/RequestQueue")
     private Queue requestQueue;

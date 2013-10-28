@@ -23,9 +23,10 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.core.api.remote;
 
-public interface IRemoteCloudProviderManager extends ICloudProviderManager {
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteCloudProviderManager";
+import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 
+public interface IRemoteSystemManager extends ISystemManager {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager";
 }

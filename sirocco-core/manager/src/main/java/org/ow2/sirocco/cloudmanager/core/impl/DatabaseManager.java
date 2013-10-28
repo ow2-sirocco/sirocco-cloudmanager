@@ -10,7 +10,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
 
 import org.ow2.sirocco.cloudmanager.core.api.IDatabaseManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteDatabaseManager;
+import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteDatabaseManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

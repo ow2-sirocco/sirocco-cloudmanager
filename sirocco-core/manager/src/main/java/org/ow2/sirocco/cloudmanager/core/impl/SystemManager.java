@@ -56,7 +56,6 @@ import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
@@ -67,6 +66,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteSystemManager;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
@@ -199,10 +199,10 @@ public class SystemManager implements ISystemManager {
     private ICloudProviderManager cloudProviderManager;
 
     @EJB
-    private IResourceWatcher resourceWatcher;
+    private ICloudProviderConnectorFinder connectorFinder;
 
     @EJB
-    private ICloudProviderConnectorFinder connectorFinder;
+    private IResourceWatcher resourceWatcher;
 
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
@@ -1301,7 +1301,6 @@ public class SystemManager implements ISystemManager {
         }
     }
 
-    @Override
     public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId,
         final boolean deletion) {
 

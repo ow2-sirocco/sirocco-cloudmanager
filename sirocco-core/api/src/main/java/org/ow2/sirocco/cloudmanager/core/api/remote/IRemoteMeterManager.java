@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2011 France Telecom
+ * Copyright (C) 2012 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -23,8 +23,12 @@
  *
  */
 
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.core.api.remote;
 
-public interface IRemoteUserManager extends IUserManager {
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteUserManager";
+import org.ow2.sirocco.cloudmanager.core.api.IMeterManager;
+
+
+public interface IRemoteMeterManager extends IMeterManager {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteMeterManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteMeterManager";
+
 }

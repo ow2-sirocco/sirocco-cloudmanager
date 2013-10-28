@@ -30,8 +30,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteNetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
@@ -41,6 +39,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteNetworkManager;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
@@ -89,9 +88,6 @@ public class NetworkManager implements INetworkManager {
 
     @EJB
     private ITenantManager tenantManager;
-
-    @EJB
-    private IResourceWatcher resourceWatcher;
 
     @Resource(lookup = "jms/RequestQueue")
     private Queue requestQueue;

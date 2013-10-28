@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2011 France Telecom
+ * Copyright (C) 2013 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -19,12 +19,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id$
- *
  */
 
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.core.api.remote;
 
-public interface IRemoteDatabaseManager extends IDatabaseManager {
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteDatabaseManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteDatabaseManager";
+import org.ow2.sirocco.cloudmanager.core.api.IConstraintGroupManager;
+
+public interface IRemoteConstraintGroupManager extends IConstraintGroupManager {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteConstraintGroupManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteConstraintGroupManager";
+
 }
