@@ -1,9 +1,36 @@
+/**
+ *
+ * SIROCCO
+ * Copyright (C) 2013 Orange
+ * Contact: sirocco@ow2.org
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 2.1 of the License, or any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
+ * USA
+ *
+ */
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.concurrent.Future;
+
+import javax.annotation.Resource;
+import javax.ejb.AsyncResult;
 import javax.ejb.Asynchronous;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
+import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
@@ -13,11 +40,11 @@ import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
+import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteResourceWatcher;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
@@ -38,6 +65,9 @@ public class ResourceWatcher implements IResourceWatcher {
     private static final int SLEEP_BETWEEN_POLL_IN_SECONDS = 10;
 
     private static final int MAX_WAIT_TIME_IN_SECONDS = 10 * 60;
+
+    @Resource
+    SessionContext context;
 
     @EJB
     IMachineManager machineManager;
@@ -68,7 +98,7 @@ public class ResourceWatcher implements IResourceWatcher {
 
     @Override
     @Asynchronous
-    public void watchMachine(final Machine machine, final Job job, final Machine.State... expectedStates)
+    public Future<Void> watchMachine(final Machine machine, final Job job, final Machine.State... expectedStates)
         throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(machine.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
@@ -79,8 +109,6 @@ public class ResourceWatcher implements IResourceWatcher {
                 Machine updatedMachine = connector.getComputeService().getMachine(machine.getProviderAssignedId(), target);
 
                 for (Machine.State expectedFinalState : expectedStates) {
-                    ResourceWatcher.logger
-                        .info("updatedState=" + updatedMachine.getState() + " expected=" + expectedFinalState);
                     if (updatedMachine.getState() == expectedFinalState) {
                         this.machineManager.syncMachine(machine.getId().toString(), updatedMachine, job.getId().toString());
                         break mainloop;
@@ -97,12 +125,17 @@ public class ResourceWatcher implements IResourceWatcher {
             } catch (InterruptedException e) {
                 break;
             }
+            if (this.context.wasCancelCalled()) {
+                ResourceWatcher.logger.info("Machine watcher cancelled for machine " + machine.getId());
+                break;
+            }
         }
+        return new AsyncResult<Void>(null);
     }
 
     @Override
     @Asynchronous
-    public void watchNetwork(final Network network, final Job job, final Network.State... expectedStates)
+    public Future<Void> watchNetwork(final Network network, final Job job, final Network.State... expectedStates)
         throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(network.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(network.getCloudProviderAccount()).location(network.getLocation());
@@ -129,12 +162,16 @@ public class ResourceWatcher implements IResourceWatcher {
             } catch (InterruptedException e) {
                 break;
             }
+            if (this.context.wasCancelCalled()) {
+                break;
+            }
         }
+        return new AsyncResult<Void>(null);
     }
 
     @Override
     @Asynchronous
-    public void watchVolume(final Volume volume, final Job job) throws CloudProviderException {
+    public Future<Void> watchVolume(final Volume volume, final Job job) throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(volume.getCloudProviderAccount()).location(volume.getLocation());
 
@@ -158,12 +195,16 @@ public class ResourceWatcher implements IResourceWatcher {
             } catch (InterruptedException e) {
                 break;
             }
+            if (this.context.wasCancelCalled()) {
+                break;
+            }
         }
+        return new AsyncResult<Void>(null);
     }
 
     @Override
     @Asynchronous
-    public void watchVolumeAttachment(final Machine machine, final MachineVolume volumeAttachment, final Job job)
+    public Future<Void> watchVolumeAttachment(final Machine machine, final MachineVolume volumeAttachment, final Job job)
         throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(machine.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
@@ -205,11 +246,15 @@ public class ResourceWatcher implements IResourceWatcher {
             } catch (InterruptedException e) {
                 break;
             }
+            if (this.context.wasCancelCalled()) {
+                break;
+            }
         }
+        return new AsyncResult<Void>(null);
     }
 
     @Override
-    public void watchSystem(final System system, final Job job) throws CloudProviderException {
+    public Future<Void> watchSystem(final System system, final Job job) throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(system.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(system.getCloudProviderAccount()).location(system.getLocation());
 
@@ -233,7 +278,11 @@ public class ResourceWatcher implements IResourceWatcher {
             } catch (InterruptedException e) {
                 break;
             }
+            if (this.context.wasCancelCalled()) {
+                break;
+            }
         }
+        return new AsyncResult<Void>(null);
     }
 
 }
