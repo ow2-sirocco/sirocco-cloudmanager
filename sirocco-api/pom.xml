@@ -42,5 +42,14 @@
 		<module>server</module>
 		<module>command-line-tools</module>
 	</modules>
+	
+	<profiles>
+		<profile>
+			<id>packaging</id>
+			<modules>
+				<module>debian-packaging</module>
+			</modules>
+		</profile>
+	</profiles>
 
 </project>
