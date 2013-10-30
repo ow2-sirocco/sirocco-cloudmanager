@@ -35,9 +35,6 @@ import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
-import org.ow2.sirocco.cloudmanager.core.util.FilterExpressionParser;
-import org.ow2.sirocco.cloudmanager.core.util.ParseException;
-import org.ow2.sirocco.cloudmanager.core.util.TokenMgrError;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
@@ -280,7 +277,8 @@ public class QueryHelper {
         if (params.getFilters() != null) {
             String filterClause;
             try {
-                filterClause = QueryHelper.generateFilterClause(params.getFilters(), "v");
+                filterClause = QueryHelper.generateFilterClause(params.getFilters(), "v", params.getClazz().getName()
+                    + "$State.");
             } catch (ParseException ex) {
                 throw new InvalidRequestException("Parsing error in filter expression " + ex.getMessage());
             } catch (TokenMgrError ex) {
@@ -380,7 +378,8 @@ public class QueryHelper {
         if (params.getFilters() != null) {
             String filterClause;
             try {
-                filterClause = QueryHelper.generateFilterClause(params.getFilters(), "vv");
+                filterClause = QueryHelper.generateFilterClause(params.getFilters(), "vv", params.getClazz().getName()
+                    + "$State.");
             } catch (ParseException ex) {
                 throw new InvalidRequestException("Parsing error in filter expression " + ex.getMessage());
             } catch (TokenMgrError ex) {
@@ -448,11 +447,12 @@ public class QueryHelper {
         }
     }
 
-    private static String generateFilterClause(final List<String> filters, final String variableName) throws ParseException {
+    private static String generateFilterClause(final List<String> filters, final String variableName,
+        final String stateClassPrefix) throws ParseException {
         StringBuffer jpqlFilterClause = new StringBuffer();
         if (filters != null) {
             for (String filter : filters) {
-                FilterExpressionParser parser = new FilterExpressionParser(filter, variableName);
+                FilterExpressionParser parser = new FilterExpressionParser(filter, variableName, stateClassPrefix);
                 parser.parse();
                 if (jpqlFilterClause.length() > 0) {
                     jpqlFilterClause.append(" AND ");

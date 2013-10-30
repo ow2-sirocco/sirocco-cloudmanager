@@ -1,21 +1,24 @@
 PARSER_BEGIN(FilterExpressionParser)
 
-package org.ow2.sirocco.cloudmanager.core.util;
+package org.ow2.sirocco.cloudmanager.core.utils;
 
 import java.lang.StringBuffer;
 import java.io.StringReader;
 import java.io.Reader;
+import java.util.Calendar;
 
 public class FilterExpressionParser {
     
     private StringBuffer jpqlQuery;  // internal SQL representation.
     private String variableName;
+    private String stateClassPrefix;
     
-    public FilterExpressionParser(String s, String variableName) 
+    public FilterExpressionParser(String s, String variableName, String stateClassPrefix) 
     {
         this((Reader)(new StringReader(s))); 
         jpqlQuery = new StringBuffer(); 
         this.variableName=variableName;
+        this.stateClassPrefix=stateClassPrefix;
     }
     
     public String getQuery()
@@ -28,7 +31,7 @@ public class FilterExpressionParser {
         try
         {
                 String query = args[0];
-                FilterExpressionParser parser = new FilterExpressionParser(query,"p");
+                FilterExpressionParser parser = new FilterExpressionParser(query,"p","State");
                 parser.parse();
                 System.out.println("\nJPQL Query: " + parser.getQuery());
         }
@@ -69,9 +72,11 @@ TOKEN:
 
 TOKEN : 
 {
-        < STRING : (["A"-"Z","a"-"z"])(["A"-"Z","a"-"z","0"-"9"])* >
+        < STRING : (["a"-"z"])(["A"-"Z","a"-"z","0"-"9"])* >
 |       < SINGLE_QUOTED_STRING: "\'" (~["\'"])+ "\'" >
 |       < DOUBLE_QUOTED_STRING: "\"" (~["\""])+ "\"" >
+|       < CONSTANT: (["A"-"Z"])+ >
+|       < TIMESTAMP: ("19" | "20")(["0"-"9",":",".","T","Z","+","-"])+ >
 |	< INTEGER : (["0"-"9"])+  >
 }
 
@@ -133,6 +138,7 @@ void compTerm() :
 void attrValueCompTerm() :
 {
         Token tAttribute, tComparator, tComparand;
+        String prefix="";
 }
 {
         ( 
@@ -144,12 +150,17 @@ void attrValueCompTerm() :
         ( 
           tComparand=<SINGLE_QUOTED_STRING>
           |  tComparand=<DOUBLE_QUOTED_STRING>
-	  |  tComparand=<INTEGER>
+	  	  |  tComparand=<INTEGER>
+	  	  |  tComparand=<TIMESTAMP>
+	  	  |  tComparand=<CONSTANT> {prefix=stateClassPrefix;}
         )
         
         { 
+        		if(tAttribute.image.equals("created") || tAttribute.image.equals("updated") || tAttribute.image.equals("deleted")) {
+        			tComparand.image="'"+DateUtils.convertISO8601DateToSQLDate(tComparand.image)+"'";
+        		}
                 jpqlQuery.append(" ").append(variableName).append(".").append(tAttribute.image).append(" ").append(tComparator.image);
-                jpqlQuery.append(" ").append(tComparand.image).append(" ");
+                jpqlQuery.append(" ").append(prefix).append(tComparand.image).append(" ");
         }
 }
 
@@ -163,6 +174,7 @@ void valueAttrCompTerm() :
           tComparand=<SINGLE_QUOTED_STRING>  
           | tComparand=<DOUBLE_QUOTED_STRING>
 	  | tComparand=<INTEGER>
+	  |  tComparand=<CONSTANT>
         )
         
         ( tComparator=<EQUALS> | tComparator=<NOTEQUAL> | tComparator=<GT> | tComparator=<GE> | tComparator=<LT> | tComparator=<LE> )
