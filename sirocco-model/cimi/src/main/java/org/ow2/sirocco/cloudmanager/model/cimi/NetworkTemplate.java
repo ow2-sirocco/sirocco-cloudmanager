@@ -33,6 +33,9 @@ import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
+/**
+ * Network template
+ */
 @Entity
 public class NetworkTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;

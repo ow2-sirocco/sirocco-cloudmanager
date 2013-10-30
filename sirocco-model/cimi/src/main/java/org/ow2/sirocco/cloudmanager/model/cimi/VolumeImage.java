@@ -38,6 +38,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 
+/**
+ * Image of a volume
+ */
 @NamedQueries(value = {@NamedQuery(name = "GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM VolumeImage v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
 public class VolumeImage extends CloudResource implements Serializable, ICloudProviderResource {

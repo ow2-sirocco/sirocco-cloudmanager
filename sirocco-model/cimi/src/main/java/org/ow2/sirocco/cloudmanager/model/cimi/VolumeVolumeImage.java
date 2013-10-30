@@ -32,7 +32,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.OneToOne;
 
-
+/**
+ * Association between a volume and a volume image
+ */
 @Entity
 public class VolumeVolumeImage extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;

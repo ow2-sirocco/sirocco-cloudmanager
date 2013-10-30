@@ -38,6 +38,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 
+/**
+ * Network port
+ */
 @NamedQueries(value = {@NamedQuery(name = "GET_NETWORKPORT_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM NetworkPort n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
 public class NetworkPort extends CloudResource implements Serializable, ICloudProviderResource {

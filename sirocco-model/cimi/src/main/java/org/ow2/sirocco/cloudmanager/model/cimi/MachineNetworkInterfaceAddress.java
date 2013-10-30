@@ -31,7 +31,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
 
-
+/**
+ * IP address associated with a network interface
+ */
 @Entity
 public class MachineNetworkInterfaceAddress extends CloudEntity implements Serializable, Identifiable {
 

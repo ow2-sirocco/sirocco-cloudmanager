@@ -48,6 +48,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
 
+/**
+ * Base class of CIMI entities. Can be used for polymorphic queries
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CloudResource implements Serializable, Resource {

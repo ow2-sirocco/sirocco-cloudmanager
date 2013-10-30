@@ -38,6 +38,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.IMultiCloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
 
+/**
+ * Hardware configuration of a compute resource
+ */
 @Entity
 public class MachineConfiguration extends CloudEntity implements IMultiCloudResource, Serializable {
     private static final long serialVersionUID = 1L;

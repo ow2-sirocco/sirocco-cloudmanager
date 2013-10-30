@@ -9,6 +9,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 
+/**
+ * Watches resource state transition
+ */
 public interface IResourceWatcher {
     Future<Void> watchMachine(Machine machine, Job job, Machine.State... expectedStates) throws CloudProviderException;
 

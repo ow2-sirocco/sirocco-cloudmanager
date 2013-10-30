@@ -28,6 +28,9 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * Represents a CIMI resource
+ */
 public interface Resource extends Identifiable {
 
     String getDescription();

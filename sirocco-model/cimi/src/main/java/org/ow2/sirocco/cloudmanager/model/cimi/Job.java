@@ -42,6 +42,9 @@ import javax.persistence.TemporalType;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
+/**
+ * Represents a process performed by the provider
+ */
 @Entity
 public class Job extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;

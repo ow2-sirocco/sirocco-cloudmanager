@@ -30,6 +30,9 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 
+/**
+ * Credentials
+ */
 @Entity
 public class Credentials extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
