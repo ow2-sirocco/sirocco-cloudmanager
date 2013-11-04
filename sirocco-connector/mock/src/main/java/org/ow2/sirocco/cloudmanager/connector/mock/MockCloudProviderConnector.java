@@ -1009,6 +1009,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                         this.waitForNetworkState(net.getProviderAssignedId(),
                             MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Network.State.STARTED,
                             Network.State.STOPPED);
+                        net.setState(Network.State.STOPPED);
                         SystemNetwork sn = new SystemNetwork();
                         sn.setState(SystemNetwork.State.AVAILABLE);
                         sn.setResource(net);
@@ -1274,13 +1275,13 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 switch (action) {
                 case START:
                     this.startNetwork(providerId);
-                    this.waitForSystemState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, System.State.STARTED);
+                    this.waitForNetworkState(providerId,
+                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Network.State.STARTED);
                     break;
                 case STOP:
                     this.stopNetwork(providerId);
-                    this.waitForSystemState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, System.State.STOPPED);
+                    this.waitForNetworkState(providerId,
+                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Network.State.STOPPED);
                     break;
                 }
             }
