@@ -38,8 +38,6 @@ public class SiroccoConfiguration implements Serializable {
 
     private Integer id;
 
-    private boolean mockConnectorImplementsSystem;
-
     private String httpProxyHost;
 
     private String httpProxyPort;
@@ -55,14 +53,6 @@ public class SiroccoConfiguration implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
-    }
-
-    public boolean isMockConnectorImplementsSystem() {
-        return this.mockConnectorImplementsSystem;
-    }
-
-    public void setMockConnectorImplementsSystem(final boolean mockConnectorImplementsSystem) {
-        this.mockConnectorImplementsSystem = mockConnectorImplementsSystem;
     }
 
     public String getHttpProxyHost() {
