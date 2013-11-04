@@ -28,6 +28,9 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.Map;
 
+/**
+ * Base class of CIMI entity creation classes
+ */
 public abstract class CloudEntityCreate implements Serializable {
     private static final long serialVersionUID = -1L;
 

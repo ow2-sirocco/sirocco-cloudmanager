@@ -33,11 +33,11 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 
 import org.ow2.sirocco.cloudmanager.core.api.IMeterManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteMeterManager;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteMeterManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.Meter;
 import org.ow2.sirocco.cloudmanager.model.cimi.meter.MeterConfiguration;

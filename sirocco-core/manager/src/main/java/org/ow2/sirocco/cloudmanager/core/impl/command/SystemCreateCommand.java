@@ -22,35 +22,35 @@
  */
 package org.ow2.sirocco.cloudmanager.core.impl.command;
 
-import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemCreate;
 
-public class MachineCreateCommand extends ResourceCommand {
+public class SystemCreateCommand extends ResourceCommand {
     private static final long serialVersionUID = 1L;
 
-    public static final String MACHINE_CREATE = "machineCreate";
+    public static final String SYSTEM_CREATE = "systemCreate";
 
-    private final MachineCreate machineCreate;
+    private final SystemCreate systemCreate;
 
     private CloudProviderAccount account;
 
     private CloudProviderLocation location;
 
-    public MachineCreateCommand(final MachineCreate machineCreate) {
-        super(MachineCreateCommand.MACHINE_CREATE);
-        this.machineCreate = machineCreate;
+    public SystemCreateCommand(final SystemCreate systemCreate) {
+        super(SystemCreateCommand.SYSTEM_CREATE);
+        this.systemCreate = systemCreate;
     }
 
-    public MachineCreate getMachineCreate() {
-        return this.machineCreate;
+    public SystemCreate getSystemCreate() {
+        return this.systemCreate;
     }
 
     public CloudProviderAccount getAccount() {
         return this.account;
     }
 
-    public MachineCreateCommand setAccount(final CloudProviderAccount account) {
+    public SystemCreateCommand setAccount(final CloudProviderAccount account) {
         this.account = account;
         return this;
     }
@@ -59,7 +59,7 @@ public class MachineCreateCommand extends ResourceCommand {
         return this.location;
     }
 
-    public MachineCreateCommand setLocation(final CloudProviderLocation location) {
+    public SystemCreateCommand setLocation(final CloudProviderLocation location) {
         this.location = location;
         return this;
     }

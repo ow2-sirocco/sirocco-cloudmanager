@@ -57,8 +57,6 @@ import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineManager;
-import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
@@ -71,6 +69,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineActionCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineDeleteCommand;
@@ -137,9 +136,6 @@ public class MachineManager implements IMachineManager {
     @EJB
     private IJobManager jobManager;
 
-    @EJB
-    private IResourceWatcher resourceWatcher;
-
     @Inject
     private IdentityContext identityContext;
 
@@ -157,10 +153,6 @@ public class MachineManager implements IMachineManager {
 
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
-    }
-
-    private boolean checkQuota(final Tenant t, final MachineConfiguration mc) {
-        return true;
     }
 
     /**
@@ -339,6 +331,12 @@ public class MachineManager implements IMachineManager {
         machine.setLocation(placement.getLocation());
         machine.setCpu(machineCreate.getMachineTemplate().getMachineConfig().getCpu());
         machine.setMemory(machineCreate.getMachineTemplate().getMachineConfig().getMemory());
+        if (machineCreate.getMachineTemplate().getMachineImage().getId() != null) {
+            machine.setImage(machineCreate.getMachineTemplate().getMachineImage());
+        }
+        if (machineCreate.getMachineTemplate().getMachineConfig().getId() != null) {
+            machine.setConfig(machineCreate.getMachineTemplate().getMachineConfig());
+        }
 
         for (DiskTemplate diskTemplate : machineCreate.getMachineTemplate().getMachineConfig().getDisks()) {
             MachineDisk disk = new MachineDisk();
@@ -1780,7 +1778,7 @@ public class MachineManager implements IMachineManager {
     public QueryResult<MachineDisk> getMachineDisks(final String machineId, final QueryParams... queryParams)
         throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineDisk", MachineDisk.class);
-        if (queryParams.length == 0) {
+        if (queryParams.length > 0) {
             params.params(queryParams[0]);
         }
         return QueryHelper.getCollectionItemList(this.em, params.tenantId(this.getTenant().getId()).containerType("Machine")
@@ -1900,7 +1898,7 @@ public class MachineManager implements IMachineManager {
         final QueryParams... queryParams) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineNetworkInterface",
             MachineNetworkInterface.class);
-        if (queryParams.length == 0) {
+        if (queryParams.length > 0) {
             params.params(queryParams[0]);
         }
         return QueryHelper.getCollectionItemList(this.em, params.tenantId(this.getTenant().getId()).containerType("Machine")

@@ -40,24 +40,23 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.JMSContext;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.Topic;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
-import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
-import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
-import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IRemoteSystemManager;
-import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
@@ -67,6 +66,10 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
+import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteSystemManager;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SystemActionCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SystemCreateCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SystemDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
@@ -100,7 +103,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
-import org.ow2.sirocco.cloudmanager.model.utils.SiroccoConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,6 +179,15 @@ public class SystemManager implements ISystemManager {
     @Resource
     private EJBContext ctx;
 
+    @Resource(lookup = "jms/RequestQueue")
+    private Queue requestQueue;
+
+    @Resource(lookup = "jms/ResourceStateChangeTopic")
+    private Topic resourceStateChangeTopic;
+
+    @Inject
+    private JMSContext jmsContext;
+
     @EJB
     private ITenantManager tenantManager;
 
@@ -199,86 +210,10 @@ public class SystemManager implements ISystemManager {
     private ICloudProviderManager cloudProviderManager;
 
     @EJB
-    private IResourceWatcher resourceWatcher;
-
-    @EJB
     private ICloudProviderConnectorFinder connectorFinder;
 
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
-    }
-
-    private boolean isSystemSupportedInConnector(final ICloudProviderConnector connector) {
-        boolean isSystemSupportedInConnector = false;
-
-        if (connector.getClass().getName().equals("org.ow2.sirocco.cloudmanager.connector.mock.MockCloudProviderConnector")) {
-            try {
-                if ((Boolean) this.getConfiguration("mockConnectorImplementsSystem")) {
-                    isSystemSupportedInConnector = true;
-                } else {
-                    isSystemSupportedInConnector = false;
-                }
-            } catch (CloudProviderException e) {
-                SystemManager.logger.warn("no parameter found for mockConnectorImplementsSystem");
-                isSystemSupportedInConnector = false;
-            }
-        } else {
-            try {
-                ISystemService sysServ = connector.getSystemService();
-                isSystemSupportedInConnector = true;
-            } catch (ConnectorException e1) {
-                isSystemSupportedInConnector = false;
-            }
-        }
-
-        return isSystemSupportedInConnector;
-
-    }
-
-    @Override
-    public void setConfiguration(final String paramName, final Object paramValue) throws CloudProviderException {
-
-        SiroccoConfiguration config = null;
-        try {
-            config = (SiroccoConfiguration) this.em.createQuery("SELECT s FROM SiroccoConfiguration s").getSingleResult();
-        } catch (NoResultException e) {
-            config = null;
-        }
-
-        if (config == null) {
-            config = new SiroccoConfiguration();
-            this.em.persist(config);
-            // this.em.flush();
-        }
-        if (paramName.equals("mockConnectorImplementsSystem") && paramValue instanceof Boolean) {
-            config.setMockConnectorImplementsSystem((Boolean) paramValue);
-        } else {
-            throw new CloudProviderException("no parameter found for " + paramName);
-        }
-
-    }
-
-    @Override
-    public Object getConfiguration(final String paramName) throws CloudProviderException {
-
-        SiroccoConfiguration config = null;
-        try {
-            config = (SiroccoConfiguration) this.em.createQuery("SELECT s FROM SiroccoConfiguration s").getSingleResult();
-        } catch (NoResultException e) {
-            config = null;
-        }
-
-        if (config == null) {
-            config = new SiroccoConfiguration();
-            this.em.persist(config);
-            // this.em.flush();
-        }
-        if (paramName.equals("mockConnectorImplementsSystem")) {
-            return config.isMockConnectorImplementsSystem();
-        } else {
-            throw new CloudProviderException("no parameter found for " + paramName);
-        }
-
     }
 
     private CloudCollectionItem createCollection(final Class<? extends CloudCollectionItem> entityType,
@@ -313,18 +248,6 @@ public class SystemManager implements ISystemManager {
         return sc;
     }
 
-    private ICloudProviderConnector getCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)
-        throws CloudProviderException {
-        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(cloudProviderAccount
-            .getCloudProvider().getCloudProviderType());
-        if (connector == null) {
-            SystemManager.logger.error("Cannot find connector for cloud provider type "
-                + cloudProviderAccount.getCloudProvider().getCloudProviderType());
-            return null;
-        }
-        return connector;
-    }
-
     @Override
     public Job createSystem(final SystemCreate systemCreate) throws CloudProviderException {
         SystemManager.logger.info("Creating System " + systemCreate.getName());
@@ -332,11 +255,6 @@ public class SystemManager implements ISystemManager {
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), systemCreate.getProperties());
-        ICloudProviderConnector connector = this.getCloudProviderConnector(placement.getAccount());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
 
         // creating credentials if necessary
         // iterating through descriptors
@@ -390,19 +308,7 @@ public class SystemManager implements ISystemManager {
             }
         }
 
-        System systemFromProvider;
-
-        try {
-            ISystemService systemService = connector.getSystemService();
-            systemFromProvider = systemService.createSystem(systemCreate, new ProviderTarget().account(placement.getAccount())
-                .location(placement.getLocation()));
-        } catch (ConnectorException e) {
-            SystemManager.logger.error("Failed to create system: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
-
         System system = new System();
-        system.setProviderAssignedId(systemFromProvider.getProviderAssignedId());
         system.setName(systemCreate.getName());
         system.setDescription(systemCreate.getDescription());
         system.setProperties(systemCreate.getProperties() == null ? new HashMap<String, String>()
@@ -430,7 +336,10 @@ public class SystemManager implements ISystemManager {
         this.em.persist(job);
         this.em.flush();
 
-        this.resourceWatcher.watchSystem(system, job);
+        ObjectMessage message = this.jmsContext.createObjectMessage(new SystemCreateCommand(systemCreate)
+            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(system.getId().toString())
+            .setJob(job));
+        this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
 
@@ -977,6 +886,12 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
+    public void updateSystemState(final String systemId, final State state) throws CloudProviderException {
+        System system = this.getSystemById(systemId);
+        system.setState(state);
+    }
+
+    @Override
     public System updateSystem(final System system) throws CloudProviderException {
         // TODO Auto-generated method stub
         throw new CloudProviderException("action not implemented");
@@ -1056,34 +971,13 @@ public class SystemManager implements ISystemManager {
     private Job doService(final String systemId, final String action, final Map<String, String> properties,
         final Object... params) throws CloudProviderException {
         System system = this.getSystemById(systemId);
-
-        ICloudProviderConnector connector = this.getCloudProviderConnector(system.getCloudProviderAccount());
-
-        try {
-            ISystemService systemService = connector.getSystemService();
-            ProviderTarget target = new ProviderTarget().account(system.getCloudProviderAccount()).location(
-                system.getLocation());
-            if (action.equals("start")) {
-                systemService.startSystem(system.getProviderAssignedId(), properties, target);
-            } else if (action.equals("stop")) {
-                boolean force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
-                systemService.stopSystem(system.getProviderAssignedId(), force, properties, target);
-            } else if (action.equals("suspend")) {
-                systemService.suspendSystem(system.getProviderAssignedId(), properties, target);
-            } else if (action.equals("pause")) {
-                systemService.pauseSystem(system.getProviderAssignedId(), properties, target);
-            } else if (action.equals("delete")) {
-                systemService.deleteSystem(system.getProviderAssignedId(), target);
-            }
-        } catch (ConnectorException e) {
-            SystemManager.logger.error("Failed to " + action + " system: ", e);
-            throw new CloudProviderException(e.getMessage());
-        }
+        boolean force = false;
 
         // choosing the right action
         if (action.equals("start")) {
             system.setState(System.State.STARTING);
         } else if (action.equals("stop")) {
+            force = (params.length > 0 && params[0] instanceof Boolean) ? ((Boolean) params[0]) : false;
             system.setState(System.State.STOPPING);
         } else if (action.equals("suspend")) {
             system.setState(System.State.SUSPENDING);
@@ -1111,7 +1005,15 @@ public class SystemManager implements ISystemManager {
         this.em.persist(job);
         this.em.flush();
 
-        this.resourceWatcher.watchSystem(system, job);
+        ObjectMessage message;
+        if (!action.equals("delete")) {
+            message = this.jmsContext.createObjectMessage(new SystemActionCommand(action).setForce(force)
+                .setResourceId(system.getId().toString()).setJob(job));
+        } else {
+            message = this.jmsContext.createObjectMessage(new SystemDeleteCommand().setResourceId(system.getId().toString())
+                .setJob(job));
+        }
+        this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
     }
@@ -1301,7 +1203,6 @@ public class SystemManager implements ISystemManager {
         }
     }
 
-    @Override
     public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId,
         final boolean deletion) {
 

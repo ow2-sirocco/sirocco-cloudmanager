@@ -25,6 +25,9 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+/**
+ * Network port creation class
+ */
 public class NetworkPortCreate extends CloudEntityCreate {
     private static final long serialVersionUID = 1L;
 

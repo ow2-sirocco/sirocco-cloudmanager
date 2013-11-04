@@ -25,6 +25,9 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+/**
+ * Forwarding group creation class
+ */
 public class ForwardingGroupCreate extends CloudEntityCreate {
     private static final long serialVersionUID = 1L;
 

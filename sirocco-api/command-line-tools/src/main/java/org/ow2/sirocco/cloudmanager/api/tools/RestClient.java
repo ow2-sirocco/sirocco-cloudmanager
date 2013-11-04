@@ -262,6 +262,19 @@ public class RestClient {
         }
     }
 
+    void putRequest(final String path, final Map<String, String> queryParams) throws Exception {
+        WebResource service = this.webResource.path(path);
+        for (Map.Entry<String, String> param : queryParams.entrySet()) {
+            service = service.queryParam("key", param.getKey()).queryParam("value", param.getValue());
+        }
+        try {
+            ClientResponse response = this.addAuthenticationHeaders(service).accept(this.mediaType).put(ClientResponse.class);
+            this.handleResponseStatus(response);
+        } catch (ClientHandlerException e) {
+            throw new Exception(e.getMessage(), e);
+        }
+    }
+
     void deleteRequest(final String path) throws Exception {
         WebResource service = this.webResource.path(path);
         try {

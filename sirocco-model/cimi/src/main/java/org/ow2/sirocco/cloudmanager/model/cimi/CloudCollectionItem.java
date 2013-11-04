@@ -44,6 +44,9 @@ import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+/**
+ * Base class of collection entities
+ */
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
 public abstract class CloudCollectionItem implements Serializable, Resource {
@@ -55,7 +58,7 @@ public abstract class CloudCollectionItem implements Serializable, Resource {
 
     private Integer id;
 
-    private String name="systemComponent";
+    private String name = "systemComponent";
 
     private String description;
 

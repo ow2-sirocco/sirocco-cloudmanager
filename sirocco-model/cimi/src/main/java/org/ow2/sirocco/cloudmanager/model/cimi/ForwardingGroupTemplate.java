@@ -32,6 +32,9 @@ import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
+/**
+ * Forwarding group template
+ */
 @Entity
 public class ForwardingGroupTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;

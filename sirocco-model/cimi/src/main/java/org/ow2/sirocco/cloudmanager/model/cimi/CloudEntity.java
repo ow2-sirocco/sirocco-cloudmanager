@@ -41,6 +41,9 @@ import javax.persistence.TemporalType;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 
+/**
+ * Base class of CIMI entities that cannot be referenced in a Job
+ */
 @MappedSuperclass
 public abstract class CloudEntity implements Serializable, Resource {
 

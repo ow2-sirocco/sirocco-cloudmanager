@@ -32,14 +32,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
-
 @Entity
 public class SiroccoConfiguration implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    protected Integer id;
+    private Integer id;
 
-    boolean mockConnectorImplementsSystem;
+    private String httpProxyHost;
+
+    private String httpProxyPort;
 
     public SiroccoConfiguration() {
     }
@@ -54,12 +55,20 @@ public class SiroccoConfiguration implements Serializable {
         this.id = id;
     }
 
-    public boolean isMockConnectorImplementsSystem() {
-        return this.mockConnectorImplementsSystem;
+    public String getHttpProxyHost() {
+        return this.httpProxyHost;
     }
 
-    public void setMockConnectorImplementsSystem(final boolean mockConnectorImplementsSystem) {
-        this.mockConnectorImplementsSystem = mockConnectorImplementsSystem;
+    public void setHttpProxyHost(final String httpProxyHost) {
+        this.httpProxyHost = httpProxyHost;
+    }
+
+    public String getHttpProxyPort() {
+        return this.httpProxyPort;
+    }
+
+    public void setHttpProxyPort(final String httpProxyPort) {
+        this.httpProxyPort = httpProxyPort;
     }
 
 }

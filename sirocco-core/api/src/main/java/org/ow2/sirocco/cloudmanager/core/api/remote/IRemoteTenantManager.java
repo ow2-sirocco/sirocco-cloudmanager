@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2013 Orange
+ * Copyright (C) 2011 France Telecom
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -19,34 +19,13 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
+ *  $Id$
+ *
  */
-package org.ow2.sirocco.cloudmanager.core.impl.command;
+package org.ow2.sirocco.cloudmanager.core.api.remote;
 
-public class MachineActionCommand extends ResourceCommand {
-    private static final long serialVersionUID = 1L;
+import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 
-    public static final String MACHINE_ACTION = "machineAction";
-
-    private final String action;
-
-    private boolean force;
-
-    public MachineActionCommand(final String action) {
-        super(MachineActionCommand.MACHINE_ACTION);
-        this.action = action;
-    }
-
-    public boolean isForce() {
-        return this.force;
-    }
-
-    public MachineActionCommand setForce(final boolean force) {
-        this.force = force;
-        return this;
-    }
-
-    public String getAction() {
-        return this.action;
-    }
-
+public interface IRemoteTenantManager extends ITenantManager {
+    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteTenantManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteTenantManager";
 }

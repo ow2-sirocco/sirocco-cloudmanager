@@ -22,7 +22,9 @@
  *  $Id$
  *
  */
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.core.api.remote;
+
+import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 
 public interface IRemoteResourceWatcher extends IResourceWatcher {
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteResourceWatcher#org.ow2.sirocco.cloudmanager.core.api.IRemoteResourceWatcher";

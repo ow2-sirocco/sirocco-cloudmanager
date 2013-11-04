@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2013 France Telecom
+ * Copyright (C) 2013 Orange
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -20,10 +20,18 @@
  * USA
  *
  */
-
 package org.ow2.sirocco.cloudmanager.core.api;
 
-public interface IRemoteConstraintGroupManager extends IConstraintGroupManager {
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteConstraintGroupManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteConstraintGroupManager";
+import java.util.Map;
 
+public interface IConfigManager {
+    final String HTTP_PROXY_HOST = "http.proxy.host";
+
+    final String HTTP_PROXY_PORT = "http.proxy.port";
+
+    void setConfigParameter(String key, String value);
+
+    Map<String, String> getConfigParameters();
+
+    String getConfigParameter(String key);
 }

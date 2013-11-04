@@ -33,6 +33,9 @@ import javax.persistence.Enumerated;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 
+/**
+ * Represents the attachment of a volume to a machine
+ */
 @Entity
 public class MachineVolume extends CloudResource implements Serializable, Identifiable {
 

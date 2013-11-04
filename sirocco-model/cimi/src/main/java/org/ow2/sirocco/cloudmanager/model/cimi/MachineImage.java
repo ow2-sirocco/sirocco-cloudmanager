@@ -42,6 +42,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.IMultiCloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
 
+/**
+ * Machine image encapsulating a pre-built OS and applications
+ */
 @Entity
 public class MachineImage extends CloudResource implements Serializable, IMultiCloudResource {
     private static final long serialVersionUID = 1L;

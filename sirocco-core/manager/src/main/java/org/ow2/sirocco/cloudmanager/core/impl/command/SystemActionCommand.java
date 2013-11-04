@@ -22,17 +22,17 @@
  */
 package org.ow2.sirocco.cloudmanager.core.impl.command;
 
-public class MachineActionCommand extends ResourceCommand {
+public class SystemActionCommand extends ResourceCommand {
     private static final long serialVersionUID = 1L;
 
-    public static final String MACHINE_ACTION = "machineAction";
+    public static final String SYSTEM_ACTION = "systemAction";
 
     private final String action;
 
     private boolean force;
 
-    public MachineActionCommand(final String action) {
-        super(MachineActionCommand.MACHINE_ACTION);
+    public SystemActionCommand(final String action) {
+        super(SystemActionCommand.SYSTEM_ACTION);
         this.action = action;
     }
 
@@ -40,7 +40,7 @@ public class MachineActionCommand extends ResourceCommand {
         return this.force;
     }
 
-    public MachineActionCommand setForce(final boolean force) {
+    public SystemActionCommand setForce(final boolean force) {
         this.force = force;
         return this;
     }

@@ -31,7 +31,9 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 
-
+/**
+ * Disk of a machine
+ */
 @Entity
 public class MachineDisk extends CloudEntity implements Serializable, Identifiable {
 

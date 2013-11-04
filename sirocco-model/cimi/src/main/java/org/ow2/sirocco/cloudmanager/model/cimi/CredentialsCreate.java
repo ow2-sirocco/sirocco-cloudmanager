@@ -24,6 +24,9 @@
  */
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+/**
+ * Credentials create class
+ */
 public class CredentialsCreate extends CloudEntityCreate {
     private static final long serialVersionUID = 1L;
 

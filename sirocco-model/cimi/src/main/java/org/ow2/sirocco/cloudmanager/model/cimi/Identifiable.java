@@ -25,6 +25,10 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+/**
+ * An identifiable object is one that can be uniquely identified with a CIMI
+ * identifier
+ */
 public interface Identifiable {
     Integer getId();
 

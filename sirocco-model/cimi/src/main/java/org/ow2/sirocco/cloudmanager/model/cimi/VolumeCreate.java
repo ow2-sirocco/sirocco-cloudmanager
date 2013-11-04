@@ -25,12 +25,13 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
-
+/**
+ * Volume creation class
+ */
 public class VolumeCreate extends CloudEntityCreate {
     private static final long serialVersionUID = 1L;
 
     private VolumeTemplate volumeTemplate;
-
 
     public VolumeTemplate getVolumeTemplate() {
         return this.volumeTemplate;

@@ -25,6 +25,9 @@
 
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
+/**
+ * Machine creation class
+ */
 public class MachineCreate extends CloudEntityCreate {
 
     private static final long serialVersionUID = -1L;

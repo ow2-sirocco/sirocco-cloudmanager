@@ -22,7 +22,9 @@
  *  $Id$
  *
  */
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.core.api.remote;
+
+import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 
 public interface IRemoteVolumeManager extends IVolumeManager {
     static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteVolumeManager";

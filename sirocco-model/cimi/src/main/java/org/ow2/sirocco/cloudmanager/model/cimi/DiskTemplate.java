@@ -29,6 +29,9 @@ import java.io.Serializable;
 
 import javax.persistence.Embeddable;
 
+/**
+ * Disk template
+ */
 @Embeddable
 public class DiskTemplate implements Serializable {
     private static final long serialVersionUID = 1L;

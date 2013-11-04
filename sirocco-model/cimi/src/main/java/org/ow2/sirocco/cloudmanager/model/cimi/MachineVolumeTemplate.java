@@ -33,7 +33,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 
-
+/**
+ * Used to attach a volume to a machine at machine creation time
+ */
 @Entity
 public class MachineVolumeTemplate implements Serializable, Identifiable {
 

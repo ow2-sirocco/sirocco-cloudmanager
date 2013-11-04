@@ -31,6 +31,9 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.OneToOne;
 
+/**
+ * Association between a forwarding group and a network
+ */
 @Entity
 public class ForwardingGroupNetwork extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;

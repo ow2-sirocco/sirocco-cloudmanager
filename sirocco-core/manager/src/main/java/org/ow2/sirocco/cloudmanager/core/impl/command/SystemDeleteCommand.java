@@ -1,7 +1,7 @@
 /**
  *
  * SIROCCO
- * Copyright (C) 2011 France Telecom
+ * Copyright (C) 2013 Orange
  * Contact: sirocco@ow2.org
  *
  * This library is free software; you can redistribute it and/or
@@ -19,11 +19,16 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307
  * USA
  *
- *  $Id$
- *
  */
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.core.impl.command;
 
-public interface IRemoteTenantManager extends ITenantManager {
-    static final String EJB_JNDI_NAME = "org.ow2.sirocco.cloudmanager.core.api.IRemoteTenantManager#org.ow2.sirocco.cloudmanager.core.api.IRemoteTenantManager";
+public class SystemDeleteCommand extends ResourceCommand {
+    private static final long serialVersionUID = 1L;
+
+    public static final String SYSTEM_DELETE = "systemDelete";
+
+    public SystemDeleteCommand() {
+        super(SystemDeleteCommand.SYSTEM_DELETE);
+    }
+
 }

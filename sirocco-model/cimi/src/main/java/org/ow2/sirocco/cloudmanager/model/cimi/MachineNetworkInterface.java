@@ -38,6 +38,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 
+/**
+ * Network interface of an machine
+ */
 @Entity
 public class MachineNetworkInterface extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;

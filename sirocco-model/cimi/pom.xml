@@ -78,6 +78,17 @@
     			<datasource>jdbc/MySQLDataSource</datasource>
     			<database>MySQL4</database>
     			<creationSuffix>engine=InnoDB</creationSuffix>
+    			<ddl-generation>none</ddl-generation>
+			</properties>
+		</profile>
+		<profile>
+			<id>dev</id>
+  			<properties>
+  				<authRequired>true</authRequired>
+    			<datasource>jdbc/MySQLDataSource</datasource>
+    			<database>MySQL4</database>
+    			<creationSuffix>engine=InnoDB</creationSuffix>
+    			<ddl-generation>create-or-extend-tables</ddl-generation>
 			</properties>
 			<activation>
       			<activeByDefault>true</activeByDefault>

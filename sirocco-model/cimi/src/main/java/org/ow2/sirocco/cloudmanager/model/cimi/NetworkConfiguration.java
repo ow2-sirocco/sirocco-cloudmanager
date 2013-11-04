@@ -36,6 +36,9 @@ import javax.persistence.FetchType;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
 
+/**
+ * Network configuration
+ */
 @Entity
 public class NetworkConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;

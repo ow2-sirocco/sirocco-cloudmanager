@@ -29,7 +29,9 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 
-
+/**
+ * Network port configuration
+ */
 @Entity
 public class NetworkPortConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;

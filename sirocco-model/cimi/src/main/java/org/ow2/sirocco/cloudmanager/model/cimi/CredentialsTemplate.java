@@ -29,6 +29,9 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 
+/**
+ * Credentials template
+ */
 @Entity
 public class CredentialsTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;

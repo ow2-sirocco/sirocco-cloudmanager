@@ -26,7 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 /**
- * IP address creation helper class
+ * IP address creation class
  */
 public class AddressCreate extends CloudEntityCreate {
     private static final long serialVersionUID = 1L;
