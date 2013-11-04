@@ -72,7 +72,7 @@ TOKEN:
 
 TOKEN : 
 {
-        < STRING : (["a"-"z"])(["A"-"Z","a"-"z","0"-"9"])* >
+        < STRING : (["a"-"z"])(["A"-"Z","a"-"z","0"-"9"])*("."(["a"-"z"])(["A"-"Z","a"-"z","0"-"9"])*)? >
 |       < SINGLE_QUOTED_STRING: "\'" (~["\'"])+ "\'" >
 |       < DOUBLE_QUOTED_STRING: "\"" (~["\""])+ "\"" >
 |       < CONSTANT: (["A"-"Z"])+ >

@@ -78,6 +78,10 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     private CloudProviderAccount cloudProviderAccount;
 
+    private MachineImage image;
+
+    private MachineConfiguration config;
+
     @Transient
     private static transient FSM<Machine.State, String> fsm = Machine.initFSM();
 
@@ -276,4 +280,23 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     public void setLocation(final CloudProviderLocation location) {
         this.location = location;
     }
+
+    @ManyToOne
+    public MachineImage getImage() {
+        return this.image;
+    }
+
+    public void setImage(final MachineImage image) {
+        this.image = image;
+    }
+
+    @ManyToOne
+    public MachineConfiguration getConfig() {
+        return this.config;
+    }
+
+    public void setConfig(final MachineConfiguration config) {
+        this.config = config;
+    }
+
 }
