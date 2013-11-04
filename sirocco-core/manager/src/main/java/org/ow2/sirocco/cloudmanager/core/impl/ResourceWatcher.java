@@ -253,18 +253,22 @@ public class ResourceWatcher implements IResourceWatcher {
         return new AsyncResult<Void>(null);
     }
 
+    @Asynchronous
     @Override
-    public Future<Void> watchSystem(final System system, final Job job) throws CloudProviderException {
+    public Future<Void> watchSystem(final System system, final Job job, final System.State... expectedStates)
+        throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(system.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(system.getCloudProviderAccount()).location(system.getLocation());
 
         int tries = ResourceWatcher.MAX_WAIT_TIME_IN_SECONDS / ResourceWatcher.SLEEP_BETWEEN_POLL_IN_SECONDS;
-        while (tries-- > 0) {
+        mainloop: while (tries-- > 0) {
             try {
                 System updatedSystem = connector.getSystemService().getSystem(system.getProviderAssignedId(), target);
-                if (!updatedSystem.getState().toString().endsWith("ING")) {
-                    this.systemManager.syncSystem(system.getId().toString(), updatedSystem, job.getId().toString());
-                    break;
+                for (System.State expectedFinalState : expectedStates) {
+                    if (updatedSystem.getState() == expectedFinalState) {
+                        this.systemManager.syncSystem(system.getId().toString(), updatedSystem, job.getId().toString());
+                        break mainloop;
+                    }
                 }
             } catch (ResourceNotFoundException e) {
                 this.systemManager.syncSystem(system.getId().toString(), null, job.getId().toString());

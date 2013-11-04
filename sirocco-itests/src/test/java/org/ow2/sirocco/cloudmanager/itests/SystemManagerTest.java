@@ -95,27 +95,8 @@ public class SystemManagerTest extends AbstractTestBase {
 
         this.initDatabase();
 
-        // setting connector use for system
-        this.systemManager.setConfiguration("mockConnectorImplementsSystem", true);
-
         java.lang.System.out.println("testing systemManager using a connector");
         this._testSystemManager();
-    }
-
-    @Test
-    public void testSystemManagerStandalone() throws Exception {
-
-        // User user = userManager.createUser("Jeanne", "Calmant",
-        // "jeanne.calmant@vieux.com", "jeanne.calmant", "titigrosminet");
-
-        this.initDatabase();
-
-        // setting no connector use for system
-        this.systemManager.setConfiguration("mockConnectorImplementsSystem", false);
-
-        java.lang.System.out.println("testing systemManager with no connector");
-        this._testSystemManager();
-
     }
 
     public void _testSystemManager() throws Exception {

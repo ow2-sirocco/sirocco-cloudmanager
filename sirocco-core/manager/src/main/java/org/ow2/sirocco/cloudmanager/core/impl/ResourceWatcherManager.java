@@ -41,6 +41,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,6 +83,12 @@ public class ResourceWatcherManager {
     public void createMachineStateWatcher(final Machine machine, final Job job, final Machine.State... expectedStates)
         throws CloudProviderException {
         Future<Void> watcher = this.resourceWatcher.watchMachine(machine, job, expectedStates);
+        this.watchers.add(watcher);
+    }
+
+    public void createSystemStateWatcher(final System system, final Job job, final System.State... expectedStates)
+        throws CloudProviderException {
+        Future<Void> watcher = this.resourceWatcher.watchSystem(system, job, expectedStates);
         this.watchers.add(watcher);
     }
 

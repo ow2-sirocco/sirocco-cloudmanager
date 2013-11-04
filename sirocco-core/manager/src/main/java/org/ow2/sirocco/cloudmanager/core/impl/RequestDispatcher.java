@@ -39,10 +39,12 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
+import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
+import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineActionCommand;
@@ -51,6 +53,9 @@ import org.ow2.sirocco.cloudmanager.core.impl.command.MachineDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.ResourceCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SystemActionCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SystemCreateCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SystemDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.VolumeAttachCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.VolumeCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.VolumeDeleteCommand;
@@ -62,6 +67,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,6 +100,9 @@ public class RequestDispatcher implements MessageListener {
 
     @EJB
     private INetworkManager networkManager;
+
+    @EJB
+    private ISystemManager systemManager;
 
     @Override
     public void onMessage(final Message inMessage) {
@@ -128,6 +137,15 @@ public class RequestDispatcher implements MessageListener {
                 break;
             case NetworkDeleteCommand.NETWORK_DELETE:
                 this.deleteNetwork(command);
+                break;
+            case SystemCreateCommand.SYSTEM_CREATE:
+                this.createSystem((SystemCreateCommand) command);
+                break;
+            case SystemDeleteCommand.SYSTEM_DELETE:
+                this.deleteSystem(command);
+                break;
+            case SystemActionCommand.SYSTEM_ACTION:
+                this.actionSystem((SystemActionCommand) command);
                 break;
             }
         } catch (JMSException e) {
@@ -169,6 +187,11 @@ public class RequestDispatcher implements MessageListener {
         case NetworkCreateCommand.NETWORK_CREATE:
         case NetworkDeleteCommand.NETWORK_DELETE:
             this.networkManager.updateNetworkState(command.getResourceId(), Network.State.ERROR);
+            break;
+        case SystemCreateCommand.SYSTEM_CREATE:
+        case SystemDeleteCommand.SYSTEM_DELETE:
+        case SystemActionCommand.SYSTEM_ACTION:
+            this.systemManager.updateSystemState(command.getResourceId(), System.State.ERROR);
             break;
         }
     }
@@ -213,11 +236,11 @@ public class RequestDispatcher implements MessageListener {
             expectedState = State.STOPPED;
             break;
         case "suspend":
-            computeService.deleteMachine(machine.getProviderAssignedId(), target);
+            computeService.suspendMachine(machine.getProviderAssignedId(), target);
             expectedState = State.SUSPENDED;
             break;
         case "pause":
-            computeService.deleteMachine(machine.getProviderAssignedId(), target);
+            computeService.pauseMachine(machine.getProviderAssignedId(), target);
             expectedState = State.PAUSED;
             break;
         case "restart":
@@ -294,6 +317,58 @@ public class RequestDispatcher implements MessageListener {
             new ProviderTarget().account(network.getCloudProviderAccount()).location(network.getLocation()));
 
         this.resourceWatcherManager.createNetworkStateWatcher(network, command.getJob(), Network.State.DELETED);
+    }
+
+    private void createSystem(final SystemCreateCommand command) throws CloudProviderException, ConnectorException {
+        ICloudProviderConnector connector = this.findCloudProviderConnector(command.getAccount());
+
+        ISystemService systemService = connector.getSystemService();
+        System newSystem = systemService.createSystem(command.getSystemCreate(),
+            new ProviderTarget().account(command.getAccount()).location(command.getLocation()));
+
+        System system = this.em.find(System.class, Integer.valueOf(command.getResourceId()));
+        system.setProviderAssignedId(newSystem.getProviderAssignedId());
+
+        this.resourceWatcherManager.createSystemStateWatcher(system, command.getJob(), System.State.STARTED,
+            System.State.STOPPED);
+    }
+
+    private void deleteSystem(final ResourceCommand command) throws CloudProviderException, ConnectorException {
+        System system = this.em.find(System.class, Integer.valueOf(command.getResourceId()));
+        ICloudProviderConnector connector = this.findCloudProviderConnector(system.getCloudProviderAccount());
+        ISystemService systemService = connector.getSystemService();
+        systemService.deleteSystem(system.getProviderAssignedId(),
+            new ProviderTarget().account(system.getCloudProviderAccount()).location(system.getLocation()));
+
+        this.resourceWatcherManager.createSystemStateWatcher(system, command.getJob(), System.State.DELETED);
+    }
+
+    private void actionSystem(final SystemActionCommand command) throws CloudProviderException, ConnectorException {
+        System system = this.em.find(System.class, Integer.valueOf(command.getResourceId()));
+        ICloudProviderConnector connector = this.findCloudProviderConnector(system.getCloudProviderAccount());
+        ISystemService systemService = connector.getSystemService();
+        ProviderTarget target = new ProviderTarget().account(system.getCloudProviderAccount()).location(system.getLocation());
+        System.State expectedState = null;
+        switch (command.getAction()) {
+        case "start":
+            systemService.startSystem(system.getProviderAssignedId(), null, target);
+            expectedState = System.State.STARTED;
+            break;
+        case "stop":
+            systemService.stopSystem(system.getProviderAssignedId(), command.isForce(), null, target);
+            expectedState = System.State.STOPPED;
+            break;
+        case "suspend":
+            systemService.suspendSystem(system.getProviderAssignedId(), null, target);
+            expectedState = System.State.SUSPENDED;
+            break;
+        case "restart":
+            systemService.restartSystem(system.getProviderAssignedId(), command.isForce(), null, target);
+            expectedState = System.State.STARTED;
+            break;
+        }
+
+        this.resourceWatcherManager.createSystemStateWatcher(system, command.getJob(), expectedState);
     }
 
     private ICloudProviderConnector findCloudProviderConnector(final CloudProviderAccount cloudProviderAccount)

@@ -21,6 +21,6 @@ public interface IResourceWatcher {
 
     Future<Void> watchVolumeAttachment(Machine machine, MachineVolume volumeAttachement, Job job) throws CloudProviderException;
 
-    Future<Void> watchSystem(org.ow2.sirocco.cloudmanager.model.cimi.system.System system, Job job)
-        throws CloudProviderException;
+    Future<Void> watchSystem(org.ow2.sirocco.cloudmanager.model.cimi.system.System system, Job job,
+        org.ow2.sirocco.cloudmanager.model.cimi.system.System.State... expectedStates) throws CloudProviderException;
 }

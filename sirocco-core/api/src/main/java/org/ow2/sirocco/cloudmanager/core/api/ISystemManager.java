@@ -95,6 +95,8 @@ public interface ISystemManager {
     // global entity updates
     System updateSystem(final System system) throws CloudProviderException;
 
+    void updateSystemState(String systemId, System.State state) throws CloudProviderException;
+
     System updateAttributesInSystem(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
 
     SystemTemplate updateSystemTemplate(final SystemTemplate systemTemplate) throws CloudProviderException;
@@ -145,10 +147,6 @@ public interface ISystemManager {
         throws CloudProviderException;
 
     Job importSystemTemplate(String source, Map<String, String> properties) throws CloudProviderException;
-
-    void setConfiguration(String paramName, Object paramValue) throws CloudProviderException;
-
-    Object getConfiguration(String paramName) throws CloudProviderException;
 
     void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId, final boolean deletion);
 
