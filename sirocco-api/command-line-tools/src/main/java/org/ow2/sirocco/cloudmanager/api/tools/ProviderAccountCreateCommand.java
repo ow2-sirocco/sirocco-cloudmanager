@@ -66,8 +66,8 @@ public class ProviderAccountCreateCommand implements Command {
                 account.addProperty(this.properties.get(i * 2), this.properties.get(i * 2 + 1));
             }
         }
-        account.setClientId(this.clientId);
-        account.setClientSecret(this.clientSecret);
+        account.setIdentity(this.clientId);
+        account.setCredential(this.clientSecret);
 
         account = restClient.postCreateRequest("providers/" + this.providerId + "/accounts", account, ProviderAccount.class);
         System.out.println(account.getId());

@@ -238,8 +238,9 @@ public class ProviderResource extends ResourceBase {
     private ProviderAccount toApiProviderAccount(final CloudProviderAccount account) {
         ProviderAccount a = new ProviderAccount();
         a.setId(account.getId().toString());
-        a.setClientId(account.getLogin());
-        a.setClientSecret(account.getPassword());
+        a.setProviderId(account.getCloudProvider().getId().toString());
+        a.setIdentity(account.getLogin());
+        a.setCredential(account.getPassword());
         a.setProperties(account.getProperties());
         a.setHref(this.uri.getBaseUri() + "providers/" + account.getCloudProvider().getId().toString() + "/accounts/"
             + a.getId());
@@ -248,8 +249,8 @@ public class ProviderResource extends ResourceBase {
 
     private CloudProviderAccount toProviderAccount(final ProviderAccount apiAccount) {
         CloudProviderAccount account = new CloudProviderAccount();
-        account.setLogin(apiAccount.getClientId());
-        account.setPassword(apiAccount.getClientSecret());
+        account.setLogin(apiAccount.getIdentity());
+        account.setPassword(apiAccount.getCredential());
         account.setProperties(apiAccount.getProperties());
         return account;
     }

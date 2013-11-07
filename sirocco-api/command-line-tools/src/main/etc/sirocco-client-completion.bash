@@ -106,7 +106,7 @@ _sirocco_client()
             return 0
             ;;  
     provider-account-delete | provider-account-list)
-    	local opts="-providerId"
+    	local opts=""
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;  

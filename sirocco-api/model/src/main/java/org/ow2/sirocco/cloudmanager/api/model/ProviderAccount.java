@@ -29,27 +29,38 @@ import org.codehaus.jackson.annotate.JsonPropertyOrder;
 import org.codehaus.jackson.map.annotate.JsonSerialize;
 import org.codehaus.jackson.map.annotate.JsonSerialize.Inclusion;
 
-@JsonPropertyOrder({"id", "href", "name", "description", "created", "updated", "properties", "clientId", "clientSecret"})
+@JsonPropertyOrder({"id", "href", "name", "description", "created", "updated", "properties", "providerId", "identity",
+    "credential"})
 @JsonSerialize(include = Inclusion.NON_NULL)
 public class ProviderAccount extends CommonAttributes {
-    private String clientId;
+    private String providerId;
 
-    private String clientSecret;
+    private String identity;
 
-    public String getClientId() {
-        return this.clientId;
+    private String credential;
+
+    public String getProviderId() {
+        return this.providerId;
     }
 
-    public void setClientId(final String clientId) {
-        this.clientId = clientId;
+    public void setProviderId(final String providerId) {
+        this.providerId = providerId;
     }
 
-    public String getClientSecret() {
-        return this.clientSecret;
+    public String getIdentity() {
+        return this.identity;
     }
 
-    public void setClientSecret(final String clientSecret) {
-        this.clientSecret = clientSecret;
+    public void setIdentity(final String identity) {
+        this.identity = identity;
+    }
+
+    public String getCredential() {
+        return this.credential;
+    }
+
+    public void setCredential(final String credential) {
+        this.credential = credential;
     }
 
     public static class Collection {
