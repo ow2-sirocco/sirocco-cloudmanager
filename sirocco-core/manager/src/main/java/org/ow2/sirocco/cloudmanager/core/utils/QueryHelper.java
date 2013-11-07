@@ -38,6 +38,8 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.IMultiCloudResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -337,6 +339,17 @@ public class QueryHelper {
                         } catch (NoSuchMethodException e) {
                             // ignore wrong attribute name
                         }
+                    }
+                    if (resource instanceof ICloudProviderResource) {
+                        ICloudProviderResource fromResource = (ICloudProviderResource) from;
+                        ICloudProviderResource toResource = (ICloudProviderResource) resource;
+                        toResource.setLocation(fromResource.getLocation());
+                        toResource.setProviderAssignedId(fromResource.getProviderAssignedId());
+                        toResource.setCloudProviderAccount(fromResource.getCloudProviderAccount());
+                    } else if (resource instanceof IMultiCloudResource) {
+                        IMultiCloudResource fromResource = (IMultiCloudResource) from;
+                        IMultiCloudResource toResource = (IMultiCloudResource) resource;
+                        toResource.setProviderMappings(fromResource.getProviderMappings());
                     }
                     items.add(resource);
                 }
