@@ -756,7 +756,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                             networkInterface.setState(InterfaceState.ACTIVE);
                         }
                     }
-                    machine.setState(Machine.State.STOPPED);
+                    machine.setState(Machine.State.STARTED);
                     machine.setUpdated(new Date());
                 } else if (machine.getState() == Machine.State.DELETING) {
                     this.machines.remove(machine.getProviderAssignedId());
