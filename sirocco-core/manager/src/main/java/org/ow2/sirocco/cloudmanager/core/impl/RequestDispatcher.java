@@ -206,8 +206,7 @@ public class RequestDispatcher implements MessageListener {
         Machine machine = this.em.find(Machine.class, Integer.valueOf(command.getResourceId()));
         machine.setProviderAssignedId(newMachine.getProviderAssignedId());
 
-        this.resourceWatcherManager.createMachineStateWatcher(machine, command.getJob(), Machine.State.STARTED,
-            Machine.State.STOPPED);
+        this.resourceWatcherManager.createMachineStateWatcher(machine, command.getJob(), Machine.State.STARTED);
     }
 
     private void deleteMachine(final ResourceCommand command) throws CloudProviderException, ConnectorException {
@@ -262,7 +261,7 @@ public class RequestDispatcher implements MessageListener {
         Volume volume = this.em.find(Volume.class, Integer.valueOf(command.getResourceId()));
         volume.setProviderAssignedId(newVolume.getProviderAssignedId());
 
-        this.resourceWatcherManager.createVolumeStateWatcher(volume, command.getJob());
+        this.resourceWatcherManager.createVolumeStateWatcher(volume, command.getJob(), Volume.State.AVAILABLE);
     }
 
     private void deleteVolume(final ResourceCommand command) throws CloudProviderException, ConnectorException {
@@ -272,7 +271,7 @@ public class RequestDispatcher implements MessageListener {
         volumeService.deleteVolume(volume.getProviderAssignedId(),
             new ProviderTarget().account(volume.getCloudProviderAccount()).location(volume.getLocation()));
 
-        this.resourceWatcherManager.createVolumeStateWatcher(volume, command.getJob());
+        this.resourceWatcherManager.createVolumeStateWatcher(volume, command.getJob(), Volume.State.DELETED);
     }
 
     private void attachVolume(final VolumeAttachCommand command) throws CloudProviderException, ConnectorException {
@@ -282,7 +281,8 @@ public class RequestDispatcher implements MessageListener {
         ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
         computeService.addVolumeToMachine(machine.getProviderAssignedId(), command.getVolumeAttachment(), target);
 
-        this.resourceWatcherManager.createVolumeAttachmentWatcher(machine, command.getVolumeAttachment(), command.getJob());
+        this.resourceWatcherManager.createVolumeAttachmentWatcher(machine, command.getVolumeAttachment(), command.getJob(),
+            MachineVolume.State.ATTACHED);
     }
 
     private void detachVolume(final VolumeDetachCommand command) throws CloudProviderException, ConnectorException {
@@ -292,7 +292,8 @@ public class RequestDispatcher implements MessageListener {
         ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
         computeService.removeVolumeFromMachine(machine.getProviderAssignedId(), command.getVolumeAttachment(), target);
 
-        this.resourceWatcherManager.createVolumeAttachmentWatcher(machine, command.getVolumeAttachment(), command.getJob());
+        this.resourceWatcherManager.createVolumeAttachmentWatcher(machine, command.getVolumeAttachment(), command.getJob(),
+            MachineVolume.State.DELETED);
     }
 
     private void createNetwork(final NetworkCreateCommand command) throws CloudProviderException, ConnectorException {

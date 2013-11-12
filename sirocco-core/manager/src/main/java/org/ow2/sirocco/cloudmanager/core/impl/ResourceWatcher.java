@@ -171,18 +171,22 @@ public class ResourceWatcher implements IResourceWatcher {
 
     @Override
     @Asynchronous
-    public Future<Void> watchVolume(final Volume volume, final Job job) throws CloudProviderException {
+    public Future<Void> watchVolume(final Volume volume, final Job job, final Volume.State... expectedStates)
+        throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(volume.getCloudProviderAccount()).location(volume.getLocation());
 
         int tries = ResourceWatcher.MAX_WAIT_TIME_IN_SECONDS / ResourceWatcher.SLEEP_BETWEEN_POLL_IN_SECONDS;
-        while (tries-- > 0) {
+        mainloop: while (tries-- > 0) {
             try {
                 Volume updatedVolume = connector.getVolumeService().getVolume(volume.getProviderAssignedId(), target);
-                if (!updatedVolume.getState().toString().endsWith("ING")) {
-                    this.volumeManager.syncVolume(volume.getId().toString(), updatedVolume, job.getId().toString());
-                    break;
+                for (Volume.State expectedFinalState : expectedStates) {
+                    if (updatedVolume.getState() == expectedFinalState) {
+                        this.volumeManager.syncVolume(volume.getId().toString(), updatedVolume, job.getId().toString());
+                        break mainloop;
+                    }
                 }
+
             } catch (ResourceNotFoundException e) {
                 this.volumeManager.syncVolume(volume.getId().toString(), null, job.getId().toString());
                 break;
@@ -204,8 +208,8 @@ public class ResourceWatcher implements IResourceWatcher {
 
     @Override
     @Asynchronous
-    public Future<Void> watchVolumeAttachment(final Machine machine, final MachineVolume volumeAttachment, final Job job)
-        throws CloudProviderException {
+    public Future<Void> watchVolumeAttachment(final Machine machine, final MachineVolume volumeAttachment, final Job job,
+        final MachineVolume.State... expectedStates) throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(machine.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
 
@@ -219,10 +223,12 @@ public class ResourceWatcher implements IResourceWatcher {
                     for (MachineVolume mv : updatedMachine.getVolumes()) {
                         if (mv.getVolume().getProviderAssignedId().equals(volumeId)) {
                             volumeAttachmentFound = true;
-                            if (!mv.getState().toString().endsWith("ING")) {
-                                this.machineManager
-                                    .syncVolumeAttachment(machine.getId().toString(), mv, job.getId().toString());
-                                break mainloop;
+                            for (MachineVolume.State expectedFinalState : expectedStates) {
+                                if (mv.getState() == expectedFinalState) {
+                                    this.machineManager.syncVolumeAttachment(machine.getId().toString(), mv, job.getId()
+                                        .toString());
+                                    break mainloop;
+                                }
                             }
                             break;
                         }
