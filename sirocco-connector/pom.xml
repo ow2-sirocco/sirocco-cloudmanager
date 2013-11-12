@@ -48,6 +48,7 @@
 		<module>openstack</module>
 		<module>vcd</module>
 		<module>amazon</module>
+		<module>cloudstack</module>
 		<module>test</module> 
 	</modules>
 
