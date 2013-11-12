@@ -3,5 +3,6 @@ Version: [[version]]-1
 Section: misc
 Priority: optional
 Architecture: all
+Depends: openjdk-7-jdk 
 Description: [[description]]
 Maintainer: Gregoire Lejeune <gregoire.lejeune@enovance.com>
