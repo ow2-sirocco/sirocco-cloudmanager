@@ -61,7 +61,7 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     private CloudProviderLocation location;
 
     public static enum State {
-        CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
+        CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR, UNKNOWN
     }
 
     private State state;
