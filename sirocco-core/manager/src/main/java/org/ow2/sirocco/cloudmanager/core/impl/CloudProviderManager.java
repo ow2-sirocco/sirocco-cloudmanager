@@ -537,7 +537,11 @@ public class CloudProviderManager implements ICloudProviderManager {
 
         String providerAccountId = create.getProviderAccountId();
         if (providerAccountId == null) {
-            throw new CloudProviderException("Missing provider account id");
+            List<CloudProviderAccount> accounts = this.getCloudProviderAccountsByTenant(tenantId);
+            if (accounts.isEmpty()) {
+                throw new CloudProviderException("No provider account");
+            }
+            targetAccount = accounts.get(0);
         } else {
             targetAccount = this.getCloudProviderAccountById(providerAccountId);
             if (targetAccount == null) {
