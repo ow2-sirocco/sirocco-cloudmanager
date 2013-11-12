@@ -35,39 +35,30 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 /**
  * Geographical location where cloud resources are running
  */
 @Entity
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"iso3166_1", "iso3166_2", "postal_code"}),
-    @UniqueConstraint(columnNames = {"gps_latitude", "gps_longitude", "gps_altitude"})})
 public class CloudProviderLocation implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
     private Integer id;
 
+    private String providerAssignedId;
+
     /**
      * Iso3166-1 alpha-2 code (country code) -example: FR for France
      */
-    private String Iso3166_1;
+    private String iso3166_1;
 
     /**
      * Iso3166-2 code (subdivision code/province/departement/district, etc.) -
      * example:for France, FR-M (Lorraine), but we could also store FR-55
      * (Meuse) which is more precise
      */
-    private String Iso3166_2;
-
-    /**
-     * country specific postal Code (or City code for countries without any
-     * postal code like Ireland). This code is alphanumerical and has no
-     * standard.
-     */
-    private String postalCode;
+    private String iso3166_2;
 
     /**
      * country name matching iso 3166-1
@@ -84,21 +75,6 @@ public class CloudProviderLocation implements Serializable {
      */
     private String cityName;
 
-    /**
-     * GPS Latitude
-     */
-    private Double GPS_Latitude;
-
-    /**
-     * GPS Longitude
-     */
-    private Double GPS_Longitude;
-
-    /**
-     * GPS Altitude
-     */
-    private Double GPS_Altitude;
-
     private Set<CloudProvider> cloudProviders;
 
     public CloudProviderLocation() {
@@ -106,37 +82,28 @@ public class CloudProviderLocation implements Serializable {
 
     public CloudProviderLocation(final String iso3166_1, final String iso3166_2, final String countryName,
         final String stateName) {
-        this.Iso3166_1 = iso3166_1;
-        this.Iso3166_2 = iso3166_2;
+        this.iso3166_1 = iso3166_1;
+        this.iso3166_2 = iso3166_2;
         this.countryName = countryName;
         this.stateName = stateName;
     }
 
     @Column(name = "iso3166_1")
     public String getIso3166_1() {
-        return this.Iso3166_1;
+        return this.iso3166_1;
     }
 
     public void setIso3166_1(final String iso3166_1) {
-        this.Iso3166_1 = iso3166_1;
+        this.iso3166_1 = iso3166_1;
     }
 
     @Column(name = "iso3166_2")
     public String getIso3166_2() {
-        return this.Iso3166_2;
+        return this.iso3166_2;
     }
 
     public void setIso3166_2(final String iso3166_2) {
-        this.Iso3166_2 = iso3166_2;
-    }
-
-    @Column(name = "postal_code")
-    public String getPostalCode() {
-        return this.postalCode;
-    }
-
-    public void setPostalCode(final String postalCode) {
-        this.postalCode = postalCode;
+        this.iso3166_2 = iso3166_2;
     }
 
     public String getCityName() {
@@ -145,33 +112,6 @@ public class CloudProviderLocation implements Serializable {
 
     public void setCityName(final String cityName) {
         this.cityName = cityName;
-    }
-
-    @Column(name = "gps_latitude")
-    public Double getGPS_Latitude() {
-        return this.GPS_Latitude;
-    }
-
-    public void setGPS_Latitude(final Double gPS_Latitude) {
-        this.GPS_Latitude = gPS_Latitude;
-    }
-
-    @Column(name = "gps_longitude")
-    public Double getGPS_Longitude() {
-        return this.GPS_Longitude;
-    }
-
-    public void setGPS_Longitude(final Double gPS_Longitude) {
-        this.GPS_Longitude = gPS_Longitude;
-    }
-
-    @Column(name = "gps_altitude")
-    public Double getGPS_Altitude() {
-        return this.GPS_Altitude;
-    }
-
-    public void setGPS_Altitude(final Double gPS_Altitude) {
-        this.GPS_Altitude = gPS_Altitude;
     }
 
     public String getCountryName() {
@@ -200,6 +140,14 @@ public class CloudProviderLocation implements Serializable {
         this.id = Id;
     }
 
+    public String getProviderAssignedId() {
+        return this.providerAssignedId;
+    }
+
+    public void setProviderAssignedId(final String providerAssignedId) {
+        this.providerAssignedId = providerAssignedId;
+    }
+
     @ManyToMany(fetch = FetchType.EAGER)
     public Set<CloudProvider> getCloudProviders() {
         return this.cloudProviders;
@@ -213,8 +161,8 @@ public class CloudProviderLocation implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((this.Iso3166_1 == null) ? 0 : this.Iso3166_1.hashCode());
-        result = prime * result + ((this.Iso3166_2 == null) ? 0 : this.Iso3166_2.hashCode());
+        result = prime * result + ((this.iso3166_1 == null) ? 0 : this.iso3166_1.hashCode());
+        result = prime * result + ((this.iso3166_2 == null) ? 0 : this.iso3166_2.hashCode());
         return result;
     }
 
@@ -230,18 +178,18 @@ public class CloudProviderLocation implements Serializable {
             return false;
         }
         CloudProviderLocation other = (CloudProviderLocation) obj;
-        if (this.Iso3166_1 == null) {
-            if (other.Iso3166_1 != null) {
+        if (this.iso3166_1 == null) {
+            if (other.iso3166_1 != null) {
                 return false;
             }
-        } else if (!this.Iso3166_1.equals(other.Iso3166_1)) {
+        } else if (!this.iso3166_1.equals(other.iso3166_1)) {
             return false;
         }
-        if (this.Iso3166_2 == null) {
-            if (other.Iso3166_2 != null) {
+        if (this.iso3166_2 == null) {
+            if (other.iso3166_2 != null) {
                 return false;
             }
-        } else if (!this.Iso3166_2.equals(other.Iso3166_2)) {
+        } else if (!this.iso3166_2.equals(other.iso3166_2)) {
             return false;
         }
         return true;
@@ -249,8 +197,8 @@ public class CloudProviderLocation implements Serializable {
 
     @Override
     public String toString() {
-        return "CloudProviderLocation [" + (this.Iso3166_1 != null ? "Iso3166_1=" + this.Iso3166_1 + ", " : "")
-            + (this.Iso3166_2 != null ? "Iso3166_2=" + this.Iso3166_2 + ", " : "")
+        return "CloudProviderLocation [" + (this.iso3166_1 != null ? "Iso3166_1=" + this.iso3166_1 + ", " : "")
+            + (this.iso3166_2 != null ? "Iso3166_2=" + this.iso3166_2 + ", " : "")
             + (this.countryName != null ? "countryName=" + this.countryName + ", " : "")
             + (this.stateName != null ? "stateName=" + this.stateName : "") + "]";
     }

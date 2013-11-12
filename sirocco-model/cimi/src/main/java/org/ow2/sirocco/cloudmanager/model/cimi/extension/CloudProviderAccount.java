@@ -50,6 +50,10 @@ public class CloudProviderAccount implements Serializable {
 
     private Integer id;
 
+    private String name;
+
+    private String description;
+
     private Date created;
 
     private String login;
@@ -62,6 +66,8 @@ public class CloudProviderAccount implements Serializable {
 
     private CloudProvider cloudProvider;
 
+    private Boolean enabled = true;
+
     public CloudProviderAccount() {
     }
 
@@ -73,6 +79,22 @@ public class CloudProviderAccount implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -107,6 +129,14 @@ public class CloudProviderAccount implements Serializable {
     @ElementCollection(fetch = FetchType.EAGER, targetClass = java.lang.String.class)
     public Map<String, String> getProperties() {
         return this.properties;
+    }
+
+    public Boolean getEnabled() {
+        return this.enabled;
+    }
+
+    public void setEnabled(final Boolean enabled) {
+        this.enabled = enabled;
     }
 
     @ManyToOne

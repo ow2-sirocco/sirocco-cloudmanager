@@ -31,6 +31,7 @@ import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntityCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -164,8 +165,6 @@ public interface ICloudProviderManager {
 
     void removeCloudProviderAccountFromTenant(String tenantId, String cloudProviderAccountId) throws CloudProviderException;
 
-    double locationDistance(CloudProviderLocation pointA, CloudProviderLocation pointB) throws CloudProviderException;
-
     List<CloudProviderAccount> getCloudProviderAccountsByProvider(String providerId) throws CloudProviderException;
 
     List<CloudProviderAccount> getCloudProviderAccountsByTenant(String tenantId) throws CloudProviderException;
@@ -174,7 +173,7 @@ public interface ICloudProviderManager {
 
     List<CloudProvider> getCloudProviders() throws CloudProviderException;
 
-    Placement placeResource(String tenantId, final Map<String, String> properties) throws CloudProviderException;
+    Placement placeResource(String tenantId, CloudEntityCreate create) throws CloudProviderException;
 
     CloudProviderProfile createCloudProviderProfile(CloudProviderProfile providerType);
 

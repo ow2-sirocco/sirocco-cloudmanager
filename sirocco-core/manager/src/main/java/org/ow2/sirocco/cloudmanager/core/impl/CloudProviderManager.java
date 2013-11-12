@@ -57,6 +57,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.OperationFailureException
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntityCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
@@ -408,10 +409,6 @@ public class CloudProviderManager implements ICloudProviderManager {
 
         cpl.setIso3166_1(Iso3166_1_Code);
         cpl.setIso3166_2(Iso3166_2_Code);
-        cpl.setPostalCode(postalCode);
-        cpl.setGPS_Altitude(altitude);
-        cpl.setGPS_Latitude(latitude);
-        cpl.setGPS_Longitude(longitude);
         cpl.setCountryName(countryName);
         cpl.setStateName(stateName);
         cpl.setCityName(cityName);
@@ -425,7 +422,6 @@ public class CloudProviderManager implements ICloudProviderManager {
         cpl.setStateName(this.normalizeLabel(cpl.getStateName()));
         cpl.setIso3166_1(this.normalizeLabel(cpl.getIso3166_1()));
         cpl.setIso3166_2(this.normalizeLabel(cpl.getIso3166_2()));
-        cpl.setPostalCode(this.normalizeLabel(cpl.getPostalCode()));
         return cpl;
     }
 
@@ -453,34 +449,6 @@ public class CloudProviderManager implements ICloudProviderManager {
             return false;
         }
         if (cpl.getIso3166_2().equals("")) {
-            return false;
-        }
-
-        if (cpl.getPostalCode() == null) {
-            return false;
-        }
-        if (cpl.getPostalCode().equals("")) {
-            return false;
-        }
-
-        if (cpl.getGPS_Altitude() == null) {
-            return false;
-        }
-        if (cpl.getGPS_Altitude().equals("")) {
-            return false;
-        }
-
-        if (cpl.getGPS_Latitude() == null) {
-            return false;
-        }
-        if (cpl.getGPS_Latitude().equals("")) {
-            return false;
-        }
-
-        if (cpl.getGPS_Longitude() == null) {
-            return false;
-        }
-        if (cpl.getGPS_Longitude().equals("")) {
             return false;
         }
 
@@ -539,32 +507,6 @@ public class CloudProviderManager implements ICloudProviderManager {
         return this.em.createQuery("Select p From CloudProviderLocation p").getResultList();
     }
 
-    /**
-     * Method to evaluate distance between 2 different locations <br>
-     * ** Only works if the points are close enough that you can omit that earth is not regular shape ** <br>
-     * <br>
-     * <i>see http://androidsnippets.com/distance-between-two-gps-coordinates-in- meter</i>
-     * 
-     * @return
-     */
-    @Override
-    public double locationDistance(final CloudProviderLocation pointA, final CloudProviderLocation pointB) {
-
-        float pk = (float) (180 / 3.14159265);
-
-        double a1 = pointA.getGPS_Latitude() / pk;
-        double a2 = pointA.getGPS_Longitude() / pk;
-        double b1 = pointB.getGPS_Latitude() / pk;
-        double b2 = pointB.getGPS_Longitude() / pk;
-
-        double t1 = Math.cos(a1) * Math.cos(a2) * Math.cos(b1) * Math.cos(b2);
-        double t2 = Math.cos(a1) * Math.sin(a2) * Math.cos(b1) * Math.sin(b2);
-        double t3 = Math.sin(a1) * Math.sin(b1);
-        double tt = Math.acos(t1 + t2 + t3);
-
-        return 6366000 * tt;
-    }
-
     @Override
     public void addLocationToCloudProvider(final String cloudProviderId, final String locationId) throws CloudProviderException {
         CloudProvider provider = this.getCloudProviderById(cloudProviderId);
@@ -587,61 +529,45 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public Placement placeResource(final String tenantId, final Map<String, String> properties) throws CloudProviderException {
+    public Placement placeResource(final String tenantId, final CloudEntityCreate create) throws CloudProviderException {
         Tenant tenant = this.tenantManager.getTenantById(tenantId);
-        String cloudProviderType = null;
-        String cloudProviderAccountId = null;
-        String cloudProviderLocationCountry = null;
-        if (properties != null) {
-            cloudProviderType = properties.get("provider");
-            cloudProviderAccountId = properties.get("providerAccountId");
-            cloudProviderLocationCountry = properties.get("location");
-        }
-        if (cloudProviderType == null) {
-            cloudProviderType = "mock";
-        }
+
         CloudProviderAccount targetAccount = null;
-        if (cloudProviderAccountId != null) {
-            for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
-                if (account.getId().toString().equals(cloudProviderAccountId)) {
-                    targetAccount = account;
-                    break;
-                }
-            }
-            if (targetAccount == null) {
-                throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider id "
-                    + cloudProviderAccountId);
-            }
+        CloudProviderLocation targetLocation = null;
 
+        String providerAccountId = create.getProviderAccountId();
+        if (providerAccountId == null) {
+            throw new CloudProviderException("Missing provider account id");
         } else {
-            for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
-                if (account.getCloudProvider().getCloudProviderType().equals(cloudProviderType)) {
-                    targetAccount = account;
+            targetAccount = this.getCloudProviderAccountById(providerAccountId);
+            if (targetAccount == null) {
+                throw new CloudProviderException("Provider account with id=" + providerAccountId);
+            }
+            boolean accountAllowed = false;
+            for (Tenant t : targetAccount.getTenants()) {
+                if (t.getId() == tenant.getId()) {
+                    accountAllowed = true;
                     break;
                 }
             }
-            if (targetAccount == null) {
-                throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider type "
-                    + cloudProviderType);
+            if (!accountAllowed) {
+                throw new CloudProviderException("Access not allowed to provider account " + providerAccountId);
             }
         }
 
-        CloudProviderLocation targetLocation = null;
-        if (cloudProviderLocationCountry != null) {
+        String location = create.getLocation();
+        if (location == null) {
+            targetLocation = targetAccount.getCloudProvider().getCloudProviderLocations().iterator().next();
+        } else {
             for (CloudProviderLocation loc : targetAccount.getCloudProvider().getCloudProviderLocations()) {
-                if (loc.getCountryName().equalsIgnoreCase(cloudProviderLocationCountry)) {
+                if (loc.getCountryName().equalsIgnoreCase(location)) {
                     targetLocation = loc;
                     break;
                 }
             }
             if (targetLocation == null) {
-                throw new CloudProviderException("Cloud Provider " + cloudProviderType + " does not support location "
-                    + cloudProviderLocationCountry);
-            }
-        } else {
-            if (targetAccount.getCloudProvider().getCloudProviderLocations() != null
-                && !targetAccount.getCloudProvider().getCloudProviderLocations().isEmpty()) {
-                targetLocation = targetAccount.getCloudProvider().getCloudProviderLocations().iterator().next();
+                throw new CloudProviderException("Location " + location + " not supported by provider "
+                    + targetAccount.getCloudProvider().getDescription());
             }
         }
 

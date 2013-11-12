@@ -62,6 +62,8 @@ public class CloudProvider implements Serializable {
 
     private String endpoint;
 
+    private Boolean enabled = true;
+
     private Map<String, String> properties;
 
     private Set<CloudProviderAccount> cloudProviderAccounts;
@@ -122,6 +124,14 @@ public class CloudProvider implements Serializable {
 
     public void setEndpoint(final String endPoint) {
         this.endpoint = endPoint;
+    }
+
+    public Boolean getEnabled() {
+        return this.enabled;
+    }
+
+    public void setEnabled(final Boolean enabled) {
+        this.enabled = enabled;
     }
 
     @OneToMany(mappedBy = "cloudProvider", fetch = FetchType.EAGER)

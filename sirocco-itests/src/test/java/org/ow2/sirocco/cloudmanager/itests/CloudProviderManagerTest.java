@@ -28,10 +28,6 @@ public class CloudProviderManagerTest extends AbstractTestBase {
         Assert.assertNotNull(lcpl);
         Assert.assertEquals(iso3166_1.toUpperCase(), lcpl.getIso3166_1());
         Assert.assertEquals(iso3166_2.toUpperCase(), lcpl.getIso3166_2());
-        Assert.assertEquals(postalCode.toUpperCase(), lcpl.getPostalCode());
-        Assert.assertEquals(GPS_Altitude, lcpl.getGPS_Altitude());
-        Assert.assertEquals(GPS_Latitude, lcpl.getGPS_Latitude());
-        Assert.assertEquals(GPS_Longitude, lcpl.getGPS_Longitude());
         Assert.assertEquals(countryName.toUpperCase(), lcpl.getCountryName().toUpperCase());
         Assert.assertEquals(stateName.toUpperCase(), lcpl.getStateName().toUpperCase());
         Assert.assertEquals(cityName.toUpperCase(), lcpl.getCityName().toUpperCase());
@@ -90,10 +86,6 @@ public class CloudProviderManagerTest extends AbstractTestBase {
         CloudProviderAccount cpa2 = this.createCPA(cp1.getId().toString(), "bruno.salomone", "passwort2");
         Assert.assertEquals(cpa2.getId(), this.cloudProviderManager.getCloudProviderAccountById(cpa2.getId().toString())
             .getId());
-
-        // distance
-        Double dist = this.cloudProviderManager.locationDistance(cpl1, cpl2);
-        Assert.assertEquals(46495, dist.longValue());
 
         // add user
         // this.cloudProviderManager.addCloudProviderAccountToUserByName("jeanne.calmant",
