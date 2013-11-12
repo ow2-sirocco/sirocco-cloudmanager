@@ -51,6 +51,11 @@ public class SiroccoStartup {
             System.setProperty("http.proxyPort", proxyPort);
             SiroccoStartup.logger.info("Set http.proxyPort to " + proxyPort);
         }
+        String nonProxyHosts = this.configManager.getConfigParameter(IConfigManager.HTTP_NON_PROXY_HOSTS);
+        if (nonProxyHosts != null) {
+            System.setProperty("http.nonProxyHosts", nonProxyHosts);
+            SiroccoStartup.logger.info("Set http.nonProxyHosts to " + nonProxyHosts);
+        }
     }
 
 }

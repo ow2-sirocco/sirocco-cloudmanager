@@ -29,6 +29,8 @@ public interface IConfigManager {
 
     final String HTTP_PROXY_PORT = "http.proxy.port";
 
+    final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
+
     void setConfigParameter(String key, String value);
 
     Map<String, String> getConfigParameters();
