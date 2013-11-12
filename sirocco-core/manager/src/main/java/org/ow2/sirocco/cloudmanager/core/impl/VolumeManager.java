@@ -123,7 +123,7 @@ public class VolumeManager implements IVolumeManager {
 
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), volumeCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), volumeCreate);
 
         Volume volume = new Volume();
 
@@ -594,7 +594,7 @@ public class VolumeManager implements IVolumeManager {
         Tenant tenant = this.getTenant();
 
         ICloudProviderConnector connector = null;
-        Placement placement;
+        Placement placement = null;
 
         if (volumeToSnapshot != null) {
             // TODO:workflowconnector =
@@ -602,7 +602,6 @@ public class VolumeManager implements IVolumeManager {
             // TODO:workflow volumeToSnapshot.getLocation());
             placement = new Placement(volumeToSnapshot.getCloudProviderAccount(), volumeToSnapshot.getLocation());
         } else {
-            placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), volumeImage.getProperties());
             connector = null;// this.getCloudProviderConnector(placement.getAccount(),
                              // placement.getLocation());
         }

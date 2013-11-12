@@ -314,10 +314,9 @@ public class MachineManager implements IMachineManager {
 
     public Job createMachine(final MachineCreate machineCreate) throws CloudProviderException {
         MachineManager.logger.info("Creating Machine");
-
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), machineCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), machineCreate);
 
         Machine machine = new Machine();
 

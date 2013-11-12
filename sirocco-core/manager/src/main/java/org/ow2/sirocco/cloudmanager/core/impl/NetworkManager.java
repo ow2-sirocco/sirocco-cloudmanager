@@ -136,7 +136,7 @@ public class NetworkManager implements INetworkManager {
         // retrieve user
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), networkCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), networkCreate);
 
         Network network = new Network();
 
@@ -572,8 +572,7 @@ public class NetworkManager implements INetworkManager {
         // retrieve tenant
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(),
-            networkPortCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), networkPortCreate);
         ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
                                                  // placement.getLocation());
         if (connector == null) {
@@ -1047,8 +1046,7 @@ public class NetworkManager implements INetworkManager {
         // retrieve user
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(),
-            forwardingGroupCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), forwardingGroupCreate);
         ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
                                                  // placement.getLocation());
         if (connector == null) {

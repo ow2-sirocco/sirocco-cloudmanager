@@ -254,7 +254,7 @@ public class SystemManager implements ISystemManager {
 
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), systemCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), systemCreate);
 
         // creating credentials if necessary
         // iterating through descriptors
