@@ -250,6 +250,8 @@ public class CloudProviderConnectorTest {
             }
         }
 
+        Assert.assertNotNull("cannot find machine config " + this.machineConfigName, selectedMachineConfig);
+
         // get images
 
         List<MachineImage> images = imageService.getMachineImages(false, null, target);
@@ -261,8 +263,6 @@ public class CloudProviderConnectorTest {
         }
 
         String imageId = images.get(0).getProviderMappings().get(0).getProviderAssignedId();
-
-        Assert.assertNotNull("cannot find machine config " + this.machineConfigName, selectedMachineConfig);
 
         MachineCreate machineCreate = new MachineCreate();
         MachineTemplate machineTemplate = new MachineTemplate();
