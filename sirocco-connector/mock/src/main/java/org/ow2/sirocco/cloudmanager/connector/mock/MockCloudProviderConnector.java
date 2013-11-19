@@ -587,6 +587,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
                     newNetIntf.setState(InterfaceState.PASSIVE);
 
+                    newNetIntf.setNetwork(networkInterface.getNetwork());
+
                     newNetIntf.setNetworkType(networkInterface.getNetworkType());
 
                     machine.addNetworkInterface(newNetIntf);
