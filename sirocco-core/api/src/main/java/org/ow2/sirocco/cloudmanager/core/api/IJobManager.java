@@ -44,6 +44,8 @@ public interface IJobManager {
 
     Job getJobById(String id) throws ResourceNotFoundException, CloudProviderException;
 
+    QueryResult<Job> getJobs(QueryParams... queryParams) throws CloudProviderException;
+
     Job getJobAttributes(final String id, List<String> attributes) throws ResourceNotFoundException, CloudProviderException;
 
     QueryResult<Job> getJobs(int first, int last, List<String> filters, List<String> attributes)
@@ -59,7 +61,5 @@ public interface IJobManager {
     String getTopmostJobId(String jobId) throws CloudProviderException;
 
     String getJobIdFromProvider(Job providerJob);
-
-    List<Job> getJobs() throws CloudProviderException;
 
 }

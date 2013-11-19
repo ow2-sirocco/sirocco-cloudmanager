@@ -51,6 +51,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
+import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -182,11 +183,17 @@ public class JobManager implements IJobManager {
         return UtilsForManagers.fillResourceAttributes(job, attributes);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<Job> getJobs() throws CloudProviderException {
-        return this.em.createQuery("SELECT j FROM Job j WHERE j.tenant.id=:tenantId")
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+    public QueryResult<Job> getJobs(final QueryParams... queryParams) throws CloudProviderException {
+        if (queryParams.length == 0) {
+            @SuppressWarnings("unchecked")
+            List<Job> jobs = this.em.createQuery("SELECT j FROM Job j WHERE j.tenant.id=:tenantId")
+                .setParameter("tenantId", this.getTenant().getId()).getResultList();
+            return new QueryResult<Job>(jobs.size(), jobs);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Job", Job.class)
+            .tenantId(this.getTenant().getId()).params(queryParams[0]);
+        return QueryHelper.getEntityList(this.em, params);
     }
 
     @Override
