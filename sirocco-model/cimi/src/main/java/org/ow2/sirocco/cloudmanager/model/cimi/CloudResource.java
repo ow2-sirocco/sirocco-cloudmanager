@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -57,6 +58,8 @@ public abstract class CloudResource implements Serializable, Resource {
     private static final long serialVersionUID = 1L;
 
     protected Integer id;
+
+    protected String uuid = UUID.randomUUID().toString();
 
     protected Tenant tenant;
 
@@ -208,6 +211,14 @@ public abstract class CloudResource implements Serializable, Resource {
 
     public void setEventLog(final EventLog eventLog) {
         this.eventLog = eventLog;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
 }

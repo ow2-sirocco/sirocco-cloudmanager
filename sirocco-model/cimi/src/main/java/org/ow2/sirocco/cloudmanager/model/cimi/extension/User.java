@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -51,6 +52,8 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+
+    private String uuid = UUID.randomUUID().toString();
 
     private Date created;
 
@@ -153,6 +156,14 @@ public class User implements Serializable {
 
     public void setTenants(final Set<Tenant> tenants) {
         this.tenants = tenants;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
 }

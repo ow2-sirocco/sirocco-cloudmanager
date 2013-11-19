@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -49,6 +50,8 @@ public class CloudProviderAccount implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+
+    private String uuid = UUID.randomUUID().toString();
 
     private String name;
 
@@ -157,4 +160,11 @@ public class CloudProviderAccount implements Serializable {
         this.tenants = tenants;
     }
 
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
 }

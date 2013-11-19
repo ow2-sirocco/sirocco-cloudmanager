@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -53,6 +54,8 @@ public class CloudProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+
+    private String uuid = UUID.randomUUID().toString();
 
     private Date created;
 
@@ -153,6 +156,14 @@ public class CloudProvider implements Serializable {
 
     public void setCloudProviderLocations(final Set<CloudProviderLocation> cloudProviderLocations) {
         this.cloudProviderLocations = cloudProviderLocations;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
 }

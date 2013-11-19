@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -46,6 +47,8 @@ public class Tenant implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+
+    private String uuid = UUID.randomUUID().toString();
 
     private String name;
 
@@ -69,6 +72,14 @@ public class Tenant implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {

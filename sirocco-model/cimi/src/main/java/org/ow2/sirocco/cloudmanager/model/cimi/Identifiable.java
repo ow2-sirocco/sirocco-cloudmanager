@@ -33,4 +33,8 @@ public interface Identifiable {
     Integer getId();
 
     void setId(Integer id);
+
+    String getUuid();
+
+    void setUuid(String uuid);
 }

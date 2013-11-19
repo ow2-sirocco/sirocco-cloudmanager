@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -57,6 +58,8 @@ public abstract class CloudCollectionItem implements Serializable, Resource {
     }
 
     private Integer id;
+
+    private String uuid = UUID.randomUUID().toString();
 
     private String name = "systemComponent";
 
@@ -153,5 +156,13 @@ public abstract class CloudCollectionItem implements Serializable, Resource {
     @Temporal(TemporalType.TIMESTAMP)
     public Date getUpdated() {
         return this.updated;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 }

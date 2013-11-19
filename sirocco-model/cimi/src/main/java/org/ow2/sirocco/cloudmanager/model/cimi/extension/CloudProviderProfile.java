@@ -26,6 +26,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
@@ -47,6 +48,8 @@ public class CloudProviderProfile implements Serializable {
 
     private Integer id;
 
+    private String uuid = UUID.randomUUID().toString();
+
     private String description = "";
 
     private String type;
@@ -63,6 +66,14 @@ public class CloudProviderProfile implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
     public String getDescription() {
