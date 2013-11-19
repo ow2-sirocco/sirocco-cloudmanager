@@ -1354,10 +1354,12 @@ public class MachineManager implements IMachineManager {
                     } else {
                         MachineManager.logger.error("Unknown network with provider-assigned id "
                             + nic.getNetwork().getProviderAssignedId());
+                        nic.setNetwork(null);
                     }
                 } else {
                     MachineManager.logger.error("Missing provider-assigned id in nic.network for machine with id "
                         + persisted.getId());
+                    continue;
                 }
             }
 
