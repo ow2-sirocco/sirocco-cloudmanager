@@ -74,30 +74,6 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-mock</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-amazon</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-openstack-nova</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-vcd</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-  
-		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>
 			<version>1.4.0</version>
@@ -114,10 +90,6 @@
 					<ejbVersion>3.1</ejbVersion>
 					<jarName>sirocco-cloudmanager-core-manager</jarName>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.felix</groupId>
-				<artifactId>maven-bundle-plugin</artifactId>
 			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
