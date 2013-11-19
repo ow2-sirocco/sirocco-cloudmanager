@@ -64,7 +64,12 @@ public class ConfigManager implements IConfigManager {
             config.setHttpProxyPort(value);
             System.setProperty("http.proxyPort", value);
             break;
+        case IConfigManager.HTTP_NON_PROXY_HOSTS:
+            config.setHttpNonProxyHosts(value);
+            System.setProperty("http.nonProxyHosts", value);
+            break;
         }
+
     }
 
     @Override
@@ -73,6 +78,7 @@ public class ConfigManager implements IConfigManager {
         HashMap<String, String> result = new HashMap<>();
         result.put(IConfigManager.HTTP_PROXY_HOST, config.getHttpProxyHost());
         result.put(IConfigManager.HTTP_PROXY_PORT, config.getHttpProxyPort());
+        result.put(IConfigManager.HTTP_NON_PROXY_HOSTS, config.getHttpNonProxyHosts());
         return result;
     }
 
@@ -84,6 +90,8 @@ public class ConfigManager implements IConfigManager {
             return config.getHttpProxyHost();
         case IConfigManager.HTTP_PROXY_PORT:
             return config.getHttpProxyPort();
+        case IConfigManager.HTTP_NON_PROXY_HOSTS:
+            return config.getHttpNonProxyHosts();
         default:
             return null;
         }
