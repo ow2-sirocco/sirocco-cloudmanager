@@ -377,14 +377,14 @@ public class CloudStackCloudProviderConnector implements ICloudProviderConnector
             this.secretKey = cloudProviderAccount.getPassword();
             Properties overrides = new Properties();
 
-            String httpProxyHost = java.lang.System.getProperty("http.proxyHost");
-            String httpProxyPort = java.lang.System.getProperty("http.proxyPort");
-            if (httpProxyHost != null) {
-                overrides.setProperty(Constants.PROPERTY_PROXY_HOST, httpProxyHost);
-            }
-            if (httpProxyPort != null) {
-                overrides.setProperty(Constants.PROPERTY_PROXY_PORT, httpProxyPort);
-            }
+            // String httpProxyHost = java.lang.System.getProperty("http.proxyHost");
+            // String httpProxyPort = java.lang.System.getProperty("http.proxyPort");
+            // if (httpProxyHost != null) {
+            // overrides.setProperty(Constants.PROPERTY_PROXY_HOST, httpProxyHost);
+            // }
+            // if (httpProxyPort != null) {
+            // overrides.setProperty(Constants.PROPERTY_PROXY_PORT, httpProxyPort);
+            // }
             overrides.setProperty(Constants.PROPERTY_TRUST_ALL_CERTS, "true");
             overrides.setProperty(Constants.PROPERTY_RELAX_HOSTNAME, "true");
 
@@ -671,7 +671,9 @@ public class CloudStackCloudProviderConnector implements ICloudProviderConnector
             machineImage.setState(this.fromTemplateStatusToCimiMachineImageState(template.getStatus()));
             machineImage.setType(Type.IMAGE);
             machineImage.setOsType(template.getOSType());
-            machineImage.setCapacity(template.getSize().intValue());
+            if (template.getSize() != null) {
+                machineImage.setCapacity(template.getSize().intValue());
+            }
             ProviderMapping providerMapping = new ProviderMapping();
             providerMapping.setProviderAssignedId(template.getId());
             providerMapping.setProviderAccount(this.cloudProviderAccount);
