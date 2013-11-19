@@ -29,7 +29,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 	        <artifactId>sirocco-api-multi</artifactId>
-		<version>0.6.0-SNAPSHOT</version>
+		<version>0.6.0</version>
 	</parent>
 
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
@@ -51,14 +51,14 @@
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-core-api</artifactId>
-			<version>0.6.0-SNAPSHOT</version>
+			<version>0.6.0</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
-			<version>0.6.0-SNAPSHOT</version>
+			<version>0.6.0</version>
 			<scope>provided</scope>
 		</dependency>
 		

@@ -28,7 +28,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager-model</artifactId>
-		<version>0.6.0-SNAPSHOT</version>
+		<version>0.6.0</version>
 	</parent>
 	<groupId>org.ow2.sirocco.cloudmanager</groupId>
 	<artifactId>sirocco-cloudmanager-model-cimi</artifactId>
@@ -68,7 +68,7 @@
   				<authRequired>false</authRequired>
   				<datasource>jdbc/H2InMemory</datasource>
     			<database>org.eclipse.persistence.platform.database.H2Platform</database>
-    			<creationSuffix></creationSuffix>
+    			<creationSuffix />
 			</properties>
 		</profile>
 		<profile>
