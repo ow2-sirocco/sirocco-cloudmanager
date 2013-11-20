@@ -57,7 +57,7 @@ public class TenantManager implements ITenantManager {
 
     @Override
     public Tenant getTenant(final IdentityContext context) throws CloudProviderException {
-        if (context.getTenantId() != null) {
+        if (context.getTenantId() != null && !context.getTenantId().isEmpty()) {
             return this.getTenantById(context.getTenantId());
         }
         User user = this.userManager.getUserByUsername(context.getUserName());
