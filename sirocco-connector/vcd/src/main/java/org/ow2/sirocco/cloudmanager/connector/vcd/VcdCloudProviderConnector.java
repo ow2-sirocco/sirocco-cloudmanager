@@ -318,7 +318,7 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
     @Override
     public Network getNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
-        throw new ConnectorException("unsupported operation");
+        return this.getProvider(target).getNetwork(networkId);
     }
 
     @Override

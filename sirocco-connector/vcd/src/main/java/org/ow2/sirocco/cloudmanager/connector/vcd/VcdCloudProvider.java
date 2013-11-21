@@ -799,6 +799,18 @@ public class VcdCloudProvider {
         }
     }
 
+    private void fromOrgVdcNetworkToNetwork(final OrgVdcNetwork orgVdcNetwork, final Network n) {
+        ReferenceType orgVdcNetworkReferenceType = orgVdcNetwork.getReference();
+        n.setName(orgVdcNetworkReferenceType.getName());
+        n.setProviderAssignedId(orgVdcNetworkReferenceType.getHref());
+        n.setState(Network.State.STARTED);
+        if (orgVdcNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
+            n.setNetworkType(Network.Type.PUBLIC);
+        } else {
+            n.setNetworkType(Network.Type.PRIVATE);
+        }
+    }
+
     public List<Network> getNetworks() throws ConnectorException {
         ArrayList<Network> networks = new ArrayList<Network>();
         networks.add(this.vCloudContext.getCimiPublicNetwork());
@@ -806,6 +818,13 @@ public class VcdCloudProvider {
         // TODO add orgVcd networks
 
         return networks;
+    }
+
+    public Network getNetwork(final String networkId) throws ResourceNotFoundException {
+        final Network network = new Network();
+        OrgVdcNetwork orgVdcNetwork = this.getOrgVdcNetworkByProviderAssignedId(networkId);
+        this.fromOrgVdcNetworkToNetwork(orgVdcNetwork, network);
+        return network;
     }
 
     //
@@ -838,34 +857,34 @@ public class VcdCloudProvider {
         }
     }
 
-    private VappNetwork getVappNetworkByProviderAssignedId(final String id) throws ConnectorException {
+    private VappNetwork getVappNetworkByProviderAssignedId(final String id) throws ResourceNotFoundException {
         try {
             ReferenceType vappNetworkRef = new ReferenceType();
             vappNetworkRef.setHref(id);
             return VappNetwork.getVappNetworkByReference(this.vCloudContext.getVcloudClient(), vappNetworkRef);
         } catch (VCloudException e) {
-            throw new ConnectorException(e);
+            throw new ResourceNotFoundException(e);
         }
     }
 
-    private VappNetwork getVappNetworkByName(final Vapp vapp, final String networkName) throws ConnectorException {
+    private VappNetwork getVappNetworkByName(final Vapp vapp, final String networkName) throws ResourceNotFoundException {
         try {
             ReferenceType vappNetworkReferenceType = vapp.getVappNetworkRefsByName().get(networkName);
             VappNetwork vappNetwork = VappNetwork.getVappNetworkByReference(this.vCloudContext.getVcloudClient(),
                 vappNetworkReferenceType);
             return vappNetwork;
         } catch (VCloudException e) {
-            throw new ConnectorException(e);
+            throw new ResourceNotFoundException(e);
         }
     }
 
-    private OrgVdcNetwork getOrgVdcNetworkByProviderAssignedId(final String id) throws ConnectorException {
+    private OrgVdcNetwork getOrgVdcNetworkByProviderAssignedId(final String id) throws ResourceNotFoundException {
         try {
             ReferenceType orgVdcNetworkRef = new ReferenceType();
             orgVdcNetworkRef.setHref(id);
             return OrgVdcNetwork.getOrgVdcNetworkByReference(this.vCloudContext.getVcloudClient(), orgVdcNetworkRef);
         } catch (VCloudException e) {
-            throw new ConnectorException(e);
+            throw new ResourceNotFoundException(e);
         }
     }
 
