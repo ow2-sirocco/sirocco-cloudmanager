@@ -813,9 +813,11 @@ public class VcdCloudProvider {
 
     public List<Network> getNetworks() throws ConnectorException {
         ArrayList<Network> networks = new ArrayList<Network>();
-        networks.add(this.vCloudContext.getCimiPublicNetwork());
+        // networks.add(this.vCloudContext.getCimiPublicNetwork());
 
-        // TODO add orgVcd networks
+        for (ReferenceType orgVdcNetworkRefType : this.vCloudContext.getVdc().getAvailableNetworkRefs()) {
+            networks.add(this.getNetwork(orgVdcNetworkRefType.getHref()));
+        }
 
         return networks;
     }
