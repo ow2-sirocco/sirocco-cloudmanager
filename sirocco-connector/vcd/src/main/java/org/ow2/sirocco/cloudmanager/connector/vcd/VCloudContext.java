@@ -165,7 +165,7 @@ public class VCloudContext {
                     + " : should be Direct or Routed");
             }
             logger.info("CIMI public OrgVdcNetwork=" + this.cimiPublicOrgVdcNetwork.getResource().getName() + ", isRouted="
-                + this.cimiPublicOrgVdcNetworkIsRouted);
+                + this.cimiPublicOrgVdcNetworkIsRouted + ", id=" + this.cimiPublicOrgVdcNetwork.getResource().getHref());
 
         } catch (Exception ex) {
             throw new ConnectorException("cannot connect user=" + cloudProviderAccount.getLogin() + " to Organization="
@@ -202,9 +202,9 @@ public class VCloudContext {
         return this.cimiPublicOrgVdcNetworkIsRouted;
     }
 
-    public Network getCimiPublicNetwork() {
+    /*public Network getCimiPublicNetwork() {
         return this.cimiPublicNetwork;
-    }
+    }*/
 
     public String getEdgeGatewayName() {
         return this.edgeGatewayName;

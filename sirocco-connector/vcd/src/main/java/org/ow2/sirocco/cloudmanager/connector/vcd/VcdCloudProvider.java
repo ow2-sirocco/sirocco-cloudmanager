@@ -790,12 +790,13 @@ public class VcdCloudProvider {
         n.setName(vappNetworkReferenceType.getName());
         n.setProviderAssignedId(vappNetworkReferenceType.getHref());
         n.setState(Network.State.STARTED);
-        if (vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())) {
-            n.setNetworkType(Network.Type.PRIVATE);
-        } else {
+        if (!vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())
+            && vappNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
+            /* Applying this rule with a vApp created outside Sirocco might not work properly ! 
+             * A workaround in this case is to use the OrgVdcNetwork to which the vAppNetwork is connected */
             n.setNetworkType(Network.Type.PUBLIC);
-            /* FIXME consider any other vAppNetwork as a Public CIMI network for the moment */
-            /* NB: future release might use vAppNetwork with fence mode=bridged for shared Private CIMI Networks between Systems)*/
+        } else {
+            n.setNetworkType(Network.Type.PRIVATE);
         }
     }
 
