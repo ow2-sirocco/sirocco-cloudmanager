@@ -505,7 +505,22 @@ public class VcdCloudProvider {
                 Vapp parentVapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vm.getParentVappReference());
                 VappNetwork vappNetwork = this.getVappNetworkByName(parentVapp, networkConnection.getNetwork());
                 Network network = new Network();
-                this.fromVappNetworkToNetwork(vappNetwork, network);
+                // this.fromVappNetworkToNetwork(vappNetwork, network);
+
+                // FIXME
+                if (vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())) {
+                    this.fromVappNetworkToNetwork(vappNetwork, network);
+                } else {
+                    /*VAppNetworkConfigurationType vAppNetworkConfigurationType = parentVapp
+                        .getVappNetworkConfigurationByName(networkConnection.getNetwork());*/
+
+                    VAppNetworkConfigurationType vAppNetworkConfigurationType = this.getVappNetworkConfigurationByName(
+                        parentVapp, networkConnection.getNetwork());
+                    OrgVdcNetwork orgVdcNetwork = this.getOrgVdcNetworkByProviderAssignedId(vAppNetworkConfigurationType
+                        .getConfiguration().getParentNetwork().getHref());
+
+                    this.fromOrgVdcNetworkToNetwork(orgVdcNetwork, network);
+                }
 
                 if (networkConnection.getIpAddress() != null && networkConnection.getIpAddress() != "") {
                     /*Address cimiAddress = new Address();
@@ -870,12 +885,22 @@ public class VcdCloudProvider {
         }
     }
 
-    private VappNetwork getVappNetworkByName(final Vapp vapp, final String networkName) throws ResourceNotFoundException {
+    private VappNetwork getVappNetworkByName(final Vapp vapp, final String vAppNetworkName) throws ResourceNotFoundException {
         try {
-            ReferenceType vappNetworkReferenceType = vapp.getVappNetworkRefsByName().get(networkName);
+            ReferenceType vappNetworkReferenceType = vapp.getVappNetworkRefsByName().get(vAppNetworkName);
             VappNetwork vappNetwork = VappNetwork.getVappNetworkByReference(this.vCloudContext.getVcloudClient(),
                 vappNetworkReferenceType);
             return vappNetwork;
+        } catch (VCloudException e) {
+            throw new ResourceNotFoundException(e);
+        }
+    }
+
+    private VAppNetworkConfigurationType getVappNetworkConfigurationByName(final Vapp vapp, final String vAppNetworkName)
+        throws ResourceNotFoundException {
+        try {
+            VAppNetworkConfigurationType vAppNetworkConfigurationType = vapp.getVappNetworkConfigurationByName(vAppNetworkName);
+            return vAppNetworkConfigurationType;
         } catch (VCloudException e) {
             throw new ResourceNotFoundException(e);
         }
