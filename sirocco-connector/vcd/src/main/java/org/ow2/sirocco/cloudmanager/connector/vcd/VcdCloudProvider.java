@@ -251,6 +251,7 @@ public class VcdCloudProvider {
 
             // refresh the vapp (otherwise no childrenVms is visible!
             vapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
+            this.startSystem(vapp.getResource().getHref(), new HashMap<String, String>());
             this.fromvAppToSystem(vapp, system);
 
         } catch (Exception ex) {
@@ -635,6 +636,11 @@ public class VcdCloudProvider {
 
             /*refresh the vapp (otherwise no childrenVms is visible! (TBC if this second refresh is required)*/
             vapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
+
+            if (machineCreate.getMachineTemplate().getInitialState() == null
+                || machineCreate.getMachineTemplate().getInitialState() == Machine.State.STARTED) {
+                this.startMachine(vapp.getChildrenVms().get(0).getResource().getHref());
+            }
 
             this.fromVmToMachine(vapp.getChildrenVms().get(0), machine);
 
