@@ -35,6 +35,8 @@ import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -44,6 +46,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
  * Machine template
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "MachineTemplate.findByUuid", query = "SELECT m from MachineTemplate m WHERE m.uuid=:uuid")})
 public class MachineTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -216,6 +216,7 @@ public class CloudProviderConnectorTest {
 
         // get public network
         Network publicNetwork = null;
+        Network privateNetwork = null;
         for (Network net : networkService.getNetworks(target)) {
             Assert.assertNotNull(net.getName());
             Assert.assertNotNull(net.getProviderAssignedId());
@@ -223,10 +224,12 @@ public class CloudProviderConnectorTest {
             Assert.assertNotNull(net.getNetworkType());
             if (net.getNetworkType() == Network.Type.PUBLIC) {
                 publicNetwork = net;
+            } else {
+                privateNetwork = net;
             }
         }
 
-        Assert.assertNotNull("no public network", publicNetwork);
+        Assert.assertTrue("no network", publicNetwork != null || privateNetwork != null);
 
         // get MachineConfigs
 
@@ -247,6 +250,8 @@ public class CloudProviderConnectorTest {
             }
         }
 
+        Assert.assertNotNull("cannot find machine config " + this.machineConfigName, selectedMachineConfig);
+
         // get images
 
         List<MachineImage> images = imageService.getMachineImages(false, null, target);
@@ -258,8 +263,6 @@ public class CloudProviderConnectorTest {
         }
 
         String imageId = images.get(0).getProviderMappings().get(0).getProviderAssignedId();
-
-        Assert.assertNotNull("cannot find machine config " + this.machineConfigName, selectedMachineConfig);
 
         MachineCreate machineCreate = new MachineCreate();
         MachineTemplate machineTemplate = new MachineTemplate();
@@ -275,7 +278,7 @@ public class CloudProviderConnectorTest {
 
         List<MachineTemplateNetworkInterface> nics = new ArrayList<MachineTemplateNetworkInterface>();
         MachineTemplateNetworkInterface nic = new MachineTemplateNetworkInterface();
-        nic.setNetwork(publicNetwork);
+        nic.setNetwork(publicNetwork != null ? publicNetwork : privateNetwork);
         nics.add(nic);
         machineTemplate.setNetworkInterfaces(nics);
         if (this.key != null) {
@@ -325,24 +328,24 @@ public class CloudProviderConnectorTest {
             }
         }
 
-        VolumeCreate volumeCreate = new VolumeCreate();
-        VolumeTemplate volumeTemplate = new VolumeTemplate();
-        VolumeConfiguration volumeConfig = new VolumeConfiguration();
-        volumeConfig.setCapacity(this.volumeConfigSizeGB * 1000 * 1000);
-        volumeTemplate.setVolumeConfig(volumeConfig);
-        volumeCreate.setVolumeTemplate(volumeTemplate);
-        volumeCreate.setName("test");
-        volumeCreate.setDescription("a test volume");
-
-        System.out.println("Creating Volume size=" + this.volumeConfigSizeGB + "GB");
-        Volume volume = volumeService.createVolume(volumeCreate, target);
-        String volumeId = volume.getProviderAssignedId();
-        this.waitForVolumeState(volumeService, target, volumeId,
-            CloudProviderConnectorTest.ASYNC_OPERATION_WAIT_TIME_IN_SECONDS, Volume.State.AVAILABLE);
-        volume = volumeService.getVolume(volumeId, target);
-        System.out.println("Volume id=" + volume.getProviderAssignedId() + " size=" + volume.getCapacity() + " KB");
-
         if (this.testVolumeAttach) {
+            VolumeCreate volumeCreate = new VolumeCreate();
+            VolumeTemplate volumeTemplate = new VolumeTemplate();
+            VolumeConfiguration volumeConfig = new VolumeConfiguration();
+            volumeConfig.setCapacity(this.volumeConfigSizeGB * 1000 * 1000);
+            volumeTemplate.setVolumeConfig(volumeConfig);
+            volumeCreate.setVolumeTemplate(volumeTemplate);
+            volumeCreate.setName("test");
+            volumeCreate.setDescription("a test volume");
+
+            System.out.println("Creating Volume size=" + this.volumeConfigSizeGB + "GB");
+            Volume volume = volumeService.createVolume(volumeCreate, target);
+            String volumeId = volume.getProviderAssignedId();
+            this.waitForVolumeState(volumeService, target, volumeId,
+                CloudProviderConnectorTest.ASYNC_OPERATION_WAIT_TIME_IN_SECONDS, Volume.State.AVAILABLE);
+            volume = volumeService.getVolume(volumeId, target);
+            System.out.println("Volume id=" + volume.getProviderAssignedId() + " size=" + volume.getCapacity() + " KB");
+
             MachineVolume machineVolume = new MachineVolume();
             machineVolume.setVolume(volume);
             machineVolume.setInitialLocation(this.volumeDevice);
@@ -378,21 +381,21 @@ public class CloudProviderConnectorTest {
                 }
             }
             Assert.assertTrue(machine.getVolumes().isEmpty());
-        }
 
-        System.out.println("Deleting volume " + volumeId);
-        volumeService.deleteVolume(volumeId, target);
-        try {
-            this.waitForVolumeState(volumeService, target, volumeId,
-                CloudProviderConnectorTest.ASYNC_OPERATION_WAIT_TIME_IN_SECONDS, Volume.State.DELETED);
-        } catch (ConnectorException ex) {
-            // OK
-        }
-        try {
-            volume = volumeService.getVolume(volumeId, target);
-            Assert.fail("Volume still exists after deletion");
-        } catch (ConnectorException ex) {
-            // OK
+            System.out.println("Deleting volume " + volumeId);
+            volumeService.deleteVolume(volumeId, target);
+            try {
+                this.waitForVolumeState(volumeService, target, volumeId,
+                    CloudProviderConnectorTest.ASYNC_OPERATION_WAIT_TIME_IN_SECONDS, Volume.State.DELETED);
+            } catch (ConnectorException ex) {
+                // OK
+            }
+            try {
+                volume = volumeService.getVolume(volumeId, target);
+                Assert.fail("Volume still exists after deletion");
+            } catch (ConnectorException ex) {
+                // OK
+            }
         }
 
         System.out.println("Deleting machine " + machineId);

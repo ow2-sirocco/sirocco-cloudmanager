@@ -52,11 +52,15 @@ public interface ISystemManager {
     SystemTemplate createSystemTemplate(SystemTemplate systemTemplate) throws CloudProviderException;
 
     // get by id
-    System getSystemById(String systemId) throws CloudProviderException;
+    System getSystemById(int systemId) throws CloudProviderException;
+
+    System getSystemByUuid(String systemUuid) throws CloudProviderException;
 
     System getSystemAttributes(String systemId, List<String> attributes) throws CloudProviderException;
 
-    SystemTemplate getSystemTemplateById(String systemTemplateId) throws CloudProviderException;
+    SystemTemplate getSystemTemplateById(int systemTemplateId) throws CloudProviderException;
+
+    SystemTemplate getSystemTemplateByUuid(String systemTemplateUuid) throws CloudProviderException;
 
     SystemTemplate getSystemTemplateAttributes(String systemTemplateId, List<String> attributes) throws CloudProviderException;
 
@@ -95,7 +99,7 @@ public interface ISystemManager {
     // global entity updates
     System updateSystem(final System system) throws CloudProviderException;
 
-    void updateSystemState(String systemId, System.State state) throws CloudProviderException;
+    void updateSystemState(int systemId, System.State state) throws CloudProviderException;
 
     System updateAttributesInSystem(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
 
@@ -148,8 +152,8 @@ public interface ISystemManager {
 
     Job importSystemTemplate(String source, Map<String, String> properties) throws CloudProviderException;
 
-    void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId, final boolean deletion);
+    void handleEntityStateChange(final Class<? extends CloudResource> entityType, final int entityId, final boolean deletion);
 
-    void syncSystem(String systemId, System system, String jobId) throws CloudProviderException;
+    void syncSystem(int systemId, System system, int jobId) throws CloudProviderException;
 
 }

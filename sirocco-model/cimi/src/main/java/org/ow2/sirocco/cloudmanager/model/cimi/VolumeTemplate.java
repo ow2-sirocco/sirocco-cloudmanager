@@ -29,6 +29,8 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
@@ -37,6 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
  * Volume template
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "VolumeTemplate.findByUuid", query = "SELECT v from VolumeTemplate v WHERE v.uuid=:uuid")})
 public class VolumeTemplate extends CloudTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 

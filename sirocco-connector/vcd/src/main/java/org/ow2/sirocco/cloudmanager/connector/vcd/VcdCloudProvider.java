@@ -251,6 +251,7 @@ public class VcdCloudProvider {
 
             // refresh the vapp (otherwise no childrenVms is visible!
             vapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
+            this.startSystem(vapp.getResource().getHref(), new HashMap<String, String>());
             this.fromvAppToSystem(vapp, system);
 
         } catch (Exception ex) {
@@ -505,7 +506,22 @@ public class VcdCloudProvider {
                 Vapp parentVapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vm.getParentVappReference());
                 VappNetwork vappNetwork = this.getVappNetworkByName(parentVapp, networkConnection.getNetwork());
                 Network network = new Network();
-                this.fromVappNetworkToNetwork(vappNetwork, network);
+                // this.fromVappNetworkToNetwork(vappNetwork, network);
+
+                // FIXME
+                if (vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())) {
+                    this.fromVappNetworkToNetwork(vappNetwork, network);
+                } else {
+                    /*VAppNetworkConfigurationType vAppNetworkConfigurationType = parentVapp
+                        .getVappNetworkConfigurationByName(networkConnection.getNetwork());*/
+
+                    VAppNetworkConfigurationType vAppNetworkConfigurationType = this.getVappNetworkConfigurationByName(
+                        parentVapp, networkConnection.getNetwork());
+                    OrgVdcNetwork orgVdcNetwork = this.getOrgVdcNetworkByProviderAssignedId(vAppNetworkConfigurationType
+                        .getConfiguration().getParentNetwork().getHref());
+
+                    this.fromOrgVdcNetworkToNetwork(orgVdcNetwork, network);
+                }
 
                 if (networkConnection.getIpAddress() != null && networkConnection.getIpAddress() != "") {
                     /*Address cimiAddress = new Address();
@@ -620,6 +636,11 @@ public class VcdCloudProvider {
 
             /*refresh the vapp (otherwise no childrenVms is visible! (TBC if this second refresh is required)*/
             vapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vapp.getReference());
+
+            if (machineCreate.getMachineTemplate().getInitialState() == null
+                || machineCreate.getMachineTemplate().getInitialState() == Machine.State.STARTED) {
+                this.startMachine(vapp.getChildrenVms().get(0).getResource().getHref());
+            }
 
             this.fromVmToMachine(vapp.getChildrenVms().get(0), machine);
 
@@ -790,22 +811,44 @@ public class VcdCloudProvider {
         n.setName(vappNetworkReferenceType.getName());
         n.setProviderAssignedId(vappNetworkReferenceType.getHref());
         n.setState(Network.State.STARTED);
-        if (vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())) {
-            n.setNetworkType(Network.Type.PRIVATE);
-        } else {
+        if (!vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())
+            && vappNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
+            /* Applying this rule with a vApp created outside Sirocco might not work properly ! 
+             * A workaround in this case is to use the OrgVdcNetwork to which the vAppNetwork is connected */
             n.setNetworkType(Network.Type.PUBLIC);
-            /* FIXME consider any other vAppNetwork as a Public CIMI network for the moment */
-            /* NB: future release might use vAppNetwork with fence mode=bridged for shared Private CIMI Networks between Systems)*/
+        } else {
+            n.setNetworkType(Network.Type.PRIVATE);
+        }
+    }
+
+    private void fromOrgVdcNetworkToNetwork(final OrgVdcNetwork orgVdcNetwork, final Network n) {
+        ReferenceType orgVdcNetworkReferenceType = orgVdcNetwork.getReference();
+        n.setName(orgVdcNetworkReferenceType.getName());
+        n.setProviderAssignedId(orgVdcNetworkReferenceType.getHref());
+        n.setState(Network.State.STARTED);
+        if (orgVdcNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
+            n.setNetworkType(Network.Type.PUBLIC);
+        } else {
+            n.setNetworkType(Network.Type.PRIVATE);
         }
     }
 
     public List<Network> getNetworks() throws ConnectorException {
         ArrayList<Network> networks = new ArrayList<Network>();
-        networks.add(this.vCloudContext.getCimiPublicNetwork());
+        // networks.add(this.vCloudContext.getCimiPublicNetwork());
 
-        // TODO add orgVcd networks
+        for (ReferenceType orgVdcNetworkRefType : this.vCloudContext.getVdc().getAvailableNetworkRefs()) {
+            networks.add(this.getNetwork(orgVdcNetworkRefType.getHref()));
+        }
 
         return networks;
+    }
+
+    public Network getNetwork(final String networkId) throws ResourceNotFoundException {
+        final Network network = new Network();
+        OrgVdcNetwork orgVdcNetwork = this.getOrgVdcNetworkByProviderAssignedId(networkId);
+        this.fromOrgVdcNetworkToNetwork(orgVdcNetwork, network);
+        return network;
     }
 
     //
@@ -838,34 +881,44 @@ public class VcdCloudProvider {
         }
     }
 
-    private VappNetwork getVappNetworkByProviderAssignedId(final String id) throws ConnectorException {
+    private VappNetwork getVappNetworkByProviderAssignedId(final String id) throws ResourceNotFoundException {
         try {
             ReferenceType vappNetworkRef = new ReferenceType();
             vappNetworkRef.setHref(id);
             return VappNetwork.getVappNetworkByReference(this.vCloudContext.getVcloudClient(), vappNetworkRef);
         } catch (VCloudException e) {
-            throw new ConnectorException(e);
+            throw new ResourceNotFoundException(e);
         }
     }
 
-    private VappNetwork getVappNetworkByName(final Vapp vapp, final String networkName) throws ConnectorException {
+    private VappNetwork getVappNetworkByName(final Vapp vapp, final String vAppNetworkName) throws ResourceNotFoundException {
         try {
-            ReferenceType vappNetworkReferenceType = vapp.getVappNetworkRefsByName().get(networkName);
+            ReferenceType vappNetworkReferenceType = vapp.getVappNetworkRefsByName().get(vAppNetworkName);
             VappNetwork vappNetwork = VappNetwork.getVappNetworkByReference(this.vCloudContext.getVcloudClient(),
                 vappNetworkReferenceType);
             return vappNetwork;
         } catch (VCloudException e) {
-            throw new ConnectorException(e);
+            throw new ResourceNotFoundException(e);
         }
     }
 
-    private OrgVdcNetwork getOrgVdcNetworkByProviderAssignedId(final String id) throws ConnectorException {
+    private VAppNetworkConfigurationType getVappNetworkConfigurationByName(final Vapp vapp, final String vAppNetworkName)
+        throws ResourceNotFoundException {
+        try {
+            VAppNetworkConfigurationType vAppNetworkConfigurationType = vapp.getVappNetworkConfigurationByName(vAppNetworkName);
+            return vAppNetworkConfigurationType;
+        } catch (VCloudException e) {
+            throw new ResourceNotFoundException(e);
+        }
+    }
+
+    private OrgVdcNetwork getOrgVdcNetworkByProviderAssignedId(final String id) throws ResourceNotFoundException {
         try {
             ReferenceType orgVdcNetworkRef = new ReferenceType();
             orgVdcNetworkRef.setHref(id);
             return OrgVdcNetwork.getOrgVdcNetworkByReference(this.vCloudContext.getVcloudClient(), orgVdcNetworkRef);
         } catch (VCloudException e) {
-            throw new ConnectorException(e);
+            throw new ResourceNotFoundException(e);
         }
     }
 

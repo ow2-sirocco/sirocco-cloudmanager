@@ -27,10 +27,10 @@ package org.ow2.sirocco.cloudmanager.core.api;
 
 import java.io.Serializable;
 import java.util.List;
-import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntityCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -116,13 +116,11 @@ public interface ICloudProviderManager {
 
     CloudProvider createCloudProvider(CloudProvider cp) throws CloudProviderException;
 
-    CloudProvider getCloudProviderById(String cloudProviderId) throws CloudProviderException;
+    CloudProvider getCloudProviderById(int cloudProviderId) throws CloudProviderException;
+
+    CloudProvider getCloudProviderByUuid(String cloudProviderId) throws CloudProviderException;
 
     List<CloudProvider> getCloudProviderByType(String type) throws CloudProviderException;
-
-    CloudProvider updateCloudProvider(final String id, Map<String, Object> updatedAttributes) throws CloudProviderException;
-
-    CloudProvider updateCloudProvider(CloudProvider CP) throws CloudProviderException;
 
     void deleteCloudProvider(String cloudProviderId) throws CloudProviderException;
 
@@ -132,12 +130,9 @@ public interface ICloudProviderManager {
     CloudProviderAccount createCloudProviderAccount(CloudProvider provider, CloudProviderLocation location,
         CloudProviderAccount account, CreateCloudProviderAccountOptions... options) throws CloudProviderException;
 
-    CloudProviderAccount getCloudProviderAccountById(String cloudProviderAccountId) throws CloudProviderException;
+    CloudProviderAccount getCloudProviderAccountById(int cloudProviderAccountId) throws CloudProviderException;
 
-    CloudProviderAccount updateCloudProviderAccount(final String id, Map<String, Object> updatedAttributes)
-        throws CloudProviderException;
-
-    CloudProviderAccount updateCloudProviderAccount(CloudProviderAccount CP) throws CloudProviderException;
+    CloudProviderAccount getCloudProviderAccountByUuid(String cloudProviderAccountId) throws CloudProviderException;
 
     void deleteCloudProviderAccount(String cloudProviderAccountId) throws CloudProviderException;
 
@@ -147,12 +142,9 @@ public interface ICloudProviderManager {
 
     CloudProviderLocation createCloudProviderLocation(CloudProviderLocation cpl) throws CloudProviderException;
 
-    CloudProviderLocation updateCloudProviderLocation(final String id, Map<String, Object> updatedAttributes)
-        throws CloudProviderException;
+    CloudProviderLocation getCloudProviderLocationById(int cloudProviderLocationId) throws CloudProviderException;
 
-    CloudProviderLocation updateCloudProviderLocation(CloudProviderLocation CP) throws CloudProviderException;
-
-    CloudProviderLocation getCloudProviderLocationById(String cloudProviderLocationId) throws CloudProviderException;
+    CloudProviderLocation getCloudProviderLocationByUuid(String cloudProviderLocationUuid) throws CloudProviderException;
 
     void deleteCloudProviderLocation(String cloudProviderLocationId) throws CloudProviderException;
 
@@ -164,8 +156,6 @@ public interface ICloudProviderManager {
 
     void removeCloudProviderAccountFromTenant(String tenantId, String cloudProviderAccountId) throws CloudProviderException;
 
-    double locationDistance(CloudProviderLocation pointA, CloudProviderLocation pointB) throws CloudProviderException;
-
     List<CloudProviderAccount> getCloudProviderAccountsByProvider(String providerId) throws CloudProviderException;
 
     List<CloudProviderAccount> getCloudProviderAccountsByTenant(String tenantId) throws CloudProviderException;
@@ -174,7 +164,7 @@ public interface ICloudProviderManager {
 
     List<CloudProvider> getCloudProviders() throws CloudProviderException;
 
-    Placement placeResource(String tenantId, final Map<String, String> properties) throws CloudProviderException;
+    Placement placeResource(int tenantId, CloudEntityCreate create) throws CloudProviderException;
 
     CloudProviderProfile createCloudProviderProfile(CloudProviderProfile providerType);
 

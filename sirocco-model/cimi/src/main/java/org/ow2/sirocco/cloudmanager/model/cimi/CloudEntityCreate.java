@@ -40,6 +40,10 @@ public abstract class CloudEntityCreate implements Serializable {
 
     private Map<String, String> properties;
 
+    private String providerAccountId;
+
+    private String location;
+
     public String getName() {
         return this.name;
     }
@@ -63,4 +67,21 @@ public abstract class CloudEntityCreate implements Serializable {
     public void setProperties(final Map<String, String> properties) {
         this.properties = properties;
     }
+
+    public String getProviderAccountId() {
+        return this.providerAccountId;
+    }
+
+    public void setProviderAccountId(final String providerAccountId) {
+        this.providerAccountId = providerAccountId;
+    }
+
+    public String getLocation() {
+        return this.location;
+    }
+
+    public void setLocation(final String location) {
+        this.location = location;
+    }
+
 }

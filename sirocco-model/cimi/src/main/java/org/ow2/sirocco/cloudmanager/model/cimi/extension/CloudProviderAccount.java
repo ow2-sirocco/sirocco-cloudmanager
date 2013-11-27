@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -38,6 +39,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -45,10 +49,17 @@ import javax.persistence.TemporalType;
  * An account on a cloud provider
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "CloudProviderAccount.findByUuid", query = "SELECT c from CloudProviderAccount c WHERE c.uuid=:uuid")})
 public class CloudProviderAccount implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+
+    private String uuid;
+
+    private String name;
+
+    private String description;
 
     private Date created;
 
@@ -62,6 +73,8 @@ public class CloudProviderAccount implements Serializable {
 
     private CloudProvider cloudProvider;
 
+    private Boolean enabled = true;
+
     public CloudProviderAccount() {
     }
 
@@ -73,6 +86,22 @@ public class CloudProviderAccount implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public void setName(final String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public void setDescription(final String description) {
+        this.description = description;
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -109,6 +138,14 @@ public class CloudProviderAccount implements Serializable {
         return this.properties;
     }
 
+    public Boolean getEnabled() {
+        return this.enabled;
+    }
+
+    public void setEnabled(final Boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @ManyToOne
     public CloudProvider getCloudProvider() {
         return this.cloudProvider;
@@ -127,4 +164,18 @@ public class CloudProviderAccount implements Serializable {
         this.tenants = tenants;
     }
 
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
 }

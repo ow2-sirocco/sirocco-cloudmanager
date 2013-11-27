@@ -31,7 +31,7 @@ public class ResourceCommand implements Serializable {
 
     private final String commandType;
 
-    private String resourceId;
+    private int resourceId;
 
     private Job job;
 
@@ -52,11 +52,11 @@ public class ResourceCommand implements Serializable {
         return this.commandType;
     }
 
-    public String getResourceId() {
+    public int getResourceId() {
         return this.resourceId;
     }
 
-    public ResourceCommand setResourceId(final String resourceId) {
+    public ResourceCommand setResourceId(final int resourceId) {
         this.resourceId = resourceId;
         return this;
     }

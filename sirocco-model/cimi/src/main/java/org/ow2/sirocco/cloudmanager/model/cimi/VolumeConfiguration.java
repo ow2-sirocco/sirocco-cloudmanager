@@ -30,6 +30,8 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
 
@@ -37,6 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
  * Volume configuration
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "VolumeConfiguration.findByUuid", query = "SELECT v from VolumeConfiguration v WHERE v.uuid=:uuid")})
 public class VolumeConfiguration extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

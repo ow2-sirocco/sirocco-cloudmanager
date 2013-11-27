@@ -36,6 +36,7 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
@@ -122,20 +123,11 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     public void updateCredentials(final Credentials credentials) throws CloudProviderException {
-        Credentials c = this.em.find(Credentials.class, credentials.getId());
-        if (c == null) {
-            throw new ResourceNotFoundException(" Could not find credential " + credentials.getId());
-        }
-        this.validateCredentials(credentials);
-        this.em.merge(credentials);
-
+        // TODO
     }
 
-    public Credentials getCredentialsById(final String credentialsId) throws CloudProviderException {
-        if (credentialsId == null) {
-            throw new InvalidRequestException("null credentials id");
-        }
-        Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
+    public Credentials getCredentialsById(final int credentialsId) throws CloudProviderException {
+        Credentials cred = this.em.find(Credentials.class, credentialsId);
         if (cred == null) {
             throw new ResourceNotFoundException("Credentials " + credentialsId + " not found");
         }
@@ -143,28 +135,32 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     @Override
+    public Credentials getCredentialsByUuid(final String uuid) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("Credentials.findByUuid", Credentials.class).setParameter("uuid", uuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public Credentials getCredentialsAttributes(final String credentialsId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        Credentials cred = this.getCredentialsById(credentialsId);
+        Credentials cred = this.getCredentialsByUuid(credentialsId);
         return UtilsForManagers.fillResourceAttributes(cred, attributes);
     }
 
     public void deleteCredentials(final String credentialsId) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException {
-        if (credentialsId == null) {
-            throw new InvalidRequestException("null credentials id");
-        }
-        Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
-        if (cred == null) {
-            throw new ResourceNotFoundException(" Invalid credential id " + credentialsId);
-        }
+        Credentials cred = this.getCredentialsByUuid(credentialsId);
         /**
          * if anymachine template refers to this credential do not delete.
          */
         List<MachineTemplate> mts = null;
         try {
-            mts = this.em.createQuery("SELECT t FROM MachineTemplate t WHERE t.credential=:cred").setParameter("cred", cred)
-                .getResultList();
+            mts = this.em.createQuery("SELECT t FROM MachineTemplate t WHERE t.credential=:cred", MachineTemplate.class)
+                .setParameter("cred", cred).getResultList();
         } catch (Exception e) {
             throw new CloudProviderException(" Internal Error");
         }
@@ -180,14 +176,7 @@ public class CredentialsManager implements ICredentialsManager {
 
     public void updateCredentialsAttributes(final String credentialsId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
-
-        if (credentialsId == null) {
-            throw new InvalidRequestException("null credentials id");
-        }
-        Credentials cred = this.em.find(Credentials.class, Integer.valueOf(credentialsId));
-        if (cred == null) {
-            throw new ResourceNotFoundException("Credentials " + credentialsId + " not found");
-        }
+        Credentials cred = this.getCredentialsByUuid(credentialsId);
 
         try {
             UtilsForManagers.fillObject(cred, attributes);
@@ -200,7 +189,7 @@ public class CredentialsManager implements ICredentialsManager {
 
     @Override
     public List<Credentials> getCredentials() throws CloudProviderException {
-        return this.em.createQuery("SELECT c FROM Credentials c WHERE c.tenant.id=:tenantId")
+        return this.em.createQuery("SELECT c FROM Credentials c WHERE c.tenant.id=:tenantId", Credentials.class)
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
@@ -231,7 +220,13 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     @Override
-    public CredentialsTemplate getCredentialsTemplateById(final String credentialsTemplateId) throws CloudProviderException {
+    public CredentialsTemplate getCredentialsTemplateById(final int credentialsTemplateId) throws CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public CredentialsTemplate getCredentialsTemplateByUuid(final String credentialsTemplateUuid) throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }

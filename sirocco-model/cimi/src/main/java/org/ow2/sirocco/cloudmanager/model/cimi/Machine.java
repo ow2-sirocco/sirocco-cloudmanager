@@ -52,16 +52,14 @@ import org.ow2.sirocco.cloudmanager.model.utils.FSM;
  * Compute resource
  */
 @Entity
-@NamedQueries({@NamedQuery(name = "GET_MACHINE_BY_STATE", query = "SELECT v from Machine v WHERE v.state=:state")})
+@NamedQueries({@NamedQuery(name = "Machine.findByUuid", query = "SELECT m from Machine m WHERE m.uuid=:uuid")})
 public class Machine extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
-
-    public static final String GET_MACHINE_BY_STATE = "GET_MACHINE_BY_STATE";
 
     private CloudProviderLocation location;
 
     public static enum State {
-        CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR
+        CREATING, STARTING, STARTED, STOPPING, STOPPED, PAUSING, PAUSED, SUSPENDING, SUSPENDED, DELETING, DELETED, ERROR, UNKNOWN
     }
 
     private State state;

@@ -34,15 +34,12 @@ public class ProviderAccountDeleteCommand implements Command {
     @Parameter(description = "<account id>", required = true)
     private List<String> accountIds;
 
-    @Parameter(names = "-providerId", description = "provider id", required = true)
-    private String providerId;
-
     @Override
     public String getName() {
         return ProviderAccountDeleteCommand.COMMAND_NAME;
     }
 
     public void execute(final RestClient restClient) throws Exception {
-        restClient.deleteRequest("providers/" + this.providerId + "/accounts/" + this.accountIds.get(0));
+        restClient.deleteRequest("providers/accounts/" + this.accountIds.get(0));
     }
 }

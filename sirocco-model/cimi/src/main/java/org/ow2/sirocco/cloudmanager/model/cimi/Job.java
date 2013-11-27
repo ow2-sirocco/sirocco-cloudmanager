@@ -36,24 +36,23 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-
-import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 /**
  * Represents a process performed by the provider
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "Job.findByUuid", query = "SELECT j from Job j WHERE j.uuid=:uuid")})
 public class Job extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 
     public static enum Status {
         RUNNING, SUCCESS, FAILED, CANCELLED
     };
-
-    private CloudProviderLocation location;
 
     private Status state;
 
@@ -76,34 +75,6 @@ public class Job extends CloudEntity implements Serializable {
     private List<CloudResource> affectedResources;
 
     private Boolean isCancellable;
-
-    /*
-     * protected long versionNum;
-     * @Version
-     * @Column(name="OPTLOCK") protected long getVersionNum() { return
-     * versionNum; } protected void setVersionNum(long versionNum) {
-     * this.versionNum = versionNum; }
-     */
-
-    public Job(final CloudProviderLocation location, final Status status, final Date timeOfStatusChange,
-        final CloudResource targetEntity, final Integer returnCode, final String action, final String statusMessage,
-        final Job parentJob, final List<Job> nestedJobs, final Boolean isCancellable, final Integer progress,
-        final List<CloudResource> affectedEntities) {
-
-        System.out.println("using job full constructor");
-        this.location = location;
-        this.state = status;
-        this.timeOfStatusChange = timeOfStatusChange;
-        this.targetResource = targetEntity;
-        this.returnCode = returnCode;
-        this.action = action;
-        this.statusMessage = statusMessage;
-        this.parentJob = parentJob;
-        this.nestedJobs = nestedJobs;
-        this.progress = progress;
-        this.affectedResources = affectedEntities;
-
-    }
 
     public Job() {
     }
@@ -191,15 +162,6 @@ public class Job extends CloudEntity implements Serializable {
         }
         this.nestedJobs.add(nestedJob);
         nestedJob.setParentJob(this);
-    }
-
-    @ManyToOne
-    public CloudProviderLocation getLocation() {
-        return this.location;
-    }
-
-    public void setLocation(final CloudProviderLocation location) {
-        this.location = location;
     }
 
     @ManyToMany(fetch = FetchType.EAGER)

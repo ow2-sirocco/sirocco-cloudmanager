@@ -34,6 +34,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -46,13 +48,14 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
  * Machine image encapsulating a pre-built OS and applications
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "MachineImage.findByUuid", query = "SELECT m from MachineImage m WHERE m.uuid=:uuid")})
 public class MachineImage extends CloudResource implements Serializable, IMultiCloudResource {
     private static final long serialVersionUID = 1L;
 
     private CloudProviderLocation location;
 
     public static enum State {
-        CREATING, AVAILABLE, DELETING, ERROR, DELETED
+        CREATING, AVAILABLE, DELETING, ERROR, DELETED, UNKNOWN
     }
 
     public static enum Type {
@@ -72,6 +75,12 @@ public class MachineImage extends CloudResource implements Serializable, IMultiC
     private Visibility visibility = Visibility.PRIVATE;
 
     private List<ProviderMapping> providerMappings;
+
+    private Integer capacity;
+
+    private String architecture;
+
+    private String osType;
 
     @Enumerated(EnumType.STRING)
     public Visibility getVisibility() {
@@ -115,6 +124,30 @@ public class MachineImage extends CloudResource implements Serializable, IMultiC
 
     public void setImageLocation(final String imageLocation) {
         this.imageLocation = imageLocation;
+    }
+
+    public String getArchitecture() {
+        return this.architecture;
+    }
+
+    public void setArchitecture(final String architecture) {
+        this.architecture = architecture;
+    }
+
+    public String getOsType() {
+        return this.osType;
+    }
+
+    public void setOsType(final String osType) {
+        this.osType = osType;
+    }
+
+    public Integer getCapacity() {
+        return this.capacity;
+    }
+
+    public void setCapacity(final Integer capacity) {
+        this.capacity = capacity;
     }
 
     @ManyToOne

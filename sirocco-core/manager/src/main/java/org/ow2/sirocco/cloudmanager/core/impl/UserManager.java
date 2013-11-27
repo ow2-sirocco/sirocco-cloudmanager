@@ -68,8 +68,8 @@ public class UserManager implements IUserManager {
             java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
             byte[] array = md.digest(md5.getBytes());
             StringBuffer sb = new StringBuffer();
-            for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+            for (byte element : array) {
+                sb.append(Integer.toHexString((element & 0xFF) | 0x100).substring(1, 3));
             }
             return sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
@@ -103,6 +103,7 @@ public class UserManager implements IUserManager {
         u.setRole("sirocco-user");
         u.setPassword(this.md5(u.getPassword()));
         this.em.persist(u);
+        this.em.flush();
         return u;
     }
 
@@ -139,12 +140,21 @@ public class UserManager implements IUserManager {
     }
 
     @Override
-    public User getUserById(final String userId) throws CloudProviderException {
-        User result = this.em.find(User.class, new Integer(userId));
+    public User getUserById(final int userId) throws CloudProviderException {
+        User result = this.em.find(User.class, userId);
         if (result == null) {
             throw new ResourceNotFoundException();
         }
         return result;
+    }
+
+    @Override
+    public User getUserByUuid(final String userUuid) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("User.findByUuid", User.class).setParameter("uuid", userUuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -173,7 +183,7 @@ public class UserManager implements IUserManager {
     @Override
     public User updateUser(final String id, final Map<String, Object> updatedAttributes) throws CloudProviderException {
 
-        User u = this.getUserById(id);
+        User u = this.getUserByUuid(id);
 
         try {
             UtilsForManagers.fillObject(u, updatedAttributes);
@@ -200,7 +210,7 @@ public class UserManager implements IUserManager {
     @Override
     public void deleteUser(final String userId) throws CloudProviderException {
 
-        User result = this.getUserById(userId);
+        User result = this.getUserByUuid(userId);
 
         if (result != null) {
             this.em.remove(result);

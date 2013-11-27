@@ -26,6 +26,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Embeddable;
@@ -34,8 +35,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 
 @Entity
+@NamedQueries({@NamedQuery(name = "CloudProviderProfile.findByUuid", query = "SELECT c from CloudProviderProfile c WHERE c.uuid=:uuid")})
 public class CloudProviderProfile implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -46,6 +51,8 @@ public class CloudProviderProfile implements Serializable {
     public static final String PROVIDER_ACCOUNT_PASSWORD = "password";
 
     private Integer id;
+
+    private String uuid;
 
     private String description = "";
 
@@ -63,6 +70,21 @@ public class CloudProviderProfile implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
     public String getDescription() {

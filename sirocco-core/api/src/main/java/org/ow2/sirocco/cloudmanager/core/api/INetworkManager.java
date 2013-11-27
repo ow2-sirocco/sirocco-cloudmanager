@@ -60,7 +60,7 @@ public interface INetworkManager {
 
     Job createNetwork(NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException;
 
-    void syncNetwork(String networkId, Network network, String jobId);
+    void syncNetwork(int networkId, Network network, int jobId);
 
     Job startNetwork(String networkId, Map<String, String> properties) throws ResourceNotFoundException, CloudProviderException;
 
@@ -70,7 +70,9 @@ public interface INetworkManager {
 
     Job stopNetwork(String networkId) throws ResourceNotFoundException, CloudProviderException;
 
-    Network getNetworkById(String networkId) throws ResourceNotFoundException;
+    Network getNetworkById(int networkId) throws ResourceNotFoundException;
+
+    Network getNetworkByUuid(String networkId) throws ResourceNotFoundException;
 
     Network getNetworkByProviderAssignedId(String providerAssignedId);
 
@@ -111,7 +113,9 @@ public interface INetworkManager {
     NetworkConfiguration createNetworkConfiguration(NetworkConfiguration networkConfig) throws InvalidRequestException,
         CloudProviderException;
 
-    NetworkConfiguration getNetworkConfigurationById(String networkConfigId) throws ResourceNotFoundException;
+    NetworkConfiguration getNetworkConfigurationById(int networkConfigId) throws ResourceNotFoundException;
+
+    NetworkConfiguration getNetworkConfigurationByUuid(String networkConfigUuid) throws ResourceNotFoundException;
 
     NetworkConfiguration getNetworkConfigurationAttributes(final String networkConfigId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
@@ -136,7 +140,9 @@ public interface INetworkManager {
     NetworkTemplate createNetworkTemplate(NetworkTemplate networkTemplate) throws InvalidRequestException,
         CloudProviderException;
 
-    NetworkTemplate getNetworkTemplateById(String networkTemplateId) throws ResourceNotFoundException;
+    NetworkTemplate getNetworkTemplateById(int networkTemplateId) throws ResourceNotFoundException;
+
+    NetworkTemplate getNetworkTemplateByUuid(String networkTemplateUuid) throws ResourceNotFoundException;
 
     NetworkTemplate getNetworkTemplateAttributes(final String networkTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
@@ -169,7 +175,9 @@ public interface INetworkManager {
 
     Job stopNetworkPort(String networkPortId) throws ResourceNotFoundException, CloudProviderException;
 
-    NetworkPort getNetworkPortById(String networkPortId) throws ResourceNotFoundException;
+    NetworkPort getNetworkPortById(int networkPortId) throws ResourceNotFoundException;
+
+    NetworkPort getNetworkPortByUuid(String networkPortUuid) throws ResourceNotFoundException;
 
     NetworkPort getNetworkPortAttributes(final String networkPortId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
@@ -194,7 +202,9 @@ public interface INetworkManager {
 
     List<NetworkPortConfiguration> getNetworkPortConfigurations() throws CloudProviderException;
 
-    NetworkPortConfiguration getNetworkPortConfigurationById(String networkPortConfigurationId)
+    NetworkPortConfiguration getNetworkPortConfigurationById(int networkPortConfigurationId) throws ResourceNotFoundException;
+
+    NetworkPortConfiguration getNetworkPortConfigurationByUuid(String networkPortConfigurationUuid)
         throws ResourceNotFoundException;
 
     NetworkPortConfiguration getNetworkPortConfigurationAttributes(final String networkPortConfigurationId,
@@ -219,7 +229,9 @@ public interface INetworkManager {
 
     List<NetworkPortTemplate> getNetworkPortTemplates() throws CloudProviderException;
 
-    NetworkPortTemplate getNetworkPortTemplateById(String networkPortTemplateId) throws ResourceNotFoundException;
+    NetworkPortTemplate getNetworkPortTemplateById(int networkPortTemplateId) throws ResourceNotFoundException;
+
+    NetworkPortTemplate getNetworkPortTemplateByUuid(String networkPortTemplateUuid) throws ResourceNotFoundException;
 
     NetworkPortTemplate getNetworkPortTemplateAttributes(final String networkPortTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
@@ -242,7 +254,10 @@ public interface INetworkManager {
 
     List<ForwardingGroupTemplate> getForwardingGroupTemplates() throws CloudProviderException;
 
-    ForwardingGroupTemplate getForwardingGroupTemplateById(String forwardingGroupTemplateId) throws ResourceNotFoundException;
+    ForwardingGroupTemplate getForwardingGroupTemplateById(int forwardingGroupTemplateId) throws ResourceNotFoundException;
+
+    ForwardingGroupTemplate getForwardingGroupTemplateByUuid(String forwardingGroupTemplateUuid)
+        throws ResourceNotFoundException;
 
     ForwardingGroupTemplate getForwardingGroupTemplateAttributes(final String forwardingGroupTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
@@ -264,7 +279,9 @@ public interface INetworkManager {
     Job createForwardingGroup(ForwardingGroupCreate forwardingGroupCreate) throws InvalidRequestException,
         CloudProviderException;
 
-    ForwardingGroup getForwardingGroupById(String forwardingGroupId) throws ResourceNotFoundException;
+    ForwardingGroup getForwardingGroupById(int forwardingGroupId) throws ResourceNotFoundException;
+
+    ForwardingGroup getForwardingGroupByUuid(String forwardingGroupUuid) throws ResourceNotFoundException;
 
     ForwardingGroup getForwardingGroupAttributes(final String forwardingGroupId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
@@ -305,7 +322,9 @@ public interface INetworkManager {
 
     Job createAddress(AddressCreate addressCreate) throws InvalidRequestException, CloudProviderException;
 
-    Address getAddressById(String addressId) throws ResourceNotFoundException;
+    Address getAddressById(int addressId) throws ResourceNotFoundException;
+
+    Address getAddressByUuid(String addressUuid) throws ResourceNotFoundException;
 
     Address getAddressAttributes(final String addressId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
@@ -326,7 +345,9 @@ public interface INetworkManager {
 
     List<AddressTemplate> getAddressTemplates() throws CloudProviderException;
 
-    AddressTemplate getAddressTemplateById(String addressTemplateId) throws ResourceNotFoundException;
+    AddressTemplate getAddressTemplateById(int addressTemplateId) throws ResourceNotFoundException;
+
+    AddressTemplate getAddressTemplateByUuid(String addressTemplateUuid) throws ResourceNotFoundException;
 
     AddressTemplate getAddressTemplateAttributes(final String addressTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
@@ -342,8 +363,6 @@ public interface INetworkManager {
 
     void deleteAddressTemplate(String addressTemplateId) throws ResourceNotFoundException, CloudProviderException;
 
-    boolean jobCompletionHandler(final Job job) throws CloudProviderException;
-
-    void updateNetworkState(String networkId, Network.State state) throws CloudProviderException;
+    void updateNetworkState(int networkId, Network.State state) throws CloudProviderException;
 
 }

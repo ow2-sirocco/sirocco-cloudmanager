@@ -17,9 +17,10 @@ public interface IResourceWatcher {
 
     Future<Void> watchNetwork(Network network, Job job, Network.State... expectedStates) throws CloudProviderException;
 
-    Future<Void> watchVolume(Volume volume, Job job) throws CloudProviderException;
+    Future<Void> watchVolume(Volume volume, Job job, Volume.State... expectedStates) throws CloudProviderException;
 
-    Future<Void> watchVolumeAttachment(Machine machine, MachineVolume volumeAttachement, Job job) throws CloudProviderException;
+    Future<Void> watchVolumeAttachment(Machine machine, MachineVolume volumeAttachement, Job job,
+        MachineVolume.State... expectedStates) throws CloudProviderException;
 
     Future<Void> watchSystem(org.ow2.sirocco.cloudmanager.model.cimi.system.System system, Job job,
         org.ow2.sirocco.cloudmanager.model.cimi.system.System.State... expectedStates) throws CloudProviderException;

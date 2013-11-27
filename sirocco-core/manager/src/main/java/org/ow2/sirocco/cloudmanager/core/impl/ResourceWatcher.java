@@ -110,12 +110,12 @@ public class ResourceWatcher implements IResourceWatcher {
 
                 for (Machine.State expectedFinalState : expectedStates) {
                     if (updatedMachine.getState() == expectedFinalState) {
-                        this.machineManager.syncMachine(machine.getId().toString(), updatedMachine, job.getId().toString());
+                        this.machineManager.syncMachine(machine.getId(), updatedMachine, job.getId());
                         break mainloop;
                     }
                 }
             } catch (ResourceNotFoundException e) {
-                this.machineManager.syncMachine(machine.getId().toString(), null, job.getId().toString());
+                this.machineManager.syncMachine(machine.getId(), null, job.getId());
                 break;
             } catch (ConnectorException e) {
                 ResourceWatcher.logger.error("Failed to poll machine state: ", e);
@@ -146,12 +146,12 @@ public class ResourceWatcher implements IResourceWatcher {
                 Network updatedNetwork = connector.getNetworkService().getNetwork(network.getProviderAssignedId(), target);
                 for (Network.State expectedFinalState : expectedStates) {
                     if (updatedNetwork.getState() == expectedFinalState) {
-                        this.networkManager.syncNetwork(network.getId().toString(), updatedNetwork, job.getId().toString());
+                        this.networkManager.syncNetwork(network.getId(), updatedNetwork, job.getId());
                         break mainloop;
                     }
                 }
             } catch (ResourceNotFoundException e) {
-                this.networkManager.syncNetwork(network.getId().toString(), null, job.getId().toString());
+                this.networkManager.syncNetwork(network.getId(), null, job.getId());
                 break;
             } catch (ConnectorException e) {
                 ResourceWatcher.logger.error("Failed to poll network state: ", e);
@@ -171,20 +171,24 @@ public class ResourceWatcher implements IResourceWatcher {
 
     @Override
     @Asynchronous
-    public Future<Void> watchVolume(final Volume volume, final Job job) throws CloudProviderException {
+    public Future<Void> watchVolume(final Volume volume, final Job job, final Volume.State... expectedStates)
+        throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(volume.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(volume.getCloudProviderAccount()).location(volume.getLocation());
 
         int tries = ResourceWatcher.MAX_WAIT_TIME_IN_SECONDS / ResourceWatcher.SLEEP_BETWEEN_POLL_IN_SECONDS;
-        while (tries-- > 0) {
+        mainloop: while (tries-- > 0) {
             try {
                 Volume updatedVolume = connector.getVolumeService().getVolume(volume.getProviderAssignedId(), target);
-                if (!updatedVolume.getState().toString().endsWith("ING")) {
-                    this.volumeManager.syncVolume(volume.getId().toString(), updatedVolume, job.getId().toString());
-                    break;
+                for (Volume.State expectedFinalState : expectedStates) {
+                    if (updatedVolume.getState() == expectedFinalState) {
+                        this.volumeManager.syncVolume(volume.getId(), updatedVolume, job.getId());
+                        break mainloop;
+                    }
                 }
+
             } catch (ResourceNotFoundException e) {
-                this.volumeManager.syncVolume(volume.getId().toString(), null, job.getId().toString());
+                this.volumeManager.syncVolume(volume.getId(), null, job.getId());
                 break;
             } catch (ConnectorException e) {
                 ResourceWatcher.logger.error("Failed to poll volume state: ", e);
@@ -204,8 +208,8 @@ public class ResourceWatcher implements IResourceWatcher {
 
     @Override
     @Asynchronous
-    public Future<Void> watchVolumeAttachment(final Machine machine, final MachineVolume volumeAttachment, final Job job)
-        throws CloudProviderException {
+    public Future<Void> watchVolumeAttachment(final Machine machine, final MachineVolume volumeAttachment, final Job job,
+        final MachineVolume.State... expectedStates) throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(machine.getCloudProviderAccount());
         ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
 
@@ -219,23 +223,23 @@ public class ResourceWatcher implements IResourceWatcher {
                     for (MachineVolume mv : updatedMachine.getVolumes()) {
                         if (mv.getVolume().getProviderAssignedId().equals(volumeId)) {
                             volumeAttachmentFound = true;
-                            if (!mv.getState().toString().endsWith("ING")) {
-                                this.machineManager
-                                    .syncVolumeAttachment(machine.getId().toString(), mv, job.getId().toString());
-                                break mainloop;
+                            for (MachineVolume.State expectedFinalState : expectedStates) {
+                                if (mv.getState() == expectedFinalState) {
+                                    this.machineManager.syncVolumeAttachment(machine.getId(), mv, job.getId());
+                                    break mainloop;
+                                }
                             }
                             break;
                         }
                     }
                     if (!volumeAttachmentFound) {
                         volumeAttachment.setState(State.DELETED);
-                        this.machineManager.syncVolumeAttachment(machine.getId().toString(), volumeAttachment, job.getId()
-                            .toString());
+                        this.machineManager.syncVolumeAttachment(machine.getId(), volumeAttachment, job.getId());
                         break;
                     }
                 }
             } catch (ResourceNotFoundException e) {
-                this.machineManager.syncMachine(machine.getId().toString(), null, job.getId().toString());
+                this.machineManager.syncMachine(machine.getId(), null, job.getId());
                 break;
             } catch (ConnectorException e) {
                 ResourceWatcher.logger.error("Failed to poll machine state: ", e);
@@ -266,12 +270,12 @@ public class ResourceWatcher implements IResourceWatcher {
                 System updatedSystem = connector.getSystemService().getSystem(system.getProviderAssignedId(), target);
                 for (System.State expectedFinalState : expectedStates) {
                     if (updatedSystem.getState() == expectedFinalState) {
-                        this.systemManager.syncSystem(system.getId().toString(), updatedSystem, job.getId().toString());
+                        this.systemManager.syncSystem(system.getId(), updatedSystem, job.getId());
                         break mainloop;
                     }
                 }
             } catch (ResourceNotFoundException e) {
-                this.systemManager.syncSystem(system.getId().toString(), null, job.getId().toString());
+                this.systemManager.syncSystem(system.getId(), null, job.getId());
                 break;
             } catch (ConnectorException e) {
                 ResourceWatcher.logger.error("Failed to poll system state: ", e);

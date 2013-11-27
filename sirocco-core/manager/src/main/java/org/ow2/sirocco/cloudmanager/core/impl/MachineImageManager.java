@@ -37,6 +37,7 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
@@ -102,7 +103,7 @@ public class MachineImageManager implements IMachineImageManager {
             String providerAccountId = mi.getProperties().get("providerAccountId");
             String providerAssignedId = mi.getProperties().get("providerAssignedId");
             if (providerAccountId != null && providerAssignedId != null) {
-                CloudProviderAccount account = this.cloudProviderManager.getCloudProviderAccountById(providerAccountId);
+                CloudProviderAccount account = this.cloudProviderManager.getCloudProviderAccountByUuid(providerAccountId);
                 if (account == null) {
                     throw new CloudProviderException("Invalid provider account id: " + providerAccountId);
                 }
@@ -140,9 +141,9 @@ public class MachineImageManager implements IMachineImageManager {
         return QueryHelper.getEntityList("MachineImage", this.em, this.getTenant().getId(), MachineImage.State.DELETED, true);
     }
 
-    public MachineImage getMachineImageById(final String imageId) throws CloudProviderException {
+    public MachineImage getMachineImageById(final int imageId) throws CloudProviderException {
         MachineImage image = null;
-        image = this.em.find(MachineImage.class, Integer.valueOf(new String(imageId)));
+        image = this.em.find(MachineImage.class, imageId);
         if (image == null || image.getState() == State.DELETED) {
             throw new ResourceNotFoundException();
         }
@@ -150,20 +151,24 @@ public class MachineImageManager implements IMachineImageManager {
     }
 
     @Override
+    public MachineImage getMachineImageByUuid(final String uuid) throws ResourceNotFoundException, CloudProviderException {
+        try {
+            return this.em.createNamedQuery("MachineImage.findByUuid", MachineImage.class).setParameter("uuid", uuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public MachineImage getMachineImageAttributes(final String imageId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        MachineImage machineImage = this.getMachineImageById(imageId);
+        MachineImage machineImage = this.getMachineImageByUuid(imageId);
         return UtilsForManagers.fillResourceAttributes(machineImage, attributes);
     }
 
     public void deleteMachineImage(final String imageId) throws CloudProviderException, ResourceNotFoundException {
-        MachineImage image = null;
-        try {
-            image = this.em.find(MachineImage.class, Integer.valueOf(imageId));
-
-        } catch (Exception e) {
-            throw new CloudProviderException("MachineImage of identity " + imageId + " cannot be found ");
-        }
+        MachineImage image = this.getMachineImageByUuid(imageId);
 
         /** if related image is not null then do not permit deletion */
         if (image.getRelatedImage() != null) {
@@ -172,8 +177,9 @@ public class MachineImageManager implements IMachineImageManager {
         /** if a machine template referernces the image do not permit deletion */
         List<MachineTemplate> templates = null;
         try {
-            templates = this.em.createQuery("SELECT  t FROM MachineTemplate t WHERE t.machineImage.id=:mid")
-                .setParameter("mid", Integer.valueOf(imageId)).getResultList();
+            templates = this.em
+                .createQuery("SELECT  t FROM MachineTemplate t WHERE t.machineImage.uuid=:mid", MachineTemplate.class)
+                .setParameter("mid", imageId).getResultList();
         } catch (Exception e) {
             throw new CloudProviderException("Internal query error" + e.getMessage());
         }
@@ -205,10 +211,7 @@ public class MachineImageManager implements IMachineImageManager {
     public void updateMachineImageAttributes(final String imageId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
 
-        MachineImage image = this.em.find(MachineImage.class, Integer.valueOf(imageId));
-        if (image == null) {
-            throw new ResourceNotFoundException("MachineImage of identity " + imageId + " cannot be found ");
-        }
+        MachineImage image = this.getMachineImageByUuid(imageId);
         if (attributes.containsKey("name")) {
             image.setName((String) attributes.get("name"));
         }

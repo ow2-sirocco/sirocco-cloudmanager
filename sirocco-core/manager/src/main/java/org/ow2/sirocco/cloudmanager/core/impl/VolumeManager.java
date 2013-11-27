@@ -40,6 +40,7 @@ import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Topic;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
@@ -123,7 +124,7 @@ public class VolumeManager implements IVolumeManager {
 
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), volumeCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), volumeCreate);
 
         Volume volume = new Volume();
 
@@ -157,21 +158,20 @@ public class VolumeManager implements IVolumeManager {
         this.em.flush();
 
         ObjectMessage message = this.jmsContext.createObjectMessage(new VolumeCreateCommand(volumeCreate)
-            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(volume.getId().toString())
-            .setJob(job));
+            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(volume.getId()).setJob(job));
         this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
     }
 
     @Override
-    public void syncVolume(final String volumeId, final Volume updatedVolume, final String jobId) throws CloudProviderException {
-        Volume volume = this.em.find(Volume.class, Integer.valueOf(volumeId));
-        Job job = this.em.find(Job.class, Integer.valueOf(jobId));
+    public void syncVolume(final int volumeId, final Volume updatedVolume, final int jobId) throws CloudProviderException {
+        Volume volume = this.em.find(Volume.class, volumeId);
+        Job job = this.em.find(Job.class, jobId);
         if (updatedVolume == null) {
             volume.setState(Volume.State.DELETED);
             // detach deleted volume from machines if any
-            List<MachineVolume> attachments = this.getVolumeAttachments(volumeId);
+            List<MachineVolume> attachments = this.getVolumeAttachments(volume.getUuid());
             for (MachineVolume attachment : attachments) {
                 attachment.getOwner().removeMachineVolume(attachment);
                 attachment.setState(MachineVolume.State.DELETED);
@@ -225,18 +225,30 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public Volume getVolumeById(final String volumeId) throws CloudProviderException {
-        Volume volume = this.em.find(Volume.class, Integer.valueOf(volumeId));
+    public Volume getVolumeById(final int volumeId) throws CloudProviderException {
+        Volume volume = this.em.find(Volume.class, volumeId);
         if (volume == null || volume.getState() == Volume.State.DELETED) {
             throw new ResourceNotFoundException(" Invalid volume id " + volumeId);
         }
-        volume.setAttachments(this.getVolumeAttachments(volume.getId().toString()));
+        volume.setAttachments(this.getVolumeAttachments(volume.getUuid()));
         return volume;
     }
 
     @Override
-    public VolumeConfiguration getVolumeConfigurationById(final String volumeConfigId) throws CloudProviderException {
-        VolumeConfiguration result = this.em.find(VolumeConfiguration.class, Integer.valueOf(volumeConfigId));
+    public Volume getVolumeByUuid(final String volumeUuid) throws ResourceNotFoundException, CloudProviderException {
+        try {
+            Volume result = this.em.createNamedQuery("Volume.findByUuid", Volume.class).setParameter("uuid", volumeUuid)
+                .getSingleResult();
+            result.setAttachments(this.getVolumeAttachments(result.getUuid()));
+            return result;
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
+    public VolumeConfiguration getVolumeConfigurationById(final int volumeConfigId) throws CloudProviderException {
+        VolumeConfiguration result = this.em.find(VolumeConfiguration.class, volumeConfigId);
         if (result == null) {
             throw new ResourceNotFoundException(" Invalid Volume Configuration id " + volumeConfigId);
         }
@@ -244,18 +256,25 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public VolumeConfiguration getVolumeConfigurationAttributes(final String volumeConfigId, final List<String> attributes)
-        throws ResourceNotFoundException, CloudProviderException {
-        VolumeConfiguration result = this.em.find(VolumeConfiguration.class, Integer.valueOf(volumeConfigId));
-        if (result == null) {
-            throw new ResourceNotFoundException(" Invalid Volume Configuration id " + volumeConfigId);
+    public VolumeConfiguration getVolumeConfigurationByUuid(final String volumeConfigUuid) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("VolumeConfiguration.findByUuid", VolumeConfiguration.class)
+                .setParameter("uuid", volumeConfigUuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
         }
+    }
+
+    @Override
+    public VolumeConfiguration getVolumeConfigurationAttributes(final String volumeConfigUuid, final List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException {
+        VolumeConfiguration result = this.getVolumeConfigurationByUuid(volumeConfigUuid);
         return result;
     }
 
     @Override
-    public VolumeTemplate getVolumeTemplateById(final String volumeTemplateId) throws CloudProviderException {
-        VolumeTemplate result = this.em.find(VolumeTemplate.class, Integer.valueOf(volumeTemplateId));
+    public VolumeTemplate getVolumeTemplateById(final int volumeTemplateId) throws CloudProviderException {
+        VolumeTemplate result = this.em.find(VolumeTemplate.class, volumeTemplateId);
         if (result == null) {
             throw new ResourceNotFoundException(" Invalid Volume Template id " + volumeTemplateId);
         }
@@ -263,22 +282,26 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
-    public VolumeTemplate getVolumeTemplateAttributes(final String volumeTemplateId, final List<String> attributes)
-        throws ResourceNotFoundException, CloudProviderException {
-        VolumeTemplate result = this.em.find(VolumeTemplate.class, Integer.valueOf(volumeTemplateId));
-        if (result == null) {
-            throw new ResourceNotFoundException(" Invalid Volume Template id " + volumeTemplateId);
+    public VolumeTemplate getVolumeTemplateByUuid(final String volumeTemplateUuid) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("VolumeTemplate.findByUuid", VolumeTemplate.class)
+                .setParameter("uuid", volumeTemplateUuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
         }
+    }
+
+    @Override
+    public VolumeTemplate getVolumeTemplateAttributes(final String volumeTemplateUuid, final List<String> attributes)
+        throws ResourceNotFoundException, CloudProviderException {
+        VolumeTemplate result = this.getVolumeTemplateByUuid(volumeTemplateUuid);
         return result;
     }
 
     @Override
-    public Volume getVolumeAttributes(final String volumeId, final List<String> attributes) throws ResourceNotFoundException,
+    public Volume getVolumeAttributes(final String volumeUuid, final List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException {
-        Volume result = this.em.find(Volume.class, Integer.valueOf(volumeId));
-        if (result == null) {
-            throw new ResourceNotFoundException(" Invalid volume id " + volumeId);
-        }
+        Volume result = this.getVolumeByUuid(volumeUuid);
         return result;
     }
 
@@ -287,7 +310,7 @@ public class VolumeManager implements IVolumeManager {
             false);
         // FIXME
         for (Volume vol : result) {
-            vol.setAttachments(this.getVolumeAttachments(vol.getId().toString()));
+            vol.setAttachments(this.getVolumeAttachments(vol.getUuid()));
         }
         return result;
     }
@@ -317,7 +340,8 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<VolumeConfiguration> getVolumeConfigurations() throws CloudProviderException {
-        return this.em.createQuery("SELECT c FROM VolumeConfiguration c WHERE c.tenant.id=:tenantId")
+        return this.em
+            .createQuery("SELECT c FROM VolumeConfiguration c WHERE c.tenant.id=:tenantId", VolumeConfiguration.class)
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
@@ -334,7 +358,7 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<VolumeTemplate> getVolumeTemplates() throws CloudProviderException {
-        return this.em.createQuery("SELECT c FROM VolumeTemplate c WHERE c.tenant.id=:tenantId")
+        return this.em.createQuery("SELECT c FROM VolumeTemplate c WHERE c.tenant.id=:tenantId", VolumeTemplate.class)
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
@@ -391,10 +415,7 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public Job updateVolumeAttributes(final String volumeId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        Volume volume = this.getVolumeById(volumeId);
-        if (volume == null) {
-            throw new ResourceNotFoundException("Volume " + volumeId + " doesn't not exist");
-        }
+        Volume volume = this.getVolumeByUuid(volumeId);
         // TODO
         throw new UnsupportedOperationException();
     }
@@ -402,10 +423,6 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public Job updateVolume(final Volume volume) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException {
-        Volume volumeInDb = this.getVolumeById(volume.getId().toString());
-        if (volumeInDb == null) {
-            throw new ResourceNotFoundException("Volume " + volume.getId() + " doesn't not exist");
-        }
         // TODO
         throw new UnsupportedOperationException();
     }
@@ -414,13 +431,12 @@ public class VolumeManager implements IVolumeManager {
     public void updateVolumeConfiguration(final VolumeConfiguration volumeConfiguration) throws InvalidRequestException,
         ResourceNotFoundException, CloudProviderException {
         // TODO Auto-generated method stub
-
     }
 
     @Override
     public void updateVolumeConfigurationAttributes(final String volumeConfigId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        VolumeConfiguration volumeConfig = this.getVolumeConfigurationById(volumeConfigId);
+        VolumeConfiguration volumeConfig = this.getVolumeConfigurationByUuid(volumeConfigId);
         if (volumeConfig == null) {
             throw new ResourceNotFoundException();
         }
@@ -452,14 +468,14 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public void updateVolumeTemplateAttributes(final String volumeTemplateId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        VolumeTemplate volumeTemplate = this.getVolumeTemplateById(volumeTemplateId);
+        VolumeTemplate volumeTemplate = this.getVolumeTemplateByUuid(volumeTemplateId);
         if (volumeTemplate == null) {
             throw new ResourceNotFoundException();
         }
         boolean updated = this.updateCloudEntityAttributes(volumeTemplate, attributes);
         if (attributes.containsKey("volumeConfig")) {
             VolumeConfiguration config = (VolumeConfiguration) attributes.get("volumeConfig");
-            config = this.getVolumeConfigurationById(config.getId().toString());
+            config = this.getVolumeConfigurationByUuid(config.getUuid());
             volumeTemplate.setVolumeConfig(config);
             updated = true;
         }
@@ -469,12 +485,12 @@ public class VolumeManager implements IVolumeManager {
     }
 
     private void fireVolumeStateChangeEvent(final Volume volume) {
-        this.jmsContext.createProducer().setProperty("tenantId", volume.getTenant().getId().toString())
+        this.jmsContext.createProducer().setProperty("tenantId", volume.getTenant().getUuid())
             .send(this.resourceStateChangeTopic, new ResourceStateChangeEvent(volume));
     }
 
     @Override
-    public void updateVolumeState(final String volumeId, final Volume.State state) throws CloudProviderException {
+    public void updateVolumeState(final int volumeId, final Volume.State state) throws CloudProviderException {
         Volume volume = this.getVolumeById(volumeId);
         volume.setState(state);
         this.fireVolumeStateChangeEvent(volume);
@@ -483,10 +499,7 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public Job deleteVolume(final String volumeId) throws ResourceNotFoundException, CloudProviderException {
         VolumeManager.logger.info("Deleting Volume " + volumeId);
-        Volume volume = this.getVolumeById(volumeId);
-        if (volume == null) {
-            throw new ResourceNotFoundException("Volume " + volumeId + " doesn't not exist");
-        }
+        Volume volume = this.getVolumeByUuid(volumeId);
 
         if (!volume.getAttachments().isEmpty()) {
             throw new ResourceConflictException("Volume in use");
@@ -513,46 +526,40 @@ public class VolumeManager implements IVolumeManager {
         this.em.persist(job);
         this.em.flush();
 
-        ObjectMessage message = this.jmsContext.createObjectMessage(new VolumeDeleteCommand().setResourceId(
-            volume.getId().toString()).setJob(job));
+        ObjectMessage message = this.jmsContext.createObjectMessage(new VolumeDeleteCommand().setResourceId(volume.getId())
+            .setJob(job));
         this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
     }
 
     @Override
-    public void deleteVolumeConfiguration(final String volumeConfigId) throws CloudProviderException {
-        VolumeConfiguration volumeConfig = this.em.find(VolumeConfiguration.class, Integer.valueOf(volumeConfigId));
-        if (volumeConfig == null) {
-            throw new CloudProviderException("VolumeConfiguration does't exist with id " + volumeConfig);
-        }
+    public void deleteVolumeConfiguration(final String volumeConfigUuid) throws CloudProviderException {
+        VolumeConfiguration volumeConfig = this.getVolumeConfigurationByUuid(volumeConfigUuid);
         this.em.remove(volumeConfig);
     }
 
     @Override
-    public void deleteVolumeTemplate(final String volumeTemplateId) throws CloudProviderException {
-        VolumeTemplate volumeTemplate = this.em.find(VolumeTemplate.class, Integer.valueOf(volumeTemplateId));
-        if (volumeTemplate == null) {
-            throw new CloudProviderException("VolumeTemplate does't exist with id " + volumeTemplateId);
-        }
+    public void deleteVolumeTemplate(final String volumeTemplateUuid) throws CloudProviderException {
+        VolumeTemplate volumeTemplate = this.getVolumeTemplateByUuid(volumeTemplateUuid);
         this.em.remove(volumeTemplate);
     }
 
     private Volume getVolumeByProviderAssignedId(final String providerAssignedId) {
-        Volume volume = (Volume) this.em.createNamedQuery(Volume.GET_VOLUME_BY_PROVIDER_ASSIGNED_ID)
+        Volume volume = (Volume) this.em.createNamedQuery("Volume.findVolumeByProviderAssignedId")
             .setParameter("providerAssignedId", providerAssignedId).getSingleResult();
         return volume;
     }
 
     private VolumeImage getVolumeImageByProviderAssignedId(final String providerAssignedId) {
-        VolumeImage volumeImage = (VolumeImage) this.em.createNamedQuery(VolumeImage.GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID)
+        VolumeImage volumeImage = (VolumeImage) this.em.createNamedQuery("VolumeImage.findVolumeByProviderAssignedId")
             .setParameter("providerAssignedId", providerAssignedId).getSingleResult();
         return volumeImage;
     }
 
     @Override
-    public VolumeImage getVolumeImageById(final String volumeImageId) throws ResourceNotFoundException {
-        VolumeImage volumeImage = this.em.find(VolumeImage.class, Integer.valueOf(volumeImageId));
+    public VolumeImage getVolumeImageById(final int volumeImageId) throws ResourceNotFoundException {
+        VolumeImage volumeImage = this.em.find(VolumeImage.class, volumeImageId);
         if (volumeImage == null || volumeImage.getState() == VolumeImage.State.DELETED) {
             throw new ResourceNotFoundException(" Invalid volumeImage id " + volumeImageId);
         }
@@ -560,9 +567,19 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
+    public VolumeImage getVolumeImageByUuid(final String volumeImageUuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("VolumeImage.findByUuid", VolumeImage.class).setParameter("uuid", volumeImageUuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public VolumeImage getVolumeImageAttributes(final String volumeImageId, final List<String> attributes)
         throws ResourceNotFoundException {
-        VolumeImage volumeImage = this.getVolumeImageById(volumeImageId);
+        VolumeImage volumeImage = this.getVolumeImageByUuid(volumeImageId);
         return UtilsForManagers.fillResourceAttributes(volumeImage, attributes);
     }
 
@@ -594,7 +611,7 @@ public class VolumeManager implements IVolumeManager {
         Tenant tenant = this.getTenant();
 
         ICloudProviderConnector connector = null;
-        Placement placement;
+        Placement placement = null;
 
         if (volumeToSnapshot != null) {
             // TODO:workflowconnector =
@@ -602,7 +619,6 @@ public class VolumeManager implements IVolumeManager {
             // TODO:workflow volumeToSnapshot.getLocation());
             placement = new Placement(volumeToSnapshot.getCloudProviderAccount(), volumeToSnapshot.getLocation());
         } else {
-            placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), volumeImage.getProperties());
             connector = null;// this.getCloudProviderConnector(placement.getAccount(),
                              // placement.getLocation());
         }
@@ -620,7 +636,7 @@ public class VolumeManager implements IVolumeManager {
                 // TODO:workflowproviderJob =
                 // volumeService.createVolumeImage(volumeImage);
             } else {
-                volumeToSnapshot = this.getVolumeById(volumeToSnapshot.getId().toString());
+                volumeToSnapshot = this.getVolumeById(volumeToSnapshot.getId());
                 // TODO:workflowproviderJob =
                 // volumeService.createVolumeSnapshot(volumeToSnapshot.getProviderAssignedId(),
                 // volumeImage);
@@ -705,10 +721,6 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public Job updateVolumeImage(final VolumeImage volumeImage) throws InvalidRequestException, ResourceNotFoundException,
         CloudProviderException {
-        VolumeImage volumeImageInDb = this.getVolumeImageById(volumeImage.getId().toString());
-        if (volumeImageInDb == null) {
-            throw new ResourceNotFoundException("VolumeImage " + volumeImage.getId() + " doesn't not exist");
-        }
         // TODO
         throw new UnsupportedOperationException();
     }
@@ -716,10 +728,7 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public Job updateVolumeImageAttributes(final String volumeImageId, final Map<String, Object> updatedAttributes)
         throws InvalidRequestException, ResourceNotFoundException, CloudProviderException {
-        VolumeImage volumeImage = this.getVolumeImageById(volumeImageId);
-        if (volumeImage == null) {
-            throw new ResourceNotFoundException("VolumeImage " + volumeImageId + " doesn't not exist");
-        }
+        VolumeImage volumeImage = this.getVolumeImageByUuid(volumeImageId);
         boolean updated = this.updateCloudResourceAttributes(volumeImage, updatedAttributes);
         if (updated) {
             volumeImage.setUpdated(new Date());
@@ -735,7 +744,7 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public Job deleteVolumeImage(final String volumeImageId) throws ResourceNotFoundException, CloudProviderException {
-        VolumeImage volumeImage = this.getVolumeImageById(volumeImageId);
+        VolumeImage volumeImage = this.getVolumeImageByUuid(volumeImageId);
         if (volumeImage == null) {
             throw new ResourceNotFoundException("VolumeImage " + volumeImageId + " doesn't not exist");
         }
@@ -790,11 +799,8 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public VolumeVolumeImage getVolumeImageFromVolume(final String volumeId, final String volumeVolumeImageId)
         throws ResourceNotFoundException, CloudProviderException {
-        Volume volume = this.getVolumeById(volumeId);
-        VolumeVolumeImage volumeVolumeImage = this.em.find(VolumeVolumeImage.class, Integer.valueOf(volumeVolumeImageId));
-        if (volumeVolumeImage == null) {
-            throw new ResourceNotFoundException();
-        }
+        Volume volume = this.getVolumeByUuid(volumeId);
+        VolumeVolumeImage volumeVolumeImage = this.getVolumeVolumeImageByUuid(volumeVolumeImageId);
         if (!volume.getImages().contains(volumeVolumeImage)) {
             throw new ResourceNotFoundException();
         }
@@ -804,7 +810,17 @@ public class VolumeManager implements IVolumeManager {
     @Override
     public List<VolumeVolumeImage> getVolumeVolumeImages(final String volumeId) throws ResourceNotFoundException,
         CloudProviderException {
-        return this.getVolumeById(volumeId).getImages();
+        return this.getVolumeByUuid(volumeId).getImages();
+    }
+
+    public VolumeVolumeImage getVolumeVolumeImageByUuid(final String volumeVolumeImageUuid) throws ResourceNotFoundException,
+        CloudProviderException {
+        try {
+            return this.em.createNamedQuery("VolumeVolumeImage.findByUuid", VolumeVolumeImage.class)
+                .setParameter("uuid", volumeVolumeImageUuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
     }
 
     @Override
@@ -834,14 +850,8 @@ public class VolumeManager implements IVolumeManager {
     public Job removeVolumeImageFromVolume(final String volumeId, final String volumeVolumeImageId)
         throws ResourceNotFoundException, CloudProviderException {
         // XXX ask the connector to perform the operation ?
-        Volume volume = this.getVolumeById(volumeId);
-        if (volume == null) {
-            throw new ResourceNotFoundException("Volume " + volumeId + " doesn't not exist");
-        }
-        VolumeVolumeImage volumeVolumeImage = this.em.find(VolumeVolumeImage.class, Integer.valueOf(volumeVolumeImageId));
-        if (volumeVolumeImage == null) {
-            throw new ResourceNotFoundException();
-        }
+        Volume volume = this.getVolumeByUuid(volumeId);
+        VolumeVolumeImage volumeVolumeImage = this.getVolumeVolumeImageByUuid(volumeVolumeImageId);
         if (!volume.getImages().contains(volumeVolumeImage)) {
             throw new ResourceNotFoundException();
         }
@@ -876,9 +886,9 @@ public class VolumeManager implements IVolumeManager {
 
     @Override
     public List<MachineVolume> getVolumeAttachments(final String volumeId) throws CloudProviderException {
-        int vid = Integer.valueOf(volumeId);
-        return this.em.createQuery("SELECT mv FROM MachineVolume mv WHERE mv.volume.id=:vid AND mv.state!=:state")
-            .setParameter("vid", vid).setParameter("state", MachineVolume.State.DELETED).getResultList();
+        return this.em
+            .createQuery("SELECT mv FROM MachineVolume mv WHERE mv.volume.uuid=:vid AND mv.state!=:state", MachineVolume.class)
+            .setParameter("vid", volumeId).setParameter("state", MachineVolume.State.DELETED).getResultList();
     }
 
 }

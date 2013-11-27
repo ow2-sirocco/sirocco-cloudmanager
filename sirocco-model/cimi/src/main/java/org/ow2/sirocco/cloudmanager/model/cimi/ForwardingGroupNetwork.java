@@ -29,12 +29,15 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
 /**
  * Association between a forwarding group and a network
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "ForwardingGroupNetwork.findByUuid", query = "SELECT f from ForwardingGroupNetwork f WHERE f.uuid=:uuid")})
 public class ForwardingGroupNetwork extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

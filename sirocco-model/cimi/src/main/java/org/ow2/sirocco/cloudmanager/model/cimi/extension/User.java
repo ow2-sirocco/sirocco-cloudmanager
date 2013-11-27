@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -36,6 +37,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -44,6 +48,7 @@ import javax.persistence.TemporalType;
  * Person who uses Sirocco manager
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "User.findByUuid", query = "SELECT u from User u WHERE u.uuid=:uuid")})
 @Table(name = "Users")
 public class User implements Serializable {
     public final static String ADMIN_ROLE = "sirocco-admin";
@@ -51,6 +56,8 @@ public class User implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+
+    private String uuid;
 
     private Date created;
 
@@ -78,6 +85,13 @@ public class User implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
         return this.id;
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
     }
 
     @Temporal(TemporalType.TIMESTAMP)
@@ -153,6 +167,14 @@ public class User implements Serializable {
 
     public void setTenants(final Set<Tenant> tenants) {
         this.tenants = tenants;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
 }

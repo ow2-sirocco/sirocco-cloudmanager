@@ -84,16 +84,18 @@ public interface IMachineManager {
 
     Job deleteMachine(final String machineId) throws ResourceNotFoundException, CloudProviderException;
 
-    Machine getMachineById(final String machineId) throws ResourceNotFoundException, CloudProviderException;
+    Machine getMachineById(final int machineId) throws ResourceNotFoundException, CloudProviderException;
+
+    Machine getMachineByUuid(final String machineUuid) throws ResourceNotFoundException, CloudProviderException;
 
     Machine getMachineAttributes(final String machineId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
 
     Job updateMachine(final Machine machine) throws ResourceNotFoundException, CloudProviderException;
 
-    void updateMachineState(String machineId, Machine.State state) throws CloudProviderException;
+    void updateMachineState(int machineId, Machine.State state) throws CloudProviderException;
 
-    void updateMachineVolumeState(String machineVolumeId, MachineVolume.State state) throws CloudProviderException;
+    void updateMachineVolumeState(int machineVolumeId, MachineVolume.State state) throws CloudProviderException;
 
     Job updateMachineAttributes(final String machineId, Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, CloudProviderException;
@@ -101,9 +103,9 @@ public interface IMachineManager {
     Job createMachine(MachineCreate machineCreate) throws ResourceConflictException, InvalidRequestException,
         CloudProviderException;
 
-    void syncMachine(String machineId, Machine machine, String jobId) throws CloudProviderException;
+    void syncMachine(int machineId, Machine machine, int jobId) throws CloudProviderException;
 
-    void syncVolumeAttachment(String machineId, MachineVolume volumeAttachment, String jobId);
+    void syncVolumeAttachment(int machineId, MachineVolume volumeAttachment, int jobId);
 
     QueryResult<Machine> getMachines(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
@@ -113,7 +115,10 @@ public interface IMachineManager {
     /**
      * Operations on MachineConfiguration
      */
-    MachineConfiguration getMachineConfigurationById(final String machineConfigurationId) throws ResourceNotFoundException,
+    MachineConfiguration getMachineConfigurationById(final int machineConfigurationId) throws ResourceNotFoundException,
+        CloudProviderException;
+
+    MachineConfiguration getMachineConfigurationByUuid(final String machineConfigurationId) throws ResourceNotFoundException,
         CloudProviderException;
 
     MachineConfiguration getMachineConfigurationAttributes(final String machineConfigurationId, List<String> attributes)
@@ -140,7 +145,10 @@ public interface IMachineManager {
     /**
      * Operations on MachineTemplate
      */
-    MachineTemplate getMachineTemplateById(String machineTemplateId) throws ResourceNotFoundException, CloudProviderException;
+    MachineTemplate getMachineTemplateById(int machineTemplateId) throws ResourceNotFoundException, CloudProviderException;
+
+    MachineTemplate getMachineTemplateByUuid(String machineTemplateUuid) throws ResourceNotFoundException,
+        CloudProviderException;
 
     MachineTemplate getMachineTemplateAttributes(final String machineTemplateId, List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException;
@@ -168,10 +176,6 @@ public interface IMachineManager {
     /**
      * Machine and Machine template volumes
      */
-
-    // List<MachineVolume> getMachineVolumes(final String machineId) throws
-    // ResourceNotFoundException, CloudProviderException,
-    // InvalidRequestException;
 
     QueryResult<MachineVolume> getMachineVolumes(final String machineId, QueryParams... queryParams)
         throws InvalidRequestException, CloudProviderException;

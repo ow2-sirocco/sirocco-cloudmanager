@@ -41,12 +41,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 /**
  * Image of a volume
  */
-@NamedQueries(value = {@NamedQuery(name = "GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM VolumeImage v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "VolumeImage.findByProviderAssignedId", query = "SELECT v FROM VolumeImage v WHERE v.providerAssignedId=:providerAssignedId"),
+    @NamedQuery(name = "VolumeImage.findByUuid", query = "SELECT v from VolumeImage v WHERE v.uuid=:uuid")})
 public class VolumeImage extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
-
-    public static final String GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID = "GET_VOLUMEIMAGE_BY_PROVIDER_ASSIGNED_ID";
 
     public static enum State {
         CREATING, AVAILABLE, DELETING, DELETED, ERROR

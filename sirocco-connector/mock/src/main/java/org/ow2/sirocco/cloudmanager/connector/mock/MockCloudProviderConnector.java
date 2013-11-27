@@ -101,7 +101,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static Logger logger = LoggerFactory.getLogger(MockCloudProviderConnector.class);
 
-    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS = 10;
+    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS = 1;
 
     private List<MockProvider> mockProviders = new ArrayList<MockProvider>();
 
@@ -587,6 +587,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
                     newNetIntf.setState(InterfaceState.PASSIVE);
 
+                    newNetIntf.setNetwork(networkInterface.getNetwork());
+
                     newNetIntf.setNetworkType(networkInterface.getNetworkType());
 
                     machine.addNetworkInterface(newNetIntf);
@@ -756,7 +758,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                             networkInterface.setState(InterfaceState.ACTIVE);
                         }
                     }
-                    machine.setState(Machine.State.STOPPED);
+                    machine.setState(Machine.State.STARTED);
                     machine.setUpdated(new Date());
                 } else if (machine.getState() == Machine.State.DELETING) {
                     this.machines.remove(machine.getProviderAssignedId());
@@ -1408,7 +1410,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MachineVolume targetMachineVolume = null;
             for (MachineVolume mv : machine.getVolumes()) {
                 if (mv.getVolume() != null
-                    && mv.getVolume().getProviderAssignedId() == machineVolume.getVolume().getProviderAssignedId()) {
+                    && mv.getVolume().getProviderAssignedId().equals(machineVolume.getVolume().getProviderAssignedId())) {
                     targetMachineVolume = mv;
                     break;
                 }

@@ -30,6 +30,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
@@ -38,7 +39,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -49,10 +53,13 @@ import javax.persistence.TemporalType;
  * public cloud (e.g. Amazon EC2).
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "CloudProvider.findByUuid", query = "SELECT c from CloudProvider c WHERE c.uuid=:uuid")})
 public class CloudProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
+
+    private String uuid;
 
     private Date created;
 
@@ -61,6 +68,8 @@ public class CloudProvider implements Serializable {
     private String description;
 
     private String endpoint;
+
+    private Boolean enabled = true;
 
     private Map<String, String> properties;
 
@@ -124,6 +133,14 @@ public class CloudProvider implements Serializable {
         this.endpoint = endPoint;
     }
 
+    public Boolean getEnabled() {
+        return this.enabled;
+    }
+
+    public void setEnabled(final Boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @OneToMany(mappedBy = "cloudProvider", fetch = FetchType.EAGER)
     public Set<CloudProviderAccount> getCloudProviderAccounts() {
         return this.cloudProviderAccounts;
@@ -143,6 +160,21 @@ public class CloudProvider implements Serializable {
 
     public void setCloudProviderLocations(final Set<CloudProviderLocation> cloudProviderLocations) {
         this.cloudProviderLocations = cloudProviderLocations;
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
 }

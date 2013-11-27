@@ -30,7 +30,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
  * identifier
  */
 public interface Identifiable {
-    Integer getId();
+    String getUuid();
 
-    void setId(Integer id);
+    void setUuid(String uuid);
 }

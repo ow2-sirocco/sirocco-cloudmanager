@@ -43,12 +43,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 /**
  * Forwarding group
  */
-@NamedQueries(value = {@NamedQuery(name = "GET_FORWARDINGGROUP_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM ForwardingGroup n WHERE n.providerAssignedId=:providerAssignedId")})
+@NamedQueries(value = {
+    @NamedQuery(name = "ForwardingGroup.findByProviderAssignedId", query = "SELECT f FROM ForwardingGroup f WHERE f.providerAssignedId=:providerAssignedId"),
+    @NamedQuery(name = "ForwardingGroup.findByUuid", query = "SELECT f from ForwardingGroup f WHERE f.uuid=:uuid")})
 @Entity
 public class ForwardingGroup extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
-
-    public static final String GET_FORWARDINGGROUP_BY_PROVIDER_ASSIGNED_ID = "GET_FORWARDINGGROUP_BY_PROVIDER_ASSIGNED_ID";
 
     public static enum State {
         CREATING, AVAILABLE, DELETING, DELETED, ERROR

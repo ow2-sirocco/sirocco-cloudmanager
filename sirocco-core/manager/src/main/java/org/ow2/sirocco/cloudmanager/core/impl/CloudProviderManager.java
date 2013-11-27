@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -39,6 +38,7 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
@@ -56,7 +56,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.OperationFailureException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteCloudProviderManager;
-import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
+import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntityCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
@@ -132,9 +132,19 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProvider getCloudProviderById(final String cloudProviderId) throws CloudProviderException {
-        CloudProvider result = this.em.find(CloudProvider.class, new Integer(cloudProviderId));
+    public CloudProvider getCloudProviderById(final int cloudProviderId) throws CloudProviderException {
+        CloudProvider result = this.em.find(CloudProvider.class, cloudProviderId);
         return result;
+    }
+
+    @Override
+    public CloudProvider getCloudProviderByUuid(final String uuid) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("CloudProvider.findByUuid", CloudProvider.class).setParameter("uuid", uuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
     }
 
     @Override
@@ -177,14 +187,15 @@ public class CloudProviderManager implements ICloudProviderManager {
     public CloudProviderAccount createCloudProviderAccount(final CloudProvider provider, final CloudProviderLocation location,
         final CloudProviderAccount account, final CreateCloudProviderAccountOptions... options) throws CloudProviderException {
         CloudProvider newProvider = this.createCloudProvider(provider);
-        this.addLocationToCloudProvider(newProvider.getId().toString(), location);
-        return this.createCloudProviderAccount(newProvider.getId().toString(), account, options);
+        CloudProviderManager.logger.info("New provider with uuid=", newProvider.getUuid());
+        this.addLocationToCloudProvider(newProvider.getUuid(), location);
+        return this.createCloudProviderAccount(newProvider.getUuid(), account, options);
     }
 
     @Override
     public CloudProviderAccount createCloudProviderAccount(final String providerId, final CloudProviderAccount account,
         final CreateCloudProviderAccountOptions... _options) throws CloudProviderException {
-        CloudProvider provider = this.getCloudProviderById(providerId);
+        CloudProvider provider = this.getCloudProviderByUuid(providerId);
         account.setCloudProvider(provider);
         account.setCreated(new Date());
         this.em.persist(account);
@@ -274,13 +285,22 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProviderAccount getCloudProviderAccountById(final String cloudProviderAccountId) throws CloudProviderException {
-
+    public CloudProviderAccount getCloudProviderAccountById(final int cloudProviderAccountId) throws CloudProviderException {
         CloudProviderAccount result = this.em.find(CloudProviderAccount.class, new Integer(cloudProviderAccountId));
         if (result != null) {
             result.getTenants().size();
         }
         return result;
+    }
+
+    @Override
+    public CloudProviderAccount getCloudProviderAccountByUuid(final String uuid) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("CloudProviderAccount.findByUuid", CloudProviderAccount.class)
+                .setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
     }
 
     /**
@@ -293,8 +313,8 @@ public class CloudProviderManager implements ICloudProviderManager {
     public void addCloudProviderAccountToTenant(final String tenantId, final String cloudProviderAccountId)
         throws CloudProviderException {
 
-        CloudProviderAccount account = this.getCloudProviderAccountById(cloudProviderAccountId);
-        Tenant tenant = this.tenantManager.getTenantById(tenantId);
+        CloudProviderAccount account = this.getCloudProviderAccountByUuid(cloudProviderAccountId);
+        Tenant tenant = this.tenantManager.getTenantByUuid(tenantId);
         account.getTenants().add(tenant);
         tenant.getCloudProviderAccounts().add(account);
 
@@ -315,8 +335,8 @@ public class CloudProviderManager implements ICloudProviderManager {
     public void removeCloudProviderAccountFromTenant(final String tenantId, final String cloudProviderAccountId)
         throws CloudProviderException {
 
-        CloudProviderAccount account = this.getCloudProviderAccountById(cloudProviderAccountId);
-        Tenant tenant = this.tenantManager.getTenantById(tenantId);
+        CloudProviderAccount account = this.getCloudProviderAccountByUuid(cloudProviderAccountId);
+        Tenant tenant = this.tenantManager.getTenantByUuid(tenantId);
         account.getTenants().remove(account);
         this.em.merge(account);
     }
@@ -340,63 +360,8 @@ public class CloudProviderManager implements ICloudProviderManager {
 
     @Override
     public List<CloudProviderAccount> getCloudProviderAccountsByTenant(final String tenantId) throws CloudProviderException {
-        Tenant tenant = this.tenantManager.getTenantById(tenantId);
+        Tenant tenant = this.tenantManager.getTenantByUuid(tenantId);
         return new ArrayList<CloudProviderAccount>(tenant.getCloudProviderAccounts());
-    }
-
-    @Override
-    public CloudProvider updateCloudProvider(final String id, final Map<String, Object> updatedAttributes)
-        throws CloudProviderException {
-
-        CloudProvider lCP = this.getCloudProviderById(id);
-
-        try {
-            UtilsForManagers.fillObject(lCP, updatedAttributes);
-        } catch (Exception e) {
-            CloudProviderManager.logger.info(e.getMessage());
-            throw new CloudProviderException();
-        }
-
-        return this.updateCloudProvider(lCP);
-    }
-
-    @Override
-    public CloudProvider updateCloudProvider(final CloudProvider CP) throws CloudProviderException {
-
-        // if (!isCloudProviderValid(CP)){throw new
-        // CloudProviderException("CloudProvider validation failed");}
-        Integer CPId = CP.getId();
-        this.em.merge(CP);
-
-        return this.getCloudProviderById(CPId.toString());
-    }
-
-    @Override
-    public CloudProviderAccount updateCloudProviderAccount(final String id, final Map<String, Object> updatedAttributes)
-        throws CloudProviderException {
-
-        CloudProviderAccount lCPA = this.getCloudProviderAccountById(id);
-
-        try {
-            UtilsForManagers.fillObject(lCPA, updatedAttributes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CloudProviderException();
-        }
-
-        return this.updateCloudProviderAccount(lCPA);
-    }
-
-    @Override
-    public CloudProviderAccount updateCloudProviderAccount(final CloudProviderAccount CPA) throws CloudProviderException {
-
-        Integer CPAId = CPA.getId();
-        // if (!isCloudProviderAccountValid(CPA)){throw new
-        // CloudProviderException("CloudProviderAccount validation failed");};
-
-        this.em.merge(CPA);
-
-        return this.getCloudProviderAccountById(CPAId.toString());
     }
 
     @Override
@@ -408,10 +373,6 @@ public class CloudProviderManager implements ICloudProviderManager {
 
         cpl.setIso3166_1(Iso3166_1_Code);
         cpl.setIso3166_2(Iso3166_2_Code);
-        cpl.setPostalCode(postalCode);
-        cpl.setGPS_Altitude(altitude);
-        cpl.setGPS_Latitude(latitude);
-        cpl.setGPS_Longitude(longitude);
         cpl.setCountryName(countryName);
         cpl.setStateName(stateName);
         cpl.setCityName(cityName);
@@ -425,7 +386,6 @@ public class CloudProviderManager implements ICloudProviderManager {
         cpl.setStateName(this.normalizeLabel(cpl.getStateName()));
         cpl.setIso3166_1(this.normalizeLabel(cpl.getIso3166_1()));
         cpl.setIso3166_2(this.normalizeLabel(cpl.getIso3166_2()));
-        cpl.setPostalCode(this.normalizeLabel(cpl.getPostalCode()));
         return cpl;
     }
 
@@ -456,73 +416,23 @@ public class CloudProviderManager implements ICloudProviderManager {
             return false;
         }
 
-        if (cpl.getPostalCode() == null) {
-            return false;
-        }
-        if (cpl.getPostalCode().equals("")) {
-            return false;
-        }
-
-        if (cpl.getGPS_Altitude() == null) {
-            return false;
-        }
-        if (cpl.getGPS_Altitude().equals("")) {
-            return false;
-        }
-
-        if (cpl.getGPS_Latitude() == null) {
-            return false;
-        }
-        if (cpl.getGPS_Latitude().equals("")) {
-            return false;
-        }
-
-        if (cpl.getGPS_Longitude() == null) {
-            return false;
-        }
-        if (cpl.getGPS_Longitude().equals("")) {
-            return false;
-        }
-
         return true;
     }
 
     @Override
-    public CloudProviderLocation getCloudProviderLocationById(final String cloudProviderLocationId)
-        throws CloudProviderException {
-
-        CloudProviderLocation result = this.em.find(CloudProviderLocation.class, new Integer(cloudProviderLocationId));
-
+    public CloudProviderLocation getCloudProviderLocationById(final int cloudProviderLocationId) throws CloudProviderException {
+        CloudProviderLocation result = this.em.find(CloudProviderLocation.class, cloudProviderLocationId);
         return result;
     }
 
     @Override
-    public CloudProviderLocation updateCloudProviderLocation(final String id, final Map<String, Object> updatedAttributes)
-        throws CloudProviderException {
-
-        CloudProviderLocation lCPL = this.getCloudProviderLocationById(id);
-
+    public CloudProviderLocation getCloudProviderLocationByUuid(final String uuid) throws CloudProviderException {
         try {
-            UtilsForManagers.fillObject(lCPL, updatedAttributes);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new CloudProviderException();
+            return this.em.createNamedQuery("CloudProviderLocation.findByUuid", CloudProviderLocation.class)
+                .setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
         }
-
-        return this.updateCloudProviderLocation(lCPL);
-    }
-
-    @Override
-    public CloudProviderLocation updateCloudProviderLocation(final CloudProviderLocation CPL) throws CloudProviderException {
-
-        // if (!isCloudProviderLocationValid(CPL)){throw new
-        // CloudProviderException("CloudProviderLocation validation failed");}
-
-        Integer CPLId = CPL.getId();
-        this.normalizeCloudProviderLocation(CPL);
-        this.em.merge(CPL);
-
-        return this.getCloudProviderLocationById(CPLId.toString());
     }
 
     @Override
@@ -539,36 +449,10 @@ public class CloudProviderManager implements ICloudProviderManager {
         return this.em.createQuery("Select p From CloudProviderLocation p").getResultList();
     }
 
-    /**
-     * Method to evaluate distance between 2 different locations <br>
-     * ** Only works if the points are close enough that you can omit that earth is not regular shape ** <br>
-     * <br>
-     * <i>see http://androidsnippets.com/distance-between-two-gps-coordinates-in- meter</i>
-     * 
-     * @return
-     */
-    @Override
-    public double locationDistance(final CloudProviderLocation pointA, final CloudProviderLocation pointB) {
-
-        float pk = (float) (180 / 3.14159265);
-
-        double a1 = pointA.getGPS_Latitude() / pk;
-        double a2 = pointA.getGPS_Longitude() / pk;
-        double b1 = pointB.getGPS_Latitude() / pk;
-        double b2 = pointB.getGPS_Longitude() / pk;
-
-        double t1 = Math.cos(a1) * Math.cos(a2) * Math.cos(b1) * Math.cos(b2);
-        double t2 = Math.cos(a1) * Math.sin(a2) * Math.cos(b1) * Math.sin(b2);
-        double t3 = Math.sin(a1) * Math.sin(b1);
-        double tt = Math.acos(t1 + t2 + t3);
-
-        return 6366000 * tt;
-    }
-
     @Override
     public void addLocationToCloudProvider(final String cloudProviderId, final String locationId) throws CloudProviderException {
-        CloudProvider provider = this.getCloudProviderById(cloudProviderId);
-        CloudProviderLocation location = this.getCloudProviderLocationById(locationId);
+        CloudProvider provider = this.getCloudProviderByUuid(cloudProviderId);
+        CloudProviderLocation location = this.getCloudProviderLocationByUuid(locationId);
         if (location == null) {
             throw new ResourceNotFoundException("Wrong location id: " + locationId);
         }
@@ -579,7 +463,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     @Override
     public void addLocationToCloudProvider(final String cloudProviderId, CloudProviderLocation location)
         throws CloudProviderException {
-        CloudProvider provider = this.getCloudProviderById(cloudProviderId);
+        CloudProvider provider = this.getCloudProviderByUuid(cloudProviderId);
         location = this.createCloudProviderLocation(location);
         provider.getCloudProviderLocations().add(location);
         location.setCloudProviders(new HashSet<CloudProvider>());
@@ -587,61 +471,49 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public Placement placeResource(final String tenantId, final Map<String, String> properties) throws CloudProviderException {
+    public Placement placeResource(final int tenantId, final CloudEntityCreate create) throws CloudProviderException {
         Tenant tenant = this.tenantManager.getTenantById(tenantId);
-        String cloudProviderType = null;
-        String cloudProviderAccountId = null;
-        String cloudProviderLocationCountry = null;
-        if (properties != null) {
-            cloudProviderType = properties.get("provider");
-            cloudProviderAccountId = properties.get("providerAccountId");
-            cloudProviderLocationCountry = properties.get("location");
-        }
-        if (cloudProviderType == null) {
-            cloudProviderType = "mock";
-        }
+
         CloudProviderAccount targetAccount = null;
-        if (cloudProviderAccountId != null) {
-            for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
-                if (account.getId().toString().equals(cloudProviderAccountId)) {
-                    targetAccount = account;
-                    break;
-                }
-            }
-            if (targetAccount == null) {
-                throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider id "
-                    + cloudProviderAccountId);
-            }
+        CloudProviderLocation targetLocation = null;
 
+        String providerAccountId = create.getProviderAccountId();
+        if (providerAccountId == null) {
+            List<CloudProviderAccount> accounts = this.getCloudProviderAccountsByTenant(tenant.getUuid());
+            if (accounts.isEmpty()) {
+                throw new CloudProviderException("No provider account");
+            }
+            targetAccount = accounts.get(0);
         } else {
-            for (CloudProviderAccount account : tenant.getCloudProviderAccounts()) {
-                if (account.getCloudProvider().getCloudProviderType().equals(cloudProviderType)) {
-                    targetAccount = account;
+            targetAccount = this.getCloudProviderAccountByUuid(providerAccountId);
+            if (targetAccount == null) {
+                throw new CloudProviderException("Provider account with id=" + providerAccountId);
+            }
+            boolean accountAllowed = false;
+            for (Tenant t : targetAccount.getTenants()) {
+                if (t.getId() == tenant.getId()) {
+                    accountAllowed = true;
                     break;
                 }
             }
-            if (targetAccount == null) {
-                throw new CloudProviderException("No provider account for tenant " + tenant.getName() + " and provider type "
-                    + cloudProviderType);
+            if (!accountAllowed) {
+                throw new CloudProviderException("Access not allowed to provider account " + providerAccountId);
             }
         }
 
-        CloudProviderLocation targetLocation = null;
-        if (cloudProviderLocationCountry != null) {
+        String location = create.getLocation();
+        if (location == null) {
+            targetLocation = targetAccount.getCloudProvider().getCloudProviderLocations().iterator().next();
+        } else {
             for (CloudProviderLocation loc : targetAccount.getCloudProvider().getCloudProviderLocations()) {
-                if (loc.getCountryName().equalsIgnoreCase(cloudProviderLocationCountry)) {
+                if (loc.getCountryName().equalsIgnoreCase(location)) {
                     targetLocation = loc;
                     break;
                 }
             }
             if (targetLocation == null) {
-                throw new CloudProviderException("Cloud Provider " + cloudProviderType + " does not support location "
-                    + cloudProviderLocationCountry);
-            }
-        } else {
-            if (targetAccount.getCloudProvider().getCloudProviderLocations() != null
-                && !targetAccount.getCloudProvider().getCloudProviderLocations().isEmpty()) {
-                targetLocation = targetAccount.getCloudProvider().getCloudProviderLocations().iterator().next();
+                throw new CloudProviderException("Location " + location + " not supported by provider "
+                    + targetAccount.getCloudProvider().getDescription());
             }
         }
 
@@ -660,14 +532,20 @@ public class CloudProviderManager implements ICloudProviderManager {
         return this.em.createQuery("Select p From CloudProviderProfile p").getResultList();
     }
 
-    @Override
-    public void addCloudProviderProfileMetadata(final String profileId,
-        final org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile.AccountParameter metadata)
-        throws ResourceNotFoundException {
-        CloudProviderProfile profile = this.em.find(CloudProviderProfile.class, Integer.parseInt(profileId));
-        if (profile == null) {
+    public CloudProviderProfile getCloudProviderProfileByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("CloudProviderProfile.findByUuid", CloudProviderProfile.class)
+                .setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
             throw new ResourceNotFoundException();
         }
+    }
+
+    @Override
+    public void addCloudProviderProfileMetadata(final String profileUuid,
+        final org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile.AccountParameter metadata)
+        throws ResourceNotFoundException {
+        CloudProviderProfile profile = this.getCloudProviderProfileByUuid(profileUuid);
         profile.getAccountParameters().add(metadata);
     }
 

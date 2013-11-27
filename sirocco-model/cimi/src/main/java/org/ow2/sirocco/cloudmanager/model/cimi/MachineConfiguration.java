@@ -33,6 +33,10 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.IMultiCloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
@@ -42,13 +46,19 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
  * Hardware configuration of a compute resource
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "MachineConfiguration.findByUuid", query = "SELECT m from MachineConfiguration m WHERE m.uuid=:uuid")})
 public class MachineConfiguration extends CloudEntity implements IMultiCloudResource, Serializable {
     private static final long serialVersionUID = 1L;
 
+    @NotNull
+    @Min(1)
     private Integer cpu;
 
+    @NotNull
+    @Min(0)
     private Integer memory;
 
+    @NotNull
     private List<DiskTemplate> disks;
 
     private Visibility visibility = Visibility.PRIVATE;

@@ -25,9 +25,7 @@
 
 package org.ow2.sirocco.cloudmanager.core.impl;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -35,8 +33,6 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -51,6 +47,7 @@ import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
+import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -110,7 +107,7 @@ public class JobManager implements IJobManager {
         return this.tenantManager.getTenant(this.identityContext);
     }
 
-    public Job createJob(final CloudResource targetEntity, final String action, final String parentJob)
+    public Job createJob(final CloudResource targetEntity, final String action, final Integer parentJob)
         throws CloudProviderException {
 
         Job j = new Job();
@@ -125,7 +122,6 @@ public class JobManager implements IJobManager {
             } else {
                 parent.addNestedJob(j);
             }
-
         }
 
         this.em.persist(j);
@@ -134,9 +130,8 @@ public class JobManager implements IJobManager {
     }
 
     @Override
-    public Job getJobById(final String id) throws CloudProviderException {
-
-        Job result = this.em.find(Job.class, new Integer(id));
+    public Job getJobById(final int id) throws CloudProviderException {
+        Job result = this.em.find(Job.class, id);
         if (result == null) {
             throw new ResourceNotFoundException("Invalid Job id " + id);
         }
@@ -146,47 +141,38 @@ public class JobManager implements IJobManager {
     }
 
     @Override
-    public void updateJob(final Job job) throws CloudProviderException {
-
-        Integer jobId = job.getId();
-        this.em.merge(job);
-
+    public Job getJobByUuid(final String uuid) throws ResourceNotFoundException, CloudProviderException {
+        try {
+            return this.em.createNamedQuery("Job.findByUuid", Job.class).setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
     }
 
-    /*
-     * public Job updateJob(final String jobId, final Map<String, Object>
-     * attributes) throws ResourceNotFoundException, CloudProviderException {
-     * Job j = this.em.find(Job.class, new Integer(jobId)); if (j == null) {
-     * throw new ResourceNotFoundException("Machine " + jobId +
-     * " cannot be found"); } for (Map.Entry<String, Object> entry :
-     * attributes.entrySet()) { j.s System.out.println("Key = " + entry.getKey()
-     * + ", Value = " + entry.getValue()); } // return j; } private Job
-     * updateAttribute(Job j,String Attribute,Object value) { if
-     * (Attribute.equals("")) return j; }
-     */
-
     @Override
-    public void deleteJob(final String id) throws CloudProviderException {
-        Job result = this.getJobById(id);
-
-        if (result != null) {
-            this.em.remove(result);
-        }
-
+    public void deleteJob(final String uuid) throws CloudProviderException {
+        Job result = this.getJobByUuid(uuid);
+        this.em.remove(result);
     }
 
     @Override
     public Job getJobAttributes(final String id, final List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException {
-        Job job = this.getJobById(id);
+        Job job = this.getJobByUuid(id);
         return UtilsForManagers.fillResourceAttributes(job, attributes);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<Job> getJobs() throws CloudProviderException {
-        return this.em.createQuery("SELECT j FROM Job j WHERE j.tenant.id=:tenantId")
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+    public QueryResult<Job> getJobs(final QueryParams... queryParams) throws CloudProviderException {
+        if (queryParams.length == 0) {
+            @SuppressWarnings("unchecked")
+            List<Job> jobs = this.em.createQuery("SELECT j FROM Job j WHERE j.tenant.id=:tenantId")
+                .setParameter("tenantId", this.getTenant().getId()).getResultList();
+            return new QueryResult<Job>(jobs.size(), jobs);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Job", Job.class)
+            .tenantId(this.getTenant().getId()).params(queryParams[0]);
+        return QueryHelper.getEntityList(this.em, params);
     }
 
     @Override
@@ -195,92 +181,6 @@ public class JobManager implements IJobManager {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Job", Job.class);
         return QueryHelper.getEntityList(this.em,
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
-    }
-
-    @Override
-    public void updateJobAttributes(final String id, final Map<String, Object> updatedAttributes)
-        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
-        // TODO Auto-generated method stub
-    }
-
-    /**
-     * to call internal methods by passing by the proxy.<br>
-     * It is used to take care of transaction annotations on methods<br>
-     * because if EJB method is called with <i>this</i>, it is not taken<br>
-     * into account
-     * 
-     * @return
-     */
-    private IJobManager getThis() {
-        return this.sessionContext.getBusinessObject(IJobManager.class);
-    }
-
-    /**
-     * update entity job with a pojo from provider layer
-     * 
-     * @param providerJob
-     * @return
-     */
-    private Job updateProviderJob(final Job providerJob) {
-        Job job = null;
-        // update Job entity
-        try {
-            job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
-                .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
-            job.setState(providerJob.getState());
-            job.setStatusMessage(providerJob.getStatusMessage());
-            job.setReturnCode(providerJob.getReturnCode());
-            job.setTimeOfStatusChange(new Date());
-        } catch (NoResultException e) {
-            // should not happen
-            JobManager.logger.error("Cannot find job with providerAssignedId " + providerJob.getProviderAssignedId());
-            throw e;
-        }
-        return job;
-    }
-
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public String getJobIdFromProvider(final Job providerJob) throws NoResultException {
-        Job job = null;
-        if (providerJob == null) {
-            JobManager.logger.warn("providerJob is null");
-        }
-        if (providerJob.getProviderAssignedId() == null) {
-            JobManager.logger.warn("providerJob ProviderAssignedId is null");
-        }
-        JobManager.logger.debug(" getting persisted job from provider job of providerAssignedId "
-            + providerJob.getProviderAssignedId());
-        try {
-            job = (Job) this.em.createQuery("SELECT j FROM Job j WHERE j.providerAssignedId=:providerAssignedId")
-                .setParameter("providerAssignedId", providerJob.getProviderAssignedId()).getSingleResult();
-        } catch (NoResultException e) {
-            // should not happen
-            JobManager.logger.error("Cannot find job with providerAssignedId " + providerJob.getProviderAssignedId());
-            throw e;
-        }
-        if (job == null) {
-            JobManager.logger.warn("job is null");
-        }
-
-        JobManager.logger.debug(" got persisted job " + job.getId());
-        return job.getId().toString();
-    }
-
-    /**
-     * find the root job in the job tree
-     */
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRES_NEW)
-    public String getTopmostJobId(final String jobId) throws CloudProviderException {
-
-        Job j = this.getJobById(jobId);
-
-        Job topmost = j;
-        while (topmost.getParentJob() != null) {
-            topmost = topmost.getParentJob();
-        }
-
-        return topmost.getId().toString();
     }
 
 }

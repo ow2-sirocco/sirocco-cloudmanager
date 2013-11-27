@@ -98,14 +98,15 @@ public class ResourceWatcherManager {
         this.watchers.add(watcher);
     }
 
-    public void createVolumeStateWatcher(final Volume volume, final Job job) throws CloudProviderException {
-        Future<Void> watcher = this.resourceWatcher.watchVolume(volume, job);
+    public void createVolumeStateWatcher(final Volume volume, final Job job, final Volume.State... expectedStates)
+        throws CloudProviderException {
+        Future<Void> watcher = this.resourceWatcher.watchVolume(volume, job, expectedStates);
         this.watchers.add(watcher);
     }
 
-    public void createVolumeAttachmentWatcher(final Machine machine, final MachineVolume volumeAttachement, final Job job)
-        throws CloudProviderException {
-        Future<Void> watcher = this.resourceWatcher.watchVolumeAttachment(machine, volumeAttachement, job);
+    public void createVolumeAttachmentWatcher(final Machine machine, final MachineVolume volumeAttachement, final Job job,
+        final MachineVolume.State... expectedStates) throws CloudProviderException {
+        Future<Void> watcher = this.resourceWatcher.watchVolumeAttachment(machine, volumeAttachement, job, expectedStates);
         this.watchers.add(watcher);
     }
 

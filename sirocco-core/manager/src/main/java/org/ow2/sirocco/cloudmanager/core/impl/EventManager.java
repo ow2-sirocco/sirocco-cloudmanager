@@ -110,7 +110,13 @@ public class EventManager implements IEventManager {
     }
 
     @Override
-    public EventLog getEventLogById(final String eventLogId) throws ResourceNotFoundException, CloudProviderException {
+    public EventLog getEventLogById(final int eventLogId) throws ResourceNotFoundException, CloudProviderException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public EventLog getEventLogByUuid(final String eventLogUuid) throws ResourceNotFoundException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }

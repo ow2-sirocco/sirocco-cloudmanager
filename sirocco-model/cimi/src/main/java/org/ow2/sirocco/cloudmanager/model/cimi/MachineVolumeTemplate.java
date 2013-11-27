@@ -26,6 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -43,6 +44,8 @@ public class MachineVolumeTemplate implements Serializable, Identifiable {
 
     private Integer id;
 
+    private String uuid = UUID.randomUUID().toString();
+
     private String initialLocation;
 
     private VolumeTemplate volumeTemplate;
@@ -55,6 +58,14 @@ public class MachineVolumeTemplate implements Serializable, Identifiable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 
     // TODO unidirectional

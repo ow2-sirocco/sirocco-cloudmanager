@@ -254,7 +254,7 @@ public class SystemManager implements ISystemManager {
 
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), systemCreate.getProperties());
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), systemCreate);
 
         // creating credentials if necessary
         // iterating through descriptors
@@ -337,8 +337,7 @@ public class SystemManager implements ISystemManager {
         this.em.flush();
 
         ObjectMessage message = this.jmsContext.createObjectMessage(new SystemCreateCommand(systemCreate)
-            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(system.getId().toString())
-            .setJob(job));
+            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(system.getId()).setJob(job));
         this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
@@ -346,9 +345,9 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public void syncSystem(final String systemId, final System updatedSystem, final String jobId) throws CloudProviderException {
-        System system = this.em.find(System.class, Integer.valueOf(systemId));
-        Job job = this.em.find(Job.class, Integer.valueOf(jobId));
+    public void syncSystem(final int systemId, final System updatedSystem, final int jobId) throws CloudProviderException {
+        System system = this.em.find(System.class, systemId);
+        Job job = this.em.find(Job.class, jobId);
         if (updatedSystem == null) {
             system.setState(System.State.DELETED);
             this.updateSystemContentState(updatedSystem, "delete");
@@ -503,11 +502,8 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public System getSystemById(final String systemId) throws CloudProviderException {
-        if (systemId == null) {
-            throw new InvalidRequestException(" null system id");
-        }
-        System result = this.em.find(System.class, new Integer(systemId));
+    public System getSystemById(final int systemId) throws CloudProviderException {
+        System result = this.em.find(System.class, systemId);
 
         if (result == null || result.getState() == System.State.DELETED) {
             throw new ResourceNotFoundException(" Invalid system id " + systemId);
@@ -522,14 +518,24 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
+    public System getSystemByUuid(final String systemUuid) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("System.findByUuid", System.class).setParameter("uuid", systemUuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public System getSystemAttributes(final String systemId, final List<String> attributes) throws CloudProviderException {
-        System sys = this.getSystemById(systemId);
+        System sys = this.getSystemByUuid(systemId);
         return UtilsForManagers.fillResourceAttributes(sys, attributes);
     }
 
     @Override
-    public SystemTemplate getSystemTemplateById(final String systemTemplateId) throws CloudProviderException {
-        SystemTemplate result = this.em.find(SystemTemplate.class, new Integer(systemTemplateId));
+    public SystemTemplate getSystemTemplateById(final int systemTemplateId) throws CloudProviderException {
+        SystemTemplate result = this.em.find(SystemTemplate.class, systemTemplateId);
         if (result == null) {
             throw new ResourceNotFoundException("Invalid SystemTemplate id: " + systemTemplateId);
         }
@@ -537,9 +543,19 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
+    public SystemTemplate getSystemTemplateByUuid(final String systemTemplateUuid) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("SystemTemplate.findByUuid", SystemTemplate.class)
+                .setParameter("uuid", systemTemplateUuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public SystemTemplate getSystemTemplateAttributes(final String systemTemplateId, final List<String> attributes)
         throws CloudProviderException {
-        SystemTemplate sysTemplate = this.getSystemTemplateById(systemTemplateId);
+        SystemTemplate sysTemplate = this.getSystemTemplateByUuid(systemTemplateId);
         return UtilsForManagers.fillResourceAttributes(sysTemplate, attributes);
     }
 
@@ -566,7 +582,7 @@ public class SystemManager implements ISystemManager {
     @Override
     public Job addEntityToSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException {
 
-        System s = this.getSystemById(systemId);
+        System s = this.getSystemByUuid(systemId);
 
         if (entity == null || s == null) {
             throw new CloudProviderException("bad id given in parameter");
@@ -574,7 +590,7 @@ public class SystemManager implements ISystemManager {
         if (entity.getResource() == null) {
             throw new CloudProviderException("no resource linked to this entity");
         }
-        if (QueryHelper.getCloudResourceById(this.em, entity.getResource().getId().toString()) == null) {
+        if (QueryHelper.getCloudResourceById(this.em, entity.getResource().getId()) == null) {
             throw new CloudProviderException("nonexisting resource linked to this SystemEntity");
         }
 
@@ -625,7 +641,7 @@ public class SystemManager implements ISystemManager {
     @Override
     public Job removeEntityFromSystem(final String systemId, final String entityId) throws CloudProviderException {
 
-        System s = this.getSystemById(systemId);
+        System s = this.getSystemByUuid(systemId);
         CloudCollectionItem ce = QueryHelper.getCloudCollectionById(this.em, entityId);
         if (ce == null || s == null) {
             throw new CloudProviderException("bad id given in parameter");
@@ -716,12 +732,12 @@ public class SystemManager implements ISystemManager {
     @Override
     public Job updateEntityInSystem(final String systemId, final CloudCollectionItem entity) throws CloudProviderException {
 
-        System s = this.getSystemById(systemId);
+        System s = this.getSystemByUuid(systemId);
 
         if (entity == null || s == null) {
             throw new CloudProviderException("bad id given in parameter");
         }
-        if (QueryHelper.getCloudResourceById(this.em, entity.getResource().getId().toString()) == null) {
+        if (QueryHelper.getCloudResourceById(this.em, entity.getResource().getId()) == null) {
             throw new CloudProviderException("nonexisting resource linked to this SystemEntity");
         }
 
@@ -761,7 +777,7 @@ public class SystemManager implements ISystemManager {
     public List<? extends CloudCollectionItem> getEntityListFromSystem(final String systemId,
         final Class<? extends CloudCollectionItem> entityType) throws CloudProviderException {
 
-        System s = this.getSystemById(systemId);
+        System s = this.getSystemByUuid(systemId);
         if (s == null || entityType == null) {
             throw new CloudProviderException("bad id given in parameter");
         }
@@ -802,7 +818,7 @@ public class SystemManager implements ISystemManager {
     @Override
     public boolean addComponentDescriptorToSystemTemplate(final ComponentDescriptor componentDescriptor,
         final String systemTemplateId) throws CloudProviderException {
-        SystemTemplate s = this.getSystemTemplateById(systemTemplateId);
+        SystemTemplate s = this.getSystemTemplateByUuid(systemTemplateId);
         if (s == null) {
             throw new CloudProviderException("bad systemTemplateId given (" + systemTemplateId + ")");
         }
@@ -848,7 +864,7 @@ public class SystemManager implements ISystemManager {
     @Override
     public boolean removeComponentDescriptorFromSystemTemplate(final String componentDescriptorId, final String systemTemplateId)
         throws CloudProviderException {
-        SystemTemplate s = this.getSystemTemplateById(systemTemplateId);
+        SystemTemplate s = this.getSystemTemplateByUuid(systemTemplateId);
         Set<ComponentDescriptor> descrs = s.getComponentDescriptors();
         ComponentDescriptor cd = this.getComponentDescriptorById(componentDescriptorId);
 
@@ -886,7 +902,7 @@ public class SystemManager implements ISystemManager {
     }
 
     @Override
-    public void updateSystemState(final String systemId, final State state) throws CloudProviderException {
+    public void updateSystemState(final int systemId, final State state) throws CloudProviderException {
         System system = this.getSystemById(systemId);
         system.setState(state);
     }
@@ -970,7 +986,7 @@ public class SystemManager implements ISystemManager {
 
     private Job doService(final String systemId, final String action, final Map<String, String> properties,
         final Object... params) throws CloudProviderException {
-        System system = this.getSystemById(systemId);
+        System system = this.getSystemByUuid(systemId);
         boolean force = false;
 
         // choosing the right action
@@ -1008,10 +1024,9 @@ public class SystemManager implements ISystemManager {
         ObjectMessage message;
         if (!action.equals("delete")) {
             message = this.jmsContext.createObjectMessage(new SystemActionCommand(action).setForce(force)
-                .setResourceId(system.getId().toString()).setJob(job));
+                .setResourceId(system.getId()).setJob(job));
         } else {
-            message = this.jmsContext.createObjectMessage(new SystemDeleteCommand().setResourceId(system.getId().toString())
-                .setJob(job));
+            message = this.jmsContext.createObjectMessage(new SystemDeleteCommand().setResourceId(system.getId()).setJob(job));
         }
         this.jmsContext.createProducer().send(this.requestQueue, message);
 
@@ -1203,7 +1218,7 @@ public class SystemManager implements ISystemManager {
         }
     }
 
-    public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final String entityId,
+    public void handleEntityStateChange(final Class<? extends CloudResource> entityType, final int entityId,
         final boolean deletion) {
 
         // getting system attachement if any
@@ -1212,7 +1227,7 @@ public class SystemManager implements ISystemManager {
         try {
             obj = (CloudCollectionItem) this.em
                 .createQuery("SELECT v FROM CloudCollectionItem v WHERE v.resource.id=:resourceId")
-                .setParameter("resourceId", new Integer(entityId)).getSingleResult();
+                .setParameter("resourceId", entityId).getSingleResult();
         } catch (NoResultException e) {
             obj = null;
         }
@@ -1255,7 +1270,7 @@ public class SystemManager implements ISystemManager {
 
         // updating system status
         try {
-            this.updateSystemStatus(sys.getId().toString());
+            this.updateSystemStatus(sys.getId());
         } catch (CloudProviderException e) {
             SystemManager.logger.warn(" system status update failed for system " + sys.getId());
         }
@@ -1268,7 +1283,7 @@ public class SystemManager implements ISystemManager {
      * @param systemId
      * @throws CloudProviderException
      */
-    private boolean updateSystemStatus(final String systemId) throws CloudProviderException {
+    private boolean updateSystemStatus(final int systemId) throws CloudProviderException {
         System s = this.getSystemById(systemId);
 
         Machine.State firstState = null;
@@ -1283,7 +1298,7 @@ public class SystemManager implements ISystemManager {
         }
         // update subsystems recursively...enjoy ;)
         for (SystemSystem ss : s.getSystems()) {
-            this.updateSystemStatus(ss.getResource().getId().toString());
+            this.updateSystemStatus(ss.getResource().getId());
         }
 
         for (SystemMachine sn : s.getMachines()) {

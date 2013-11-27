@@ -31,7 +31,7 @@
 	<parent>
 		<groupId>org.ow2.sirocco.cloudmanager</groupId>
 		<artifactId>sirocco-cloudmanager-connectors</artifactId>
-		<version>0.6.0-SNAPSHOT</version>
+		<version>0.6.1-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>sirocco-cloudmanager-connector-test</artifactId>
@@ -63,11 +63,6 @@
 		<dependency>
 			<groupId>org.ow2.sirocco.cloudmanager</groupId>
 			<artifactId>sirocco-cloudmanager-connector-amazon</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.ow2.sirocco.cloudmanager</groupId>
-			<artifactId>sirocco-cloudmanager-connector-openstack-nova</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>

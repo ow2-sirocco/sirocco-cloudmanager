@@ -30,6 +30,8 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
@@ -37,6 +39,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
 @Entity
+@NamedQueries({@NamedQuery(name = "SystemTemplate.findByUuid", query = "SELECT s from SystemTemplate s WHERE s.uuid=:uuid")})
 public class SystemTemplate extends CloudTemplate {
     private static final long serialVersionUID = 1L;
 

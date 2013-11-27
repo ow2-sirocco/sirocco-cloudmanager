@@ -30,12 +30,14 @@ import java.io.Serializable;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
 /**
  * Association between a volume and a volume image
  */
 @Entity
+@NamedQuery(name = "VolumeVolumeImage.findByUuid", query = "SELECT v from VolumeVolumeImage v WHERE v.uuid=:uuid")
 public class VolumeVolumeImage extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

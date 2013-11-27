@@ -42,6 +42,8 @@ public class SiroccoConfiguration implements Serializable {
 
     private String httpProxyPort;
 
+    private String httpNonProxyHosts;
+
     public SiroccoConfiguration() {
     }
 
@@ -69,6 +71,14 @@ public class SiroccoConfiguration implements Serializable {
 
     public void setHttpProxyPort(final String httpProxyPort) {
         this.httpProxyPort = httpProxyPort;
+    }
+
+    public String getHttpNonProxyHosts() {
+        return this.httpNonProxyHosts;
+    }
+
+    public void setHttpNonProxyHosts(final String httpNonProxyHosts) {
+        this.httpNonProxyHosts = httpNonProxyHosts;
     }
 
 }

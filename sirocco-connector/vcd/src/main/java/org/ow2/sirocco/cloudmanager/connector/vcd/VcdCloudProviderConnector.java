@@ -311,19 +311,19 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
     }
 
     @Override
-    public Network createNetwork(final NetworkCreate networkCreate, final ProviderTarget target) throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
-
-    @Override
     public Network getNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
-        throw new ConnectorException("unsupported operation");
+        return this.getProvider(target).getNetwork(networkId);
     }
 
     @Override
     public org.ow2.sirocco.cloudmanager.model.cimi.Network.State getNetworkState(final String networkId,
         final ProviderTarget target) throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public Network createNetwork(final NetworkCreate networkCreate, final ProviderTarget target) throws ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
 

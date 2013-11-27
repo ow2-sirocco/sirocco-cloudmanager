@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.FetchType;
@@ -36,8 +37,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
+import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 
@@ -51,11 +54,17 @@ public abstract class CloudEntity implements Serializable, Resource {
 
     protected Integer id;
 
+    protected String uuid;
+
     protected Tenant tenant;
 
+    @Size(max = 255, message = "{resource.name.size}")
     protected String name;
 
+    @Size(max = 255)
     protected String description;
+
+    protected Map<String, String> properties;
 
     protected Date created;
 
@@ -65,14 +74,6 @@ public abstract class CloudEntity implements Serializable, Resource {
 
     protected String providerAssignedId;
 
-    /*
-     * protected long versionNum;
-     * @Version
-     * @Column(name = "OPTLOCK") protected long getVersionNum() { return
-     * this.versionNum; } protected void setVersionNum(final long versionNum) {
-     * this.versionNum = versionNum; }
-     */
-
     public String getProviderAssignedId() {
         return this.providerAssignedId;
     }
@@ -81,22 +82,17 @@ public abstract class CloudEntity implements Serializable, Resource {
         this.providerAssignedId = providerAssignedId;
     }
 
-    // @ManyToMany
-    // public Collection<CloudProvider> getCloudProviders() {
-    // return this.cloudProviders;
-    // }
-
-    // public void setCloudProviders(final Collection<CloudProvider>
-    // cloudProviders) {
-    // this.cloudProviders = cloudProviders;
-    // }
-
-    protected Map<String, String> properties;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
         return this.id;
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
     }
 
     public String getDescription() {
@@ -162,5 +158,13 @@ public abstract class CloudEntity implements Serializable, Resource {
 
     public void setTenant(final Tenant tenant) {
         this.tenant = tenant;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
     }
 }

@@ -57,7 +57,7 @@ public interface IVolumeManager {
      */
     Job createVolume(VolumeCreate volumeCreate) throws InvalidRequestException, CloudProviderException;
 
-    void syncVolume(String volumeId, Volume updatedVolume, String jobId) throws CloudProviderException;
+    void syncVolume(int volumeId, Volume updatedVolume, int jobId) throws CloudProviderException;
 
     /**
      * Creates a new Volume Configuration
@@ -89,7 +89,9 @@ public interface IVolumeManager {
      * @return if successful, the Volume instance
      * @throws ResourceNotFoundException raised if the provided id is invalid
      */
-    Volume getVolumeById(final String volumeId) throws ResourceNotFoundException, CloudProviderException;
+    Volume getVolumeById(final int volumeId) throws ResourceNotFoundException, CloudProviderException;
+
+    Volume getVolumeByUuid(final String volumeUuid) throws ResourceNotFoundException, CloudProviderException;
 
     /**
      * Returns the VolumeTemplate instance with the supplied id
@@ -98,7 +100,9 @@ public interface IVolumeManager {
      * @return if successful, the VolumeTemplate instance
      * @throws CloudProviderException raised if the provided id is invalid
      */
-    VolumeTemplate getVolumeTemplateById(final String volumeTemplateId) throws CloudProviderException;
+    VolumeTemplate getVolumeTemplateById(final int volumeTemplateId) throws CloudProviderException;
+
+    VolumeTemplate getVolumeTemplateByUuid(final String volumeTemplateUuid) throws CloudProviderException;
 
     /**
      * Retrieves some attributes of a Volume Template
@@ -120,7 +124,9 @@ public interface IVolumeManager {
      * @return if successful, the VolumeConfiguration instance
      * @throws CloudProviderException raised if the provided id is invalid
      */
-    VolumeConfiguration getVolumeConfigurationById(final String volumeConfigId) throws CloudProviderException;
+    VolumeConfiguration getVolumeConfigurationById(final int volumeConfigId) throws CloudProviderException;
+
+    VolumeConfiguration getVolumeConfigurationByUuid(final String volumeConfigUuid) throws CloudProviderException;
 
     /**
      * Retrieves some attributes of a Volume Configuration
@@ -323,7 +329,9 @@ public interface IVolumeManager {
 
     Job createVolumeSnapshot(Volume volume, VolumeImage volumeImage) throws InvalidRequestException, CloudProviderException;
 
-    VolumeImage getVolumeImageById(final String volumeImageId) throws ResourceNotFoundException;
+    VolumeImage getVolumeImageById(final int volumeImageId) throws ResourceNotFoundException;
+
+    VolumeImage getVolumeImageByUuid(final String volumeImageUuid) throws ResourceNotFoundException;
 
     VolumeImage getVolumeImageAttributes(final String volumeImageId, List<String> attributes) throws ResourceNotFoundException;
 
@@ -366,6 +374,6 @@ public interface IVolumeManager {
 
     List<MachineVolume> getVolumeAttachments(String volumeId) throws CloudProviderException;
 
-    void updateVolumeState(String volumeId, Volume.State state) throws CloudProviderException;
+    void updateVolumeState(int volumeId, Volume.State state) throws CloudProviderException;
 
 }
