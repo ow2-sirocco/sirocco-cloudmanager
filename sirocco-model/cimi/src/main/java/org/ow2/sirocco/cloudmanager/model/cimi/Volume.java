@@ -45,14 +45,14 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 /**
  * Volume resource
  */
-@NamedQueries(value = {@NamedQuery(name = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID", query = "SELECT v FROM Volume v WHERE v.providerAssignedId=:providerAssignedId")})
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Volume.findByProviderAssignedId", query = "SELECT v FROM Volume v WHERE v.providerAssignedId=:providerAssignedId"),
+    @NamedQuery(name = "Volume.findByUuid", query = "SELECT v from Volume v WHERE v.uuid=:uuid")})
 public class Volume extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
 
     private CloudProviderLocation location;
-
-    public static final String GET_VOLUME_BY_PROVIDER_ASSIGNED_ID = "GET_VOLUME_BY_PROVIDER_ASSIGNED_ID";
 
     public static enum State {
         CREATING, AVAILABLE, DELETING, DELETED, ERROR

@@ -32,6 +32,8 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
@@ -39,6 +41,7 @@ import javax.persistence.Transient;
  * IP address
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "Address.findByUuid", query = "SELECT a from Address a WHERE a.uuid=:uuid")})
 public class Address extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -33,6 +33,10 @@ import java.util.Map;
  */
 public interface Resource extends Identifiable {
 
+    void setId(Integer id);
+
+    Integer getId();
+
     String getDescription();
 
     void setDescription(final String description);

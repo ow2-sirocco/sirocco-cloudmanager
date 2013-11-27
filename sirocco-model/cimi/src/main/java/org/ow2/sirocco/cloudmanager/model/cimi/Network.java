@@ -45,12 +45,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 /**
  * L2 Network
  */
-@NamedQueries(value = {@NamedQuery(name = "GET_NETWORK_BY_PROVIDER_ASSIGNED_ID", query = "SELECT n FROM Network n WHERE n.providerAssignedId=:providerAssignedId")})
 @Entity
+@NamedQueries({
+    @NamedQuery(name = "Network.findByProviderAssignedId", query = "SELECT n FROM Network n WHERE n.providerAssignedId=:providerAssignedId"),
+    @NamedQuery(name = "Network.findByUuid", query = "SELECT n from Network n WHERE n.uuid=:uuid")})
 public class Network extends CloudResource implements Serializable, ICloudProviderResource {
     private static final long serialVersionUID = 1L;
-
-    public static final String GET_NETWORK_BY_PROVIDER_ASSIGNED_ID = "GET_NETWORK_BY_PROVIDER_ASSIGNED_ID";
 
     public static enum State {
         CREATING, STARTING, STARTED, STOPPING, STOPPED, DELETING, DELETED, ERROR

@@ -42,8 +42,10 @@ import javax.persistence.InheritanceType;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Size;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLog;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
@@ -59,13 +61,17 @@ public abstract class CloudResource implements Serializable, Resource {
 
     protected Integer id;
 
-    protected String uuid = UUID.randomUUID().toString();
+    protected String uuid;
 
     protected Tenant tenant;
 
+    @Size(max = 255)
     protected String name;
 
+    @Size(max = 255)
     protected String description;
+
+    protected Map<String, String> properties;
 
     protected Date created;
 
@@ -80,45 +86,21 @@ public abstract class CloudResource implements Serializable, Resource {
      */
     protected Set<Job> workingJobs;
 
-    // protected Collection<CloudProvider> cloudProviders;
-
     protected Set<Meter> meters;
 
     protected EventLog eventLog;
-
-    protected long versionNum;
-
-    /*
-     * @Version
-     * @Column(name = "OPTLOCK") protected long getVersionNum() { return
-     * this.versionNum; } protected void setVersionNum(final long versionNum) {
-     * this.versionNum = versionNum; }
-     */
-
-    public String getProviderAssignedId() {
-        return this.providerAssignedId;
-    }
-
-    public void setProviderAssignedId(final String providerAssignedId) {
-        this.providerAssignedId = providerAssignedId;
-    }
-
-    // @ManyToMany
-    // public Collection<CloudProvider> getCloudProviders() {
-    // return this.cloudProviders;
-    // }
-
-    // public void setCloudProviders(final Collection<CloudProvider>
-    // cloudProviders) {
-    // this.cloudProviders = cloudProviders;
-    // }
-
-    protected Map<String, String> properties;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     public Integer getId() {
         return this.id;
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
     }
 
     public String getDescription() {
@@ -219,6 +201,14 @@ public abstract class CloudResource implements Serializable, Resource {
 
     public void setUuid(final String uuid) {
         this.uuid = uuid;
+    }
+
+    public String getProviderAssignedId() {
+        return this.providerAssignedId;
+    }
+
+    public void setProviderAssignedId(final String providerAssignedId) {
+        this.providerAssignedId = providerAssignedId;
     }
 
 }

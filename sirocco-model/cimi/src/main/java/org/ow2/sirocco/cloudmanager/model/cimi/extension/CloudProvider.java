@@ -39,7 +39,10 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -50,12 +53,13 @@ import javax.persistence.TemporalType;
  * public cloud (e.g. Amazon EC2).
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "CloudProvider.findByUuid", query = "SELECT c from CloudProvider c WHERE c.uuid=:uuid")})
 public class CloudProvider implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
 
-    private String uuid = UUID.randomUUID().toString();
+    private String uuid;
 
     private Date created;
 
@@ -156,6 +160,13 @@ public class CloudProvider implements Serializable {
 
     public void setCloudProviderLocations(final Set<CloudProviderLocation> cloudProviderLocations) {
         this.cloudProviderLocations = cloudProviderLocations;
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
     }
 
     public String getUuid() {

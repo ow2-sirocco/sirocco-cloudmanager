@@ -36,6 +36,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -43,12 +46,13 @@ import javax.persistence.TemporalType;
  * Container used to isolate resources at broker level
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "Tenant.findByUuid", query = "SELECT t from Tenant t WHERE t.uuid=:uuid")})
 public class Tenant implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
 
-    private String uuid = UUID.randomUUID().toString();
+    private String uuid;
 
     private String name;
 
@@ -72,6 +76,13 @@ public class Tenant implements Serializable {
 
     public void setId(final Integer id) {
         this.id = id;
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
     }
 
     public String getUuid() {

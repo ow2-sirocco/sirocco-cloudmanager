@@ -177,12 +177,12 @@ public class RequestDispatcher implements MessageListener {
             this.volumeManager.updateVolumeState(command.getResourceId(), Volume.State.ERROR);
             break;
         case VolumeAttachCommand.VOLUME_ATTACH:
-            this.machineManager.updateMachineVolumeState(((VolumeAttachCommand) command).getVolumeAttachment().getId()
-                .toString(), MachineVolume.State.ERROR);
+            this.machineManager.updateMachineVolumeState(((VolumeAttachCommand) command).getVolumeAttachment().getId(),
+                MachineVolume.State.ERROR);
             break;
         case VolumeDetachCommand.VOLUME_DETACH:
-            this.machineManager.updateMachineVolumeState(((VolumeDetachCommand) command).getVolumeAttachment().getId()
-                .toString(), MachineVolume.State.ERROR);
+            this.machineManager.updateMachineVolumeState(((VolumeDetachCommand) command).getVolumeAttachment().getId(),
+                MachineVolume.State.ERROR);
             break;
         case NetworkCreateCommand.NETWORK_CREATE:
         case NetworkDeleteCommand.NETWORK_DELETE:
@@ -203,14 +203,14 @@ public class RequestDispatcher implements MessageListener {
         Machine newMachine = computeService.createMachine(command.getMachineCreate(),
             new ProviderTarget().account(command.getAccount()).location(command.getLocation()));
 
-        Machine machine = this.em.find(Machine.class, Integer.valueOf(command.getResourceId()));
+        Machine machine = this.em.find(Machine.class, command.getResourceId());
         machine.setProviderAssignedId(newMachine.getProviderAssignedId());
 
         this.resourceWatcherManager.createMachineStateWatcher(machine, command.getJob(), Machine.State.STARTED);
     }
 
     private void deleteMachine(final ResourceCommand command) throws CloudProviderException, ConnectorException {
-        Machine machine = this.em.find(Machine.class, Integer.valueOf(command.getResourceId()));
+        Machine machine = this.em.find(Machine.class, command.getResourceId());
         ICloudProviderConnector connector = this.findCloudProviderConnector(machine.getCloudProviderAccount());
         IComputeService computeService = connector.getComputeService();
         computeService.deleteMachine(machine.getProviderAssignedId(),
@@ -220,7 +220,7 @@ public class RequestDispatcher implements MessageListener {
     }
 
     private void actionMachine(final MachineActionCommand command) throws CloudProviderException, ConnectorException {
-        Machine machine = this.em.find(Machine.class, Integer.valueOf(command.getResourceId()));
+        Machine machine = this.em.find(Machine.class, command.getResourceId());
         ICloudProviderConnector connector = this.findCloudProviderConnector(machine.getCloudProviderAccount());
         IComputeService computeService = connector.getComputeService();
         ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
@@ -258,14 +258,14 @@ public class RequestDispatcher implements MessageListener {
         Volume newVolume = volumeService.createVolume(command.getVolumeCreate(),
             new ProviderTarget().account(command.getAccount()).location(command.getLocation()));
 
-        Volume volume = this.em.find(Volume.class, Integer.valueOf(command.getResourceId()));
+        Volume volume = this.em.find(Volume.class, command.getResourceId());
         volume.setProviderAssignedId(newVolume.getProviderAssignedId());
 
         this.resourceWatcherManager.createVolumeStateWatcher(volume, command.getJob(), Volume.State.AVAILABLE);
     }
 
     private void deleteVolume(final ResourceCommand command) throws CloudProviderException, ConnectorException {
-        Volume volume = this.em.find(Volume.class, Integer.valueOf(command.getResourceId()));
+        Volume volume = this.em.find(Volume.class, command.getResourceId());
         ICloudProviderConnector connector = this.findCloudProviderConnector(volume.getCloudProviderAccount());
         IVolumeService volumeService = connector.getVolumeService();
         volumeService.deleteVolume(volume.getProviderAssignedId(),
@@ -275,7 +275,7 @@ public class RequestDispatcher implements MessageListener {
     }
 
     private void attachVolume(final VolumeAttachCommand command) throws CloudProviderException, ConnectorException {
-        Machine machine = this.em.find(Machine.class, Integer.valueOf(command.getResourceId()));
+        Machine machine = this.em.find(Machine.class, command.getResourceId());
         ICloudProviderConnector connector = this.findCloudProviderConnector(machine.getCloudProviderAccount());
         IComputeService computeService = connector.getComputeService();
         ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
@@ -286,7 +286,7 @@ public class RequestDispatcher implements MessageListener {
     }
 
     private void detachVolume(final VolumeDetachCommand command) throws CloudProviderException, ConnectorException {
-        Machine machine = this.em.find(Machine.class, Integer.valueOf(command.getResourceId()));
+        Machine machine = this.em.find(Machine.class, command.getResourceId());
         ICloudProviderConnector connector = this.findCloudProviderConnector(machine.getCloudProviderAccount());
         IComputeService computeService = connector.getComputeService();
         ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
@@ -303,7 +303,7 @@ public class RequestDispatcher implements MessageListener {
         Network newNetwork = networkService.createNetwork(command.getNetworkCreate(),
             new ProviderTarget().account(command.getAccount()).location(command.getLocation()));
 
-        Network network = this.em.find(Network.class, Integer.valueOf(command.getResourceId()));
+        Network network = this.em.find(Network.class, command.getResourceId());
         network.setProviderAssignedId(newNetwork.getProviderAssignedId());
 
         this.resourceWatcherManager.createNetworkStateWatcher(network, command.getJob(), Network.State.STARTED,
@@ -311,7 +311,7 @@ public class RequestDispatcher implements MessageListener {
     }
 
     private void deleteNetwork(final ResourceCommand command) throws CloudProviderException, ConnectorException {
-        Network network = this.em.find(Network.class, Integer.valueOf(command.getResourceId()));
+        Network network = this.em.find(Network.class, command.getResourceId());
         ICloudProviderConnector connector = this.findCloudProviderConnector(network.getCloudProviderAccount());
         INetworkService networkService = connector.getNetworkService();
         networkService.deleteNetwork(network.getProviderAssignedId(),
@@ -327,7 +327,7 @@ public class RequestDispatcher implements MessageListener {
         System newSystem = systemService.createSystem(command.getSystemCreate(),
             new ProviderTarget().account(command.getAccount()).location(command.getLocation()));
 
-        System system = this.em.find(System.class, Integer.valueOf(command.getResourceId()));
+        System system = this.em.find(System.class, command.getResourceId());
         system.setProviderAssignedId(newSystem.getProviderAssignedId());
 
         this.resourceWatcherManager.createSystemStateWatcher(system, command.getJob(), System.State.STARTED,
@@ -335,7 +335,7 @@ public class RequestDispatcher implements MessageListener {
     }
 
     private void deleteSystem(final ResourceCommand command) throws CloudProviderException, ConnectorException {
-        System system = this.em.find(System.class, Integer.valueOf(command.getResourceId()));
+        System system = this.em.find(System.class, command.getResourceId());
         ICloudProviderConnector connector = this.findCloudProviderConnector(system.getCloudProviderAccount());
         ISystemService systemService = connector.getSystemService();
         systemService.deleteSystem(system.getProviderAssignedId(),
@@ -345,7 +345,7 @@ public class RequestDispatcher implements MessageListener {
     }
 
     private void actionSystem(final SystemActionCommand command) throws CloudProviderException, ConnectorException {
-        System system = this.em.find(System.class, Integer.valueOf(command.getResourceId()));
+        System system = this.em.find(System.class, command.getResourceId());
         ICloudProviderConnector connector = this.findCloudProviderConnector(system.getCloudProviderAccount());
         ISystemService systemService = connector.getSystemService();
         ProviderTarget target = new ProviderTarget().account(system.getCloudProviderAccount()).location(system.getLocation());

@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 import org.apache.commons.beanutils.PropertyUtils;
@@ -37,6 +38,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.Identifiable;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.IMultiCloudResource;
@@ -252,7 +254,7 @@ public class QueryHelper {
 
     }
 
-    public static <E> QueryResult<E> getEntityList(final EntityManager em, final QueryParamsBuilder params)
+    public static <E extends Identifiable> QueryResult<E> getEntityList(final EntityManager em, final QueryParamsBuilder params)
         throws InvalidRequestException {
         StringBuffer whereClauseSB = new StringBuffer();
         if (params.getTenantId() != null) {
@@ -295,14 +297,17 @@ public class QueryHelper {
         }
 
         if (params.getMarker() != null) {
-            Resource resourceAtMarker = (Resource) em.find(params.getClazz(), Integer.valueOf(params.getMarker()));
-            if (resourceAtMarker == null) {
+            try {
+                Resource resourceAtMarker = (Resource) em
+                    .createQuery("SELECT r FROM " + params.getEntityType() + " r WHERE uuid=:uuid")
+                    .setParameter("uuid", params.getMarker()).getSingleResult();
+                if (whereClauseSB.length() > 0) {
+                    whereClauseSB.append(" AND ");
+                }
+                whereClauseSB.append(" v.id>" + resourceAtMarker.getId() + " ");
+            } catch (NoResultException e) {
                 throw new InvalidRequestException("Invalid marker " + params.getMarker());
             }
-            if (whereClauseSB.length() > 0) {
-                whereClauseSB.append(" AND ");
-            }
-            whereClauseSB.append(" v.id>" + resourceAtMarker.getId() + " ");
         }
 
         String whereClause = whereClauseSB.toString();
@@ -340,6 +345,7 @@ public class QueryHelper {
                             // ignore wrong attribute name
                         }
                     }
+                    resource.setUuid(from.getUuid());
                     if (resource instanceof ICloudProviderResource) {
                         ICloudProviderResource fromResource = (ICloudProviderResource) from;
                         ICloudProviderResource toResource = (ICloudProviderResource) resource;
@@ -387,7 +393,7 @@ public class QueryHelper {
         if (whereClauseSB.length() > 0) {
             whereClauseSB.append(" AND ");
         }
-        whereClauseSB.append("v.id=:cid ");
+        whereClauseSB.append("v.uuid=:cid ");
         if (params.getFilters() != null) {
             String filterClause;
             try {
@@ -410,11 +416,11 @@ public class QueryHelper {
         String queryExpression = "SELECT COUNT(vv) FROM " + params.getEntityType() + " vv, " + params.getContainerType()
             + " v WHERE vv MEMBER OF v." + params.getContainerAttributeName() + " AND " + whereClause;
         try {
-            int count = ((Number) em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(params.getContainerId()))
+            int count = ((Number) em.createQuery(queryExpression).setParameter("cid", params.getContainerId())
                 .setParameter("tenantId", params.getTenantId()).getSingleResult()).intValue();
             queryExpression = "SELECT vv FROM " + params.getEntityType() + " vv, " + params.getContainerType()
                 + " v WHERE vv MEMBER OF v." + params.getContainerAttributeName() + " AND " + whereClause + " ORDER BY vv.id";
-            Query query = em.createQuery(queryExpression).setParameter("cid", Integer.valueOf(params.getContainerId()))
+            Query query = em.createQuery(queryExpression).setParameter("cid", params.getContainerId())
                 .setParameter("tenantId", params.getTenantId());
 
             if (params.getFirst() != null) {
@@ -486,8 +492,9 @@ public class QueryHelper {
      */
     public static CloudCollectionItem getCloudCollectionById(final EntityManager em, final String entityId)
         throws CloudProviderException {
-        CloudCollectionItem obj = (CloudCollectionItem) em.createQuery("SELECT v FROM CloudCollectionItem v  WHERE v.id=:idd")
-            .setParameter("idd", entityId).getSingleResult();
+        CloudCollectionItem obj = (CloudCollectionItem) em
+            .createQuery("SELECT v FROM CloudCollectionItem v  WHERE v.uuid=:idd").setParameter("idd", entityId)
+            .getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
         }
@@ -502,10 +509,10 @@ public class QueryHelper {
      * @return
      * @throws CloudProviderException
      */
-    public static CloudResource getCloudResourceById(final EntityManager em, final String resourceId)
+    public static CloudResource getCloudResourceById(final EntityManager em, final int resourceId)
         throws CloudProviderException {
         CloudResource obj = (CloudResource) em.createQuery("SELECT v FROM CloudResource v WHERE v.id=:idd")
-            .setParameter("idd", new Integer(resourceId)).getSingleResult();
+            .setParameter("idd", resourceId).getSingleResult();
         if (obj == null) {
             throw new CloudProviderException("bad id given");
         }

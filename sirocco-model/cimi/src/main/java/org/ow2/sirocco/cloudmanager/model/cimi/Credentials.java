@@ -29,11 +29,14 @@ import java.io.Serializable;
 
 import javax.persistence.Entity;
 import javax.persistence.Lob;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 /**
  * Credentials
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "Credentials.findByUuid", query = "SELECT c from Credentials c WHERE c.uuid=:uuid")})
 public class Credentials extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 

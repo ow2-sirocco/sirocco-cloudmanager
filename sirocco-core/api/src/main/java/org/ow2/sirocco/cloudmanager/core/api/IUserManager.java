@@ -15,7 +15,9 @@ public interface IUserManager {
 
     User createUser(User u) throws CloudProviderException;
 
-    User getUserById(String userId) throws CloudProviderException;
+    User getUserById(int userId) throws CloudProviderException;
+
+    User getUserByUuid(String userUuid) throws CloudProviderException;
 
     User getUserByUsername(String userName) throws CloudProviderException;
 

@@ -9,6 +9,7 @@ import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
@@ -47,7 +48,7 @@ public class TenantManager implements ITenantManager {
     }
 
     @Override
-    public Tenant getTenantById(final String tenantId) throws CloudProviderException {
+    public Tenant getTenantById(final int tenantId) throws CloudProviderException {
         Tenant result = this.em.find(Tenant.class, new Integer(tenantId));
         if (result == null) {
             throw new ResourceNotFoundException();
@@ -56,9 +57,19 @@ public class TenantManager implements ITenantManager {
     }
 
     @Override
+    public Tenant getTenantByUuid(final String tenantUuid) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("Tenant.findByUuid", Tenant.class).setParameter("uuid", tenantUuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public Tenant getTenant(final IdentityContext context) throws CloudProviderException {
         if (context.getTenantId() != null && !context.getTenantId().isEmpty()) {
-            return this.getTenantById(context.getTenantId());
+            return this.getTenantByUuid(context.getTenantId());
         }
         User user = this.userManager.getUserByUsername(context.getUserName());
         if (!user.getTenants().isEmpty()) {
@@ -72,25 +83,22 @@ public class TenantManager implements ITenantManager {
     public List<Tenant> getTenants() throws CloudProviderException {
         User user = this.userManager.getUserByUsername(this.identityContext.getUserName());
         if (user.isAdmin()) {
-            return this.em.createQuery("SELECT t FROM Tenant t").getResultList();
+            return this.em.createQuery("SELECT t FROM Tenant t", Tenant.class).getResultList();
         } else {
             return new ArrayList<Tenant>(user.getTenants());
         }
     }
 
     @Override
-    public void deleteTenant(final String tenantId) throws CloudProviderException {
-        Tenant result = this.getTenantById(tenantId);
-
-        if (result != null) {
-            this.em.remove(result);
-        }
+    public void deleteTenant(final String tenantUuid) throws CloudProviderException {
+        Tenant result = this.getTenantByUuid(tenantUuid);
+        this.em.remove(result);
     }
 
     @Override
-    public void addUserToTenant(final String tenantId, final String userId) throws CloudProviderException {
-        Tenant tenant = this.getTenantById(tenantId);
-        User user = this.userManager.getUserById(userId);
+    public void addUserToTenant(final String tenantUuid, final String userUuid) throws CloudProviderException {
+        Tenant tenant = this.getTenantByUuid(tenantUuid);
+        User user = this.userManager.getUserByUuid(userUuid);
         if (!tenant.getUsers().add(user)) {
             throw new ResourceConflictException();
         }
@@ -98,9 +106,9 @@ public class TenantManager implements ITenantManager {
     }
 
     @Override
-    public void removeUserFromTenant(final String tenantId, final String userId) throws CloudProviderException {
-        Tenant tenant = this.getTenantById(tenantId);
-        User user = this.userManager.getUserById(userId);
+    public void removeUserFromTenant(final String tenantUuid, final String userUuid) throws CloudProviderException {
+        Tenant tenant = this.getTenantByUuid(tenantUuid);
+        User user = this.userManager.getUserByUuid(userUuid);
         if (!tenant.getUsers().remove(user)) {
             throw new ResourceConflictException();
         }
@@ -108,8 +116,8 @@ public class TenantManager implements ITenantManager {
     }
 
     @Override
-    public List<User> getTenantUsers(final String tenantId) throws CloudProviderException {
-        Tenant tenant = this.getTenantById(tenantId);
+    public List<User> getTenantUsers(final String tenantUuid) throws CloudProviderException {
+        Tenant tenant = this.getTenantByUuid(tenantUuid);
         return tenant.getUsers();
     }
 

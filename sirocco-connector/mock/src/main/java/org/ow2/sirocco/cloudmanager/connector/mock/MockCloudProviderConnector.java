@@ -101,7 +101,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static Logger logger = LoggerFactory.getLogger(MockCloudProviderConnector.class);
 
-    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS = 10;
+    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS = 1;
 
     private List<MockProvider> mockProviders = new ArrayList<MockProvider>();
 
@@ -1410,7 +1410,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             MachineVolume targetMachineVolume = null;
             for (MachineVolume mv : machine.getVolumes()) {
                 if (mv.getVolume() != null
-                    && mv.getVolume().getProviderAssignedId() == machineVolume.getVolume().getProviderAssignedId()) {
+                    && mv.getVolume().getProviderAssignedId().equals(machineVolume.getVolume().getProviderAssignedId())) {
                     targetMachineVolume = mv;
                     break;
                 }

@@ -32,11 +32,14 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 
 /**
  * IP address template
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "AddressTemplate.findByUuid", query = "SELECT a from AddressTemplate a WHERE a.uuid=:uuid")})
 public class AddressTemplate extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

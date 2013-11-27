@@ -37,6 +37,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -53,6 +55,7 @@ import org.ow2.sirocco.cloudmanager.model.utils.FSM;
  */
 @Entity
 @Table(name = "SYSTEMINSTANCE")
+@NamedQueries({@NamedQuery(name = "System.findByUuid", query = "SELECT s from System s WHERE s.uuid=:uuid")})
 public class System extends CloudResource implements Serializable, ICloudProviderResource {
 
     private static final long serialVersionUID = 1L;

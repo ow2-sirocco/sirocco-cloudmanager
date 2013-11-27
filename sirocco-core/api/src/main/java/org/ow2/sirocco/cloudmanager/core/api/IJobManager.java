@@ -25,7 +25,6 @@
 package org.ow2.sirocco.cloudmanager.core.api;
 
 import java.util.List;
-import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -40,9 +39,11 @@ public interface IJobManager {
 
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/JobManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteJobManager";
 
-    Job createJob(CloudResource targetEntity, String action, String parentJob) throws CloudProviderException;
+    Job createJob(CloudResource targetEntity, String action, Integer parentJob) throws CloudProviderException;
 
-    Job getJobById(String id) throws ResourceNotFoundException, CloudProviderException;
+    Job getJobById(int id) throws ResourceNotFoundException, CloudProviderException;
+
+    Job getJobByUuid(String uuid) throws ResourceNotFoundException, CloudProviderException;
 
     QueryResult<Job> getJobs(QueryParams... queryParams) throws CloudProviderException;
 
@@ -51,15 +52,6 @@ public interface IJobManager {
     QueryResult<Job> getJobs(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 
-    void updateJob(Job job) throws CloudProviderException;
-
-    void updateJobAttributes(String id, Map<String, Object> updatedAttributes) throws ResourceNotFoundException,
-        InvalidRequestException, CloudProviderException;
-
-    void deleteJob(String id) throws CloudProviderException;
-
-    String getTopmostJobId(String jobId) throws CloudProviderException;
-
-    String getJobIdFromProvider(Job providerJob);
+    void deleteJob(String jobId) throws CloudProviderException;
 
 }

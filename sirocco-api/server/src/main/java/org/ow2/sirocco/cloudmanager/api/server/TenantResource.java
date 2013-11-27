@@ -90,7 +90,7 @@ public class TenantResource extends ResourceBase {
     @Produces({MediaType.APPLICATION_JSON})
     public MultiCloudTenant getTenant(@PathParam("tenantId") final String tenantId) {
         try {
-            Tenant tenant = this.tenantManager.getTenantById(tenantId);
+            Tenant tenant = this.tenantManager.getTenantByUuid(tenantId);
             return this.toMultiCloudTenant(tenant);
         } catch (ResourceNotFoundException e) {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
@@ -106,7 +106,7 @@ public class TenantResource extends ResourceBase {
         try {
             Tenant tenant = this.toTenant(apiTenant);
             this.tenantManager.createTenant(tenant);
-            apiTenant.setId(tenant.getId().toString());
+            apiTenant.setId(tenant.getUuid());
             apiTenant.setHref(this.uri.getBaseUri() + "providers/" + apiTenant.getId());
         } catch (CloudProviderException e) {
             throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -137,8 +137,8 @@ public class TenantResource extends ResourceBase {
             for (CloudProviderAccount account : this.providerManager.getCloudProviderAccountsByTenant(tenantId)) {
                 AccountAccess access = new AccountAccess();
                 access.setTenantId(tenantId);
-                access.setAccountId(account.getId().toString());
-                access.setProviderId(account.getCloudProvider().getId().toString());
+                access.setAccountId(account.getUuid());
+                access.setProviderId(account.getCloudProvider().getUuid());
                 access.setProviderName(account.getCloudProvider().getDescription());
                 access.setProviderApi(account.getCloudProvider().getCloudProviderType());
                 List<Location> locations = new ArrayList<Location>();
@@ -192,7 +192,7 @@ public class TenantResource extends ResourceBase {
             for (User user : this.tenantManager.getTenantUsers(tenantId)) {
                 UserTenantMembership membership = new UserTenantMembership();
                 membership.setTenantId(tenantId);
-                membership.setUserId(user.getId().toString());
+                membership.setUserId(user.getUuid());
                 userTenantMemberships.add(membership);
             }
         } catch (CloudProviderException e) {
@@ -233,7 +233,7 @@ public class TenantResource extends ResourceBase {
 
     private MultiCloudTenant toMultiCloudTenant(final Tenant tenant) {
         MultiCloudTenant result = new MultiCloudTenant();
-        result.setId(tenant.getId().toString());
+        result.setId(tenant.getUuid());
         result.setHref(this.uri.getBaseUri() + "tenants/" + result.getId());
         result.setName(tenant.getName());
         result.setDescription(tenant.getDescription());

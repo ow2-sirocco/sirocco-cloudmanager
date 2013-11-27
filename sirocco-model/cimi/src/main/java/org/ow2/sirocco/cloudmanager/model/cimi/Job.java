@@ -36,6 +36,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -44,6 +46,7 @@ import javax.persistence.TemporalType;
  * Represents a process performed by the provider
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "Job.findByUuid", query = "SELECT j from Job j WHERE j.uuid=:uuid")})
 public class Job extends CloudEntity implements Serializable {
     private static final long serialVersionUID = 1L;
 

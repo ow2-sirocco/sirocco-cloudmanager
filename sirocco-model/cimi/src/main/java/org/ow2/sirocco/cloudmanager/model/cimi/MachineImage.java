@@ -34,6 +34,8 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -46,6 +48,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
  * Machine image encapsulating a pre-built OS and applications
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "MachineImage.findByUuid", query = "SELECT m from MachineImage m WHERE m.uuid=:uuid")})
 public class MachineImage extends CloudResource implements Serializable, IMultiCloudResource {
     private static final long serialVersionUID = 1L;
 

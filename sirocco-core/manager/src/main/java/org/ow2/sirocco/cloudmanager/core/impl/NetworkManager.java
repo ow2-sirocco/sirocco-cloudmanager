@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,9 +21,9 @@ import javax.jms.ObjectMessage;
 import javax.jms.Queue;
 import javax.jms.Topic;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
-import javax.persistence.PersistenceException;
 
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
@@ -107,12 +106,12 @@ public class NetworkManager implements INetworkManager {
     //
 
     private void fireNetworkStateChangeEvent(final Network network) {
-        this.jmsContext.createProducer().setProperty("tenantId", network.getTenant().getId().toString())
+        this.jmsContext.createProducer().setProperty("tenantId", network.getTenant().getUuid())
             .send(this.resourceStateChangeTopic, new ResourceStateChangeEvent(network));
     }
 
     @Override
-    public void updateNetworkState(final String networkId, final Network.State state) throws CloudProviderException {
+    public void updateNetworkState(final int networkId, final Network.State state) throws CloudProviderException {
         Network network = this.getNetworkById(networkId);
         network.setState(state);
         this.fireNetworkStateChangeEvent(network);
@@ -120,8 +119,8 @@ public class NetworkManager implements INetworkManager {
 
     public Network getPublicNetwork() {
         List<Network> publicNetworks = this.em.createQuery(
-            "SELECT n FROM Network n WHERE n.networkType=org.ow2.sirocco.cloudmanager.model.cimi.Network$Type.PUBLIC")
-            .getResultList();
+            "SELECT n FROM Network n WHERE n.networkType=org.ow2.sirocco.cloudmanager.model.cimi.Network$Type.PUBLIC",
+            Network.class).getResultList();
         return publicNetworks.get(0);
     }
 
@@ -136,7 +135,7 @@ public class NetworkManager implements INetworkManager {
         // retrieve user
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), networkCreate);
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), networkCreate);
 
         Network network = new Network();
 
@@ -172,18 +171,18 @@ public class NetworkManager implements INetworkManager {
         this.em.persist(job);
         this.em.flush();
 
-        ObjectMessage message = this.jmsContext.createObjectMessage(new NetworkCreateCommand(networkCreate)
-            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(network.getId().toString())
-            .setJob(job));
+        ObjectMessage message = this.jmsContext
+            .createObjectMessage(new NetworkCreateCommand(networkCreate).setAccount(placement.getAccount())
+                .setLocation(placement.getLocation()).setResourceId(network.getId()).setJob(job));
         this.jmsContext.createProducer().send(this.requestQueue, message);
 
         return job;
     }
 
     @Override
-    public void syncNetwork(final String networkId, final Network updatedNetwork, final String jobId) {
-        Network network = this.em.find(Network.class, Integer.valueOf(networkId));
-        Job job = this.em.find(Job.class, Integer.valueOf(jobId));
+    public void syncNetwork(final int networkId, final Network updatedNetwork, final int jobId) {
+        Network network = this.em.find(Network.class, networkId);
+        Job job = this.em.find(Job.class, jobId);
         if (updatedNetwork == null) {
             network.setState(Network.State.DELETED);
         } else {
@@ -220,8 +219,8 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public Network getNetworkById(final String networkId) throws ResourceNotFoundException {
-        Network network = this.em.find(Network.class, Integer.valueOf(networkId));
+    public Network getNetworkById(final int networkId) throws ResourceNotFoundException {
+        Network network = this.em.find(Network.class, networkId);
         if (network == null || network.getState() == Network.State.DELETED) {
             throw new ResourceNotFoundException(" Invalid network id " + networkId);
         }
@@ -229,9 +228,18 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public Network getNetworkByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("Network.findByUuid", Network.class).setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public Network getNetworkAttributes(final String networkId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.getNetworkById(networkId);
+        return this.getNetworkByUuid(networkId);
     }
 
     private List<Network> getNetworks() throws CloudProviderException {
@@ -264,32 +272,19 @@ public class NetworkManager implements INetworkManager {
     @Override
     public Job updateNetwork(final Network network) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException {
-        Network networkInDb = this.getNetworkById(network.getId().toString());
-        if (networkInDb == null) {
-            throw new ResourceNotFoundException("Network " + network.getId() + " doesn't not exist");
-        }
-        // TODO
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Job updateNetworkAttributes(final String networkId, final Map<String, Object> updatedAttributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
-        Network networkInDb = this.getNetworkById(networkId);
-        if (networkInDb == null) {
-            throw new ResourceNotFoundException("Network " + networkId + " doesn't not exist");
-        }
         // TODO
         throw new UnsupportedOperationException();
     }
 
     private Job performActionOnNetwork(final String networkId, final String action) throws ResourceNotFoundException,
         CloudProviderException {
-        Network network = this.getNetworkById(networkId);
-        if (network == null) {
-            throw new ResourceNotFoundException("Network " + networkId + " doesn't not exist");
-        }
-
+        Network network = this.getNetworkByUuid(networkId);
         Tenant tenant = this.getTenant();
 
         if (action.equals("start")) {
@@ -314,7 +309,7 @@ public class NetworkManager implements INetworkManager {
 
         if (action.equals("delete")) {
             ObjectMessage message = this.jmsContext.createObjectMessage(new NetworkDeleteCommand().setResourceId(
-                network.getId().toString()).setJob(job));
+                network.getId()).setJob(job));
             this.jmsContext.createProducer().send(this.requestQueue, message);
         } else {
             // TODO
@@ -393,13 +388,14 @@ public class NetworkManager implements INetworkManager {
     }
 
     private List<NetworkConfiguration> getNetworkConfigurations() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM NetworkConfiguration v WHERE v.tenant.id=:tenantId ORDER BY v.id")
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+        return this.em
+            .createQuery("SELECT v FROM NetworkConfiguration v WHERE v.tenant.id=:tenantId ORDER BY v.id",
+                NetworkConfiguration.class).setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
-    public NetworkConfiguration getNetworkConfigurationById(final String networkConfigId) throws ResourceNotFoundException {
-        NetworkConfiguration networkConfig = this.em.find(NetworkConfiguration.class, Integer.valueOf(networkConfigId));
+    public NetworkConfiguration getNetworkConfigurationById(final int networkConfigId) throws ResourceNotFoundException {
+        NetworkConfiguration networkConfig = this.em.find(NetworkConfiguration.class, networkConfigId);
         if (networkConfig == null) {
             throw new ResourceNotFoundException(" Invalid networkConfig id " + networkConfigId);
         }
@@ -407,9 +403,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public NetworkConfiguration getNetworkConfigurationByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("NetworkConfiguration.findByUuid", NetworkConfiguration.class)
+                .setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public NetworkConfiguration getNetworkConfigurationAttributes(final String networkConfigId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.getNetworkConfigurationById(networkConfigId);
+        return this.getNetworkConfigurationByUuid(networkConfigId);
     }
 
     @Override
@@ -447,17 +453,14 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public void deleteNetworkConfiguration(final String networkConfigId) throws ResourceNotFoundException,
+    public void deleteNetworkConfiguration(final String networkConfigUuid) throws ResourceNotFoundException,
         CloudProviderException, ResourceConflictException {
-        if (!this.em.createQuery("SELECT n FROM NetworkTemplate n WHERE n.networkConfig.id=:networkConfigId")
-            .setParameter("networkConfigId", Integer.valueOf(networkConfigId)).getResultList().isEmpty()) {
-            throw new ResourceConflictException("Cannot delete NetworkConfiguration with id " + networkConfigId
+        if (!this.em.createQuery("SELECT n FROM NetworkTemplate n WHERE n.networkConfig.uuid=:networkConfigUuid")
+            .setParameter("networkConfigUuid", networkConfigUuid).getResultList().isEmpty()) {
+            throw new ResourceConflictException("Cannot delete NetworkConfiguration with id " + networkConfigUuid
                 + " used by a NetworkTemplate");
         }
-        NetworkConfiguration networkConfig = this.em.find(NetworkConfiguration.class, Integer.valueOf(networkConfigId));
-        if (networkConfig == null) {
-            throw new CloudProviderException("NetworkConfiguration does't exist with id " + networkConfigId);
-        }
+        NetworkConfiguration networkConfig = this.getNetworkConfigurationByUuid(networkConfigUuid);
         this.em.remove(networkConfig);
     }
 
@@ -487,13 +490,13 @@ public class NetworkManager implements INetworkManager {
     private List<NetworkTemplate> getNetworkTemplates() throws CloudProviderException {
         return this.em
             .createQuery(
-                "SELECT v FROM NetworkTemplate v WHERE v.tenant.id=:tenantId AND v.isEmbeddedInSystemTemplate=false ORDER BY v.id")
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+                "SELECT v FROM NetworkTemplate v WHERE v.tenant.id=:tenantId AND v.isEmbeddedInSystemTemplate=false ORDER BY v.id",
+                NetworkTemplate.class).setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
-    public NetworkTemplate getNetworkTemplateById(final String networkTemplateId) throws ResourceNotFoundException {
-        NetworkTemplate networkTemplate = this.em.find(NetworkTemplate.class, Integer.valueOf(networkTemplateId));
+    public NetworkTemplate getNetworkTemplateById(final int networkTemplateId) throws ResourceNotFoundException {
+        NetworkTemplate networkTemplate = this.em.find(NetworkTemplate.class, networkTemplateId);
         if (networkTemplate == null) {
             throw new ResourceNotFoundException(" Invalid networkConfig id " + networkTemplateId);
         }
@@ -501,9 +504,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public NetworkTemplate getNetworkTemplateByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("NetworkTemplate.findByUuid", NetworkTemplate.class).setParameter("uuid", uuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public NetworkTemplate getNetworkTemplateAttributes(final String networkTemplateId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.getNetworkTemplateById(networkTemplateId);
+        return this.getNetworkTemplateByUuid(networkTemplateId);
     }
 
     @Override
@@ -544,11 +557,9 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public void deleteNetworkTemplate(final String networkTemplateId) throws ResourceNotFoundException, CloudProviderException {
-        NetworkTemplate networkTemplate = this.em.find(NetworkTemplate.class, Integer.valueOf(networkTemplateId));
-        if (networkTemplate == null) {
-            throw new CloudProviderException("NetworkTemplate does't exist with id " + networkTemplateId);
-        }
+    public void deleteNetworkTemplate(final String networkTemplateUuid) throws ResourceNotFoundException,
+        CloudProviderException {
+        NetworkTemplate networkTemplate = this.getNetworkTemplateByUuid(networkTemplateUuid);
         this.em.remove(networkTemplate);
     }
 
@@ -566,143 +577,15 @@ public class NetworkManager implements INetworkManager {
     public Job createNetworkPort(final NetworkPortCreate networkPortCreate) throws InvalidRequestException,
         CloudProviderException {
         NetworkManager.logger.info("Creating NetworkPort");
-
-        this.validateNetworkPortTemplate(networkPortCreate.getNetworkPortTemplate());
-
-        // retrieve tenant
-        Tenant tenant = this.getTenant();
-
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), networkPortCreate);
-        ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
-                                                 // placement.getLocation());
-        if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
-                + placement.getAccount().getCloudProvider().getCloudProviderType());
-        }
-
-        // delegates network port creation to cloud provider connector
-        Job providerJob = null;
-
-        // TODO:workflowtry {
-        // TODO:workflow INetworkService networkService =
-        // connector.getNetworkService();
-        // TODO:workflow providerJob =
-        // networkService.createNetworkPort(networkPortCreate);
-        // TODO:workflow} catch (ConnectorException e) {
-        // TODO:workflow
-        // NetworkManager.logger.error("Failed to create network port: ", e);
-        // TODO:workflow throw new CloudProviderException(e.getMessage());
-        // TODO:workflow}
-
-        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
-            throw new CloudProviderException(providerJob.getStatusMessage());
-        }
-
-        // prepare the Network entity to be persisted
-
-        NetworkPort networkPort = new NetworkPort();
-        networkPort.setName(networkPortCreate.getName());
-        networkPort.setDescription(networkPortCreate.getDescription());
-        networkPort.setProperties(networkPortCreate.getProperties() == null ? new HashMap<String, String>()
-            : new HashMap<String, String>(networkPortCreate.getProperties()));
-        networkPort.setTenant(tenant);
-
-        networkPort.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
-        networkPort.setCloudProviderAccount(placement.getAccount());
-
-        networkPort.setNetwork(networkPortCreate.getNetworkPortTemplate().getNetwork());
-        networkPort.setClassOfService(networkPortCreate.getNetworkPortTemplate().getNetworkPortConfig().getClassOfService());
-        networkPort.setPortType(networkPortCreate.getNetworkPortTemplate().getNetworkPortConfig().getPortType());
-
-        networkPort.setState(NetworkPort.State.CREATING);
-        this.em.persist(networkPort);
-        this.em.flush();
-
-        Job job = new Job();
-        job.setTargetResource(networkPort);
-        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
-        affectedResources.add(networkPort);
-        job.setAffectedResources(affectedResources);
-        job.setCreated(new Date());
-        job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setState(providerJob.getState());
-        job.setAction(providerJob.getAction());
-        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
-        this.em.persist(job);
-        this.em.flush();
-
-        try {
-            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
-        } catch (Exception e) {
-            NetworkManager.logger.error(e.getMessage(), e);
-        }
-        return job;
+        // TODO
+        throw new UnsupportedOperationException();
     }
 
     private Job performActionOnNetworkPort(final String networkPortId, final String action) throws ResourceNotFoundException,
         CloudProviderException {
-        NetworkPort networkPort = this.getNetworkPortById(networkPortId);
-        if (networkPort == null) {
-            throw new ResourceNotFoundException("NetworkPort " + networkPortId + " doesn't not exist");
-        }
-
-        // delegates volume deletion to cloud provider connector
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
-        // TODO:workflow networkPort.getLocation());
-        Job providerJob = null;
-
-        // TODO:workflow try {
-        // TODO:workflow INetworkService networkService =
-        // connector.getNetworkService();
-        // TODO:workflow if (action.equals("delete")) {
-        // TODO:workflow providerJob =
-        // networkService.deleteNetworkPort(networkPort.getProviderAssignedId());
-        // TODO:workflow } else if (action.equals("start")) {
-        // TODO:workflow providerJob =
-        // networkService.startNetworkPort(networkPort.getProviderAssignedId());
-        // TODO:workflow } else if (action.equals("stop")) {
-        // TODO:workflow providerJob =
-        // networkService.stopNetworkPort(networkPort.getProviderAssignedId());
-        // TODO:workflow }
-        // TODO:workflow} catch (ConnectorException e) {
-        // TODO:workflow NetworkManager.logger.error("Failed to " + action +
-        // " network: ", e);
-        // TODO:workflow throw new CloudProviderException(e.getMessage());
-        // TODO:workflow}
-
-        // if by change the job is done and has failed, bail out
-        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
-            throw new CloudProviderException(providerJob.getStatusMessage());
-        }
-
-        if (action.equals("delete")) {
-            networkPort.setState(NetworkPort.State.DELETING);
-        } else if (action.equals("start")) {
-            networkPort.setState(NetworkPort.State.STARTING);
-        } else if (action.equals("stop")) {
-            networkPort.setState(NetworkPort.State.STOPPING);
-        }
-
-        this.em.persist(networkPort);
-        this.em.flush();
-
-        Job job = new Job();
-        job.setTargetResource(networkPort);
-        job.setCreated(new Date());
-        job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setState(providerJob.getState());
-        job.setAction(providerJob.getAction());
-        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
-        this.em.persist(job);
-        this.em.flush();
-
-        try {
-            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
-        } catch (Exception e) {
-            NetworkManager.logger.error("", e);
-        }
-        return job;
+        NetworkPort networkPort = this.getNetworkPortByUuid(networkPortId);
+        // TODO
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -732,8 +615,8 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public NetworkPort getNetworkPortById(final String networkPortId) throws ResourceNotFoundException {
-        NetworkPort networkPort = this.em.find(NetworkPort.class, Integer.valueOf(networkPortId));
+    public NetworkPort getNetworkPortById(final int networkPortId) throws ResourceNotFoundException {
+        NetworkPort networkPort = this.em.find(NetworkPort.class, networkPortId);
         if (networkPort == null || networkPort.getState() == NetworkPort.State.DELETED) {
             throw new ResourceNotFoundException(" Invalid networkPort id " + networkPortId);
         }
@@ -741,9 +624,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public NetworkPort getNetworkPortByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("NetworkPort.findByUuid", NetworkPort.class).setParameter("uuid", uuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public NetworkPort getNetworkPortAttributes(final String networkPortId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.getNetworkPortById(networkPortId);
+        return this.getNetworkPortByUuid(networkPortId);
     }
 
     @Override
@@ -813,15 +706,15 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPortConfiguration> getNetworkPortConfigurations() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.tenant.id=:tenantId ORDER BY v.id")
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+        return this.em
+            .createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.tenant.id=:tenantId ORDER BY v.id",
+                NetworkPortConfiguration.class).setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
-    public NetworkPortConfiguration getNetworkPortConfigurationById(final String networkPortConfigurationId)
+    public NetworkPortConfiguration getNetworkPortConfigurationById(final int networkPortConfigurationId)
         throws ResourceNotFoundException {
-        NetworkPortConfiguration networkPort = this.em.find(NetworkPortConfiguration.class,
-            Integer.valueOf(networkPortConfigurationId));
+        NetworkPortConfiguration networkPort = this.em.find(NetworkPortConfiguration.class, networkPortConfigurationId);
         if (networkPort == null) {
             throw new ResourceNotFoundException(" Invalid NetworkPortConfiguration id " + networkPortConfigurationId);
         }
@@ -829,9 +722,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public NetworkPortConfiguration getNetworkPortConfigurationByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("NetworkPortConfiguration.findByUuid", NetworkPortConfiguration.class)
+                .setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public NetworkPortConfiguration getNetworkPortConfigurationAttributes(final String networkPortConfigurationId,
         final List<String> attributes) throws ResourceNotFoundException, CloudProviderException {
-        return this.getNetworkPortConfigurationById(networkPortConfigurationId);
+        return this.getNetworkPortConfigurationByUuid(networkPortConfigurationId);
     }
 
     @Override
@@ -858,19 +761,14 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public void deleteNetworkPortConfiguration(final String networkPortConfigurationId) throws ResourceNotFoundException,
+    public void deleteNetworkPortConfiguration(final String networkPortConfigUuid) throws ResourceNotFoundException,
         CloudProviderException {
-        if (!this.em
-            .createQuery("SELECT n FROM NetworkPortTemplate n WHERE n.networkPortConfig.id=:networkPortConfigurationId")
-            .setParameter("networkPortConfigurationId", Integer.valueOf(networkPortConfigurationId)).getResultList().isEmpty()) {
-            throw new ResourceConflictException("Cannot delete NetworkPortConfiguration with id " + networkPortConfigurationId
+        if (!this.em.createQuery("SELECT n FROM NetworkPortTemplate n WHERE n.networkPortConfig.uuid=:networkPortConfigUuid")
+            .setParameter("networkPortConfigUuid", networkPortConfigUuid).getResultList().isEmpty()) {
+            throw new ResourceConflictException("Cannot delete NetworkPortConfiguration with id " + networkPortConfigUuid
                 + " used by a NetworkPortTemplate");
         }
-        NetworkPortConfiguration networkPortConfig = this.em.find(NetworkPortConfiguration.class,
-            Integer.valueOf(networkPortConfigurationId));
-        if (networkPortConfig == null) {
-            throw new CloudProviderException("NetworkPortConfiguration does't exist with id " + networkPortConfigurationId);
-        }
+        NetworkPortConfiguration networkPortConfig = this.getNetworkPortConfigurationByUuid(networkPortConfigUuid);
         this.em.remove(networkPortConfig);
     }
 
@@ -900,14 +798,14 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<NetworkPortTemplate> getNetworkPortTemplates() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM NetworkPortTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id")
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+        return this.em
+            .createQuery("SELECT v FROM NetworkPortTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id",
+                NetworkPortTemplate.class).setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
-    public NetworkPortTemplate getNetworkPortTemplateById(final String networkPortTemplateId) throws ResourceNotFoundException {
-        NetworkPortTemplate networkPortTemplate = this.em.find(NetworkPortTemplate.class,
-            Integer.valueOf(networkPortTemplateId));
+    public NetworkPortTemplate getNetworkPortTemplateById(final int networkPortTemplateId) throws ResourceNotFoundException {
+        NetworkPortTemplate networkPortTemplate = this.em.find(NetworkPortTemplate.class, networkPortTemplateId);
         if (networkPortTemplate == null) {
             throw new ResourceNotFoundException(" Invalid NetworkPortTemplate id " + networkPortTemplateId);
         }
@@ -915,9 +813,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public NetworkPortTemplate getNetworkPortTemplateByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("NetworkPortTemplate.findByUuid", NetworkPortTemplate.class)
+                .setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public NetworkPortTemplate getNetworkPortTemplateAttributes(final String networkPortTemplateId,
         final List<String> attributes) throws ResourceNotFoundException, CloudProviderException {
-        return this.getNetworkPortTemplateById(networkPortTemplateId);
+        return this.getNetworkPortTemplateByUuid(networkPortTemplateId);
     }
 
     @Override
@@ -944,13 +852,9 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public void deleteNetworkPortTemplate(final String networkPortTemplateId) throws ResourceNotFoundException,
+    public void deleteNetworkPortTemplate(final String networkPortTemplateUuidd) throws ResourceNotFoundException,
         CloudProviderException {
-        NetworkPortTemplate networkPortTemplate = this.em.find(NetworkPortTemplate.class,
-            Integer.valueOf(networkPortTemplateId));
-        if (networkPortTemplate == null) {
-            throw new CloudProviderException("NetworkPortTemplate does't exist with id " + networkPortTemplateId);
-        }
+        NetworkPortTemplate networkPortTemplate = this.getNetworkPortTemplateByUuid(networkPortTemplateUuidd);
         this.em.remove(networkPortTemplate);
     }
 
@@ -979,15 +883,16 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<ForwardingGroupTemplate> getForwardingGroupTemplates() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM ForwardingGroupTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id")
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+        return this.em
+            .createQuery("SELECT v FROM ForwardingGroupTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id",
+                ForwardingGroupTemplate.class).setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
-    public ForwardingGroupTemplate getForwardingGroupTemplateById(final String forwardingGroupTemplateId)
+    public ForwardingGroupTemplate getForwardingGroupTemplateById(final int forwardingGroupTemplateId)
         throws ResourceNotFoundException {
-        ForwardingGroupTemplate forwardingGroupTemplate = this.em.find(ForwardingGroupTemplate.class,
-            Integer.valueOf(forwardingGroupTemplateId));
+        ForwardingGroupTemplate forwardingGroupTemplate = this.em
+            .find(ForwardingGroupTemplate.class, forwardingGroupTemplateId);
         if (forwardingGroupTemplate == null) {
             throw new ResourceNotFoundException(" Invalid ForwardingGroupTemplate id " + forwardingGroupTemplateId);
         }
@@ -995,9 +900,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public ForwardingGroupTemplate getForwardingGroupTemplateByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("ForwardingGroupTemplate.findByUuid", ForwardingGroupTemplate.class)
+                .setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public ForwardingGroupTemplate getForwardingGroupTemplateAttributes(final String forwardingGroupTemplateId,
         final List<String> attributes) throws ResourceNotFoundException, CloudProviderException {
-        return this.getForwardingGroupTemplateById(forwardingGroupTemplateId);
+        return this.getForwardingGroupTemplateByUuid(forwardingGroupTemplateId);
     }
 
     @Override
@@ -1024,13 +939,9 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public void deleteForwardingGroupTemplate(final String forwardingGroupTemplateId) throws ResourceNotFoundException,
+    public void deleteForwardingGroupTemplate(final String forwardingGroupTemplateUuid) throws ResourceNotFoundException,
         CloudProviderException {
-        ForwardingGroupTemplate forwardingGroupTemplate = this.em.find(ForwardingGroupTemplate.class,
-            Integer.valueOf(forwardingGroupTemplateId));
-        if (forwardingGroupTemplate == null) {
-            throw new CloudProviderException("ForwardingGroupTemplate does't exist with id " + forwardingGroupTemplateId);
-        }
+        ForwardingGroupTemplate forwardingGroupTemplate = this.getForwardingGroupTemplateByUuid(forwardingGroupTemplateUuid);
         this.em.remove(forwardingGroupTemplate);
     }
 
@@ -1046,7 +957,7 @@ public class NetworkManager implements INetworkManager {
         // retrieve user
         Tenant tenant = this.getTenant();
 
-        Placement placement = this.cloudProviderManager.placeResource(tenant.getId().toString(), forwardingGroupCreate);
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), forwardingGroupCreate);
         ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
                                                  // placement.getLocation());
         if (connector == null) {
@@ -1123,8 +1034,8 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public ForwardingGroup getForwardingGroupById(final String forwardingGroupId) throws ResourceNotFoundException {
-        ForwardingGroup forwardingGroup = this.em.find(ForwardingGroup.class, Integer.valueOf(forwardingGroupId));
+    public ForwardingGroup getForwardingGroupById(final int forwardingGroupId) throws ResourceNotFoundException {
+        ForwardingGroup forwardingGroup = this.em.find(ForwardingGroup.class, forwardingGroupId);
         if (forwardingGroup == null || forwardingGroup.getState() == ForwardingGroup.State.DELETED) {
             throw new ResourceNotFoundException(" Invalid ForwardingGroup id " + forwardingGroupId);
         }
@@ -1133,9 +1044,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public ForwardingGroup getForwardingGroupByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("ForwardingGroup.findByUuid", ForwardingGroup.class).setParameter("uuid", uuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public ForwardingGroup getForwardingGroupAttributes(final String forwardingGroupId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.getForwardingGroupById(forwardingGroupId);
+        return this.getForwardingGroupByUuid(forwardingGroupId);
     }
 
     @Override
@@ -1177,7 +1098,7 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public Job deleteForwardingGroup(final String forwardingGroupId) throws ResourceNotFoundException, CloudProviderException {
-        ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
+        ForwardingGroup forwardingGroup = this.getForwardingGroupByUuid(forwardingGroupId);
         if (forwardingGroup == null) {
             throw new ResourceNotFoundException("ForwardingGroup " + forwardingGroupId + " doesn't not exist");
         }
@@ -1231,7 +1152,7 @@ public class NetworkManager implements INetworkManager {
     @Override
     public Job addNetworkToForwardingGroup(final String forwardingGroupId, final ForwardingGroupNetwork forwardingGroupNetwork)
         throws ResourceNotFoundException, CloudProviderException {
-        ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
+        ForwardingGroup forwardingGroup = this.getForwardingGroupByUuid(forwardingGroupId);
         if (forwardingGroup == null) {
             throw new ResourceNotFoundException("ForwardingGroup " + forwardingGroupId + " doesn't not exist");
         }
@@ -1293,63 +1214,8 @@ public class NetworkManager implements INetworkManager {
     @Override
     public Job removeNetworkFromForwardingGroup(final String forwardingGroupId, final String fgNetworkId)
         throws ResourceNotFoundException, CloudProviderException {
-        ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
-        if (forwardingGroup == null) {
-            throw new ResourceNotFoundException("ForwardingGroup " + forwardingGroupId + " doesn't not exist");
-        }
-
-        ForwardingGroupNetwork forwardingGroupNetwork = this.em
-            .find(ForwardingGroupNetwork.class, Integer.valueOf(fgNetworkId));
-        if (forwardingGroupNetwork == null) {
-            throw new ResourceNotFoundException();
-        }
-        if (!forwardingGroup.getNetworks().contains(forwardingGroupNetwork)) {
-            throw new ResourceNotFoundException();
-        }
-
-        forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.DETACHING);
-
-        // delegates ForwardingGroup deletion to cloud provider connector
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-        // TODO:workflow forwardingGroup.getLocation());
-        Job providerJob = null;
-
-        // TODO:workflowtry {
-        // TODO:workflow INetworkService networkService =
-        // connector.getNetworkService();
-        // TODO:workflow providerJob =
-        // networkService.removeNetworkFromForwardingGroup(forwardingGroup.getProviderAssignedId(),
-        // TODO:workflow
-        // forwardingGroupNetwork.getNetwork().getProviderAssignedId());
-        // TODO:workflow} catch (ConnectorException e) {
-        // TODO:workflow
-        // NetworkManager.logger.error("Failed to remove network from forwarding group: ",
-        // e);
-        // TODO:workflow throw new CloudProviderException(e.getMessage());
-        // TODO:workflow}
-
-        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
-            throw new CloudProviderException(providerJob.getStatusMessage());
-        }
-
-        Job job = new Job();
-        job.setTargetResource(forwardingGroup);
-        job.setAffectedResources(Collections.<CloudResource> singletonList(forwardingGroupNetwork.getNetwork()));
-        job.setCreated(new Date());
-        job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setState(providerJob.getState());
-        job.setAction(providerJob.getAction());
-        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
-        this.em.persist(job);
-        this.em.flush();
-
-        try {
-            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
-        } catch (Exception e) {
-            NetworkManager.logger.error("", e);
-        }
-        return job;
+        // TODO
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -1369,13 +1235,13 @@ public class NetworkManager implements INetworkManager {
     }
 
     private List<Address> getAddresses() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM Address v WHERE v.tenant.id=:tenantId ORDER BY v.id")
+        return this.em.createQuery("SELECT v FROM Address v WHERE v.tenant.id=:tenantId ORDER BY v.id", Address.class)
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
-    public Address getAddressById(final String addressId) throws ResourceNotFoundException {
-        Address address = this.em.find(Address.class, Integer.valueOf(addressId));
+    public Address getAddressById(final int addressId) throws ResourceNotFoundException {
+        Address address = this.em.find(Address.class, addressId);
         if (address == null) {
             throw new ResourceNotFoundException(" Invalid Address id " + addressId);
         }
@@ -1383,9 +1249,18 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public Address getAddressByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("Address.findByUuid", Address.class).setParameter("uuid", uuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public Address getAddressAttributes(final String addressId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.getAddressById(addressId);
+        return this.getAddressByUuid(addressId);
     }
 
     @Override
@@ -1444,13 +1319,14 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public List<AddressTemplate> getAddressTemplates() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM AddressTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id")
+        return this.em
+            .createQuery("SELECT v FROM AddressTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id", AddressTemplate.class)
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
-    public AddressTemplate getAddressTemplateById(final String addressTemplateId) throws ResourceNotFoundException {
-        AddressTemplate addressTemplate = this.em.find(AddressTemplate.class, Integer.valueOf(addressTemplateId));
+    public AddressTemplate getAddressTemplateById(final int addressTemplateId) throws ResourceNotFoundException {
+        AddressTemplate addressTemplate = this.em.find(AddressTemplate.class, addressTemplateId);
         if (addressTemplate == null) {
             throw new ResourceNotFoundException(" Invalid AddressTemplate id " + addressTemplateId);
         }
@@ -1458,9 +1334,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public AddressTemplate getAddressTemplateByUuid(final String uuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("AddressTemplate.findByUuid", AddressTemplate.class).setParameter("uuid", uuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public AddressTemplate getAddressTemplateAttributes(final String addressTemplateId, final List<String> attributes)
         throws ResourceNotFoundException, CloudProviderException {
-        return this.getAddressTemplateById(addressTemplateId);
+        return this.getAddressTemplateByUuid(addressTemplateId);
     }
 
     @Override
@@ -1486,32 +1372,14 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public void deleteAddressTemplate(final String addressTemplateId) throws ResourceNotFoundException, CloudProviderException {
-        AddressTemplate addressTemplate = this.em.find(AddressTemplate.class, Integer.valueOf(addressTemplateId));
-        if (addressTemplate == null) {
-            throw new CloudProviderException("AddressTemplate does't exist with id " + addressTemplateId);
-        }
+    public void deleteAddressTemplate(final String addressTemplateUuid) throws ResourceNotFoundException,
+        CloudProviderException {
+        AddressTemplate addressTemplate = this.getAddressTemplateByUuid(addressTemplateUuid);
         this.em.remove(addressTemplate);
     }
 
-    //
-    // Job completion handler
-    //
-
-    @Override
-    public boolean jobCompletionHandler(final Job job) throws CloudProviderException {
-        if (job.getTargetResource() instanceof Network) {
-            return this.networkCompletionHandler(job);
-        } else if (job.getTargetResource() instanceof NetworkPort) {
-            return this.networkPortCompletionHandler(job);
-        } else if (job.getTargetResource() instanceof ForwardingGroup) {
-            return this.forwardingGroupCompletionHandler(job);
-        }
-        return false;
-    }
-
     public Network getNetworkByProviderAssignedId(final String providerAssignedId) {
-        List<Network> networks = this.em.createNamedQuery(Network.GET_NETWORK_BY_PROVIDER_ASSIGNED_ID)
+        List<Network> networks = this.em.createNamedQuery("Network.findByProviderAssignedId", Network.class)
             .setParameter("providerAssignedId", providerAssignedId).getResultList();
         if (!networks.isEmpty()) {
             return networks.get(0);
@@ -1520,303 +1388,22 @@ public class NetworkManager implements INetworkManager {
     }
 
     private NetworkPort getNetworkPortByProviderAssignedId(final String providerAssignedId) {
-        NetworkPort networkPort = (NetworkPort) this.em.createNamedQuery(NetworkPort.GET_NETWORKPORT_BY_PROVIDER_ASSIGNED_ID)
+        NetworkPort networkPort = this.em.createNamedQuery("NetworkPort.findByProviderAssignedId", NetworkPort.class)
             .setParameter("providerAssignedId", providerAssignedId).getSingleResult();
         return networkPort;
     }
 
     private ForwardingGroup getForwardingGroupByProviderAssignedId(final String providerAssignedId) {
-        ForwardingGroup forwardingGroup = (ForwardingGroup) this.em
-            .createNamedQuery(ForwardingGroup.GET_FORWARDINGGROUP_BY_PROVIDER_ASSIGNED_ID)
+        ForwardingGroup forwardingGroup = this.em
+            .createNamedQuery("ForwardingGroup.findByProviderAssignedId", ForwardingGroup.class)
             .setParameter("providerAssignedId", providerAssignedId).getSingleResult();
         return forwardingGroup;
-    }
-
-    private boolean networkCompletionHandler(final Job providerJob) throws CloudProviderException {
-        // retrieve the Network whose providerAssignedId is
-        // job.getTargetEntity()
-        Network network = null;
-
-        try {
-            network = this.getNetworkByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
-        } catch (PersistenceException e) {
-            NetworkManager.logger.error("Cannot find Network with provider-assigned id " + providerJob.getTargetResource());
-            return false;
-        }
-
-        // update Network entity
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getCloudProviderConnector(network.getCloudProviderAccount(),
-        // TODO:workflow network.getLocation());
-
-        if (providerJob.getAction().equals("add")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                try {
-                    // TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
-                    network.setCreated(new Date());
-                    this.em.persist(network);
-                } catch (Exception ex) {
-                    NetworkManager.logger.error("Failed to create network " + network.getName(), ex);
-                }
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                network.setState(Network.State.ERROR);
-                NetworkManager.logger.error("Failed to create network  " + network.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(network);
-            }
-        }
-        if (providerJob.getAction().equals("start")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                try {
-                    // TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
-                    network.setUpdated(new Date());
-                    this.em.persist(network);
-                } catch (Exception ex) {
-                    NetworkManager.logger.error("Failed to start network " + network.getName(), ex);
-                }
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                network.setState(Network.State.ERROR);
-                NetworkManager.logger.error("Failed to start network  " + network.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(network);
-            }
-        }
-        if (providerJob.getAction().equals("stop")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                try {
-                    // TODO:workflownetwork.setState(connector.getNetworkService().getNetwork(network.getProviderAssignedId()).getState());
-                    network.setUpdated(new Date());
-                    this.em.persist(network);
-                } catch (Exception ex) {
-                    NetworkManager.logger.error("Failed to stop network " + network.getName(), ex);
-                }
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                network.setState(Network.State.ERROR);
-                NetworkManager.logger.error("Failed to create network  " + network.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(network);
-            }
-        } else if (providerJob.getAction().equals("delete")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                network.setState(Network.State.DELETED);
-                this.em.persist(network);
-                this.em.flush();
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                network.setState(Network.State.ERROR);
-                NetworkManager.logger.error("Failed to delete network  " + network.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(network);
-            }
-        }
-
-        return true;
-    }
-
-    private boolean networkPortCompletionHandler(final Job providerJob) throws CloudProviderException {
-        // retrieve the Network whose providerAssignedId is
-        // job.getTargetEntity()
-        NetworkPort networkPort = null;
-
-        try {
-            networkPort = this.getNetworkPortByProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
-        } catch (PersistenceException e) {
-            NetworkManager.logger.error("Cannot find NetworkPort with provider-assigned id " + providerJob.getTargetResource());
-            return false;
-        }
-
-        // update NetworkPort entity
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getCloudProviderConnector(networkPort.getCloudProviderAccount(),
-        // TODO:workflow networkPort.getLocation());
-
-        if (providerJob.getAction().equals("add")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                try {
-                    // TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
-                    // TODO:workflow .getState());
-                    networkPort.setCreated(new Date());
-                    this.em.persist(networkPort);
-                } catch (Exception ex) {
-                    NetworkManager.logger.error("Failed to create network port" + networkPort.getName(), ex);
-                }
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                networkPort.setState(NetworkPort.State.ERROR);
-                NetworkManager.logger.error("Failed to create network port " + networkPort.getName() + " : "
-                    + providerJob.getStatusMessage());
-                this.em.persist(networkPort);
-            }
-        }
-        if (providerJob.getAction().equals("start")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                try {
-                    // TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
-                    // TODO:workflow .getState());
-                    networkPort.setUpdated(new Date());
-                    this.em.persist(networkPort);
-                } catch (Exception ex) {
-                    NetworkManager.logger.error("Failed to start network port " + networkPort.getName(), ex);
-                }
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                networkPort.setState(NetworkPort.State.ERROR);
-                NetworkManager.logger.error("Failed to start network port " + networkPort.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(networkPort);
-            }
-        }
-        if (providerJob.getAction().equals("stop")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                try {
-                    // TODO:workflownetworkPort.setState(connector.getNetworkService().getNetworkPort(networkPort.getProviderAssignedId())
-                    // TODO:workflow .getState());
-                    networkPort.setUpdated(new Date());
-                    this.em.persist(networkPort);
-                } catch (Exception ex) {
-                    NetworkManager.logger.error("Failed to stop network port " + networkPort.getName(), ex);
-                }
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                networkPort.setState(NetworkPort.State.ERROR);
-                NetworkManager.logger.error("Failed to create network port " + networkPort.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(networkPort);
-            }
-        } else if (providerJob.getAction().equals("delete")) {
-            if (providerJob.getState() == Job.Status.SUCCESS) {
-                networkPort.setState(NetworkPort.State.DELETED);
-                this.em.persist(networkPort);
-                this.em.flush();
-            } else if (providerJob.getState() == Job.Status.FAILED) {
-                networkPort.setState(NetworkPort.State.ERROR);
-                NetworkManager.logger.error("Failed to delete network port " + networkPort.getName() + ": "
-                    + providerJob.getStatusMessage());
-                this.em.persist(networkPort);
-            }
-        }
-
-        return true;
-    }
-
-    private boolean forwardingGroupCompletionHandler(final Job providerJob) throws CloudProviderException {
-        ForwardingGroup forwardingGroup = null;
-
-        try {
-            forwardingGroup = this.getForwardingGroupByProviderAssignedId(providerJob.getTargetResource()
-                .getProviderAssignedId());
-        } catch (PersistenceException e) {
-            NetworkManager.logger.error("Cannot find ForwardingGroup with provider-assigned id "
-                + providerJob.getTargetResource());
-            return false;
-        }
-
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-        // TODO:workflow forwardingGroup.getLocation());
-
-        Network affectedNetwork = null;
-        if (providerJob.getAffectedResources().size() == 1
-            && providerJob.getAffectedResources().iterator().next() instanceof Network) {
-            affectedNetwork = this.getNetworkByProviderAssignedId(providerJob.getAffectedResources().iterator().next()
-                .getProviderAssignedId());
-        }
-
-        if (providerJob.getAction().equals("add")) {
-            if (affectedNetwork == null) {
-                if (providerJob.getState() == Job.Status.SUCCESS) {
-                    try {
-                        // TODO:workflowforwardingGroup.setState(connector.getNetworkService()
-                        // TODO:workflow
-                        // .getForwardingGroup(forwardingGroup.getProviderAssignedId()).getState());
-                        forwardingGroup.setCreated(new Date());
-                        this.em.persist(forwardingGroup);
-                    } catch (Exception ex) {
-                        NetworkManager.logger.error("Failed to create forwarding group " + forwardingGroup.getName(), ex);
-                    }
-                } else if (providerJob.getState() == Job.Status.FAILED) {
-                    forwardingGroup.setState(ForwardingGroup.State.ERROR);
-                    NetworkManager.logger.error("Failed to create forwarding group  " + forwardingGroup.getName() + ": "
-                        + providerJob.getStatusMessage());
-                    this.em.persist(forwardingGroup);
-                }
-            } else {
-                // add network to forwarding group
-                if (providerJob.getState() == Job.Status.SUCCESS) {
-                    try {
-                        ForwardingGroupNetwork forwardingGroupNetwork = null;
-                        for (ForwardingGroupNetwork net : forwardingGroup.getNetworks()) {
-                            if (net.getNetwork().getId() == affectedNetwork.getId()) {
-                                forwardingGroupNetwork = net;
-                                break;
-                            }
-                        }
-                        if (forwardingGroupNetwork != null) {
-                            forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.AVAILABLE);
-                            this.em.persist(forwardingGroupNetwork);
-                            forwardingGroup.setUpdated(new Date());
-                            this.em.persist(forwardingGroup);
-                        } else {
-                            NetworkManager.logger.error("Cannot find added network in ForwardingGroupNetwork)");
-                        }
-                    } catch (Exception ex) {
-                        NetworkManager.logger.error("Failed to add network to forwarding group " + forwardingGroup.getName(),
-                            ex);
-                    }
-                } else if (providerJob.getState() == Job.Status.FAILED) {
-                    forwardingGroup.setState(ForwardingGroup.State.ERROR);
-                    NetworkManager.logger.error("Failed to add network to forwarding group  " + forwardingGroup.getName()
-                        + ": " + providerJob.getStatusMessage());
-                    this.em.persist(forwardingGroup);
-                }
-
-            }
-        } else if (providerJob.getAction().equals("delete")) {
-            if (affectedNetwork == null) {
-                if (providerJob.getState() == Job.Status.SUCCESS) {
-                    forwardingGroup.setState(ForwardingGroup.State.DELETED);
-                    forwardingGroup.setNetworks(new HashSet<ForwardingGroupNetwork>());
-                    this.em.persist(forwardingGroup);
-                    this.em.flush();
-                } else if (providerJob.getState() == Job.Status.FAILED) {
-                    forwardingGroup.setState(ForwardingGroup.State.ERROR);
-                    NetworkManager.logger.error("Failed to delete forwarding group  " + forwardingGroup.getName() + ": "
-                        + providerJob.getStatusMessage());
-                    this.em.persist(forwardingGroup);
-                }
-            } else {
-                // remove network from forwarding group
-                if (providerJob.getState() == Job.Status.SUCCESS) {
-                    boolean found = false;
-                    for (Iterator<ForwardingGroupNetwork> it = forwardingGroup.getNetworks().iterator(); it.hasNext();) {
-                        ForwardingGroupNetwork net = it.next();
-                        if (net.getNetwork().getId() == affectedNetwork.getId()) {
-                            it.remove();
-                            this.em.remove(net);
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        NetworkManager.logger.error("Attempting to remove network " + affectedNetwork.getId()
-                            + " not a member of forwarding group " + forwardingGroup.getId());
-                    }
-                    forwardingGroup.getNetworks().remove(affectedNetwork);
-                    this.em.persist(forwardingGroup);
-                    this.em.flush();
-                } else if (providerJob.getState() == Job.Status.FAILED) {
-                    forwardingGroup.setState(ForwardingGroup.State.ERROR);
-                    NetworkManager.logger.error("Failed to remove network from forwarding group  " + forwardingGroup.getName()
-                        + ": " + providerJob.getStatusMessage());
-                    this.em.persist(forwardingGroup);
-                }
-            }
-
-        }
-
-        return true;
     }
 
     @Override
     public List<ForwardingGroupNetwork> getForwardingGroupNetworks(final String forwardingGroupId)
         throws ResourceNotFoundException, CloudProviderException {
-        ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
+        ForwardingGroup forwardingGroup = this.getForwardingGroupByUuid(forwardingGroupId);
         return new ArrayList<ForwardingGroupNetwork>(forwardingGroup.getNetworks());
     }
 
@@ -1834,10 +1421,13 @@ public class NetworkManager implements INetworkManager {
     @Override
     public ForwardingGroupNetwork getNetworkFromForwardingGroup(final String forwardingGroupId, final String fgNetworkId)
         throws ResourceNotFoundException, CloudProviderException {
-        ForwardingGroup forwardingGroup = this.getForwardingGroupById(forwardingGroupId);
-        ForwardingGroupNetwork forwardingGroupNetwork = this.em
-            .find(ForwardingGroupNetwork.class, Integer.valueOf(fgNetworkId));
-        if (forwardingGroupNetwork == null) {
+        ForwardingGroup forwardingGroup = this.getForwardingGroupByUuid(forwardingGroupId);
+        ForwardingGroupNetwork forwardingGroupNetwork = null;
+        try {
+            forwardingGroupNetwork = this.em
+                .createNamedQuery("ForwardingGroupNetwork.findByUuid", ForwardingGroupNetwork.class)
+                .setParameter("uuid", fgNetworkId).getSingleResult();
+        } catch (NoResultException e) {
             throw new ResourceNotFoundException();
         }
         if (!forwardingGroup.getNetworks().contains(forwardingGroupNetwork)) {

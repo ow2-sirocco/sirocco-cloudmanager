@@ -39,6 +39,9 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -46,12 +49,13 @@ import javax.persistence.TemporalType;
  * An account on a cloud provider
  */
 @Entity
+@NamedQueries({@NamedQuery(name = "CloudProviderAccount.findByUuid", query = "SELECT c from CloudProviderAccount c WHERE c.uuid=:uuid")})
 public class CloudProviderAccount implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Integer id;
 
-    private String uuid = UUID.randomUUID().toString();
+    private String uuid;
 
     private String name;
 
@@ -158,6 +162,13 @@ public class CloudProviderAccount implements Serializable {
 
     public void setTenants(final Set<Tenant> tenants) {
         this.tenants = tenants;
+    }
+
+    @PrePersist
+    public void generateUuid() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID().toString();
+        }
     }
 
     public String getUuid() {

@@ -77,7 +77,9 @@ public interface IEventManager {
 
     List<EventLog> getEventLog() throws CloudProviderException;
 
-    EventLog getEventLogById(String eventLogId) throws ResourceNotFoundException, CloudProviderException;
+    EventLog getEventLogById(int eventLogId) throws ResourceNotFoundException, CloudProviderException;
+
+    EventLog getEventLogByUuid(String eventLogUuid) throws ResourceNotFoundException, CloudProviderException;
 
     List<Event> getEvents(String eventLogId) throws CloudProviderException;
 

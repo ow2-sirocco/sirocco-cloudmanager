@@ -12,7 +12,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.User;
 public interface ITenantManager {
     Tenant createTenant(Tenant tenant) throws CloudProviderException;
 
-    Tenant getTenantById(String tenantId) throws CloudProviderException;
+    Tenant getTenantById(int tenantId) throws CloudProviderException;
+
+    Tenant getTenantByUuid(String tenantUuid) throws CloudProviderException;
 
     Tenant getTenant(IdentityContext context) throws CloudProviderException;
 

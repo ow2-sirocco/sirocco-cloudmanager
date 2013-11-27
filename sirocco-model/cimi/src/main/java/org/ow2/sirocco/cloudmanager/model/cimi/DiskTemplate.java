@@ -28,6 +28,8 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 
 import javax.persistence.Embeddable;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
 /**
  * Disk template
@@ -36,6 +38,8 @@ import javax.persistence.Embeddable;
 public class DiskTemplate implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    @NotNull
+    @Min(0)
     private Integer capacity;
 
     private String format = "";

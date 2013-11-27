@@ -45,7 +45,9 @@ public interface IMachineImageManager {
 
     List<MachineImage> getMachineImages() throws CloudProviderException;
 
-    MachineImage getMachineImageById(String imageId) throws ResourceNotFoundException, CloudProviderException;
+    MachineImage getMachineImageById(int imageId) throws ResourceNotFoundException, CloudProviderException;
+
+    MachineImage getMachineImageByUuid(String imageUuid) throws ResourceNotFoundException, CloudProviderException;
 
     MachineImage getMachineImageAttributes(String imageId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;

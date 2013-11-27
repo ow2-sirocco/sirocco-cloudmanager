@@ -25,6 +25,8 @@
 
 package org.ow2.sirocco.cloudmanager.core.api.exception;
 
+import javax.validation.ConstraintViolationException;
+
 /**
  * Invalid parameter or field names in the request
  */
@@ -39,12 +41,16 @@ public class InvalidRequestException extends CloudProviderException {
     }
 
     /**
-     * Constructs a  with a detail message.
+     * Constructs a with a detail message.
      * 
      * @param message the detail message
      */
-    public InvalidRequestException(String message) {
+    public InvalidRequestException(final String message) {
         super(message);
+    }
+
+    public InvalidRequestException(final ConstraintViolationException e) {
+        this(e.getConstraintViolations().iterator().next().getMessage());
     }
 
 }
