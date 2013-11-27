@@ -71,6 +71,25 @@
       </plugin>
 
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy-deb-control</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <tasks>
+                <copy file="${project.parent.basedir}/command-line-tools/src/main/etc/sirocco-client-completion.bash" tofile="${project.build.directory}/sirocco-api-client/etc/bash_completion.d/sirocco-api-cli"/>
+              </tasks>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
         <artifactId>jdeb</artifactId>
         <groupId>org.vafer</groupId>
         <version>1.0</version>
@@ -101,6 +120,16 @@
                     <type>perm</type>
                     <prefix>/usr/bin</prefix>
                     <filemode>755</filemode>
+                  </mapper>
+                </data>
+
+                <data>
+                  <src>${project.build.directory}/sirocco-api-client/etc/bash_completion.d/sirocco-api-cli</src>
+                  <type>file</type>
+                  <mapper>
+                    <type>perm</type>
+                    <filemode>644</filemode>
+                    <prefix>/etc/bash_completion.d/</prefix>
                   </mapper>
                 </data>
 
