@@ -506,9 +506,10 @@ public class VcdCloudProvider {
                 Vapp parentVapp = Vapp.getVappByReference(this.vCloudContext.getVcloudClient(), vm.getParentVappReference());
                 VappNetwork vappNetwork = this.getVappNetworkByName(parentVapp, networkConnection.getNetwork());
                 Network network = new Network();
-                // this.fromVappNetworkToNetwork(vappNetwork, network);
 
-                // FIXME
+                /* Mapping Rule
+                * If the vAppNetwork is isolated then the mapping is based on the vAppNetwork, 
+                * else it is based on the OrgVdcNetwork to which the vAppNetwork is connected */
                 if (vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())) {
                     this.fromVappNetworkToNetwork(vappNetwork, network);
                 } else {
@@ -811,6 +812,9 @@ public class VcdCloudProvider {
         n.setName(vappNetworkReferenceType.getName());
         n.setProviderAssignedId(vappNetworkReferenceType.getHref());
         n.setState(Network.State.STARTED);
+        /* Mapping Rule
+         * If the vAppNetwork is not isolated and its name = the CIMI public network configuration parameter 
+         * then the CIMI network is set to PUBLIC else to PRIVATE */
         if (!vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())
             && vappNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
             /* Applying this rule with a vApp created outside Sirocco might not work properly ! 
@@ -826,6 +830,9 @@ public class VcdCloudProvider {
         n.setName(orgVdcNetworkReferenceType.getName());
         n.setProviderAssignedId(orgVdcNetworkReferenceType.getHref());
         n.setState(Network.State.STARTED);
+        /* Mapping Rule
+         * If the orgVdcNetwork name = the CIMI public network configuration parameter 
+         * then the CIMI network is set to PUBLIC else to PRIVATE */
         if (orgVdcNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
             n.setNetworkType(Network.Type.PUBLIC);
         } else {
