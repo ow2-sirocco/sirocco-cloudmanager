@@ -216,11 +216,16 @@ public class VcdCloudProvider {
             for (ReferenceType vappNetworkReferenceType : vapp.getVappNetworkRefsByName().values()) {
                 VappNetwork vappNetwork = VappNetwork.getVappNetworkByReference(this.vCloudContext.getVcloudClient(),
                     vappNetworkReferenceType);
-                SystemNetwork systemNetwork = new SystemNetwork();
-                this.fromVAppNetworkToSystemNetwork(vappNetwork, systemNetwork);
-                if (!systemNetwork.getNetwork().getNetworkType().equals(Network.Type.PRIVATE)) {
+                /* Mapping Rule
+                 * Add systemNetwork only for isolated vAppNetwork */
+                if (!vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())) {
                     continue;
                 }
+                SystemNetwork systemNetwork = new SystemNetwork();
+                this.fromVAppNetworkToSystemNetwork(vappNetwork, systemNetwork);
+                /*if (!systemNetwork.getNetwork().getNetworkType().equals(Network.Type.PRIVATE)) {
+                    continue;
+                }*/
                 system.getNetworks().add(systemNetwork);
             }
         } catch (VCloudException e) {
