@@ -192,6 +192,9 @@ public class NetworkManager implements INetworkManager {
             }
             network.setUpdated(new Date());
         }
+        if (network.getState() == Network.State.DELETED) {
+            network.setDeleted(new Date());
+        }
         this.fireNetworkStateChangeEvent(network);
         job.setState(Job.Status.SUCCESS);
     }
