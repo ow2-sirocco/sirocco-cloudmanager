@@ -42,7 +42,7 @@ public class DateUtils {
 
     private final static String TIME_REG_EXP = "T([01][0-9]|2[0123]):([0-5][0-9]):([0-5][0-9])(.\\d\\d\\d)?";
 
-    private final static String TIME_ZONE_REG_EXP = "(Z|((?:\\+|-)[0-5][0-9]:[0-5][0-9]))?";
+    private final static String TIME_ZONE_REG_EXP = "(Z|((?:\\+|-)[0-5][0-9](:[0-5][0-9])?))?";
 
     private final static String ISO8601_REG_EXP = "^" + DateUtils.DATE_REG_EXP + DateUtils.TIME_REG_EXP
         + DateUtils.TIME_ZONE_REG_EXP + "$";
@@ -86,7 +86,7 @@ public class DateUtils {
                 if (timeZoneId != null) {
                     // Now that date is found we should define its TimeZone
                     TimeZone timeZone = TimeZone.getTimeZone(timeZoneId);
-                    if (!timeZone.getID().equals(timeZoneId)) {
+                    if (!timeZone.getID().startsWith(timeZoneId)) {
                         // Time Zone is not valid
                         throw new ParseException("Invalid time zone in date value " + value);
                     }
