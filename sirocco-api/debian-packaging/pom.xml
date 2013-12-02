@@ -82,7 +82,7 @@
             </goals>
             <configuration>
               <tasks>
-                <copy file="${project.parent.basedir}/command-line-tools/src/main/etc/sirocco-client-completion.bash" tofile="${project.build.directory}/sirocco-api-client/etc/bash_completion.d/sirocco-api-cli"/>
+                <copy file="../command-line-tools/src/main/etc/sirocco-client-completion.bash" tofile="${project.build.directory}/sirocco-api-client/etc/bash_completion.d/sirocco-api-cli"/>
               </tasks>
             </configuration>
           </execution>
