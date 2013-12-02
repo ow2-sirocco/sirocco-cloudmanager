@@ -31,11 +31,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
+import javax.jms.JMSContext;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
+import javax.jms.Topic;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
@@ -47,14 +52,18 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.core.api.ResourceStateChangeEvent;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteMachineImageManager;
+import org.ow2.sirocco.cloudmanager.core.impl.command.MachineImageDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
@@ -86,6 +95,15 @@ public class MachineImageManager implements IMachineImageManager {
 
     @Inject
     private IdentityContext identityContext;
+
+    @Resource(lookup = "jms/ResourceStateChangeTopic")
+    private Topic resourceStateChangeTopic;
+
+    @Resource(lookup = "jms/RequestQueue")
+    private Queue requestQueue;
+
+    @Inject
+    private JMSContext jmsContext;
 
     private Tenant getTenant() throws CloudProviderException {
         return this.tenantManager.getTenant(this.identityContext);
@@ -167,29 +185,48 @@ public class MachineImageManager implements IMachineImageManager {
         return UtilsForManagers.fillResourceAttributes(machineImage, attributes);
     }
 
-    public void deleteMachineImage(final String imageId) throws CloudProviderException, ResourceNotFoundException {
-        MachineImage image = this.getMachineImageByUuid(imageId);
+    public Job deleteMachineImage(final String imageUuid) throws CloudProviderException, ResourceNotFoundException {
+        MachineImage image = this.getMachineImageByUuid(imageUuid);
 
-        /** if related image is not null then do not permit deletion */
+        // if related image is not null then do not permit deletion
         if (image.getRelatedImage() != null) {
-            throw new CloudProviderException("Related images exist for this image" + imageId);
+            throw new ResourceConflictException("Related images exist for this image" + imageUuid);
         }
-        /** if a machine template referernces the image do not permit deletion */
-        List<MachineTemplate> templates = null;
-        try {
-            templates = this.em
-                .createQuery("SELECT  t FROM MachineTemplate t WHERE t.machineImage.uuid=:mid", MachineTemplate.class)
-                .setParameter("mid", imageId).getResultList();
-        } catch (Exception e) {
-            throw new CloudProviderException("Internal query error" + e.getMessage());
-        }
-        if (templates != null && !templates.isEmpty()) {
-            throw new CloudProviderException("Machine templates refer to this image " + imageId);
+        // if a machine template references this image do not permit deletion
+        List<MachineTemplate> templates = this.em
+            .createQuery("SELECT  t FROM MachineTemplate t WHERE t.machineImage.uuid=:mid", MachineTemplate.class)
+            .setParameter("mid", imageUuid).getResultList();
+        if (!templates.isEmpty()) {
+            throw new ResourceConflictException("Image used by MachineTemplate");
         }
 
-        image.setState(MachineImage.State.DELETED);
+        // if a machine references this image do not permit deletion
+        List<Machine> machines = this.em.createQuery("SELECT  m FROM Machine m WHERE m.image.uuid=:uuid", Machine.class)
+            .setParameter("uuid", imageUuid).getResultList();
+        if (!machines.isEmpty()) {
+            throw new ResourceConflictException("Image used by Machine");
+        }
+
+        image.setState(MachineImage.State.DELETING);
+        this.fireMachineImageStateChangeEvent(image);
+
+        // creating Job
+        Job job = new Job();
+        job.setTenant(this.getTenant());
+        job.setTargetResource(image);
+        job.setCreated(new Date());
+        job.setDescription("MachineImage deletion");
+        job.setState(Job.Status.RUNNING);
+        job.setAction("delete");
+        job.setTimeOfStatusChange(new Date());
+        this.em.persist(job);
         this.em.flush();
 
+        ObjectMessage message = this.jmsContext.createObjectMessage(new MachineImageDeleteCommand()
+            .setResourceId(image.getId()).setJob(job));
+        this.jmsContext.createProducer().send(this.requestQueue, message);
+
+        return job;
     }
 
     @Override
@@ -227,6 +264,38 @@ public class MachineImageManager implements IMachineImageManager {
         image.setUpdated(new Date());
         this.em.merge(image);
         this.em.flush();
+    }
+
+    @Override
+    public void updateMachineImageState(final int imageId, final State state) {
+        MachineImage image = this.em.find(MachineImage.class, imageId);
+        image.setState(state);
+        this.fireMachineImageStateChangeEvent(image);
+    }
+
+    @Override
+    public void syncMachineImage(final int imageId, final MachineImage updatedImage, final int jobId) {
+        MachineImage image = this.em.find(MachineImage.class, imageId);
+        Job job = this.em.find(Job.class, jobId);
+        if (updatedImage == null) {
+            image.setState(MachineImage.State.DELETED);
+        } else {
+            image.setState(updatedImage.getState());
+            if (image.getCreated() == null) {
+                image.setCreated(new Date());
+            }
+            image.setUpdated(new Date());
+        }
+        if (image.getState() == MachineImage.State.DELETED) {
+            image.setDeleted(new Date());
+        }
+        this.fireMachineImageStateChangeEvent(image);
+        job.setState(Job.Status.SUCCESS);
+    }
+
+    private void fireMachineImageStateChangeEvent(final MachineImage image) {
+        this.jmsContext.createProducer().setProperty("tenantId", image.getTenant().getUuid())
+            .send(this.resourceStateChangeTopic, new ResourceStateChangeEvent(image));
     }
 
 }

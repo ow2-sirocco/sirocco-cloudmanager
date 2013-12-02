@@ -72,6 +72,7 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException
 import org.ow2.sirocco.cloudmanager.core.api.exception.ServiceUnavailableException;
 import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteMachineManager;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineActionCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.MachineCaptureCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.VolumeAttachCommand;
@@ -192,7 +193,7 @@ public class MachineManager implements IMachineManager {
     }
 
     public Job createMachine(final MachineCreate machineCreate) throws CloudProviderException {
-        MachineManager.logger.info("Creating Machine");
+        MachineManager.logger.info("Creating Machine " + machineCreate.getName());
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), machineCreate);
@@ -251,6 +252,7 @@ public class MachineManager implements IMachineManager {
         Job job = this.em.find(Job.class, jobId);
         if (updatedMachine == null || updatedMachine.getState() == State.DELETED) {
             machine.setState(Machine.State.DELETED);
+            machine.setDeleted(new Date());
             // delete volume attachments
             for (Iterator<MachineVolume> it = machine.getVolumes().iterator(); it.hasNext();) {
                 MachineVolume attachment = it.next();
@@ -387,13 +389,45 @@ public class MachineManager implements IMachineManager {
 
     @Override
     public Job captureMachine(final String machineId, final MachineImage machineImage) throws CloudProviderException {
-        // TODO
-        throw new ServiceUnavailableException();
+        Machine machine = this.getMachineByUuid(machineId);
+        MachineManager.logger.info("Capturing machine " + machine.getName());
+        Tenant tenant = this.getTenant();
+
+        MachineImage newMachineImage = new MachineImage();
+        newMachineImage.setTenant(tenant);
+        newMachineImage.setCloudProviderAccount(machine.getCloudProviderAccount());
+        newMachineImage.setLocation(machine.getLocation());
+        newMachineImage.setName(machineImage.getName());
+        newMachineImage.setDescription(machineImage.getDescription());
+        newMachineImage.setProperties(machineImage.getProperties());
+        newMachineImage.setState(MachineImage.State.CREATING);
+
+        this.em.persist(newMachineImage);
+
+        Job job = new Job();
+        job.setTenant(tenant);
+        job.setTargetResource(machine);
+        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+        affectedResources.add(newMachineImage);
+        job.setAffectedResources(affectedResources);
+        job.setCreated(new Date());
+        job.setDescription("Machine capture");
+        job.setState(Job.Status.RUNNING);
+        job.setAction("capture");
+        job.setTimeOfStatusChange(new Date());
+        this.em.persist(job);
+        this.em.flush();
+
+        ObjectMessage message = this.jmsContext.createObjectMessage(new MachineCaptureCommand(newMachineImage.getId())
+            .setResourceId(machine.getId()).setJob(job));
+        this.jmsContext.createProducer().send(this.requestQueue, message);
+
+        return job;
     }
 
     private Job doService(final String machineId, final String action, final Object... params) throws CloudProviderException {
-        MachineManager.logger.info(action + "ing Machine " + machineId);
         Machine machine = this.getMachineByUuid(machineId);
+        MachineManager.logger.info("Starting action " + action.toUpperCase() + " on Machine " + machine.getName());
 
         // checking compatible op
         if (machine.getOperations().contains(action) == false) {
@@ -442,10 +476,10 @@ public class MachineManager implements IMachineManager {
 
     // Delete may be done in any state of the machine
     public Job deleteMachine(final String machineId) throws CloudProviderException {
-        MachineManager.logger.info("Deleting machine " + machineId);
         Tenant tenant = this.getTenant();
 
         Machine machine = this.getMachineByUuid(machineId);
+        MachineManager.logger.info("Deleting machine " + machine.getName());
 
         machine.setState(Machine.State.DELETING);
         this.fireResourceStateChangeEvent(machine);
@@ -1091,12 +1125,10 @@ public class MachineManager implements IMachineManager {
      * Create network interface entities
      */
     private void createNetworkInterfaces(final Machine persisted, final Machine created) {
-        MachineManager.logger.info("createNetworkInterfaces " + persisted.getId());
         List<MachineNetworkInterface> nics = created.getNetworkInterfaces();
         if (nics == null) {
             return;
         }
-        MachineManager.logger.info("createNetworkInterfaces machine " + persisted.getId() + " has nics " + nics.size());
         for (MachineNetworkInterface nic : nics) {
             nic.setId(null);
             nic.setNetworkPort(null);
@@ -1120,16 +1152,13 @@ public class MachineManager implements IMachineManager {
 
             List<MachineNetworkInterfaceAddress> entries = nic.getAddresses();
             if (entries != null) {
-                MachineManager.logger.info(" createNetworkInterfaces has addresses " + entries.size());
                 for (MachineNetworkInterfaceAddress entry : entries) {
                     if (entry.getAddress() != null) {
                         entry.getAddress().setNetwork(null);
                         entry.getAddress().setResource(null);
-                        MachineManager.logger.info(" createNetworkInterfaces: new addr IP " + entry.getAddress().getIp());
                     }
                 }
             }
-            MachineManager.logger.info("createNetworkInterfaces persist nic ");
             this.em.persist(nic);
             persisted.addNetworkInterface(nic);
         }

@@ -52,7 +52,7 @@ public interface IMachineImageManager {
     MachineImage getMachineImageAttributes(String imageId, List<String> attributes) throws ResourceNotFoundException,
         CloudProviderException;
 
-    void deleteMachineImage(String imageId) throws ResourceNotFoundException, CloudProviderException;
+    Job deleteMachineImage(String imageId) throws ResourceNotFoundException, CloudProviderException;
 
     void updateMachineImage(MachineImage machineImage) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
@@ -62,4 +62,8 @@ public interface IMachineImageManager {
 
     QueryResult<MachineImage> getMachineImages(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
+
+    void syncMachineImage(int imageId, MachineImage updatedMachineImage, int jobId);
+
+    void updateMachineImageState(int imageId, org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State state);
 }

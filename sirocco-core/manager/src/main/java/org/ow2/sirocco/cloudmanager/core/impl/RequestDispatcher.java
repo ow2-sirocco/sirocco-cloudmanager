@@ -22,6 +22,8 @@
  */
 package org.ow2.sirocco.cloudmanager.core.impl;
 
+import java.util.Collections;
+
 import javax.annotation.Resource;
 import javax.ejb.ActivationConfigProperty;
 import javax.ejb.EJB;
@@ -38,18 +40,22 @@ import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
+import org.ow2.sirocco.cloudmanager.connector.api.IImageService;
 import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineActionCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.MachineCaptureCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.MachineDeleteCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.MachineImageDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.ResourceCommand;
@@ -63,10 +69,12 @@ import org.ow2.sirocco.cloudmanager.core.impl.command.VolumeDetachCommand;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -96,6 +104,9 @@ public class RequestDispatcher implements MessageListener {
     private IMachineManager machineManager;
 
     @EJB
+    private IMachineImageManager machineImageManager;
+
+    @EJB
     private IVolumeManager volumeManager;
 
     @EJB
@@ -119,6 +130,12 @@ public class RequestDispatcher implements MessageListener {
                 break;
             case MachineActionCommand.MACHINE_ACTION:
                 this.actionMachine((MachineActionCommand) command);
+                break;
+            case MachineCaptureCommand.MACHINE_CAPTURE:
+                this.captureMachine((MachineCaptureCommand) command);
+                break;
+            case MachineImageDeleteCommand.MACHINEIMAGE_DELETE:
+                this.deleteMachineImage(command);
                 break;
             case VolumeCreateCommand.VOLUME_CREATE:
                 this.createVolume((VolumeCreateCommand) command);
@@ -171,6 +188,13 @@ public class RequestDispatcher implements MessageListener {
         case MachineDeleteCommand.MACHINE_DELETE:
         case MachineActionCommand.MACHINE_ACTION:
             this.machineManager.updateMachineState(command.getResourceId(), Machine.State.ERROR);
+            break;
+        case MachineCaptureCommand.MACHINE_CAPTURE:
+            this.machineImageManager.updateMachineImageState(((MachineCaptureCommand) command).getMachineImageId(),
+                MachineImage.State.ERROR);
+            break;
+        case MachineImageDeleteCommand.MACHINEIMAGE_DELETE:
+            this.machineImageManager.updateMachineImageState(command.getResourceId(), MachineImage.State.ERROR);
             break;
         case VolumeCreateCommand.VOLUME_CREATE:
         case VolumeDeleteCommand.VOLUME_DELETE:
@@ -251,6 +275,24 @@ public class RequestDispatcher implements MessageListener {
         this.resourceWatcherManager.createMachineStateWatcher(machine, command.getJob(), expectedState);
     }
 
+    private void captureMachine(final MachineCaptureCommand command) throws CloudProviderException, ConnectorException {
+        Machine machine = this.em.find(Machine.class, command.getResourceId());
+        MachineImage image = this.em.find(MachineImage.class, command.getMachineImageId());
+        ICloudProviderConnector connector = this.findCloudProviderConnector(machine.getCloudProviderAccount());
+        IComputeService computeService = connector.getComputeService();
+        ProviderTarget target = new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation());
+
+        MachineImage newImage = computeService.captureMachine(machine.getProviderAssignedId(), image, target);
+
+        ProviderMapping providerMapping = new ProviderMapping();
+        providerMapping.setProviderAssignedId(newImage.getProviderAssignedId());
+        providerMapping.setProviderAccount(machine.getCloudProviderAccount());
+        providerMapping.setProviderLocation(machine.getLocation());
+        image.setProviderMappings(Collections.singletonList(providerMapping));
+
+        this.resourceWatcherManager.createMachineImageStateWatcher(image, command.getJob(), MachineImage.State.AVAILABLE);
+    }
+
     private void createVolume(final VolumeCreateCommand command) throws CloudProviderException, ConnectorException {
         ICloudProviderConnector connector = this.findCloudProviderConnector(command.getAccount());
 
@@ -318,6 +360,19 @@ public class RequestDispatcher implements MessageListener {
             new ProviderTarget().account(network.getCloudProviderAccount()).location(network.getLocation()));
 
         this.resourceWatcherManager.createNetworkStateWatcher(network, command.getJob(), Network.State.DELETED);
+    }
+
+    private void deleteMachineImage(final ResourceCommand command) throws CloudProviderException, ConnectorException {
+        MachineImage image = this.em.find(MachineImage.class, command.getResourceId());
+        ICloudProviderConnector connector = this.findCloudProviderConnector(image.getProviderMappings().get(0)
+            .getProviderAccount());
+        IImageService imageService = connector.getImageService();
+        imageService.deleteMachineImage(
+            image.getProviderMappings().get(0).getProviderAssignedId(),
+            new ProviderTarget().account(image.getProviderMappings().get(0).getProviderAccount()).location(
+                image.getProviderMappings().get(0).getProviderLocation()));
+
+        this.resourceWatcherManager.createMachineImageStateWatcher(image, command.getJob(), MachineImage.State.DELETED);
     }
 
     private void createSystem(final SystemCreateCommand command) throws CloudProviderException, ConnectorException {

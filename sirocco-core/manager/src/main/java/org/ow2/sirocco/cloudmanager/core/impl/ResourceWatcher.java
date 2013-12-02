@@ -29,7 +29,6 @@ import javax.ejb.AsyncResult;
 import javax.ejb.Asynchronous;
 import javax.ejb.EJB;
 import javax.ejb.Local;
-import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
 
@@ -38,15 +37,15 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
-import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.ISystemManager;
 import org.ow2.sirocco.cloudmanager.core.api.IVolumeManager;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
-import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteResourceWatcher;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
@@ -57,9 +56,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Stateless
-@Local(IResourceWatcher.class)
-@Remote(IRemoteResourceWatcher.class)
-public class ResourceWatcher implements IResourceWatcher {
+@Local
+public class ResourceWatcher {
     private static Logger logger = LoggerFactory.getLogger(ResourceWatcher.class.getName());
 
     private static final int SLEEP_BETWEEN_POLL_IN_SECONDS = 10;
@@ -71,6 +69,9 @@ public class ResourceWatcher implements IResourceWatcher {
 
     @EJB
     IMachineManager machineManager;
+
+    @EJB
+    IMachineImageManager machineImageManager;
 
     @EJB
     INetworkManager networkManager;
@@ -96,7 +97,6 @@ public class ResourceWatcher implements IResourceWatcher {
         return connector;
     }
 
-    @Override
     @Asynchronous
     public Future<Void> watchMachine(final Machine machine, final Job job, final Machine.State... expectedStates)
         throws CloudProviderException {
@@ -133,7 +133,45 @@ public class ResourceWatcher implements IResourceWatcher {
         return new AsyncResult<Void>(null);
     }
 
-    @Override
+    @Asynchronous
+    public Future<Void> watchMachineImage(final MachineImage machineImage, final Job job,
+        final MachineImage.State... expectedStates) throws CloudProviderException {
+        ICloudProviderConnector connector = this.getCloudProviderConnector(machineImage.getProviderMappings().get(0)
+            .getProviderAccount());
+        ProviderTarget target = new ProviderTarget().account(machineImage.getProviderMappings().get(0).getProviderAccount())
+            .location(machineImage.getProviderMappings().get(0).getProviderLocation());
+
+        int tries = ResourceWatcher.MAX_WAIT_TIME_IN_SECONDS / ResourceWatcher.SLEEP_BETWEEN_POLL_IN_SECONDS;
+        mainloop: while (tries-- > 0) {
+            try {
+                MachineImage updatedMachineImage = connector.getImageService().getMachineImage(
+                    machineImage.getProviderMappings().get(0).getProviderAssignedId(), target);
+
+                for (MachineImage.State expectedFinalState : expectedStates) {
+                    if (updatedMachineImage.getState() == expectedFinalState) {
+                        this.machineImageManager.syncMachineImage(machineImage.getId(), updatedMachineImage, job.getId());
+                        break mainloop;
+                    }
+                }
+            } catch (ResourceNotFoundException e) {
+                this.machineImageManager.syncMachineImage(machineImage.getId(), null, job.getId());
+                break;
+            } catch (ConnectorException e) {
+                ResourceWatcher.logger.error("Failed to poll machine image state: ", e);
+            }
+            try {
+                Thread.sleep(1000 * ResourceWatcher.SLEEP_BETWEEN_POLL_IN_SECONDS);
+            } catch (InterruptedException e) {
+                break;
+            }
+            if (this.context.wasCancelCalled()) {
+                ResourceWatcher.logger.info("MachineImage watcher cancelled for image " + machineImage.getId());
+                break;
+            }
+        }
+        return new AsyncResult<Void>(null);
+    }
+
     @Asynchronous
     public Future<Void> watchNetwork(final Network network, final Job job, final Network.State... expectedStates)
         throws CloudProviderException {
@@ -169,7 +207,6 @@ public class ResourceWatcher implements IResourceWatcher {
         return new AsyncResult<Void>(null);
     }
 
-    @Override
     @Asynchronous
     public Future<Void> watchVolume(final Volume volume, final Job job, final Volume.State... expectedStates)
         throws CloudProviderException {
@@ -206,7 +243,6 @@ public class ResourceWatcher implements IResourceWatcher {
         return new AsyncResult<Void>(null);
     }
 
-    @Override
     @Asynchronous
     public Future<Void> watchVolumeAttachment(final Machine machine, final MachineVolume volumeAttachment, final Job job,
         final MachineVolume.State... expectedStates) throws CloudProviderException {
@@ -258,7 +294,6 @@ public class ResourceWatcher implements IResourceWatcher {
     }
 
     @Asynchronous
-    @Override
     public Future<Void> watchSystem(final System system, final Job job, final System.State... expectedStates)
         throws CloudProviderException {
         ICloudProviderConnector connector = this.getCloudProviderConnector(system.getCloudProviderAccount());

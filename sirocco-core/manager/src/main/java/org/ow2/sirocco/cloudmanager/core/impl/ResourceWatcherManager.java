@@ -34,10 +34,10 @@ import javax.ejb.LockType;
 import javax.ejb.Schedule;
 import javax.ejb.Singleton;
 
-import org.ow2.sirocco.cloudmanager.core.api.IResourceWatcher;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
+import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
@@ -51,7 +51,7 @@ public class ResourceWatcherManager {
     private static Logger logger = LoggerFactory.getLogger(ResourceWatcherManager.class.getName());
 
     @EJB
-    private IResourceWatcher resourceWatcher;
+    private ResourceWatcher resourceWatcher;
 
     private List<Future<Void>> watchers = new ArrayList<>();
 
@@ -83,6 +83,12 @@ public class ResourceWatcherManager {
     public void createMachineStateWatcher(final Machine machine, final Job job, final Machine.State... expectedStates)
         throws CloudProviderException {
         Future<Void> watcher = this.resourceWatcher.watchMachine(machine, job, expectedStates);
+        this.watchers.add(watcher);
+    }
+
+    public void createMachineImageStateWatcher(final MachineImage machineImage, final Job job,
+        final MachineImage.State... expectedStates) throws CloudProviderException {
+        Future<Void> watcher = this.resourceWatcher.watchMachineImage(machineImage, job, expectedStates);
         this.watchers.add(watcher);
     }
 
