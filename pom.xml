@@ -45,6 +45,7 @@
 		<module>sirocco-core</module>
 		<module>sirocco-connector</module>
 		<module>sirocco-api</module>
+		<module>sirocco-test</module>
 	</modules>
 
 	<profiles>
