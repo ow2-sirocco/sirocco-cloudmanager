@@ -296,25 +296,27 @@ public class QueryHelper {
             }
         }
 
-        if (params.getMarker() != null) {
-            try {
-                Resource resourceAtMarker = (Resource) em
-                    .createQuery("SELECT r FROM " + params.getEntityType() + " r WHERE uuid=:uuid")
-                    .setParameter("uuid", params.getMarker()).getSingleResult();
-                if (whereClauseSB.length() > 0) {
-                    whereClauseSB.append(" AND ");
-                }
-                whereClauseSB.append(" v.id>" + resourceAtMarker.getId() + " ");
-            } catch (NoResultException e) {
-                throw new InvalidRequestException("Invalid marker " + params.getMarker());
-            }
-        }
-
         String whereClause = whereClauseSB.toString();
 
         try {
             int count = ((Number) em.createQuery("SELECT COUNT(v) FROM " + params.getEntityType() + " v WHERE " + whereClause)
                 .setParameter("tenantId", params.getTenantId()).getSingleResult()).intValue();
+
+            if (params.getMarker() != null) {
+                try {
+                    Resource resourceAtMarker = (Resource) em
+                        .createQuery("SELECT r FROM " + params.getEntityType() + " r WHERE r.uuid=:uuid")
+                        .setParameter("uuid", params.getMarker()).getSingleResult();
+                    if (whereClauseSB.length() > 0) {
+                        whereClauseSB.append(" AND ");
+                    }
+                    whereClauseSB.append(" v.id>" + resourceAtMarker.getId() + " ");
+                } catch (NoResultException e) {
+                    throw new InvalidRequestException("Invalid marker " + params.getMarker());
+                }
+            }
+            whereClause = whereClauseSB.toString();
+
             Query query = em.createQuery(
                 "SELECT v FROM " + params.getEntityType() + " v  WHERE " + whereClause + " ORDER BY v.id DESC").setParameter(
                 "tenantId", params.getTenantId());
