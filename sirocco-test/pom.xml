@@ -230,7 +230,7 @@
 								<copy todir="${project.build.directory}/entities"
 									overwrite="true">
 									<fileset
-										dir="../../cloudmanager-dev/sirocco-model/cimi/src/main/java"
+										dir="../sirocco-model/cimi/src/main/java"
 										includes="**/*.*" />
 								</copy>
 							</tasks>
