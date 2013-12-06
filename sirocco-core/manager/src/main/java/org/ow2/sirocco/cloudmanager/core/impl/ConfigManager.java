@@ -33,6 +33,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
 import org.ow2.sirocco.cloudmanager.core.api.IConfigManager;
+import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.model.utils.SiroccoConfiguration;
 
 @Stateless
@@ -53,7 +54,7 @@ public class ConfigManager implements IConfigManager {
     }
 
     @Override
-    public void setConfigParameter(final String key, final String value) {
+    public void setConfigParameter(final String key, final String value) throws InvalidRequestException {
         SiroccoConfiguration config = this.getConfig();
         switch (key) {
         case IConfigManager.HTTP_PROXY_HOST:
@@ -68,6 +69,8 @@ public class ConfigManager implements IConfigManager {
             config.setHttpNonProxyHosts(value);
             System.setProperty("http.nonProxyHosts", value);
             break;
+        default:
+            throw new InvalidRequestException("Invalid parameter " + key);
         }
 
     }
@@ -83,7 +86,7 @@ public class ConfigManager implements IConfigManager {
     }
 
     @Override
-    public String getConfigParameter(final String key) {
+    public String getConfigParameter(final String key) throws InvalidRequestException {
         SiroccoConfiguration config = this.getConfig();
         switch (key) {
         case IConfigManager.HTTP_PROXY_HOST:
@@ -93,7 +96,7 @@ public class ConfigManager implements IConfigManager {
         case IConfigManager.HTTP_NON_PROXY_HOSTS:
             return config.getHttpNonProxyHosts();
         default:
-            return null;
+            throw new InvalidRequestException("Invalid parameter " + key);
         }
     }
 

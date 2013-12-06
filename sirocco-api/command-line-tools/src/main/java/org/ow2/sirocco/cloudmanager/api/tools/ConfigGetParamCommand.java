@@ -20,22 +20,32 @@
  * USA
  *
  */
-package org.ow2.sirocco.cloudmanager.core.api;
+package org.ow2.sirocco.cloudmanager.api.tools;
 
+import java.util.HashMap;
 import java.util.Map;
 
-import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
 
-public interface IConfigManager {
-    final String HTTP_PROXY_HOST = "http.proxyHost";
+@Parameters(commandDescription = "get config parameter")
+public class ConfigGetParamCommand implements Command {
+    private static String COMMAND_NAME = "config-get";
 
-    final String HTTP_PROXY_PORT = "http.proxyPort";
+    @Parameter(names = "-key", description = "config key", required = true)
+    private String key;
 
-    final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
+    @Override
+    public String getName() {
+        return ConfigGetParamCommand.COMMAND_NAME;
+    }
 
-    void setConfigParameter(String key, String value) throws InvalidRequestException;
+    @Override
+    public void execute(final RestClient restClient) throws Exception {
+        Map<String, String> params = new HashMap<>();
+        params.put("key", this.key);
+        String value = restClient.getRequest("config", String.class, params);
+        System.out.println(value);
+    }
 
-    Map<String, String> getConfigParameters();
-
-    String getConfigParameter(String key) throws InvalidRequestException;
 }

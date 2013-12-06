@@ -30,13 +30,15 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 
 public class ToolClient {
-    private static String SIROCCO_USERNAME_ENV_NAME = "SIROCCO_USERNAME";
+    private static final String SIROCCO_USERNAME_ENV_NAME = "SIROCCO_USERNAME";
 
-    private static String SIROCCO_PASSWORD_ENV_NAME = "SIROCCO_PASSWORD";
+    private static final String SIROCCO_PASSWORD_ENV_NAME = "SIROCCO_PASSWORD";
 
-    private static String SIROCCO_TENANT_ID_ENV_NAME = "SIROCCO_TENANT_ID";
+    private static final String SIROCCO_TENANT_ID_ENV_NAME = "SIROCCO_TENANT_ID";
 
-    private static String SIROCCO_ENDPOINT_URL_ENV_NAME = "SIROCCO_ENDPOINT_URL";
+    private static final String SIROCCO_TENANT_NAME_ENV_NAME = "SIROCCO_TENANT_NAME";
+
+    private static final String SIROCCO_ENDPOINT_URL_ENV_NAME = "SIROCCO_ENDPOINT_URL";
 
     @Parameter(names = "-debug", description = "turn on debug mode", required = false)
     private boolean debug;
@@ -49,7 +51,7 @@ public class ToolClient {
         new TenantListCommand(), new TenantShowCommand(), new UserCreateCommand(), new UserDeleteCommand(),
         new UserListCommand(), new UserShowCommand(), new UserTenantMembershipListCommand(),
         new ProviderProfileCreateCommand(), new ProviderProfileListCommand(), new AddProviderProfileMetadataCommand(),
-        new ConfigSetParamCommand()};
+        new ConfigSetParamCommand(), new ConfigGetParamCommand()};
 
     private ToolClient(final String[] args) {
         String userName = System.getenv(ToolClient.SIROCCO_USERNAME_ENV_NAME);
@@ -68,6 +70,7 @@ public class ToolClient {
             System.exit(1);
         }
         String tenantId = System.getenv(ToolClient.SIROCCO_TENANT_ID_ENV_NAME);
+        String tenantName = System.getenv(ToolClient.SIROCCO_TENANT_NAME_ENV_NAME);
 
         JCommander jCommander = new JCommander();
         jCommander.addObject(this);
@@ -98,7 +101,7 @@ public class ToolClient {
             if (this.debug) {
                 options.setDebug(true);
             }
-            RestClient restClient = RestClient.login(endpointUrl, userName, password, tenantId, options);
+            RestClient restClient = RestClient.login(endpointUrl, userName, password, tenantId, tenantName, options);
 
             command.execute(restClient);
         } catch (ParameterException ex) {

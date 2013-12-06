@@ -28,6 +28,7 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
 import org.ow2.sirocco.cloudmanager.core.api.IConfigManager;
+import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,20 +42,24 @@ public class SiroccoStartup {
 
     @PostConstruct
     void init() {
-        String proxyHost = this.configManager.getConfigParameter(IConfigManager.HTTP_PROXY_HOST);
-        if (proxyHost != null) {
-            System.setProperty("http.proxyHost", proxyHost);
-            SiroccoStartup.logger.info("Set http.proxyHost to " + proxyHost);
-        }
-        String proxyPort = this.configManager.getConfigParameter(IConfigManager.HTTP_PROXY_PORT);
-        if (proxyPort != null) {
-            System.setProperty("http.proxyPort", proxyPort);
-            SiroccoStartup.logger.info("Set http.proxyPort to " + proxyPort);
-        }
-        String nonProxyHosts = this.configManager.getConfigParameter(IConfigManager.HTTP_NON_PROXY_HOSTS);
-        if (nonProxyHosts != null) {
-            System.setProperty("http.nonProxyHosts", nonProxyHosts);
-            SiroccoStartup.logger.info("Set http.nonProxyHosts to " + nonProxyHosts);
+        try {
+            String proxyHost = this.configManager.getConfigParameter(IConfigManager.HTTP_PROXY_HOST);
+            if (proxyHost != null) {
+                System.setProperty("http.proxyHost", proxyHost);
+                SiroccoStartup.logger.info("Set http.proxyHost to " + proxyHost);
+            }
+            String proxyPort = this.configManager.getConfigParameter(IConfigManager.HTTP_PROXY_PORT);
+            if (proxyPort != null) {
+                System.setProperty("http.proxyPort", proxyPort);
+                SiroccoStartup.logger.info("Set http.proxyPort to " + proxyPort);
+            }
+            String nonProxyHosts = this.configManager.getConfigParameter(IConfigManager.HTTP_NON_PROXY_HOSTS);
+            if (nonProxyHosts != null) {
+                System.setProperty("http.nonProxyHosts", nonProxyHosts);
+                SiroccoStartup.logger.info("Set http.nonProxyHosts to " + nonProxyHosts);
+            }
+        } catch (InvalidRequestException e) {
+            SiroccoStartup.logger.error("SiroccoStartup.init", e);
         }
     }
 

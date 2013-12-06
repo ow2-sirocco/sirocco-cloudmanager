@@ -111,7 +111,7 @@ public class RestClient {
             throw new ProviderException("Forbidden");
         } else if (response.getStatus() == 404) {
             String message = response.getEntity(String.class);
-            throw new ProviderException("Resource not found");
+            throw new ProviderException("Resource not found: " + message);
         } else if (response.getStatus() == 409) {
             String message = response.getEntity(String.class);
             throw new ProviderException(message);
@@ -130,8 +130,8 @@ public class RestClient {
         }
     }
 
-    private void initAuthenticationHeaders(final String userName, final String password, final String tenantId)
-        throws Exception {
+    private void initAuthenticationHeaders(final String userName, final String password, final String tenantId,
+        final String tenantName) throws Exception {
         StringBuilder sbToEncode = new StringBuilder();
         sbToEncode.append(userName).append(':').append(password);
         StringBuilder sb = new StringBuilder();
@@ -140,6 +140,9 @@ public class RestClient {
         this.authenticationHeaders.put("Authorization", sb.toString());
         if (tenantId != null) {
             this.authenticationHeaders.put("tenantId", tenantId);
+        }
+        if (tenantName != null) {
+            this.authenticationHeaders.put("tenantName", tenantName);
         }
     }
 
@@ -182,8 +185,8 @@ public class RestClient {
     }
 
     private RestClient(final String endpointUrl, final String userName, final String password, final String tenantId,
-        final Options... optionList) throws Exception {
-        this.initAuthenticationHeaders(userName, password, tenantId);
+        final String tenantName, final Options... optionList) throws Exception {
+        this.initAuthenticationHeaders(userName, password, tenantId, tenantName);
         // ClientConfig config = new DefaultClientConfig();
         // config.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING,
         // Boolean.TRUE);
@@ -213,8 +216,23 @@ public class RestClient {
     }
 
     public static RestClient login(final String cimiEndpointUrl, final String userName, final String password,
-        final String tenantId, final Options... options) throws Exception {
-        return new RestClient(cimiEndpointUrl, userName, password, tenantId, options);
+        final String tenantId, final String tenantName, final Options... options) throws Exception {
+        return new RestClient(cimiEndpointUrl, userName, password, tenantId, tenantName, options);
+    }
+
+    <U> U getRequest(final String path, final Class<U> clazz, final Map<String, String> queryParams) throws Exception {
+        WebResource service = this.webResource.path(path);
+        for (Map.Entry<String, String> param : queryParams.entrySet()) {
+            service = service.queryParam(param.getKey(), param.getValue());
+        }
+        try {
+            ClientResponse response = this.addAuthenticationHeaders(service).accept(this.mediaType).get(ClientResponse.class);
+            this.handleResponseStatus(response);
+            U obj = response.getEntity(clazz);
+            return obj;
+        } catch (ClientHandlerException e) {
+            throw new Exception(e.getMessage(), e);
+        }
     }
 
     <U> U getRequest(final String path, final Class<U> clazz) throws Exception {

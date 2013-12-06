@@ -52,7 +52,7 @@ _sirocco_client()
     commands="${commands} provider-location-list provider-location-add"
     commands="${commands} tenant-list tenant-create tenant-delete tenant-show tenant-account-list tenant-account-add tenant-account-remove tenant-user-add tenant-user-remove tenant-user-list"
     commands="${commands} user-list user-create user-delete user-show"
-    commands="${commands} provider-profile-list user-create provider-profile-create provider-profile-metadata-add config-set"
+    commands="${commands} provider-profile-list user-create provider-profile-create provider-profile-metadata-add config-set config-get"
 
     case "${command}" in
 	provider-create)
@@ -119,7 +119,12 @@ _sirocco_client()
 	    local opts="-key -value"
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
-            ;;           
+            ;;  
+    config-get)
+	    local opts="-key"
+	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;                   
     *)
         ;;         	   
     esac
