@@ -48,6 +48,7 @@ public class DbManagerBean {
 
             this.em.createNativeQuery("DELETE FROM CLOUDPROVIDERLOCATION").executeUpdate();
             this.em.createNativeQuery("DELETE FROM CLOUDPROVIDERACCOUNT").executeUpdate();
+            this.em.createNativeQuery("DELETE FROM CLOUDPROVIDERPROFILE").executeUpdate();
             this.em.createNativeQuery("DELETE FROM CLOUDPROVIDER").executeUpdate();
 
             this.em.createNativeQuery("DELETE FROM MACHINE").executeUpdate();
