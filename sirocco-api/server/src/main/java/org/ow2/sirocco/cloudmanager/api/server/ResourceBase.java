@@ -19,6 +19,10 @@ public class ResourceBase {
         if (values != null && !values.isEmpty()) {
             result.setTenantId(values.get(0));
         }
+        values = this.headers.getRequestHeader("tenantName");
+        if (values != null && !values.isEmpty()) {
+            result.setTenantName(values.get(0));
+        }
         values = this.headers.getRequestHeader("Authorization");
         if (values != null && !values.isEmpty()) {
             String userPassword[] = ResourceBase.decode(values.get(0));

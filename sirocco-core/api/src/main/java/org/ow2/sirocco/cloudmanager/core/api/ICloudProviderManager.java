@@ -160,13 +160,15 @@ public interface ICloudProviderManager {
 
     List<CloudProviderAccount> getCloudProviderAccountsByTenant(String tenantId) throws CloudProviderException;
 
+    List<CloudProviderAccount> getCloudProviderAccountsByTenant() throws CloudProviderException;
+
     List<CloudProviderLocation> getCloudProviderLocations() throws CloudProviderException;
 
     List<CloudProvider> getCloudProviders() throws CloudProviderException;
 
     Placement placeResource(int tenantId, CloudEntityCreate create) throws CloudProviderException;
 
-    CloudProviderProfile createCloudProviderProfile(CloudProviderProfile providerType);
+    CloudProviderProfile createCloudProviderProfile(CloudProviderProfile providerType) throws CloudProviderException;
 
     void addCloudProviderProfileMetadata(String profileId, CloudProviderProfile.AccountParameter metadata)
         throws ResourceNotFoundException;

@@ -42,9 +42,14 @@ public class TenantManager implements ITenantManager {
 
     @Override
     public Tenant createTenant(final Tenant tenant) throws CloudProviderException {
-        this.em.persist(tenant);
-        this.em.flush();
-        return tenant;
+        try {
+            this.getTenantByName(tenant.getName());
+            throw new ResourceConflictException("Tenant " + tenant.getName() + " already exists");
+        } catch (ResourceNotFoundException e) {
+            this.em.persist(tenant);
+            this.em.flush();
+            return tenant;
+        }
     }
 
     @Override
@@ -62,7 +67,17 @@ public class TenantManager implements ITenantManager {
             return this.em.createNamedQuery("Tenant.findByUuid", Tenant.class).setParameter("uuid", tenantUuid)
                 .getSingleResult();
         } catch (NoResultException e) {
-            throw new ResourceNotFoundException();
+            throw new ResourceNotFoundException("Tenant " + tenantUuid + " not found");
+        }
+    }
+
+    @Override
+    public Tenant getTenantByName(final String tenantName) throws CloudProviderException {
+        try {
+            return this.em.createNamedQuery("Tenant.findByName", Tenant.class).setParameter("name", tenantName)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException("Tenant " + tenantName + " not found");
         }
     }
 
@@ -70,6 +85,9 @@ public class TenantManager implements ITenantManager {
     public Tenant getTenant(final IdentityContext context) throws CloudProviderException {
         if (context.getTenantId() != null && !context.getTenantId().isEmpty()) {
             return this.getTenantByUuid(context.getTenantId());
+        }
+        if (context.getTenantName() != null && !context.getTenantName().isEmpty()) {
+            return this.getTenantByName(context.getTenantName());
         }
         User user = this.userManager.getUserByUsername(context.getUserName());
         if (!user.getTenants().isEmpty()) {

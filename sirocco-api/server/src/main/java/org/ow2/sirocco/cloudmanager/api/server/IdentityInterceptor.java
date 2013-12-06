@@ -24,6 +24,7 @@ public class IdentityInterceptor implements Serializable {
             IdentityContext idCtx = resourceBase.getIdentityContext();
             this.identityContext.setUserName(idCtx.getUserName());
             this.identityContext.setTenantId(idCtx.getTenantId());
+            this.identityContext.setTenantName(idCtx.getTenantName());
         }
         return ctx.proceed();
     }

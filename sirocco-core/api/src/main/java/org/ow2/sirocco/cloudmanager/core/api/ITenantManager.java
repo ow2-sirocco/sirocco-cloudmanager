@@ -16,6 +16,8 @@ public interface ITenantManager {
 
     Tenant getTenantByUuid(String tenantUuid) throws CloudProviderException;
 
+    Tenant getTenantByName(String tenantName) throws CloudProviderException;
+
     Tenant getTenant(IdentityContext context) throws CloudProviderException;
 
     List<Tenant> getTenants() throws CloudProviderException;

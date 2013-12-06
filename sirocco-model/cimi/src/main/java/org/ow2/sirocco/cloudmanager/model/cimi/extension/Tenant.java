@@ -46,7 +46,8 @@ import javax.persistence.TemporalType;
  * Container used to isolate resources at broker level
  */
 @Entity
-@NamedQueries({@NamedQuery(name = "Tenant.findByUuid", query = "SELECT t from Tenant t WHERE t.uuid=:uuid")})
+@NamedQueries({@NamedQuery(name = "Tenant.findByUuid", query = "SELECT t from Tenant t WHERE t.uuid=:uuid"),
+    @NamedQuery(name = "Tenant.findByName", query = "SELECT t from Tenant t WHERE t.name=:name")})
 public class Tenant implements Serializable {
     private static final long serialVersionUID = 1L;
 

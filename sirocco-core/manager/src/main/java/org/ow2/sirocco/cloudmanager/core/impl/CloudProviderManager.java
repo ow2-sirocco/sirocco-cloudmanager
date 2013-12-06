@@ -54,6 +54,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IUserManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.OperationFailureException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteCloudProviderManager;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntityCreate;
@@ -365,6 +366,19 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
+    public List<CloudProviderAccount> getCloudProviderAccountsByTenant() throws CloudProviderException {
+        Tenant tenant;
+        if (this.identityContext.getTenantId() != null) {
+            tenant = this.tenantManager.getTenantByUuid(this.identityContext.getTenantId());
+        } else if (this.identityContext.getTenantName() != null) {
+            tenant = this.tenantManager.getTenantByName(this.identityContext.getTenantName());
+        } else {
+            throw new CloudProviderException("No tenant identity");
+        }
+        return new ArrayList<CloudProviderAccount>(tenant.getCloudProviderAccounts());
+    }
+
+    @Override
     public CloudProviderLocation createCloudProviderLocation(final String Iso3166_1_Code, final String Iso3166_2_Code,
         final String postalCode, final Double altitude, final Double latitude, final Double longitude,
         final String countryName, final String stateName, final String cityName) throws CloudProviderException {
@@ -521,7 +535,12 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProviderProfile createCloudProviderProfile(final CloudProviderProfile providerProfile) {
+    public CloudProviderProfile createCloudProviderProfile(final CloudProviderProfile providerProfile)
+        throws CloudProviderException {
+        if (this.em.createQuery("SELECT p FROM CloudProviderProfile p WHERE p.type=:type")
+            .setParameter("type", providerProfile.getType()).getResultList().size() > 0) {
+            throw new ResourceConflictException("CloudProviderProfile of type " + providerProfile.getType() + " already exists");
+        }
         this.em.persist(providerProfile);
         return providerProfile;
     }

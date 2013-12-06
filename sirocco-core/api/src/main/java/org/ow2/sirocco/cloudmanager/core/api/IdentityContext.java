@@ -13,6 +13,8 @@ public class IdentityContext implements Serializable {
 
     private String tenantId;
 
+    private String tenantName;
+
     private String userName;
 
     public String getTenantId() {
@@ -21,6 +23,14 @@ public class IdentityContext implements Serializable {
 
     public void setTenantId(final String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public String getTenantName() {
+        return this.tenantName;
+    }
+
+    public void setTenantName(final String tenantName) {
+        this.tenantName = tenantName;
     }
 
     public String getUserName() {
