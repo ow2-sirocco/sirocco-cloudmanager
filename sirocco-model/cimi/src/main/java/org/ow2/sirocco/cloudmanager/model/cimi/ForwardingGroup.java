@@ -26,7 +26,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
-import java.util.Set;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
@@ -60,7 +60,7 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
 
     private State state;
 
-    private Set<ForwardingGroupNetwork> networks;
+    private List<ForwardingGroupNetwork> networks;
 
     @Enumerated(EnumType.STRING)
     public State getState() {
@@ -72,11 +72,11 @@ public class ForwardingGroup extends CloudResource implements Serializable, IClo
     }
 
     @OneToMany
-    public Set<ForwardingGroupNetwork> getNetworks() {
+    public List<ForwardingGroupNetwork> getNetworks() {
         return this.networks;
     }
 
-    public void setNetworks(final Set<ForwardingGroupNetwork> networks) {
+    public void setNetworks(final List<ForwardingGroupNetwork> networks) {
         this.networks = networks;
     }
 

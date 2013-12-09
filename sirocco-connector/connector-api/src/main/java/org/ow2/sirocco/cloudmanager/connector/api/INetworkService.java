@@ -204,7 +204,7 @@ public interface INetworkService {
      * @throws ResourceNotFoundException
      * @throws ConnectorException
      */
-    void deleteForwardingGroup(String forwardingGroupId, ProviderTarget target) throws ResourceNotFoundException,
+    void deleteForwardingGroup(ForwardingGroup forwardingGroup, ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException;
 
     /**

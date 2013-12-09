@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -234,8 +233,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
-    public void deleteForwardingGroup(final String forwardingGroupId, final ProviderTarget target) throws ConnectorException {
-        this.getProvider(target).deleteForwardingGroup(forwardingGroupId);
+    public void deleteForwardingGroup(final ForwardingGroup forwardingGroup, final ProviderTarget target)
+        throws ConnectorException {
+        this.getProvider(target).deleteForwardingGroup(forwardingGroup);
     }
 
     @Override
@@ -1651,7 +1651,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate)
             throws ConnectorException {
-            final Set<ForwardingGroupNetwork> networksToAdd = new HashSet<ForwardingGroupNetwork>();
+            final List<ForwardingGroupNetwork> networksToAdd = new ArrayList<ForwardingGroupNetwork>();
             if (forwardingGroupCreate.getForwardingGroupTemplate().getNetworks() != null) {
                 for (Network net : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
                     String netId = net.getProviderAssignedId();
@@ -1668,7 +1668,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             final String forwardingGroupProviderAssignedId = UUID.randomUUID().toString();
             final ForwardingGroup forwardingGroup = new ForwardingGroup();
             forwardingGroup.setProviderAssignedId(forwardingGroupProviderAssignedId);
-            forwardingGroup.setNetworks(new HashSet<ForwardingGroupNetwork>());
+            forwardingGroup.setNetworks(new ArrayList<ForwardingGroupNetwork>());
             this.forwardingGroups.put(forwardingGroupProviderAssignedId, forwardingGroup);
             forwardingGroup.setState(ForwardingGroup.State.CREATING);
             forwardingGroup.setNetworks(networksToAdd);
@@ -1706,14 +1706,17 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             return forwardingGroup;
         }
 
-        public void deleteForwardingGroup(final String forwardingGroupId) throws ConnectorException {
-            MockCloudProviderConnector.logger.info("Deleting forwarding group with providerAssignedId " + forwardingGroupId);
-            ForwardingGroup forwardingGroup = this.forwardingGroups.get(forwardingGroupId);
-            if (forwardingGroup == null) {
-                throw new ResourceNotFoundException("NetworkPort " + forwardingGroupId + " doesn't exist");
+        public void deleteForwardingGroup(final ForwardingGroup forwardingGroup) throws ConnectorException {
+            MockCloudProviderConnector.logger.info("Deleting forwarding group with providerAssignedId "
+                + forwardingGroup.getProviderAssignedId());
+            ForwardingGroup mockForwardingGroup = this.forwardingGroups.get(forwardingGroup.getProviderAssignedId());
+            if (mockForwardingGroup == null) {
+                throw new ResourceNotFoundException("ForwardingGroup " + forwardingGroup.getProviderAssignedId()
+                    + " doesn't exist");
             }
-            forwardingGroup.setState(ForwardingGroup.State.DELETING);
-            forwardingGroup.setUpdated(new Date());
+            this.forwardingGroups.remove(mockForwardingGroup.getProviderAssignedId());
+            mockForwardingGroup.setState(ForwardingGroup.State.DELETED);
+            mockForwardingGroup.setUpdated(new Date());
         }
 
         public void addNetworkToForwardingGroup(final String forwardingGroupId, final ForwardingGroupNetwork fgNetwork)

@@ -203,7 +203,8 @@ public class CloudStackCloudProviderConnector implements ICloudProviderConnector
     }
 
     @Override
-    public void deleteForwardingGroup(final String forwardingGroupId, final ProviderTarget target) throws ConnectorException {
+    public void deleteForwardingGroup(final ForwardingGroup forwardingGroup, final ProviderTarget target)
+        throws ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
 

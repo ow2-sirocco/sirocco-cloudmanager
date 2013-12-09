@@ -4,10 +4,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -25,7 +23,10 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
+import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
+import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
@@ -81,6 +82,9 @@ public class NetworkManager implements INetworkManager {
 
     @Resource
     private EJBContext context;
+
+    @EJB
+    private ICloudProviderConnectorFinder connectorFinder;
 
     @EJB
     private ICloudProviderManager cloudProviderManager;
@@ -956,34 +960,22 @@ public class NetworkManager implements INetworkManager {
     public Job createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws InvalidRequestException,
         CloudProviderException {
         NetworkManager.logger.info("Creating ForwardingGroup");
-
-        // retrieve user
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), forwardingGroupCreate);
-        ICloudProviderConnector connector = null;// this.getCloudProviderConnector(placement.getAccount(),
-                                                 // placement.getLocation());
+
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(placement.getAccount()
+            .getCloudProvider().getCloudProviderType());
         if (connector == null) {
-            throw new CloudProviderException("Cannot retrieve cloud provider connector "
+            throw new CloudProviderException("Cannot find connector for cloud provider type "
                 + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
 
-        // delegates network port creation to cloud provider connector
-        Job providerJob = null;
-
-        // TODO:workflowtry {
-        // TODO:workflow INetworkService networkService =
-        // connector.getNetworkService();
-        // TODO:workflow providerJob =
-        // networkService.createForwardingGroup(forwardingGroupCreate);
-        // TODO:workflow} catch (ConnectorException e) {
-        // TODO:workflow
-        // NetworkManager.logger.error("Failed to create ForwardingGroup: ", e);
-        // TODO:workflow throw new CloudProviderException(e.getMessage());
-        // TODO:workflow}
-
-        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
-            throw new CloudProviderException(providerJob.getStatusMessage());
+        try {
+            connector.getNetworkService().createForwardingGroup(forwardingGroupCreate,
+                new ProviderTarget().account(placement.getAccount()).location(placement.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException("Failed to create ForwardingGroup", e);
         }
 
         // prepare the ForwardingGroup entity to be persisted
@@ -995,10 +987,10 @@ public class NetworkManager implements INetworkManager {
             : new HashMap<String, String>(forwardingGroupCreate.getProperties()));
         forwardingGroup.setTenant(tenant);
 
-        forwardingGroup.setProviderAssignedId(providerJob.getTargetResource().getProviderAssignedId());
         forwardingGroup.setCloudProviderAccount(placement.getAccount());
+        forwardingGroup.setLocation(placement.getLocation());
 
-        Set<ForwardingGroupNetwork> networks = new HashSet<ForwardingGroupNetwork>();
+        List<ForwardingGroupNetwork> networks = new ArrayList<ForwardingGroupNetwork>();
         if (forwardingGroupCreate.getForwardingGroupTemplate().getNetworks() != null) {
             for (Network net : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
                 ForwardingGroupNetwork forwardingGroupNetwork = new ForwardingGroupNetwork();
@@ -1009,25 +1001,18 @@ public class NetworkManager implements INetworkManager {
         }
         forwardingGroup.setNetworks(networks);
 
-        forwardingGroup.setState(ForwardingGroup.State.CREATING);
+        forwardingGroup.setState(ForwardingGroup.State.AVAILABLE);
         this.em.persist(forwardingGroup);
-        this.em.flush();
 
         Job job = new Job();
+        job.setTenant(tenant);
         job.setTargetResource(forwardingGroup);
         job.setCreated(new Date());
-        job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setState(providerJob.getState());
-        job.setAction(providerJob.getAction());
-        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
+        job.setState(Job.Status.SUCCESS);
+        job.setAction("create");
         this.em.persist(job);
         this.em.flush();
 
-        try {
-            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
-        } catch (Exception e) {
-            NetworkManager.logger.error(e.getMessage(), e);
-        }
         return job;
     }
 
@@ -1106,49 +1091,28 @@ public class NetworkManager implements INetworkManager {
             throw new ResourceNotFoundException("ForwardingGroup " + forwardingGroupId + " doesn't not exist");
         }
 
-        // delegates ForwardingGroup deletion to cloud provider connector
-        // TODO:workflowICloudProviderConnector connector =
-        // this.getCloudProviderConnector(forwardingGroup.getCloudProviderAccount(),
-        // TODO:workflow forwardingGroup.getLocation());
-        Job providerJob = null;
-
-        // TODO:workflow try {
-        // TODO:workflow INetworkService networkService =
-        // connector.getNetworkService();
-        // TODO:workflow providerJob =
-        // networkService.deleteForwardingGroup(forwardingGroup.getProviderAssignedId());
-        // TODO:workflow} catch (ConnectorException e) {
-        // TODO:workflow
-        // NetworkManager.logger.error("Failed to delete forwarding group: ",
-        // e);
-        // TODO:workflow throw new CloudProviderException(e.getMessage());
-        // TODO:workflow}
-
-        // if by change the job is done and has failed, bail out
-        if (providerJob.getState() == Job.Status.CANCELLED || providerJob.getState() == Job.Status.FAILED) {
-            throw new CloudProviderException(providerJob.getStatusMessage());
+        try {
+            ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(forwardingGroup
+                .getCloudProviderAccount().getCloudProvider().getCloudProviderType());
+            connector.getNetworkService()
+                .deleteForwardingGroup(
+                    forwardingGroup,
+                    new ProviderTarget().account(forwardingGroup.getCloudProviderAccount()).location(
+                        forwardingGroup.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException("Failed to create ForwardingGroup", e);
         }
 
-        forwardingGroup.setState(ForwardingGroup.State.DELETING);
-
-        this.em.persist(forwardingGroup);
-        this.em.flush();
+        forwardingGroup.setState(ForwardingGroup.State.DELETED);
 
         Job job = new Job();
+        job.setTenant(this.getTenant());
         job.setTargetResource(forwardingGroup);
         job.setCreated(new Date());
-        job.setProviderAssignedId(providerJob.getProviderAssignedId());
-        job.setState(providerJob.getState());
-        job.setAction(providerJob.getAction());
-        job.setTimeOfStatusChange(providerJob.getTimeOfStatusChange());
+        job.setState(Job.Status.SUCCESS);
+        job.setAction("delete");
         this.em.persist(job);
-        this.em.flush();
 
-        try {
-            UtilsForManagers.emitJobListenerMessage(providerJob.getProviderAssignedId(), this.context);
-        } catch (Exception e) {
-            NetworkManager.logger.error("", e);
-        }
         return job;
     }
 

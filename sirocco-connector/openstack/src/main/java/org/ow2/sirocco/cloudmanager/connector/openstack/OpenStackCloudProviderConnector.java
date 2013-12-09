@@ -443,7 +443,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
 
     @Override
-    public void deleteForwardingGroup(final String forwardingGroupId, final ProviderTarget target)
+    public void deleteForwardingGroup(final ForwardingGroup forwardingGroup, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
         // TODO Auto-generated method stub
 

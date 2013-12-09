@@ -388,7 +388,7 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
     }
 
     @Override
-    public void deleteForwardingGroup(final String forwardingGroupId, final ProviderTarget target)
+    public void deleteForwardingGroup(final ForwardingGroup forwardingGroup, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
