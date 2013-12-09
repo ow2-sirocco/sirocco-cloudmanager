@@ -29,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.ejb.EJB;
@@ -295,7 +296,7 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
-    public CloudProviderAccount getCloudProviderAccountByUuid(final String uuid) throws CloudProviderException {
+    public CloudProviderAccount getCloudProviderAccountByUuid(final String uuid) throws ResourceNotFoundException {
         try {
             return this.em.createNamedQuery("CloudProviderAccount.findByUuid", CloudProviderAccount.class)
                 .setParameter("uuid", uuid).getSingleResult();
@@ -561,11 +562,42 @@ public class CloudProviderManager implements ICloudProviderManager {
     }
 
     @Override
+    public CloudProviderProfile getCloudProviderProfileByType(final String providerType) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("CloudProviderProfile.findByType", CloudProviderProfile.class)
+                .setParameter("type", providerType).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
     public void addCloudProviderProfileMetadata(final String profileUuid,
         final org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile.AccountParameter metadata)
         throws ResourceNotFoundException {
         CloudProviderProfile profile = this.getCloudProviderProfileByUuid(profileUuid);
         profile.getAccountParameters().add(metadata);
+    }
+
+    public CloudProviderAccount updateCloudProviderAccountAttributes(final String accountUuid,
+        final java.util.Map<String, Object> attributes) throws ResourceNotFoundException {
+        CloudProviderAccount account = this.getCloudProviderAccountByUuid(accountUuid);
+        if (attributes.containsKey("name")) {
+            account.getCloudProvider().setDescription((String) attributes.get("name"));
+        }
+        if (attributes.containsKey("endpoint")) {
+            account.getCloudProvider().setEndpoint((String) attributes.get("endpoint"));
+        }
+        if (attributes.containsKey("login")) {
+            account.setLogin((String) attributes.get("login"));
+        }
+        if (attributes.containsKey("password")) {
+            account.setPassword((String) attributes.get("password"));
+        }
+        if (attributes.containsKey("properties")) {
+            account.setProperties((Map<String, String>) attributes.get("properties"));
+        }
+        return account;
     }
 
 }

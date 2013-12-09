@@ -40,7 +40,9 @@ import javax.persistence.NamedQuery;
 import javax.persistence.PrePersist;
 
 @Entity
-@NamedQueries({@NamedQuery(name = "CloudProviderProfile.findByUuid", query = "SELECT c from CloudProviderProfile c WHERE c.uuid=:uuid")})
+@NamedQueries({
+    @NamedQuery(name = "CloudProviderProfile.findByUuid", query = "SELECT c from CloudProviderProfile c WHERE c.uuid=:uuid"),
+    @NamedQuery(name = "CloudProviderProfile.findByType", query = "SELECT c from CloudProviderProfile c WHERE c.type=:type")})
 public class CloudProviderProfile implements Serializable {
     private static final long serialVersionUID = 1L;
 

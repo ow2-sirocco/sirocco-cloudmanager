@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.core.api;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
@@ -174,5 +175,10 @@ public interface ICloudProviderManager {
         throws ResourceNotFoundException;
 
     List<CloudProviderProfile> getCloudProviderProfiles();
+
+    CloudProviderProfile getCloudProviderProfileByType(String providerType) throws ResourceNotFoundException;
+
+    CloudProviderAccount updateCloudProviderAccountAttributes(String accountId, Map<String, Object> attributes)
+        throws ResourceNotFoundException;
 
 }
