@@ -68,6 +68,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
@@ -152,6 +153,33 @@ public class MachineImageManager implements IMachineImageManager {
         this.em.persist(j);
         this.em.flush();
         return j;
+    }
+
+    @Override
+    public MachineImage registerMachineImage(final MachineImage fromImage, final String providerAssignedId,
+        final CloudProviderAccount account, final CloudProviderLocation location) throws CloudProviderException {
+        MachineImage image = new MachineImage();
+        image.setState(MachineImage.State.AVAILABLE);
+        image.setName(fromImage.getName());
+        image.setDescription(fromImage.getDescription());
+        image.setProperties(fromImage.getProperties());
+        image.setArchitecture(fromImage.getArchitecture());
+        image.setCapacity(fromImage.getCapacity());
+        image.setType(MachineImage.Type.IMAGE);
+        image.setOsType(fromImage.getOsType());
+        image.setImageLocation(fromImage.getImageLocation());
+        image.setTenant(this.getTenant());
+
+        ProviderMapping providerMapping = new ProviderMapping();
+        providerMapping.setProviderAssignedId(providerAssignedId);
+        providerMapping.setProviderAccount(account);
+        providerMapping.setProviderLocation(location);
+        image.setProviderMappings(Collections.singletonList(providerMapping));
+
+        image.setCreated(new Date());
+        this.em.persist(image);
+        this.em.flush();
+        return image;
     }
 
     @Override
@@ -245,7 +273,7 @@ public class MachineImageManager implements IMachineImageManager {
 
     }
 
-    public void updateMachineImageAttributes(final String imageId, final Map<String, Object> attributes)
+    public MachineImage updateMachineImageAttributes(final String imageId, final Map<String, Object> attributes)
         throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
 
         MachineImage image = this.getMachineImageByUuid(imageId);
@@ -264,6 +292,7 @@ public class MachineImageManager implements IMachineImageManager {
         image.setUpdated(new Date());
         this.em.merge(image);
         this.em.flush();
+        return image;
     }
 
     @Override

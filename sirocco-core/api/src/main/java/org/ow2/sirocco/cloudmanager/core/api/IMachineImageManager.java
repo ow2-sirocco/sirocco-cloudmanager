@@ -33,6 +33,8 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 /**
  * Machine Image management operations
@@ -42,6 +44,9 @@ public interface IMachineImageManager {
     static final String EJB_JNDI_NAME = "java:global/sirocco/sirocco-core/MachineImageManager!org.ow2.sirocco.cloudmanager.core.api.IRemoteMachineImageManager";
 
     Job createMachineImage(MachineImage machineImage) throws CloudProviderException;
+
+    MachineImage registerMachineImage(MachineImage machineImage, String providerAssignedId, CloudProviderAccount account,
+        CloudProviderLocation location) throws CloudProviderException;
 
     List<MachineImage> getMachineImages() throws CloudProviderException;
 
@@ -57,7 +62,7 @@ public interface IMachineImageManager {
     void updateMachineImage(MachineImage machineImage) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;
 
-    void updateMachineImageAttributes(String imageId, Map<String, Object> attributes) throws ResourceNotFoundException,
+    MachineImage updateMachineImageAttributes(String imageId, Map<String, Object> attributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
     QueryResult<MachineImage> getMachineImages(int first, int last, List<String> filters, List<String> attributes)
