@@ -27,11 +27,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
@@ -699,12 +697,12 @@ public class OpenStackCloudProvider {
     }
 
     private void fromNovaNetworkToCimiNetwork(final String networkId, final Network cimiNetwork) {
-        com.woorea.openstack.quantum.model.Network novaNetwork = this.quantum.networks().show(networkId).execute();
+        com.woorea.openstack.quantum.model.Network openStackNetwork = this.quantum.networks().show(networkId).execute();
 
-        cimiNetwork.setName(novaNetwork.getName());
-        cimiNetwork.setProviderAssignedId(novaNetwork.getId());
-        cimiNetwork.setState(this.fromNovaNetworkStatusToCimiNetworkState(novaNetwork.getStatus()));
-        if (novaNetwork.getName().equals(this.cimiPublicNetworkName)) {
+        cimiNetwork.setName(openStackNetwork.getName());
+        cimiNetwork.setProviderAssignedId(openStackNetwork.getId());
+        cimiNetwork.setState(this.fromNovaNetworkStatusToCimiNetworkState(openStackNetwork.getStatus()));
+        if (openStackNetwork.getName().equals(this.cimiPublicNetworkName)) {
             cimiNetwork.setNetworkType(Network.Type.PUBLIC);
         } else {
             cimiNetwork.setNetworkType(Network.Type.PRIVATE);
@@ -713,7 +711,7 @@ public class OpenStackCloudProvider {
         List<Subnet> subnets = new ArrayList<Subnet>();
         cimiNetwork.setSubnets(subnets);
         // 2 options
-        for (String openStackSubnetId : novaNetwork.getSubnets()) {
+        for (String openStackSubnetId : openStackNetwork.getSubnets()) {
             com.woorea.openstack.quantum.model.Subnet openStackSubnet = this.quantum.subnets().show(openStackSubnetId)
                 .execute();
             Subnet subnet = new Subnet();
@@ -731,7 +729,7 @@ public class OpenStackCloudProvider {
             subnets.add(subnet);
         }
         /*for (com.woorea.openstack.quantum.model.Subnet openStackSubnet : this.quantum.subnets().list().execute()) {
-            if (openStackSubnet.getNetworkId() == novaNetwork.getId()) {
+            if (openStackSubnet.getNetworkId() == openStackNetwork.getId()) {
                 Subnet subnet = new Subnet();
                 subnet.setCidr(openStackSubnet.getCidr());
                 subnet.setEnableDhcp(openStackSubnet.isEnableDHCP());
@@ -743,10 +741,10 @@ public class OpenStackCloudProvider {
     }
 
     private Network getNetworkByName(final String networkName) throws ConnectorException {
-        com.woorea.openstack.quantum.model.Networks novaNetworks = this.quantum.networks().list().execute();
-        for (com.woorea.openstack.quantum.model.Network novaNetwork : novaNetworks) {
-            if (novaNetwork.getName().equals(networkName)) {
-                return this.getNetwork(novaNetwork.getId());
+        com.woorea.openstack.quantum.model.Networks openStackNetworks = this.quantum.networks().list().execute();
+        for (com.woorea.openstack.quantum.model.Network openStackNetwork : openStackNetworks) {
+            if (openStackNetwork.getName().equals(networkName)) {
+                return this.getNetwork(openStackNetwork.getId());
             }
         }
         throw new ConnectorException("Cannot find network for network name:" + networkName);
@@ -770,7 +768,8 @@ public class OpenStackCloudProvider {
         networkForCreate.setName(networkName);
         networkForCreate.setAdminStateUp(true); /* set the administrative status of the network to UP */
 
-        com.woorea.openstack.quantum.model.Network novaNetwork = this.quantum.networks().create(networkForCreate).execute();
+        com.woorea.openstack.quantum.model.Network openStackNetwork = this.quantum.networks().create(networkForCreate)
+            .execute();
         final Network cimiNetwork = new Network();
 
         try {
@@ -778,8 +777,8 @@ public class OpenStackCloudProvider {
              * - Woorea bug: SubnetForCreate: EnableDhcp not supported (pull4request TBD)
              */
             do {
-                novaNetwork = this.quantum.networks().show(novaNetwork.getId()).execute();
-                if (novaNetwork.getStatus().equalsIgnoreCase("ACTIVE")) {
+                openStackNetwork = this.quantum.networks().show(openStackNetwork.getId()).execute();
+                if (openStackNetwork.getStatus().equalsIgnoreCase("ACTIVE")) {
                     break;
                 }
                 Thread.sleep(1000);
@@ -788,7 +787,7 @@ public class OpenStackCloudProvider {
             for (Subnet subnet : networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets()) {
                 SubnetForCreate subnetForCreate = new SubnetForCreate();
                 subnetForCreate.setName(subnet.getName());
-                subnetForCreate.setNetworkId(novaNetwork.getId());
+                subnetForCreate.setNetworkId(openStackNetwork.getId());
                 subnetForCreate.setCidr(subnet.getCidr());
                 if (subnet.getProtocol().equalsIgnoreCase("IPv4")) {
                     subnetForCreate.setIpVersion(4);
@@ -805,24 +804,24 @@ public class OpenStackCloudProvider {
                 this.quantum.subnets().create(subnetForCreate).execute();
             }
 
-            this.fromNovaNetworkToCimiNetwork(novaNetwork.getId(), cimiNetwork);
+            this.fromNovaNetworkToCimiNetwork(openStackNetwork.getId(), cimiNetwork);
         } catch (ConnectorException ex) {
-            this.cleanUpGhostNetwork(novaNetwork);
+            this.cleanUpGhostNetwork(openStackNetwork);
             throw (ex);
         } catch (OpenStackResponseException ex) {
-            this.cleanUpGhostNetwork(novaNetwork);
+            this.cleanUpGhostNetwork(openStackNetwork);
             throw (ex);
         } catch (InterruptedException ex) {
-            this.cleanUpGhostNetwork(novaNetwork);
+            this.cleanUpGhostNetwork(openStackNetwork);
             throw (ex);
         }
         return cimiNetwork;
     }
 
-    private void cleanUpGhostNetwork(final com.woorea.openstack.quantum.model.Network novaNetwork) {
+    private void cleanUpGhostNetwork(final com.woorea.openstack.quantum.model.Network openStackNetwork) {
         try {
-            if (novaNetwork != null) {
-                this.deleteNetwork(novaNetwork.getId());
+            if (openStackNetwork != null) {
+                this.deleteNetwork(openStackNetwork.getId());
             }
         } catch (OpenStackResponseException e) {
         }
@@ -835,20 +834,20 @@ public class OpenStackCloudProvider {
     }
 
     public Network.State getNetworkState(final String networkId) {
-        com.woorea.openstack.quantum.model.Network novaNetwork = this.quantum.networks().show(networkId).execute();
-        return this.fromNovaNetworkStatusToCimiNetworkState(novaNetwork.getStatus());
+        com.woorea.openstack.quantum.model.Network openStackNetwork = this.quantum.networks().show(networkId).execute();
+        return this.fromNovaNetworkStatusToCimiNetworkState(openStackNetwork.getStatus());
     }
 
     public List<Network> getNetworks() {
         ArrayList<Network> networks = new ArrayList<Network>();
 
-        com.woorea.openstack.quantum.model.Networks novaNetworks = this.quantum.networks().list().execute();
-        for (com.woorea.openstack.quantum.model.Network novaNetwork : novaNetworks) {
-            /*System.out.println("--- network: " + novaNetwork);*/
-            if (novaNetwork.getRouterExternal().equalsIgnoreCase("true")) {
+        com.woorea.openstack.quantum.model.Networks openStackNetworks = this.quantum.networks().list().execute();
+        for (com.woorea.openstack.quantum.model.Network openStackNetwork : openStackNetworks) {
+            /*System.out.println("--- network: " + openStackNetwork);*/
+            if (openStackNetwork.getRouterExternal().equalsIgnoreCase("true")) {
                 continue;
             }
-            networks.add(this.getNetwork(novaNetwork.getId()));
+            networks.add(this.getNetwork(openStackNetwork.getId()));
         }
         return networks;
     }
@@ -863,29 +862,44 @@ public class OpenStackCloudProvider {
     //
     public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws ConnectorException {
         OpenStackCloudProvider.logger.info("creating Fowardin Group for " + this.cloudProviderAccount.getLogin());
-        // FIXME
 
         ForwardingGroup forwardingGroup = new ForwardingGroup();
         forwardingGroup.setState(ForwardingGroup.State.AVAILABLE);
-        Set<ForwardingGroupNetwork> forwardingGroupnetworks = new HashSet<ForwardingGroupNetwork>();
+        List<ForwardingGroupNetwork> forwardingGroupnetworks = new ArrayList<ForwardingGroupNetwork>();
         forwardingGroup.setNetworks(forwardingGroupnetworks);
 
-        /*for (Network network : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
-        }*/
         Iterator<Network> iterator = forwardingGroupCreate.getForwardingGroupTemplate().getNetworks().iterator();
         Network sourceNetwork;
+        com.woorea.openstack.quantum.model.Network sourceOpenStackNetwork;
         if (iterator.hasNext()) {
             sourceNetwork = iterator.next();
+            sourceOpenStackNetwork = this.quantum.networks().show(sourceNetwork.getProviderAssignedId()).execute();
+            ForwardingGroupNetwork forwardingGroupNetwork = new ForwardingGroupNetwork();
+            forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.AVAILABLE);
+            forwardingGroupNetwork.setNetwork(sourceNetwork); /* FIXME set fresh network (ForwardingGroups) ? */
+            forwardingGroupnetworks.add(forwardingGroupNetwork);
+
         } else {
             return forwardingGroup;
         }
 
         while (iterator.hasNext()) {
             Network targetNetwork = iterator.next();
+            com.woorea.openstack.quantum.model.Network targetOpenStackNetwork = this.quantum.networks()
+                .show(targetNetwork.getProviderAssignedId()).execute();
 
-            /*this.addAddress(iterator.next(), cimiNetwork, machineNetworkInterface);*/
+            // associate vpn profile
+            this.quantum.networks()
+                .associateVpnProfile(sourceOpenStackNetwork.getId(), targetOpenStackNetwork.getDefaultVpnProfile().getId())
+                .execute();
+
+            ForwardingGroupNetwork forwardingGroupNetwork = new ForwardingGroupNetwork();
+            forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.AVAILABLE);
+            forwardingGroupNetwork.setNetwork(targetNetwork); /* FIXME set fresh network (ForwardingGroups) ? */
+            forwardingGroupnetworks.add(forwardingGroupNetwork);
 
             sourceNetwork = targetNetwork;
+            sourceOpenStackNetwork = targetOpenStackNetwork;
         }
 
         return forwardingGroup;
