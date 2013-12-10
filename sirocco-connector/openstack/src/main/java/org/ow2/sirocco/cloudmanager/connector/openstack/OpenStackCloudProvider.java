@@ -27,15 +27,20 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.codec.binary.Base64;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
@@ -418,9 +423,8 @@ public class OpenStackCloudProvider {
         org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
         cimiAddress.setIp(address.getAddr());
         cimiAddress.setAllocation("dynamic"); /* static! */
-        // cimiAddress.setProtocol("IPv4"); /*static mapping!*/
-        // cimiAddress.setProtocol(address.getVersion()); //cimi mapping 4/IPv4!
-        if (address.getVersion().equalsIgnoreCase("4")) {
+        if (address.getVersion().equalsIgnoreCase("4")) { // cimi mapping
+                                                          // 4/IPv4!
             cimiAddress.setProtocol("IPv4");
         } else if (address.getVersion().equalsIgnoreCase("6")) {
             cimiAddress.setProtocol("IPv6");
@@ -558,8 +562,7 @@ public class OpenStackCloudProvider {
         OpenStackCloudProvider.logger.info("Allocating floating IP " + floatingIp.getIp());
         this.novaClient.servers().associateFloatingIp(serverId, floatingIp.getIp()).execute();
 
-        // Check if it is safe not to wait that the floating IP shows up in the
-        // server detail
+        /*Check if it is safe not to wait that the floating IP shows up in the server detail*/
         /*do {
             Server server = novaClient.servers().show(serverId).execute();  
             if (this.findIpAddressOnServer(server, floatingIp.getIp())) {
@@ -772,8 +775,6 @@ public class OpenStackCloudProvider {
 
         try {
             /* FIXME
-             * - Woorea bug: SubnetForCreate: networkId/networkid (ongoing pull4request)
-             * - Woorea bug: Subnet deserialization (pull4request TBD)
              * - Woorea bug: SubnetForCreate: EnableDhcp not supported (pull4request TBD)
              */
             do {
@@ -783,17 +784,6 @@ public class OpenStackCloudProvider {
                 }
                 Thread.sleep(1000);
             } while (OpenStackCloudProvider.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS-- > 0);
-
-            /*SubnetForCreate subnetForCreate = new SubnetForCreate();
-            subnetForCreate.setNetworkId(novaNetwork.getId());
-            subnetForCreate.setCidr("10.0.1.0/24");
-            subnetForCreate.setIpVersion(4);
-            subnetForCreate.setName("defaultSubnet");
-            try {  // catch block to be removed : Woorea bug: Subnet deserialization
-                this.quantum.subnets().create(subnetForCreate).execute();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }*/
 
             for (Subnet subnet : networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets()) {
                 SubnetForCreate subnetForCreate = new SubnetForCreate();
@@ -813,12 +803,6 @@ public class OpenStackCloudProvider {
                 // subnetForCreate.setEnableDhcp(subnet.isEnableDhcp());
 
                 this.quantum.subnets().create(subnetForCreate).execute();
-                /* catch block to be removed : Woorea bug: Subnet deserialization
-                try {  
-                    this.quantum.subnets().create(subnetForCreate).execute();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }*/
             }
 
             this.fromNovaNetworkToCimiNetwork(novaNetwork.getId(), cimiNetwork);
@@ -875,6 +859,39 @@ public class OpenStackCloudProvider {
     }
 
     //
+    // Forwarding group
+    //
+    public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws ConnectorException {
+        OpenStackCloudProvider.logger.info("creating Fowardin Group for " + this.cloudProviderAccount.getLogin());
+        // FIXME
+
+        ForwardingGroup forwardingGroup = new ForwardingGroup();
+        forwardingGroup.setState(ForwardingGroup.State.AVAILABLE);
+        Set<ForwardingGroupNetwork> forwardingGroupnetworks = new HashSet<ForwardingGroupNetwork>();
+        forwardingGroup.setNetworks(forwardingGroupnetworks);
+
+        /*for (Network network : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
+        }*/
+        Iterator<Network> iterator = forwardingGroupCreate.getForwardingGroupTemplate().getNetworks().iterator();
+        Network sourceNetwork;
+        if (iterator.hasNext()) {
+            sourceNetwork = iterator.next();
+        } else {
+            return forwardingGroup;
+        }
+
+        while (iterator.hasNext()) {
+            Network targetNetwork = iterator.next();
+
+            /*this.addAddress(iterator.next(), cimiNetwork, machineNetworkInterface);*/
+
+            sourceNetwork = targetNetwork;
+        }
+
+        return forwardingGroup;
+    }
+
+    //
     // Image
     //
 
@@ -917,23 +934,4 @@ public class OpenStackCloudProvider {
         }
         return result;
     }
-
-    /*public List<MachineImage> getMachineImages(final boolean returnPublicImages, final Map<String, String> searchCriteria) {
-        List<MachineImage> result = new ArrayList<MachineImage>();
-        Images images = this.novaClient.images().list(true).execute();
-        for (Image image : images) { // TODO getMachineImage
-            MachineImage machineImage = new MachineImage();
-            machineImage.setName(image.getName());
-            machineImage.setState(this.fromNovaImageStatusToCimiMachineImageState(image.getStatus()));
-            // no distinction between between images and snaphots in Havana
-            machineImage.setType(Type.IMAGE);
-            ProviderMapping providerMapping = new ProviderMapping();
-            providerMapping.setProviderAssignedId(image.getId());
-            providerMapping.setProviderAccount(this.cloudProviderAccount);
-            machineImage.setProviderMappings(Collections.singletonList(providerMapping));
-            result.add(machineImage);
-        }
-        return result;
-    }*/
-
 }

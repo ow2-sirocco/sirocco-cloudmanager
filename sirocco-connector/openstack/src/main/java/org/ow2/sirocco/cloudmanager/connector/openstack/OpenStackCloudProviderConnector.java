@@ -431,15 +431,17 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate, final ProviderTarget target)
         throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        try {
+            return this.getProvider(target).createForwardingGroup(forwardingGroupCreate);
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+        }
     }
 
     @Override
     public ForwardingGroup getForwardingGroup(final String forwardingGroupId, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
