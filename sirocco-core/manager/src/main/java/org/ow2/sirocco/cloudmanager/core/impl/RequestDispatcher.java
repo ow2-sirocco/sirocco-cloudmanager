@@ -45,6 +45,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
@@ -185,20 +186,24 @@ public class RequestDispatcher implements MessageListener {
         job.setStatusMessage(e.getMessage());
         switch (command.getCommandType()) {
         case MachineCreateCommand.MACHINE_CREATE:
-        case MachineDeleteCommand.MACHINE_DELETE:
         case MachineActionCommand.MACHINE_ACTION:
-            this.machineManager.updateMachineState(command.getResourceId(), Machine.State.ERROR);
+        case MachineDeleteCommand.MACHINE_DELETE:
+            Machine.State machineState = (e instanceof ResourceNotFoundException) ? Machine.State.DELETED : Machine.State.ERROR;
+            this.machineManager.updateMachineState(command.getResourceId(), machineState);
             break;
         case MachineCaptureCommand.MACHINE_CAPTURE:
             this.machineImageManager.updateMachineImageState(((MachineCaptureCommand) command).getMachineImageId(),
                 MachineImage.State.ERROR);
             break;
         case MachineImageDeleteCommand.MACHINEIMAGE_DELETE:
-            this.machineImageManager.updateMachineImageState(command.getResourceId(), MachineImage.State.ERROR);
+            MachineImage.State imageState = (e instanceof ResourceNotFoundException) ? MachineImage.State.DELETED
+                : MachineImage.State.ERROR;
+            this.machineImageManager.updateMachineImageState(command.getResourceId(), imageState);
             break;
         case VolumeCreateCommand.VOLUME_CREATE:
         case VolumeDeleteCommand.VOLUME_DELETE:
-            this.volumeManager.updateVolumeState(command.getResourceId(), Volume.State.ERROR);
+            Volume.State volumeState = (e instanceof ResourceNotFoundException) ? Volume.State.DELETED : Volume.State.ERROR;
+            this.volumeManager.updateVolumeState(command.getResourceId(), volumeState);
             break;
         case VolumeAttachCommand.VOLUME_ATTACH:
             this.machineManager.updateMachineVolumeState(((VolumeAttachCommand) command).getVolumeAttachment().getId(),
@@ -210,12 +215,14 @@ public class RequestDispatcher implements MessageListener {
             break;
         case NetworkCreateCommand.NETWORK_CREATE:
         case NetworkDeleteCommand.NETWORK_DELETE:
-            this.networkManager.updateNetworkState(command.getResourceId(), Network.State.ERROR);
+            Network.State netState = (e instanceof ResourceNotFoundException) ? Network.State.DELETED : Network.State.ERROR;
+            this.networkManager.updateNetworkState(command.getResourceId(), netState);
             break;
         case SystemCreateCommand.SYSTEM_CREATE:
         case SystemDeleteCommand.SYSTEM_DELETE:
         case SystemActionCommand.SYSTEM_ACTION:
-            this.systemManager.updateSystemState(command.getResourceId(), System.State.ERROR);
+            System.State systemState = (e instanceof ResourceNotFoundException) ? System.State.DELETED : System.State.ERROR;
+            this.systemManager.updateSystemState(command.getResourceId(), systemState);
             break;
         }
     }
