@@ -24,6 +24,7 @@
 package org.ow2.sirocco.cloudmanager.connector.openstack;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -106,6 +107,8 @@ public class OpenStackCloudProvider {
 
     private Quantum quantum;
 
+    private final Calendar expirationDate;
+
     public OpenStackCloudProvider(final ProviderTarget target) throws ConnectorException {
         this.cloudProviderAccount = target.getAccount();
         this.cloudProviderLocation = target.getLocation();
@@ -152,6 +155,8 @@ public class OpenStackCloudProvider {
         // use the token in the following requests
         keystone.token(access.getToken().getId());
 
+        this.expirationDate = access.getToken().getExpires();
+
         /*java.lang.System.out.println("1="
             + KeystoneUtils.findEndpointURL(access.getServiceCatalog(), "compute", null, "public"));*/
 
@@ -188,6 +193,10 @@ public class OpenStackCloudProvider {
             System.out.println(image);
         }*/
 
+    }
+
+    public Calendar getExpirationDate() {
+        return this.expirationDate;
     }
 
     public CloudProviderAccount getCloudProviderAccount() {
