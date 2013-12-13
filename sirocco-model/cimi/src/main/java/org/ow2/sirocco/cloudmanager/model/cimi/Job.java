@@ -96,7 +96,7 @@ public class Job extends CloudEntity implements Serializable {
 
         private String description;
 
-        private Job.Status status;
+        private Job.Status status = Status.RUNNING;
 
         private String action;
 
