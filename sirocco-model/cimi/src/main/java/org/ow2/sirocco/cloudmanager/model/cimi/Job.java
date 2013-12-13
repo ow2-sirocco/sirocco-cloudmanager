@@ -42,6 +42,8 @@ import javax.persistence.OneToMany;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
+
 /**
  * Represents a process performed by the provider
  */
@@ -53,6 +55,10 @@ public class Job extends CloudEntity implements Serializable {
     public static enum Status {
         RUNNING, SUCCESS, FAILED, CANCELLED
     };
+
+    public static enum Action {
+        ADD, DELETE, START, STOP, SUSPEND, PAUSE, RESTART, CAPTURE
+    }
 
     private Status state;
 
@@ -77,6 +83,64 @@ public class Job extends CloudEntity implements Serializable {
     private Boolean isCancellable;
 
     public Job() {
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private Tenant tenant;
+
+        private CloudResource target;
+
+        private String description;
+
+        private Job.Status status;
+
+        private String action;
+
+        public Builder tenant(final Tenant tenant) {
+            this.tenant = tenant;
+            return this;
+        }
+
+        public Builder target(final CloudResource target) {
+            this.target = target;
+            return this;
+        }
+
+        public Builder description(final String description) {
+            this.description = description;
+            return this;
+        }
+
+        public Builder status(final Job.Status status) {
+            this.status = status;
+            return this;
+        }
+
+        public Builder action(final Action action) {
+            this.action = action.toString().toLowerCase();
+            return this;
+        }
+
+        public Job build() {
+            Job job = new Job();
+            job.setTenant(this.tenant);
+            job.setTargetResource(this.target);
+            List<CloudResource> affectedResources = new ArrayList<CloudResource>();
+            affectedResources.add(this.target);
+            job.setAffectedResources(affectedResources);
+            job.setCreated(new Date());
+            job.setAction(this.action);
+            job.setDescription(this.description);
+            job.setState(this.status);
+            if (this.status == Status.SUCCESS) {
+                job.setTimeOfStatusChange(job.getCreated());
+            }
+            return job;
+        }
     }
 
     @Enumerated(EnumType.STRING)
