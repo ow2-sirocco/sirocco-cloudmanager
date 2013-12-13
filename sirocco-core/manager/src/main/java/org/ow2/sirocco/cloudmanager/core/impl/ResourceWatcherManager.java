@@ -68,7 +68,7 @@ public class ResourceWatcherManager {
         ResourceWatcherManager.logger.info(count + " resource watchers stopped");
     }
 
-    @Schedule(minute = "*/1", persistent = false)
+    @Schedule(minute = "*/5", persistent = false)
     public void cleanupWatchers() {
         ResourceWatcherManager.logger.info("Cleaning up resource watchers...");
         for (Iterator<Future<Void>> it = this.watchers.iterator(); it.hasNext();) {
