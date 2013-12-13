@@ -84,6 +84,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudResource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Credentials;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job.Action;
+import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
@@ -481,21 +483,20 @@ public class MachineManager implements IMachineManager {
         Machine machine = this.getMachineByUuid(machineId);
         MachineManager.logger.info("Deleting machine " + machine.getName());
 
+        if (machine.getState() == State.ERROR && machine.getProviderAssignedId() == null) {
+            machine.setState(Machine.State.DELETED);
+            this.fireResourceStateChangeEvent(machine);
+            Job job = Job.newBuilder().tenant(tenant).target(machine).description("Machine deletion").status(Status.SUCCESS)
+                .action(Action.DELETE).build();
+            this.em.persist(job);
+            return job;
+        }
+
         machine.setState(Machine.State.DELETING);
         this.fireResourceStateChangeEvent(machine);
 
         // creating Job
-        Job job = new Job();
-        job.setTenant(tenant);
-        job.setTargetResource(machine);
-        List<CloudResource> affectedResources = new ArrayList<CloudResource>();
-        affectedResources.add(machine);
-        job.setAffectedResources(affectedResources);
-        job.setCreated(new Date());
-        job.setDescription("Machine deletion");
-        job.setState(Job.Status.RUNNING);
-        job.setAction("delete");// TODO: normalize!!
-        job.setTimeOfStatusChange(new Date());// now
+        Job job = Job.newBuilder().tenant(tenant).target(machine).description("Machine deletion").action(Action.DELETE).build();
         this.em.persist(job);
         this.em.flush();
 
