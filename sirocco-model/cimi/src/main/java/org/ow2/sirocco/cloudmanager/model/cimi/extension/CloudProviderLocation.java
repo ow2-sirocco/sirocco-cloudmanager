@@ -217,6 +217,14 @@ public class CloudProviderLocation implements Serializable {
         return true;
     }
 
+    public String toShortString() {
+        if (this.iso3166_2 != null) {
+            return this.iso3166_1 + "/" + this.iso3166_2;
+        } else {
+            return this.iso3166_1;
+        }
+    }
+
     @Override
     public String toString() {
         return "CloudProviderLocation [" + (this.iso3166_1 != null ? "Iso3166_1=" + this.iso3166_1 + ", " : "")
