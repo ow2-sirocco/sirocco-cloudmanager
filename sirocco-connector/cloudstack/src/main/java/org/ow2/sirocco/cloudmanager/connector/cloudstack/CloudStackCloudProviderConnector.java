@@ -80,7 +80,7 @@ public class CloudStackCloudProviderConnector implements ICloudProviderConnector
 
     private synchronized CloudStackProvider getProvider(final ProviderTarget target) {
         for (CloudStackProvider provider : this.providers) {
-            if (provider.cloudProviderAccount.getId().equals(target.getAccount().getId())) {
+            if (provider.cloudProviderAccount.equals(target.getAccount())) {
                 // location can be null?
                 if (provider.cloudProviderLocation != target.getLocation()) {
                     if (target.getLocation() != null) {

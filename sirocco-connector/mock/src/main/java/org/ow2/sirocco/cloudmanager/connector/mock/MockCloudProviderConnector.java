@@ -106,7 +106,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private synchronized MockProvider getProvider(final ProviderTarget target) {
         for (MockProvider provider : this.mockProviders) {
-            if (provider.cloudProviderAccount.getId().equals(target.getAccount().getId())) {
+            if (provider.cloudProviderAccount.equals(target.getAccount())) {
                 // location can be null?
                 if (provider.cloudProviderLocation != target.getLocation()) {
                     if (target.getLocation() != null) {

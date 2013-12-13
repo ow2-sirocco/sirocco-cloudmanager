@@ -24,6 +24,8 @@
 package org.ow2.sirocco.cloudmanager.connector.openstack;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,15 +71,19 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
         if (target.getAccount() == null || target.getLocation() == null) {
             throw new ConnectorException("target.account or target.location is null");
         }
-        for (OpenStackCloudProvider provider : this.openstackCPs) {
-            /*
-             * if
-             * (provider.getCloudProviderAccount().equals(target.getAccount())
-             * &&
-             * provider.getCloudProviderLocation().equals(target.getLocation()))
-             * { return provider; }
-             */
-            if (provider.getCloudProviderAccount().getId().equals(target.getAccount().getId())) {
+        for (Iterator<OpenStackCloudProvider> it = this.openstackCPs.iterator(); it.hasNext();) {
+            OpenStackCloudProvider provider = it.next();
+
+            Calendar now = Calendar.getInstance();
+
+            if (provider.getExpirationDate().before(now)) {
+                OpenStackCloudProviderConnector.logger.info("OpenStackCloudProvider "
+                    + provider.getCloudProviderAccount().getCloudProvider().getDescription() + " token expired");
+                it.remove();
+                // TODO close provider
+                continue;
+            }
+            if (provider.getCloudProviderAccount().equals(target.getAccount())) {
                 // location can be null?
                 if (provider.getCloudProviderLocation() != target.getLocation()) {
                     if (target.getLocation() != null) {

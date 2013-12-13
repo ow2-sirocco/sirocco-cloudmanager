@@ -73,7 +73,7 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
              * provider.getCloudProviderLocation().equals(target.getLocation()))
              * { return provider; }
              */
-            if (provider.getCloudProviderAccount().getId().equals(target.getAccount().getId())) {
+            if (provider.getCloudProviderAccount().equals(target.getAccount())) {
                 // location can be null?
                 if (provider.getCloudProviderLocation() != target.getLocation()) {
                     if (target.getLocation() != null) {

@@ -126,7 +126,7 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
 
     private synchronized AmazonProvider getProvider(final ProviderTarget target) {
         for (AmazonProvider provider : this.providers) {
-            if (provider.cloudProviderAccount.getId().equals(target.getAccount().getId())) {
+            if (provider.cloudProviderAccount.equals(target.getAccount())) {
                 // location can be null?
                 if (provider.cloudProviderLocation != target.getLocation()) {
                     if (target.getLocation() != null) {
