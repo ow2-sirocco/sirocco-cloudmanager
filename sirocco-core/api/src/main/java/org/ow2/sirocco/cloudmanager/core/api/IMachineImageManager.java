@@ -30,6 +30,7 @@ import java.util.Map;
 
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
@@ -58,6 +59,8 @@ public interface IMachineImageManager {
         CloudProviderException;
 
     Job deleteMachineImage(String imageId) throws ResourceNotFoundException, CloudProviderException;
+
+    void unregisterMachineImage(String machineImageId) throws ResourceNotFoundException, ResourceConflictException;
 
     void updateMachineImage(MachineImage machineImage) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException;

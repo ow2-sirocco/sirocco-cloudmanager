@@ -197,7 +197,7 @@ public class MachineImageManager implements IMachineImageManager {
     }
 
     @Override
-    public MachineImage getMachineImageByUuid(final String uuid) throws ResourceNotFoundException, CloudProviderException {
+    public MachineImage getMachineImageByUuid(final String uuid) throws ResourceNotFoundException {
         try {
             return this.em.createNamedQuery("MachineImage.findByUuid", MachineImage.class).setParameter("uuid", uuid)
                 .getSingleResult();
@@ -213,27 +213,40 @@ public class MachineImageManager implements IMachineImageManager {
         return UtilsForManagers.fillResourceAttributes(machineImage, attributes);
     }
 
-    public Job deleteMachineImage(final String imageUuid) throws CloudProviderException, ResourceNotFoundException {
-        MachineImage image = this.getMachineImageByUuid(imageUuid);
-
+    private void checkImageUse(final MachineImage image) throws ResourceConflictException {
         // if related image is not null then do not permit deletion
         if (image.getRelatedImage() != null) {
-            throw new ResourceConflictException("Related images exist for this image" + imageUuid);
+            throw new ResourceConflictException("Related images exist for this image" + image.getName());
         }
         // if a machine template references this image do not permit deletion
         List<MachineTemplate> templates = this.em
-            .createQuery("SELECT  t FROM MachineTemplate t WHERE t.machineImage.uuid=:mid", MachineTemplate.class)
-            .setParameter("mid", imageUuid).getResultList();
+            .createQuery("SELECT  t FROM MachineTemplate t WHERE t.machineImage=:image", MachineTemplate.class)
+            .setParameter("image", image).getResultList();
         if (!templates.isEmpty()) {
             throw new ResourceConflictException("Image used by MachineTemplate");
         }
 
         // if a machine references this image do not permit deletion
-        List<Machine> machines = this.em.createQuery("SELECT  m FROM Machine m WHERE m.image.uuid=:uuid", Machine.class)
-            .setParameter("uuid", imageUuid).getResultList();
+        List<Machine> machines = this.em
+            .createQuery("SELECT  m FROM Machine m WHERE m.image=:image AND m.state!=:state ", Machine.class)
+            .setParameter("image", image).setParameter("state", Machine.State.DELETED).getResultList();
         if (!machines.isEmpty()) {
             throw new ResourceConflictException("Image used by Machine");
         }
+    }
+
+    @Override
+    public void unregisterMachineImage(final String imageUuid) throws ResourceNotFoundException, ResourceConflictException {
+        MachineImage image = this.getMachineImageByUuid(imageUuid);
+        this.checkImageUse(image);
+        image.setState(MachineImage.State.DELETED);
+        this.fireMachineImageStateChangeEvent(image);
+    }
+
+    @Override
+    public Job deleteMachineImage(final String imageUuid) throws CloudProviderException, ResourceNotFoundException {
+        MachineImage image = this.getMachineImageByUuid(imageUuid);
+        this.checkImageUse(image);
 
         image.setState(MachineImage.State.DELETING);
         this.fireMachineImageStateChangeEvent(image);
