@@ -177,4 +177,50 @@ public class CloudProvider implements Serializable {
         this.uuid = uuid;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.cloudProviderType == null) ? 0 : this.cloudProviderType.hashCode());
+        result = prime * result + ((this.endpoint == null) ? 0 : this.endpoint.hashCode());
+        result = prime * result + ((this.properties == null) ? 0 : this.properties.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        CloudProvider other = (CloudProvider) obj;
+        if (this.cloudProviderType == null) {
+            if (other.cloudProviderType != null) {
+                return false;
+            }
+        } else if (!this.cloudProviderType.equals(other.cloudProviderType)) {
+            return false;
+        }
+        if (this.endpoint == null) {
+            if (other.endpoint != null) {
+                return false;
+            }
+        } else if (!this.endpoint.equals(other.endpoint)) {
+            return false;
+        }
+        if (this.properties == null) {
+            if (other.properties != null) {
+                return false;
+            }
+        } else if (!this.properties.equals(other.properties)) {
+            return false;
+        }
+        return true;
+    }
+
 }

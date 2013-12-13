@@ -178,4 +178,59 @@ public class CloudProviderAccount implements Serializable {
     public void setUuid(final String uuid) {
         this.uuid = uuid;
     }
+
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((this.cloudProvider == null) ? 0 : this.cloudProvider.hashCode());
+        result = prime * result + ((this.login == null) ? 0 : this.login.hashCode());
+        result = prime * result + ((this.password == null) ? 0 : this.password.hashCode());
+        result = prime * result + ((this.properties == null) ? 0 : this.properties.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
+        CloudProviderAccount other = (CloudProviderAccount) obj;
+        if (this.cloudProvider == null) {
+            if (other.cloudProvider != null) {
+                return false;
+            }
+        } else if (!this.cloudProvider.equals(other.cloudProvider)) {
+            return false;
+        }
+        if (this.login == null) {
+            if (other.login != null) {
+                return false;
+            }
+        } else if (!this.login.equals(other.login)) {
+            return false;
+        }
+        if (this.password == null) {
+            if (other.password != null) {
+                return false;
+            }
+        } else if (!this.password.equals(other.password)) {
+            return false;
+        }
+        if (this.properties == null) {
+            if (other.properties != null) {
+                return false;
+            }
+        } else if (!this.properties.equals(other.properties)) {
+            return false;
+        }
+        return true;
+    }
+
 }
