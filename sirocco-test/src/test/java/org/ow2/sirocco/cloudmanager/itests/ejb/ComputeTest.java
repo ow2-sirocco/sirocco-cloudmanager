@@ -168,7 +168,7 @@ public class ComputeTest extends AbstractTestBase {
         Assert.assertNotNull(job.getUuid());
 
         Job.Status status = this.waitForJobCompletion(job);
-        Assert.assertEquals(status, Job.Status.SUCCESS);
+        Assert.assertEquals(Job.Status.SUCCESS, status);
         machine = this.machineManager.getMachineByUuid(machine.getUuid());
         Assert.assertNotNull(machine.getCreated());
         Assert.assertTrue(machine.getState() == Machine.State.STARTED);
@@ -189,7 +189,7 @@ public class ComputeTest extends AbstractTestBase {
         try {
             Job job = this.machineManager.deleteMachine(machineUuid);
             Job.Status status = this.waitForJobCompletion(job);
-            Assert.assertEquals(status, Job.Status.SUCCESS);
+            Assert.assertEquals(Job.Status.SUCCESS, status);
             Machine machine = this.machineManager.getMachineByUuid(machineUuid);
             Assert.assertTrue(machine.getState() == State.DELETED);
             Assert.assertNotNull(machine.getDeleted());
@@ -202,7 +202,7 @@ public class ComputeTest extends AbstractTestBase {
         Date now = new Date();
         Job job = this.machineManager.stopMachine(machineUuid);
         Job.Status status = this.waitForJobCompletion(job);
-        Assert.assertEquals(status, Job.Status.SUCCESS);
+        Assert.assertEquals(Job.Status.SUCCESS, status);
         Machine machine = this.machineManager.getMachineByUuid(machineUuid);
         Assert.assertTrue(machine.getUpdated().after(now));
         Assert.assertTrue(machine.getState() == Machine.State.STOPPED);
@@ -368,7 +368,7 @@ public class ComputeTest extends AbstractTestBase {
         newAttributeMap.put("properties", newProps);
         Date timeBeforeUpdate = new Date();
         Job job = this.machineManager.updateMachineAttributes(machine.getUuid(), newAttributeMap);
-        Assert.assertEquals(job.getState(), Job.Status.SUCCESS);
+        Assert.assertEquals(Job.Status.SUCCESS, job.getState());
 
         machine = this.machineManager.getMachineByUuid(machine.getUuid());
         Assert.assertTrue(machine.getUpdated().after(timeBeforeUpdate));
@@ -398,7 +398,7 @@ public class ComputeTest extends AbstractTestBase {
         MachineImage newImage = (MachineImage) job.getAffectedResources().get(0);
         Assert.assertNotNull(newImage.getUuid());
         Job.Status status = this.waitForJobCompletion(job);
-        Assert.assertEquals(status, Job.Status.SUCCESS);
+        Assert.assertEquals(Job.Status.SUCCESS, status);
 
         newImage = this.machineImageManager.getMachineImageByUuid(newImage.getUuid());
         Assert.assertEquals(ComputeTest.IMAGE_CAPTURED_FROM_MACHINE, newImage.getName());
@@ -413,7 +413,7 @@ public class ComputeTest extends AbstractTestBase {
         try {
             Job job = this.machineImageManager.deleteMachineImage(imageUuid);
             Job.Status status = this.waitForJobCompletion(job);
-            Assert.assertEquals(status, Job.Status.SUCCESS);
+            Assert.assertEquals(Job.Status.SUCCESS, status);
             MachineImage image = this.machineImageManager.getMachineImageByUuid(imageUuid);
             Assert.assertTrue(image.getState() == MachineImage.State.DELETED);
             Assert.assertNotNull(image.getDeleted());
