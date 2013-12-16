@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
@@ -472,6 +473,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         private Map<String, ForwardingGroup> forwardingGroups = new ConcurrentHashMap<String, ForwardingGroup>();
 
+        private Random random = new Random();
+
         MockProvider() {
             Network publicNetwork = new Network();
             publicNetwork.setNetworkType(Network.Type.PUBLIC);
@@ -566,32 +569,22 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
                 for (MachineTemplateNetworkInterface networkInterface : machineCreate.getMachineTemplate()
                     .getNetworkInterfaces()) {
-                    MachineNetworkInterface newNetIntf = new MachineNetworkInterface();
-                    // TODO
-                    if (networkInterface.getAddresses() != null) {
-                        List<MachineNetworkInterfaceAddress> addrs = new ArrayList<MachineNetworkInterfaceAddress>();
-                        for (Address a : networkInterface.getAddresses()) {
-                            MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+                    MachineNetworkInterface nic = new MachineNetworkInterface();
+                    List<MachineNetworkInterfaceAddress> addrs = new ArrayList<MachineNetworkInterfaceAddress>();
+                    MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+                    Address ip = new Address();
+                    ip.setIp("192.168.0." + this.random.nextInt(255));
+                    ip.setAllocation("dynamic");
+                    ip.setProtocol("IPv4");
+                    ip.setNetwork(networkInterface.getNetwork());
+                    entry.setAddress(ip);
+                    addrs.add(entry);
+                    nic.setAddresses(addrs);
 
-                            Address new_a = new Address();
-                            a.clone(new_a);
-                            new_a.setNetwork(a.getNetwork());
-                            entry.setAddress(new_a);
-                            addrs.add(entry);
-                        }
-                        newNetIntf.setAddresses(addrs);
-
-                    }
-
-                    newNetIntf.setMacAddress("00:11:22:33:44:55");
-
-                    newNetIntf.setState(InterfaceState.PASSIVE);
-
-                    newNetIntf.setNetwork(networkInterface.getNetwork());
-
-                    newNetIntf.setNetworkType(networkInterface.getNetworkType());
-
-                    machine.addNetworkInterface(newNetIntf);
+                    nic.setState(InterfaceState.ACTIVE);
+                    nic.setNetwork(networkInterface.getNetwork());
+                    nic.setNetworkType(networkInterface.getNetwork().getNetworkType());
+                    machine.addNetworkInterface(nic);
                 }
             }
 
