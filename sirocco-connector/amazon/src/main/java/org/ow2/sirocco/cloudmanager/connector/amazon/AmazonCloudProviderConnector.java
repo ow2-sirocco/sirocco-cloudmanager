@@ -769,6 +769,8 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
                     this.fromAWSRunningInstanceToMachine(Iterables.getFirst(reservation, null), machine);
                     return machine;
                 }
+            } catch (org.jclouds.rest.ResourceNotFoundException e) {
+
             } catch (Exception ex) {
                 throw new ConnectorException(ex.getMessage());
             }
@@ -881,7 +883,10 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
                     this.fromEbsVolumetToCimiVolume(ebsVolume, cimiVolume);
                     return cimiVolume;
                 }
+            } catch (org.jclouds.rest.ResourceNotFoundException e) {
+
             } catch (Exception ex) {
+                AmazonCloudProviderConnector.logger.error("getVolume", ex);
                 throw new ConnectorException(ex.getMessage());
             }
             throw new ResourceNotFoundException("volume with id " + volumeId + " not found");
