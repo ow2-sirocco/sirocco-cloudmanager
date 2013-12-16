@@ -47,7 +47,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
  */
 @Entity
 @NamedQueries({@NamedQuery(name = "MachineConfiguration.findByUuid", query = "SELECT m from MachineConfiguration m WHERE m.uuid=:uuid")})
-public class MachineConfiguration extends CloudEntity implements IMultiCloudResource, Serializable {
+public class MachineConfiguration extends CloudEntity implements IMultiCloudResource, Comparable<MachineConfiguration>,
+    Serializable {
     private static final long serialVersionUID = 1L;
 
     @NotNull
@@ -99,6 +100,14 @@ public class MachineConfiguration extends CloudEntity implements IMultiCloudReso
         this.disks = diskTemplates;
     }
 
+    public int getTotalDiskSpace() {
+        int result = 0;
+        for (DiskTemplate disk : this.disks) {
+            result += disk.getCapacity();
+        }
+        return result;
+    }
+
     @ElementCollection(fetch = FetchType.EAGER)
     public List<ProviderMapping> getProviderMappings() {
         return this.providerMappings;
@@ -108,4 +117,16 @@ public class MachineConfiguration extends CloudEntity implements IMultiCloudReso
         this.providerMappings = providerMappings;
     }
 
+    @Override
+    public int compareTo(final MachineConfiguration other) {
+        int cpuDiff = this.cpu - other.cpu;
+        if (cpuDiff != 0) {
+            return cpuDiff;
+        }
+        int memDiff = this.memory - other.memory;
+        if (memDiff != 0) {
+            return memDiff;
+        }
+        return this.getTotalDiskSpace() - other.getTotalDiskSpace();
+    }
 }
