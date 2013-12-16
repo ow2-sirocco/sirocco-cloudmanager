@@ -26,8 +26,10 @@
 package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -42,6 +44,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OrderBy;
 import javax.persistence.PrePersist;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -75,7 +78,7 @@ public class CloudProvider implements Serializable {
 
     private Set<CloudProviderAccount> cloudProviderAccounts;
 
-    private Set<CloudProviderLocation> cloudProviderLocations;
+    private List<CloudProviderLocation> cloudProviderLocations;
 
     public CloudProvider() {
         this.cloudProviderAccounts = new HashSet<CloudProviderAccount>();
@@ -151,14 +154,15 @@ public class CloudProvider implements Serializable {
     }
 
     @ManyToMany(mappedBy = "cloudProviders", fetch = FetchType.EAGER)
-    public Set<CloudProviderLocation> getCloudProviderLocations() {
+    @OrderBy("iso3166_1")
+    public List<CloudProviderLocation> getCloudProviderLocations() {
         if (this.cloudProviderLocations == null) {
-            this.cloudProviderLocations = new HashSet<>();
+            this.cloudProviderLocations = new ArrayList<>();
         }
         return this.cloudProviderLocations;
     }
 
-    public void setCloudProviderLocations(final Set<CloudProviderLocation> cloudProviderLocations) {
+    public void setCloudProviderLocations(final List<CloudProviderLocation> cloudProviderLocations) {
         this.cloudProviderLocations = cloudProviderLocations;
     }
 
