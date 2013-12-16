@@ -212,12 +212,8 @@ public class MachineManager implements IMachineManager {
         machine.setLocation(placement.getLocation());
         machine.setCpu(machineCreate.getMachineTemplate().getMachineConfig().getCpu());
         machine.setMemory(machineCreate.getMachineTemplate().getMachineConfig().getMemory());
-        if (machineCreate.getMachineTemplate().getMachineImage().getId() != null) {
-            machine.setImage(machineCreate.getMachineTemplate().getMachineImage());
-        }
-        if (machineCreate.getMachineTemplate().getMachineConfig().getId() != null) {
-            machine.setConfig(machineCreate.getMachineTemplate().getMachineConfig());
-        }
+        machine.setImage(machineCreate.getMachineTemplate().getMachineImage());
+        machine.setConfig(machineCreate.getMachineTemplate().getMachineConfig());
 
         for (DiskTemplate diskTemplate : machineCreate.getMachineTemplate().getMachineConfig().getDisks()) {
             MachineDisk disk = new MachineDisk();
