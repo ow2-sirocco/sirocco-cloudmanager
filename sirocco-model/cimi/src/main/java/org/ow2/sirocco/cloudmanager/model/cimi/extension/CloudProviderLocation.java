@@ -225,6 +225,22 @@ public class CloudProviderLocation implements Serializable {
         }
     }
 
+    public boolean matchLocationConstraint(final String locationConstraint) {
+        String iso3166Codes[] = locationConstraint.split("/");
+        if (iso3166Codes.length == 1) {
+            return this.iso3166_1.equals(iso3166Codes[0]);
+        }
+        return this.iso3166_1.equals(iso3166Codes[0]) && this.iso3166_2.equals(iso3166Codes[1]);
+    }
+
+    public String description(final boolean useIsoCode) {
+        String result = useIsoCode ? this.iso3166_1 : (this.countryName != null ? this.countryName : this.iso3166_1);
+        if (this.iso3166_2 != null) {
+            result += " " + (this.stateName != null ? this.stateName : this.iso3166_2);
+        }
+        return result;
+    }
+
     @Override
     public String toString() {
         return "CloudProviderLocation [" + (this.iso3166_1 != null ? "Iso3166_1=" + this.iso3166_1 + ", " : "")

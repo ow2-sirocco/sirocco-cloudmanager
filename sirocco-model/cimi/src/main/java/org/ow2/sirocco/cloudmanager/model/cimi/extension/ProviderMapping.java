@@ -81,13 +81,14 @@ public class ProviderMapping implements Serializable {
         return null;
     }
 
-    public static ProviderMapping find(final IMultiCloudResource resource, final String providerAccountId, final String country) {
+    public static ProviderMapping find(final IMultiCloudResource resource, final String providerAccountId,
+        final String locationConstraint) {
         for (ProviderMapping mapping : resource.getProviderMappings()) {
             if (mapping.getProviderAccount().getUuid().equals(providerAccountId)) {
                 if (mapping.getProviderLocation() == null) {
                     return mapping;
                 }
-                if (mapping.getProviderLocation().getCountryName().equals(country)) {
+                if (mapping.getProviderLocation().matchLocationConstraint(locationConstraint)) {
                     return mapping;
                 }
             }

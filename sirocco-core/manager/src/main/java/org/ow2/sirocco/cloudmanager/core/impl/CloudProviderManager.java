@@ -516,18 +516,18 @@ public class CloudProviderManager implements ICloudProviderManager {
             }
         }
 
-        String location = create.getLocation();
-        if (location == null) {
+        String locationConstraint = create.getLocation();
+        if (locationConstraint == null) {
             targetLocation = targetAccount.getCloudProvider().getCloudProviderLocations().iterator().next();
         } else {
             for (CloudProviderLocation loc : targetAccount.getCloudProvider().getCloudProviderLocations()) {
-                if (loc.getCountryName().equalsIgnoreCase(location)) {
+                if (loc.matchLocationConstraint(locationConstraint)) {
                     targetLocation = loc;
                     break;
                 }
             }
             if (targetLocation == null) {
-                throw new CloudProviderException("Location " + location + " not supported by provider "
+                throw new CloudProviderException("Location constraint" + locationConstraint + " not matched by provider "
                     + targetAccount.getCloudProvider().getDescription());
             }
         }
