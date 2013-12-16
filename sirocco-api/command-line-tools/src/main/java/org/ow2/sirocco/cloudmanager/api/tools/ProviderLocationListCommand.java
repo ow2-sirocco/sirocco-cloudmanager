@@ -48,12 +48,18 @@ public class ProviderLocationListCommand implements Command {
         Location.Collection providers = restClient.getRequest("providers/" + this.providerIds.get(0) + "/locations",
             Location.Collection.class);
 
-        Table table = new Table(3);
+        Table table = new Table(4);
+        table.addCell("Path");
         table.addCell("Country");
         table.addCell("Region");
         table.addCell("City");
 
         for (Location location : providers.getLocations()) {
+            if (location.getIso3166_2() != null) {
+                table.addCell(location.getIso3166_1() + "/" + location.getIso3166_2());
+            } else {
+                table.addCell(location.getIso3166_1());
+            }
             if (location.getCountryName() != null) {
                 table.addCell(location.getCountryName());
             } else if (location.getIso3166_1() != null) {
