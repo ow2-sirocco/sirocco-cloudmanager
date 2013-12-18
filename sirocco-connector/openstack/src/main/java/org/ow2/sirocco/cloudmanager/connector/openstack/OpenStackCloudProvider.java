@@ -782,9 +782,6 @@ public class OpenStackCloudProvider {
         final Network cimiNetwork = new Network();
 
         try {
-            /* FIXME
-             * - Woorea bug: SubnetForCreate: EnableDhcp not supported (pull4request TBD)
-             */
             do {
                 openStackNetwork = this.quantum.networks().show(openStackNetwork.getId()).execute();
                 if (openStackNetwork.getStatus().equalsIgnoreCase("ACTIVE")) {
@@ -807,7 +804,9 @@ public class OpenStackCloudProvider {
                     throw new ConnectorException("Invalid input for ip_version. Reason: " + subnet.getProtocol()
                         + " is not in [IPv4, IPv6].");
                 }
-                /* XXX mapping cimi/woorea/openStack for EnableDhcp*/
+                /* FIXME
+                 * - Woorea bug: SubnetForCreate: EnableDhcp not supported (pull4request TBD)
+                 */
                 // subnetForCreate.setEnableDhcp(subnet.isEnableDhcp());
 
                 this.quantum.subnets().create(subnetForCreate).execute();
@@ -869,8 +868,14 @@ public class OpenStackCloudProvider {
     //
     // Forwarding group
     //
+
+    /* FIXME 
+     * Mapping : Sirocco FG / Bagpipe VPN profile 
+     * - Algo : create FG (list of ntwk) / Bagpipe API calls (ntwk.associate(vpnProfile)
+     * - Algo : delete FG (list of ntwk) / Bagpipe API calls (ntwk.dissociate(vpnProfile)
+     * */
     public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws ConnectorException {
-        OpenStackCloudProvider.logger.info("creating Fowardin Group for " + this.cloudProviderAccount.getLogin());
+        OpenStackCloudProvider.logger.info("creating Fowarding Group for " + this.cloudProviderAccount.getLogin());
 
         ForwardingGroup forwardingGroup = new ForwardingGroup();
         forwardingGroup.setState(ForwardingGroup.State.AVAILABLE);
@@ -885,7 +890,7 @@ public class OpenStackCloudProvider {
             sourceOpenStackNetwork = this.quantum.networks().show(sourceNetwork.getProviderAssignedId()).execute();
             ForwardingGroupNetwork forwardingGroupNetwork = new ForwardingGroupNetwork();
             forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.AVAILABLE);
-            forwardingGroupNetwork.setNetwork(sourceNetwork); /* FIXME set fresh network (ForwardingGroups) ? */
+            forwardingGroupNetwork.setNetwork(sourceNetwork);
             forwardingGroupnetworks.add(forwardingGroupNetwork);
 
         } else {
@@ -904,7 +909,7 @@ public class OpenStackCloudProvider {
 
             ForwardingGroupNetwork forwardingGroupNetwork = new ForwardingGroupNetwork();
             forwardingGroupNetwork.setState(ForwardingGroupNetwork.State.AVAILABLE);
-            forwardingGroupNetwork.setNetwork(targetNetwork); /* FIXME set fresh network (ForwardingGroups) ? */
+            forwardingGroupNetwork.setNetwork(targetNetwork);
             forwardingGroupnetworks.add(forwardingGroupNetwork);
 
             sourceNetwork = targetNetwork;
@@ -912,6 +917,35 @@ public class OpenStackCloudProvider {
         }
 
         return forwardingGroup;
+    }
+
+    public void deleteForwardingGroup(final ForwardingGroup forwardingGroup) throws ConnectorException {
+        OpenStackCloudProvider.logger.info("deleting Fowarding Group for " + this.cloudProviderAccount.getLogin());
+
+        Iterator<ForwardingGroupNetwork> iterator = forwardingGroup.getNetworks().iterator();
+        Network sourceNetwork;
+        com.woorea.openstack.quantum.model.Network sourceOpenStackNetwork;
+        if (iterator.hasNext()) {
+            sourceNetwork = iterator.next().getNetwork();
+            sourceOpenStackNetwork = this.quantum.networks().show(sourceNetwork.getProviderAssignedId()).execute();
+
+        } else {
+            return;
+        }
+
+        while (iterator.hasNext()) {
+            Network targetNetwork = iterator.next().getNetwork();
+            com.woorea.openstack.quantum.model.Network targetOpenStackNetwork = this.quantum.networks()
+                .show(targetNetwork.getProviderAssignedId()).execute();
+
+            // dissociate vpn profile
+            this.quantum.networks()
+                .dissociateVpnProfile(sourceOpenStackNetwork.getId(), targetOpenStackNetwork.getDefaultVpnProfile().getId())
+                .execute();
+
+            sourceNetwork = targetNetwork;
+            sourceOpenStackNetwork = targetOpenStackNetwork;
+        }
     }
 
     //

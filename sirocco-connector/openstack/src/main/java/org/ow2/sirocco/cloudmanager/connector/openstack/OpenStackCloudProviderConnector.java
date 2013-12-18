@@ -102,7 +102,9 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
 
     /*
-     * TODO Mix 
+     * TODO 
+     * 
+     * Mix 
      * - connector cache 
      * - REST call trace (On/Off) 
      * - woorea exception handling 
@@ -453,22 +455,23 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public void deleteForwardingGroup(final ForwardingGroup forwardingGroup, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
-        // TODO Auto-generated method stub
-
+        try {
+            this.getProvider(target).deleteForwardingGroup(forwardingGroup);
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+        }
     }
 
     @Override
     public void addNetworkToForwardingGroup(final String forwardingGroupId, final ForwardingGroupNetwork fgNetwork,
         final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
-        // TODO Auto-generated method stub
-
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public void removeNetworkFromForwardingGroup(final String forwardingGroupId, final String networkId,
         final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
-        // TODO Auto-generated method stub
-
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
