@@ -991,4 +991,8 @@ public class OpenStackCloudProvider {
         }
         return result;
     }
+
+    public void deleteMachineImage(final String machineImageId) {
+        this.novaClient.images().delete(machineImageId).execute();
+    }
 }

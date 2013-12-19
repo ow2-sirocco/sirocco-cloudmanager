@@ -118,9 +118,6 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
      * Network 
      * - createNetwork/deleteNetwork: woorea bugs : see fixme 
      * - Forwarding groups / BagPipe
-     * 
-     * Image
-     * - deleteMachineImage
      */
 
     //
@@ -535,7 +532,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public void deleteMachineImage(final String imageId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
-        throw new ConnectorException("unsupported operation");
+        this.getProvider(target).deleteMachineImage(imageId);
 
     }
 
