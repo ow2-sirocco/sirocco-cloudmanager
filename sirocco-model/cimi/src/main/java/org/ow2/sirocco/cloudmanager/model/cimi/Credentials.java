@@ -46,6 +46,8 @@ public class Credentials extends CloudResource implements Serializable {
 
     private String publicKey;
 
+    private String fingerprint;
+
     public Credentials() {
     }
 
@@ -73,4 +75,13 @@ public class Credentials extends CloudResource implements Serializable {
     public void setPublicKey(final String key) {
         this.publicKey = key;
     }
+
+    public String getFingerprint() {
+        return this.fingerprint;
+    }
+
+    public void setFingerprint(final String fingerprint) {
+        this.fingerprint = fingerprint;
+    }
+
 }
