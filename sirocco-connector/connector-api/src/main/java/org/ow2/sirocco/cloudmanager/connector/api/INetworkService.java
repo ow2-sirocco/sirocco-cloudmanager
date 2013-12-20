@@ -34,6 +34,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
 
 /**
  * Lifecycle operations on Network resources
@@ -230,5 +233,17 @@ public interface INetworkService {
      */
     void removeNetworkFromForwardingGroup(String forwardingGroupId, String networkId, ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException;
+
+    String createSecurityGroup(SecurityGroupCreate create, ProviderTarget target) throws ConnectorException;
+
+    void deleteSecurityGroup(String groupId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
+
+    SecurityGroup getSecurityGroup(String groupId, ProviderTarget target) throws ResourceNotFoundException, ConnectorException;
+
+    List<SecurityGroup> getSecurityGroups(ProviderTarget target) throws ConnectorException;
+
+    String addRuleToSecurityGroup(String groupId, SecurityGroupRule rule, ProviderTarget target) throws ConnectorException;
+
+    void deleteRuleFromSecurityGroup(String groupId, SecurityGroupRule rule, ProviderTarget target) throws ConnectorException;
 
 }

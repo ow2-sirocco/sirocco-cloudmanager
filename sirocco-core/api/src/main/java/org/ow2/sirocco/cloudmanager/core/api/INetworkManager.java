@@ -49,6 +49,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
 
 /**
  * Network management operations
@@ -364,5 +367,28 @@ public interface INetworkManager {
     void deleteAddressTemplate(String addressTemplateId) throws ResourceNotFoundException, CloudProviderException;
 
     void updateNetworkState(int networkId, Network.State state) throws CloudProviderException;
+
+    // Security group operations
+
+    Job createSecurityGroup(SecurityGroupCreate securityGroupCreate) throws InvalidRequestException, CloudProviderException;
+
+    Job deleteSecurityGroup(String securityGroupUuid) throws CloudProviderException;
+
+    SecurityGroupRule addRuleToSecurityGroupUsingIpRange(String securityGroupUuid, String cidr, String ipProtocol,
+        int fromPort, int toPort) throws CloudProviderException;
+
+    SecurityGroupRule addRuleToSecurityGroupUsingSourceGroup(String securityGroupUuid, String sourceGroupUuid,
+        String ipProtocol, int fromPort, int toPort) throws CloudProviderException;
+
+    void deleteRuleFromSecurityGroup(String securityGroupUuid, String ruleUuid) throws CloudProviderException;
+
+    SecurityGroup getSecurityGroupByUuid(String groupUuid) throws ResourceNotFoundException;
+
+    SecurityGroup getSecurityGroupById(int groupId) throws ResourceNotFoundException;
+
+    QueryResult<SecurityGroup> getSecurityGroups(QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException;
+
+    void updateSecurityGroupState(int securityGroupId, SecurityGroup.State state) throws CloudProviderException;
 
 }

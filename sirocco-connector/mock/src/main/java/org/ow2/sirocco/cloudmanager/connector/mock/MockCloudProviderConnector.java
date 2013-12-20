@@ -82,6 +82,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.ComponentDescriptor.ComponentType;
@@ -249,6 +252,40 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     public void removeNetworkFromForwardingGroup(final String forwardingGroupId, final String networkId,
         final ProviderTarget target) throws ConnectorException {
         this.getProvider(target).removeNetworkFromForwardingGroup(forwardingGroupId, networkId);
+    }
+
+    @Override
+    public String createSecurityGroup(final SecurityGroupCreate create, final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).createSecurityGroup(create);
+    }
+
+    @Override
+    public SecurityGroup getSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        return this.getProvider(target).getSecurityGroup(groupId);
+    }
+
+    @Override
+    public List<SecurityGroup> getSecurityGroups(final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).getSecurityGroups();
+    }
+
+    @Override
+    public void deleteRuleFromSecurityGroup(final String groupId, final SecurityGroupRule rule, final ProviderTarget target)
+        throws ConnectorException {
+        this.getProvider(target).deleteRuleFromSecurityGroup(groupId, rule);
+    }
+
+    @Override
+    public String addRuleToSecurityGroup(final String groupId, final SecurityGroupRule rule, final ProviderTarget target)
+        throws ConnectorException {
+        return this.getProvider(target).addRuleToSecurityGroup(groupId, rule);
+    }
+
+    @Override
+    public void deleteSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        this.getProvider(target).deleteSecurityGroup(groupId);
     }
 
     @Override
@@ -472,6 +509,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         private Map<String, NetworkPort> networkPorts = new ConcurrentHashMap<String, NetworkPort>();
 
         private Map<String, ForwardingGroup> forwardingGroups = new ConcurrentHashMap<String, ForwardingGroup>();
+
+        private Map<String, SecurityGroup> securityGroups = new ConcurrentHashMap<String, SecurityGroup>();
 
         private Random random = new Random();
 
@@ -1750,6 +1789,80 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             }
             fgNetwork.setState(ForwardingGroupNetwork.State.DETACHING);
             fgNetwork.setUpdated(new Date());
+        }
+
+        public String createSecurityGroup(final SecurityGroupCreate create) {
+            SecurityGroup secGroup = new SecurityGroup();
+            secGroup.setName(create.getName());
+            secGroup.setDescription(create.getDescription());
+            secGroup.setProviderAssignedId(UUID.randomUUID().toString());
+            secGroup.setRules(new ArrayList<SecurityGroupRule>());
+            secGroup.setState(SecurityGroup.State.AVAILABLE);
+            secGroup.setCreated(new Date());
+            this.securityGroups.put(secGroup.getProviderAssignedId(), secGroup);
+            return secGroup.getProviderAssignedId();
+        }
+
+        public SecurityGroup getSecurityGroup(final String groupId) throws ConnectorException {
+            SecurityGroup secGroup = this.securityGroups.get(groupId);
+            if (secGroup == null) {
+                throw new ResourceNotFoundException();
+            }
+            return secGroup;
+        }
+
+        public List<SecurityGroup> getSecurityGroups() {
+            List<SecurityGroup> result = new ArrayList<SecurityGroup>();
+            for (SecurityGroup group : this.securityGroups.values()) {
+                result.add(group);
+            }
+            return result;
+        }
+
+        public void deleteSecurityGroup(final String groupId) throws ConnectorException {
+            SecurityGroup secGroup = this.securityGroups.get(groupId);
+            if (secGroup == null) {
+                throw new ResourceNotFoundException();
+            }
+            this.securityGroups.remove(groupId);
+        }
+
+        public void deleteRuleFromSecurityGroup(final String groupId, final SecurityGroupRule rule) throws ConnectorException {
+            SecurityGroup secGroup = this.securityGroups.get(groupId);
+            if (secGroup == null) {
+                throw new ResourceNotFoundException();
+            }
+            for (Iterator<SecurityGroupRule> it = secGroup.getRules().iterator(); it.hasNext();) {
+                SecurityGroupRule groupRule = it.next();
+                if (groupRule.getProviderAssignedId().equals(rule.getProviderAssignedId())) {
+                    it.remove();
+                    return;
+                }
+            }
+            throw new ResourceNotFoundException("rule with id " + rule.getProviderAssignedId() + " not found");
+        }
+
+        public String addRuleToSecurityGroup(final String groupId, final SecurityGroupRule rule) throws ConnectorException {
+            SecurityGroup secGroup = this.securityGroups.get(groupId);
+            if (secGroup == null) {
+                throw new ResourceNotFoundException();
+            }
+            SecurityGroupRule newRule = new SecurityGroupRule();
+            newRule.setParentGroup(secGroup);
+            newRule.setIpProtocol(rule.getIpProtocol());
+            newRule.setFromPort(rule.getFromPort());
+            newRule.setToPort(rule.getToPort());
+            newRule.setSourceIpRange(rule.getSourceIpRange());
+            if (rule.getSourceGroup() != null) {
+                SecurityGroup sourceSecGroup = this.securityGroups.get(rule.getSourceGroup().getProviderAssignedId());
+                if (sourceSecGroup == null) {
+                    throw new ResourceNotFoundException();
+                }
+                newRule.setSourceGroup(sourceSecGroup);
+            }
+            newRule.setProviderAssignedId(UUID.randomUUID().toString());
+            secGroup.getRules().add(newRule);
+            return newRule.getProviderAssignedId();
         }
 
     }

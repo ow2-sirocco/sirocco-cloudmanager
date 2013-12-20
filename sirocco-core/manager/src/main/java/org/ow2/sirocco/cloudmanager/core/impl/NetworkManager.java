@@ -26,6 +26,7 @@ import javax.persistence.PersistenceContextType;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
+import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
@@ -42,6 +43,8 @@ import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException
 import org.ow2.sirocco.cloudmanager.core.api.remote.IRemoteNetworkManager;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkDeleteCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SecurityGroupCreateCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SecurityGroupDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.utils.QueryHelper;
 import org.ow2.sirocco.cloudmanager.core.utils.UtilsForManagers;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
@@ -64,6 +67,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup.State;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,7 +116,7 @@ public class NetworkManager implements INetworkManager {
     // Network operations
     //
 
-    private void fireNetworkStateChangeEvent(final Network network) {
+    private void fireResourceStateChangeEvent(final CloudResource network) {
         this.jmsContext.createProducer().setProperty("tenantId", network.getTenant().getUuid())
             .send(this.resourceStateChangeTopic, new ResourceStateChangeEvent(network));
     }
@@ -118,7 +125,7 @@ public class NetworkManager implements INetworkManager {
     public void updateNetworkState(final int networkId, final Network.State state) throws CloudProviderException {
         Network network = this.getNetworkById(networkId);
         network.setState(state);
-        this.fireNetworkStateChangeEvent(network);
+        this.fireResourceStateChangeEvent(network);
     }
 
     public Network getPublicNetwork() {
@@ -199,7 +206,7 @@ public class NetworkManager implements INetworkManager {
         if (network.getState() == Network.State.DELETED) {
             network.setDeleted(new Date());
         }
-        this.fireNetworkStateChangeEvent(network);
+        this.fireResourceStateChangeEvent(network);
         job.setState(Job.Status.SUCCESS);
     }
 
@@ -302,7 +309,7 @@ public class NetworkManager implements INetworkManager {
             network.setState(Network.State.DELETING);
         }
 
-        this.fireNetworkStateChangeEvent(network);
+        this.fireResourceStateChangeEvent(network);
 
         Job job = new Job();
         job.setTenant(tenant);
@@ -1402,4 +1409,201 @@ public class NetworkManager implements INetworkManager {
         }
         return forwardingGroupNetwork;
     }
+
+    //
+    // Security groups
+    //
+
+    @Override
+    public Job createSecurityGroup(final SecurityGroupCreate securityGroupCreate) throws InvalidRequestException,
+        CloudProviderException {
+        Tenant tenant = this.getTenant();
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), securityGroupCreate);
+
+        SecurityGroup secGroup = new SecurityGroup();
+        secGroup.setName(securityGroupCreate.getName());
+        secGroup.setDescription(securityGroupCreate.getDescription());
+        secGroup.setProperties(securityGroupCreate.getProperties() == null ? new HashMap<String, String>()
+            : new HashMap<String, String>(securityGroupCreate.getProperties()));
+        secGroup.setTenant(tenant);
+        secGroup.setCloudProviderAccount(placement.getAccount());
+        secGroup.setLocation(placement.getLocation());
+
+        secGroup.setState(SecurityGroup.State.CREATING);
+        this.em.persist(secGroup);
+        this.em.flush();
+
+        Job job = Job.newBuilder().tenant(tenant).action(Job.Action.ADD).target(secGroup).build();
+        this.em.persist(job);
+        this.em.flush();
+
+        ObjectMessage message = this.jmsContext.createObjectMessage(new SecurityGroupCreateCommand(securityGroupCreate)
+            .setAccount(placement.getAccount()).setLocation(placement.getLocation()).setResourceId(secGroup.getId())
+            .setJob(job));
+        this.jmsContext.createProducer().send(this.requestQueue, message);
+
+        return job;
+    }
+
+    @Override
+    public Job deleteSecurityGroup(final String securityGroupUuid) throws CloudProviderException {
+        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
+        Tenant tenant = this.getTenant();
+
+        if (!secGroup.getMembers().isEmpty()) {
+            throw new ResourceConflictException("Security group " + secGroup.getName() + " used by machines");
+        }
+
+        if (!this.em.createNamedQuery("SecurityGroupRule.findUsingGroup", SecurityGroupRule.class)
+            .setParameter("source", secGroup).getResultList().isEmpty()) {
+            throw new ResourceConflictException("Security group " + secGroup.getName() + " used by another security group");
+        }
+
+        secGroup.setState(SecurityGroup.State.DELETING);
+
+        this.fireResourceStateChangeEvent(secGroup);
+
+        Job job = Job.newBuilder().tenant(tenant).action(Job.Action.DELETE).target(secGroup).build();
+        this.em.persist(job);
+        this.em.flush();
+
+        ObjectMessage message = this.jmsContext.createObjectMessage(new SecurityGroupDeleteCommand().setResourceId(
+            secGroup.getId()).setJob(job));
+        this.jmsContext.createProducer().send(this.requestQueue, message);
+
+        return job;
+    }
+
+    @Override
+    public void updateSecurityGroupState(final int securityGroupId, final State state) throws CloudProviderException {
+        SecurityGroup secGroup = this.getSecurityGroupById(securityGroupId);
+        secGroup.setState(state);
+        if (state == State.DELETED) {
+            for (SecurityGroupRule rule : secGroup.getRules()) {
+                this.em.remove(rule);
+            }
+            secGroup.getRules().clear();
+            secGroup.setDeleted(new Date());
+        } else if (state == State.AVAILABLE) {
+            secGroup.setCreated(new Date());
+        }
+        this.fireResourceStateChangeEvent(secGroup);
+    }
+
+    private SecurityGroupRule addRuleToSecurityGroup(final SecurityGroup secGroup, final SecurityGroupRule rule)
+        throws CloudProviderException {
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(secGroup.getCloudProviderAccount()
+            .getCloudProvider().getCloudProviderType());
+
+        String ruleProviderAssignedId;
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            ruleProviderAssignedId = networkService.addRuleToSecurityGroup(secGroup.getProviderAssignedId(), rule,
+                new ProviderTarget().account(secGroup.getCloudProviderAccount()).location(secGroup.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+
+        rule.setProviderAssignedId(ruleProviderAssignedId);
+        this.em.persist(rule);
+
+        rule.setParentGroup(secGroup);
+        secGroup.getRules().add(rule);
+
+        this.em.flush();
+
+        return rule;
+    }
+
+    @Override
+    public SecurityGroupRule addRuleToSecurityGroupUsingIpRange(final String securityGroupUuid, final String cidr,
+        final String ipProtocol, final int fromPort, final int toPort) throws CloudProviderException {
+        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
+        SecurityGroupRule rule = new SecurityGroupRule();
+        rule.setIpProtocol(ipProtocol);
+        rule.setFromPort(fromPort);
+        rule.setToPort(toPort);
+        rule.setSourceIpRange(cidr);
+
+        return this.addRuleToSecurityGroup(secGroup, rule);
+    }
+
+    @Override
+    public SecurityGroupRule addRuleToSecurityGroupUsingSourceGroup(final String securityGroupUuid,
+        final String sourceGroupUuid, final String ipProtocol, final int fromPort, final int toPort)
+        throws CloudProviderException {
+        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
+        SecurityGroup sourceSecGroup = this.getSecurityGroupByUuid(sourceGroupUuid);
+        SecurityGroupRule rule = new SecurityGroupRule();
+        rule.setIpProtocol(ipProtocol);
+        rule.setFromPort(fromPort);
+        rule.setToPort(toPort);
+        rule.setSourceGroup(sourceSecGroup);
+
+        return this.addRuleToSecurityGroup(secGroup, rule);
+    }
+
+    @Override
+    public void deleteRuleFromSecurityGroup(final String securityGroupUuid, final String ruleUuid)
+        throws CloudProviderException {
+        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
+        SecurityGroupRule rule;
+        try {
+            rule = this.em.createNamedQuery("SecurityGroupRule.findByUuid", SecurityGroupRule.class)
+                .setParameter("uuid", ruleUuid).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(secGroup.getCloudProviderAccount()
+            .getCloudProvider().getCloudProviderType());
+
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            networkService.deleteRuleFromSecurityGroup(secGroup.getProviderAssignedId(), rule,
+                new ProviderTarget().account(secGroup.getCloudProviderAccount()).location(secGroup.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+        rule.setParentGroup(null);
+        secGroup.getRules().remove(rule);
+        this.em.remove(rule);
+    }
+
+    @Override
+    public SecurityGroup getSecurityGroupByUuid(final String groupUuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("SecurityGroup.findByUuid", SecurityGroup.class).setParameter("uuid", groupUuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
+    public SecurityGroup getSecurityGroupById(final int groupId) throws ResourceNotFoundException {
+        SecurityGroup secGroup = this.em.find(SecurityGroup.class, groupId);
+        if (secGroup == null || secGroup.getState() == SecurityGroup.State.DELETED) {
+            throw new ResourceNotFoundException(" Invalid security group id " + groupId);
+        }
+        return secGroup;
+    }
+
+    private List<SecurityGroup> getSecurityGroups() throws CloudProviderException {
+        return QueryHelper
+            .getEntityList("SecurityGroup", this.em, this.getTenant().getId(), SecurityGroup.State.DELETED, false);
+    }
+
+    @Override
+    public QueryResult<SecurityGroup> getSecurityGroups(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<SecurityGroup> groups = this.getSecurityGroups();
+            return new QueryResult<SecurityGroup>(groups.size(), groups);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("SecurityGroup", SecurityGroup.class)
+            .params(queryParams[0]);
+        return QueryHelper.getEntityList(this.em,
+            params.tenantId(this.getTenant().getId()).stateToIgnore(SecurityGroup.State.DELETED));
+    }
+
 }

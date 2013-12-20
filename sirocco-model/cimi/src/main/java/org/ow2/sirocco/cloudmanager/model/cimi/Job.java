@@ -94,6 +94,8 @@ public class Job extends CloudEntity implements Serializable {
 
         private CloudResource target;
 
+        private CloudResource affectedResource;
+
         private String description;
 
         private Job.Status status = Status.RUNNING;
@@ -107,6 +109,11 @@ public class Job extends CloudEntity implements Serializable {
 
         public Builder target(final CloudResource target) {
             this.target = target;
+            return this;
+        }
+
+        public Builder affectedResource(final CloudResource resource) {
+            this.affectedResource = resource;
             return this;
         }
 
@@ -130,7 +137,7 @@ public class Job extends CloudEntity implements Serializable {
             job.setTenant(this.tenant);
             job.setTargetResource(this.target);
             List<CloudResource> affectedResources = new ArrayList<CloudResource>();
-            affectedResources.add(this.target);
+            affectedResources.add(this.affectedResource != null ? this.affectedResource : this.target);
             job.setAffectedResources(affectedResources);
             job.setCreated(new Date());
             job.setAction(this.action);

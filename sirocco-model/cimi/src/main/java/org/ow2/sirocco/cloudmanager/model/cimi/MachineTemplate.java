@@ -39,6 +39,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Transient;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
 
@@ -69,6 +70,8 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     private Machine.State initialState;
 
     private EventLogTemplate eventLogTemplate;
+
+    private List<String> securityGroupUuids;
 
     public MachineTemplate() {
 
@@ -202,6 +205,15 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     public void setEventLogTemplate(final EventLogTemplate eventLogTemplate) {
         this.eventLogTemplate = eventLogTemplate;
+    }
+
+    @Transient
+    public List<String> getSecurityGroupUuids() {
+        return this.securityGroupUuids;
+    }
+
+    public void setSecurityGroupUuids(final List<String> securityGroupUuids) {
+        this.securityGroupUuids = securityGroupUuids;
     }
 
 }

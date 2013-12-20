@@ -64,6 +64,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -264,6 +267,46 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
     public void removeNetworkFromForwardingGroup(final String forwardingGroupId, final String networkId,
         final ProviderTarget target) throws ConnectorException {
         throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public String createSecurityGroup(final SecurityGroupCreate create, final ProviderTarget target) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public SecurityGroup getSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public List<SecurityGroup> getSecurityGroups(final ProviderTarget target) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteRuleFromSecurityGroup(final String groupId, final SecurityGroupRule rule, final ProviderTarget target)
+        throws ConnectorException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public String addRuleToSecurityGroup(final String groupId, final SecurityGroupRule rule, final ProviderTarget target)
+        throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        // TODO Auto-generated method stub
+
     }
 
     @Override

@@ -60,6 +60,8 @@ import org.ow2.sirocco.cloudmanager.core.impl.command.MachineImageDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.NetworkDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.ResourceCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SecurityGroupCreateCommand;
+import org.ow2.sirocco.cloudmanager.core.impl.command.SecurityGroupDeleteCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.SystemActionCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.SystemCreateCommand;
 import org.ow2.sirocco.cloudmanager.core.impl.command.SystemDeleteCommand;
@@ -76,6 +78,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.System;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,6 +159,12 @@ public class RequestDispatcher implements MessageListener {
             case NetworkDeleteCommand.NETWORK_DELETE:
                 this.deleteNetwork(command);
                 break;
+            case SecurityGroupCreateCommand.SECURITY_GROUP_CREATE:
+                this.createSecurityGroup((SecurityGroupCreateCommand) command);
+                break;
+            case SecurityGroupDeleteCommand.SECURITY_GROUP_DELETE:
+                this.deleteSecurityGroup(command);
+                break;
             case SystemCreateCommand.SYSTEM_CREATE:
                 this.createSystem((SystemCreateCommand) command);
                 break;
@@ -217,6 +226,12 @@ public class RequestDispatcher implements MessageListener {
         case NetworkDeleteCommand.NETWORK_DELETE:
             Network.State netState = (e instanceof ResourceNotFoundException) ? Network.State.DELETED : Network.State.ERROR;
             this.networkManager.updateNetworkState(command.getResourceId(), netState);
+            break;
+        case SecurityGroupCreateCommand.SECURITY_GROUP_CREATE:
+        case SecurityGroupDeleteCommand.SECURITY_GROUP_DELETE:
+            SecurityGroup.State groupState = (e instanceof ResourceNotFoundException) ? SecurityGroup.State.DELETED
+                : SecurityGroup.State.ERROR;
+            this.networkManager.updateSecurityGroupState(command.getResourceId(), groupState);
             break;
         case SystemCreateCommand.SYSTEM_CREATE:
         case SystemDeleteCommand.SYSTEM_DELETE:
@@ -368,6 +383,35 @@ public class RequestDispatcher implements MessageListener {
             new ProviderTarget().account(network.getCloudProviderAccount()).location(network.getLocation()));
 
         this.resourceWatcherManager.createNetworkStateWatcher(network, command.getJob(), Network.State.DELETED);
+    }
+
+    private void createSecurityGroup(final SecurityGroupCreateCommand command) throws CloudProviderException,
+        ConnectorException {
+        ICloudProviderConnector connector = this.findCloudProviderConnector(command.getAccount());
+
+        INetworkService networkService = connector.getNetworkService();
+        String secGroupProviderAssignedId = networkService.createSecurityGroup(command.getSecurityGroupCreate(),
+            new ProviderTarget().account(command.getAccount()).location(command.getLocation()));
+
+        SecurityGroup securityGroup = this.em.find(SecurityGroup.class, command.getResourceId());
+        securityGroup.setProviderAssignedId(secGroupProviderAssignedId);
+
+        command.getJob().setState(Job.Status.SUCCESS);
+        this.em.merge(command.getJob());
+
+        this.networkManager.updateSecurityGroupState(securityGroup.getId(), SecurityGroup.State.AVAILABLE);
+    }
+
+    private void deleteSecurityGroup(final ResourceCommand command) throws CloudProviderException, ConnectorException {
+        SecurityGroup secGroup = this.em.find(SecurityGroup.class, command.getResourceId());
+        ICloudProviderConnector connector = this.findCloudProviderConnector(secGroup.getCloudProviderAccount());
+        INetworkService networkService = connector.getNetworkService();
+        networkService.deleteSecurityGroup(secGroup.getProviderAssignedId(),
+            new ProviderTarget().account(secGroup.getCloudProviderAccount()).location(secGroup.getLocation()));
+
+        command.getJob().setState(Job.Status.SUCCESS);
+        this.em.merge(command.getJob());
+        this.networkManager.updateSecurityGroupState(command.getResourceId(), SecurityGroup.State.DELETED);
     }
 
     private void deleteMachineImage(final ResourceCommand command) throws CloudProviderException, ConnectorException {

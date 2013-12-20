@@ -37,6 +37,7 @@ import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -46,6 +47,7 @@ import javax.persistence.Transient;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ICloudProviderResource;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.utils.FSM;
 
 /**
@@ -79,6 +81,8 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
     private MachineImage image;
 
     private MachineConfiguration config;
+
+    private List<SecurityGroup> securityGroups;
 
     @Transient
     private static transient FSM<Machine.State, String> fsm = Machine.initFSM();
@@ -295,6 +299,18 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     public void setConfig(final MachineConfiguration config) {
         this.config = config;
+    }
+
+    @ManyToMany
+    public List<SecurityGroup> getSecurityGroups() {
+        if (this.securityGroups == null) {
+            this.securityGroups = new ArrayList<>();
+        }
+        return this.securityGroups;
+    }
+
+    public void setSecurityGroups(final List<SecurityGroup> securityGroups) {
+        this.securityGroups = securityGroups;
     }
 
 }

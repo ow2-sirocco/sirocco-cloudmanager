@@ -42,6 +42,7 @@ import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
+import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
@@ -53,7 +54,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 @RunWith(Arquillian.class)
@@ -143,7 +148,7 @@ public class ComputeTest extends AbstractTestBase {
     }
 
     private Machine createMachine(final int index, final MachineConfiguration machineConfig, final MachineImage image,
-        final Network network) throws Exception {
+        final Network network, final String... securityGroupIds) throws Exception {
         MachineCreate machineCreate = new MachineCreate();
         machineCreate.setName(ComputeTest.MACHINE_NAME + index);
         machineCreate.setDescription(ComputeTest.MACHINE_DESCRIPTION);
@@ -158,6 +163,10 @@ public class ComputeTest extends AbstractTestBase {
         nic.setNetwork(network);
         machineTemplate.setNetworkInterfaces(Collections.singletonList(nic));
         machineTemplate.setInitialState(Machine.State.STARTED);
+        if (securityGroupIds.length > 0) {
+            List<String> sgIds = Lists.newArrayList(securityGroupIds);
+            machineTemplate.setSecurityGroupUuids(sgIds);
+        }
         machineCreate.setMachineTemplate(machineTemplate);
         Job job = this.machineManager.createMachine(machineCreate);
 
@@ -420,6 +429,181 @@ public class ComputeTest extends AbstractTestBase {
         } catch (ResourceNotFoundException e) {
             // OK
         }
+    }
+
+    final static String SECURITY_GROUP_0_NAME = "myGroup0";
+
+    final static String SECURITY_GROUP_0_DESCRIPTION = "my security group0";
+
+    final static String SECURITY_GROUP_1_NAME = "myGroup1";
+
+    final static String SECURITY_GROUP_1_DESCRIPTION = "my security group1";
+
+    final static String RULE0_CIDR = "0.0.0.0/0";
+
+    final static String RULE_PROTOCOL = "TCP";
+
+    final static int RULE_FROM_PORT = 8000;
+
+    final static int RULE_TO_PORT = 900;
+
+    @Test
+    public void testSecurityGroups() throws Exception {
+        // create security group 0
+        SecurityGroupCreate securityGroupCreate = new SecurityGroupCreate();
+        securityGroupCreate.setName(ComputeTest.SECURITY_GROUP_0_NAME);
+        securityGroupCreate.setDescription(ComputeTest.SECURITY_GROUP_0_DESCRIPTION);
+
+        Job job = this.networkManager.createSecurityGroup(securityGroupCreate);
+
+        SecurityGroup secGroup0 = (SecurityGroup) job.getTargetResource();
+        Assert.assertNotNull(secGroup0.getId());
+        Assert.assertNotNull(secGroup0.getUuid());
+        Assert.assertNotNull(job.getId());
+        Assert.assertNotNull(job.getUuid());
+        Job.Status status = this.waitForJobCompletion(job);
+        Assert.assertEquals(Job.Status.SUCCESS, status);
+
+        secGroup0 = this.networkManager.getSecurityGroupByUuid(secGroup0.getUuid());
+        Assert.assertEquals(SecurityGroup.State.AVAILABLE, secGroup0.getState());
+        Assert.assertEquals(ComputeTest.SECURITY_GROUP_0_NAME, secGroup0.getName());
+        Assert.assertEquals(ComputeTest.SECURITY_GROUP_0_DESCRIPTION, secGroup0.getDescription());
+        Assert.assertNotNull(secGroup0.getCreated());
+
+        // create security group 1
+
+        securityGroupCreate = new SecurityGroupCreate();
+        securityGroupCreate.setName(ComputeTest.SECURITY_GROUP_1_NAME);
+        securityGroupCreate.setDescription(ComputeTest.SECURITY_GROUP_1_DESCRIPTION);
+
+        job = this.networkManager.createSecurityGroup(securityGroupCreate);
+        SecurityGroup secGroup1 = (SecurityGroup) job.getTargetResource();
+        status = this.waitForJobCompletion(job);
+        Assert.assertEquals(Job.Status.SUCCESS, status);
+
+        // list groups
+
+        QueryResult<SecurityGroup> secGroups = this.networkManager.getSecurityGroups();
+        Assert.assertEquals(2, secGroups.getCount());
+        Assert.assertEquals(2, secGroups.getItems().size());
+        Assert.assertEquals(secGroup0.getUuid(), secGroups.getItems().get(1).getUuid());
+        Assert.assertEquals(secGroup1.getUuid(), secGroups.getItems().get(0).getUuid());
+
+        // create rule with cidr for group 0
+
+        SecurityGroupRule rule = this.networkManager.addRuleToSecurityGroupUsingIpRange(secGroup0.getUuid(),
+            ComputeTest.RULE0_CIDR, ComputeTest.RULE_PROTOCOL, ComputeTest.RULE_FROM_PORT, ComputeTest.RULE_TO_PORT);
+        Assert.assertNotNull(rule.getId());
+        Assert.assertNotNull(rule.getUuid());
+        Assert.assertNotNull(rule.getProviderAssignedId());
+        Assert.assertNull(rule.getSourceGroup());
+        Assert.assertEquals(ComputeTest.RULE0_CIDR, rule.getSourceIpRange());
+        Assert.assertEquals(ComputeTest.RULE_PROTOCOL, rule.getIpProtocol());
+        Assert.assertTrue(ComputeTest.RULE_FROM_PORT == rule.getFromPort());
+        Assert.assertTrue(ComputeTest.RULE_TO_PORT == rule.getToPort());
+
+        secGroup0 = this.networkManager.getSecurityGroupByUuid(secGroup0.getUuid());
+        Assert.assertEquals(1, secGroup0.getRules().size());
+        Assert.assertEquals(secGroup0.getRules().get(0).getUuid(), rule.getUuid());
+
+        // create machine in security group 0
+
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations().getItems();
+        MachineConfiguration machineConfig = machineConfigs.get(0);
+        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
+        MachineImage image = machineImages.get(0);
+        List<Network> networks = this.networkManager.getNetworks().getItems();
+        Network network = networks.get(0);
+
+        Machine machine = this.createMachine(0, machineConfig, image, network, secGroup0.getUuid());
+        Assert.assertEquals(1, machine.getSecurityGroups().size());
+        Assert.assertEquals(secGroup0.getUuid(), machine.getSecurityGroups().get(0).getUuid());
+
+        secGroup0 = this.networkManager.getSecurityGroupByUuid(secGroup0.getUuid());
+        Assert.assertEquals(1, secGroup0.getMembers().size());
+        Assert.assertEquals(machine.getUuid(), secGroup0.getMembers().get(0).getUuid());
+
+        // attempting to delete the security group should fail
+
+        try {
+            this.networkManager.deleteSecurityGroup(secGroup0.getUuid());
+            Assert.fail("deleting a security group in use should fail");
+        } catch (ResourceConflictException e) {
+            // OK
+        }
+
+        // delete machine
+
+        this.deleteMachine(machine.getUuid());
+
+        secGroup0 = this.networkManager.getSecurityGroupByUuid(secGroup0.getUuid());
+        Assert.assertEquals(0, secGroup0.getMembers().size());
+
+        // create rule with source group 0 for group 1
+
+        SecurityGroupRule rule1 = this.networkManager.addRuleToSecurityGroupUsingSourceGroup(secGroup1.getUuid(),
+            secGroup0.getUuid(), ComputeTest.RULE_PROTOCOL, ComputeTest.RULE_FROM_PORT, ComputeTest.RULE_TO_PORT);
+        Assert.assertNotNull(rule1.getId());
+        Assert.assertNotNull(rule1.getUuid());
+        Assert.assertNotNull(rule1.getProviderAssignedId());
+        Assert.assertNull(rule1.getSourceIpRange());
+        Assert.assertEquals(secGroup0.getUuid(), rule1.getSourceGroup().getUuid());
+        Assert.assertEquals(ComputeTest.RULE_PROTOCOL, rule1.getIpProtocol());
+        Assert.assertTrue(ComputeTest.RULE_FROM_PORT == rule1.getFromPort());
+        Assert.assertTrue(ComputeTest.RULE_TO_PORT == rule1.getToPort());
+
+        secGroup1 = this.networkManager.getSecurityGroupByUuid(secGroup1.getUuid());
+        Assert.assertEquals(1, secGroup1.getRules().size());
+        Assert.assertEquals(secGroup1.getRules().get(0).getUuid(), rule1.getUuid());
+
+        // deleting sec group 0 should fail because it is used by sec group 1
+
+        try {
+            this.networkManager.deleteSecurityGroup(secGroup0.getUuid());
+            Assert.fail("deleting a security group in use should fail");
+        } catch (ResourceConflictException e) {
+            // OK
+            System.out.println(e.getMessage());
+        }
+
+        // delete rule for sec group 0
+
+        this.networkManager.deleteRuleFromSecurityGroup(secGroup0.getUuid(), rule.getUuid());
+
+        secGroup0 = this.networkManager.getSecurityGroupByUuid(secGroup0.getUuid());
+        Assert.assertTrue(secGroup0.getRules().isEmpty());
+
+        // delete security groups
+
+        job = this.networkManager.deleteSecurityGroup(secGroup1.getUuid());
+        Assert.assertNotNull(job.getId());
+        Assert.assertNotNull(job.getUuid());
+        status = this.waitForJobCompletion(job);
+        Assert.assertEquals(Job.Status.SUCCESS, status);
+
+        job = this.networkManager.deleteSecurityGroup(secGroup0.getUuid());
+        Assert.assertNotNull(job.getId());
+        Assert.assertNotNull(job.getUuid());
+        status = this.waitForJobCompletion(job);
+        Assert.assertEquals(Job.Status.SUCCESS, status);
+
+        try {
+            secGroup0 = this.networkManager.getSecurityGroupByUuid(secGroup0.getUuid());
+            Assert.assertTrue(secGroup0.getState() == SecurityGroup.State.DELETED);
+            Assert.assertNotNull(secGroup0.getDeleted());
+        } catch (ResourceNotFoundException e) {
+            // OK
+            System.out.println(e.getMessage());
+        }
+
+        try {
+            secGroup1 = this.networkManager.getSecurityGroupByUuid(secGroup1.getUuid());
+            Assert.assertTrue(secGroup1.getState() == SecurityGroup.State.DELETED);
+            Assert.assertNotNull(secGroup1.getDeleted());
+        } catch (ResourceNotFoundException e) {
+            // OK
+        }
+
     }
 
 }

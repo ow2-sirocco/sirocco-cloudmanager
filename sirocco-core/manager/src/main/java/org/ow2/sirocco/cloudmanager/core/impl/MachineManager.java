@@ -103,6 +103,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Visibility;
 import org.slf4j.Logger;
@@ -196,6 +197,7 @@ public class MachineManager implements IMachineManager {
 
     public Job createMachine(final MachineCreate machineCreate) throws CloudProviderException {
         MachineManager.logger.info("Creating Machine " + machineCreate.getName());
+
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), machineCreate);
@@ -221,7 +223,26 @@ public class MachineManager implements IMachineManager {
             machine.addMachineDisk(disk);
         }
 
+        // look-up all security groups that this machine will join
+        // replace broker ids with provider-assigned ids
+        List<SecurityGroup> securityGroups = new ArrayList<>();
+        if (machineCreate.getMachineTemplate().getSecurityGroupUuids() != null) {
+            List<String> secGroupProviderAssignedIds = new ArrayList<>();
+            for (String groupUuid : machineCreate.getMachineTemplate().getSecurityGroupUuids()) {
+                SecurityGroup secGroup = this.networkManager.getSecurityGroupByUuid(groupUuid);
+                securityGroups.add(secGroup);
+                secGroupProviderAssignedIds.add(secGroup.getProviderAssignedId());
+            }
+            machineCreate.getMachineTemplate().setSecurityGroupUuids(secGroupProviderAssignedIds);
+        }
+
         this.em.persist(machine);
+
+        for (SecurityGroup secGroup : securityGroups) {
+            machine.getSecurityGroups().add(secGroup);
+            secGroup.getMembers().add(machine);
+        }
+        machine.setSecurityGroups(securityGroups);
 
         Job job = new Job();
         job.setTenant(tenant);
@@ -249,6 +270,7 @@ public class MachineManager implements IMachineManager {
         Machine machine = this.em.find(Machine.class, machineId);
         Job job = this.em.find(Job.class, jobId);
         if (updatedMachine == null || updatedMachine.getState() == State.DELETED) {
+            this.removeMachineFromSecurityGroup(machine);
             machine.setState(Machine.State.DELETED);
             machine.setDeleted(new Date());
             // delete volume attachments
@@ -472,6 +494,16 @@ public class MachineManager implements IMachineManager {
         return job;
     }
 
+    /**
+     * @param machine managed entity
+     */
+    private void removeMachineFromSecurityGroup(final Machine machine) {
+        for (SecurityGroup secGroup : machine.getSecurityGroups()) {
+            secGroup.getMembers().remove(machine);
+        }
+        machine.getSecurityGroups().clear();
+    }
+
     // Delete may be done in any state of the machine
     public Job deleteMachine(final String machineId) throws CloudProviderException {
         Tenant tenant = this.getTenant();
@@ -480,6 +512,7 @@ public class MachineManager implements IMachineManager {
         MachineManager.logger.info("Deleting machine " + machine.getName());
 
         if (machine.getState() == State.ERROR && machine.getProviderAssignedId() == null) {
+            this.removeMachineFromSecurityGroup(machine);
             machine.setState(Machine.State.DELETED);
             this.fireResourceStateChangeEvent(machine);
             Job job = Job.newBuilder().tenant(tenant).target(machine).description("Machine deletion").status(Status.SUCCESS)
@@ -1112,6 +1145,7 @@ public class MachineManager implements IMachineManager {
                 this.em.remove(nic);
             }
         }
+        this.removeMachineFromSecurityGroup(deleted);
         deleted.setState(State.DELETED);
         this.em.flush();
         this.systemManager.handleEntityStateChange(deleted.getClass(), deleted.getId(), true);
