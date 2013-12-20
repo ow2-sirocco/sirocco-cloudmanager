@@ -409,9 +409,9 @@ public class OpenStackCloudProvider {
     }
 
     public void restartMachine(final String machineId, final boolean force) throws ConnectorException {
-        /*novaClient.servers().reboot(machineId, << force ? Reboot HARD : Reboot SOFT >>).execute();*/
+        this.novaClient.servers().reboot(machineId, force ? "HARD" : "SOFT").execute();
         /*TODO when supported by woorea (RebootAction, RebootType)*/
-        throw new ConnectorException("unsupported operation");
+        // throw new ConnectorException("unsupported operation");
     }
 
     public void addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException {
@@ -871,8 +871,8 @@ public class OpenStackCloudProvider {
 
     /* FIXME 
      * Mapping : Sirocco FG / Bagpipe VPN profile 
-     * - Algo : create FG (list of ntwk) / Bagpipe API calls (ntwk.associate(vpnProfile)
-     * - Algo : delete FG (list of ntwk) / Bagpipe API calls (ntwk.dissociate(vpnProfile)
+     * - create FG (list of ntwk) / Bagpipe API calls (ntwk.associate(vpnProfile)
+     * - delete FG (list of ntwk) / Bagpipe API calls (ntwk.dissociate(vpnProfile)
      * */
     public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws ConnectorException {
         OpenStackCloudProvider.logger.info("creating Fowarding Group for " + this.cloudProviderAccount.getLogin());
