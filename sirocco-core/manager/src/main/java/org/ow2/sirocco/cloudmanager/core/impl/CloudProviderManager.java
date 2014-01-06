@@ -527,7 +527,7 @@ public class CloudProviderManager implements ICloudProviderManager {
                 }
             }
             if (targetLocation == null) {
-                throw new CloudProviderException("Location constraint" + locationConstraint + " not matched by provider "
+                throw new CloudProviderException("Location constraint " + locationConstraint + " not matched by provider "
                     + targetAccount.getCloudProvider().getDescription());
             }
         }
