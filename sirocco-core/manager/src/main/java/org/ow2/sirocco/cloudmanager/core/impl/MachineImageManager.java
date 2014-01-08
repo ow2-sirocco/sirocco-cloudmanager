@@ -116,6 +116,7 @@ public class MachineImageManager implements IMachineImageManager {
 
         mi.setTenant(this.getTenant());
         mi.setCreated(new Date());
+        mi.setUpdated(mi.getCreated());
         mi.setState(MachineImage.State.AVAILABLE);
 
         if (mi.getProperties() != null) {
@@ -323,9 +324,6 @@ public class MachineImageManager implements IMachineImageManager {
             image.setState(MachineImage.State.DELETED);
         } else {
             image.setState(updatedImage.getState());
-            if (image.getCreated() == null) {
-                image.setCreated(new Date());
-            }
             image.setUpdated(new Date());
         }
         if (image.getState() == MachineImage.State.DELETED) {

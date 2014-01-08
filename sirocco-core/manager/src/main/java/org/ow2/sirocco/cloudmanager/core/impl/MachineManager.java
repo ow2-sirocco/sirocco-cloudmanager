@@ -236,6 +236,8 @@ public class MachineManager implements IMachineManager {
             machineCreate.getMachineTemplate().setSecurityGroupUuids(secGroupProviderAssignedIds);
         }
 
+        machine.setCreated(new Date());
+        machine.setUpdated(machine.getCreated());
         this.em.persist(machine);
 
         for (SecurityGroup secGroup : securityGroups) {
@@ -284,8 +286,7 @@ public class MachineManager implements IMachineManager {
             }
         } else {
             machine.setState(updatedMachine.getState());
-            if (machine.getCreated() == null) {
-                machine.setCreated(new Date());
+            if (machine.getNetworkInterfaces() == null || machine.getNetworkInterfaces().isEmpty()) {
                 this.createNetworkInterfaces(machine, updatedMachine);
             }
             machine.setUpdated(new Date());
@@ -421,6 +422,8 @@ public class MachineManager implements IMachineManager {
         newMachineImage.setDescription(machineImage.getDescription());
         newMachineImage.setProperties(machineImage.getProperties());
         newMachineImage.setState(MachineImage.State.CREATING);
+        newMachineImage.setCreated(new Date());
+        newMachineImage.setUpdated(newMachineImage.getCreated());
 
         this.em.persist(newMachineImage);
 

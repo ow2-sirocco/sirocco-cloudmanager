@@ -140,6 +140,9 @@ public class VolumeManager implements IVolumeManager {
         volume.setLocation(placement.getLocation());
         volume.setTenant(tenant);
         volume.setState(Volume.State.CREATING);
+
+        volume.setCreated(new Date());
+        volume.setUpdated(volume.getCreated());
         this.em.persist(volume);
 
         // creating Job
@@ -179,9 +182,6 @@ public class VolumeManager implements IVolumeManager {
             }
         } else {
             volume.setState(updatedVolume.getState());
-            if (volume.getCreated() == null) {
-                volume.setCreated(new Date());
-            }
             volume.setUpdated(new Date());
         }
         this.fireVolumeStateChangeEvent(volume);

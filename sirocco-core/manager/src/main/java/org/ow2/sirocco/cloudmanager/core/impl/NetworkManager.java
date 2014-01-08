@@ -168,6 +168,8 @@ public class NetworkManager implements INetworkManager {
         network.setSubnets(networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets());
 
         network.setState(Network.State.CREATING);
+        network.setCreated(new Date());
+        network.setUpdated(network.getCreated());
         this.em.persist(network);
         this.em.flush();
 
@@ -198,9 +200,6 @@ public class NetworkManager implements INetworkManager {
             network.setState(Network.State.DELETED);
         } else {
             network.setState(updatedNetwork.getState());
-            if (network.getCreated() == null) {
-                network.setCreated(new Date());
-            }
             network.setUpdated(new Date());
         }
         if (network.getState() == Network.State.DELETED) {
@@ -1009,6 +1008,8 @@ public class NetworkManager implements INetworkManager {
         forwardingGroup.setNetworks(networks);
 
         forwardingGroup.setState(ForwardingGroup.State.AVAILABLE);
+        forwardingGroup.setCreated(new Date());
+        forwardingGroup.setUpdated(forwardingGroup.getCreated());
         this.em.persist(forwardingGroup);
 
         Job job = new Job();
@@ -1430,6 +1431,8 @@ public class NetworkManager implements INetworkManager {
         secGroup.setLocation(placement.getLocation());
 
         secGroup.setState(SecurityGroup.State.CREATING);
+        secGroup.setCreated(new Date());
+        secGroup.setUpdated(secGroup.getUpdated());
         this.em.persist(secGroup);
         this.em.flush();
 
@@ -1485,7 +1488,7 @@ public class NetworkManager implements INetworkManager {
             secGroup.getRules().clear();
             secGroup.setDeleted(new Date());
         } else if (state == State.AVAILABLE) {
-            secGroup.setCreated(new Date());
+            secGroup.setUpdated(new Date());
         }
         this.fireResourceStateChangeEvent(secGroup);
     }
