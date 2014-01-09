@@ -26,7 +26,9 @@
 package org.ow2.sirocco.cloudmanager.connector.api;
 
 import java.util.List;
+import java.util.Map;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
@@ -245,5 +247,15 @@ public interface INetworkService {
     String addRuleToSecurityGroup(String groupId, SecurityGroupRule rule, ProviderTarget target) throws ConnectorException;
 
     void deleteRuleFromSecurityGroup(String groupId, SecurityGroupRule rule, ProviderTarget target) throws ConnectorException;
+
+    List<Address> getAddresses(ProviderTarget target) throws ConnectorException;
+
+    Address allocateAddress(Map<String, String> properties, ProviderTarget target) throws ConnectorException;
+
+    void deleteAddress(Address address, ProviderTarget target) throws ConnectorException;
+
+    void addAddressToMachine(String machineId, Address address, ProviderTarget target) throws ConnectorException;
+
+    void removeAddressFromMachine(String machineId, Address address, ProviderTarget target) throws ConnectorException;
 
 }

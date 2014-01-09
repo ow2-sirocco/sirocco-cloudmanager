@@ -289,6 +289,33 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
+    public List<Address> getAddresses(final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).getAddresses();
+    }
+
+    @Override
+    public Address allocateAddress(final Map<String, String> properties, final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).allocateAddress(properties);
+    }
+
+    @Override
+    public void deleteAddress(final Address address, final ProviderTarget target) throws ConnectorException {
+        this.getProvider(target).deleteAddress(address);
+    }
+
+    @Override
+    public void addAddressToMachine(final String machineId, final Address address, final ProviderTarget target)
+        throws ConnectorException {
+        this.getProvider(target).addAddressToMachine(machineId, address);
+    }
+
+    @Override
+    public void removeAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
+        throws ConnectorException {
+        this.getProvider(target).removeAddressFromMachine(machineId, address);
+    }
+
+    @Override
     public Volume createVolume(final VolumeCreate volumeCreate, final ProviderTarget target) throws ConnectorException {
         return this.getProvider(target).createVolume(volumeCreate);
     }
@@ -490,6 +517,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     private static class MockProvider {
+        private final static String ADDRESS_PREFIX = "81.200.35.";
+
+        private final static int ADDRESS_NUMBER = 20;
+
         private CloudProviderAccount cloudProviderAccount;
 
         private CloudProviderLocation cloudProviderLocation;
@@ -512,6 +543,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         private Map<String, SecurityGroup> securityGroups = new ConcurrentHashMap<String, SecurityGroup>();
 
+        private Address addressPool[];
+
+        private Map<String, Address> allocatedAddresses = new ConcurrentHashMap<String, Address>();
+
         private Random random = new Random();
 
         MockProvider() {
@@ -523,6 +558,14 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             publicNetwork.setCloudProviderAccount(this.cloudProviderAccount);
             publicNetwork.setLocation(this.cloudProviderLocation);
             this.networks.put(publicNetwork.getProviderAssignedId(), publicNetwork);
+            this.addressPool = new Address[MockProvider.ADDRESS_NUMBER];
+            for (int address_suffix = 1; address_suffix <= MockProvider.ADDRESS_NUMBER; address_suffix++) {
+                Address address = new Address();
+                address.setProviderAssignedId(UUID.randomUUID().toString());
+                address.setIp(MockProvider.ADDRESS_PREFIX + address_suffix);
+                address.setState(Address.State.DELETED);
+                this.addressPool[address_suffix - 1] = address;
+            }
         }
 
         private boolean actionDone(final Resource resource) {
@@ -1863,6 +1906,66 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             newRule.setProviderAssignedId(UUID.randomUUID().toString());
             secGroup.getRules().add(newRule);
             return newRule.getProviderAssignedId();
+        }
+
+        public void removeAddressFromMachine(final String machineId, final Address address) throws ConnectorException {
+            final Machine machine = this.machines.get(machineId);
+            if (machine == null) {
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
+            }
+            Address addr = this.allocatedAddresses.get(address.getIp());
+            if (addr == null) {
+                throw new ConnectorException("Address " + address.getIp() + " not found");
+            }
+            if (addr.getResource() == null || !addr.getResource().getProviderAssignedId().equals(machineId)) {
+                throw new ConnectorException("Address " + addr.getIp() + " not associated with machine " + machineId);
+            }
+            addr.setResource(null);
+            // TODO remove address from machine nic
+        }
+
+        public void addAddressToMachine(final String machineId, final Address address) throws ConnectorException {
+            final Machine machine = this.machines.get(machineId);
+            if (machine == null) {
+                throw new ResourceNotFoundException("Machine " + machineId + " doesn't exist");
+            }
+            Address addr = this.allocatedAddresses.get(address.getIp());
+            if (addr == null) {
+                throw new ConnectorException("Address " + address.getIp() + " not found");
+            }
+            if (addr.getResource() != null) {
+                throw new ConnectorException("Address " + addr.getIp() + " already associated");
+            }
+            addr.setResource(machine);
+            // TODO add address to machine nic
+        }
+
+        public synchronized void deleteAddress(final Address address) throws ConnectorException {
+            Address addr = this.allocatedAddresses.get(address.getIp());
+            if (addr == null) {
+                throw new ConnectorException("Address " + address.getIp() + " not found");
+            }
+            addr.setState(Address.State.DELETED);
+            if (addr.getResource() != null) {
+                // TODO remove address from machine nic
+                addr.setResource(null);
+            }
+            this.allocatedAddresses.remove(address.getIp());
+        }
+
+        public synchronized Address allocateAddress(final Map<String, String> properties) throws ConnectorException {
+            for (Address addr : this.addressPool) {
+                if (addr.getState() == Address.State.DELETED) {
+                    addr.setState(Address.State.CREATED);
+                    this.allocatedAddresses.put(addr.getIp(), addr);
+                    return addr;
+                }
+            }
+            throw new ConnectorException("No address available");
+        }
+
+        public List<Address> getAddresses() {
+            return new ArrayList<Address>(this.allocatedAddresses.values());
         }
 
     }

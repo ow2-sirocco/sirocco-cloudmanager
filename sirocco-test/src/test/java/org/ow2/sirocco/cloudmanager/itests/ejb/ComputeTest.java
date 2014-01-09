@@ -44,6 +44,8 @@ import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceConflictException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
+import org.ow2.sirocco.cloudmanager.model.cimi.AddressCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
@@ -603,6 +605,89 @@ public class ComputeTest extends AbstractTestBase {
         } catch (ResourceNotFoundException e) {
             // OK
         }
+
+    }
+
+    @Test
+    public void testAddresses() throws Exception {
+        AddressCreate addressCreate = new AddressCreate();
+
+        // create Address
+
+        Job job = this.networkManager.createAddress(addressCreate);
+        Assert.assertNotNull(job.getId());
+        Assert.assertNotNull(job.getUuid());
+        Assert.assertEquals(Job.Status.SUCCESS, job.getState());
+
+        Address publicAddress = (Address) job.getTargetResource();
+        Assert.assertNotNull(publicAddress.getCreated());
+        Assert.assertNotNull(publicAddress.getUpdated());
+        Assert.assertNotNull(publicAddress.getId());
+        Assert.assertNotNull(publicAddress.getProviderAssignedId());
+        Assert.assertNotNull(publicAddress.getIp());
+        Assert.assertEquals(Address.State.CREATED, publicAddress.getState());
+
+        // get address by uuid
+
+        Address address = this.networkManager.getAddressByUuid(publicAddress.getUuid());
+        Assert.assertEquals(publicAddress.getIp(), address.getIp());
+
+        // get addresses
+
+        QueryResult<Address> result = this.networkManager.getAddresses();
+        Assert.assertEquals(1, result.getCount());
+        Assert.assertEquals(1, result.getItems().size());
+        Assert.assertEquals(publicAddress.getIp(), result.getItems().get(0).getIp());
+
+        // create machine
+
+        List<MachineConfiguration> machineConfigs = this.machineManager.getMachineConfigurations().getItems();
+        MachineConfiguration machineConfig = machineConfigs.get(0);
+        List<MachineImage> machineImages = this.machineImageManager.getMachineImages();
+        MachineImage image = machineImages.get(0);
+        List<Network> networks = this.networkManager.getNetworks().getItems();
+        Network network = networks.get(0);
+
+        Machine machine = this.createMachine(0, machineConfig, image, network);
+
+        // associate address to machine
+
+        job = this.networkManager.addAddressToMachine(machine.getUuid(), publicAddress.getIp());
+        Assert.assertNotNull(job.getId());
+        Assert.assertNotNull(job.getUuid());
+        Assert.assertEquals(Job.Status.SUCCESS, job.getState());
+
+        publicAddress = this.networkManager.getAddressByUuid(publicAddress.getUuid());
+        Assert.assertNotNull(publicAddress.getResource());
+        Machine attachedMachine = (Machine) publicAddress.getResource();
+        Assert.assertEquals(machine.getUuid(), attachedMachine.getUuid());
+
+        // dissociate address from machine
+
+        job = this.networkManager.removeAddressFromMachine(machine.getUuid(), publicAddress.getIp());
+        Assert.assertNotNull(job.getId());
+        Assert.assertNotNull(job.getUuid());
+        Assert.assertEquals(Job.Status.SUCCESS, job.getState());
+
+        publicAddress = this.networkManager.getAddressByUuid(publicAddress.getUuid());
+        Assert.assertNull(publicAddress.getResource());
+
+        // delete address
+        job = this.networkManager.deleteAddress(publicAddress.getUuid());
+        Assert.assertNotNull(job.getId());
+        Assert.assertNotNull(job.getUuid());
+        Assert.assertEquals(Job.Status.SUCCESS, job.getState());
+
+        try {
+            address = this.networkManager.getAddressByUuid(publicAddress.getUuid());
+            Assert.assertEquals(Address.State.DELETED, address.getState());
+        } catch (ResourceNotFoundException e) {
+            // OK
+        }
+
+        result = this.networkManager.getAddresses();
+        Assert.assertEquals(0, result.getCount());
+        Assert.assertEquals(0, result.getItems().size());
 
     }
 

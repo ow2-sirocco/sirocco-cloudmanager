@@ -341,6 +341,10 @@ public interface INetworkManager {
 
     Job deleteAddress(String addressId) throws ResourceNotFoundException, CloudProviderException;
 
+    Job addAddressToMachine(String machineUuid, String ip) throws ResourceNotFoundException, CloudProviderException;
+
+    Job removeAddressFromMachine(String machineUuid, String ip) throws ResourceNotFoundException, CloudProviderException;
+
     // AddressTemplate operations
 
     AddressTemplate createAddressTemplate(AddressTemplate addressTemplate) throws InvalidRequestException,

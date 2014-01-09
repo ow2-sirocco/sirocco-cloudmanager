@@ -39,6 +39,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.ISystemService;
 import org.ow2.sirocco.cloudmanager.connector.api.IVolumeService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
@@ -305,6 +306,38 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
     @Override
     public void deleteSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public Address allocateAddress(final Map<String, String> properties, final ProviderTarget target) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void deleteAddress(final Address address, final ProviderTarget target) throws ConnectorException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public List<Address> getAddresses(final ProviderTarget target) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void addAddressToMachine(final String machineId, final Address address, final ProviderTarget target)
+        throws ConnectorException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void removeAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
+        throws ConnectorException {
         // TODO Auto-generated method stub
 
     }

@@ -30,6 +30,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.INetworkService;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
+import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
@@ -57,6 +58,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
+import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
@@ -98,6 +100,9 @@ public class NetworkManager implements INetworkManager {
 
     @EJB
     private ITenantManager tenantManager;
+
+    @EJB
+    private IMachineManager machineManager;
 
     @Resource(lookup = "jms/RequestQueue")
     private Queue requestQueue;
@@ -1205,13 +1210,43 @@ public class NetworkManager implements INetworkManager {
 
     @Override
     public Job createAddress(final AddressCreate addressCreate) throws InvalidRequestException, CloudProviderException {
-        // TODO
-        return null;
+        Tenant tenant = this.getTenant();
+        Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), addressCreate);
+
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(placement.getAccount()
+            .getCloudProvider().getCloudProviderType());
+
+        Address externalAddress;
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            externalAddress = networkService.allocateAddress(addressCreate.getProperties(),
+                new ProviderTarget().account(placement.getAccount()).location(placement.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+
+        Address address = new Address();
+        address.setState(Address.State.CREATED);
+        address.setProviderAssignedId(externalAddress.getProviderAssignedId());
+        address.setTenant(tenant);
+        address.setCloudProviderAccount(placement.getAccount());
+        address.setLocation(placement.getLocation());
+        address.setIp(externalAddress.getIp());
+
+        address.setCreated(new Date());
+        address.setUpdated(address.getCreated());
+        this.em.persist(address);
+        this.em.flush();
+
+        Job job = Job.newBuilder().tenant(tenant).action(Job.Action.ADD).status(Status.SUCCESS).target(address).build();
+        this.em.persist(job);
+        this.em.flush();
+
+        return job;
     }
 
     private List<Address> getAddresses() throws CloudProviderException {
-        return this.em.createQuery("SELECT v FROM Address v WHERE v.tenant.id=:tenantId ORDER BY v.id", Address.class)
-            .setParameter("tenantId", this.getTenant().getId()).getResultList();
+        return QueryHelper.getEntityList("Address", this.em, this.getTenant().getId(), Address.State.DELETED, false);
     }
 
     @Override
@@ -1264,9 +1299,109 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public Job deleteAddress(final String addressId) throws ResourceNotFoundException, CloudProviderException {
-        // TODO
-        return null;
+    public Job deleteAddress(final String addressUuid) throws ResourceNotFoundException, CloudProviderException {
+        Address address = this.getAddressByUuid(addressUuid);
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(address.getCloudProviderAccount()
+            .getCloudProvider().getCloudProviderType());
+
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            networkService.deleteAddress(address,
+                new ProviderTarget().account(address.getCloudProviderAccount()).location(address.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+
+        address.setState(Address.State.DELETED);
+        address.setDeleted(new Date());
+        address.setResource(null);
+
+        Job job = Job.newBuilder().tenant(this.getTenant()).action(Job.Action.DELETE).status(Status.SUCCESS).target(address)
+            .build();
+        this.em.persist(job);
+        this.em.flush();
+
+        return job;
+    }
+
+    @Override
+    public Job addAddressToMachine(final String machineUuid, final String ip) throws ResourceNotFoundException,
+        CloudProviderException {
+        Tenant tenant = this.getTenant();
+        Machine machine = this.machineManager.getMachineByUuid(machineUuid);
+        Address address;
+        try {
+            address = this.em.createNamedQuery("Address.findByIp", Address.class).setParameter("ip", ip)
+                .setParameter("tenant", tenant).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+        if (address.getState() == Address.State.DELETED) {
+            throw new ResourceNotFoundException();
+        }
+        if (address.getResource() != null) {
+            throw new ResourceConflictException("Address " + ip + " already mapped");
+        }
+
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(address.getCloudProviderAccount()
+            .getCloudProvider().getCloudProviderType());
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            networkService.addAddressToMachine(machine.getProviderAssignedId(), address,
+                new ProviderTarget().account(address.getCloudProviderAccount()).location(address.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+
+        address.setResource(machine);
+        // TODO add Machine nic.address
+
+        Job job = Job.newBuilder().tenant(this.getTenant()).action(Job.Action.ADD).status(Status.SUCCESS).target(machine)
+            .affectedResource(address).build();
+        this.em.persist(job);
+        this.em.flush();
+
+        return job;
+    }
+
+    @Override
+    public Job removeAddressFromMachine(final String machineUuid, final String ip) throws ResourceNotFoundException,
+        CloudProviderException {
+        Tenant tenant = this.getTenant();
+        Machine machine = this.machineManager.getMachineByUuid(machineUuid);
+        Address address;
+        try {
+            address = this.em.createNamedQuery("Address.findByIp", Address.class).setParameter("ip", ip)
+                .setParameter("tenant", tenant).getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
+        if (address.getState() == Address.State.DELETED) {
+            throw new ResourceNotFoundException();
+        }
+        if (address.getResource() == null || !((Machine) address.getResource()).getUuid().equals(machineUuid)) {
+            throw new ResourceConflictException("Address " + ip + " not associated with machine " + machineUuid);
+        }
+
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(address.getCloudProviderAccount()
+            .getCloudProvider().getCloudProviderType());
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            networkService.removeAddressFromMachine(machine.getProviderAssignedId(), address,
+                new ProviderTarget().account(address.getCloudProviderAccount()).location(address.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+
+        address.setResource(null);
+        // TODO remove Machine nic.address
+
+        Job job = Job.newBuilder().tenant(this.getTenant()).action(Job.Action.ADD).status(Status.SUCCESS).target(machine)
+            .affectedResource(address).build();
+        this.em.persist(job);
+        this.em.flush();
+
+        return job;
     }
 
     //
