@@ -104,7 +104,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
     private static Logger logger = LoggerFactory.getLogger(MockCloudProviderConnector.class);
 
-    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS = 1;
+    private static final int ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS = 1;
 
     private List<MockProvider> mockProviders = new ArrayList<MockProvider>();
 
@@ -573,7 +573,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 return false;
             }
             Date now = new Date();
-            return (now.getTime() - resource.getUpdated().getTime()) > MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 1000;
+            return (now.getTime() - resource.getUpdated().getTime()) > MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS;
         }
 
         public synchronized Volume createVolume(final VolumeCreate volumeCreate) throws ConnectorException {
@@ -939,9 +939,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             }
         }
 
-        private Machine.State waitForMachineState(final String machineId, final int seconds,
-            final Machine.State... expectedStates) throws ConnectorException {
-            int tries = seconds;
+        private Machine.State waitForMachineState(final String machineId, final Machine.State... expectedStates)
+            throws ConnectorException {
+            int tries = 1 + MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS / 1000;
             while (tries-- > 0) {
                 Machine.State machineState = this.getMachineState(machineId);
                 for (Machine.State expectedFinalState : expectedStates) {
@@ -957,9 +957,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             return null;
         }
 
-        private Volume.State waitForVolumeState(final String volumeId, final int seconds, final Volume.State... expectedStates)
+        private Volume.State waitForVolumeState(final String volumeId, final Volume.State... expectedStates)
             throws ConnectorException {
-            int tries = seconds;
+            int tries = 1 + MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS / 1000;
             while (tries-- > 0) {
                 Volume.State volumeState = this.getVolumeState(volumeId);
                 for (Volume.State expectedFinalState : expectedStates) {
@@ -975,9 +975,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             return null;
         }
 
-        private Network.State waitForNetworkState(final String networkId, final int seconds,
-            final Network.State... expectedStates) throws ConnectorException {
-            int tries = seconds;
+        private Network.State waitForNetworkState(final String networkId, final Network.State... expectedStates)
+            throws ConnectorException {
+            int tries = 1 + MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS / 1000;
             while (tries-- > 0) {
                 Network.State networkState = this.getNetworkState(networkId);
                 for (Network.State expectedFinalState : expectedStates) {
@@ -993,9 +993,9 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             return null;
         }
 
-        private System.State waitForSystemState(final String systemId, final int seconds, final System.State... expectedStates)
+        private System.State waitForSystemState(final String systemId, final System.State... expectedStates)
             throws ConnectorException {
-            int tries = seconds;
+            int tries = 1 + MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_MILLISECONDS / 1000;
             while (tries-- > 0) {
                 System.State systemState = this.getSystemState(systemId);
                 for (System.State expectedFinalState : expectedStates) {
@@ -1058,8 +1058,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                         vc.setProperties(cd.getProperties());
 
                         Volume vol = this.createVolume(vc);
-                        this.waitForVolumeState(vol.getProviderAssignedId(),
-                            MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Volume.State.AVAILABLE);
+                        this.waitForVolumeState(vol.getProviderAssignedId(), Volume.State.AVAILABLE);
                         SystemVolume sv = new SystemVolume();
                         sv.setState(SystemVolume.State.AVAILABLE);
                         sv.setResource(vol);
@@ -1083,9 +1082,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                         nc.setProperties(cd.getProperties());
 
                         Network net = this.createNetwork(nc);
-                        this.waitForNetworkState(net.getProviderAssignedId(),
-                            MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Network.State.STARTED,
-                            Network.State.STOPPED);
+                        this.waitForNetworkState(net.getProviderAssignedId(), Network.State.STARTED, Network.State.STOPPED);
                         net.setState(Network.State.STOPPED);
                         SystemNetwork sn = new SystemNetwork();
                         sn.setState(SystemNetwork.State.AVAILABLE);
@@ -1162,9 +1159,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                         mc.setProperties(cd.getProperties());
 
                         Machine machine = this.createMachine(mc);
-                        this.waitForMachineState(machine.getProviderAssignedId(),
-                            MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Machine.State.STARTED,
-                            Machine.State.STOPPED);
+                        this.waitForMachineState(machine.getProviderAssignedId(), Machine.State.STARTED, Machine.State.STOPPED);
                         // attach volumes
                         if (mt.getVolumes() != null) {
                             for (MachineVolume machineVolume : mt.getVolumes()) {
@@ -1203,9 +1198,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                         sc.setProperties(cd.getProperties());
 
                         System subSystem = this.createSystem(sc);
-                        this.waitForSystemState(subSystem.getProviderAssignedId(),
-                            MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, System.State.STARTED,
-                            System.State.STOPPED);
+                        this.waitForSystemState(subSystem.getProviderAssignedId(), System.State.STARTED, System.State.STOPPED);
                         SystemSystem ss = new SystemSystem();
                         ss.setState(SystemSystem.State.AVAILABLE);
                         ss.setResource(subSystem);
@@ -1300,23 +1293,19 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 switch (action) {
                 case START:
                     this.startMachine(providerId);
-                    this.waitForMachineState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Machine.State.STARTED);
+                    this.waitForMachineState(providerId, Machine.State.STARTED);
                     break;
                 case STOP:
                     this.stopMachine(providerId, force);
-                    this.waitForMachineState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Machine.State.STOPPED);
+                    this.waitForMachineState(providerId, Machine.State.STOPPED);
                     break;
                 case SUSPEND:
                     this.suspendMachine(providerId);
-                    this.waitForMachineState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Machine.State.SUSPENDED);
+                    this.waitForMachineState(providerId, Machine.State.SUSPENDED);
                     break;
                 case PAUSE:
                     this.pauseMachine(providerId);
-                    this.waitForMachineState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Machine.State.PAUSED);
+                    this.waitForMachineState(providerId, Machine.State.PAUSED);
                     break;
                 case RESTART:
                     this.restartMachine(providerId, force);
@@ -1326,23 +1315,19 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 switch (action) {
                 case START:
                     this.startSystem(providerId, properties);
-                    this.waitForSystemState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, System.State.STARTED);
+                    this.waitForSystemState(providerId, System.State.STARTED);
                     break;
                 case STOP:
                     this.stopSystem(providerId, force, properties);
-                    this.waitForSystemState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, System.State.STOPPED);
+                    this.waitForSystemState(providerId, System.State.STOPPED);
                     break;
                 case SUSPEND:
                     this.suspendSystem(providerId, properties);
-                    this.waitForSystemState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, System.State.SUSPENDED);
+                    this.waitForSystemState(providerId, System.State.SUSPENDED);
                     break;
                 case PAUSE:
                     this.pauseSystem(providerId, properties);
-                    this.waitForSystemState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, System.State.PAUSED);
+                    this.waitForSystemState(providerId, System.State.PAUSED);
                     break;
                 case RESTART:
                     this.restartSystem(providerId, force, properties);
@@ -1352,13 +1337,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 switch (action) {
                 case START:
                     this.startNetwork(providerId);
-                    this.waitForNetworkState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Network.State.STARTED);
+                    this.waitForNetworkState(providerId, Network.State.STARTED);
                     break;
                 case STOP:
                     this.stopNetwork(providerId);
-                    this.waitForNetworkState(providerId,
-                        MockCloudProviderConnector.ENTITY_LIFECYCLE_OPERATION_TIME_IN_SECONDS * 2, Network.State.STOPPED);
+                    this.waitForNetworkState(providerId, Network.State.STOPPED);
                     break;
                 }
             }
