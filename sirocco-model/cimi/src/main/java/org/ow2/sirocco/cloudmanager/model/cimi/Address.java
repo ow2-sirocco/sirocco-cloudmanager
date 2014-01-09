@@ -30,6 +30,8 @@ import java.util.Set;
 
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
@@ -37,13 +39,27 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+
 /**
  * IP address
  */
 @Entity
-@NamedQueries({@NamedQuery(name = "Address.findByUuid", query = "SELECT a from Address a WHERE a.uuid=:uuid")})
-public class Address extends CloudEntity implements Serializable {
+@NamedQueries({@NamedQuery(name = "Address.findByUuid", query = "SELECT a from Address a WHERE a.uuid=:uuid"),
+    @NamedQuery(name = "Address.findByIp", query = "SELECT a from Address a WHERE a.ip=:ip AND a.tenant=:tenant")})
+public class Address extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
+
+    public static enum State {
+        CREATED, DELETED, ERROR
+    }
+
+    private State state;
+
+    private CloudProviderAccount cloudProviderAccount;
+
+    private CloudProviderLocation location;
 
     private String ip;
 
@@ -63,12 +79,49 @@ public class Address extends CloudEntity implements Serializable {
 
     private CloudResource resource;
 
+    private String internalIp;
+
+    @Enumerated(EnumType.STRING)
+    public State getState() {
+        return this.state;
+    }
+
+    public void setState(final State state) {
+        this.state = state;
+    }
+
+    @ManyToOne
+    public CloudProviderAccount getCloudProviderAccount() {
+        return this.cloudProviderAccount;
+    }
+
+    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
+        this.cloudProviderAccount = cloudProviderAccount;
+    }
+
+    @ManyToOne
+    public CloudProviderLocation getLocation() {
+        return this.location;
+    }
+
+    public void setLocation(final CloudProviderLocation location) {
+        this.location = location;
+    }
+
     public String getIp() {
         return this.ip;
     }
 
     public void setIp(final String ip) {
         this.ip = ip;
+    }
+
+    public String getInternalIp() {
+        return this.internalIp;
+    }
+
+    public void setInternalIp(final String internalIp) {
+        this.internalIp = internalIp;
     }
 
     public String getHostName() {
