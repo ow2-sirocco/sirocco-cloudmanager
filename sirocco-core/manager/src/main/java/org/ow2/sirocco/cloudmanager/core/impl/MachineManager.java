@@ -1172,8 +1172,10 @@ public class MachineManager implements IMachineManager {
                     Network net = this.networkManager.getNetworkByProviderAssignedId(nic.getNetwork().getProviderAssignedId());
                     if (net != null) {
                         nic.setNetwork(net);
+                        MachineManager.logger.info("Adding NIC to machine " + persisted.getName() + " connected to Network "
+                            + net.getName());
                     } else {
-                        MachineManager.logger.error("Unknown network with provider-assigned id "
+                        MachineManager.logger.error("Adding NIC connected to unknown network with provider-assigned id "
                             + nic.getNetwork().getProviderAssignedId());
                         nic.setNetwork(null);
                     }
@@ -1188,6 +1190,8 @@ public class MachineManager implements IMachineManager {
             if (entries != null) {
                 for (MachineNetworkInterfaceAddress entry : entries) {
                     if (entry.getAddress() != null) {
+                        MachineManager.logger.info("Adding IP address " + entry.getAddress().getIp() + " to Machine "
+                            + persisted.getName());
                         entry.getAddress().setNetwork(null);
                         entry.getAddress().setResource(null);
                     }
