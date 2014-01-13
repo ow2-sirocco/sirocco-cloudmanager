@@ -384,9 +384,11 @@ public interface INetworkManager {
     SecurityGroupRule addRuleToSecurityGroupUsingSourceGroup(String securityGroupUuid, String sourceGroupUuid,
         String ipProtocol, int fromPort, int toPort) throws CloudProviderException;
 
-    void deleteRuleFromSecurityGroup(String securityGroupUuid, String ruleUuid) throws CloudProviderException;
+    void deleteRuleFromSecurityGroup(String ruleUuid) throws CloudProviderException;
 
     SecurityGroup getSecurityGroupByUuid(String groupUuid) throws ResourceNotFoundException;
+
+    SecurityGroupRule getSecurityGroupRuleByUuid(String ruleUuid) throws ResourceNotFoundException;
 
     SecurityGroup getSecurityGroupById(int groupId) throws ResourceNotFoundException;
 

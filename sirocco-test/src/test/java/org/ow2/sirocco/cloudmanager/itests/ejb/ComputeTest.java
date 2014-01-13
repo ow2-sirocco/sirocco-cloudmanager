@@ -504,6 +504,12 @@ public class ComputeTest extends AbstractTestBase {
         Assert.assertTrue(ComputeTest.RULE_FROM_PORT == rule.getFromPort());
         Assert.assertTrue(ComputeTest.RULE_TO_PORT == rule.getToPort());
 
+        SecurityGroupRule rule2 = this.networkManager.getSecurityGroupRuleByUuid(rule.getUuid());
+        Assert.assertEquals(ComputeTest.RULE0_CIDR, rule2.getSourceIpRange());
+        Assert.assertEquals(ComputeTest.RULE_PROTOCOL, rule2.getIpProtocol());
+        Assert.assertTrue(ComputeTest.RULE_FROM_PORT == rule2.getFromPort());
+        Assert.assertTrue(ComputeTest.RULE_TO_PORT == rule2.getToPort());
+
         secGroup0 = this.networkManager.getSecurityGroupByUuid(secGroup0.getUuid());
         Assert.assertEquals(1, secGroup0.getRules().size());
         Assert.assertEquals(secGroup0.getRules().get(0).getUuid(), rule.getUuid());
@@ -570,7 +576,7 @@ public class ComputeTest extends AbstractTestBase {
 
         // delete rule for sec group 0
 
-        this.networkManager.deleteRuleFromSecurityGroup(secGroup0.getUuid(), rule.getUuid());
+        this.networkManager.deleteRuleFromSecurityGroup(rule.getUuid());
 
         secGroup0 = this.networkManager.getSecurityGroupByUuid(secGroup0.getUuid());
         Assert.assertTrue(secGroup0.getRules().isEmpty());

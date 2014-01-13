@@ -1682,16 +1682,19 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public void deleteRuleFromSecurityGroup(final String securityGroupUuid, final String ruleUuid)
-        throws CloudProviderException {
-        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
-        SecurityGroupRule rule;
+    public SecurityGroupRule getSecurityGroupRuleByUuid(final String ruleUuid) throws ResourceNotFoundException {
         try {
-            rule = this.em.createNamedQuery("SecurityGroupRule.findByUuid", SecurityGroupRule.class)
+            return this.em.createNamedQuery("SecurityGroupRule.findByUuid", SecurityGroupRule.class)
                 .setParameter("uuid", ruleUuid).getSingleResult();
         } catch (NoResultException e) {
             throw new ResourceNotFoundException();
         }
+    }
+
+    @Override
+    public void deleteRuleFromSecurityGroup(final String ruleUuid) throws CloudProviderException {
+        SecurityGroupRule rule = this.getSecurityGroupRuleByUuid(ruleUuid);
+        SecurityGroup secGroup = rule.getParentGroup();
         ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(secGroup.getCloudProviderAccount()
             .getCloudProvider().getCloudProviderType());
 
