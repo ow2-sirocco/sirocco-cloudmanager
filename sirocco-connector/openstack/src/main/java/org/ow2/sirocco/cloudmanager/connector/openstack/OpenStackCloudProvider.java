@@ -410,7 +410,7 @@ public class OpenStackCloudProvider {
 
     public void restartMachine(final String machineId, final boolean force) throws ConnectorException {
         this.novaClient.servers().reboot(machineId, force ? "HARD" : "SOFT").execute();
-        /*TODO when supported by woorea (RebootAction, RebootType)*/
+        /*TODO Pull4Request: woorea support of reboot */
         // throw new ConnectorException("unsupported operation");
     }
 
@@ -426,12 +426,24 @@ public class OpenStackCloudProvider {
         this.novaClient.servers().detachVolume(machineId, machineVolume.getProviderAssignedId()).execute();
     }
 
+    public void startMachine(final String machineId) throws ConnectorException {
+        this.novaClient.servers().start(machineId).execute();
+    }
+
+    public void stopMachine(final String machineId, final boolean force) throws ConnectorException {
+        /* The param force is ignored  
+         * 
+         * When set to "true", the Provider should forcefully stop the Machine, as opposed to a value of "false," 
+         * which indicates that the Provider should attempt to gracefully stop the Machine
+         * */
+        this.novaClient.servers().stop(machineId).execute();
+    }
+
     private void addAddress(final Address address, final Network cimiNetwork, final MachineNetworkInterface nic) {
         org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
         cimiAddress.setIp(address.getAddr());
         cimiAddress.setAllocation("dynamic"); /* static! */
-        if (address.getVersion().equalsIgnoreCase("4")) { // cimi mapping
-                                                          // 4/IPv4!
+        if (address.getVersion().equalsIgnoreCase("4")) { /* cimi mapping 4/IPv4! */
             cimiAddress.setProtocol("IPv4");
         } else if (address.getVersion().equalsIgnoreCase("6")) {
             cimiAddress.setProtocol("IPv6");

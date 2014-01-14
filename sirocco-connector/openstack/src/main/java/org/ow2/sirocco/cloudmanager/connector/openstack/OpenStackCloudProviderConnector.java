@@ -266,13 +266,29 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public void startMachine(final String machineId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
-        throw new ConnectorException("unsupported operation");
+        try {
+            this.getProvider(target).startMachine(machineId);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
     }
 
     @Override
     public void stopMachine(final String machineId, final boolean force, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
-        throw new ConnectorException("unsupported operation");
+        try {
+            this.getProvider(target).stopMachine(machineId, force);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
     }
 
     @Override
