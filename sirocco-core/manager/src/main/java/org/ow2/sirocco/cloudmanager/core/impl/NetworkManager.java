@@ -970,7 +970,20 @@ public class NetworkManager implements INetworkManager {
     @Override
     public Job createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws InvalidRequestException,
         CloudProviderException {
-        NetworkManager.logger.info("Creating ForwardingGroup");
+        NetworkManager.logger.info("Creating ForwardingGroup with following networks");
+
+        List<Network> networks2 = new ArrayList<>();
+        if (forwardingGroupCreate.getForwardingGroupTemplate().getNetworks() != null) {
+            for (Network net : forwardingGroupCreate.getForwardingGroupTemplate().getNetworks()) {
+                NetworkManager.logger.info("net uuid=" + net.getUuid() + " name=" + net.getName());
+                Network net2 = this.getNetworkByUuid(net.getUuid());
+                networks2.add(net2);
+                NetworkManager.logger.info("\tnetwork " + net2.getName() + " provider-id=" + net2.getProviderAssignedId());
+            }
+        }
+
+        forwardingGroupCreate.getForwardingGroupTemplate().setNetworks(networks2);
+
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), forwardingGroupCreate);
@@ -982,8 +995,9 @@ public class NetworkManager implements INetworkManager {
                 + placement.getAccount().getCloudProvider().getCloudProviderType());
         }
 
+        ForwardingGroup providerFG;
         try {
-            connector.getNetworkService().createForwardingGroup(forwardingGroupCreate,
+            providerFG = connector.getNetworkService().createForwardingGroup(forwardingGroupCreate,
                 new ProviderTarget().account(placement.getAccount()).location(placement.getLocation()));
         } catch (ConnectorException e) {
             throw new CloudProviderException("Failed to create ForwardingGroup", e);
@@ -992,6 +1006,7 @@ public class NetworkManager implements INetworkManager {
         // prepare the ForwardingGroup entity to be persisted
 
         ForwardingGroup forwardingGroup = new ForwardingGroup();
+        forwardingGroup.setProviderAssignedId(providerFG.getProviderAssignedId());
         forwardingGroup.setName(forwardingGroupCreate.getName());
         forwardingGroup.setDescription(forwardingGroupCreate.getDescription());
         forwardingGroup.setProperties(forwardingGroupCreate.getProperties() == null ? new HashMap<String, String>()
@@ -1112,6 +1127,8 @@ public class NetworkManager implements INetworkManager {
                     forwardingGroup,
                     new ProviderTarget().account(forwardingGroup.getCloudProviderAccount()).location(
                         forwardingGroup.getLocation()));
+        } catch (org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException e) {
+            // ignore
         } catch (ConnectorException e) {
             throw new CloudProviderException("Failed to create ForwardingGroup", e);
         }
