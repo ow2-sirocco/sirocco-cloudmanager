@@ -1728,7 +1728,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             forwardingGroup.setProviderAssignedId(forwardingGroupProviderAssignedId);
             forwardingGroup.setNetworks(new ArrayList<ForwardingGroupNetwork>());
             this.forwardingGroups.put(forwardingGroupProviderAssignedId, forwardingGroup);
-            forwardingGroup.setState(ForwardingGroup.State.CREATING);
+            forwardingGroup.setState(ForwardingGroup.State.AVAILABLE);
             forwardingGroup.setNetworks(networksToAdd);
             forwardingGroup.setUpdated(new Date());
             return forwardingGroup;
