@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.core.impl;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -298,7 +299,7 @@ public class MachineImageManager implements IMachineImageManager {
             image.setDescription((String) attributes.get("description"));
         }
         if (attributes.containsKey("properties")) {
-            image.setProperties((Map<String, String>) attributes.get("properties"));
+            image.setProperties(new HashMap<String, String>((Map<String, String>) attributes.get("properties")));
         }
         if (attributes.containsKey("imageLocation")) {
             image.setImageLocation((String) attributes.get("imageLocation"));

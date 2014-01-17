@@ -627,7 +627,7 @@ public class MachineManager implements IMachineManager {
         }
 
         if (attributes.containsKey("properties")) {
-            m.setProperties((Map<String, String>) attributes.get("properties"));
+            m.setProperties(new HashMap<String, String>((Map<String, String>) attributes.get("properties")));
         }
         m.setUpdated(new Date());
 
