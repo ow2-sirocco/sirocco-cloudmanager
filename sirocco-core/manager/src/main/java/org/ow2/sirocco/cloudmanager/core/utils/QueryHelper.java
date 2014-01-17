@@ -150,12 +150,14 @@ public class QueryHelper {
         }
 
         public QueryParamsBuilder params(final QueryParams queryParams) {
-            this.first = queryParams.getFirst();
-            this.last = queryParams.getLast();
-            this.filters = queryParams.getFilters();
-            this.attributes = queryParams.getAttributes();
-            this.marker = queryParams.getMarker();
-            this.limit = queryParams.getLimit();
+            if (queryParams != null) {
+                this.first = queryParams.getFirst();
+                this.last = queryParams.getLast();
+                this.filters = queryParams.getFilters();
+                this.attributes = queryParams.getAttributes();
+                this.marker = queryParams.getMarker();
+                this.limit = queryParams.getLimit();
+            }
             return this;
         }
 
