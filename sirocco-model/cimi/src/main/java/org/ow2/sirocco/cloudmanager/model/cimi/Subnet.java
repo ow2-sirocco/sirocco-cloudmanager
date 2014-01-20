@@ -33,6 +33,8 @@ import javax.persistence.Embeddable;
 public class Subnet implements Serializable {
     private static final long serialVersionUID = 1L;
 
+    private String uuid;
+
     private String name;
 
     private String providerAssignedId;
@@ -42,6 +44,14 @@ public class Subnet implements Serializable {
     private String protocol = "IPv4";
 
     private boolean enableDhcp = true;
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(final String uuid) {
+        this.uuid = uuid;
+    }
 
     public String getName() {
         return this.name;
