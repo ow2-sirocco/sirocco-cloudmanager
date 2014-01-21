@@ -59,6 +59,8 @@ public interface ICredentialsManager {
     void updateCredentialsAttributes(String credentialsId, Map<String, Object> attributes) throws ResourceNotFoundException,
         InvalidRequestException, CloudProviderException;
 
+    QueryResult<Credentials> getCredentials(QueryParams... queryParams) throws InvalidRequestException, CloudProviderException;
+
     QueryResult<Credentials> getCredentials(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 

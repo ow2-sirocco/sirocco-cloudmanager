@@ -43,6 +43,7 @@ import javax.persistence.PersistenceContextType;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
 import org.ow2.sirocco.cloudmanager.core.api.ITenantManager;
 import org.ow2.sirocco.cloudmanager.core.api.IdentityContext;
+import org.ow2.sirocco.cloudmanager.core.api.QueryParams;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
 import org.ow2.sirocco.cloudmanager.core.api.exception.CloudProviderException;
 import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
@@ -191,6 +192,18 @@ public class CredentialsManager implements ICredentialsManager {
     public List<Credentials> getCredentials() throws CloudProviderException {
         return this.em.createQuery("SELECT c FROM Credentials c WHERE c.tenant.id=:tenantId", Credentials.class)
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
+    }
+
+    @Override
+    public QueryResult<Credentials> getCredentials(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<Credentials> creds = this.getCredentials();
+            return new QueryResult<Credentials>(creds.size(), creds);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Credentials", Credentials.class)
+            .tenantId(this.getTenant().getId()).params(queryParams[0]);
+        return QueryHelper.getEntityList(this.em, params);
     }
 
     @Override
