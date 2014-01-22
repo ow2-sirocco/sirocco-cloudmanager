@@ -213,22 +213,25 @@ public class OpenStackCloudProvider {
 
     /* proposed mapping: see http://docs.openstack.org/api/openstack-compute/2/content/List_Servers-d1e2078.html */
     public Machine.State fromServerStatusToMachineState(final String novaStatus) {
-        if (novaStatus.equalsIgnoreCase("ACTIVE")) {
+        if (novaStatus.equalsIgnoreCase("ACTIVE") || novaStatus.equalsIgnoreCase("PASSWORD")
+            || novaStatus.equalsIgnoreCase("REBUILD") || novaStatus.equalsIgnoreCase("MIGRATING")
+            || novaStatus.equalsIgnoreCase("RESIZE") || novaStatus.equalsIgnoreCase("REBOOT")
+            || novaStatus.equalsIgnoreCase("HARD_REBOOT")) {
             return Machine.State.STARTED;
         } else if (novaStatus.equalsIgnoreCase("BUILD")) {
             return Machine.State.CREATING;
         } else if (novaStatus.equalsIgnoreCase("DELETED")) {
             return Machine.State.DELETED;
-        } else if (novaStatus.equalsIgnoreCase("HARD_REBOOT")) {
-            return Machine.State.STARTED;
-        } else if (novaStatus.equalsIgnoreCase("PASSWORD")) {
-            return Machine.State.STARTED;
-        } else if (novaStatus.equalsIgnoreCase("REBOOT")) {
-            return Machine.State.STARTED;
         } else if (novaStatus.equalsIgnoreCase("SUSPENDED")) {
+            return Machine.State.SUSPENDED;
+        } else if (novaStatus.equalsIgnoreCase("PAUSED")) {
+            return Machine.State.PAUSED;
+        } else if (novaStatus.equalsIgnoreCase("SHUTOFF")) {
             return Machine.State.STOPPED;
+        } else if (novaStatus.equalsIgnoreCase("ERROR")) {
+            return Machine.State.ERROR;
         } else {
-            return Machine.State.ERROR; // CIMI mapping!
+            return Machine.State.UNKNOWN;
         }
     }
 
