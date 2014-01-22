@@ -36,6 +36,8 @@ import java.util.concurrent.TimeoutException;
 import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
+import org.apache.commons.net.util.SubnetUtils;
+import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
@@ -51,6 +53,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineNetworkInterfaceAddress;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -1071,7 +1074,7 @@ public class VcdCloudProvider {
                     "validation error on field 'Network componentDescriptor.networkTemplate.networkConfiguration.networkType': should be equal to Private");
             }
             VAppNetworkConfigurationType private_vAppNetworkConfigurationType = this
-                .createIsolatedVAppNetworkConfigurationType(ncd.getName());
+                .createIsolatedVAppNetworkConfigurationType(ncd.getName(), nt.getNetworkConfig());
             // fill in the NetworkConfigSection
             vAppNetworkConfigs.add(private_vAppNetworkConfigurationType);
         }
@@ -1098,7 +1101,8 @@ public class VcdCloudProvider {
         return vAppNetworkConfigurationType;
     }
 
-    VAppNetworkConfigurationType createIsolatedVAppNetworkConfigurationType(final String networkName) {
+    VAppNetworkConfigurationType createIsolatedVAppNetworkConfigurationType(final String networkName,
+        final NetworkConfiguration networkConfiguration) throws ConnectorException {
         VAppNetworkConfigurationType private_vAppNetworkConfigurationType = new VAppNetworkConfigurationType();
         NetworkConfigurationType private_networkConfigurationType = new NetworkConfigurationType();
         VcdCloudProvider.logger.info("vAppNetworkConfiguration Isolated:" + networkName);
@@ -1107,17 +1111,31 @@ public class VcdCloudProvider {
         private_networkConfigurationType.setFenceMode(FenceModeValuesType.ISOLATED.value());
         private_networkConfigurationType.setRetainNetInfoAcrossDeployments(true);
 
-        // Configure Internal IP Settings (XXX static config?)
+        // Configure Internal IP Settings
+        if (networkConfiguration.getSubnets().size() != 1) {
+            throw new ConnectorException("validation error on field 'networkConfiguration.subnets.size': should be equal to 1");
+        }
+        SubnetUtils utils = new SubnetUtils(networkConfiguration.getSubnets().get(0).getCidr());
+        utils.setInclusiveHostCount(false);
+        SubnetInfo info = utils.getInfo();
+        if (info.getAddressCount() < 2) { /* gateway @ + IP range @ >= 2 */
+            throw new ConnectorException("no usable addresses");
+        }
+
         IpScopeType ipScope = new IpScopeType();
-        ipScope.setNetmask("255.255.255.0");
-        ipScope.setGateway("192.168.2.1");
+        /*ipScope.setNetmask("255.255.255.0");
+        ipScope.setGateway("192.168.2.1");*/
+        ipScope.setNetmask(info.getNetmask());
+        ipScope.setGateway(info.getLowAddress());
         ipScope.setIsEnabled(true);
         ipScope.setIsInherited(false); // ???
 
         IpRangesType ipRangesType = new IpRangesType();
         IpRangeType ipRangeType = new IpRangeType();
-        ipRangeType.setStartAddress("192.168.2.100");
-        ipRangeType.setEndAddress("192.168.2.199");
+        /*ipRangeType.setStartAddress("192.168.2.100");
+        ipRangeType.setEndAddress("192.168.2.199");*/
+        ipRangeType.setStartAddress(info.getAllAddresses()[1]);
+        ipRangeType.setEndAddress(info.getHighAddress());
 
         ipRangesType.getIpRange().add(ipRangeType);
 
