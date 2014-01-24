@@ -164,11 +164,16 @@ public class OpenStackCloudProvider {
         this.novaClient = new Nova(KeystoneUtils.findEndpointURL(access.getServiceCatalog(), "compute", null, "public"));
         this.novaClient.token(access.getToken().getId());
 
-        /*this.quantum = new Quantum(KeystoneUtils.findEndpointURL(access.getServiceCatalog(), "network", null, "public"));*/
-        this.quantum = new Quantum(KeystoneUtils.findEndpointURL(access.getServiceCatalog(), "network", null, "public").concat(
-            "v2.0/"));
-        this.quantum.setTokenProvider(new OpenStackSimpleTokenProvider(access.getToken().getId()));
-        // this.quantum.token(access.getToken().getId());
+        try {
+            /*this.quantum = new Quantum(KeystoneUtils.findEndpointURL(access.getServiceCatalog(), "network", null, "public"));*/
+            this.quantum = new Quantum(KeystoneUtils.findEndpointURL(access.getServiceCatalog(), "network", null, "public")
+                .concat("v2.0/"));
+            this.quantum.setTokenProvider(new OpenStackSimpleTokenProvider(access.getToken().getId()));
+            // this.quantum.token(access.getToken().getId());
+        } catch (RuntimeException e) {
+            OpenStackCloudProvider.logger.info("### Quantum is not available in Service Catalog. Message=" + e.getMessage());
+            // throw new ConnectorException("message=" + e.getMessage(), e);
+        }
 
         // check how to trace REST call (On/Off)
         /*novaClient.enableLogging(Logger.getLogger("nova"), 100 * 1024);*/
@@ -267,7 +272,10 @@ public class OpenStackCloudProvider {
         machine.setNetworkInterfaces(nics);
         /*OpenStackCloudProvider.logger.info("-- " + server.getAddresses().getAddresses().keySet());*/
         for (String networkName : server.getAddresses().getAddresses().keySet()) {
-            Network cimiNetwork = this.getNetworkByName(networkName);
+            Network cimiNetwork = null;
+            if (this.quantum != null) {
+                cimiNetwork = this.getNetworkByName(networkName);
+            }
             // Nic
             MachineNetworkInterface machineNetworkInterface = new MachineNetworkInterface();
             // machineNetworkInterface.setName(networkName);
