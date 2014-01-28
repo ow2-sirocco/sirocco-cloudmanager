@@ -133,7 +133,7 @@ public class AbstractTestBase {
             }
             Thread.sleep(1000);
             if (counter-- == 0) {
-                throw new Exception("Machine operation time out");
+                throw new Exception("Operation time out");
             }
         }
         return job.getState();
