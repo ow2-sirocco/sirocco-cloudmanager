@@ -56,6 +56,11 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
+import org.ow2.sirocco.cloudmanager.model.cimi.SubnetConfig;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
@@ -694,6 +699,85 @@ public class ComputeTest extends AbstractTestBase {
         result = this.networkManager.getAddresses();
         Assert.assertEquals(0, result.getCount());
         Assert.assertEquals(0, result.getItems().size());
+
+    }
+
+    private final String CIDR0 = "10.10.10.0/28";
+
+    @Test
+    public void testNetworksAndSubnets() throws Exception {
+        // create network
+        NetworkCreate networkCreate = new NetworkCreate();
+        networkCreate.setName("NET0");
+        networkCreate.setDescription("NET0 description");
+
+        NetworkTemplate template = new NetworkTemplate();
+        NetworkConfiguration config = new NetworkConfiguration();
+        SubnetConfig subnetConfig = new SubnetConfig();
+        subnetConfig.setCidr(this.CIDR0);
+        config.setSubnets(Collections.singletonList(subnetConfig));
+        template.setNetworkConfig(config);
+        networkCreate.setNetworkTemplate(template);
+
+        Job job = this.networkManager.createNetwork(networkCreate);
+        Network net = (Network) job.getTargetResource();
+        Assert.assertNotNull(net.getId());
+        Assert.assertNotNull(net.getUuid());
+        Assert.assertNotNull(net.getCreated());
+        Assert.assertNotNull(job.getId());
+        Assert.assertNotNull(job.getUuid());
+
+        Job.Status status = this.waitForJobCompletion(job);
+        Assert.assertEquals(Job.Status.SUCCESS, status);
+
+        // retrieve network
+        QueryResult<Network> nets = this.networkManager.getNetworks();
+        // another network has been imported from the mock provider
+        Assert.assertEquals(2, nets.getCount());
+        Assert.assertEquals(2, nets.getItems().size());
+
+        net = this.networkManager.getNetworkByUuid(net.getUuid());
+        Assert.assertEquals(Network.State.STARTED, net.getState());
+        Subnet subnet = net.getSubnets().get(0);
+        Assert.assertEquals(Subnet.State.AVAILABLE, subnet.getState());
+        Assert.assertEquals(this.CIDR0, subnet.getCidr());
+        Assert.assertNotNull(subnet.getCreated());
+        Assert.assertNotNull(subnet.getId());
+        Assert.assertNotNull(subnet.getUuid());
+
+        subnet = this.networkManager.getSubnetByUuid(subnet.getUuid());
+        Assert.assertEquals(this.CIDR0, subnet.getCidr());
+        QueryResult<Subnet> subnets = this.networkManager.getSubnets();
+        Assert.assertEquals(2, subnets.getCount());
+        Assert.assertEquals(2, subnets.getItems().size());
+
+        // delete network
+
+        job = this.networkManager.deleteNetwork(net.getUuid());
+        status = this.waitForJobCompletion(job);
+        Assert.assertEquals(Job.Status.SUCCESS, status);
+        try {
+            net = this.networkManager.getNetworkByUuid(net.getUuid());
+            Assert.assertTrue(net.getState() == Network.State.DELETED);
+            for (Subnet sn : net.getSubnets()) {
+                Assert.assertEquals(Subnet.State.DELETED, sn.getState());
+            }
+            Assert.assertNotNull(net.getDeleted());
+        } catch (ResourceNotFoundException e) {
+            // OK
+        }
+
+        // network subnet should be deleted
+
+        subnets = this.networkManager.getSubnets();
+        Assert.assertEquals(1, subnets.getCount());
+        Assert.assertEquals(1, subnets.getItems().size());
+
+        try {
+            this.networkManager.getSubnetByUuid(subnet.getUuid());
+        } catch (ResourceNotFoundException e) {
+            // OK
+        }
 
     }
 
