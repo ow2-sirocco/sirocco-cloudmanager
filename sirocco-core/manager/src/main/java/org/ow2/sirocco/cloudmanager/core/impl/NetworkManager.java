@@ -69,6 +69,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
@@ -170,7 +171,7 @@ public class NetworkManager implements INetworkManager {
         network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
         network.setNetworkType(networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType());
         network.setForwardingGroup(networkCreate.getNetworkTemplate().getForwardingGroup());
-        network.setSubnets(networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets());
+        // network.setSubnets(networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets());
 
         network.setState(Network.State.CREATING);
         network.setCreated(new Date());
@@ -201,14 +202,32 @@ public class NetworkManager implements INetworkManager {
     public void syncNetwork(final int networkId, final Network updatedNetwork, final int jobId) {
         Network network = this.em.find(Network.class, networkId);
         Job job = this.em.find(Job.class, jobId);
-        if (updatedNetwork == null) {
+
+        if (updatedNetwork == null || updatedNetwork.getState() == Network.State.DELETED) {
             network.setState(Network.State.DELETED);
         } else {
             network.setState(updatedNetwork.getState());
             network.setUpdated(new Date());
+            for (Subnet from : updatedNetwork.getSubnets()) {
+                Subnet subnet = new Subnet();
+                subnet.setCreated(new Date());
+                subnet.setUpdated(subnet.getCreated());
+                subnet.setTenant(network.getTenant());
+                subnet.setCloudProviderAccount(network.getCloudProviderAccount());
+                subnet.setLocation(network.getLocation());
+                subnet.setCidr(from.getCidr());
+                subnet.setEnableDhcp(from.isEnableDhcp());
+                subnet.setState(from.getState());
+                subnet.setOwner(network);
+                network.getSubnets().add(subnet);
+            }
         }
         if (network.getState() == Network.State.DELETED) {
             network.setDeleted(new Date());
+            for (Subnet subnet : network.getSubnets()) {
+                subnet.setState(Subnet.State.DELETED);
+                subnet.setDeleted(network.getDeleted());
+            }
         }
         this.fireResourceStateChangeEvent(network);
         job.setState(Job.Status.SUCCESS);
@@ -339,6 +358,41 @@ public class NetworkManager implements INetworkManager {
     @Override
     public Job deleteNetwork(final String networkId) throws ResourceNotFoundException, CloudProviderException {
         return this.performActionOnNetwork(networkId, "delete");
+    }
+
+    // Subnet operations
+
+    @Override
+    public QueryResult<Subnet> getSubnets(final QueryParams... queryParams) throws InvalidRequestException,
+        CloudProviderException {
+        if (queryParams.length == 0) {
+            List<Subnet> subnets = QueryHelper.getEntityList("Subnet", this.em, this.getTenant().getId(), Subnet.State.DELETED,
+                false);
+            return new QueryResult<Subnet>(subnets.size(), subnets);
+        }
+        QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Subnet", Subnet.class).params(
+            queryParams[0]);
+        return QueryHelper.getEntityList(this.em, params.tenantId(this.getTenant().getId())
+            .stateToIgnore(Network.State.DELETED));
+    }
+
+    @Override
+    public Subnet getSubnetById(final int subnetId) throws ResourceNotFoundException {
+        Subnet subnet = this.em.find(Subnet.class, subnetId);
+        if (subnet == null || subnet.getState() == Subnet.State.DELETED) {
+            throw new ResourceNotFoundException(" Invalid subnet id " + subnetId);
+        }
+        return subnet;
+    }
+
+    @Override
+    public Subnet getSubnetByUuid(final String subnetUuid) throws ResourceNotFoundException {
+        try {
+            return this.em.createNamedQuery("Subnet.findByUuid", Subnet.class).setParameter("uuid", subnetUuid)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            throw new ResourceNotFoundException();
+        }
     }
 
     @Override
@@ -497,6 +551,13 @@ public class NetworkManager implements INetworkManager {
                 .isEmpty()) {
                 throw new CloudProviderException("NetworkTemplate already exists with name " + networkTemplate.getName());
             }
+        }
+        if (!this.em.contains(networkTemplate.getNetworkConfig())) {
+            String configUuid = networkTemplate.getNetworkConfig().getUuid();
+            if (configUuid == null) {
+                throw new InvalidRequestException();
+            }
+            networkTemplate.setNetworkConfig(this.getNetworkConfigurationByUuid(configUuid));
         }
         networkTemplate.setTenant(tenant);
         networkTemplate.setCreated(new Date());

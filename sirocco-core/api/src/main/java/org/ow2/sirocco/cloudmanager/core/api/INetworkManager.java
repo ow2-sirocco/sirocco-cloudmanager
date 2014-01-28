@@ -49,6 +49,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
@@ -396,5 +397,13 @@ public interface INetworkManager {
         CloudProviderException;
 
     void updateSecurityGroupState(int securityGroupId, SecurityGroup.State state) throws CloudProviderException;
+
+    // Subnet operations
+
+    QueryResult<Subnet> getSubnets(QueryParams... queryParams) throws InvalidRequestException, CloudProviderException;
+
+    Subnet getSubnetById(int subnetId) throws ResourceNotFoundException;
+
+    Subnet getSubnetByUuid(String subnetUuid) throws ResourceNotFoundException;
 
 }

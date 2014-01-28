@@ -75,6 +75,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
+import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
+import org.ow2.sirocco.cloudmanager.model.cimi.SubnetConfig;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
@@ -98,6 +100,9 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
 
 public class MockCloudProviderConnector implements ICloudProviderConnector, IComputeService, ISystemService, IVolumeService,
     INetworkService, IImageService {
@@ -557,6 +562,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             publicNetwork.setProviderAssignedId("publicNetwork" + UUID.randomUUID().toString());
             publicNetwork.setCloudProviderAccount(this.cloudProviderAccount);
             publicNetwork.setLocation(this.cloudProviderLocation);
+            Subnet subnet = new Subnet();
+            subnet.setCidr("192.168.200.0/24");
+            subnet.setProviderAssignedId(UUID.randomUUID().toString());
+            subnet.setProtocol("IPv4");
+            subnet.setState(Subnet.State.AVAILABLE);
+            publicNetwork.setSubnets(Collections.singletonList(subnet));
             this.networks.put(publicNetwork.getProviderAssignedId(), publicNetwork);
             this.addressPool = new Address[MockProvider.ADDRESS_NUMBER];
             for (int address_suffix = 1; address_suffix <= MockProvider.ADDRESS_NUMBER; address_suffix++) {
@@ -655,7 +666,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     List<MachineNetworkInterfaceAddress> addrs = new ArrayList<MachineNetworkInterfaceAddress>();
                     MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
                     Address ip = new Address();
-                    ip.setIp("192.168.0." + this.random.nextInt(255));
+                    ip.setIp("192.168.200." + this.random.nextInt(253) + 2);
                     ip.setAllocation("dynamic");
                     ip.setProtocol("IPv4");
                     ip.setNetwork(networkInterface.getNetwork());
@@ -1532,12 +1543,26 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             volumeImage.setUpdated(new Date());
         }
 
+        private static class SubnetConfig2MockSubnet implements Function<SubnetConfig, Subnet> {
+            @Override
+            public Subnet apply(final SubnetConfig config) {
+                Subnet subnet = new Subnet();
+                subnet.setCidr(config.getCidr());
+                subnet.setProtocol(config.getProtocol());
+                subnet.setEnableDhcp(config.isEnableDhcp());
+                subnet.setState(Subnet.State.AVAILABLE);
+                subnet.setProviderAssignedId(UUID.randomUUID().toString());
+                return subnet;
+            }
+        }
+
         public Network createNetwork(final NetworkCreate networkCreate) throws ConnectorException {
             final String networkProviderAssignedId = UUID.randomUUID().toString();
             final Network network = new Network();
             network.setName(networkCreate.getName());
             network.setNetworkType(networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType());
-            network.setSubnets(networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets());
+            network.setSubnets(Lists.transform(networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets(),
+                new SubnetConfig2MockSubnet()));
             network.setClassOfService(networkCreate.getNetworkTemplate().getNetworkConfig().getClassOfService());
             network.setMtu(networkCreate.getNetworkTemplate().getNetworkConfig().getMtu());
             network.setProviderAssignedId(networkProviderAssignedId);

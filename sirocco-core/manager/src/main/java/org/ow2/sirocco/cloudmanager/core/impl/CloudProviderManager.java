@@ -62,6 +62,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.CloudEntityCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
+import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -251,6 +252,13 @@ public class CloudProviderManager implements ICloudProviderManager {
                         net.setCreated(new Date());
                         net.setCloudProviderAccount(account);
                         net.setLocation(location);
+                        for (Subnet subnet : net.getSubnets()) {
+                            subnet.setTenant(this.getTenant());
+                            subnet.setCreated(new Date());
+                            subnet.setCloudProviderAccount(account);
+                            subnet.setLocation(location);
+                            subnet.setOwner(net);
+                        }
                         this.em.persist(net);
                     }
                 } catch (Exception e) {

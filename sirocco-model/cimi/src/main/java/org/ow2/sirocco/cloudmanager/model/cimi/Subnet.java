@@ -24,20 +24,37 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
 
-import javax.persistence.Embeddable;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 
 /**
  * Subnet abstraction
  */
-@Embeddable
-public class Subnet implements Serializable {
+@Entity
+@NamedQueries({
+    @NamedQuery(name = "Subnet.findByProviderAssignedId", query = "SELECT s FROM Subnet s WHERE s.providerAssignedId=:providerAssignedId"),
+    @NamedQuery(name = "Subnet.findByUuid", query = "SELECT s from Subnet s WHERE s.uuid=:uuid")})
+public class Subnet extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String uuid;
+    public static enum State {
+        CREATING, AVAILABLE, DELETING, DELETED, ERROR
+    }
 
-    private String name;
+    private CloudProviderAccount cloudProviderAccount;
 
-    private String providerAssignedId;
+    private CloudProviderLocation location;
+
+    private State state;
+
+    private Network owner;
 
     private String cidr;
 
@@ -45,28 +62,40 @@ public class Subnet implements Serializable {
 
     private boolean enableDhcp = true;
 
-    public String getUuid() {
-        return this.uuid;
+    @ManyToOne
+    public CloudProviderAccount getCloudProviderAccount() {
+        return this.cloudProviderAccount;
     }
 
-    public void setUuid(final String uuid) {
-        this.uuid = uuid;
+    public void setCloudProviderAccount(final CloudProviderAccount cloudProviderAccount) {
+        this.cloudProviderAccount = cloudProviderAccount;
     }
 
-    public String getName() {
-        return this.name;
+    @ManyToOne
+    public CloudProviderLocation getLocation() {
+        return this.location;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setLocation(final CloudProviderLocation location) {
+        this.location = location;
     }
 
-    public String getProviderAssignedId() {
-        return this.providerAssignedId;
+    @Enumerated(EnumType.STRING)
+    public State getState() {
+        return this.state;
     }
 
-    public void setProviderAssignedId(final String providerAssignedId) {
-        this.providerAssignedId = providerAssignedId;
+    public void setState(final State state) {
+        this.state = state;
+    }
+
+    @ManyToOne
+    public Network getOwner() {
+        return this.owner;
+    }
+
+    public void setOwner(final Network owner) {
+        this.owner = owner;
     }
 
     public String getCidr() {

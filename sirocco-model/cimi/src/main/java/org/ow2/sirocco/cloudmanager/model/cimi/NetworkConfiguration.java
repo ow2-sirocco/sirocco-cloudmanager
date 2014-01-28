@@ -54,7 +54,7 @@ public class NetworkConfiguration extends CloudEntity implements Serializable {
 
     private Visibility visibility = Visibility.PRIVATE;
 
-    private List<Subnet> subnets;
+    private List<SubnetConfig> subnets;
 
     @Enumerated(EnumType.STRING)
     public Visibility getVisibility() {
@@ -91,11 +91,11 @@ public class NetworkConfiguration extends CloudEntity implements Serializable {
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
-    public List<Subnet> getSubnets() {
+    public List<SubnetConfig> getSubnets() {
         return this.subnets;
     }
 
-    public void setSubnets(final List<Subnet> subnets) {
+    public void setSubnets(final List<SubnetConfig> subnets) {
         this.subnets = subnets;
     }
 

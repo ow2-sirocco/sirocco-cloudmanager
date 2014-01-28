@@ -26,10 +26,10 @@
 package org.ow2.sirocco.cloudmanager.model.cimi;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import javax.persistence.ElementCollection;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -38,7 +38,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
@@ -79,19 +78,6 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
     private ForwardingGroup forwardingGroup;
 
     private List<Subnet> subnets;
-
-    @Override
-    @PrePersist
-    public void generateUuid() {
-        super.generateUuid();
-        if (this.subnets != null) {
-            for (Subnet subnet : this.subnets) {
-                if (subnet.getUuid() == null) {
-                    subnet.setUuid(UUID.randomUUID().toString());
-                }
-            }
-        }
-    }
 
     @Enumerated(EnumType.STRING)
     public State getState() {
@@ -163,8 +149,11 @@ public class Network extends CloudResource implements Serializable, ICloudProvid
         this.forwardingGroup = forwardingGroup;
     }
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "owner", cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     public List<Subnet> getSubnets() {
+        if (this.subnets == null) {
+            return new ArrayList<>();
+        }
         return this.subnets;
     }
 
