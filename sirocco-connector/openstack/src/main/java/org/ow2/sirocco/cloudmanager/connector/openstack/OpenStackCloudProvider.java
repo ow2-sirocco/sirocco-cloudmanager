@@ -53,6 +53,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
+import org.ow2.sirocco.cloudmanager.model.cimi.SubnetConfig;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
@@ -731,7 +732,7 @@ public class OpenStackCloudProvider {
 
     private void fromNovaNetworkToCimiNetwork(final String networkId, final Network cimiNetwork) throws ConnectorException {
         if (this.quantum == null) {
-            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+            throw new ConnectorException("Neutron is not available in the Service Catalog");
         }
 
         com.woorea.openstack.quantum.model.Network openStackNetwork = this.quantum.networks().show(networkId).execute();
@@ -756,6 +757,7 @@ public class OpenStackCloudProvider {
             subnet.setEnableDhcp(openStackSubnet.isEnableDHCP());
             subnet.setName(openStackSubnet.getName());
             subnet.setProviderAssignedId(openStackSubnet.getId());
+            subnet.setState(Subnet.State.AVAILABLE);
             if (openStackSubnet.getIpversion().toString().equalsIgnoreCase("4")) {
                 subnet.setProtocol("IPv4");
             } else if (openStackSubnet.getIpversion().toString().equalsIgnoreCase("6")) {
@@ -779,7 +781,7 @@ public class OpenStackCloudProvider {
 
     private Network getNetworkByName(final String networkName) throws ConnectorException {
         if (this.quantum == null) {
-            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+            throw new ConnectorException("Neutron is not available in the Service Catalog");
         }
 
         com.woorea.openstack.quantum.model.Networks openStackNetworks = this.quantum.networks().list().execute();
@@ -793,7 +795,7 @@ public class OpenStackCloudProvider {
 
     public Network createNetwork(final NetworkCreate networkCreate) throws ConnectorException, InterruptedException {
         if (this.quantum == null) {
-            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+            throw new ConnectorException("Neutron is not available in the Service Catalog");
         }
 
         OpenStackCloudProvider.logger.info("creating Network for " + this.cloudProviderAccount.getLogin());
@@ -826,18 +828,18 @@ public class OpenStackCloudProvider {
                 Thread.sleep(1000);
             } while (OpenStackCloudProvider.DEFAULT_RESOURCE_STATE_CHANGE_WAIT_TIME_IN_SECONDS-- > 0);
 
-            for (Subnet subnet : networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets()) {
+            for (SubnetConfig subnetConfig : networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets()) {
                 SubnetForCreate subnetForCreate = new SubnetForCreate();
-                subnetForCreate.setName(subnet.getName());
+                subnetForCreate.setName(subnetConfig.getName());
                 subnetForCreate.setNetworkId(openStackNetwork.getId());
-                subnetForCreate.setCidr(subnet.getCidr());
-                if (subnet.getProtocol().equalsIgnoreCase("IPv4")) {
+                subnetForCreate.setCidr(subnetConfig.getCidr());
+                if (subnetConfig.getProtocol().equalsIgnoreCase("IPv4")) {
                     subnetForCreate.setIpVersion(4);
-                } else if (subnet.getProtocol().equalsIgnoreCase("IPv6")) {
+                } else if (subnetConfig.getProtocol().equalsIgnoreCase("IPv6")) {
                     subnetForCreate.setIpVersion(6);
                 } else {
                     // subnetForCreate.setIpVersion(subnet.getProtocol());
-                    throw new ConnectorException("Invalid input for ip_version. Reason: " + subnet.getProtocol()
+                    throw new ConnectorException("Invalid input for ip_version. Reason: " + subnetConfig.getProtocol()
                         + " is not in [IPv4, IPv6].");
                 }
                 /* FIXME
@@ -865,7 +867,7 @@ public class OpenStackCloudProvider {
     private void cleanUpGhostNetwork(final com.woorea.openstack.quantum.model.Network openStackNetwork)
         throws ConnectorException {
         if (this.quantum == null) {
-            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+            throw new ConnectorException("Neutron is not available in the Service Catalog");
         }
 
         try {
@@ -878,7 +880,7 @@ public class OpenStackCloudProvider {
 
     public Network getNetwork(final String networkId) throws ConnectorException {
         if (this.quantum == null) {
-            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+            throw new ConnectorException("Neutron is not available in the Service Catalog");
         }
 
         final Network network = new Network();
@@ -888,7 +890,7 @@ public class OpenStackCloudProvider {
 
     public Network.State getNetworkState(final String networkId) throws ConnectorException {
         if (this.quantum == null) {
-            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+            throw new ConnectorException("Neutron is not available in the Service Catalog");
         }
 
         com.woorea.openstack.quantum.model.Network openStackNetwork = this.quantum.networks().show(networkId).execute();
@@ -897,7 +899,7 @@ public class OpenStackCloudProvider {
 
     public List<Network> getNetworks() throws ConnectorException {
         if (this.quantum == null) {
-            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+            throw new ConnectorException("Neutron is not available in the Service Catalog");
         }
 
         ArrayList<Network> networks = new ArrayList<Network>();
@@ -915,7 +917,7 @@ public class OpenStackCloudProvider {
 
     public void deleteNetwork(final String networkId) throws ConnectorException {
         if (this.quantum == null) {
-            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+            throw new ConnectorException("Neutron is not available in the Service Catalog");
         }
 
         /* FIXME woorea Bug : err 409 ignored when trying to delete a network attached to servers */
