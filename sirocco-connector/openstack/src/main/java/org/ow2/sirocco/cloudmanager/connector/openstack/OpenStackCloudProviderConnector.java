@@ -505,74 +505,63 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 
     @Override
     public String createSecurityGroup(final SecurityGroupCreate create, final ProviderTarget target) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public SecurityGroup getSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public List<SecurityGroup> getSecurityGroups(final ProviderTarget target) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public void deleteRuleFromSecurityGroup(final String groupId, final SecurityGroupRule rule, final ProviderTarget target)
         throws ConnectorException {
-        // TODO Auto-generated method stub
-
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public String addRuleToSecurityGroup(final String groupId, final SecurityGroupRule rule, final ProviderTarget target)
         throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public void deleteSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
-        // TODO Auto-generated method stub
-
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public Address allocateAddress(final Map<String, String> properties, final ProviderTarget target) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public void deleteAddress(final Address address, final ProviderTarget target) throws ConnectorException {
-        // TODO Auto-generated method stub
-
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public List<Address> getAddresses(final ProviderTarget target) throws ConnectorException {
-        // TODO Auto-generated method stub
-        return null;
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public void addAddressToMachine(final String machineId, final Address address, final ProviderTarget target)
         throws ConnectorException {
-        // TODO Auto-generated method stub
-
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public void removeAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
         throws ConnectorException {
-        // TODO Auto-generated method stub
-
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override
