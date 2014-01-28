@@ -171,7 +171,8 @@ public class OpenStackCloudProvider {
             this.quantum.setTokenProvider(new OpenStackSimpleTokenProvider(access.getToken().getId()));
             // this.quantum.token(access.getToken().getId());
         } catch (RuntimeException e) {
-            OpenStackCloudProvider.logger.info("### Quantum is not available in Service Catalog. Message=" + e.getMessage());
+            OpenStackCloudProvider.logger
+                .info("### Neutron is not available in the Service Catalog. Message=" + e.getMessage());
             // throw new ConnectorException("message=" + e.getMessage(), e);
         }
 
@@ -728,7 +729,11 @@ public class OpenStackCloudProvider {
         }
     }
 
-    private void fromNovaNetworkToCimiNetwork(final String networkId, final Network cimiNetwork) {
+    private void fromNovaNetworkToCimiNetwork(final String networkId, final Network cimiNetwork) throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         com.woorea.openstack.quantum.model.Network openStackNetwork = this.quantum.networks().show(networkId).execute();
 
         cimiNetwork.setName(openStackNetwork.getName());
@@ -773,6 +778,10 @@ public class OpenStackCloudProvider {
     }
 
     private Network getNetworkByName(final String networkName) throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         com.woorea.openstack.quantum.model.Networks openStackNetworks = this.quantum.networks().list().execute();
         for (com.woorea.openstack.quantum.model.Network openStackNetwork : openStackNetworks) {
             if (openStackNetwork.getName().equals(networkName)) {
@@ -783,6 +792,10 @@ public class OpenStackCloudProvider {
     }
 
     public Network createNetwork(final NetworkCreate networkCreate) throws ConnectorException, InterruptedException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         OpenStackCloudProvider.logger.info("creating Network for " + this.cloudProviderAccount.getLogin());
 
         if (networkCreate.getNetworkTemplate().getNetworkConfig().getSubnets().size() == 0) {
@@ -849,7 +862,12 @@ public class OpenStackCloudProvider {
         return cimiNetwork;
     }
 
-    private void cleanUpGhostNetwork(final com.woorea.openstack.quantum.model.Network openStackNetwork) {
+    private void cleanUpGhostNetwork(final com.woorea.openstack.quantum.model.Network openStackNetwork)
+        throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         try {
             if (openStackNetwork != null) {
                 this.deleteNetwork(openStackNetwork.getId());
@@ -858,18 +876,30 @@ public class OpenStackCloudProvider {
         }
     }
 
-    public Network getNetwork(final String networkId) {
+    public Network getNetwork(final String networkId) throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         final Network network = new Network();
         this.fromNovaNetworkToCimiNetwork(networkId, network);
         return network;
     }
 
-    public Network.State getNetworkState(final String networkId) {
+    public Network.State getNetworkState(final String networkId) throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         com.woorea.openstack.quantum.model.Network openStackNetwork = this.quantum.networks().show(networkId).execute();
         return this.fromNovaNetworkStatusToCimiNetworkState(openStackNetwork.getStatus());
     }
 
-    public List<Network> getNetworks() {
+    public List<Network> getNetworks() throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         ArrayList<Network> networks = new ArrayList<Network>();
 
         com.woorea.openstack.quantum.model.Networks openStackNetworks = this.quantum.networks().list().execute();
@@ -883,7 +913,11 @@ public class OpenStackCloudProvider {
         return networks;
     }
 
-    public void deleteNetwork(final String networkId) {
+    public void deleteNetwork(final String networkId) throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         /* FIXME woorea Bug : err 409 ignored when trying to delete a network attached to servers */
         this.quantum.networks().delete(networkId).execute();
     }
@@ -898,6 +932,10 @@ public class OpenStackCloudProvider {
      * - delete FG (list of ntwk) / Bagpipe API calls (ntwk.dissociate(vpnProfile)
      * */
     public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate) throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         OpenStackCloudProvider.logger.info("creating Fowarding Group for " + this.cloudProviderAccount.getLogin());
 
         ForwardingGroup forwardingGroup = new ForwardingGroup();
@@ -943,6 +981,10 @@ public class OpenStackCloudProvider {
     }
 
     public void deleteForwardingGroup(final ForwardingGroup forwardingGroup) throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("### Neutron is not available in the Service Catalog");
+        }
+
         OpenStackCloudProvider.logger.info("deleting Fowarding Group for " + this.cloudProviderAccount.getLogin());
 
         Iterator<ForwardingGroupNetwork> iterator = forwardingGroup.getNetworks().iterator();
