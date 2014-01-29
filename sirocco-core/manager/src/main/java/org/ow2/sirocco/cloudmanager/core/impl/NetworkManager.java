@@ -1386,7 +1386,7 @@ public class NetworkManager implements INetworkManager {
 
         try {
             INetworkService networkService = connector.getNetworkService();
-            networkService.deleteAddress(address,
+            networkService.deallocateAddress(address,
                 new ProviderTarget().account(address.getCloudProviderAccount()).location(address.getLocation()));
         } catch (ConnectorException e) {
             throw new CloudProviderException(e.getMessage());

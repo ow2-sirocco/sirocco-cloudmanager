@@ -252,7 +252,7 @@ public interface INetworkService {
 
     Address allocateAddress(Map<String, String> properties, ProviderTarget target) throws ConnectorException;
 
-    void deleteAddress(Address address, ProviderTarget target) throws ConnectorException;
+    void deallocateAddress(Address address, ProviderTarget target) throws ConnectorException;
 
     void addAddressToMachine(String machineId, Address address, ProviderTarget target) throws ConnectorException;
 
