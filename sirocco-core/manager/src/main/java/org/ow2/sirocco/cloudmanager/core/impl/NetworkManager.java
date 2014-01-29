@@ -60,7 +60,6 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Job;
 import org.ow2.sirocco.cloudmanager.model.cimi.Job.Status;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network.Type;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkNetworkPort;
@@ -145,8 +144,9 @@ public class NetworkManager implements INetworkManager {
     public Job createNetwork(final NetworkCreate networkCreate) throws InvalidRequestException, CloudProviderException {
         NetworkManager.logger.info("Creating Network");
 
-        if (networkCreate.getNetworkTemplate().getNetworkConfig().getNetworkType() == Type.PUBLIC) {
-            throw new InvalidRequestException("Cannot create public network");
+        if (networkCreate.getNetworkTemplate().getNetworkConfig().getUuid() != null) {
+            networkCreate.getNetworkTemplate().setNetworkConfig(
+                this.getNetworkConfigurationByUuid(networkCreate.getNetworkTemplate().getNetworkConfig().getUuid()));
         }
 
         // retrieve user
@@ -552,6 +552,8 @@ public class NetworkManager implements INetworkManager {
                 throw new CloudProviderException("NetworkTemplate already exists with name " + networkTemplate.getName());
             }
         }
+        NetworkManager.logger.info("NetworkConfig uuid=" + networkTemplate.getNetworkConfig().getUuid() + " id="
+            + networkTemplate.getNetworkConfig().getId());
         if (!this.em.contains(networkTemplate.getNetworkConfig())) {
             String configUuid = networkTemplate.getNetworkConfig().getUuid();
             if (configUuid == null) {

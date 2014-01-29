@@ -993,6 +993,13 @@ public class MachineManager implements IMachineManager {
             return;
         }
         for (MachineTemplateNetworkInterface nic : nics) {
+            if (nic.getNetwork() != null) {
+                String netUuid = nic.getNetwork().getUuid();
+                if (netUuid == null) {
+                    throw new InvalidRequestException();
+                }
+                nic.setNetwork(this.networkManager.getNetworkByUuid(netUuid));
+            }
             Set<Address> addresses = nic.getAddresses();
             if (addresses != null) {
                 for (Address addr : addresses) {
