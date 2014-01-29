@@ -87,6 +87,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineVolume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
@@ -1086,6 +1087,22 @@ public class SystemManager implements ISystemManager {
             sn.getNetwork().setLocation(location);
             // TODO: replace with dedicated method from related manager!
             Network network = sn.getNetwork();
+            List<Subnet> subnets = new ArrayList<>();
+            for (Subnet from : network.getSubnets()) {
+                Subnet subnet = new Subnet();
+                subnet.setProviderAssignedId(from.getProviderAssignedId());
+                subnet.setCidr(from.getCidr());
+                subnet.setEnableDhcp(from.isEnableDhcp());
+                subnet.setState(from.getState());
+                subnet.setCreated(new Date());
+                subnet.setUpdated(subnet.getCreated());
+                subnet.setTenant(network.getTenant());
+                subnet.setCloudProviderAccount(network.getCloudProviderAccount());
+                subnet.setLocation(network.getLocation());
+                subnet.setOwner(network);
+                subnets.add(subnet);
+            }
+            network.setSubnets(subnets);
             this.em.persist(network);
             networkMap.put(network.getProviderAssignedId(), network);
             this.updateCollectionFromProvider(sn, sn.getResource(), SystemNetwork.State.AVAILABLE);
