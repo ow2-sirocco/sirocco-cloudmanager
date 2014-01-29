@@ -389,7 +389,7 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
     }
 
     @Override
-    public void deleteAddress(final Address address, final ProviderTarget target) throws ConnectorException {
+    public void deallocateAddress(final Address address, final ProviderTarget target) throws ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
 
