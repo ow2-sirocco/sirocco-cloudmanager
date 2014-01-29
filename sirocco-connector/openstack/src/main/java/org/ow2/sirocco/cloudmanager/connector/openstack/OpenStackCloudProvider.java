@@ -36,6 +36,7 @@ import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroupCreate;
@@ -74,11 +75,12 @@ import com.woorea.openstack.nova.api.extensions.FloatingIpPoolsExtension;
 import com.woorea.openstack.nova.model.Flavor;
 import com.woorea.openstack.nova.model.FloatingIp;
 import com.woorea.openstack.nova.model.FloatingIpPools;
+import com.woorea.openstack.nova.model.FloatingIps;
 import com.woorea.openstack.nova.model.Image;
 import com.woorea.openstack.nova.model.Images;
 import com.woorea.openstack.nova.model.KeyPair;
 import com.woorea.openstack.nova.model.Server;
-import com.woorea.openstack.nova.model.Server.Addresses.Address;
+import com.woorea.openstack.nova.model.Server.Addresses;
 import com.woorea.openstack.nova.model.ServerForCreate;
 import com.woorea.openstack.nova.model.VolumeAttachment;
 import com.woorea.openstack.nova.model.VolumeAttachments;
@@ -285,8 +287,8 @@ public class OpenStackCloudProvider {
             machineNetworkInterface.setNetwork(cimiNetwork);
             machineNetworkInterface.setState(MachineNetworkInterface.InterfaceState.ACTIVE);
             // Addresses
-            Collection<Address> addresses = server.getAddresses().getAddresses().get(networkName);
-            Iterator<Address> iterator = addresses.iterator();
+            Collection<Addresses.Address> addresses = server.getAddresses().getAddresses().get(networkName);
+            Iterator<Addresses.Address> iterator = addresses.iterator();
             while (iterator.hasNext()) {
                 this.addAddress(iterator.next(), cimiNetwork, machineNetworkInterface);
             }
@@ -452,8 +454,8 @@ public class OpenStackCloudProvider {
         this.novaClient.servers().stop(machineId).execute();
     }
 
-    private void addAddress(final Address address, final Network cimiNetwork, final MachineNetworkInterface nic) {
-        org.ow2.sirocco.cloudmanager.model.cimi.Address cimiAddress = new org.ow2.sirocco.cloudmanager.model.cimi.Address();
+    private void addAddress(final Addresses.Address address, final Network cimiNetwork, final MachineNetworkInterface nic) {
+        Address cimiAddress = new Address();
         cimiAddress.setIp(address.getAddr());
         cimiAddress.setAllocation("dynamic"); /* static! */
         if (address.getVersion().equalsIgnoreCase("4")) { /* cimi mapping 4/IPv4! */
@@ -609,8 +611,8 @@ public class OpenStackCloudProvider {
 
     private boolean findIpAddressOnServer(final Server server, final String ip) {
         for (String networkType : server.getAddresses().getAddresses().keySet()) {
-            Collection<Address> addresses = server.getAddresses().getAddresses().get(networkType);
-            for (Address address : addresses) {
+            Collection<Addresses.Address> addresses = server.getAddresses().getAddresses().get(networkType);
+            for (Addresses.Address address : addresses) {
                 if (address.getAddr().equals(ip)) {
                     return true;
                 }
@@ -925,7 +927,42 @@ public class OpenStackCloudProvider {
     }
 
     //
-    // Forwarding group
+    // Network : Address
+    //
+
+    private void fromFloatingIpToCimiAddress(final FloatingIp floatingIp, final Address cimiAddress) throws ConnectorException {
+
+        cimiAddress.setProviderAssignedId(floatingIp.getId());
+        cimiAddress.setIp(floatingIp.getIp());
+        cimiAddress.setInternalIp(floatingIp.getFixedIp());
+        cimiAddress.setState(Address.State.CREATED);
+        if (floatingIp.getInstanceId() != null) {
+            Machine machine = new Machine();
+            machine.setProviderAssignedId(floatingIp.getInstanceId());
+            cimiAddress.setResource(machine);
+        }
+        cimiAddress.setAllocation("dynamic"); /* static! */
+        cimiAddress.setProtocol("IPv4"); /* static! */
+    }
+
+    public List<Address> getAddresses() throws ConnectorException {
+        if (this.quantum == null) {
+            throw new ConnectorException("Neutron is not available in the Service Catalog");
+        }
+
+        ArrayList<Address> addresses = new ArrayList<Address>();
+
+        FloatingIps floatingIps = this.novaClient.floatingIps().list().execute();
+        for (FloatingIp floatingIp : floatingIps) {
+            Address cimiAddress = new Address();
+            this.fromFloatingIpToCimiAddress(floatingIp, cimiAddress);
+            addresses.add(cimiAddress);
+        }
+        return addresses;
+    }
+
+    //
+    // Network : Forwarding group
     //
 
     /* FIXME 

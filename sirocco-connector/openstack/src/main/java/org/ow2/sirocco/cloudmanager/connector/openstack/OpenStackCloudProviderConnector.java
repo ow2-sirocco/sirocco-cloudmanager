@@ -454,6 +454,22 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
 
     @Override
+    public void startNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void stopNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    //
+    // Network : Forwarding Group
+    //
+
+    @Override
     public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate, final ProviderTarget target)
         throws ConnectorException {
         try {
@@ -491,17 +507,9 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
         throw new ConnectorException("unsupported operation");
     }
 
-    @Override
-    public void startNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
-        ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
-
-    @Override
-    public void stopNetwork(final String networkId, final ProviderTarget target) throws ResourceNotFoundException,
-        ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
+    //
+    // Network : Security Group
+    //
 
     @Override
     public String createSecurityGroup(final SecurityGroupCreate create, final ProviderTarget target) throws ConnectorException {
@@ -537,6 +545,10 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
         throw new ConnectorException("unsupported operation");
     }
 
+    //
+    // Network : Address
+    //
+
     @Override
     public Address allocateAddress(final Map<String, String> properties, final ProviderTarget target) throws ConnectorException {
         throw new ConnectorException("unsupported operation");
@@ -549,7 +561,12 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
 
     @Override
     public List<Address> getAddresses(final ProviderTarget target) throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
+        try {
+            return this.getProvider(target).getAddresses();
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+        }
+        // throw new ConnectorException("unsupported operation");
     }
 
     @Override
@@ -563,6 +580,10 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
         throws ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
+
+    //
+    // Network : Port
+    //
 
     @Override
     public NetworkPort createNetworkPort(final NetworkPortCreate networkPortCreate, final ProviderTarget target)
