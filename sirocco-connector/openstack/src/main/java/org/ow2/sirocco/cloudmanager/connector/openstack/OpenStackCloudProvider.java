@@ -447,24 +447,16 @@ public class OpenStackCloudProvider {
 
     public void stopMachine(final String machineId, final boolean force) throws ConnectorException {
         /* The param force is ignored  
-         * 
          * When set to "true", the Provider should forcefully stop the Machine, as opposed to a value of "false," 
          * which indicates that the Provider should attempt to gracefully stop the Machine
          * */
         this.novaClient.servers().stop(machineId).execute();
     }
 
-    private void addAddress(final Addresses.Address address, final Network cimiNetwork, final MachineNetworkInterface nic) {
+    private void addAddress(final Addresses.Address openStackAddress, final Network cimiNetwork,
+        final MachineNetworkInterface nic) {
         Address cimiAddress = new Address();
-        cimiAddress.setIp(address.getAddr());
-        cimiAddress.setAllocation("dynamic"); /* static! */
-        if (address.getVersion().equalsIgnoreCase("4")) { /* cimi mapping 4/IPv4! */
-            cimiAddress.setProtocol("IPv4");
-        } else if (address.getVersion().equalsIgnoreCase("6")) {
-            cimiAddress.setProtocol("IPv6");
-        } else {
-            cimiAddress.setProtocol(address.getVersion()); // default!
-        }
+        this.fromOpenStackAddressToCimiAddress(openStackAddress, cimiAddress); /* cimiAddress.setResource(machine)! */
         MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
         entry.setAddress(cimiAddress);
         nic.getAddresses().add(entry);
@@ -930,7 +922,7 @@ public class OpenStackCloudProvider {
     // Network : Address
     //
 
-    private void fromFloatingIpToCimiAddress(final FloatingIp floatingIp, final Address cimiAddress) throws ConnectorException {
+    private void fromFloatingIpToCimiAddress(final FloatingIp floatingIp, final Address cimiAddress) {
 
         cimiAddress.setProviderAssignedId(floatingIp.getId());
         cimiAddress.setIp(floatingIp.getIp());
@@ -945,11 +937,22 @@ public class OpenStackCloudProvider {
         cimiAddress.setProtocol("IPv4"); /* static! */
     }
 
-    public List<Address> getAddresses() throws ConnectorException {
-        if (this.quantum == null) {
-            throw new ConnectorException("Neutron is not available in the Service Catalog");
-        }
+    private void fromOpenStackAddressToCimiAddress(final Addresses.Address openStackAddress, final Address cimiAddress) {
 
+        /* TBC: ProviderAssignedId, InternalIp */
+        cimiAddress.setIp(openStackAddress.getAddr());
+        cimiAddress.setState(Address.State.CREATED);
+        cimiAddress.setAllocation("dynamic"); /* static! */
+        if (openStackAddress.getVersion().equalsIgnoreCase("4")) { /* cimi mapping 4/IPv4! */
+            cimiAddress.setProtocol("IPv4");
+        } else if (openStackAddress.getVersion().equalsIgnoreCase("6")) {
+            cimiAddress.setProtocol("IPv6");
+        } else {
+            cimiAddress.setProtocol(openStackAddress.getVersion()); // default!
+        }
+    }
+
+    public List<Address> getAddresses() throws ConnectorException {
         ArrayList<Address> addresses = new ArrayList<Address>();
 
         FloatingIps floatingIps = this.novaClient.floatingIps().list().execute();
@@ -959,6 +962,23 @@ public class OpenStackCloudProvider {
             addresses.add(cimiAddress);
         }
         return addresses;
+    }
+
+    public Address allocateAddress(final Map<String, String> properties) throws ConnectorException {
+        /* assumption: first FloatingIpPools is used to allocate floating IP (TBC if pool is optional) */
+        FloatingIpPoolsExtension floatingIpPoolsExtension = new FloatingIpPoolsExtension(this.novaClient);
+        FloatingIpPools pools = floatingIpPoolsExtension.list().execute();
+        FloatingIp floatingIp = this.novaClient.floatingIps().allocate(pools.getList().get(0).getName()).execute();
+        OpenStackCloudProvider.logger.info("Allocating floating IP " + floatingIp.getIp());
+
+        Address cimiAddress = new Address();
+        this.fromFloatingIpToCimiAddress(floatingIp, cimiAddress);
+        return cimiAddress;
+    }
+
+    public void deallocateAddress(final Address cimiAddress) throws ConnectorException {
+        OpenStackCloudProvider.logger.info("Deallocating floating IP " + cimiAddress.getIp());
+        this.novaClient.floatingIps().deallocate(cimiAddress.getProviderAssignedId()).execute();
     }
 
     //

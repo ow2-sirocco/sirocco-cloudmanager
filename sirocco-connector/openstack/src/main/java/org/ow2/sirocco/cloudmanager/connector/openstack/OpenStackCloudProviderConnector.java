@@ -114,14 +114,6 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
      * - woorea exception handling 
      * - availability_zone (API for zone) 
      * 
-     * Compute 
-     * - reboot: not supported by woorea 
-     * - CIMI address allocation mode : dynamic / fixed 
-     * - captureMachine 
-     * 
-     * Network 
-     * - createNetwork/deleteNetwork: woorea bugs : see fixme 
-     * - Forwarding groups / BagPipe
      */
 
     //
@@ -514,34 +506,40 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public String createSecurityGroup(final SecurityGroupCreate create, final ProviderTarget target) throws ConnectorException {
         throw new ConnectorException("unsupported operation");
+        // TODO
     }
 
     @Override
     public SecurityGroup getSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
+        // TODO
         throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public List<SecurityGroup> getSecurityGroups(final ProviderTarget target) throws ConnectorException {
+        // TODO
         throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public void deleteRuleFromSecurityGroup(final String groupId, final SecurityGroupRule rule, final ProviderTarget target)
         throws ConnectorException {
+        // TODO
         throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public String addRuleToSecurityGroup(final String groupId, final SecurityGroupRule rule, final ProviderTarget target)
         throws ConnectorException {
+        // TODO
         throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public void deleteSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
+        // TODO
         throw new ConnectorException("unsupported operation");
     }
 
@@ -550,34 +548,47 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     //
 
     @Override
-    public Address allocateAddress(final Map<String, String> properties, final ProviderTarget target) throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
-
-    @Override
-    public void deallocateAddress(final Address address, final ProviderTarget target) throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
-
-    @Override
     public List<Address> getAddresses(final ProviderTarget target) throws ConnectorException {
         try {
             return this.getProvider(target).getAddresses();
         } catch (OpenStackResponseException e) {
             throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
         }
-        // throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public Address allocateAddress(final Map<String, String> properties, final ProviderTarget target) throws ConnectorException {
+        try {
+            return this.getProvider(target).allocateAddress(properties);
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void deallocateAddress(final Address address, final ProviderTarget target) throws ConnectorException {
+        try {
+            this.getProvider(target).deallocateAddress(address);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
     }
 
     @Override
     public void addAddressToMachine(final String machineId, final Address address, final ProviderTarget target)
         throws ConnectorException {
+        // TODO
         throw new ConnectorException("unsupported operation");
     }
 
     @Override
     public void removeAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
         throws ConnectorException {
+        // TODO
         throw new ConnectorException("unsupported operation");
     }
 
