@@ -544,7 +544,7 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
 
     //
-    // Network : Address
+    // Network : (floating IP) Address
     //
 
     @Override
@@ -581,15 +581,29 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public void addAddressToMachine(final String machineId, final Address address, final ProviderTarget target)
         throws ConnectorException {
-        // TODO
-        throw new ConnectorException("unsupported operation");
+        try {
+            this.getProvider(target).addAddressToMachine(machineId, address);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
     }
 
     @Override
     public void removeAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
         throws ConnectorException {
-        // TODO
-        throw new ConnectorException("unsupported operation");
+        try {
+            this.getProvider(target).removeAddressFromMachine(machineId, address);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
     }
 
     //

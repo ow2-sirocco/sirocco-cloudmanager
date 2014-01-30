@@ -919,7 +919,7 @@ public class OpenStackCloudProvider {
     }
 
     //
-    // Network : Address
+    // Network : (floating IP) Address
     //
 
     private void fromFloatingIpToCimiAddress(final FloatingIp floatingIp, final Address cimiAddress) {
@@ -979,6 +979,16 @@ public class OpenStackCloudProvider {
     public void deallocateAddress(final Address cimiAddress) throws ConnectorException {
         OpenStackCloudProvider.logger.info("Deallocating floating IP " + cimiAddress.getIp());
         this.novaClient.floatingIps().deallocate(cimiAddress.getProviderAssignedId()).execute();
+    }
+
+    public void addAddressToMachine(final String machineId, final Address cimiAddress) throws ConnectorException {
+        OpenStackCloudProvider.logger.info("Adding floating IP " + cimiAddress.getIp() + " to server " + machineId);
+        this.novaClient.servers().associateFloatingIp(machineId, cimiAddress.getIp()).execute();
+    }
+
+    public void removeAddressFromMachine(final String machineId, final Address cimiAddress) throws ConnectorException {
+        OpenStackCloudProvider.logger.info("Adding floating IP " + cimiAddress.getIp() + " to server " + machineId);
+        this.novaClient.servers().disassociateFloatingIp(machineId, cimiAddress.getIp()).execute();
     }
 
     //
