@@ -101,8 +101,6 @@ public class OpenStackCloudProvider {
 
     private String tenantName;
 
-    private String cimiPublicNetworkName;
-
     // private String novaEndPointName;
 
     private Nova novaClient;
@@ -120,10 +118,8 @@ public class OpenStackCloudProvider {
             throw new ConnectorException("No access to properties: tenantName or publicNetworkName");
         }
         this.tenantName = properties.get("tenantName");
-        this.cimiPublicNetworkName = properties.get("publicNetworkName");
         OpenStackCloudProvider.logger.info("connect user=" + this.cloudProviderAccount.getLogin() + " to tenant="
-            + this.tenantName + " at KEYSTONE_AUTH_URL=" + this.cloudProviderAccount.getCloudProvider().getEndpoint()
-            + ", with publicNetwork=" + this.cimiPublicNetworkName);
+            + this.tenantName + " at KEYSTONE_AUTH_URL=" + this.cloudProviderAccount.getCloudProvider().getEndpoint());
 
         Keystone keystone = new Keystone(this.cloudProviderAccount.getCloudProvider().getEndpoint());
         Access access;
@@ -732,11 +728,11 @@ public class OpenStackCloudProvider {
         cimiNetwork.setName(openStackNetwork.getName());
         cimiNetwork.setProviderAssignedId(openStackNetwork.getId());
         cimiNetwork.setState(this.fromNovaNetworkStatusToCimiNetworkState(openStackNetwork.getStatus()));
-        if (openStackNetwork.getName().equals(this.cimiPublicNetworkName)) {
+        /*if (openStackNetwork.getName().equals(this.cimiPublicNetworkName)) {
             cimiNetwork.setNetworkType(Network.Type.PUBLIC);
         } else {
             cimiNetwork.setNetworkType(Network.Type.PRIVATE);
-        }
+        }*/
 
         List<Subnet> subnets = new ArrayList<Subnet>();
         cimiNetwork.setSubnets(subnets);
