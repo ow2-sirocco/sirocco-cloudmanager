@@ -35,11 +35,11 @@
 		<version>0.6.1-SNAPSHOT</version>
 	</parent>
 
-	<artifactId>sirocco-cloudmanager-connector-openstack-nova</artifactId>
+	<artifactId>sirocco-cloudmanager-connector-openstack</artifactId>
 
 	<packaging>jar</packaging>
 
-	<name>SIROCCO :: CloudManager :: Connector :: OpenStack Nova</name>
+	<name>SIROCCO :: CloudManager :: Connector :: OpenStack</name>
 	
 	<properties>
 		<woorea.version>3.2.2-SNAPSHOT</woorea.version>
