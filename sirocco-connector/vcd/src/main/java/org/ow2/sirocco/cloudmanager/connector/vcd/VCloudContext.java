@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
-import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.slf4j.Logger;
 
@@ -67,7 +66,7 @@ public class VCloudContext {
 
     private OrgVdcNetwork cimiPublicOrgVdcNetwork;
 
-    private Network cimiPublicNetwork;
+    // private Network cimiPublicNetwork;
 
     private boolean cimiPublicOrgVdcNetworkIsRouted = false;
 
@@ -127,12 +126,12 @@ public class VCloudContext {
             this.cimiPublicOrgVdcNetwork = OrgVdcNetwork.getOrgVdcNetworkByReference(this.vcloudClient, orgVdcNetworkNameRef);
             /*VcdCloudProviderConnectorFactory.logger.info("publicOrgVdcNetwork=" + this.cimiPublicOrgVdcNetwork.getResource().getName());*/
 
-            this.cimiPublicNetwork = new Network();
+            /*this.cimiPublicNetwork = new Network();
             // this.cimiPublicNetwork.setName(this.cimiPublicOrgVdcNetworkName);
             this.cimiPublicNetwork.setName(this.cimiPublicOrgVdcNetwork.getResource().getName());
             this.cimiPublicNetwork.setProviderAssignedId(this.cimiPublicOrgVdcNetwork.getResource().getHref());
             this.cimiPublicNetwork.setState(Network.State.STARTED);
-            this.cimiPublicNetwork.setNetworkType(Network.Type.PUBLIC);
+            this.cimiPublicNetwork.setNetworkType(Network.Type.PUBLIC);*/
 
             // Bridged/NatRouted
             if (this.cimiPublicOrgVdcNetwork.getResource().getConfiguration().getFenceMode()

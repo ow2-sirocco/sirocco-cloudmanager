@@ -226,9 +226,6 @@ public class VcdCloudProvider {
                 }
                 SystemNetwork systemNetwork = new SystemNetwork();
                 this.fromVAppNetworkToSystemNetwork(vappNetwork, systemNetwork);
-                /*if (!systemNetwork.getNetwork().getNetworkType().equals(Network.Type.PRIVATE)) {
-                    continue;
-                }*/
                 system.getNetworks().add(systemNetwork);
             }
         } catch (VCloudException e) {
@@ -555,9 +552,8 @@ public class VcdCloudProvider {
                     entry.setAddress(cimiAddress);
                     cimiAddresses.add(entry);
 
-                    /*if CIMI.public && CimiPublicOrgVdcNetworkName && NAT routed*/
-                    if (network.getNetworkType().equals(Network.Type.PUBLIC)
-                        && network.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())
+                    /*if CimiPublicOrgVdcNetworkName && NAT routed*/
+                    if (network.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())
                         && this.vCloudContext.isCimiPublicOrgVdcNetworkIsRouted()) {
                         Address publicCimiAddress = new Address();
                         publicCimiAddress.setIp(this.getNatRoutedIpAddress(networkConnection.getIpAddress()));
@@ -567,6 +563,19 @@ public class VcdCloudProvider {
                         publicEntry.setAddress(publicCimiAddress);
                         cimiAddresses.add(publicEntry);
                     }
+
+                    /*if CIMI.public && CimiPublicOrgVdcNetworkName && NAT routed*/
+                    /*if (network.getNetworkType().equals(Network.Type.PUBLIC)
+                        && network.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())
+                        && this.vCloudContext.isCimiPublicOrgVdcNetworkIsRouted()) {
+                        Address publicCimiAddress = new Address();
+                        publicCimiAddress.setIp(this.getNatRoutedIpAddress(networkConnection.getIpAddress()));
+                        publicCimiAddress.setAllocation("dynamic");
+                        publicCimiAddress.setProtocol("IPv4");
+                        MachineNetworkInterfaceAddress publicEntry = new MachineNetworkInterfaceAddress();
+                        publicEntry.setAddress(publicCimiAddress);
+                        cimiAddresses.add(publicEntry);
+                    }*/
 
                     MachineNetworkInterface privateNic = new MachineNetworkInterface();
                     privateNic.setAddresses(cimiAddresses);
@@ -823,14 +832,14 @@ public class VcdCloudProvider {
         /* Mapping Rule
          * If the vAppNetwork is not isolated and its name = the CIMI public network configuration parameter 
          * then the CIMI network is set to PUBLIC else to PRIVATE */
-        if (!vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())
+        /* Applying this rule with a vApp created outside Sirocco might not work properly ! 
+         * A workaround in this case is to use the OrgVdcNetwork to which the vAppNetwork is connected */
+        /*if (!vappNetwork.getResource().getConfiguration().getFenceMode().equals(FenceModeValuesType.ISOLATED.value())
             && vappNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
-            /* Applying this rule with a vApp created outside Sirocco might not work properly ! 
-             * A workaround in this case is to use the OrgVdcNetwork to which the vAppNetwork is connected */
             n.setNetworkType(Network.Type.PUBLIC);
         } else {
             n.setNetworkType(Network.Type.PRIVATE);
-        }
+        }*/
     }
 
     private void fromOrgVdcNetworkToNetwork(final OrgVdcNetwork orgVdcNetwork, final Network n) {
@@ -841,11 +850,11 @@ public class VcdCloudProvider {
         /* Mapping Rule
          * If the orgVdcNetwork name = the CIMI public network configuration parameter 
          * then the CIMI network is set to PUBLIC else to PRIVATE */
-        if (orgVdcNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
+        /*if (orgVdcNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
             n.setNetworkType(Network.Type.PUBLIC);
         } else {
             n.setNetworkType(Network.Type.PRIVATE);
-        }
+        }*/
     }
 
     public List<Network> getNetworks() throws ConnectorException {
@@ -1069,10 +1078,10 @@ public class VcdCloudProvider {
                 throw new ConnectorException(
                     "validation error on field 'Network componentDescriptor.quantity': should be equal to 1");
             }
-            if (nt.getNetworkConfig().getNetworkType() != Network.Type.PRIVATE) {
+            /*if (nt.getNetworkConfig().getNetworkType() != Network.Type.PRIVATE) {
                 throw new ConnectorException(
                     "validation error on field 'Network componentDescriptor.networkTemplate.networkConfiguration.networkType': should be equal to Private");
-            }
+            }*/
             VAppNetworkConfigurationType private_vAppNetworkConfigurationType = this
                 .createIsolatedVAppNetworkConfigurationType(ncd.getName(), nt.getNetworkConfig());
             // fill in the NetworkConfigSection
