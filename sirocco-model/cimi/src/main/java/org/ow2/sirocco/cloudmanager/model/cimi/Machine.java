@@ -28,6 +28,7 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -179,6 +180,21 @@ public class Machine extends CloudResource implements Serializable, ICloudProvid
 
     public void setNetworkInterfaces(final List<MachineNetworkInterface> networkInterfaces) {
         this.networkInterfaces = networkInterfaces;
+    }
+
+    @Transient
+    public Set<String> getAddresses() {
+        Set<String> result = new HashSet<>();
+        if (this.networkInterfaces != null) {
+            for (MachineNetworkInterface nic : this.networkInterfaces) {
+                if (nic.getAddresses() != null) {
+                    for (MachineNetworkInterfaceAddress nicAddr : nic.getAddresses()) {
+                        result.add(nicAddr.getAddress().getIp());
+                    }
+                }
+            }
+        }
+        return result;
     }
 
     @ManyToOne
