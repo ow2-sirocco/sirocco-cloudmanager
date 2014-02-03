@@ -54,4 +54,6 @@ public interface IJobManager {
 
     void deleteJob(String jobId) throws CloudProviderException;
 
+    void updateJobStatus(int jobId, Job.Status status);
+
 }

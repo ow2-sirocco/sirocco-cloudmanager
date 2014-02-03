@@ -121,9 +121,9 @@ public class NetworkManager implements INetworkManager {
     // Network operations
     //
 
-    private void fireResourceStateChangeEvent(final CloudResource network) {
-        this.jmsContext.createProducer().setProperty("tenantId", network.getTenant().getUuid())
-            .send(this.resourceStateChangeTopic, new ResourceStateChangeEvent(network));
+    private void fireResourceStateChangeEvent(final CloudResource resource) {
+        this.jmsContext.createProducer().setProperty("tenantId", resource.getTenant().getUuid())
+            .send(this.resourceStateChangeTopic, new ResourceStateChangeEvent(resource));
     }
 
     @Override
@@ -1389,7 +1389,8 @@ public class NetworkManager implements INetworkManager {
             networkService.deallocateAddress(address,
                 new ProviderTarget().account(address.getCloudProviderAccount()).location(address.getLocation()));
         } catch (ConnectorException e) {
-            throw new CloudProviderException(e.getMessage());
+            // ignore
+            NetworkManager.logger.info("Failed to release address", e);
         }
 
         address.setState(Address.State.DELETED);
@@ -1404,15 +1405,20 @@ public class NetworkManager implements INetworkManager {
         return job;
     }
 
+    private Address findAddressByIp(final String ip, final Machine machine) {
+        return this.em.createNamedQuery("Address.findByIp", Address.class).setParameter("ip", ip)
+            .setParameter("tenant", machine.getTenant()).setParameter("state", Address.State.DELETED)
+            .setParameter("account", machine.getCloudProviderAccount()).setParameter("location", machine.getLocation())
+            .getSingleResult();
+    }
+
     @Override
     public Job addAddressToMachine(final String machineUuid, final String ip) throws ResourceNotFoundException,
         CloudProviderException {
-        Tenant tenant = this.getTenant();
         Machine machine = this.machineManager.getMachineByUuid(machineUuid);
         Address address;
         try {
-            address = this.em.createNamedQuery("Address.findByIp", Address.class).setParameter("ip", ip)
-                .setParameter("tenant", tenant).getSingleResult();
+            address = this.findAddressByIp(ip, machine);
         } catch (NoResultException e) {
             throw new ResourceNotFoundException();
         }
@@ -1434,7 +1440,9 @@ public class NetworkManager implements INetworkManager {
         }
 
         address.setResource(machine);
-        // TODO add Machine nic.address
+        this.fireResourceStateChangeEvent(address);
+
+        this.machineManager.refreshMachine(machine.getId());
 
         Job job = Job.newBuilder().tenant(this.getTenant()).action(Job.Action.ADD).status(Status.SUCCESS).target(machine)
             .affectedResource(address).build();
@@ -1447,12 +1455,10 @@ public class NetworkManager implements INetworkManager {
     @Override
     public Job removeAddressFromMachine(final String machineUuid, final String ip) throws ResourceNotFoundException,
         CloudProviderException {
-        Tenant tenant = this.getTenant();
         Machine machine = this.machineManager.getMachineByUuid(machineUuid);
         Address address;
         try {
-            address = this.em.createNamedQuery("Address.findByIp", Address.class).setParameter("ip", ip)
-                .setParameter("tenant", tenant).getSingleResult();
+            address = this.findAddressByIp(ip, machine);
         } catch (NoResultException e) {
             throw new ResourceNotFoundException();
         }
@@ -1474,7 +1480,10 @@ public class NetworkManager implements INetworkManager {
         }
 
         address.setResource(null);
-        // TODO remove Machine nic.address
+
+        this.fireResourceStateChangeEvent(address);
+
+        this.machineManager.refreshMachine(machine.getId());
 
         Job job = Job.newBuilder().tenant(this.getTenant()).action(Job.Action.ADD).status(Status.SUCCESS).target(machine)
             .affectedResource(address).build();
@@ -1482,6 +1491,15 @@ public class NetworkManager implements INetworkManager {
         this.em.flush();
 
         return job;
+    }
+
+    public void disassociateAddressesFromMachine(final int machineId) {
+        List<Address> addresses = this.em.createNamedQuery("Address.findByMachineId", Address.class)
+            .setParameter("id", machineId).getResultList();
+        for (Address addr : addresses) {
+            addr.setResource(null);
+            this.fireResourceStateChangeEvent(addr);
+        }
     }
 
     //

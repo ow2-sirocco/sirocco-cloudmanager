@@ -37,6 +37,7 @@ import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
+import org.ow2.sirocco.cloudmanager.core.api.IJobManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineImageManager;
 import org.ow2.sirocco.cloudmanager.core.api.IMachineManager;
 import org.ow2.sirocco.cloudmanager.core.api.INetworkManager;
@@ -66,6 +67,9 @@ public class ResourceWatcher {
 
     @Resource
     SessionContext context;
+
+    @EJB
+    IJobManager jobManager;
 
     @EJB
     IMachineManager machineManager;
@@ -110,12 +114,14 @@ public class ResourceWatcher {
 
                 for (Machine.State expectedFinalState : expectedStates) {
                     if (updatedMachine.getState() == expectedFinalState) {
-                        this.machineManager.syncMachine(machine.getId(), updatedMachine, job.getId());
+                        this.machineManager.syncMachine(machine.getId(), updatedMachine);
+                        this.jobManager.updateJobStatus(job.getId(), Job.Status.SUCCESS);
                         break mainloop;
                     }
                 }
             } catch (ResourceNotFoundException e) {
-                this.machineManager.syncMachine(machine.getId(), null, job.getId());
+                this.machineManager.syncMachine(machine.getId(), null);
+                this.jobManager.updateJobStatus(job.getId(), Job.Status.SUCCESS);
                 break;
             } catch (ConnectorException e) {
                 ResourceWatcher.logger.error("Failed to poll machine state: ", e);
@@ -275,7 +281,8 @@ public class ResourceWatcher {
                     }
                 }
             } catch (ResourceNotFoundException e) {
-                this.machineManager.syncMachine(machine.getId(), null, job.getId());
+                this.machineManager.syncMachine(machine.getId(), null);
+                this.jobManager.updateJobStatus(job.getId(), Job.Status.SUCCESS);
                 break;
             } catch (ConnectorException e) {
                 ResourceWatcher.logger.error("Failed to poll machine state: ", e);

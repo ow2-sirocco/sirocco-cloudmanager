@@ -346,6 +346,8 @@ public interface INetworkManager {
 
     Job removeAddressFromMachine(String machineUuid, String ip) throws ResourceNotFoundException, CloudProviderException;
 
+    void disassociateAddressesFromMachine(final int machineId);
+
     // AddressTemplate operations
 
     AddressTemplate createAddressTemplate(AddressTemplate addressTemplate) throws InvalidRequestException,

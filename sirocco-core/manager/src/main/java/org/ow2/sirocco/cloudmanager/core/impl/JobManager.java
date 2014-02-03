@@ -183,4 +183,10 @@ public class JobManager implements IJobManager {
             params.tenantId(this.getTenant().getId()).first(first).last(last).filter(filters).attributes(attributes));
     }
 
+    @Override
+    public void updateJobStatus(final int jobId, final Status status) {
+        Job job = this.em.find(Job.class, jobId);
+        job.setState(status);
+    }
+
 }

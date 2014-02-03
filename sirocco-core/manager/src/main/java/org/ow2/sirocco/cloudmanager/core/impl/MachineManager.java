@@ -51,6 +51,11 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 import javax.validation.ConstraintViolationException;
 
+import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
+import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
+import org.ow2.sirocco.cloudmanager.connector.api.IComputeService;
+import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager;
 import org.ow2.sirocco.cloudmanager.core.api.ICloudProviderManager.Placement;
 import org.ow2.sirocco.cloudmanager.core.api.ICredentialsManager;
@@ -123,6 +128,9 @@ public class MachineManager implements IMachineManager {
 
     @EJB
     private ITenantManager tenantManager;
+
+    @EJB
+    private ICloudProviderConnectorFinder connectorFinder;
 
     @EJB
     private ICloudProviderManager cloudProviderManager;
@@ -268,10 +276,15 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
-    public void syncMachine(final int machineId, final Machine updatedMachine, final int jobId) {
+    public void syncMachine(final int machineId, final Machine updatedMachine) {
         Machine machine = this.em.find(Machine.class, machineId);
-        Job job = this.em.find(Job.class, jobId);
+        this.syncMachine(machine, updatedMachine);
+    }
+
+    private void syncMachine(final Machine machine, final Machine updatedMachine) {
+        boolean updated = false;
         if (updatedMachine == null || updatedMachine.getState() == State.DELETED) {
+            updated = true;
             this.removeMachineFromSecurityGroup(machine);
             machine.setState(Machine.State.DELETED);
             machine.setDeleted(new Date());
@@ -284,15 +297,40 @@ public class MachineManager implements IMachineManager {
                 attachment.setVolume(null);
                 this.em.persist(attachment);
             }
+            this.networkManager.disassociateAddressesFromMachine(machine.getId());
         } else {
-            machine.setState(updatedMachine.getState());
-            if (machine.getNetworkInterfaces() == null || machine.getNetworkInterfaces().isEmpty()) {
+            if (updatedMachine.getState() != machine.getState()) {
+                updated = true;
+                machine.setState(updatedMachine.getState());
+            }
+            if (!machine.getAddresses().equals(updatedMachine.getAddresses())) {
+                updated = true;
                 this.createNetworkInterfaces(machine, updatedMachine);
             }
-            machine.setUpdated(new Date());
         }
-        this.fireResourceStateChangeEvent(machine);
-        job.setState(Job.Status.SUCCESS);
+        if (updated) {
+            machine.setUpdated(new Date());
+            this.fireResourceStateChangeEvent(machine);
+        }
+    }
+
+    @Override
+    public void refreshMachine(final int machineId) throws CloudProviderException {
+        Machine machine = this.em.find(Machine.class, machineId);
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(machine.getCloudProviderAccount()
+            .getCloudProvider().getCloudProviderType());
+
+        Machine updatedMachine = null;
+        try {
+            IComputeService computeService = connector.getComputeService();
+            updatedMachine = computeService.getMachine(machine.getProviderAssignedId(),
+                new ProviderTarget().account(machine.getCloudProviderAccount()).location(machine.getLocation()));
+        } catch (org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException ex) {
+            // machine is deleted
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+        this.syncMachine(machine, updatedMachine);
     }
 
     @Override
@@ -1166,6 +1204,13 @@ public class MachineManager implements IMachineManager {
      * Create network interface entities
      */
     private void createNetworkInterfaces(final Machine persisted, final Machine created) {
+        // delete nics in database
+        if (persisted.getNetworkInterfaces() != null) {
+            for (MachineNetworkInterface nic : persisted.getNetworkInterfaces()) {
+                this.em.remove(nic);
+            }
+            persisted.getNetworkInterfaces().clear();
+        }
         List<MachineNetworkInterface> nics = created.getNetworkInterfaces();
         if (nics == null) {
             return;

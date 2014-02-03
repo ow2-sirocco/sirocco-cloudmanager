@@ -103,7 +103,9 @@ public interface IMachineManager {
     Job createMachine(MachineCreate machineCreate) throws ResourceConflictException, InvalidRequestException,
         CloudProviderException;
 
-    void syncMachine(int machineId, Machine machine, int jobId) throws CloudProviderException;
+    void syncMachine(int machineId, Machine machine) throws CloudProviderException;
+
+    void refreshMachine(final int machineId) throws CloudProviderException;
 
     void syncVolumeAttachment(int machineId, MachineVolume volumeAttachment, int jobId);
 
