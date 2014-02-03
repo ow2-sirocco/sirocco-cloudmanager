@@ -46,8 +46,10 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
  * IP address
  */
 @Entity
-@NamedQueries({@NamedQuery(name = "Address.findByUuid", query = "SELECT a from Address a WHERE a.uuid=:uuid"),
-    @NamedQuery(name = "Address.findByIp", query = "SELECT a from Address a WHERE a.ip=:ip AND a.tenant=:tenant")})
+@NamedQueries({
+    @NamedQuery(name = "Address.findByUuid", query = "SELECT a from Address a WHERE a.uuid=:uuid"),
+    @NamedQuery(name = "Address.findByIp", query = "SELECT a from Address a WHERE a.ip=:ip AND a.tenant=:tenant AND a.state!=:state AND a.cloudProviderAccount=:account AND a.location=:location"),
+    @NamedQuery(name = "Address.findByMachineId", query = "SELECT a from Address a WHERE a.resource.id=:id")})
 public class Address extends CloudResource implements Serializable {
     private static final long serialVersionUID = 1L;
 
