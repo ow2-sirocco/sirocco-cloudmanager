@@ -679,6 +679,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     nic.setNetworkType(networkInterface.getNetwork().getNetworkType());
                     machine.addNetworkInterface(nic);
                 }
+            } else {
+                machine.setNetworkInterfaces(Lists.<MachineNetworkInterface> newArrayList());
             }
 
             // TODO create and attach volumes
@@ -1930,7 +1932,19 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 throw new ConnectorException("Address " + addr.getIp() + " not associated with machine " + machineId);
             }
             addr.setResource(null);
-            // TODO remove address from machine nic
+            // remove address from machine first nic
+            this.deleteAddressFromMachine(addr.getIp(), machine);
+        }
+
+        private void deleteAddressFromMachine(final String ip, final Machine machine) {
+            for (Iterator<MachineNetworkInterfaceAddress> it = machine.getNetworkInterfaces().get(0).getAddresses().iterator(); it
+                .hasNext();) {
+                MachineNetworkInterfaceAddress nicAddr = it.next();
+                if (nicAddr.getAddress().getIp().equals(ip)) {
+                    it.remove();
+                    break;
+                }
+            }
         }
 
         public void addAddressToMachine(final String machineId, final Address address) throws ConnectorException {
@@ -1945,8 +1959,22 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             if (addr.getResource() != null) {
                 throw new ConnectorException("Address " + addr.getIp() + " already associated");
             }
+            if (machine.getNetworkInterfaces().isEmpty()) {
+                throw new ConnectorException("No network");
+            }
+
             addr.setResource(machine);
-            // TODO add address to machine nic
+
+            // add address to machine first nic
+            MachineNetworkInterface nic = machine.getNetworkInterfaces().get(0);
+            MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
+            Address ip = new Address();
+            ip.setIp(addr.getIp());
+            ip.setAllocation("dynamic");
+            ip.setProtocol("IPv4");
+            ip.setNetwork(nic.getNetwork());
+            entry.setAddress(ip);
+            nic.getAddresses().add(entry);
         }
 
         public synchronized void deleteAddress(final Address address) throws ConnectorException {
@@ -1956,7 +1984,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             }
             addr.setState(Address.State.DELETED);
             if (addr.getResource() != null) {
-                // TODO remove address from machine nic
+                this.deleteAddressFromMachine(addr.getIp(), (Machine) addr.getResource());
                 addr.setResource(null);
             }
             this.allocatedAddresses.remove(address.getIp());
