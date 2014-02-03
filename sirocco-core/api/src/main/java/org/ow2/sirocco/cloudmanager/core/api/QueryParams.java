@@ -42,6 +42,10 @@ public class QueryParams {
 
     private final List<String> attributes;
 
+    private final String providerUuid;
+
+    private final String locationUuid;
+
     /**
      * QueryParams builder class
      */
@@ -57,6 +61,10 @@ public class QueryParams {
         private List<String> filters = new ArrayList<>();
 
         private List<String> attributes = new ArrayList<>();
+
+        private String providerUuid;
+
+        private String locationUuid;
 
         /**
          * 
@@ -111,6 +119,26 @@ public class QueryParams {
         }
 
         /**
+         * Filters by provider
+         * 
+         * @param providerUuid uuid of provider
+         */
+        public Builder filterByProvider(final String providerUuid) {
+            this.providerUuid = providerUuid;
+            return this;
+        }
+
+        /**
+         * Filters by location
+         * 
+         * @param locationUuid uuid of location
+         */
+        public Builder filterByLocation(final String locationUuid) {
+            this.locationUuid = locationUuid;
+            return this;
+        }
+
+        /**
          * Selects the item attributes to return. Other attributes will have a
          * null value. If the list is empty, all attributes are selected.
          */
@@ -150,6 +178,8 @@ public class QueryParams {
         this.limit = builder.limit;
         this.filters = builder.filters;
         this.attributes = builder.attributes;
+        this.providerUuid = builder.providerUuid;
+        this.locationUuid = builder.locationUuid;
     }
 
     /**
@@ -190,6 +220,20 @@ public class QueryParams {
      */
     public List<String> getFilters() {
         return this.filters;
+    }
+
+    /**
+     * Cloud Provider uuid
+     */
+    public String getProviderUuid() {
+        return this.providerUuid;
+    }
+
+    /**
+     * Location uuid
+     */
+    public String getLocationUuid() {
+        return this.locationUuid;
     }
 
     /**

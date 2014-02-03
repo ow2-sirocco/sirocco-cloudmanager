@@ -63,6 +63,10 @@ public class QueryHelper {
 
         private Integer limit;
 
+        private String providerUuid;
+
+        private String locationUuid;
+
         private List<String> filters;
 
         private List<String> attributes;
@@ -116,6 +120,16 @@ public class QueryHelper {
             return this;
         }
 
+        public QueryParamsBuilder filterByProvider(final String providerUuid) {
+            this.providerUuid = providerUuid;
+            return this;
+        }
+
+        public QueryParamsBuilder filterByLocation(final String locationUuid) {
+            this.locationUuid = locationUuid;
+            return this;
+        }
+
         public QueryParamsBuilder filter(final List<String> filters) {
             this.filters = filters;
             return this;
@@ -157,6 +171,8 @@ public class QueryHelper {
                 this.attributes = queryParams.getAttributes();
                 this.marker = queryParams.getMarker();
                 this.limit = queryParams.getLimit();
+                this.providerUuid = queryParams.getProviderUuid();
+                this.locationUuid = queryParams.getLocationUuid();
             }
             return this;
         }
@@ -179,6 +195,14 @@ public class QueryHelper {
 
         public Integer getLast() {
             return this.last;
+        }
+
+        public String getProviderUuid() {
+            return this.providerUuid;
+        }
+
+        public String getLocationUuid() {
+            return this.locationUuid;
         }
 
         public List<String> getFilters() {
@@ -296,6 +320,18 @@ public class QueryHelper {
                 }
                 whereClauseSB.append(filterClause);
             }
+        }
+        if (params.getProviderUuid() != null) {
+            if (whereClauseSB.length() > 0) {
+                whereClauseSB.append(" AND ");
+            }
+            whereClauseSB.append(" v.cloudProviderAccount.uuid='" + params.getProviderUuid() + "' ");
+        }
+        if (params.getLocationUuid() != null) {
+            if (whereClauseSB.length() > 0) {
+                whereClauseSB.append(" AND ");
+            }
+            whereClauseSB.append(" v.location.uuid='" + params.getLocationUuid() + "' ");
         }
 
         String whereClause = whereClauseSB.toString();
