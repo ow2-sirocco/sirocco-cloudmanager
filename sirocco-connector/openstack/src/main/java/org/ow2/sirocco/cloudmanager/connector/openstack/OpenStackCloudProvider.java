@@ -117,8 +117,8 @@ public class OpenStackCloudProvider {
         this.cloudProviderLocation = target.getLocation();
 
         Map<String, String> properties = this.cloudProviderAccount.getProperties();
-        if (properties == null || properties.get("tenantName") == null || properties.get("publicNetworkName") == null) {
-            throw new ConnectorException("No access to properties: tenantName or publicNetworkName");
+        if (properties == null || properties.get("tenantName") == null) {
+            throw new ConnectorException("No access to properties: tenantName");
         }
         this.tenantName = properties.get("tenantName");
         OpenStackCloudProvider.logger.info("connect user=" + this.cloudProviderAccount.getLogin() + " to tenant="
