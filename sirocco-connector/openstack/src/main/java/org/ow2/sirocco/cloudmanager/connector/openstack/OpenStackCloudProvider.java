@@ -61,6 +61,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,6 @@ import com.woorea.openstack.nova.model.FloatingIps;
 import com.woorea.openstack.nova.model.Image;
 import com.woorea.openstack.nova.model.Images;
 import com.woorea.openstack.nova.model.KeyPair;
-import com.woorea.openstack.nova.model.SecurityGroup;
 import com.woorea.openstack.nova.model.Server;
 import com.woorea.openstack.nova.model.Server.Addresses;
 import com.woorea.openstack.nova.model.ServerForCreate;
@@ -921,13 +921,45 @@ public class OpenStackCloudProvider {
     // Network : Security Group
     //
 
+    private void fromOpenstackSecurityGroupToCimiSecurityGroup(
+        final com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup, final SecurityGroup cimiSecurityGroup) {
+
+        cimiSecurityGroup.setName(openStackSecurityGroup.getName());
+        cimiSecurityGroup.setDescription(openStackSecurityGroup.getDescription());
+        cimiSecurityGroup.setProviderAssignedId(openStackSecurityGroup.getId());
+        cimiSecurityGroup.setState(SecurityGroup.State.AVAILABLE);
+
+        // TODO SecurityGroup Rules : cimiSecurityGroup.setRules(rules)
+
+    }
+
     public String createSecurityGroup(final SecurityGroupCreate create) throws ConnectorException {
         OpenStackCloudProvider.logger.info("creating SecurityGroup for " + this.cloudProviderAccount.getLogin());
 
-        SecurityGroup openStackSecurityGroup = this.novaClient.securityGroups()
+        com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup = this.novaClient.securityGroups()
             .createSecurityGroup(create.getName(), create.getDescription()).execute();
 
         return openStackSecurityGroup.getId();
+    }
+
+    public SecurityGroup getSecurityGroup(final String groupId) throws ConnectorException {
+        com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup = this.novaClient.securityGroups()
+            .showSecurityGroup(groupId).execute();
+
+        final SecurityGroup securityGroup = new SecurityGroup();
+        this.fromOpenstackSecurityGroupToCimiSecurityGroup(openStackSecurityGroup, securityGroup);
+        return securityGroup;
+    }
+
+    public List<SecurityGroup> getSecurityGroups() throws ConnectorException {
+        ArrayList<SecurityGroup> securityGroups = new ArrayList<SecurityGroup>();
+
+        com.woorea.openstack.nova.model.SecurityGroups openStackSecurityGroups = this.novaClient.securityGroups()
+            .listSecurityGroups().execute();
+        for (com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup : openStackSecurityGroups) {
+            securityGroups.add(this.getSecurityGroup(openStackSecurityGroup.getId()));
+        }
+        return securityGroups;
     }
 
     public void deleteSecurityGroup(final String groupId) throws ConnectorException {

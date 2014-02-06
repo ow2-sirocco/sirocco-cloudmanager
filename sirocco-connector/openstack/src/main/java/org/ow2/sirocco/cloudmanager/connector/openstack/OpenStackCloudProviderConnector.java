@@ -487,14 +487,24 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public SecurityGroup getSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
         ConnectorException {
-        // TODO
-        throw new ConnectorException("unsupported operation");
+        try {
+            return this.getProvider(target).getSecurityGroup(groupId);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
     }
 
     @Override
     public List<SecurityGroup> getSecurityGroups(final ProviderTarget target) throws ConnectorException {
-        // TODO
-        throw new ConnectorException("unsupported operation");
+        try {
+            return this.getProvider(target).getSecurityGroups();
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+        }
     }
 
     @Override
