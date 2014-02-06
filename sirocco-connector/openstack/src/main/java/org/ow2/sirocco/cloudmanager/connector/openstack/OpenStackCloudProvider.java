@@ -312,6 +312,13 @@ public class OpenStackCloudProvider {
             machineVolume.setInitialLocation(volumeAttachment.getDevice());
             machineVolumes.add(machineVolume);
         }
+
+        // Security Group
+        List<SecurityGroup> securityGroups = new ArrayList<SecurityGroup>();
+        machine.setSecurityGroups(securityGroups);
+        for (com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup : server.getSecurityGroups()) {
+            securityGroups.add(this.getSecurityGroup(openStackSecurityGroup.getId()));
+        }
     }
 
     public Machine createMachine(final MachineCreate machineCreate) throws ConnectorException, InterruptedException {
