@@ -61,6 +61,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +80,7 @@ import com.woorea.openstack.nova.model.FloatingIps;
 import com.woorea.openstack.nova.model.Image;
 import com.woorea.openstack.nova.model.Images;
 import com.woorea.openstack.nova.model.KeyPair;
+import com.woorea.openstack.nova.model.SecurityGroup;
 import com.woorea.openstack.nova.model.Server;
 import com.woorea.openstack.nova.model.Server.Addresses;
 import com.woorea.openstack.nova.model.ServerForCreate;
@@ -913,6 +915,23 @@ public class OpenStackCloudProvider {
 
         /* FIXME woorea Bug : err 409 ignored when trying to delete a network attached to servers */
         this.quantum.networks().delete(networkId).execute();
+    }
+
+    //
+    // Network : Security Group
+    //
+
+    public String createSecurityGroup(final SecurityGroupCreate create) throws ConnectorException {
+        OpenStackCloudProvider.logger.info("creating SecurityGroup for " + this.cloudProviderAccount.getLogin());
+
+        SecurityGroup openStackSecurityGroup = this.novaClient.securityGroups()
+            .createSecurityGroup(create.getName(), create.getDescription()).execute();
+
+        return openStackSecurityGroup.getId();
+    }
+
+    public void deleteSecurityGroup(final String groupId) throws ConnectorException {
+        this.novaClient.securityGroups().deleteSecurityGroup(groupId).execute();
     }
 
     //

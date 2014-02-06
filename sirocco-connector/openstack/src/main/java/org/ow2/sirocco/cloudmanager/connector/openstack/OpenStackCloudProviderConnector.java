@@ -458,55 +458,30 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     }
 
     //
-    // Network : Forwarding Group
-    //
-
-    @Override
-    public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate, final ProviderTarget target)
-        throws ConnectorException {
-        try {
-            return this.getProvider(target).createForwardingGroup(forwardingGroupCreate);
-        } catch (OpenStackResponseException e) {
-            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public ForwardingGroup getForwardingGroup(final String forwardingGroupId, final ProviderTarget target)
-        throws ResourceNotFoundException, ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
-
-    @Override
-    public void deleteForwardingGroup(final ForwardingGroup forwardingGroup, final ProviderTarget target)
-        throws ResourceNotFoundException, ConnectorException {
-        try {
-            this.getProvider(target).deleteForwardingGroup(forwardingGroup);
-        } catch (OpenStackResponseException e) {
-            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void addNetworkToForwardingGroup(final String forwardingGroupId, final ForwardingGroupNetwork fgNetwork,
-        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
-
-    @Override
-    public void removeNetworkFromForwardingGroup(final String forwardingGroupId, final String networkId,
-        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
-        throw new ConnectorException("unsupported operation");
-    }
-
-    //
     // Network : Security Group
     //
 
     @Override
     public String createSecurityGroup(final SecurityGroupCreate create, final ProviderTarget target) throws ConnectorException {
-        throw new ConnectorException("unsupported operation");
-        // TODO
+        try {
+            return this.getProvider(target).createSecurityGroup(create);
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void deleteSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
+        ConnectorException {
+        try {
+            this.getProvider(target).deleteSecurityGroup(groupId);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
     }
 
     @Override
@@ -532,13 +507,6 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public String addRuleToSecurityGroup(final String groupId, final SecurityGroupRule rule, final ProviderTarget target)
         throws ConnectorException {
-        // TODO
-        throw new ConnectorException("unsupported operation");
-    }
-
-    @Override
-    public void deleteSecurityGroup(final String groupId, final ProviderTarget target) throws ResourceNotFoundException,
-        ConnectorException {
         // TODO
         throw new ConnectorException("unsupported operation");
     }
@@ -604,6 +572,48 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
                 throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
             }
         }
+    }
+
+    //
+    // Network : Forwarding Group
+    //
+
+    @Override
+    public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate, final ProviderTarget target)
+        throws ConnectorException {
+        try {
+            return this.getProvider(target).createForwardingGroup(forwardingGroupCreate);
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public ForwardingGroup getForwardingGroup(final String forwardingGroupId, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void deleteForwardingGroup(final ForwardingGroup forwardingGroup, final ProviderTarget target)
+        throws ResourceNotFoundException, ConnectorException {
+        try {
+            this.getProvider(target).deleteForwardingGroup(forwardingGroup);
+        } catch (OpenStackResponseException e) {
+            throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void addNetworkToForwardingGroup(final String forwardingGroupId, final ForwardingGroupNetwork fgNetwork,
+        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void removeNetworkFromForwardingGroup(final String forwardingGroupId, final String networkId,
+        final ProviderTarget target) throws ResourceNotFoundException, ConnectorException {
+        throw new ConnectorException("unsupported operation");
     }
 
     //
