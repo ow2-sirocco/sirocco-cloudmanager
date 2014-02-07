@@ -334,6 +334,7 @@ public class OpenStackCloudProvider {
 
         ServerForCreate serverForCreate = new ServerForCreate();
 
+        // name
         String serverName = null;
         if (machineCreate.getName() != null) {
             serverName = machineCreate.getName() + "-" + UUID.randomUUID();
@@ -342,12 +343,14 @@ public class OpenStackCloudProvider {
         }
         serverForCreate.setName(serverName);
 
+        // flavor
         String flavorId = this.findSuitableFlavor(machineCreate.getMachineTemplate().getMachineConfig());
         if (flavorId == null) {
             throw new ConnectorException("Cannot find Nova flavor matching machineConfig");
         }
         serverForCreate.setFlavorRef(flavorId);
 
+        // image
         ProviderMapping mapping = ProviderMapping.find(machineCreate.getMachineTemplate().getMachineImage(),
             this.cloudProviderAccount, this.cloudProviderLocation);
         if (mapping == null) {
@@ -356,6 +359,7 @@ public class OpenStackCloudProvider {
         }
         serverForCreate.setImageRef(mapping.getProviderAssignedId());
 
+        // key pair
         String keyPairName = null;
         if (machineCreate.getMachineTemplate().getCredential() != null) {
             // String publicKey = new
@@ -367,8 +371,14 @@ public class OpenStackCloudProvider {
             serverForCreate.setKeyName(keyPairName);
         }
 
-        serverForCreate.getSecurityGroups().add(new ServerForCreate.SecurityGroup("default")); /*default security group*/
+        // security group
+        /*serverForCreate.getSecurityGroups().add(new ServerForCreate.SecurityGroup("default")); // default security group*/
+        for (String securityGroupUuid : machineCreate.getMachineTemplate().getSecurityGroupUuids()) {
+            SecurityGroup securityGroup = this.getSecurityGroup(securityGroupUuid);
+            serverForCreate.getSecurityGroups().add(new ServerForCreate.SecurityGroup(securityGroup.getName()));
+        }
 
+        // network
         List<ServerForCreate.Network> networks = serverForCreate.getNetworks();
         // boolean allocateFloatingIp = false;
         if (machineCreate.getMachineTemplate().getNetworkInterfaces() != null) {
@@ -382,6 +392,7 @@ public class OpenStackCloudProvider {
             }
         }
 
+        // user data
         String userData = machineCreate.getMachineTemplate().getUserData();
         if (userData != null) {
             byte[] encoded = Base64.encodeBase64(userData.getBytes());
@@ -389,7 +400,8 @@ public class OpenStackCloudProvider {
             serverForCreate.setUserData(userData);
         }
 
-        Server server = this.novaClient.servers().boot(serverForCreate).execute(); /*get the server id*/
+        // get the server
+        Server server = this.novaClient.servers().boot(serverForCreate).execute();
         Machine machine = new Machine();
         try {
             server = this.novaClient.servers().show(server.getId()).execute(); /*get detailed information about the server*/
