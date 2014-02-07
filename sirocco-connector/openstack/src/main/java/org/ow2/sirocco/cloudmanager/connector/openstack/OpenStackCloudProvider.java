@@ -316,8 +316,16 @@ public class OpenStackCloudProvider {
         // Security Group
         List<SecurityGroup> securityGroups = new ArrayList<SecurityGroup>();
         machine.setSecurityGroups(securityGroups);
-        for (com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup : server.getSecurityGroups()) {
+        // does not work: provides only the security group Name
+        /*for (com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup : server.getSecurityGroups()) {
             securityGroups.add(this.getSecurityGroup(openStackSecurityGroup.getId()));
+        }*/
+        com.woorea.openstack.nova.model.SecurityGroups openstackSecurityGroups = this.novaClient.securityGroups()
+            .listByServer(serverId).execute();
+        for (com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup : openstackSecurityGroups) {
+            final SecurityGroup securityGroup = new SecurityGroup();
+            this.fromOpenstackSecurityGroupToCimiSecurityGroup(openStackSecurityGroup, securityGroup);
+            securityGroups.add(securityGroup);
         }
     }
 
