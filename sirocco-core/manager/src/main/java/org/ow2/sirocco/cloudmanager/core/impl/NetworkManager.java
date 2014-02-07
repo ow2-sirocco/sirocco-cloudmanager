@@ -1845,4 +1845,49 @@ public class NetworkManager implements INetworkManager {
             params.tenantId(this.getTenant().getId()).stateToIgnore(SecurityGroup.State.DELETED));
     }
 
+    @Override
+    public void addMachineToSecurityGroup(final String machineUuid, final String securityGroupUuid)
+        throws CloudProviderException {
+        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
+        Machine machine = this.machineManager.getMachineByUuid(machineUuid);
+        if (secGroup.getMembers().contains(machine)) {
+            return;
+        }
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(secGroup.getCloudProviderAccount()
+            .getCloudProvider().getCloudProviderType());
+
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            networkService.addMachineToSecurityGroup(machine.getProviderAssignedId(), secGroup.getProviderAssignedId(),
+                new ProviderTarget().account(secGroup.getCloudProviderAccount()).location(secGroup.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+        secGroup.getMembers().add(machine);
+        machine.getSecurityGroups().add(secGroup);
+    }
+
+    @Override
+    public void removeMachineFromSecurityGroup(final String machineUuid, final String securityGroupUuid)
+        throws CloudProviderException {
+        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
+        Machine machine = this.machineManager.getMachineByUuid(machineUuid);
+        if (!secGroup.getMembers().contains(machine)) {
+            throw new InvalidRequestException("Machine " + machine.getName() + " not a member of security group "
+                + secGroup.getName());
+        }
+        ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(secGroup.getCloudProviderAccount()
+            .getCloudProvider().getCloudProviderType());
+
+        try {
+            INetworkService networkService = connector.getNetworkService();
+            networkService.removeMachineFromSecurityGroup(machine.getProviderAssignedId(), secGroup.getProviderAssignedId(),
+                new ProviderTarget().account(secGroup.getCloudProviderAccount()).location(secGroup.getLocation()));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException(e.getMessage());
+        }
+        secGroup.getMembers().remove(machine);
+        machine.getSecurityGroups().remove(secGroup);
+    }
+
 }

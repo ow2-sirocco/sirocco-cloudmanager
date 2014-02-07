@@ -311,6 +311,20 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
     }
 
     @Override
+    public void addMachineToSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
+        throws ConnectorException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void removeMachineFromSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
+        throws ConnectorException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     public Address allocateAddress(final Map<String, String> properties, final ProviderTarget target) throws ConnectorException {
         // TODO Auto-generated method stub
         return null;

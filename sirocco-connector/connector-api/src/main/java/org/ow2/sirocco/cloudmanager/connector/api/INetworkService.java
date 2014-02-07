@@ -248,6 +248,10 @@ public interface INetworkService {
 
     void deleteRuleFromSecurityGroup(String groupId, SecurityGroupRule rule, ProviderTarget target) throws ConnectorException;
 
+    void addMachineToSecurityGroup(String machineId, String groupId, ProviderTarget target) throws ConnectorException;
+
+    void removeMachineFromSecurityGroup(String machineId, String groupId, ProviderTarget target) throws ConnectorException;
+
     List<Address> getAddresses(ProviderTarget target) throws ConnectorException;
 
     Address allocateAddress(Map<String, String> properties, ProviderTarget target) throws ConnectorException;

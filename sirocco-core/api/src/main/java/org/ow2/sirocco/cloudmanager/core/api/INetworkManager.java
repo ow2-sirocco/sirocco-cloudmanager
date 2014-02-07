@@ -400,6 +400,10 @@ public interface INetworkManager {
 
     void updateSecurityGroupState(int securityGroupId, SecurityGroup.State state) throws CloudProviderException;
 
+    void addMachineToSecurityGroup(String machineId, String groupId) throws CloudProviderException;
+
+    void removeMachineFromSecurityGroup(String machineId, String groupId) throws CloudProviderException;
+
     // Subnet operations
 
     QueryResult<Subnet> getSubnets(QueryParams... queryParams) throws InvalidRequestException, CloudProviderException;

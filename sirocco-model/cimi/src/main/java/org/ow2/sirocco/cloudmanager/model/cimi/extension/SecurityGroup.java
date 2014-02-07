@@ -23,6 +23,7 @@
 package org.ow2.sirocco.cloudmanager.model.cimi.extension;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -97,6 +98,9 @@ public class SecurityGroup extends CloudResource implements Serializable, ICloud
 
     @ManyToMany(mappedBy = "securityGroups")
     public List<Machine> getMembers() {
+        if (this.members == null) {
+            this.members = new ArrayList<Machine>();
+        }
         return this.members;
     }
 

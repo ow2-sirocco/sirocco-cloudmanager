@@ -294,6 +294,18 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     }
 
     @Override
+    public void addMachineToSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
+        throws ConnectorException {
+        this.getProvider(target).addMachineToSecurityGroup(machineId, groupId);
+    }
+
+    @Override
+    public void removeMachineFromSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
+        throws ConnectorException {
+        this.getProvider(target).removeMachineFromSecurityGroup(machineId, groupId);
+    }
+
+    @Override
     public List<Address> getAddresses(final ProviderTarget target) throws ConnectorException {
         return this.getProvider(target).getAddresses();
     }
@@ -637,7 +649,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             final String machineProviderAssignedId = UUID.randomUUID().toString();
             final Machine machine = new Machine();
             machine.setProviderAssignedId(machineProviderAssignedId);
-            this.machines.put(machineProviderAssignedId, machine);
+
             MockCloudProviderConnector.logger.info("Creating machine with providerAssignedId " + machineProviderAssignedId);
             machine.setName(machineCreate.getName());
             machine.setDescription(machineCreate.getDescription());
@@ -683,10 +695,21 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 machine.setNetworkInterfaces(Lists.<MachineNetworkInterface> newArrayList());
             }
 
+            List<SecurityGroup> secGroups = Lists.<SecurityGroup> newArrayList();
+            if (machineCreate.getMachineTemplate().getSecurityGroupUuids() != null) {
+                for (String sgId : machineCreate.getMachineTemplate().getSecurityGroupUuids()) {
+                    secGroups.add(this.getSecurityGroup(sgId));
+                }
+                for (SecurityGroup secGroup : secGroups) {
+                    secGroup.getMembers().add(machine);
+                }
+            }
+
             // TODO create and attach volumes
 
             machine.setVolumes(new ArrayList<MachineVolume>());
             machine.setUpdated(new Date());
+            this.machines.put(machineProviderAssignedId, machine);
             return machine;
         }
 
@@ -850,6 +873,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     machine.setUpdated(new Date());
                 } else if (machine.getState() == Machine.State.DELETING) {
                     this.machines.remove(machine.getProviderAssignedId());
+                    // remove machine from security groups
+                    for (SecurityGroup secGroup : machine.getSecurityGroups()) {
+                        secGroup.getMembers().remove(machine);
+                    }
                     machine.setState(Machine.State.DELETED);
                     machine.setUpdated(new Date());
                 } else if (machine.getState() == Machine.State.PAUSING) {
@@ -1917,6 +1944,27 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
             newRule.setProviderAssignedId(UUID.randomUUID().toString());
             secGroup.getRules().add(newRule);
             return newRule.getProviderAssignedId();
+        }
+
+        public void removeMachineFromSecurityGroup(final String machineId, final String groupId) throws ConnectorException {
+            Machine machine = this.getMachine(machineId);
+            SecurityGroup secGroup = this.getSecurityGroup(groupId);
+            if (secGroup.getMembers().contains(machine)) {
+                secGroup.getMembers().remove(machine);
+                machine.getSecurityGroups().remove(secGroup);
+            } else {
+                throw new ConnectorException("Machine " + machine.getName() + " not a member of security group "
+                    + secGroup.getName());
+            }
+        }
+
+        public void addMachineToSecurityGroup(final String machineId, final String groupId) throws ConnectorException {
+            Machine machine = this.getMachine(machineId);
+            SecurityGroup secGroup = this.getSecurityGroup(groupId);
+            if (!secGroup.getMembers().contains(machine)) {
+                secGroup.getMembers().add(machine);
+                machine.getSecurityGroups().add(secGroup);
+            }
         }
 
         public void removeAddressFromMachine(final String machineId, final Address address) throws ConnectorException {
