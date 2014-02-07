@@ -349,6 +349,10 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
         throw new ConnectorException("unsupported operation");
     }
 
+    //
+    // Network Service : security group
+    //
+
     @Override
     public String createSecurityGroup(final SecurityGroupCreate create, final ProviderTarget target) throws ConnectorException {
         throw new ConnectorException("unsupported operation");
@@ -384,6 +388,22 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
     }
 
     @Override
+    public void addMachineToSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
+        throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void removeMachineFromSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
+        throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    //
+    // Network Service : floating Ip
+    //
+
+    @Override
     public Address allocateAddress(final Map<String, String> properties, final ProviderTarget target) throws ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
@@ -409,6 +429,10 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
         throws ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
+
+    //
+    // Network Service : port
+    //
 
     @Override
     public NetworkPort createNetworkPort(final NetworkPortCreate networkPortCreate, final ProviderTarget target)
@@ -439,6 +463,10 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
         ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
+
+    //
+    // Network Service : forwarding group
+    //
 
     @Override
     public ForwardingGroup createForwardingGroup(final ForwardingGroupCreate forwardingGroupCreate, final ProviderTarget target)

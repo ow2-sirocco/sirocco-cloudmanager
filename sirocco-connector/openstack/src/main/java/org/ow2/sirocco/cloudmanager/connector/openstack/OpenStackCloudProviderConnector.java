@@ -521,6 +521,20 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
         throw new ConnectorException("unsupported operation");
     }
 
+    @Override
+    public void addMachineToSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
+        throws ConnectorException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void removeMachineFromSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
+        throws ConnectorException {
+        // TODO Auto-generated method stub
+
+    }
+
     //
     // Network : (floating IP) Address
     //
