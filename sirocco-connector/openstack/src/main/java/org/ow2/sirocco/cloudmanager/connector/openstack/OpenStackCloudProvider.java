@@ -456,9 +456,9 @@ public class OpenStackCloudProvider {
 
     public void addVolumeToMachine(final String machineId, final MachineVolume machineVolume) throws ConnectorException {
         String device = machineVolume.getInitialLocation();
-        if (device == null) {
+        /*if (device == null) {
             throw new ConnectorException("device not specified");
-        }
+        }*/
         this.novaClient.servers().attachVolume(machineId, machineVolume.getVolume().getProviderAssignedId(), device).execute();
     }
 
