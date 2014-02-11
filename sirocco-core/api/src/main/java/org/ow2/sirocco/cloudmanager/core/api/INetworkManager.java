@@ -53,6 +53,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRuleParams;
 
 /**
  * Network management operations
@@ -381,11 +382,11 @@ public interface INetworkManager {
 
     Job deleteSecurityGroup(String securityGroupUuid) throws CloudProviderException;
 
-    SecurityGroupRule addRuleToSecurityGroupUsingIpRange(String securityGroupUuid, String cidr, String ipProtocol,
-        int fromPort, int toPort) throws CloudProviderException;
+    SecurityGroup updateSecurityGroupAttributes(String securityGroupUuid, Map<String, Object> attributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException;
 
-    SecurityGroupRule addRuleToSecurityGroupUsingSourceGroup(String securityGroupUuid, String sourceGroupUuid,
-        String ipProtocol, int fromPort, int toPort) throws CloudProviderException;
+    SecurityGroupRule addRuleToSecurityGroup(String securityGroupUuid, SecurityGroupRuleParams permission)
+        throws CloudProviderException;
 
     void deleteRuleFromSecurityGroup(String ruleUuid) throws CloudProviderException;
 

@@ -64,6 +64,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.SubnetConfig;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRuleParams;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -498,8 +499,9 @@ public class ComputeTest extends AbstractTestBase {
 
         // create rule with cidr for group 0
 
-        SecurityGroupRule rule = this.networkManager.addRuleToSecurityGroupUsingIpRange(secGroup0.getUuid(),
-            ComputeTest.RULE0_CIDR, ComputeTest.RULE_PROTOCOL, ComputeTest.RULE_FROM_PORT, ComputeTest.RULE_TO_PORT);
+        SecurityGroupRule rule = this.networkManager.addRuleToSecurityGroup(secGroup0.getUuid(),
+            new SecurityGroupRuleParams().setSourceIpRange(ComputeTest.RULE0_CIDR).setIpProtocol(ComputeTest.RULE_PROTOCOL)
+                .setFromPort(ComputeTest.RULE_FROM_PORT).setToPort(ComputeTest.RULE_TO_PORT));
         Assert.assertNotNull(rule.getId());
         Assert.assertNotNull(rule.getUuid());
         Assert.assertNotNull(rule.getProviderAssignedId());
@@ -554,8 +556,9 @@ public class ComputeTest extends AbstractTestBase {
 
         // create rule with source group 0 for group 1
 
-        SecurityGroupRule rule1 = this.networkManager.addRuleToSecurityGroupUsingSourceGroup(secGroup1.getUuid(),
-            secGroup0.getUuid(), ComputeTest.RULE_PROTOCOL, ComputeTest.RULE_FROM_PORT, ComputeTest.RULE_TO_PORT);
+        SecurityGroupRule rule1 = this.networkManager.addRuleToSecurityGroup(secGroup1.getUuid(),
+            new SecurityGroupRuleParams().setSourceGroupUuid(secGroup0.getUuid()).setIpProtocol(ComputeTest.RULE_PROTOCOL)
+                .setFromPort(ComputeTest.RULE_FROM_PORT).setToPort(ComputeTest.RULE_TO_PORT));
         Assert.assertNotNull(rule1.getId());
         Assert.assertNotNull(rule1.getUuid());
         Assert.assertNotNull(rule1.getProviderAssignedId());

@@ -73,6 +73,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRuleParams;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1711,6 +1712,25 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    public SecurityGroup updateSecurityGroupAttributes(final String securityGroupUuid, final Map<String, Object> attributes)
+        throws ResourceNotFoundException, InvalidRequestException, CloudProviderException {
+        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
+        if (attributes.containsKey("name")) {
+            secGroup.setName((String) attributes.get("name"));
+        }
+        if (attributes.containsKey("description")) {
+            secGroup.setDescription((String) attributes.get("description"));
+        }
+        if (attributes.containsKey("properties")) {
+            secGroup.setProperties(new HashMap<String, String>((Map<String, String>) attributes.get("properties")));
+        }
+        secGroup.setUpdated(new Date());
+        this.em.merge(secGroup);
+        this.em.flush();
+        return secGroup;
+    }
+
+    @Override
     public void updateSecurityGroupState(final int securityGroupId, final State state) throws CloudProviderException {
         SecurityGroup secGroup = this.getSecurityGroupById(securityGroupId);
         secGroup.setState(state);
@@ -1726,8 +1746,22 @@ public class NetworkManager implements INetworkManager {
         this.fireResourceStateChangeEvent(secGroup);
     }
 
-    private SecurityGroupRule addRuleToSecurityGroup(final SecurityGroup secGroup, final SecurityGroupRule rule)
+    @Override
+    public SecurityGroupRule addRuleToSecurityGroup(final String securityGroupUuid, final SecurityGroupRuleParams permission)
         throws CloudProviderException {
+        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
+        SecurityGroupRule rule = new SecurityGroupRule();
+        rule.setIpProtocol(permission.getIpProtocol());
+        rule.setFromPort(permission.getFromPort());
+        rule.setToPort(permission.getToPort());
+        if (permission.getSourceIpRange() != null) {
+            rule.setSourceIpRange(permission.getSourceIpRange());
+        } else if (permission.getSourceGroupUuid() != null) {
+            rule.setSourceGroup(this.getSecurityGroupByUuid(permission.getSourceGroupUuid()));
+        } else {
+            throw new InvalidRequestException("Missing rule source");
+        }
+
         ICloudProviderConnector connector = this.connectorFinder.getCloudProviderConnector(secGroup.getCloudProviderAccount()
             .getCloudProvider().getCloudProviderType());
 
@@ -1752,34 +1786,6 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
-    public SecurityGroupRule addRuleToSecurityGroupUsingIpRange(final String securityGroupUuid, final String cidr,
-        final String ipProtocol, final int fromPort, final int toPort) throws CloudProviderException {
-        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
-        SecurityGroupRule rule = new SecurityGroupRule();
-        rule.setIpProtocol(ipProtocol);
-        rule.setFromPort(fromPort);
-        rule.setToPort(toPort);
-        rule.setSourceIpRange(cidr);
-
-        return this.addRuleToSecurityGroup(secGroup, rule);
-    }
-
-    @Override
-    public SecurityGroupRule addRuleToSecurityGroupUsingSourceGroup(final String securityGroupUuid,
-        final String sourceGroupUuid, final String ipProtocol, final int fromPort, final int toPort)
-        throws CloudProviderException {
-        SecurityGroup secGroup = this.getSecurityGroupByUuid(securityGroupUuid);
-        SecurityGroup sourceSecGroup = this.getSecurityGroupByUuid(sourceGroupUuid);
-        SecurityGroupRule rule = new SecurityGroupRule();
-        rule.setIpProtocol(ipProtocol);
-        rule.setFromPort(fromPort);
-        rule.setToPort(toPort);
-        rule.setSourceGroup(sourceSecGroup);
-
-        return this.addRuleToSecurityGroup(secGroup, rule);
-    }
-
-    @Override
     public SecurityGroupRule getSecurityGroupRuleByUuid(final String ruleUuid) throws ResourceNotFoundException {
         try {
             return this.em.createNamedQuery("SecurityGroupRule.findByUuid", SecurityGroupRule.class)
@@ -1800,6 +1806,8 @@ public class NetworkManager implements INetworkManager {
             INetworkService networkService = connector.getNetworkService();
             networkService.deleteRuleFromSecurityGroup(secGroup.getProviderAssignedId(), rule,
                 new ProviderTarget().account(secGroup.getCloudProviderAccount()).location(secGroup.getLocation()));
+        } catch (org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException e) {
+            // ignore
         } catch (ConnectorException e) {
             throw new CloudProviderException(e.getMessage());
         }
