@@ -957,7 +957,18 @@ public class OpenStackCloudProvider {
         cimiSecurityGroup.setProviderAssignedId(openStackSecurityGroup.getId());
         cimiSecurityGroup.setState(SecurityGroup.State.AVAILABLE);
 
-        // TODO SecurityGroup Rules : cimiSecurityGroup.setRules(rules)
+        // Add Rules
+        for (com.woorea.openstack.nova.model.SecurityGroup.Rule openStackRule : openStackSecurityGroup.getRules()) {
+            SecurityGroupRule rule = new SecurityGroupRule();
+            rule.setProviderAssignedId(openStackRule.getId());
+            rule.setParentGroup(cimiSecurityGroup);
+            rule.setIpProtocol(openStackRule.getIpProtocol());
+            rule.setFromPort(openStackRule.getFromPort());
+            rule.setToPort(openStackRule.getToPort());
+            rule.setSourceIpRange(openStackRule.getIpRange().getCidr());
+
+            cimiSecurityGroup.getRules().add(rule);
+        }
 
     }
 
