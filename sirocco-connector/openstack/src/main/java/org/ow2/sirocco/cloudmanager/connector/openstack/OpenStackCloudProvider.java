@@ -63,6 +63,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -990,7 +991,22 @@ public class OpenStackCloudProvider {
     }
 
     public void deleteSecurityGroup(final String groupId) throws ConnectorException {
+        OpenStackCloudProvider.logger.info("deleting SecurityGroup for " + this.cloudProviderAccount.getLogin());
         this.novaClient.securityGroups().deleteSecurityGroup(groupId).execute();
+    }
+
+    public String addRuleToSecurityGroup(final String groupId, final SecurityGroupRule rule) {
+        com.woorea.openstack.nova.model.SecurityGroup.Rule openStackSecurityGroupRule = this.novaClient
+            .securityGroups()
+            .createSecurityGroupRule(groupId, rule.getIpProtocol(), rule.getFromPort(), rule.getToPort(),
+                rule.getSourceIpRange()).execute();
+
+        // return rule id
+        return openStackSecurityGroupRule.getId();
+    }
+
+    public void deleteRuleFromSecurityGroup(final String groupId, final SecurityGroupRule rule) {
+        this.novaClient.securityGroups().deleteSecurityGroupRule(rule.getProviderAssignedId()).execute();
     }
 
     //
