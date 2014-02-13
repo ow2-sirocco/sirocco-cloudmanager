@@ -974,7 +974,7 @@ public class OpenStackCloudProvider {
                 com.woorea.openstack.nova.model.SecurityGroup sourceOpenStackSecurityGroup = this
                     .getOpenstackSecurityGroupsByName(openStackRule.getGroup().getName());
                 sourceCimiSecurityGroup.setProviderAssignedId(sourceOpenStackSecurityGroup.getId());
-                rule.setParentGroup(sourceCimiSecurityGroup);
+                rule.setSourceGroup(sourceCimiSecurityGroup);
             }
 
             cimiSecurityGroup.getRules().add(rule);
