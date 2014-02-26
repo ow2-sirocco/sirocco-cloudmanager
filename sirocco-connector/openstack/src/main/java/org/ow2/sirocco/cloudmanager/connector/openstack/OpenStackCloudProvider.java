@@ -967,7 +967,7 @@ public class OpenStackCloudProvider {
             rule.setIpProtocol(openStackRule.getIpProtocol());
             rule.setFromPort(openStackRule.getFromPort());
             rule.setToPort(openStackRule.getToPort());
-            if (openStackRule.getGroup() == null) {
+            /*if (openStackRule.getGroup() == null) {
                 rule.setSourceIpRange(openStackRule.getIpRange().getCidr());
             } else {
                 SecurityGroup sourceCimiSecurityGroup = new SecurityGroup();
@@ -975,7 +975,7 @@ public class OpenStackCloudProvider {
                     .getOpenstackSecurityGroupsByName(openStackRule.getGroup().getName());
                 sourceCimiSecurityGroup.setProviderAssignedId(sourceOpenStackSecurityGroup.getId());
                 rule.setSourceGroup(sourceCimiSecurityGroup);
-            }
+            }*/
 
             cimiSecurityGroup.getRules().add(rule);
         }
