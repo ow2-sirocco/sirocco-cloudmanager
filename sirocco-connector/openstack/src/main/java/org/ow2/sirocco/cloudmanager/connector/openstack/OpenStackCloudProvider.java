@@ -1051,6 +1051,18 @@ public class OpenStackCloudProvider {
         this.novaClient.securityGroups().deleteSecurityGroupRule(rule.getProviderAssignedId()).execute();
     }
 
+    public void addMachineToSecurityGroup(final String machineId, final String groupId) {
+        com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup = this.novaClient.securityGroups()
+            .showSecurityGroup(groupId).execute();
+        this.novaClient.servers().addSecurityGroupAction(machineId, openStackSecurityGroup.getName()).execute();
+    }
+
+    public void removeMachineFromSecurityGroup(final String machineId, final String groupId) {
+        com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup = this.novaClient.securityGroups()
+            .showSecurityGroup(groupId).execute();
+        this.novaClient.servers().removeSecurityGroupAction(machineId, openStackSecurityGroup.getName()).execute();
+    }
+
     //
     // Network : (floating IP) Address
     //

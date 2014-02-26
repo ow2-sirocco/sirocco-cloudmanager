@@ -538,14 +538,30 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public void addMachineToSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
         throws ConnectorException {
-        // TODO Auto-generated method stub
+        try {
+            this.getProvider(target).addMachineToSecurityGroup(machineId, groupId);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
 
     }
 
     @Override
     public void removeMachineFromSecurityGroup(final String machineId, final String groupId, final ProviderTarget target)
         throws ConnectorException {
-        // TODO Auto-generated method stub
+        try {
+            this.getProvider(target).removeMachineFromSecurityGroup(machineId, groupId);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
 
     }
 
