@@ -89,7 +89,10 @@ public class SecurityGroup extends CloudResource implements Serializable, ICloud
 
     @OneToMany(mappedBy = "parentGroup", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, fetch = FetchType.EAGER)
     public List<SecurityGroupRule> getRules() {
-        return this.rules;
+    	if (this.rules == null){
+            this.rules = new ArrayList<SecurityGroupRule>();
+    	}
+    		return this.rules; 
     }
 
     public void setRules(final List<SecurityGroupRule> rules) {
