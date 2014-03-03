@@ -22,7 +22,7 @@
     <jdbc-resource pool-name="H2InMemory" jndi-name="jdbc/arquillian"></jdbc-resource>
 	
 
-	<connector-connection-pool max-pool-size="250" steady-pool-size="1" name="jms/__defaultConnectionFactory-Connection-Pool" resource-adapter-name="jmsra" connection-definition-name="javax.jms.ConnectionFactory"></connector-connection-pool>
+	<connector-connection-pool max-pool-size="250" steady-pool-size="1" name="jms/__defaultConnectionFactory-Connection-Pool" resource-adapter-name="jmsra" connection-definition-name="javax.jms.ConnectionFactory" transaction-support="NoTransaction"></connector-connection-pool>
     <connector-resource pool-name="jms/__defaultConnectionFactory-Connection-Pool" jndi-name="jms/__defaultConnectionFactory" object-type="system-all"></connector-resource>
 	
 	<admin-object-resource res-adapter="jmsra"
