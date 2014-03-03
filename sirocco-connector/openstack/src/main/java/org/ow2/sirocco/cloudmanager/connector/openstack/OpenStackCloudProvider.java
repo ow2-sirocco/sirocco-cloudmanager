@@ -36,6 +36,7 @@ import java.util.UUID;
 import org.apache.commons.codec.binary.Base64;
 import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
+import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.ForwardingGroup;
@@ -63,6 +64,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -949,15 +951,47 @@ public class OpenStackCloudProvider {
     //
 
     private void fromOpenstackSecurityGroupToCimiSecurityGroup(
-        final com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup, final SecurityGroup cimiSecurityGroup) {
+        final com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup, final SecurityGroup cimiSecurityGroup)
+        throws ResourceNotFoundException {
 
         cimiSecurityGroup.setName(openStackSecurityGroup.getName());
         cimiSecurityGroup.setDescription(openStackSecurityGroup.getDescription());
         cimiSecurityGroup.setProviderAssignedId(openStackSecurityGroup.getId());
         cimiSecurityGroup.setState(SecurityGroup.State.AVAILABLE);
 
-        // TODO SecurityGroup Rules : cimiSecurityGroup.setRules(rules)
+        // Add Rules
+        for (com.woorea.openstack.nova.model.SecurityGroup.Rule openStackRule : openStackSecurityGroup.getRules()) {
+            SecurityGroupRule rule = new SecurityGroupRule();
+            rule.setProviderAssignedId(openStackRule.getId());
+            rule.setParentGroup(cimiSecurityGroup);
+            rule.setIpProtocol(openStackRule.getIpProtocol());
+            rule.setFromPort(openStackRule.getFromPort());
+            rule.setToPort(openStackRule.getToPort());
+            if (openStackRule.getGroup() == null || openStackRule.getGroup().getName() == null) {
+                rule.setSourceIpRange(openStackRule.getIpRange().getCidr());
+            } else {
+                SecurityGroup sourceCimiSecurityGroup = new SecurityGroup();
+                com.woorea.openstack.nova.model.SecurityGroup sourceOpenStackSecurityGroup = this
+                    .getOpenstackSecurityGroupsByName(openStackRule.getGroup().getName());
+                sourceCimiSecurityGroup.setProviderAssignedId(sourceOpenStackSecurityGroup.getId());
+                rule.setSourceGroup(sourceCimiSecurityGroup);
+            }
 
+            cimiSecurityGroup.getRules().add(rule);
+        }
+
+    }
+
+    private com.woorea.openstack.nova.model.SecurityGroup getOpenstackSecurityGroupsByName(final String securityGroupName)
+        throws ResourceNotFoundException {
+        com.woorea.openstack.nova.model.SecurityGroups openStackSecurityGroups = this.novaClient.securityGroups()
+            .listSecurityGroups().execute();
+        for (com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup : openStackSecurityGroups) {
+            if (openStackSecurityGroup.getName().equals(securityGroupName)) {
+                return openStackSecurityGroup;
+            }
+        }
+        throw new ResourceNotFoundException("No security group with the name=" + securityGroupName);
     }
 
     public String createSecurityGroup(final SecurityGroupCreate create) throws ConnectorException {
@@ -990,7 +1024,43 @@ public class OpenStackCloudProvider {
     }
 
     public void deleteSecurityGroup(final String groupId) throws ConnectorException {
+        OpenStackCloudProvider.logger.info("deleting SecurityGroup for " + this.cloudProviderAccount.getLogin());
         this.novaClient.securityGroups().deleteSecurityGroup(groupId).execute();
+    }
+
+    public String addRuleToSecurityGroup(final String groupId, final SecurityGroupRule rule) {
+        com.woorea.openstack.nova.model.SecurityGroup.Rule openStackSecurityGroupRule;
+
+        if (rule.getSourceGroup() == null) {
+            openStackSecurityGroupRule = this.novaClient
+                .securityGroups()
+                .createSecurityGroupRule(groupId, rule.getIpProtocol(), rule.getFromPort(), rule.getToPort(),
+                    rule.getSourceIpRange()).execute();
+        } else {
+            openStackSecurityGroupRule = this.novaClient
+                .securityGroups()
+                .createSecurityGroupRule(groupId, rule.getSourceGroup().getProviderAssignedId(), rule.getIpProtocol(),
+                    rule.getFromPort(), rule.getToPort()).execute();
+        }
+
+        // return rule id
+        return openStackSecurityGroupRule.getId();
+    }
+
+    public void deleteRuleFromSecurityGroup(final String groupId, final SecurityGroupRule rule) {
+        this.novaClient.securityGroups().deleteSecurityGroupRule(rule.getProviderAssignedId()).execute();
+    }
+
+    public void addMachineToSecurityGroup(final String machineId, final String groupId) {
+        com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup = this.novaClient.securityGroups()
+            .showSecurityGroup(groupId).execute();
+        this.novaClient.servers().addSecurityGroupAction(machineId, openStackSecurityGroup.getName()).execute();
+    }
+
+    public void removeMachineFromSecurityGroup(final String machineId, final String groupId) {
+        com.woorea.openstack.nova.model.SecurityGroup openStackSecurityGroup = this.novaClient.securityGroups()
+            .showSecurityGroup(groupId).execute();
+        this.novaClient.servers().removeSecurityGroupAction(machineId, openStackSecurityGroup.getName()).execute();
     }
 
     //
