@@ -678,7 +678,8 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     List<MachineNetworkInterfaceAddress> addrs = new ArrayList<MachineNetworkInterfaceAddress>();
                     MachineNetworkInterfaceAddress entry = new MachineNetworkInterfaceAddress();
                     Address ip = new Address();
-                    ip.setIp("192.168.200." + this.random.nextInt(253) + 2);
+                    int address_suffix = this.random.nextInt(253) + 2;
+                    ip.setIp("192.168.200." + address_suffix);
                     ip.setAllocation("dynamic");
                     ip.setProtocol("IPv4");
                     ip.setNetwork(networkInterface.getNetwork());
