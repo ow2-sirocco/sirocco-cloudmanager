@@ -55,6 +55,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.MachineTemplateNetworkInterface;
 import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
@@ -829,8 +830,9 @@ public class VcdCloudProvider {
         n.setName(vappNetworkReferenceType.getName());
         n.setProviderAssignedId(vappNetworkReferenceType.getHref());
         n.setState(Network.State.STARTED);
-        /* Mapping Rule
-         * If the vAppNetwork is not isolated and its name = the CIMI public network configuration parameter 
+
+        // Mapping Rule
+        /* If the vAppNetwork is not isolated and its name = the CIMI public network configuration parameter 
          * then the CIMI network is set to PUBLIC else to PRIVATE */
         /* Applying this rule with a vApp created outside Sirocco might not work properly ! 
          * A workaround in this case is to use the OrgVdcNetwork to which the vAppNetwork is connected */
@@ -840,6 +842,25 @@ public class VcdCloudProvider {
         } else {
             n.setNetworkType(Network.Type.PRIVATE);
         }*/
+
+        // subnet
+        List<Subnet> subnets = new ArrayList<Subnet>();
+        n.setSubnets(subnets);
+        /*SubnetUtils utils = new SubnetUtils(vappNetwork.getResource().getConfiguration().getIpScope().getGateway(), vappNetwork
+            .getResource().getConfiguration().getIpScope().getNetmask());*/
+        SubnetUtils utils = new SubnetUtils(vappNetwork.getResource().getConfiguration().getIpScopes().getIpScope().get(0)
+            .getGateway(), vappNetwork.getResource().getConfiguration().getIpScopes().getIpScope().get(0).getNetmask());
+        utils = new SubnetUtils(utils.getInfo().getNetworkAddress(), utils.getInfo().getNetmask());
+        utils.setInclusiveHostCount(false);
+        SubnetInfo info = utils.getInfo();
+        Subnet subnet = new Subnet();
+        subnet.setCidr(info.getCidrSignature());
+        // subnet.setName(????);
+        // subnet.setEnableDhcp(???);
+        // subnet.setProviderAssignedId(???);
+        subnet.setState(Subnet.State.AVAILABLE);
+        subnet.setProtocol("IPv4");
+        subnets.add(subnet);
     }
 
     private void fromOrgVdcNetworkToNetwork(final OrgVdcNetwork orgVdcNetwork, final Network n) {
@@ -847,14 +868,34 @@ public class VcdCloudProvider {
         n.setName(orgVdcNetworkReferenceType.getName());
         n.setProviderAssignedId(orgVdcNetworkReferenceType.getHref());
         n.setState(Network.State.STARTED);
-        /* Mapping Rule
-         * If the orgVdcNetwork name = the CIMI public network configuration parameter 
+
+        // Mapping Rule
+        /* If the orgVdcNetwork name = the CIMI public network configuration parameter 
          * then the CIMI network is set to PUBLIC else to PRIVATE */
         /*if (orgVdcNetworkReferenceType.getName().equals(this.vCloudContext.getCimiPublicOrgVdcNetworkName())) {
             n.setNetworkType(Network.Type.PUBLIC);
         } else {
             n.setNetworkType(Network.Type.PRIVATE);
         }*/
+
+        // subnet
+        List<Subnet> subnets = new ArrayList<Subnet>();
+        n.setSubnets(subnets);
+        /*SubnetUtils utils = new SubnetUtils(orgVdcNetwork.getResource().getConfiguration().getIpScope().getGateway(), orgVdcNetwork
+            .getResource().getConfiguration().getIpScope().getNetmask());*/
+        SubnetUtils utils = new SubnetUtils(orgVdcNetwork.getResource().getConfiguration().getIpScopes().getIpScope().get(0)
+            .getGateway(), orgVdcNetwork.getResource().getConfiguration().getIpScopes().getIpScope().get(0).getNetmask());
+        utils = new SubnetUtils(utils.getInfo().getNetworkAddress(), utils.getInfo().getNetmask());
+        utils.setInclusiveHostCount(false);
+        SubnetInfo info = utils.getInfo();
+        Subnet subnet = new Subnet();
+        subnet.setCidr(info.getCidrSignature());
+        // subnet.setName(????);
+        // subnet.setEnableDhcp(???);
+        // subnet.setProviderAssignedId(???);
+        subnet.setState(Subnet.State.AVAILABLE);
+        subnet.setProtocol("IPv4");
+        subnets.add(subnet);
     }
 
     public List<Network> getNetworks() throws ConnectorException {
