@@ -253,6 +253,8 @@ public class SystemManager implements ISystemManager {
     public Job createSystem(final SystemCreate systemCreate) throws CloudProviderException {
         SystemManager.logger.info("Creating System " + systemCreate.getName());
 
+        systemCreate.setSystemTemplate(this.getSystemTemplateByUuid(systemCreate.getSystemTemplate().getUuid()));
+
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), systemCreate);
