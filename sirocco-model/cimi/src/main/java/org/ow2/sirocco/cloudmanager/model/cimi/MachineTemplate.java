@@ -209,6 +209,9 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     @Transient
     public List<String> getSecurityGroupUuids() {
+        if (this.securityGroupUuids == null) {
+            this.securityGroupUuids = new ArrayList<>();
+        }
         return this.securityGroupUuids;
     }
 
