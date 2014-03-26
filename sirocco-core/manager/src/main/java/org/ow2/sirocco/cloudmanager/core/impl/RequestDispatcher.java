@@ -437,8 +437,7 @@ public class RequestDispatcher implements MessageListener {
         System system = this.em.find(System.class, command.getResourceId());
         system.setProviderAssignedId(newSystem.getProviderAssignedId());
 
-        this.resourceWatcherManager.createSystemStateWatcher(system, command.getJob(), System.State.STARTED,
-            System.State.STOPPED);
+        this.resourceWatcherManager.createSystemStateWatcher(system, command.getJob(), System.State.STARTED);
     }
 
     private void deleteSystem(final ResourceCommand command) throws CloudProviderException, ConnectorException {
