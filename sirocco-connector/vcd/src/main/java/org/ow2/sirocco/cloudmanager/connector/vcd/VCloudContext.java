@@ -37,6 +37,7 @@ import com.vmware.vcloud.sdk.OrgVdcNetwork;
 import com.vmware.vcloud.sdk.Organization;
 import com.vmware.vcloud.sdk.QueryParams;
 import com.vmware.vcloud.sdk.ReferenceResult;
+import com.vmware.vcloud.sdk.VCloudException;
 import com.vmware.vcloud.sdk.VcloudClient;
 import com.vmware.vcloud.sdk.Vdc;
 import com.vmware.vcloud.sdk.admin.EdgeGateway;
@@ -47,6 +48,8 @@ import com.vmware.vcloud.sdk.constants.query.QueryReferenceField;
 import com.vmware.vcloud.sdk.constants.query.QueryReferenceType;
 
 public class VCloudContext {
+
+    private CloudProviderAccount cloudProviderAccount;
 
     private VcloudClient vcloudClient;
 
@@ -76,6 +79,7 @@ public class VCloudContext {
 
     public VCloudContext(final CloudProviderAccount cloudProviderAccount, final Logger logger) throws ConnectorException {
 
+        this.cloudProviderAccount = cloudProviderAccount;
         Map<String, String> properties = cloudProviderAccount.getProperties();
         if (properties == null || properties.get("orgName") == null || properties.get("vdcName") == null
             || properties.get("publicNetworkName") == null) {
@@ -88,15 +92,9 @@ public class VCloudContext {
             + cloudProviderAccount.getCloudProvider().getEndpoint() + ", with VirtualDataCenter=" + this.vdcName
             + ", publicNetwork=" + this.cimiPublicOrgVdcNetworkName);
 
-        try {
-            VcloudClient.setLogLevel(Level.OFF);
-            // VcloudClient.setLogLevel(Level.INFO);
-            this.vcloudClient = new VcloudClient(cloudProviderAccount.getCloudProvider().getEndpoint(), Version.V5_1);
-            this.vcloudClient.registerScheme("https", 443, FakeSSLSocketFactory.getInstance());
-            String user = cloudProviderAccount.getLogin() + "@" + this.orgName;
-            /*String user = "Administrator@System";*/// !!!
-            this.vcloudClient.login(user, cloudProviderAccount.getPassword());
+        this.vcloudClient = this.initiateVcloudClient();
 
+        try {
             // Org
             ReferenceType orgRef = this.vcloudClient.getOrgRefByName(this.orgName);
             if (orgRef == null) {
@@ -173,7 +171,33 @@ public class VCloudContext {
         }
     }
 
-    public VcloudClient getVcloudClient() {
+    private VcloudClient initiateVcloudClient() throws ConnectorException {
+        try {
+            VcloudClient.setLogLevel(Level.OFF);
+            // VcloudClient.setLogLevel(Level.INFO);
+            this.vcloudClient = new VcloudClient(this.cloudProviderAccount.getCloudProvider().getEndpoint(), Version.V5_1);
+            this.vcloudClient.registerScheme("https", 443, FakeSSLSocketFactory.getInstance());
+            String user = this.cloudProviderAccount.getLogin() + "@" + this.orgName;
+            /*String user = "Administrator@System";*/// !!!
+            this.vcloudClient.login(user, this.cloudProviderAccount.getPassword());
+            return this.vcloudClient;
+        } catch (Exception ex) {
+            throw new ConnectorException("cannot connect user=" + this.cloudProviderAccount.getLogin() + " to Organization="
+                + this.orgName + " at " + this.cloudProviderAccount.getCloudProvider().getEndpoint()
+                + ", with VirtualDataCenter=" + this.vdcName + ", publicNetwork=" + this.cimiPublicOrgVdcNetworkName, ex);
+        }
+    }
+
+    public VcloudClient getVcloudClient() throws ConnectorException {
+        /* FIXME clarify the method extendSession() in the VcloudClient (VCloudException raised and boolean returned in the the Java API ?) 
+         * see https://communities.vmware.com/message/2199229 */
+        try {
+            this.vcloudClient.extendSession();
+            this.vcloudClient.getUpdatedOrgList(); /*only to check the connection*/
+
+        } catch (VCloudException e) {
+            this.initiateVcloudClient();
+        }
         return this.vcloudClient;
     }
 
