@@ -49,6 +49,8 @@ import com.vmware.vcloud.sdk.constants.query.QueryReferenceType;
 
 public class VCloudContext {
 
+    private Logger logger;
+
     private CloudProviderAccount cloudProviderAccount;
 
     private VcloudClient vcloudClient;
@@ -79,6 +81,7 @@ public class VCloudContext {
 
     public VCloudContext(final CloudProviderAccount cloudProviderAccount, final Logger logger) throws ConnectorException {
 
+        this.logger = logger;
         this.cloudProviderAccount = cloudProviderAccount;
         Map<String, String> properties = cloudProviderAccount.getProperties();
         if (properties == null || properties.get("orgName") == null || properties.get("vdcName") == null
@@ -189,7 +192,18 @@ public class VCloudContext {
     }
 
     public VcloudClient getVcloudClient() throws ConnectorException {
-        /* FIXME clarify the method extendSession() in the VcloudClient (VCloudException raised and boolean returned in the the Java API ?) 
+        /* Clarify the method extendSession() in the VcloudClient (VCloudException raised and boolean returned in the the Java API ?) 
+         * see https://communities.vmware.com/message/2199229 
+         * The assumption here is that false is returned when it is necessary to log on again */
+        if (this.vcloudClient.extendSession() == false) {
+            this.logger.info("Login user=" + this.cloudProviderAccount.getLogin() + " to Organization=" + this.orgName);
+            this.initiateVcloudClient();
+        }
+        return this.vcloudClient;
+    }
+
+    public VcloudClient getVcloudClientOld() throws ConnectorException {
+        /* clarify the method extendSession() in the VcloudClient (VCloudException raised and boolean returned in the the Java API ?) 
          * see https://communities.vmware.com/message/2199229 */
         try {
             this.vcloudClient.extendSession();
