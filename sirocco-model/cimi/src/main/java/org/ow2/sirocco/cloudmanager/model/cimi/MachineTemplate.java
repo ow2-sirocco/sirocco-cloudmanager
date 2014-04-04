@@ -42,6 +42,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Transient;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.event.EventLogTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.PlacementHint;
 
 /**
  * Machine template
@@ -72,6 +73,8 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
     private EventLogTemplate eventLogTemplate;
 
     private List<String> securityGroupUuids;
+
+    private PlacementHint placementHint;
 
     public MachineTemplate() {
 
@@ -217,6 +220,15 @@ public class MachineTemplate extends CloudTemplate implements Serializable {
 
     public void setSecurityGroupUuids(final List<String> securityGroupUuids) {
         this.securityGroupUuids = securityGroupUuids;
+    }
+
+    @Transient
+    public PlacementHint getPlacementHint() {
+        return this.placementHint;
+    }
+
+    public void setPlacementHint(final PlacementHint placementHint) {
+        this.placementHint = placementHint;
     }
 
 }

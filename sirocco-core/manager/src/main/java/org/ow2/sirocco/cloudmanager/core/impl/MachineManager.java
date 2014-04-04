@@ -109,6 +109,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.PlacementHint;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
@@ -205,12 +206,50 @@ public class MachineManager implements IMachineManager {
         return true;
     }
 
+    /**
+     * Validates the placement hint if any and translate Machine uuids into provider-assigned identifiers
+     * 
+     * @param machineCreate
+     * @param placement
+     * @throws CloudProviderException
+     */
+    private void translateAndValidatePlacementHint(final MachineCreate machineCreate, final Placement placement)
+        throws CloudProviderException {
+        PlacementHint placementHint = machineCreate.getMachineTemplate().getPlacementHint();
+        if (placementHint != null) {
+            PlacementHint providerPlacementHint = new PlacementHint();
+            providerPlacementHint.setPlacementConstraint(placementHint.getPlacementConstraint());
+            providerPlacementHint.setMachineIds(new ArrayList<String>());
+            for (String machineId : placementHint.getMachineIds()) {
+                try {
+                    Machine machine = this.getMachineByUuid(machineId);
+                    if (!machine.getCloudProviderAccount().getUuid().equals(placement.getAccount().getUuid())
+                        || !machine.getLocation().getUuid().equals(placement.getLocation().getUuid())) {
+                        throw new InvalidRequestException("Machine with id " + machineId
+                            + " in placement hint not located on target provider account");
+                    }
+                    // if a machine
+                    if (machine.getProviderAssignedId() != null) {
+                        providerPlacementHint.getMachineIds().add(machine.getProviderAssignedId());
+                    }
+                } catch (ResourceNotFoundException ex) {
+                    throw new InvalidRequestException("Cannot find machine with id " + machineId + " in placement hint");
+                }
+            }
+
+            machineCreate.getMachineTemplate().setPlacementHint(providerPlacementHint);
+        }
+
+    }
+
     public Job createMachine(final MachineCreate machineCreate) throws CloudProviderException {
         MachineManager.logger.info("Creating Machine " + machineCreate.getName());
 
         Tenant tenant = this.getTenant();
 
         Placement placement = this.cloudProviderManager.placeResource(tenant.getId(), machineCreate);
+
+        this.translateAndValidatePlacementHint(machineCreate, placement);
 
         Machine machine = new Machine();
 
