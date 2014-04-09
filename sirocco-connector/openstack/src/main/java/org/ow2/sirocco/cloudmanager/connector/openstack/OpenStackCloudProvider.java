@@ -61,6 +61,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.PlacementHint;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
@@ -83,9 +84,11 @@ import com.woorea.openstack.nova.model.FloatingIps;
 import com.woorea.openstack.nova.model.Image;
 import com.woorea.openstack.nova.model.Images;
 import com.woorea.openstack.nova.model.KeyPair;
+import com.woorea.openstack.nova.model.SchedulerHints;
 import com.woorea.openstack.nova.model.Server;
 import com.woorea.openstack.nova.model.Server.Addresses;
 import com.woorea.openstack.nova.model.ServerForCreate;
+import com.woorea.openstack.nova.model.ServerForCreateWithSchedulerHints;
 import com.woorea.openstack.nova.model.VolumeAttachment;
 import com.woorea.openstack.nova.model.VolumeAttachments;
 import com.woorea.openstack.nova.model.VolumeForCreate;
@@ -402,8 +405,30 @@ public class OpenStackCloudProvider {
             serverForCreate.setUserData(userData);
         }
 
+        // scheduler hints
+        SchedulerHints schedulerHints = null;
+
+        PlacementHint placementHint = machineCreate.getMachineTemplate().getPlacementHint();
+        if (placementHint != null) {
+            if (placementHint.getPlacementConstraint().equals(PlacementHint.AFFINITY_CONSTRAINT)) {
+                schedulerHints = new SchedulerHints();
+                schedulerHints.setSameHosts(placementHint.getMachineIds());
+            } else if (placementHint.getPlacementConstraint().equals(PlacementHint.ANTI_AFFINITY_CONSTRAINT)) {
+                schedulerHints = new SchedulerHints();
+                schedulerHints.setDifferentHosts(placementHint.getMachineIds());
+            }
+        }
+
         // get the server
-        Server server = this.novaClient.servers().boot(serverForCreate).execute();
+        Server server;
+
+        if (schedulerHints == null) {
+            server = this.novaClient.servers().boot(serverForCreate).execute();
+        } else {
+            ServerForCreateWithSchedulerHints serverForCreateWithSchedulerHints = new ServerForCreateWithSchedulerHints(
+                serverForCreate, schedulerHints);
+            server = this.novaClient.servers().boot(serverForCreateWithSchedulerHints).execute();
+        }
         Machine machine = new Machine();
         try {
             server = this.novaClient.servers().show(server.getId()).execute(); /*get detailed information about the server*/
