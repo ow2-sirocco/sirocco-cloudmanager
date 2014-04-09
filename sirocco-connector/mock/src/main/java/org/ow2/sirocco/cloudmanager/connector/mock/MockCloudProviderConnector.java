@@ -83,6 +83,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.PlacementHint;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
@@ -704,6 +705,12 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 for (SecurityGroup secGroup : secGroups) {
                     secGroup.getMembers().add(machine);
                 }
+            }
+
+            // dump placement hint if any
+            PlacementHint placementHint = machineCreate.getMachineTemplate().getPlacementHint();
+            if (placementHint != null) {
+                MockCloudProviderConnector.logger.info("" + placementHint);
             }
 
             // TODO create and attach volumes
