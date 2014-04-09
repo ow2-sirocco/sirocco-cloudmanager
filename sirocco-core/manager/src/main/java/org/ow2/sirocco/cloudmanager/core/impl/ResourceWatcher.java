@@ -112,6 +112,11 @@ public class ResourceWatcher {
             try {
                 Machine updatedMachine = connector.getComputeService().getMachine(machine.getProviderAssignedId(), target);
 
+                if (updatedMachine.getState() == Machine.State.ERROR) {
+                    this.machineManager.syncMachine(machine.getId(), updatedMachine);
+                    this.jobManager.updateJobStatus(job.getId(), Job.Status.FAILED);
+                    break;
+                }
                 for (Machine.State expectedFinalState : expectedStates) {
                     if (updatedMachine.getState() == expectedFinalState) {
                         this.machineManager.syncMachine(machine.getId(), updatedMachine);
