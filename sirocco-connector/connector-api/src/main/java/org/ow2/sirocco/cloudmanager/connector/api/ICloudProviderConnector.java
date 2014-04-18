@@ -27,6 +27,7 @@ package org.ow2.sirocco.cloudmanager.connector.api;
 import java.util.Set;
 
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 
 /**
  * Performs the translation between the CIMI API and the IaaS provider-specific
@@ -100,5 +101,7 @@ public interface ICloudProviderConnector {
      * @throws ConnectorException raised if unsupported
      */
     ISystemService getSystemService() throws ConnectorException;
+
+    Quota getQuota(ProviderTarget target) throws ConnectorException;
 
 }

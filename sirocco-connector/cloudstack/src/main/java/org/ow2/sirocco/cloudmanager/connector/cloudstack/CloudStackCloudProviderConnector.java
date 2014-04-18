@@ -66,6 +66,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
@@ -106,6 +107,12 @@ public class CloudStackCloudProviderConnector implements ICloudProviderConnector
     @Override
     public Set<CloudProviderLocation> getLocations() {
         return Collections.emptySet();
+    }
+
+    @Override
+    public Quota getQuota(final ProviderTarget target) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     @Override

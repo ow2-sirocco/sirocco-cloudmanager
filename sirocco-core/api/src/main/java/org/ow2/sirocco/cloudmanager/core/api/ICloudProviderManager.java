@@ -36,6 +36,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 
 /**
  * Cloud provider manager
@@ -180,5 +181,7 @@ public interface ICloudProviderManager {
 
     CloudProviderAccount updateCloudProviderAccountAttributes(String accountId, Map<String, Object> attributes)
         throws ResourceNotFoundException;
+
+    Quota getQuota(String accountId, String locationId) throws CloudProviderException;;
 
 }

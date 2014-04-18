@@ -43,6 +43,7 @@ import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceContextType;
 
+import org.ow2.sirocco.cloudmanager.connector.api.ConnectorException;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnector;
 import org.ow2.sirocco.cloudmanager.connector.api.ICloudProviderConnectorFinder;
 import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
@@ -67,6 +68,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProvider;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderProfile;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Tenant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -606,6 +608,28 @@ public class CloudProviderManager implements ICloudProviderManager {
             account.setProperties((Map<String, String>) attributes.get("properties"));
         }
         return account;
+    }
+
+    @Override
+    public Quota getQuota(final String accountUuid, final String locationUuid) throws CloudProviderException {
+        CloudProviderAccount account = this.getCloudProviderAccountByUuid(accountUuid);
+        CloudProviderLocation location;
+        if (locationUuid != null) {
+            location = this.getCloudProviderLocationByUuid(locationUuid);
+        } else {
+            location = account.getCloudProvider().getCloudProviderLocations().get(0);
+        }
+
+        ICloudProviderConnector connector = this.getCloudProviderConnector(account);
+
+        Quota quota;
+        try {
+            quota = connector.getQuota(new ProviderTarget().account(account).location(location));
+        } catch (ConnectorException e) {
+            throw new CloudProviderException("Cannot retrieve provider quota", e);
+        }
+
+        return quota;
     }
 
 }

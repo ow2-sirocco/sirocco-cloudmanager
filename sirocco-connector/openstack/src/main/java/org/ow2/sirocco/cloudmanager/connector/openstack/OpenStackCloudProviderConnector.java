@@ -57,6 +57,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
@@ -103,6 +104,11 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
         OpenStackCloudProvider provider = new OpenStackCloudProvider(target);
         this.openstackCPs.add(provider);
         return provider;
+    }
+
+    @Override
+    public Quota getQuota(final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).getQuota();
     }
 
     /*

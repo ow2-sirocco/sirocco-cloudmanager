@@ -63,9 +63,12 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.PlacementHint;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
+import org.ow2.sirocco.cloudmanager.model.utils.ResourceType;
+import org.ow2.sirocco.cloudmanager.model.utils.Unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,6 +87,7 @@ import com.woorea.openstack.nova.model.FloatingIps;
 import com.woorea.openstack.nova.model.Image;
 import com.woorea.openstack.nova.model.Images;
 import com.woorea.openstack.nova.model.KeyPair;
+import com.woorea.openstack.nova.model.Limits.AbsoluteLimit;
 import com.woorea.openstack.nova.model.SchedulerHints;
 import com.woorea.openstack.nova.model.Server;
 import com.woorea.openstack.nova.model.Server.Addresses;
@@ -1298,5 +1302,48 @@ public class OpenStackCloudProvider {
 
     public void deleteMachineImage(final String machineImageId) {
         this.novaClient.images().delete(machineImageId).execute();
+    }
+
+    public Quota getQuota() {
+        AbsoluteLimit limits = this.novaClient.quotaSets().showUsedLimits().execute().getAbsolute();
+        Quota quota = new Quota();
+        List<Quota.Resource> resourceQuotas = new ArrayList<Quota.Resource>();
+        quota.setResources(resourceQuotas);
+
+        if (limits.getMaxTotalInstances() != null) {
+            Quota.Resource vmCountQuota = new Quota.Resource(ResourceType.VIRTUAL_MACHINE, Unit.COUNT);
+            vmCountQuota.setLimit(limits.getMaxTotalInstances());
+            vmCountQuota.setUsed(limits.getTotalInstancesUsed());
+            resourceQuotas.add(vmCountQuota);
+        }
+
+        if (limits.getMaxTotalRAMSize() != null) {
+            Quota.Resource memoryQuota = new Quota.Resource(ResourceType.MEMORY, Unit.MEGABYTE);
+            memoryQuota.setLimit(limits.getMaxTotalRAMSize());
+            memoryQuota.setUsed(limits.getTotalRAMUsed());
+            resourceQuotas.add(memoryQuota);
+        }
+
+        if (limits.getMaxTotalVolumeGigabytes() != null) {
+            Quota.Resource storageQuota = new Quota.Resource(ResourceType.DISK_SPACE, Unit.GIGABYTE);
+            storageQuota.setLimit(limits.getMaxTotalVolumeGigabytes());
+            storageQuota.setUsed(limits.getTotalVolumeGigabytesUsed());
+            resourceQuotas.add(storageQuota);
+        }
+
+        if (limits.getMaxTotalCores() != null) {
+            Quota.Resource cpuCountQuota = new Quota.Resource(ResourceType.CPU, Unit.COUNT);
+            cpuCountQuota.setLimit(limits.getMaxTotalCores());
+            cpuCountQuota.setUsed(limits.getTotalCoresUsed());
+            resourceQuotas.add(cpuCountQuota);
+        }
+
+        if (limits.getMaxTotalFloatingIps() != null) {
+            Quota.Resource externalIpCountQuota = new Quota.Resource(ResourceType.EXTERNAL_IP, Unit.COUNT);
+            externalIpCountQuota.setLimit(limits.getMaxTotalFloatingIps());
+            externalIpCountQuota.setUsed(limits.getTotalFloatingIpsUsed());
+            resourceQuotas.add(externalIpCountQuota);
+        }
+        return quota;
     }
 }

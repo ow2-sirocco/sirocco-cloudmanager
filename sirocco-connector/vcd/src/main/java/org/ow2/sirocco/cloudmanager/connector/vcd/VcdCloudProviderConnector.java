@@ -54,6 +54,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
@@ -93,6 +94,12 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
         VcdCloudProvider provider = new VcdCloudProvider(target);
         this.vcdCPs.add(provider);
         return provider;
+    }
+
+    @Override
+    public Quota getQuota(final ProviderTarget target) throws ConnectorException {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /*

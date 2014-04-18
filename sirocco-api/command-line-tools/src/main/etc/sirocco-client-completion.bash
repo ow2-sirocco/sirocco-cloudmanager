@@ -48,7 +48,7 @@ _sirocco_client()
     command=$(_find_command)
 
     commands="-debug provider-list provider-show provider-delete provider-create"
-    commands="${commands} provider-account-list provider-account-create provider-account-delete"
+    commands="${commands} provider-account-list provider-account-create provider-account-delete provider-account-quota-show"
     commands="${commands} provider-location-list provider-location-add"
     commands="${commands} tenant-list tenant-create tenant-delete tenant-show tenant-account-list tenant-account-add tenant-account-remove tenant-user-add tenant-user-remove tenant-user-list"
     commands="${commands} user-list user-create user-delete user-show"
@@ -66,10 +66,15 @@ _sirocco_client()
             return 0
             ;;
 	provider-show )
-	    local opts="-"
+	    local opts="-providerId"
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;
+    provider-account-quota-show )
+	    local opts=""
+	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+            return 0
+            ;;        
     tenant-create)
 	    local opts="-name -description -properties"
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )

@@ -85,6 +85,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.PlacementHint;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
@@ -99,6 +100,8 @@ import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemNetwork;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemSystem;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.system.SystemVolume;
+import org.ow2.sirocco.cloudmanager.model.utils.ResourceType;
+import org.ow2.sirocco.cloudmanager.model.utils.Unit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -142,6 +145,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         CloudProviderLocation mockLocation = new CloudProviderLocation();
         mockLocation.setCountryName("France");
         return Collections.singleton(mockLocation);
+    }
+
+    @Override
+    public Quota getQuota(final ProviderTarget target) throws ConnectorException {
+        return this.getProvider(target).quota;
     }
 
     @Override
@@ -539,6 +547,14 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         private final static int ADDRESS_NUMBER = 20;
 
+        private static final int VM_COUNT_LIMIT = 20;
+
+        private static final int MEMORY_MB_LIMIT = 32;
+
+        private static final int STORAGE_MB_LIMIT = 20000;
+
+        private static final int CPU_COUNT_LIMIT = 30;
+
         private CloudProviderAccount cloudProviderAccount;
 
         private CloudProviderLocation cloudProviderLocation;
@@ -565,6 +581,10 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
 
         private Map<String, Address> allocatedAddresses = new ConcurrentHashMap<String, Address>();
 
+        private Quota quota = new Quota();
+
+        Quota.Resource vmCountQuota, memoryQuota, storageQuota, cpuCountQuota;
+
         private Random random = new Random();
 
         MockProvider() {
@@ -590,6 +610,24 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 address.setState(Address.State.DELETED);
                 this.addressPool[address_suffix - 1] = address;
             }
+            // init resource quota
+            List<Quota.Resource> resourceQuotas = new ArrayList<Quota.Resource>();
+            this.quota.setResources(resourceQuotas);
+            this.vmCountQuota = new Quota.Resource(ResourceType.VIRTUAL_MACHINE, Unit.COUNT);
+            this.vmCountQuota.setLimit(MockProvider.VM_COUNT_LIMIT);
+            resourceQuotas.add(this.vmCountQuota);
+
+            this.memoryQuota = new Quota.Resource(ResourceType.MEMORY, Unit.MEGABYTE);
+            this.memoryQuota.setLimit(MockProvider.MEMORY_MB_LIMIT);
+            resourceQuotas.add(this.memoryQuota);
+
+            this.storageQuota = new Quota.Resource(ResourceType.DISK_SPACE, Unit.MEGABYTE);
+            this.storageQuota.setLimit(MockProvider.STORAGE_MB_LIMIT);
+            resourceQuotas.add(this.storageQuota);
+
+            this.cpuCountQuota = new Quota.Resource(ResourceType.CPU, Unit.COUNT);
+            this.cpuCountQuota.setLimit(MockProvider.CPU_COUNT_LIMIT);
+            resourceQuotas.add(this.cpuCountQuota);
         }
 
         private boolean actionDone(final Resource resource) {
@@ -601,6 +639,13 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         }
 
         public synchronized Volume createVolume(final VolumeCreate volumeCreate) throws ConnectorException {
+            long storageUsedMB = this.storageQuota.getUsed() + volumeCreate.getVolumeTemplate().getVolumeConfig().getCapacity()
+                / 1000;
+            if (storageUsedMB > this.storageQuota.getLimit()) {
+                throw new ConnectorException("Quota exceeded");
+            }
+            this.storageQuota.setUsed(storageUsedMB);
+
             final String volumeProviderAssignedId = UUID.randomUUID().toString();
             final Volume volume = new Volume();
             volume.setName(volumeCreate.getName());
@@ -640,6 +685,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 } else if (volume.getState() == Volume.State.DELETING) {
                     this.volumes.remove(volume.getProviderAssignedId());
                     volume.setState(Volume.State.DELETED);
+                    this.storageQuota.setUsed(this.storageQuota.getUsed() - volume.getCapacity() / 1000);
                     volume.setUpdated(new Date());
                 }
             }
@@ -647,6 +693,24 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
         }
 
         public synchronized Machine createMachine(final MachineCreate machineCreate) throws ConnectorException {
+            long vmCountUsed = this.vmCountQuota.getUsed() + 1;
+            if (vmCountUsed > this.vmCountQuota.getLimit()) {
+                throw new ConnectorException("Quota exceeded");
+            }
+            long memoryMBUsed = this.memoryQuota.getUsed() + machineCreate.getMachineTemplate().getMachineConfig().getMemory()
+                / 1024;
+            if (memoryMBUsed > this.memoryQuota.getLimit()) {
+                throw new ConnectorException("Quota exceeded");
+            }
+            long cpuCountUsed = this.cpuCountQuota.getUsed() + machineCreate.getMachineTemplate().getMachineConfig().getCpu();
+            if (cpuCountUsed > this.cpuCountQuota.getLimit()) {
+                throw new ConnectorException("Quota exceeded");
+            }
+
+            this.cpuCountQuota.setUsed(cpuCountUsed);
+            this.memoryQuota.setUsed(memoryMBUsed);
+            this.vmCountQuota.setUsed(vmCountUsed);
+
             final String machineProviderAssignedId = UUID.randomUUID().toString();
             final Machine machine = new Machine();
             machine.setProviderAssignedId(machineProviderAssignedId);
@@ -887,6 +951,11 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                     }
                     machine.setState(Machine.State.DELETED);
                     machine.setUpdated(new Date());
+
+                    this.cpuCountQuota.setUsed(this.cpuCountQuota.getUsed() - machine.getCpu());
+                    this.memoryQuota.setUsed(this.memoryQuota.getUsed() - machine.getMemory() / 1024);
+                    this.vmCountQuota.setUsed(this.vmCountQuota.getUsed() - 1);
+
                 } else if (machine.getState() == Machine.State.PAUSING) {
                     machine.setState(Machine.State.PAUSED);
                     machine.setUpdated(new Date());
