@@ -101,7 +101,7 @@ _sirocco_client()
             return 0
             ;;          
     provider-account-create) 
-    	local opts="-providerId -clientId -clientSecret -name -description -properties"
+    	local opts="-type -endpoint -identity -credential -iso3166_1 -country -name -description -properties"
 	    COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
             return 0
             ;;  

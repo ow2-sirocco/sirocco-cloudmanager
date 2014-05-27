@@ -183,10 +183,7 @@ public class CloudProviderAccount implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((this.cloudProvider == null) ? 0 : this.cloudProvider.hashCode());
-        result = prime * result + ((this.login == null) ? 0 : this.login.hashCode());
-        result = prime * result + ((this.password == null) ? 0 : this.password.hashCode());
-        result = prime * result + ((this.properties == null) ? 0 : this.properties.hashCode());
+        result = prime * result + ((this.uuid == null) ? 0 : this.uuid.hashCode());
         return result;
     }
 
@@ -202,32 +199,11 @@ public class CloudProviderAccount implements Serializable {
             return false;
         }
         CloudProviderAccount other = (CloudProviderAccount) obj;
-        if (this.cloudProvider == null) {
-            if (other.cloudProvider != null) {
+        if (this.uuid == null) {
+            if (other.uuid != null) {
                 return false;
             }
-        } else if (!this.cloudProvider.equals(other.cloudProvider)) {
-            return false;
-        }
-        if (this.login == null) {
-            if (other.login != null) {
-                return false;
-            }
-        } else if (!this.login.equals(other.login)) {
-            return false;
-        }
-        if (this.password == null) {
-            if (other.password != null) {
-                return false;
-            }
-        } else if (!this.password.equals(other.password)) {
-            return false;
-        }
-        if (this.properties == null) {
-            if (other.properties != null) {
-                return false;
-            }
-        } else if (!this.properties.equals(other.properties)) {
+        } else if (!this.uuid.equals(other.uuid)) {
             return false;
         }
         return true;

@@ -24,7 +24,9 @@ package org.ow2.sirocco.cloudmanager.api.tools;
 
 import java.util.List;
 
+import org.ow2.sirocco.cloudmanager.api.model.Location;
 import org.ow2.sirocco.cloudmanager.api.model.ProviderAccount;
+import org.ow2.sirocco.cloudmanager.api.model.ProviderAccountCreate;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
@@ -33,14 +35,23 @@ import com.beust.jcommander.Parameters;
 public class ProviderAccountCreateCommand implements Command {
     private static String COMMAND_NAME = "provider-account-create";
 
-    @Parameter(names = "-providerId", description = "provider id", required = true)
-    private String providerId;
+    @Parameter(names = "-endpoint", description = "provider endpoint", required = true)
+    private String endpoint;
 
-    @Parameter(names = "-clientId", description = "client id", required = true)
+    @Parameter(names = "-type", description = "provider type", required = true)
+    private String type;
+
+    @Parameter(names = "-identity", description = "identity", required = true)
     private String clientId;
 
-    @Parameter(names = "-clientSecret", description = "client secret", required = true)
+    @Parameter(names = "-credential", description = "credential", required = true)
     private String clientSecret;
+
+    @Parameter(names = "-iso3166_1", description = "iso3166-1 code", required = true)
+    private String iso3166_1;
+
+    @Parameter(names = "-country", description = "country", required = false)
+    private String countryName;
 
     @Parameter(names = "-name", description = "name of provider account", required = false)
     private String name;
@@ -58,7 +69,7 @@ public class ProviderAccountCreateCommand implements Command {
 
     @Override
     public void execute(final RestClient restClient) throws Exception {
-        ProviderAccount account = new ProviderAccount();
+        ProviderAccountCreate account = new ProviderAccountCreate();
         account.setName(this.name);
         account.setDescription(this.description);
         if (this.properties != null) {
@@ -68,9 +79,16 @@ public class ProviderAccountCreateCommand implements Command {
         }
         account.setIdentity(this.clientId);
         account.setCredential(this.clientSecret);
+        account.setEndpoint(this.endpoint);
+        account.setType(this.type);
 
-        account = restClient.postCreateRequest("providers/" + this.providerId + "/accounts", account, ProviderAccount.class);
-        System.out.println(account.getId());
+        Location location = new Location();
+        location.setIso3166_1(this.iso3166_1);
+        location.setCountryName(this.countryName);
+        account.setLocation(location);
+
+        ProviderAccount newAccount = restClient.postCreateRequest("providers/accounts", account, ProviderAccount.class);
+        System.out.println(newAccount.getId());
     }
 
 }
