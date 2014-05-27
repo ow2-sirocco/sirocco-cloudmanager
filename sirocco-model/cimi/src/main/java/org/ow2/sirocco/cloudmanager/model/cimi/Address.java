@@ -28,7 +28,9 @@ package org.ow2.sirocco.cloudmanager.model.cimi;
 import java.io.Serializable;
 import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -83,6 +85,8 @@ public class Address extends CloudResource implements Serializable {
 
     private String internalIp;
 
+    private PortForwardingRule portForwardingRule;
+
     @Enumerated(EnumType.STRING)
     public State getState() {
         return this.state;
@@ -118,6 +122,7 @@ public class Address extends CloudResource implements Serializable {
         this.ip = ip;
     }
 
+    @Column(name = "InternalIpAddress")
     public String getInternalIp() {
         return this.internalIp;
     }
@@ -193,6 +198,15 @@ public class Address extends CloudResource implements Serializable {
 
     public void setResource(final CloudResource resource) {
         this.resource = resource;
+    }
+
+    @Embedded
+    public PortForwardingRule getPortForwardingRule() {
+        return this.portForwardingRule;
+    }
+
+    public void setPortForwardingRule(final PortForwardingRule portForwardingRule) {
+        this.portForwardingRule = portForwardingRule;
     }
 
     @Transient
