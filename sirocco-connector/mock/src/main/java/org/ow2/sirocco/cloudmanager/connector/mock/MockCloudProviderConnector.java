@@ -74,6 +74,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.NetworkNetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkTemplate;
+import org.ow2.sirocco.cloudmanager.model.cimi.PortForwardingRule;
 import org.ow2.sirocco.cloudmanager.model.cimi.Resource;
 import org.ow2.sirocco.cloudmanager.model.cimi.Subnet;
 import org.ow2.sirocco.cloudmanager.model.cimi.SubnetConfig;
@@ -339,6 +340,18 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
     public void removeAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
         throws ConnectorException {
         this.getProvider(target).removeAddressFromMachine(machineId, address);
+    }
+
+    @Override
+    public Address allocateAndAddAddressToMachine(final String machineId, final PortForwardingRule natRule,
+        final ProviderTarget target) throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void removeAndReleaseAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
+        throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override

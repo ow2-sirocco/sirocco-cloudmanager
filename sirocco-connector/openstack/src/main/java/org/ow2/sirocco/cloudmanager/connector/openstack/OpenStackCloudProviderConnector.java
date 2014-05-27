@@ -53,6 +53,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.PortForwardingRule;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
@@ -632,6 +633,18 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
                 throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
             }
         }
+    }
+
+    @Override
+    public Address allocateAndAddAddressToMachine(final String machineId, final PortForwardingRule natRule,
+        final ProviderTarget target) throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void removeAndReleaseAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
+        throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
     }
 
     //

@@ -36,6 +36,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.PortForwardingRule;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroupRule;
@@ -261,5 +262,10 @@ public interface INetworkService {
     void addAddressToMachine(String machineId, Address address, ProviderTarget target) throws ConnectorException;
 
     void removeAddressFromMachine(String machineId, Address address, ProviderTarget target) throws ConnectorException;
+
+    Address allocateAndAddAddressToMachine(String machineId, PortForwardingRule natRule, ProviderTarget target)
+        throws ConnectorException;
+
+    void removeAndReleaseAddressFromMachine(String machineId, Address address, ProviderTarget target) throws ConnectorException;
 
 }

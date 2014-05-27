@@ -57,6 +57,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.PortForwardingRule;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume;
 import org.ow2.sirocco.cloudmanager.model.cimi.Volume.State;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeConfiguration;
@@ -361,6 +362,18 @@ public class AmazonCloudProviderConnector implements ICloudProviderConnector, IC
         throws ConnectorException {
         // TODO Auto-generated method stub
 
+    }
+
+    @Override
+    public Address allocateAndAddAddressToMachine(final String machineId, final PortForwardingRule natRule,
+        final ProviderTarget target) throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void removeAndReleaseAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
+        throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
     }
 
     @Override

@@ -53,6 +53,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.Network;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPort;
 import org.ow2.sirocco.cloudmanager.model.cimi.NetworkPortCreate;
+import org.ow2.sirocco.cloudmanager.model.cimi.PortForwardingRule;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
@@ -433,6 +434,18 @@ public class VcdCloudProviderConnector implements ICloudProviderConnector, IComp
 
     @Override
     public void removeAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
+        throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public Address allocateAndAddAddressToMachine(final String machineId, final PortForwardingRule natRule,
+        final ProviderTarget target) throws ConnectorException {
+        throw new ConnectorException("unsupported operation");
+    }
+
+    @Override
+    public void removeAndReleaseAddressFromMachine(final String machineId, final Address address, final ProviderTarget target)
         throws ConnectorException {
         throw new ConnectorException("unsupported operation");
     }
