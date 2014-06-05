@@ -621,6 +621,7 @@ public class MockCloudProviderConnector implements ICloudProviderConnector, ICom
                 address.setProviderAssignedId(UUID.randomUUID().toString());
                 address.setIp(MockProvider.ADDRESS_PREFIX + address_suffix);
                 address.setState(Address.State.DELETED);
+                address.setAllocation("dynamic");
                 this.addressPool[address_suffix - 1] = address;
             }
             // init resource quota
