@@ -76,7 +76,9 @@ public class QueryParams {
          * Index of the first item to return. Ignored if marker or limit is set.
          */
         public Builder first(final int val) {
-            this.first = val;
+            if (val >= 0) {
+                this.first = val;
+            }
             return this;
         }
 
@@ -84,7 +86,9 @@ public class QueryParams {
          * Index of the last item to return. Ignored if marker or limit is set.
          */
         public Builder last(final int val) {
-            this.last = val;
+            if (val >= 0) {
+                this.last = val;
+            }
             return this;
         }
 
