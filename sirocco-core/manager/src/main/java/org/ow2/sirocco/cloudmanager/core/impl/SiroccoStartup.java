@@ -28,7 +28,6 @@ import javax.ejb.Singleton;
 import javax.ejb.Startup;
 
 import org.ow2.sirocco.cloudmanager.core.api.IConfigManager;
-import org.ow2.sirocco.cloudmanager.core.api.exception.InvalidRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,8 +57,9 @@ public class SiroccoStartup {
                 System.setProperty("http.nonProxyHosts", nonProxyHosts);
                 SiroccoStartup.logger.info("Set http.nonProxyHosts to " + nonProxyHosts);
             }
-        } catch (InvalidRequestException e) {
-            SiroccoStartup.logger.error("SiroccoStartup.init", e);
+        } catch (Exception e) {
+            // ignore all exceptions in particular those due to fact that the database table might not exist
+            // if this bean is started before the JPA provider has a chance to generate it
         }
     }
 
