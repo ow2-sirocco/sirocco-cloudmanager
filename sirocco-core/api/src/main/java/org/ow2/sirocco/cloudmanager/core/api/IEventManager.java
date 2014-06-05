@@ -72,10 +72,10 @@ public interface IEventManager {
 
     void updateEventLog(EventLog eventLog) throws InvalidRequestException, CloudProviderException;
 
-    QueryResult<EventLog> getEventLog(int first, int last, List<String> filters, List<String> attributes)
+    QueryResult<EventLog> getEventLogs(int first, int last, List<String> filters, List<String> attributes)
         throws InvalidRequestException, CloudProviderException;
 
-    List<EventLog> getEventLog() throws CloudProviderException;
+    List<EventLog> getEventLogs() throws CloudProviderException;
 
     EventLog getEventLogById(int eventLogId) throws ResourceNotFoundException, CloudProviderException;
 
