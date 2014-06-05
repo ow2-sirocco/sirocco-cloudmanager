@@ -730,7 +730,15 @@ public class OpenStackCloudProviderConnector implements ICloudProviderConnector,
     @Override
     public MachineImage getMachineImage(final String machineImageId, final ProviderTarget target)
         throws ResourceNotFoundException, ConnectorException {
-        return this.getProvider(target).getMachineImage(machineImageId);
+        try {
+            return this.getProvider(target).getMachineImage(machineImageId);
+        } catch (OpenStackResponseException e) {
+            if (e.getStatus() == 404) {
+                throw new ResourceNotFoundException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            } else {
+                throw new ConnectorException("cause=" + e.getStatus() + ", message=" + e.getMessage(), e);
+            }
+        }
     }
 
     @Override
