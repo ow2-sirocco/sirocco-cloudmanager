@@ -39,6 +39,8 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
 import javax.jms.ObjectMessage;
@@ -491,11 +493,13 @@ public class SystemManager implements ISystemManager {
 
     @SuppressWarnings("unchecked")
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<System> getSystems() throws CloudProviderException {
         return QueryHelper.getEntityList("System", this.em, this.getTenant().getId(), System.State.DELETED, false);
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<System> getSystems(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("System", System.class);
@@ -564,11 +568,13 @@ public class SystemManager implements ISystemManager {
 
     @SuppressWarnings("unchecked")
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<SystemTemplate> getSystemTemplates() throws CloudProviderException {
         return QueryHelper.getEntityList("SystemTemplate", this.em, this.getTenant().getId(), null, true);
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<SystemTemplate> getSystemTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("SystemTemplate", SystemTemplate.class);

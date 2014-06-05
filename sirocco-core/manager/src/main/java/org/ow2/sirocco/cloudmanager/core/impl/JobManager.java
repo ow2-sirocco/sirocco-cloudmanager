@@ -33,6 +33,8 @@ import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.SessionContext;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -163,6 +165,7 @@ public class JobManager implements IJobManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Job> getJobs(final QueryParams... queryParams) throws CloudProviderException {
         if (queryParams.length == 0) {
             @SuppressWarnings("unchecked")
@@ -176,6 +179,7 @@ public class JobManager implements IJobManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Job> getJobs(final int first, final int last, final List<String> filters, final List<String> attributes)
         throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Job", Job.class);

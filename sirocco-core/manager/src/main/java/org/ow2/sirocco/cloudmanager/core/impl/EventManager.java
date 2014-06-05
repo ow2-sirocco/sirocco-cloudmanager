@@ -31,6 +31,8 @@ import java.util.Map;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import org.ow2.sirocco.cloudmanager.core.api.IEventManager;
 import org.ow2.sirocco.cloudmanager.core.api.QueryResult;
@@ -91,20 +93,23 @@ public class EventManager implements IEventManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<EventLogTemplate> getEventLogTemplates() throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public QueryResult<EventLog> getEventLog(final int first, final int last, final List<String> filters,
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public QueryResult<EventLog> getEventLogs(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Override
-    public List<EventLog> getEventLog() throws CloudProviderException {
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
+    public List<EventLog> getEventLogs() throws CloudProviderException {
         // TODO Auto-generated method stub
         return null;
     }

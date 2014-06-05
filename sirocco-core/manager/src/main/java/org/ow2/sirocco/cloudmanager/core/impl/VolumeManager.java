@@ -34,6 +34,8 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
 import javax.jms.ObjectMessage;
@@ -317,6 +319,7 @@ public class VolumeManager implements IVolumeManager {
 
     @SuppressWarnings("unchecked")
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Volume> getVolumes(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Volume", Volume.class);
@@ -326,6 +329,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Volume> getVolumes(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -339,6 +343,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<VolumeConfiguration> getVolumeConfigurations() throws CloudProviderException {
         return this.em
             .createQuery("SELECT c FROM VolumeConfiguration c WHERE c.tenant.id=:tenantId", VolumeConfiguration.class)
@@ -347,6 +352,7 @@ public class VolumeManager implements IVolumeManager {
 
     @SuppressWarnings("unchecked")
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<VolumeConfiguration> getVolumeConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeConfiguration",
@@ -357,6 +363,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<VolumeTemplate> getVolumeTemplates() throws CloudProviderException {
         return this.em.createQuery("SELECT c FROM VolumeTemplate c WHERE c.tenant.id=:tenantId", VolumeTemplate.class)
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
@@ -364,6 +371,7 @@ public class VolumeManager implements IVolumeManager {
 
     @SuppressWarnings("unchecked")
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<VolumeTemplate> getVolumeTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeTemplate", VolumeTemplate.class);
@@ -695,6 +703,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<VolumeImage> getVolumeImages(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("VolumeImage", VolumeImage.class);
@@ -703,6 +712,7 @@ public class VolumeManager implements IVolumeManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<VolumeImage> getVolumeImages(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {

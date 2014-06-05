@@ -141,6 +141,7 @@ public class MachineImageManager implements IMachineImageManager {
 
         Job j = new Job();
         j.setCreated(new Date());
+        j.setTimeOfStatusChange(j.getCreated());
         j.setDescription("MachineImage creation");
         j.setTargetResource(mi);
         List<CloudResource> affectedResources = new ArrayList<CloudResource>();

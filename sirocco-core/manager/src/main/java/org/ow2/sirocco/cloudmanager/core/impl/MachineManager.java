@@ -411,6 +411,7 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Machine> getMachines(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Machine", Machine.class);
@@ -420,6 +421,7 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Machine> getMachines(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -824,6 +826,7 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<MachineConfiguration> getMachineConfigurations(final QueryParams... queryParams)
         throws InvalidRequestException, CloudProviderException {
         if (queryParams.length == 0) {
@@ -843,6 +846,7 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<MachineConfiguration> getMachineConfigurations(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("MachineConfiguration",
@@ -1160,6 +1164,7 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<MachineTemplate> getMachineTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
@@ -1170,6 +1175,7 @@ public class MachineManager implements IMachineManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<MachineTemplate> getMachineTemplates(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -1778,8 +1784,9 @@ public class MachineManager implements IMachineManager {
     public Job addAddressToMachineNetworkInterface(final String machineId, final String nicId,
         final MachineNetworkInterfaceAddress addressEntry) throws ResourceNotFoundException, InvalidRequestException,
         CloudProviderException {
-
-        throw new InvalidRequestException(" Address cannot be added to a created machine ");
+        // XXX ignore nic
+        Address address = this.networkManager.getAddressByUuid(addressEntry.getAddress().getUuid());
+        return this.networkManager.addAddressToMachine(machineId, address.getIp());
     }
 
     @Override

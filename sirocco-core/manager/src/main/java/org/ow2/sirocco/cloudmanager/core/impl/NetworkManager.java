@@ -13,6 +13,8 @@ import javax.ejb.EJBContext;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.jms.JMSContext;
 import javax.jms.ObjectMessage;
@@ -286,6 +288,7 @@ public class NetworkManager implements INetworkManager {
 
     @SuppressWarnings("unchecked")
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Network> getNetworks(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Network", Network.class);
@@ -295,6 +298,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Network> getNetworks(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -364,6 +368,7 @@ public class NetworkManager implements INetworkManager {
     // Subnet operations
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Subnet> getSubnets(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -602,6 +607,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<NetworkTemplate> getNetworkTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
@@ -613,6 +619,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<NetworkTemplate> getNetworkTemplates(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -722,6 +729,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<NetworkPort> getNetworkPorts(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("NetworkPort", NetworkPort.class);
@@ -731,6 +739,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<NetworkPort> getNetworkPorts(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -787,6 +796,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<NetworkPortConfiguration> getNetworkPortConfigurations() throws CloudProviderException {
         return this.em
             .createQuery("SELECT v FROM NetworkPortConfiguration v WHERE v.tenant.id=:tenantId ORDER BY v.id",
@@ -1140,6 +1150,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<ForwardingGroup> getForwardingGroups(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
@@ -1150,6 +1161,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<ForwardingGroup> getForwardingGroups(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -1313,6 +1325,7 @@ public class NetworkManager implements INetworkManager {
         address.setCloudProviderAccount(placement.getAccount());
         address.setLocation(placement.getLocation());
         address.setIp(externalAddress.getIp());
+        address.setAllocation(externalAddress.getAllocation());
 
         address.setCreated(new Date());
         address.setUpdated(address.getCreated());
@@ -1355,6 +1368,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Address> getAddresses(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -1362,7 +1376,8 @@ public class NetworkManager implements INetworkManager {
             return new QueryResult<Address>(addresses.size(), addresses);
         }
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Address", Address.class);
-        return QueryHelper.getEntityList(this.em, params.tenantId(this.getTenant().getId()).params(queryParams[0]));
+        return QueryHelper.getEntityList(this.em, params.tenantId(this.getTenant().getId())
+            .stateToIgnore(Address.State.DELETED).params(queryParams[0]));
     }
 
     @Override
@@ -1527,6 +1542,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<AddressTemplate> getAddressTemplates() throws CloudProviderException {
         return this.em
             .createQuery("SELECT v FROM AddressTemplate v WHERE v.tenant.id=:tenantId ORDER BY v.id", AddressTemplate.class)
@@ -1559,6 +1575,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<AddressTemplate> getAddressTemplates(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder
@@ -1841,6 +1858,7 @@ public class NetworkManager implements INetworkManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<SecurityGroup> getSecurityGroups(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {

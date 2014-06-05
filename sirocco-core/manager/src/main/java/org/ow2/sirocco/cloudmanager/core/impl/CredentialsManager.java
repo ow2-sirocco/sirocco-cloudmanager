@@ -34,6 +34,8 @@ import javax.ejb.EJB;
 import javax.ejb.Local;
 import javax.ejb.Remote;
 import javax.ejb.Stateless;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -189,12 +191,14 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<Credentials> getCredentials() throws CloudProviderException {
         return this.em.createQuery("SELECT c FROM Credentials c WHERE c.tenant.id=:tenantId", Credentials.class)
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Credentials> getCredentials(final QueryParams... queryParams) throws InvalidRequestException,
         CloudProviderException {
         if (queryParams.length == 0) {
@@ -207,6 +211,7 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<Credentials> getCredentials(final int first, final int last, final List<String> filters,
         final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("Credentials", Credentials.class);
@@ -266,12 +271,14 @@ public class CredentialsManager implements ICredentialsManager {
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public List<CredentialsTemplate> getCredentialsTemplates() throws CloudProviderException {
         return this.em.createQuery("SELECT c FROM CredentialsTemplate c WHERE c.tenant.id=:tenantId")
             .setParameter("tenantId", this.getTenant().getId()).getResultList();
     }
 
     @Override
+    @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
     public QueryResult<CredentialsTemplate> getCredentialsTemplates(final int first, final int last,
         final List<String> filters, final List<String> attributes) throws InvalidRequestException, CloudProviderException {
         QueryHelper.QueryParamsBuilder params = QueryHelper.QueryParamsBuilder.builder("CredentialsTemplate",
