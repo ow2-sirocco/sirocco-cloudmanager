@@ -66,6 +66,7 @@ import org.ow2.sirocco.cloudmanager.model.cimi.VolumeCreate;
 import org.ow2.sirocco.cloudmanager.model.cimi.VolumeImage;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderAccount;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.CloudProviderLocation;
+import org.ow2.sirocco.cloudmanager.model.cimi.extension.PlacementHint;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.ProviderMapping;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.Quota;
 import org.ow2.sirocco.cloudmanager.model.cimi.extension.SecurityGroup;
@@ -77,6 +78,9 @@ import org.slf4j.LoggerFactory;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.BaseEncoding;
 import com.google.inject.Module;
+
+import fr.btrcloud.btrcloudstack.connector.BtrCloudStackProviderConnector;
+import fr.btrcloud.btrcloudstack.connector.Tokens;
 
 public class CloudStackCloudProviderConnector implements ICloudProviderConnector, IComputeService, IVolumeService,
     INetworkService, IImageService {
@@ -100,7 +104,7 @@ public class CloudStackCloudProviderConnector implements ICloudProviderConnector
             }
         }
 
-        CloudStackProvider provider = new CloudStackProvider(target.getAccount(), target.getLocation());
+        CloudStackProvider provider = new CloudStackProvider(target);
         this.providers.add(provider);
         return provider;
     }
@@ -480,12 +484,24 @@ public class CloudStackCloudProviderConnector implements ICloudProviderConnector
 
         private Map<String, String> keyPairMap = new HashMap<String, String>();
 
-        public CloudStackProvider(final CloudProviderAccount cloudProviderAccount,
-            final CloudProviderLocation cloudProviderLocation) {
-            this.cloudProviderLocation = cloudProviderLocation;
-            this.cloudProviderAccount = cloudProviderAccount;
-            this.apiKey = cloudProviderAccount.getLogin();
-            this.secretKey = cloudProviderAccount.getPassword();
+        private BtrCloudStackProviderConnector btrCloudStackProviderConnector;
+
+        public CloudStackProvider(final ProviderTarget target) {
+            this.cloudProviderLocation = target.getLocation();
+            this.cloudProviderAccount = target.getAccount();
+            this.apiKey = this.cloudProviderAccount.getLogin();
+            this.secretKey = this.cloudProviderAccount.getPassword();
+
+            // BtrCloudStack API
+            Map<String, String> providerProperties = target.getAccount().getProperties();
+            if (providerProperties.get("btrcloudstack.ip") != null && providerProperties.get("btrcloudstack.port") != null) {
+                this.btrCloudStackProviderConnector = new BtrCloudStackProviderConnector();
+                BtrCloudStackProviderConnector.setBtrScriptIp(providerProperties.get("btrcloudstack.ip"));
+                BtrCloudStackProviderConnector.setBtrScriptPort(Integer.parseInt(providerProperties.get("btrcloudstack.port")));
+                CloudStackCloudProviderConnector.logger.info("BtrCloudStackProviderConnector configuration: "
+                    + providerProperties.get("btrcloudstack.ip") + "/" + providerProperties.get("btrcloudstack.port"));
+            }
+
             Properties overrides = new Properties();
 
             // String httpProxyHost = java.lang.System.getProperty("http.proxyHost");
@@ -500,7 +516,7 @@ public class CloudStackCloudProviderConnector implements ICloudProviderConnector
             overrides.setProperty(Constants.PROPERTY_RELAX_HOSTNAME, "true");
 
             CloudStackContext context = ContextBuilder.newBuilder("cloudstack")
-                .endpoint(cloudProviderAccount.getCloudProvider().getEndpoint()).credentials(this.apiKey, this.secretKey)
+                .endpoint(this.cloudProviderAccount.getCloudProvider().getEndpoint()).credentials(this.apiKey, this.secretKey)
                 .modules(ImmutableSet.<Module> of()).overrides(overrides).buildApi(CloudStackContext.class);
 
             this.vmClient = context.getApi().getVirtualMachineClient();
@@ -578,6 +594,27 @@ public class CloudStackCloudProviderConnector implements ICloudProviderConnector
                 templateId, options);
             final Machine machine = new Machine();
             machine.setProviderAssignedId(response.getId());
+
+            // VM placement
+            if (this.btrCloudStackProviderConnector != null) {
+                PlacementHint placementHint = machineCreate.getMachineTemplate().getPlacementHint();
+                if (placementHint != null) {
+                    List<String> vmIds = new ArrayList<String>();
+                    vmIds.addAll(placementHint.getMachineIds());
+                    vmIds.add(machine.getProviderAssignedId());
+                    if (placementHint.getPlacementConstraint().equals(PlacementHint.AFFINITY_CONSTRAINT)) {
+                        CloudStackCloudProviderConnector.logger.info("Creating BtrPlace rule: " + "ruleVM-"
+                            + machineCreate.getName());
+                        this.btrCloudStackProviderConnector.createRULE("ruleVM-" + machineCreate.getName(), Tokens.Type.GROUP,
+                            vmIds);
+                    } else if (placementHint.getPlacementConstraint().equals(PlacementHint.ANTI_AFFINITY_CONSTRAINT)) {
+                        CloudStackCloudProviderConnector.logger.info("Creating BtrPlace rule: " + "ruleVM-"
+                            + machineCreate.getName());
+                        this.btrCloudStackProviderConnector.createRULE("ruleVM-" + machineCreate.getName(), Tokens.Type.SPREAD,
+                            vmIds);
+                    }
+                }
+            }
 
             return machine;
         }

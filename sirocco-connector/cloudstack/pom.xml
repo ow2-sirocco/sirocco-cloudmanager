@@ -40,6 +40,13 @@
 	<properties>
 		<jclouds.version>1.6.0</jclouds.version>
 	</properties>
+	
+	<repositories>
+        <repository>
+            <id>btrcloustack</id>
+            <url>http://btrcloud.org/btrCloud/fd/</url>
+        </repository>
+    </repositories>
 
 	<dependencies>
 
@@ -49,6 +56,12 @@
 			<version>0.6.1-SNAPSHOT</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+            <groupId>fr.btrcloud.btrcloudstack</groupId>
+            <artifactId>connector</artifactId>
+            <version>1.0.0</version>
+        </dependency>
 
 		<dependency>
 		    <groupId>org.jclouds.api</groupId>
