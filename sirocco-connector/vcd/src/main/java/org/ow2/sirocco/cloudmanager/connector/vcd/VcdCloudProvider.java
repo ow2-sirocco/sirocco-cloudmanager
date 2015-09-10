@@ -34,7 +34,6 @@ import java.util.UUID;
 import java.util.concurrent.TimeoutException;
 
 import javax.xml.bind.JAXBElement;
-import javax.xml.namespace.QName;
 
 import org.apache.commons.net.util.SubnetUtils;
 import org.apache.commons.net.util.SubnetUtils.SubnetInfo;
@@ -43,7 +42,6 @@ import org.ow2.sirocco.cloudmanager.connector.api.ProviderTarget;
 import org.ow2.sirocco.cloudmanager.connector.api.ResourceNotFoundException;
 import org.ow2.sirocco.cloudmanager.model.cimi.Address;
 import org.ow2.sirocco.cloudmanager.model.cimi.CloudCollectionItem;
-import org.ow2.sirocco.cloudmanager.model.cimi.DiskTemplate;
 import org.ow2.sirocco.cloudmanager.model.cimi.Machine;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineConfiguration;
 import org.ow2.sirocco.cloudmanager.model.cimi.MachineCreate;
@@ -95,12 +93,9 @@ import com.vmware.vcloud.api.rest.schema.SourcedCompositionItemParamType;
 import com.vmware.vcloud.api.rest.schema.VAppNetworkConfigurationType;
 import com.vmware.vcloud.api.rest.schema.VAppType;
 import com.vmware.vcloud.api.rest.schema.VmType;
-import com.vmware.vcloud.api.rest.schema.ovf.CimString;
 import com.vmware.vcloud.api.rest.schema.ovf.MsgType;
 import com.vmware.vcloud.api.rest.schema.ovf.ProductSectionProperty;
 import com.vmware.vcloud.api.rest.schema.ovf.ProductSectionType;
-import com.vmware.vcloud.api.rest.schema.ovf.RASDType;
-import com.vmware.vcloud.api.rest.schema.ovf.ResourceType;
 import com.vmware.vcloud.api.rest.schema.ovf.SectionType;
 import com.vmware.vcloud.sdk.Expression;
 import com.vmware.vcloud.sdk.Filter;
@@ -1273,41 +1268,41 @@ public class VcdCloudProvider {
 
             // Add virtual disk if needed
             // FIXME policy (add/update disks)
-            List<VirtualDisk> disks = childVm.getDisks();
-            boolean diskSectionHasChanged = false;
-            for (DiskTemplate disk : mc.getDisks()) {
-                long diskInMBytes = disk.getCapacity() / 1000; /*CIMI: kilobytes*/
-                if (diskInMBytes < 1) {
-                    diskInMBytes = 1;
-                }
-                VcdCloudProvider.logger.info("  Add New Disk: " + diskInMBytes + " MB, LsiLogic");
-                CimString cimString = new CimString();
-                Map<QName, String> cimAttributes = cimString.getOtherAttributes();
-                cimAttributes.put(new QName("http://www.vmware.com/vcloud/v1.5", "busSubType", "vcloud"), "lsilogic");
-                cimAttributes.put(new QName("http://www.vmware.com/vcloud/v1.5", "busType", "vcloud"), "6");
-                cimAttributes.put(new QName("http://www.vmware.com/vcloud/v1.5", "capacity", "vcloud"),
-                    String.valueOf(diskInMBytes));
-
-                CimString setElementName = new CimString();
-                setElementName.setValue("Hard disk");
-                CimString setInstanceID = new CimString();
-                setInstanceID.setValue("anything");
-                ResourceType setResourceType = new ResourceType();
-                setResourceType.setValue(String.valueOf(Constants.RASD_RESOURCETYPE_DISK_DEVICE));
-
-                RASDType diskItemType = new RASDType();
-                diskItemType.setElementName(setElementName);
-                diskItemType.setInstanceID(setInstanceID);
-                diskItemType.setResourceType(setResourceType);
-                List<CimString> diskAttributes = diskItemType.getHostResource();
-                diskAttributes.add(cimString);
-
-                disks.add(new VirtualDisk(diskItemType));
-                diskSectionHasChanged = true;
-            }
-            if (diskSectionHasChanged) {
-                childVm.updateDisks(disks).waitForTask(VcdCloudProvider.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
-            }
+            // List<VirtualDisk> disks = childVm.getDisks();
+            // boolean diskSectionHasChanged = false;
+            // for (DiskTemplate disk : mc.getDisks()) {
+            // long diskInMBytes = disk.getCapacity() / 1000; /*CIMI: kilobytes*/
+            // if (diskInMBytes < 1) {
+            // diskInMBytes = 1;
+            // }
+            // VcdCloudProvider.logger.info("  Add New Disk: " + diskInMBytes + " MB, LsiLogic");
+            // CimString cimString = new CimString();
+            // Map<QName, String> cimAttributes = cimString.getOtherAttributes();
+            // cimAttributes.put(new QName("http://www.vmware.com/vcloud/v1.5", "busSubType", "vcloud"), "lsilogic");
+            // cimAttributes.put(new QName("http://www.vmware.com/vcloud/v1.5", "busType", "vcloud"), "6");
+            // cimAttributes.put(new QName("http://www.vmware.com/vcloud/v1.5", "capacity", "vcloud"),
+            // String.valueOf(diskInMBytes));
+            //
+            // CimString setElementName = new CimString();
+            // setElementName.setValue("Hard disk");
+            // CimString setInstanceID = new CimString();
+            // setInstanceID.setValue("anything");
+            // ResourceType setResourceType = new ResourceType();
+            // setResourceType.setValue(String.valueOf(Constants.RASD_RESOURCETYPE_DISK_DEVICE));
+            //
+            // RASDType diskItemType = new RASDType();
+            // diskItemType.setElementName(setElementName);
+            // diskItemType.setInstanceID(setInstanceID);
+            // diskItemType.setResourceType(setResourceType);
+            // List<CimString> diskAttributes = diskItemType.getHostResource();
+            // diskAttributes.add(cimString);
+            //
+            // disks.add(new VirtualDisk(diskItemType));
+            // diskSectionHasChanged = true;
+            // }
+            // if (diskSectionHasChanged) {
+            // childVm.updateDisks(disks).waitForTask(VcdCloudProvider.DEFAULT_WAIT_TIME_IN_MILLISECONDS);
+            // }
         }
     }
 
