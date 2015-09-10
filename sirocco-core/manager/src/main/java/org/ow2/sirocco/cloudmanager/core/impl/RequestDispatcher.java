@@ -252,8 +252,9 @@ public class RequestDispatcher implements MessageListener {
         Machine machine = this.em.find(Machine.class, command.getResourceId());
         machine.setProviderAssignedId(newMachine.getProviderAssignedId());
 
-        this.resourceWatcherManager.createMachineStateWatcher(machine, command.getJob(), Machine.State.STARTED,
-            Machine.State.STOPPED);
+        // this.resourceWatcherManager.createMachineStateWatcher(machine, command.getJob(), Machine.State.STARTED,
+        // Machine.State.STOPPED);
+        this.resourceWatcherManager.createMachineStateWatcher(machine, command.getJob(), Machine.State.STARTED);
     }
 
     private void deleteMachine(final ResourceCommand command) throws CloudProviderException, ConnectorException {
