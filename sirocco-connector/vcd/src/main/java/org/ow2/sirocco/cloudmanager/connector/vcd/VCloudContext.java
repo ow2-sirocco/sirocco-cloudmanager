@@ -79,24 +79,30 @@ public class VCloudContext {
 
     private EdgeGateway edgeGateway;
 
+    private Map<String, String> properties;
+
     public VCloudContext(final CloudProviderAccount cloudProviderAccount, final Logger logger) throws ConnectorException {
 
         this.logger = logger;
         this.cloudProviderAccount = cloudProviderAccount;
-        Map<String, String> properties = cloudProviderAccount.getProperties();
-        if (properties == null || properties.get("orgName") == null || properties.get("vdcName") == null
-            || properties.get("publicNetworkName") == null) {
+        this.properties = cloudProviderAccount.getProperties();
+        if (this.properties == null || this.properties.get("orgName") == null || this.properties.get("vdcName") == null
+            || this.properties.get("publicNetworkName") == null) {
             throw new ConnectorException("No access to properties: orgName or vdcName or publicNetworkName");
         }
-        this.orgName = properties.get("orgName");
-        this.vdcName = properties.get("vdcName");
-        this.cimiPublicOrgVdcNetworkName = properties.get("publicNetworkName");
+        this.orgName = this.properties.get("orgName");
+        this.vdcName = this.properties.get("vdcName");
+        this.cimiPublicOrgVdcNetworkName = this.properties.get("publicNetworkName");
         logger.info("connect user=" + cloudProviderAccount.getLogin() + " to Organization=" + this.orgName + " at "
             + cloudProviderAccount.getCloudProvider().getEndpoint() + ", with VirtualDataCenter=" + this.vdcName
             + ", publicNetwork=" + this.cimiPublicOrgVdcNetworkName);
 
         this.vcloudClient = this.initiateVcloudClient();
 
+        this.initResources();
+    }
+
+    private void initResources() throws ConnectorException {
         try {
             // Org
             ReferenceType orgRef = this.vcloudClient.getOrgRefByName(this.orgName);
@@ -119,7 +125,7 @@ public class VCloudContext {
             this.adminVdc = AdminVdc.getAdminVdcByReference(this.vcloudClient, adminVdcRef);*/
 
             // PublicOrgVdcNetwork
-            logger.info("Available OrgVdcNetworks: " + this.vdc.getAvailableNetworkRefsByName());
+            this.logger.info("Available OrgVdcNetworks: " + this.vdc.getAvailableNetworkRefsByName());
             ReferenceType orgVdcNetworkNameRef = this.vdc.getAvailableNetworkRefByName(this.cimiPublicOrgVdcNetworkName);
             if (orgVdcNetworkNameRef == null) {
                 throw new ConnectorException("No OrgVdcNetwork: " + this.cimiPublicOrgVdcNetworkName);
@@ -141,12 +147,12 @@ public class VCloudContext {
             } else if (this.cimiPublicOrgVdcNetwork.getResource().getConfiguration().getFenceMode()
                 .equals(FenceModeValuesType.NATROUTED.value())) {
                 this.cimiPublicOrgVdcNetworkIsRouted = true;
-                if (properties.get("edgeGatewayName") == null) {
+                if (this.properties.get("edgeGatewayName") == null) {
                     throw new ConnectorException("No access to properties: edgeGatewayName");
                 }
                 /* NB: Network services associated to the cimiPublicOrgVdcNetwork are not visible (is this a bug of the SDK ?).
                  * Therefore, we get them from the edge Gateway. */
-                this.edgeGatewayName = properties.get("edgeGatewayName");
+                this.edgeGatewayName = this.properties.get("edgeGatewayName");
                 QueryParams<QueryReferenceField> params = new QueryParams<QueryReferenceField>();
                 Filter filter = new Filter(
                     new Expression(QueryReferenceField.NAME, this.edgeGatewayName, ExpressionType.EQUALS));
@@ -164,13 +170,14 @@ public class VCloudContext {
                     + this.cimiPublicOrgVdcNetwork.getResource().getConfiguration().getFenceMode()
                     + " : should be Direct or Routed");
             }
-            logger.info("CIMI public OrgVdcNetwork=" + this.cimiPublicOrgVdcNetwork.getResource().getName() + ", isRouted="
-                + this.cimiPublicOrgVdcNetworkIsRouted + ", id=" + this.cimiPublicOrgVdcNetwork.getResource().getHref());
+            this.logger.info("CIMI public OrgVdcNetwork=" + this.cimiPublicOrgVdcNetwork.getResource().getName()
+                + ", isRouted=" + this.cimiPublicOrgVdcNetworkIsRouted + ", id="
+                + this.cimiPublicOrgVdcNetwork.getResource().getHref());
 
         } catch (Exception ex) {
-            throw new ConnectorException("cannot connect user=" + cloudProviderAccount.getLogin() + " to Organization="
-                + this.orgName + " at " + cloudProviderAccount.getCloudProvider().getEndpoint() + ", with VirtualDataCenter="
-                + this.vdcName + ", publicNetwork=" + this.cimiPublicOrgVdcNetworkName, ex);
+            throw new ConnectorException("cannot connect user=" + this.cloudProviderAccount.getLogin() + " to Organization="
+                + this.orgName + " at " + this.cloudProviderAccount.getCloudProvider().getEndpoint()
+                + ", with VirtualDataCenter=" + this.vdcName + ", publicNetwork=" + this.cimiPublicOrgVdcNetworkName, ex);
         }
     }
 
@@ -196,8 +203,10 @@ public class VCloudContext {
          * see https://communities.vmware.com/message/2199229 
          * The assumption here is that false is returned when it is necessary to log on again */
         if (this.vcloudClient.extendSession() == false) {
-            this.logger.info("Login user=" + this.cloudProviderAccount.getLogin() + " to Organization=" + this.orgName);
+            this.logger.info("Session expired Login user=" + this.cloudProviderAccount.getLogin() + " to Organization="
+                + this.orgName);
             this.initiateVcloudClient();
+            this.initResources();
         }
         return this.vcloudClient;
     }
